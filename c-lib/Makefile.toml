@@ -21,3 +21,11 @@ script = """
 clang tests/integration_tests.c ../target/debug/libqcs.dylib -o tests.o
 ./tests.o
 """
+
+[tasks.pre-test]
+command = "docker"
+args = ["compose", "up", "-d"]
+
+[tasks.post-test]
+command = "docker"
+args = ["compose", "down"]
