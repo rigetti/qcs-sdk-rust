@@ -93,11 +93,11 @@ typedef struct ListQuantumProcessorResponse {
 /**
  * The return value of [`run_program_on_qvm`].
  *
- * ## SAFETY
+ * # Safety
  * In order to properly free the memory allocated in this struct, call [`free_qvm_response`]
  * with any instances created.
  *
- * ## Example
+ * # Example
  * If you have a Quil program with an "ro" register containing two items:
  *
  * ```quil
@@ -151,7 +151,10 @@ typedef struct QVMResponse {
 void free_quantum_processors(struct ListQuantumProcessorResponse response);
 
 /**
- * Frees the memory of a QVMResponse as allocated by [`run_program_on_qvm`]
+ * Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
+ *
+ * # Safety
+ * This function should only be called with the result of [`run_program_on_qvm`]
  */
 void free_qvm_response(struct QVMResponse response);
 
@@ -171,7 +174,7 @@ struct ListQuantumProcessorResponse list_quantum_processors(void);
 /**
  * Given a Quil program as a string, run that program on a local QVM.
  *
- * # SAFETY
+ * # Safety
  *
  * In order to run this function safely, you must provide the return value from this
  * function to [`free_qvm_response`] once you're done with it. The input `program` must be a
