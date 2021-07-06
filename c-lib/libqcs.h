@@ -142,6 +142,11 @@ typedef struct QVMResponse {
 
 /**
  * This function exists to deallocate the memory that was allocated by a call to [`list_quantum_processors`]
+ *
+ * # Safety
+ *
+ * The `response` passed in here must be a valid [`ListQuantumProcessorResponse`] as created by
+ * [`list_quantum_processors`].
  */
 void free_quantum_processors(struct ListQuantumProcessorResponse response);
 
@@ -153,7 +158,7 @@ void free_qvm_response(struct QVMResponse response);
 /**
  * Return a comma-separated list of available quantum processors
  *
- * ## SAFETY
+ * # Safety
  *
  * In order to safely operate this function:
  *

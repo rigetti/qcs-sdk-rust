@@ -3,12 +3,11 @@ use std::ptr;
 
 use libc::{c_char, c_uchar, c_uint};
 
-use qvm_api;
 use std::collections::HashMap;
 
 /// Given a Quil program as a string, run that program on a local QVM.
 ///
-/// # SAFETY
+/// # Safety
 ///
 /// In order to run this function safely, you must provide the return value from this
 /// function to [`free_qvm_response`] once you're done with it. The input `program` must be a
@@ -30,17 +29,21 @@ use std::collections::HashMap;
 /// This program will return a [`QVMResponse`] with a `status_code` corresponding to any errors that
 /// occur. See [`QVMStatus`] for more details on possible errors.
 #[no_mangle]
-pub extern "C" fn run_program_on_qvm(program: *mut c_char, num_shots: c_uint) -> QVMResponse {
-    let program = unsafe { CStr::from_ptr(program) };
+pub unsafe extern "C" fn run_program_on_qvm(
+    program: *mut c_char,
+    num_shots: c_uint,
+) -> QVMResponse {
+    // SAFETY: If program is not a valid null-terminated string, this is UB
+    let program = CStr::from_ptr(program);
     let program = match program.to_str() {
         Ok(program) => program,
         Err(std::str::Utf8Error { .. }) => {
-            return QVMResponse::with_error(QVMStatus::ProgramIsNotUtf8)
+            return QVMResponse::from_error(QVMStatus::ProgramIsNotUtf8)
         }
     };
     let rt = match tokio::runtime::Runtime::new() {
         Ok(rt) => rt,
-        Err(_) => return QVMResponse::with_error(QVMStatus::CannotMakeRequest),
+        Err(_) => return QVMResponse::from_error(QVMStatus::CannotMakeRequest),
     };
     let fut = qvm_api::run_program_on_qvm(program, num_shots);
     match rt.block_on(fut) {
@@ -49,20 +52,23 @@ pub extern "C" fn run_program_on_qvm(program: *mut c_char, num_shots: c_uint) ->
     }
 }
 
-/// Frees the memory of a QVMResponse as allocated by [`run_program_on_qvm`]
+/// Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
+///
+/// # Safety
+/// This function should only be called with the result of [`run_program_on_qvm`]
 #[no_mangle]
-pub extern "C" fn free_qvm_response(response: QVMResponse) {
-    let rust_managed: qvm_api::QVMResponse = response.into();
+pub unsafe extern "C" fn free_qvm_response(response: QVMResponse) {
+    let rust_managed: qvm_api::QVMResponse = response.into_api_response();
     drop(rust_managed);
 }
 
 /// The return value of [`run_program_on_qvm`].
 ///
-/// ## SAFETY
+/// # Safety
 /// In order to properly free the memory allocated in this struct, call [`free_qvm_response`]
 /// with any instances created.
 ///
-/// ## Example
+/// # Example
 /// If you have a Quil program with an "ro" register containing two items:
 ///
 /// ```quil
@@ -98,13 +104,42 @@ pub struct QVMResponse {
 }
 
 impl QVMResponse {
-    fn with_error(status_code: QVMStatus) -> Self {
+    fn from_error(status_code: QVMStatus) -> Self {
         Self {
             results_by_shot: ptr::null_mut(),
             number_of_shots: 0,
             shot_length: 0,
             status_code,
         }
+    }
+
+    unsafe fn into_api_response(self) -> qvm_api::QVMResponse {
+        let Self {
+            results_by_shot,
+            number_of_shots,
+            shot_length,
+            status_code,
+        } = self;
+
+        // SAFETY: If any of these pieces are wrong, this will read arbitrary memory
+        let results: Vec<*mut u8> = Vec::from_raw_parts(
+            results_by_shot,
+            number_of_shots as usize,
+            number_of_shots as usize,
+        );
+
+        let results: Vec<Vec<u8>> = results
+            .into_iter()
+            // SAFETY: If any of these pieces are wrong, this will read arbitrary memory
+            .map(|ptr| Vec::from_raw_parts(ptr, shot_length as usize, shot_length as usize))
+            .collect();
+
+        let mut registers = HashMap::with_capacity(1);
+        registers.insert("ro".to_string(), results);
+
+        drop(status_code);
+
+        qvm_api::QVMResponse { registers }
     }
 }
 
@@ -113,17 +148,17 @@ impl From<qvm_api::QVMResponse> for QVMResponse {
         let mut results = match response.registers.remove("ro") {
             Some(results) => results,
             None => {
-                return QVMResponse::with_error(QVMStatus::NoRORegister);
+                return QVMResponse::from_error(QVMStatus::NoRORegister);
             }
         };
         let outer_len = results.len();
         if outer_len == 0 {
-            return QVMResponse::with_error(QVMStatus::NoResultsInRORegister);
+            return QVMResponse::from_error(QVMStatus::NoResultsInRORegister);
         }
         let inner_len = results[0].len();
-        for shot in results.iter() {
+        for shot in &results {
             if shot.len() != inner_len {
-                return QVMResponse::with_error(QVMStatus::InconsistentShotLength);
+                return QVMResponse::from_error(QVMStatus::InconsistentShotLength);
             }
         }
 
@@ -140,6 +175,7 @@ impl From<qvm_api::QVMResponse> for QVMResponse {
             .collect();
         let ptr = results.as_mut_ptr();
         std::mem::forget(results);
+        #[allow(clippy::cast_possible_truncation)]
         Self {
             results_by_shot: ptr,
             number_of_shots: outer_len as u32,
@@ -157,39 +193,6 @@ impl From<qvm_api::QVMError> for QVMResponse {
             shot_length: 0,
             status_code: QVMStatus::UnableToCommunicateWithQVM,
         }
-    }
-}
-
-impl From<QVMResponse> for qvm_api::QVMResponse {
-    fn from(response: QVMResponse) -> Self {
-        let QVMResponse {
-            results_by_shot,
-            number_of_shots,
-            shot_length,
-            status_code,
-        } = response;
-
-        let results: Vec<*mut u8> = unsafe {
-            Vec::from_raw_parts(
-                results_by_shot,
-                number_of_shots as usize,
-                number_of_shots as usize,
-            )
-        };
-
-        let results: Vec<Vec<u8>> = results
-            .into_iter()
-            .map(|ptr| unsafe {
-                Vec::from_raw_parts(ptr, shot_length as usize, shot_length as usize)
-            })
-            .collect();
-
-        let mut registers = HashMap::with_capacity(1);
-        registers.insert("ro".to_string(), results);
-
-        drop(status_code);
-
-        Self { registers }
     }
 }
 
