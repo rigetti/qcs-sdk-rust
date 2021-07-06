@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "cli",
+    "c-lib",
+    "qcs-api",
+    "qcs-util"
+]

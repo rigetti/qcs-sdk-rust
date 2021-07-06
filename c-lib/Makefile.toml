@@ -1,0 +1,23 @@
+[env]
+CARGO_MAKE_TEST_USE_MUTLI_TEST_PHASES = true  # This means that test-custom will run in test-flow
+
+[tasks.cbindgen]
+workspace = false
+install_crate = { crate_name = "cbindgen", binary = "cbindgen", test_arg = "--help" }
+command = "cbindgen"
+args = ["--config=cbindgen.toml", "--crate=c-lib", "--output=libqcs.h"]
+
+[tasks.build]
+dependencies = ["cbindgen"]
+
+[tasks.detect-leaks]
+script = """
+/usr/local/opt/llvm/bin/clang -fsanitize=address -g tests/test_list_quantum_processors.c ../target/debug/libqcs.dylib -o tests.o
+ASAN_OPTIONS=detect_leaks=1 ./tests.o
+"""
+
+[tasks.test-custom]
+script = """
+clang tests/test_list_quantum_processors.c ../target/debug/libqcs.dylib -o tests.o
+./tests.o
+"""
