@@ -38,14 +38,9 @@ enum QVMStatus {
      */
     QVMStatus_CannotMakeRequest = 2,
     /**
-     * QVM did not respond with a result register called "ro", make sure one was declared in your
-     * program.
+     * QVM did not respond with a results in the specified register.
      */
-    QVMStatus_NoRORegister = 3,
-    /**
-     * QVM returned an "ro" register but it was empty.
-     */
-    QVMStatus_NoResultsInRORegister = 4,
+    QVMStatus_NoResults = 3,
     /**
      * One or more shots had differing numbers of result registers, this could be a bug with QVM.
      */
@@ -54,6 +49,10 @@ enum QVMStatus {
      * A request to QVM was attempted but failed, is it running?
      */
     QVMStatus_UnableToCommunicateWithQVM = 6,
+    /**
+     * The provided `register_name` was not valid UTF-8
+     */
+    QVMStatus_RegisterIsNotUtf8 = 7,
 };
 typedef uint8_t QVMStatus;
 
@@ -106,7 +105,7 @@ typedef struct ListQuantumProcessorResponse {
  * and you run that program 3 times (shots)
  *
  * ```C
- * QVMResponse response = run_program_on_qvm(program, 3);
+ * QVMResponse response = run_program_on_qvm(program, 3, "ro");
  * ```
  * If `status_code` is `Success` then `results_by_shot` will look something like:
  *
@@ -118,8 +117,9 @@ typedef struct ListQuantumProcessorResponse {
  */
 typedef struct QVMResponse {
     /**
-     * A 2-D array of integers containing the measurements into the "ro" memory.
-     * There will be one value per declared space in "ro" per "shot" (run of the program).
+     * A 2-D array of integers containing the measurements into register provided as
+     * `register_name`. There will be one value per declared space in the register per "shot"
+     * (run of the program).
      */
     unsigned char **results_by_shot;
     /**
@@ -177,23 +177,58 @@ struct ListQuantumProcessorResponse list_quantum_processors(void);
  * # Safety
  *
  * In order to run this function safely, you must provide the return value from this
- * function to [`free_qvm_response`] once you're done with it. The input `program` must be a
- * valid, null-terminated, non-null string which remains constant for the duration of this function.
+ * function to [`free_qvm_response`] once you're done with it. The inputs `program` and
+ * `register_name` must be valid, nul-terminated, non-null strings which remain constant for
+ * the duration of this function.
  *
  * # Usage
  *
- * In order to execute, QVM must be running at <http://localhost:5000>. The provided program
- * is expected to measure any results into a register called "ro". If this register is missing,
- * there will be an error.
+ * In order to execute, QVM must be running at <http://localhost:5000>.
  *
- * # Parameters
+ * # Arguments
  *
- * 1. `program` should be a string containing a valid Quil program. Any measurements that you'd like
- * to get back out __must be put in a register called "ro"__ (e.g. `DECLARE ro BIT[2]`).
+ * 1. `program`: A string containing a valid Quil program. Any measurements that you'd like
+ * to get back out must be in a register matching `register_name`. For example, if you have
+ * `MEASURE 0 ro[0]` then `register_name` should be `"ro"`.
  * 2. `num_shots` is the number of times you'd like to run the program.
+ * 3. `register_name`:
  *
  * # Errors
  * This program will return a [`QVMResponse`] with a `status_code` corresponding to any errors that
  * occur. See [`QVMStatus`] for more details on possible errors.
+ *
+ * # Example
+ *
+ * ```c
+ * #include <stdio.h>
+ * #include "../libqcs.h"
+ *
+ * char* BELL_STATE_PROGRAM =
+ *         "DECLARE ro BIT[2]\n"
+ *         "H 0\n"
+ *         "CNOT 0 1\n"
+ *         "MEASURE 0 ro[0]\n"
+ *         "MEASURE 1 ro[1]\n";
+ *
+ * int main() {
+ *     uint8_t shots = 10;
+ *     QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
+ *
+ *     if (response.status_code != QVMStatus_Success) {
+ *         // Something went wrong running the program
+ *         return 1;
+ *     }
+ *
+ *     for (int shot = 0; shot < response.number_of_shots; shot++) {
+ *         int bit_0 = response.results_by_shot[shot][0];
+ *         int bit_1 = response.results_by_shot[shot][1];
+ *         // With this program, bit_0 should always equal bit_1
+ *     }
+ *
+ *     free_qvm_response(response);
+ *
+ *     return 0;
+ * }
+ * ```
  */
-struct QVMResponse run_program_on_qvm(char *program, unsigned int num_shots);
+struct QVMResponse run_program_on_qvm(char *program, unsigned int num_shots, char *register_name);

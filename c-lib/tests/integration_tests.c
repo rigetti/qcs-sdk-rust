@@ -38,7 +38,7 @@ char* BELL_STATE_PROGRAM =
 
 bool test_run_program_on_qvm() {
     uint8_t shots = 2;
-    QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots);
+    QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
 
     if (response.status_code != QVMStatus_Success) {
         printf("\ntest_run_program_on_qvm failed: Response status code was %d\n\n", response.status_code);

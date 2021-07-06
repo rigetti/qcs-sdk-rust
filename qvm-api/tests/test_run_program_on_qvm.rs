@@ -16,7 +16,7 @@ MEASURE 1 ro[1]
 #[tokio::test]
 async fn test_bell_state() {
     let shots = 10;
-    let mut response = run_program_on_qvm(PROGRAM, shots)
+    let mut response = run_program_on_qvm(PROGRAM, shots, "ro")
         .await
         .expect("Failed to run program");
     let data = response

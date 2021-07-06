@@ -11,10 +11,19 @@ use thiserror::Error;
 ///
 /// QVM must be available at <http://localhost:5000/>
 ///
+/// # Arguments
+/// 1. `program`: A string of a valid Quil program to run on QVM.
+/// 2. `shots`: The number of times the program should run.
+/// 3. `register`: The name of the register containing results that should be read out from QVM.
+///
 /// # Errors
 /// See [`QVMError`] for possible errors that can occur.
-pub async fn run_program_on_qvm(program: &str, shots: u32) -> Result<QVMResponse, QVMError> {
-    let request = QVMRequest::new(program, shots);
+pub async fn run_program_on_qvm(
+    program: &str,
+    shots: u32,
+    register: &str,
+) -> Result<QVMResponse, QVMError> {
+    let request = QVMRequest::new(program, shots, register);
 
     let client = reqwest::Client::new();
     let response = client
@@ -51,9 +60,9 @@ struct QVMRequest {
 }
 
 impl QVMRequest {
-    fn new(program: &str, shots: u32) -> Self {
+    fn new(program: &str, shots: u32, register: &str) -> Self {
         let mut addresses = HashMap::new();
-        addresses.insert("ro".to_string(), true);
+        addresses.insert(register.to_string(), true);
         Self {
             quil_instructions: program.to_string(),
             addresses,
@@ -76,13 +85,13 @@ mod describe_qvm_request {
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = QVMRequest::new(program, 1);
+        let request = QVMRequest::new(program, 1, "ro");
         assert_eq!(&request.quil_instructions, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = QVMRequest::new("H 0", 10);
+        let request = QVMRequest::new("H 0", 10, "ro");
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
