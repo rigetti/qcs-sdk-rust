@@ -1,0 +1,15 @@
+# Cargo / rustc artifacts
+/target
+
+# Local config
+.env
+
+# JetBrains
+.idea
+
+# Clang debug / memory detection / test artifacts
+*.dSYM
+*.o
+
+# Generated OpenAPI stuff that is unnecessary
+qcs-api/docs
