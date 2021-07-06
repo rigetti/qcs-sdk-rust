@@ -12,12 +12,20 @@ dependencies = ["cbindgen"]
 
 [tasks.detect-leaks]
 script = """
-/usr/local/opt/llvm/bin/clang -fsanitize=address -g tests/test_list_quantum_processors.c ../target/debug/libqcs.dylib -o tests.o
+/usr/local/opt/llvm/bin/clang -fsanitize=address -g tests/integration_tests.c ../target/debug/libqcs.dylib -o tests.o
 ASAN_OPTIONS=detect_leaks=1 ./tests.o
 """
 
 [tasks.test-custom]
 script = """
-clang tests/test_list_quantum_processors.c ../target/debug/libqcs.dylib -o tests.o
+clang tests/integration_tests.c ../target/debug/libqcs.dylib -o tests.o
 ./tests.o
 """
+
+[tasks.pre-test]
+command = "docker"
+args = ["compose", "up", "-d"]
+
+[tasks.post-test]
+command = "docker"
+args = ["compose", "down"]

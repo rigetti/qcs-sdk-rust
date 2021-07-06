@@ -13,3 +13,6 @@
 
 # Generated OpenAPI stuff that is unnecessary
 qcs-api/docs
+
+# macOS
+.DS_Store

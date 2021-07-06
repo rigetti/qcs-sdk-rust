@@ -12,5 +12,6 @@ http = "0.2.4"
 libc = "0.2.97"
 qcs-api = { path = "../qcs-api" }
 qcs-util = { path = "../qcs-util" }
+qvm-api = { path = "../qvm-api" }
 thiserror = "1.0.25"
 tokio = { version = "1.7.1", features = ["rt-multi-thread"] }

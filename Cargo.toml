@@ -3,5 +3,6 @@ members = [
     "cli",
     "c-lib",
     "qcs-api",
-    "qcs-util"
+    "qcs-util",
+    "qvm-api"
 ]
