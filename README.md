@@ -6,6 +6,8 @@ A work in progress implementation of pyQuil-like features in Rust.
 - [qcs-util](./qcs-util/README.md): Manual functions for interacting with QCS API (e.g. authentication).
 - [c-lib](./c-lib/README.md): The C-API binding to QCS things
 - [cli](./cli/README.md): A toy CLI for testing QCS things during development.
+- [qvm-api](./qvm-api/README.md): An HTTP API interface to the QVM web server
+- [quilc](./quilc/README.md): An interface to `quilc`
 
 ## Development
 
