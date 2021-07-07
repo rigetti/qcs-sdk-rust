@@ -35,7 +35,7 @@ pub(crate) struct Settings {
     pub default_profile_name: String,
     /// All available configuration profiles, keyed by profile name.
     #[serde(default = "default_profiles")]
-    profiles: HashMap<String, Profile>,
+    pub profiles: HashMap<String, Profile>,
     #[serde(default)]
     auth_servers: HashMap<String, AuthServer>,
 }
@@ -63,11 +63,13 @@ fn default_auth_servers() -> HashMap<String, AuthServer> {
 }
 
 #[derive(Deserialize, Debug)]
-struct Profile {
+pub(crate) struct Profile {
     /// URL of the QCS API to use for all API calls
-    api_url: String,
+    pub api_url: String,
     auth_server_name: String,
     credentials_name: String,
+    #[serde(default)]
+    pub applications: Applications,
 }
 
 impl Default for Profile {
@@ -76,6 +78,27 @@ impl Default for Profile {
             api_url: "https://api.qcs.rigetti.com".to_string(),
             auth_server_name: "default".to_string(),
             credentials_name: "default".to_string(),
+            applications: Applications::default(),
+        }
+    }
+}
+
+#[derive(Deserialize, Debug, Default)]
+pub(crate) struct Applications {
+    pub pyquil: Pyquil,
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct Pyquil {
+    pub qvm_url: String,
+    pub quilc_url: String,
+}
+
+impl Default for Pyquil {
+    fn default() -> Self {
+        Self {
+            qvm_url: "http://127.0.0.1:5000".to_string(),
+            quilc_url: "tcp://127.0.0.1:5555".to_string(),
         }
     }
 }

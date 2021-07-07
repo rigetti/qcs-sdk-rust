@@ -14,6 +14,7 @@ enum ListQuantumProcessorsResult {
     ListQuantumProcessorsResult_Success = 0,
     ListQuantumProcessorsResult_CouldNotQueryQCS = 1,
     ListQuantumProcessorsResult_Unauthorized = 2,
+    ListQuantumProcessorsResult_CouldNotLoadConfig = 3,
 };
 typedef uint8_t ListQuantumProcessorsResult;
 
@@ -53,6 +54,10 @@ enum QVMStatus {
      * The provided `register_name` was not valid UTF-8
      */
     QVMStatus_RegisterIsNotUtf8 = 7,
+    /**
+     * Configuration could not be loaded, so QVM could not be contacted
+     */
+    QVMStatus_ConfigError = 8,
 };
 typedef uint8_t QVMStatus;
 

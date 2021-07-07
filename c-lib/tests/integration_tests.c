@@ -6,7 +6,7 @@ bool test_list_quantum_processors() {
     ListQuantumProcessorResponse response = list_quantum_processors();
 
     if (response.result != ListQuantumProcessorsResult_Success) {
-        printf("Failed with result code %d\n", response.result);
+        printf("test_list_quantum_processors: Failed with result code %d\n", response.result);
         return false;
     }
 
