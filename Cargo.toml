@@ -4,5 +4,6 @@ members = [
     "c-lib",
     "qcs-api",
     "qcs-util",
+    "quilc",
     "qvm-api"
 ]
