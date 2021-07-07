@@ -24,7 +24,7 @@ pub unsafe extern "C" fn list_quantum_processors() -> ListQuantumProcessorRespon
         Ok(runtime) => runtime,
         Err(_) => {
             return ListQuantumProcessorResponse::failure(
-                ListQuantumProcessorsResult::CouldNotQueryQCS,
+                ListQuantumProcessorsResult::CouldNotLoadConfig,
             );
         }
     };
@@ -60,7 +60,7 @@ pub unsafe extern "C" fn free_quantum_processors(response: ListQuantumProcessorR
 async fn get_config_and_list_quantum_processors(
 ) -> Result<models::ListQuantumProcessorsResponse, ListError> {
     let configuration = get_configuration().await?;
-    Ok(quantum_processors_api::list_quantum_processors(&configuration, None, None).await?)
+    Ok(quantum_processors_api::list_quantum_processors(configuration.as_ref(), None, None).await?)
 }
 
 type ApiError = quantum_processors_api::ListQuantumProcessorsError;
@@ -79,6 +79,7 @@ pub enum ListQuantumProcessorsResult {
     Success = 0,
     CouldNotQueryQCS = 1,
     Unauthorized = 2,
+    CouldNotLoadConfig = 3,
 }
 
 #[repr(C)]

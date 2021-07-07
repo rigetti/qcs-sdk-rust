@@ -89,11 +89,24 @@ pub unsafe extern "C" fn run_program_on_qvm(
         Ok(rt) => rt,
         Err(_) => return QVMResponse::from_error(QVMStatus::CannotMakeRequest),
     };
-    let fut = qvm_api::run_program_on_qvm(program, num_shots, register);
+    let fut = run_program(program, num_shots, register);
     match rt.block_on(fut) {
         Ok(response) => QVMResponse::from_api_response(response, register),
         Err(error) => QVMResponse::from(error),
     }
+}
+
+async fn run_program(
+    program: &str,
+    num_shots: u32,
+    register: &str,
+) -> Result<qvm_api::QVMResponse, QVMStatus> {
+    let config = qcs_util::get_configuration()
+        .await
+        .map_err(|_| QVMStatus::ConfigError)?;
+    qvm_api::run_program_on_qvm(program, num_shots, register, &config)
+        .await
+        .map_err(|_| QVMStatus::UnableToCommunicateWithQVM)
 }
 
 /// Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
@@ -228,13 +241,13 @@ impl QVMResponse {
     }
 }
 
-impl From<qvm_api::QVMError> for QVMResponse {
-    fn from(mut _error: qvm_api::QVMError) -> Self {
+impl From<QVMStatus> for QVMResponse {
+    fn from(status: QVMStatus) -> Self {
         Self {
             results_by_shot: ptr::null_mut(),
             number_of_shots: 0,
             shot_length: 0,
-            status_code: QVMStatus::UnableToCommunicateWithQVM,
+            status_code: status,
         }
     }
 }
@@ -260,4 +273,6 @@ pub enum QVMStatus {
     UnableToCommunicateWithQVM = 6,
     /// The provided `register_name` was not valid UTF-8
     RegisterIsNotUtf8 = 7,
+    /// Configuration could not be loaded, so QVM could not be contacted
+    ConfigError = 8,
 }

@@ -22,15 +22,12 @@ pub async fn run_program_on_qvm(
     program: &str,
     shots: u32,
     register: &str,
+    config: &qcs_util::Configuration,
 ) -> Result<QVMResponse, QVMError> {
     let request = QVMRequest::new(program, shots, register);
 
     let client = reqwest::Client::new();
-    let response = client
-        .post("http://localhost:5000")
-        .json(&request)
-        .send()
-        .await?;
+    let response = client.post(&config.qvm_url).json(&request).send().await?;
 
     Ok(response.json().await?)
 }
