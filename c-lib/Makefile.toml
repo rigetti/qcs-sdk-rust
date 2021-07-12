@@ -1,5 +1,6 @@
 [env]
-CARGO_MAKE_TEST_USE_MUTLI_TEST_PHASES = true  # This means that test-custom will run in test-flow
+CARGO_MAKE_TEST_USE_MULTI_TEST_PHASES = true  # This means that test-custom will run in test-flow
+DYLIB_PATH = "../target/debug/libqcs.dylib"
 
 [tasks.cbindgen]
 workspace = false
@@ -7,19 +8,42 @@ install_crate = { crate_name = "cbindgen", binary = "cbindgen", test_arg = "--he
 command = "cbindgen"
 args = ["--config=cbindgen.toml", "--crate=c-lib", "--output=libqcs.h"]
 
-[tasks.build]
+# This task runs implicitly before `build` which runs as part of the default rule
+[tasks.pre-build]
 dependencies = ["cbindgen"]
+
+# This task runs implicitly after `build` which runs as part of the default rule
+[tasks.post-build]
+mac_alias = "mac-post-build"  # Only run on macOS
+alias = "empty"
+
+[tasks.mac-post-build]
+command = "install_name_tool"
+args = ["-id", "@loader_path/libqcs.dylib", "${DYLIB_PATH}"]
+
+[tasks.release-flow]
+env = {"DYLIB_PATH" = "../target/release/libqcs.dylib"}
+run_task = "build-release-and-copy-artifacts"
+
+[tasks.build-release-and-copy-artifacts]
+dependencies = ["build-release", "post-build", "copy-artifacts"]
+
+[tasks.copy-artifacts]
+script = """
+cp "${DYLIB_PATH}" libqcs.dylib
+"""
 
 [tasks.detect-leaks]
 script = """
-/usr/local/opt/llvm/bin/clang -fsanitize=address -g tests/integration_tests.c ../target/debug/libqcs.dylib -o tests.o
+/usr/local/opt/llvm/bin/clang -fsanitize=address -g tests/integration_tests.c "${DYLIB_PATH}" -o tests.o
 ASAN_OPTIONS=detect_leaks=1 ./tests.o
 """
 
 [tasks.test-custom]
 script = """
-clang tests/integration_tests.c ../target/debug/libqcs.dylib -o tests.o
+clang tests/integration_tests.c ${DYLIB_PATH} -o tests.o
 ./tests.o
+rm -rf tests.o tests.o.dSYM
 """
 
 [tasks.pre-test]
