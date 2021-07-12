@@ -5,7 +5,7 @@ edition = "2018"
 
 [lib]
 name = "qcs"
-crate-type = ["dylib"]
+crate-type = ["cdylib"]
 
 [dependencies]
 http = "0.2.4"
