@@ -3,6 +3,7 @@ use std::ptr;
 
 use libc::{c_char, c_uchar, c_uint};
 
+use qvm::{run_program, QVMError};
 use std::collections::HashMap;
 
 /// Given a Quil program as a string, run that program on a local QVM.
@@ -89,24 +90,11 @@ pub unsafe extern "C" fn run_program_on_qvm(
         Ok(rt) => rt,
         Err(_) => return QVMResponse::from_error(QVMStatus::CannotMakeRequest),
     };
-    let fut = run_program(program, num_shots, register);
+    let fut = run_program(program, num_shots as usize, register);
     match rt.block_on(fut) {
-        Ok(response) => QVMResponse::from_api_response(response, register),
+        Ok(data) => QVMResponse::from_data(data),
         Err(error) => QVMResponse::from(error),
     }
-}
-
-async fn run_program(
-    program: &str,
-    num_shots: u32,
-    register: &str,
-) -> Result<qvm_api::QVMResponse, QVMStatus> {
-    let config = qcs_util::get_configuration()
-        .await
-        .map_err(|_| QVMStatus::ConfigError)?;
-    qvm_api::run_program_on_qvm(program, num_shots, register, &config)
-        .await
-        .map_err(|_| QVMStatus::UnableToCommunicateWithQVM)
 }
 
 /// Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
@@ -115,7 +103,7 @@ async fn run_program(
 /// This function should only be called with the result of [`run_program_on_qvm`]
 #[no_mangle]
 pub unsafe extern "C" fn free_qvm_response(response: QVMResponse) {
-    let rust_managed: qvm_api::QVMResponse = response.into_api_response();
+    let rust_managed: qvm::QVMResponse = response.into_api_response();
     drop(rust_managed);
 }
 
@@ -171,30 +159,11 @@ impl QVMResponse {
         }
     }
 
-    fn from_api_response(mut response: qvm_api::QVMResponse, register_name: &str) -> Self {
-        let mut results = match response.registers.remove(register_name) {
-            Some(results) => results,
-            None => {
-                return QVMResponse::from_error(QVMStatus::NoResults);
-            }
-        };
-        let outer_len = results.len();
-        if outer_len == 0 {
-            return QVMResponse::from_error(QVMStatus::NoResults);
-        }
-        let inner_len = results[0].len();
-        for shot in &results {
-            if shot.len() != inner_len {
-                return QVMResponse::from_error(QVMStatus::InconsistentShotLength);
-            }
-        }
-
-        results.shrink_to_fit();
-
-        let mut results: Vec<*mut u8> = results
-            .into_iter()
+    fn from_data(data: Vec<Vec<u8>>) -> Self {
+        let number_of_shots = data.len() as u32;
+        let shot_length = data[0].len() as u32;
+        let mut results: Vec<*mut u8> = IntoIterator::into_iter(data)
             .map(|mut shot| {
-                shot.shrink_to_fit();
                 let ptr = shot.as_mut_ptr();
                 std::mem::forget(shot);
                 ptr
@@ -205,13 +174,13 @@ impl QVMResponse {
         #[allow(clippy::cast_possible_truncation)]
         Self {
             results_by_shot: ptr,
-            number_of_shots: outer_len as u32,
-            shot_length: inner_len as u32,
+            number_of_shots,
+            shot_length,
             status_code: QVMStatus::Success,
         }
     }
 
-    unsafe fn into_api_response(self) -> qvm_api::QVMResponse {
+    unsafe fn into_api_response(self) -> qvm::QVMResponse {
         let Self {
             results_by_shot,
             number_of_shots,
@@ -237,12 +206,31 @@ impl QVMResponse {
 
         drop(status_code);
 
-        qvm_api::QVMResponse { registers }
+        qvm::QVMResponse { registers }
     }
 }
 
 impl From<QVMStatus> for QVMResponse {
     fn from(status: QVMStatus) -> Self {
+        Self {
+            results_by_shot: ptr::null_mut(),
+            number_of_shots: 0,
+            shot_length: 0,
+            status_code: status,
+        }
+    }
+}
+
+impl From<QVMError> for QVMResponse {
+    fn from(error: QVMError) -> Self {
+        let status = match error {
+            QVMError::ShotsMismatch | QVMError::InconsistentShots => {
+                QVMStatus::InconsistentShotLength
+            }
+            QVMError::RegisterMissing => QVMStatus::NoResults,
+            QVMError::Connection(_) => QVMStatus::UnableToCommunicateWithQVM,
+            QVMError::Configuration(_) => QVMStatus::ConfigError,
+        };
         Self {
             results_by_shot: ptr::null_mut(),
             number_of_shots: 0,

@@ -9,7 +9,7 @@ use thiserror::Error;
 
 /// Take in a Quil program as a string `program` and attempt to run it on QVM.
 ///
-/// QVM must be available at <http://localhost:5000/>
+/// QVM must be available at `config.qvm_url`.
 ///
 /// # Arguments
 /// 1. `program`: A string of a valid Quil program to run on QVM.
@@ -18,18 +18,38 @@ use thiserror::Error;
 ///
 /// # Errors
 /// See [`QVMError`] for possible errors that can occur.
-pub async fn run_program_on_qvm(
+pub async fn run_program(
     program: &str,
-    shots: u32,
+    shots: usize,
     register: &str,
-    config: &qcs_util::Configuration,
-) -> Result<QVMResponse, QVMError> {
+) -> Result<Vec<Vec<u8>>, QVMError> {
+    if shots == 0 {
+        return Err(QVMError::RegisterMissing);
+    }
+    let config = qcs_util::get_configuration().await?;
     let request = QVMRequest::new(program, shots, register);
 
     let client = reqwest::Client::new();
     let response = client.post(&config.qvm_url).json(&request).send().await?;
 
-    Ok(response.json().await?)
+    let QVMResponse { mut registers } = response.json().await?;
+    let mut data = registers
+        .remove(register)
+        .ok_or(QVMError::RegisterMissing)?;
+
+    if data.len() != shots {
+        return Err(QVMError::ShotsMismatch);
+    }
+    data.shrink_to_fit();
+    let shot_len = data[0].len();
+    for shot in data.iter_mut() {
+        if shot.len() != shot_len {
+            return Err(QVMError::InconsistentShots);
+        }
+        shot.shrink_to_fit();
+    }
+
+    Ok(data)
 }
 
 /// The return value of [`run_program_on_qvm`] if it is successful.
@@ -43,7 +63,15 @@ pub struct QVMResponse {
 #[derive(Error, Debug)]
 pub enum QVMError {
     #[error("Unable to connect to QVM")]
-    ConnectionError(#[from] reqwest::Error),
+    Connection(#[from] reqwest::Error),
+    #[error("Could not read configuration")]
+    Configuration(#[from] qcs_util::ConfigError),
+    #[error("The specified register was not present in the results from QVM")]
+    RegisterMissing,
+    #[error("The returned number of shots from QVM does not match the requested number")]
+    ShotsMismatch,
+    #[error("Not every shot contained the same amount of data.")]
+    InconsistentShots,
 }
 
 #[derive(Serialize)]
@@ -51,13 +79,13 @@ pub enum QVMError {
 struct QVMRequest {
     quil_instructions: String,
     addresses: HashMap<String, bool>,
-    trials: u32,
+    trials: usize,
     #[serde(rename = "type")]
     request_type: RequestType,
 }
 
 impl QVMRequest {
-    fn new(program: &str, shots: u32, register: &str) -> Self {
+    fn new(program: &str, shots: usize, register: &str) -> Self {
         let mut addresses = HashMap::new();
         addresses.insert(register.to_string(), true);
         Self {

@@ -32,13 +32,9 @@ async fn run_compiled_bell_state_on_qvm() {
     let config = Configuration::default();
     let output =
         compile_program(BELL_STATE, &isa_fixtures::aspen_9(), &config).expect("Could not compile");
-    let mut resp = qvm_api::run_program_on_qvm(&output.quil, 10, "ro", &config)
+    let results = qvm::run_program(&output.quil, 10, "ro")
         .await
         .expect("Could not run program on QVM");
-    let results = resp
-        .registers
-        .remove("ro")
-        .expect("Missing ro register in results");
     for shot in results {
         assert_eq!(shot.len(), 2);
         assert_eq!(shot[0], shot[1]);

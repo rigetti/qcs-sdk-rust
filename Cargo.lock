@@ -44,9 +44,7 @@ version = "0.0.0"
 dependencies = [
  "http",
  "libc",
- "qcs-api",
- "qcs-util",
- "qvm-api",
+ "qvm",
  "thiserror",
  "tokio",
 ]
@@ -693,6 +691,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "qpu"
+version = "0.1.0"
+
+[[package]]
 name = "quilc"
 version = "0.1.0"
 dependencies = [
@@ -700,7 +702,7 @@ dependencies = [
  "lazy_static",
  "qcs-api",
  "qcs-util",
- "qvm-api",
+ "qvm",
  "rmp-serde",
  "serde",
  "serde_json",
@@ -720,7 +722,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "qvm-api"
+name = "qvm"
 version = "0.0.0"
 dependencies = [
  "futures-retry",

@@ -16,6 +16,6 @@ lazy_static = "1.4.0"
 
 [dev-dependencies]
 float-cmp = "0.8.0"
-qvm-api = { version = "0.0.0", path = "../qvm-api" }
+qvm = { version = "0.0.0", path = "../qvm" }
 serde_json = { version = "1.0.64" }
 tokio = { version = "1.8.1", features = ["macros", "rt-multi-thread"] }
