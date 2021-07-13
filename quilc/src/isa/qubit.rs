@@ -54,8 +54,6 @@ impl Qubit {
     /// 2. The `randomized_benchmark_simultaneous_1q` benchmark did not contain data for a Qubit
     ///     which has a defined RX or RZ gate.
     /// 3. An unknown `op_name` was provided.
-    /// TODO: Switch to using eyre for these errors since user is not expected to handle individual
-    /// TODO: cases but should get context
     pub(crate) fn add_operation(
         &mut self,
         op_name: &str,
@@ -71,7 +69,7 @@ impl Qubit {
             "I" | "RESET" => vec![],
             _ => return Err(Error::BadOperator),
         };
-        if self.gates.add(op_name.to_string(), operators) {
+        if self.gates.add(&operators) {
             self.dead = false;
         }
         Ok(())
@@ -144,9 +142,9 @@ fn rx_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>, Error
     let fidelity = fidelity(frb_sim_1q, node_id)?;
 
     let mut gates = Vec::with_capacity(5);
-    let operator = String::from("RX");
+    let operator = "RX";
     gates.push(Operator::Gate {
-        operator: operator.clone(),
+        operator,
         parameters: Parameters::Float(0.0),
         arguments: Arguments::Int(node_id),
         fidelity: 1.0,
@@ -155,7 +153,7 @@ fn rx_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>, Error
 
     gates.extend(
         IntoIter::new([PI, -PI, FRAC_PI_2, -FRAC_PI_2]).map(|param| Operator::Gate {
-            operator: operator.clone(),
+            operator,
             parameters: Parameters::Float(param),
             arguments: Arguments::Int(node_id),
             fidelity,
@@ -208,36 +206,36 @@ mod describe_rx_gates {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
                 fidelity: 1.0,
-                operator: String::from("RX"),
+                operator: "RX",
                 parameters: Parameters::Float(0.0),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
                 fidelity: 0.9968326091766357,
-                operator: String::from("RX"),
-                parameters: Parameters::Float(3.141592653589793),
+                operator: "RX",
+                parameters: Parameters::Float(PI),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
                 fidelity: 0.9968326091766357,
-                operator: String::from("RX"),
-                parameters: Parameters::Float(-3.141592653589793),
+                operator: "RX",
+                parameters: Parameters::Float(-PI),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
                 fidelity: 0.9968326091766357,
-                operator: String::from("RX"),
-                parameters: Parameters::Float(1.5707963267948966),
+                operator: "RX",
+                parameters: Parameters::Float(FRAC_PI_2),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
                 fidelity: 0.9968326091766357,
-                operator: String::from("RX"),
-                parameters: Parameters::Float(-1.5707963267948966),
+                operator: "RX",
+                parameters: Parameters::Float(-FRAC_PI_2),
             },
         ];
         assert_eq!(gates, expected);
@@ -248,8 +246,8 @@ fn rz_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>, Error
     let fidelity = fidelity(frb_sim_1q, node_id)?;
 
     Ok(vec![Operator::Gate {
-        operator: String::from("RZ"),
-        parameters: Parameters::String(String::from("_")),
+        operator: "RZ",
+        parameters: Parameters::Underscore,
         fidelity,
         duration: PERFECT_DURATION,
         arguments: Arguments::Int(node_id),
@@ -298,8 +296,8 @@ mod describe_rz_gates {
             arguments: Arguments::Int(1),
             duration: 0.01,
             fidelity: 0.9968326091766357,
-            operator: String::from("RZ"),
-            parameters: Parameters::String(String::from("_")),
+            operator: "RZ",
+            parameters: Parameters::Underscore,
         }];
         assert_eq!(gates, expected);
     }
@@ -333,14 +331,14 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 
     vec![
         Operator::Measure {
-            operator: "MEASURE".to_string(),
+            operator: "MEASURE",
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
             qubit: node_id,
-            target: Some("_".to_string()),
+            target: Some("_"),
         },
         Operator::Measure {
-            operator: "MEASURE".to_string(),
+            operator: "MEASURE",
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
             qubit: node_id,
@@ -367,14 +365,14 @@ mod describe_measure {
         let result = measure(0, &characteristics);
         let expected = vec![
             Operator::Measure {
-                operator: String::from("MEASURE"),
+                operator: "MEASURE",
                 duration: 2000.0,
                 fidelity: 0.9810000061988831,
                 qubit: 0,
-                target: Some(String::from("_")),
+                target: Some("_"),
             },
             Operator::Measure {
-                operator: String::from("MEASURE"),
+                operator: "MEASURE",
                 duration: 2000.0,
                 fidelity: 0.9810000061988831,
                 qubit: 0,
@@ -387,10 +385,10 @@ mod describe_measure {
 
 fn wildcard(node_id: i32) -> Vec<Operator> {
     vec![Operator::Gate {
-        operator: "_".to_string(),
+        operator: "_",
         duration: PERFECT_DURATION,
         fidelity: PERFECT_FIDELITY,
-        parameters: Parameters::String("_".to_string()),
+        parameters: Parameters::Underscore,
         arguments: Arguments::Int(node_id),
     }]
 }

@@ -45,15 +45,18 @@ impl Edge {
         op_name: &str,
         characteristics: &[Characteristic],
     ) -> Result<(), Error> {
-        let operators = if GATE_PARAMS.contains_key(op_name) {
-            basic_gates(op_name, characteristics)?
-        } else if op_name == "WILDCARD" {
-            wildcard()
-        } else {
-            return Err(Error::BadOperator);
+        let operator = match GATE_PARAMS.get_key_value(op_name) {
+            Some((key, params)) => basic_gates(key, params, characteristics),
+            _ => {
+                if op_name == "WILDCARD" {
+                    WILDCARD
+                } else {
+                    return Err(Error::BadOperator);
+                }
+            }
         };
 
-        if self.gates.add(op_name.to_string(), operators) {
+        if self.gates.add_one(operator) {
             self.dead = false;
         }
         Ok(())
@@ -244,13 +247,13 @@ lazy_static::lazy_static! {
             default_fidelity: 0.85,
             duration: 200.0,
             characteristic_name: "fCPHASE",
-            parameters: Parameters::String("theta".to_string()),
+            parameters: Parameters::Theta,
         });
         m.insert("XY", GateParams{
             default_fidelity: 0.86,
             duration: 200.0,
             characteristic_name: "fXY",
-            parameters: Parameters::String("theta".to_string()),
+            parameters: Parameters::Theta,
         });
         m
     };
@@ -264,8 +267,11 @@ struct GateParams {
     parameters: Parameters,
 }
 
-fn basic_gates(op_name: &str, characteristics: &[Characteristic]) -> Result<Vec<Operator>, Error> {
-    let params = GATE_PARAMS.get(op_name).ok_or(Error::BadOperator)?;
+fn basic_gates(
+    op_name: &'static str,
+    params: &GateParams,
+    characteristics: &[Characteristic],
+) -> Operator {
     let GateParams {
         default_fidelity,
         duration,
@@ -279,21 +285,19 @@ fn basic_gates(op_name: &str, characteristics: &[Characteristic]) -> Result<Vec<
             characteristic.value.into()
         });
 
-    Ok(vec![Operator::Gate {
-        operator: op_name.to_string(),
-        parameters: parameters.clone(),
-        arguments: Arguments::Strings(vec!["_".to_string(), "_".to_string()]),
+    Operator::Gate {
+        operator: op_name,
+        parameters: *parameters,
+        arguments: Arguments::Underscores,
         fidelity,
         duration: *duration,
-    }])
+    }
 }
 
-fn wildcard() -> Vec<Operator> {
-    vec![Operator::Gate {
-        operator: "_".to_string(),
-        duration: PERFECT_DURATION,
-        fidelity: PERFECT_FIDELITY,
-        parameters: Parameters::String("_".to_string()),
-        arguments: Arguments::Strings(vec!["_".to_string(), "_".to_string()]),
-    }]
-}
+const WILDCARD: Operator = Operator::Gate {
+    operator: "_",
+    duration: PERFECT_DURATION,
+    fidelity: PERFECT_FIDELITY,
+    parameters: Parameters::Underscore,
+    arguments: Arguments::Underscores,
+};

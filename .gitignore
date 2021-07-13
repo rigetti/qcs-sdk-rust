@@ -10,6 +10,7 @@
 # Clang debug / memory detection / test artifacts
 *.dSYM
 *.o
+*.dylib
 
 # Generated OpenAPI stuff that is unnecessary
 qcs-api/docs
