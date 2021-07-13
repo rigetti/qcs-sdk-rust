@@ -684,6 +684,7 @@ dependencies = [
  "dirs",
  "futures",
  "qcs-api",
+ "reqwest",
  "serde",
  "thiserror",
  "tokio",
@@ -692,11 +693,19 @@ dependencies = [
 
 [[package]]
 name = "qpu"
-version = "0.1.0"
+version = "0.0.0"
+dependencies = [
+ "qcs-api",
+ "qcs-util",
+ "quilc",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
 
 [[package]]
 name = "quilc"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "float-cmp",
  "lazy_static",

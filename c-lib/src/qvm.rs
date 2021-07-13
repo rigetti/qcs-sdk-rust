@@ -1,7 +1,7 @@
 use std::ffi::CStr;
 use std::ptr;
 
-use libc::{c_char, c_uchar, c_uint};
+use libc::{c_char, c_uchar, c_ushort};
 
 use qvm::{run_program, QVMError};
 use std::collections::HashMap;
@@ -67,7 +67,7 @@ use std::collections::HashMap;
 #[no_mangle]
 pub unsafe extern "C" fn run_program_on_qvm(
     program: *mut c_char,
-    num_shots: c_uint,
+    num_shots: c_ushort,
     register_name: *mut c_char,
 ) -> QVMResponse {
     // SAFETY: If program is not a valid null-terminated string, this is UB
@@ -90,7 +90,7 @@ pub unsafe extern "C" fn run_program_on_qvm(
         Ok(rt) => rt,
         Err(_) => return QVMResponse::from_error(QVMStatus::CannotMakeRequest),
     };
-    let fut = run_program(program, num_shots as usize, register);
+    let fut = run_program(program, num_shots, register);
     match rt.block_on(fut) {
         Ok(data) => QVMResponse::from_data(data),
         Err(error) => QVMResponse::from(error),
@@ -139,10 +139,10 @@ pub struct QVMResponse {
     pub results_by_shot: *mut *mut c_uchar,
     /// The number of times the program ran (should be the same as the `num_shots` param to
     /// [`run_program_on_qvm`]. This is the outer dimension of `results_by_shot`.
-    pub number_of_shots: c_uint,
+    pub number_of_shots: c_ushort,
     /// How many bits were measured in the program in one shot. This is the inner dimension of
     /// `results_by_shot`.
-    pub shot_length: c_uint,
+    pub shot_length: c_ushort,
     /// Tells you whether or not the request to the QVM was successful. If the status
     /// code is [`QVMStatus::Success`], then `results_by_shot` will be populated.
     /// If not, `results_by_shot` will be `NULL`.
@@ -160,8 +160,14 @@ impl QVMResponse {
     }
 
     fn from_data(data: Vec<Vec<u8>>) -> Self {
-        let number_of_shots = data.len() as u32;
-        let shot_length = data[0].len() as u32;
+        // Shots was passed into QVM originally as a u16 so this is safe.
+        #[allow(clippy::cast_possible_truncation)]
+        let number_of_shots = data.len() as u16;
+
+        // This one is a guess. If more than 2^16 slots in a register then this will truncate
+        #[allow(clippy::cast_possible_truncation)]
+        let shot_length = data[0].len() as u16;
+
         let mut results: Vec<*mut u8> = IntoIterator::into_iter(data)
             .map(|mut shot| {
                 let ptr = shot.as_mut_ptr();

@@ -38,3 +38,7 @@ For new crates, the following code block should be added to the top of the `main
 #![deny(clippy::pedantic)]
 #![forbid(unsafe_code)]
 ```
+
+## Release
+
+Before release, `makers manual` must be run in order to run tests against live QCS/QPUs as there is no safe, automated way to test some of this. As of right now these tests __must__ be run locally and not from CI.

@@ -87,12 +87,12 @@ typedef struct QVMResponse {
      * The number of times the program ran (should be the same as the `num_shots` param to
      * [`run_program_on_qvm`]. This is the outer dimension of `results_by_shot`.
      */
-    unsigned int number_of_shots;
+    unsigned short number_of_shots;
     /**
      * How many bits were measured in the program in one shot. This is the inner dimension of
      * `results_by_shot`.
      */
-    unsigned int shot_length;
+    unsigned short shot_length;
     /**
      * Tells you whether or not the request to the QVM was successful. If the status
      * code is [`QVMStatus::Success`], then `results_by_shot` will be populated.
@@ -169,4 +169,4 @@ void free_qvm_response(struct QVMResponse response);
  * }
  * ```
  */
-struct QVMResponse run_program_on_qvm(char *program, unsigned int num_shots, char *register_name);
+struct QVMResponse run_program_on_qvm(char *program, unsigned short num_shots, char *register_name);

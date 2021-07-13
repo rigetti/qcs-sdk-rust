@@ -17,7 +17,7 @@ MEASURE 1 ro[1]
 
 #[tokio::test]
 async fn test_bell_state() {
-    const SHOTS: usize = 10;
+    const SHOTS: u16 = 10;
 
     // Sometimes the QVM container isn't ready yet when this runs, so let it retry
     let fut = futures_retry::FutureRetry::new(

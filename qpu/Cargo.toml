@@ -1,7 +1,18 @@
 [package]
 name = "qpu"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
 
 [dependencies]
+qcs-api = { version = "0.0.0", path = "../qcs-api" }
+qcs-util = { version = "0.0.0", path = "../qcs-util" }
+quilc = { version = "0.0.0", path = "../quilc" }
+serde_json = "1.0.64"
+thiserror = "1.0.26"
+
+[dev-dependencies]
+tokio = { version = "1.8.1", features = ["macros"] }
+
+[features]
+qcs_tests = []
