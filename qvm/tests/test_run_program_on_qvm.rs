@@ -2,7 +2,7 @@
 //! In order to run them, QVM's web server must be running at localhost:5000.
 
 use futures_retry::{ErrorHandler, RetryPolicy};
-use qvm_api::*;
+use qvm::*;
 use std::time::Duration;
 
 const PROGRAM: &str = r##"
@@ -17,21 +17,16 @@ MEASURE 1 ro[1]
 
 #[tokio::test]
 async fn test_bell_state() {
-    let shots = 10;
-    let config = qcs_util::Configuration::default();
+    const SHOTS: usize = 10;
 
     // Sometimes the QVM container isn't ready yet when this runs, so let it retry
     let fut = futures_retry::FutureRetry::new(
-        || run_program_on_qvm(PROGRAM, shots, "ro", &config),
+        || run_program(PROGRAM, SHOTS, "ro"),
         RetryHandler { max_attempts: 5 },
     );
 
-    let mut response = fut.await.expect("Could not run on QVM").0;
-    let data = response
-        .registers
-        .remove("ro")
-        .expect("ro Register was missing from response");
-    assert_eq!(data.len(), shots as usize);
+    let data = fut.await.expect("Could not run on QVM").0;
+
     for shot in data {
         assert_eq!(shot.len(), 2);
         assert_eq!(shot[0], shot[1]);
@@ -51,7 +46,8 @@ impl ErrorHandler<QVMError> for RetryHandler {
             return RetryPolicy::ForwardError(e);
         }
         match e {
-            QVMError::ConnectionError(_) => RetryPolicy::WaitRetry(Duration::from_secs(5)),
+            QVMError::Connection(_) => RetryPolicy::WaitRetry(Duration::from_secs(5)),
+            _ => RetryPolicy::ForwardError(e),
         }
     }
 }

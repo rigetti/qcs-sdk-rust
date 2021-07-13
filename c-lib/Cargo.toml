@@ -11,8 +11,6 @@ crate-type = ["cdylib"]
 [dependencies]
 http = "0.2.4"
 libc = "0.2.97"
-qcs-api = { version = "0.0.0", path = "../qcs-api" }
-qcs-util = { version = "0.0.0", path = "../qcs-util" }
-qvm-api = { version = "0.0.0", path = "../qvm-api" }
+qvm = { version = "0.0.0", path = "../qvm" }
 thiserror = "1.0.25"
 tokio = { version = "1.7.1", features = ["rt-multi-thread"] }

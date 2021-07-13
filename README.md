@@ -2,12 +2,22 @@ A work in progress implementation of pyQuil-like features in Rust.
 
 ## Crates
 
+### Public
+
+These are the top level crates intended for use by third parties.
+
+- [c-lib](./c-lib/README.md): The C-API bindings to `qvm` and `qpu`.
+- [qpu](./qpu/README.md): For running programs on a QPU.
+- [qvm](./qvm/README.md): For running programs on QVM.
+
+### Internal
+
+These are auxiliary crates not intended for use outside of development.
+
 - [qcs-api](./qcs-api/README.md): A generated OpenAPI client for QCS.
 - [qcs-util](./qcs-util/README.md): Manual functions for interacting with QCS API (e.g. authentication).
-- [c-lib](./c-lib/README.md): The C-API binding to QCS things
 - [cli](./cli/README.md): A toy CLI for testing QCS things during development.
-- [qvm-api](./qvm-api/README.md): An HTTP API interface to the QVM web server
-- [quilc](./quilc/README.md): An interface to `quilc`
+- [quilc](./quilc/README.md): An interface to `quilc`, used by `qpu`.
 
 ## Development
 

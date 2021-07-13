@@ -8,17 +8,6 @@
 
 
 /**
- * The available result codes from running [`list_quantum_processors`]
- */
-enum ListQuantumProcessorsResult {
-    ListQuantumProcessorsResult_Success = 0,
-    ListQuantumProcessorsResult_CouldNotQueryQCS = 1,
-    ListQuantumProcessorsResult_Unauthorized = 2,
-    ListQuantumProcessorsResult_CouldNotLoadConfig = 3,
-};
-typedef uint8_t ListQuantumProcessorsResult;
-
-/**
  * Codes indicating the possible results of calling [`run_program_on_qvm`]. Every [`QVMResponse`]
  * will have one of these statuses in their `status_code` field. Note that in the generated C
  * headers, each variant will be prefixed with `QVMStatus` to prevent naming conflicts
@@ -60,39 +49,6 @@ enum QVMStatus {
     QVMStatus_ConfigError = 8,
 };
 typedef uint8_t QVMStatus;
-
-/**
- * Represents the information of a single available processor
- */
-typedef struct QuantumProcessor {
-    /**
-     * Unique identifier for a Processor.
-     */
-    char *id;
-} QuantumProcessor;
-
-/**
- * The response from [`list_quantum_processors`], contains an array of strings.
- */
-typedef struct ListQuantumProcessorResponse {
-    /**
-     * The result code of the function call. Anything other than [`ListQuantumProcessorsResult::Success`]
-     * will result in a null `processors`.
-     */
-    ListQuantumProcessorsResult result;
-    /**
-     * Array of all available processors. This will be NULL if `result` is not Success
-     */
-    struct QuantumProcessor *processors;
-    /**
-     * The length of the array to use for iterating.
-     */
-    size_t len;
-    /**
-     * The total capacity of the array in case you'd like to modify it.
-     */
-    size_t cap;
-} ListQuantumProcessorResponse;
 
 /**
  * The return value of [`run_program_on_qvm`].
@@ -146,35 +102,12 @@ typedef struct QVMResponse {
 } QVMResponse;
 
 /**
- * This function exists to deallocate the memory that was allocated by a call to [`list_quantum_processors`]
- *
- * # Safety
- *
- * The `response` passed in here must be a valid [`ListQuantumProcessorResponse`] as created by
- * [`list_quantum_processors`].
- */
-void free_quantum_processors(struct ListQuantumProcessorResponse response);
-
-/**
  * Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
  *
  * # Safety
  * This function should only be called with the result of [`run_program_on_qvm`]
  */
 void free_qvm_response(struct QVMResponse response);
-
-/**
- * Return a comma-separated list of available quantum processors
- *
- * # Safety
- *
- * In order to safely operate this function:
- *
- * 1. The return value of this function __must__ be passed into [`free_quantum_processors`] in
- *     order to deallocate the memory.
- *
- */
-struct ListQuantumProcessorResponse list_quantum_processors(void);
 
 /**
  * Given a Quil program as a string, run that program on a local QVM.

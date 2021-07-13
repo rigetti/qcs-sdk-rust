@@ -2,32 +2,6 @@
 #include <string.h>
 #include "../libqcs.h"
 
-bool test_list_quantum_processors() {
-    ListQuantumProcessorResponse response = list_quantum_processors();
-
-    if (response.result != ListQuantumProcessorsResult_Success) {
-        printf("test_list_quantum_processors: Failed with result code %d\n", response.result);
-        return false;
-    }
-
-    bool aspen_9_found = false;
-
-    for (int ii = 0; ii < response.len; ii++) {
-        if (strcmp(response.processors[ii].id, "Aspen-9")) {
-            aspen_9_found = true;
-            break;
-        }
-    }
-
-    free_quantum_processors(response);
-
-    if (aspen_9_found) {
-        return true;
-    }
-    printf("\ntest_list_quantum_processors.c failed: expected Aspen-9 when listing processors.\n\n");
-    return false;
-}
-
 char* BELL_STATE_PROGRAM =
         "DECLARE ro BIT[2]\n"
         "H 0\n"
@@ -37,7 +11,7 @@ char* BELL_STATE_PROGRAM =
 
 
 bool test_run_program_on_qvm() {
-    uint8_t shots = 2;
+    unsigned int shots = 2;
     QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
 
     if (response.status_code != QVMStatus_Success) {
@@ -79,7 +53,6 @@ int main() {
     typedef bool (*test_func)(void);
 
     static test_func tests[] = {
-//        test_list_quantum_processors,
         test_run_program_on_qvm
     };
 
