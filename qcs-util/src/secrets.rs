@@ -53,7 +53,7 @@ pub(crate) struct Credential {
 
 #[derive(Deserialize, Debug, Default)]
 pub(crate) struct TokenPayload {
-    refresh_token: Option<String>,
+    pub refresh_token: Option<String>,
     pub access_token: Option<String>,
     scope: Option<String>,
     expires_in: Option<u32>,

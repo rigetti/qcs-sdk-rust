@@ -1,3 +1,6 @@
+[env]
+CARGO_MAKE_EXTEND_WORKSPACE_MAKEFILE = true
+
 [tasks.lint]
 workspace = false
 dependencies = ["clippy-flow"]
@@ -10,3 +13,6 @@ args = ["deny", "--all-features", "check"]
 
 [tasks.pre-workspace-ci-flow]
 alias = "deny"
+
+[tasks.manual]
+alias = "empty"

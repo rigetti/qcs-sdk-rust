@@ -20,7 +20,7 @@ use thiserror::Error;
 /// See [`QVMError`] for possible errors that can occur.
 pub async fn run_program(
     program: &str,
-    shots: usize,
+    shots: u16,
     register: &str,
 ) -> Result<Vec<Vec<u8>>, QVMError> {
     if shots == 0 {
@@ -37,12 +37,12 @@ pub async fn run_program(
         .remove(register)
         .ok_or(QVMError::RegisterMissing)?;
 
-    if data.len() != shots {
+    if data.len() != shots as usize {
         return Err(QVMError::ShotsMismatch);
     }
     data.shrink_to_fit();
     let shot_len = data[0].len();
-    for shot in data.iter_mut() {
+    for shot in &mut data {
         if shot.len() != shot_len {
             return Err(QVMError::InconsistentShots);
         }
@@ -79,13 +79,13 @@ pub enum QVMError {
 struct QVMRequest {
     quil_instructions: String,
     addresses: HashMap<String, bool>,
-    trials: usize,
+    trials: u16,
     #[serde(rename = "type")]
     request_type: RequestType,
 }
 
 impl QVMRequest {
-    fn new(program: &str, shots: usize, register: &str) -> Self {
+    fn new(program: &str, shots: u16, register: &str) -> Self {
         let mut addresses = HashMap::new();
         addresses.insert(register.to_string(), true);
         Self {

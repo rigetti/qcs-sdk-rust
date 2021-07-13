@@ -35,7 +35,7 @@ pub(crate) struct Settings {
     #[serde(default = "default_profiles")]
     pub profiles: HashMap<String, Profile>,
     #[serde(default)]
-    auth_servers: HashMap<String, AuthServer>,
+    pub(crate) auth_servers: HashMap<String, AuthServer>,
 }
 
 impl Default for Settings {
@@ -102,9 +102,9 @@ impl Default for Pyquil {
 }
 
 #[derive(Deserialize, Debug)]
-struct AuthServer {
-    client_id: String,
-    issuer: String,
+pub(crate) struct AuthServer {
+    pub(crate) client_id: String,
+    pub(crate) issuer: String,
 }
 
 impl Default for AuthServer {

@@ -1,0 +1,18 @@
+[env]
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = ""  # Disable --all-features to avoid QCS tests in CI for now
+
+[tasks.pre-test]
+command = "docker-compose"
+args = ["up", "-d"]
+
+[tasks.post-test]
+command = "docker-compose"
+args = ["down"]
+
+[tasks.manual]
+# Enable QCS tests locally
+command = "cargo"
+args = [
+    "test",
+    "--all-features"
+]

@@ -12,15 +12,6 @@ args = ["--config=cbindgen.toml", "--crate=c-lib", "--output=libqcs.h"]
 [tasks.pre-build]
 dependencies = ["cbindgen"]
 
-# This task runs implicitly after `build` which runs as part of the default rule
-[tasks.post-build]
-mac_alias = "mac-post-build"  # Only run on macOS
-alias = "empty"
-
-[tasks.mac-post-build]
-command = "install_name_tool"
-args = ["-id", "@loader_path/libqcs.dylib", "${DYLIB_PATH}"]
-
 [tasks.release-flow]
 env = {"DYLIB_PATH" = "../target/release/libqcs.dylib"}
 run_task = "build-release-and-copy-artifacts"
