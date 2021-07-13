@@ -2,7 +2,7 @@
 #![deny(clippy::pedantic)]
 #![forbid(unsafe_code)]
 
-use futures::future::try_join;
+use futures::future::join;
 use thiserror::Error;
 
 use crate::secrets::Secrets;
@@ -18,7 +18,7 @@ mod settings;
 /// # Errors
 /// See [`ConfigError`] for details on individual errors that can occur.
 pub async fn get_configuration() -> Result<Configuration, ConfigError> {
-    let (settings, secrets) = try_join(settings::load(), secrets::load()).await?;
+    let (settings, secrets) = join(settings::load(), secrets::load()).await;
     Configuration::new(settings, secrets)
 }
 

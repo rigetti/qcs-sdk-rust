@@ -1,7 +1,8 @@
 [package]
 name = "c-lib"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2018"
+license = "Apache-2.0"
 
 [lib]
 name = "qcs"
@@ -10,8 +11,8 @@ crate-type = ["cdylib"]
 [dependencies]
 http = "0.2.4"
 libc = "0.2.97"
-qcs-api = { path = "../qcs-api" }
-qcs-util = { path = "../qcs-util" }
-qvm-api = { path = "../qvm-api" }
+qcs-api = { version = "0.0.0", path = "../qcs-api" }
+qcs-util = { version = "0.0.0", path = "../qcs-util" }
+qvm-api = { version = "0.0.0", path = "../qvm-api" }
 thiserror = "1.0.25"
 tokio = { version = "1.7.1", features = ["rt-multi-thread"] }

@@ -28,7 +28,7 @@ run_task = "build-release-and-copy-artifacts"
 [tasks.build-release-and-copy-artifacts]
 dependencies = ["build-release", "post-build", "copy-artifacts"]
 
-[tasks.copy-artifacts]
+[tasks.copy-artifacts.mac]
 script = """
 cp "${DYLIB_PATH}" libqcs.dylib
 """
@@ -39,17 +39,24 @@ script = """
 ASAN_OPTIONS=detect_leaks=1 ./tests.o
 """
 
-[tasks.test-custom]
+[tasks.test-custom.mac]
 script = """
 clang tests/integration_tests.c ${DYLIB_PATH} -o tests.o
 ./tests.o
 rm -rf tests.o tests.o.dSYM
 """
 
+[tasks.test-custom.linux]
+script = """
+clang tests/integration_tests.c ../target/debug/libqcs.so -o tests.o
+./tests.o
+rm -rf tests.o tests.o.dSYM
+"""
+
 [tasks.pre-test]
-command = "docker"
-args = ["compose", "up", "-d"]
+command = "docker-compose"
+args = ["up", "-d"]
 
 [tasks.post-test]
-command = "docker"
-args = ["compose", "down"]
+command = "docker-compose"
+args = ["down"]

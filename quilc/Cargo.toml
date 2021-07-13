@@ -2,13 +2,12 @@
 name = "quilc"
 version = "0.1.0"
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "Apache-2.0"
 
 [dependencies]
 thiserror = "1.0.26"
-qcs-api = {path = "../qcs-api"}
-qcs-util = { path = "../qcs-util" }
+qcs-api = { version = "0.0.0", path = "../qcs-api"}
+qcs-util = { version = "0.0.0", path = "../qcs-util" }
 rmp-serde = "0.15.5"
 serde = { version = "1.0.126", features = ["derive"] }
 zmq = { version = "0.9.2", features = ["vendored"] }
@@ -17,6 +16,6 @@ lazy_static = "1.4.0"
 
 [dev-dependencies]
 float-cmp = "0.8.0"
-qvm-api = { path = "../qvm-api" }
+qvm-api = { version = "0.0.0", path = "../qvm-api" }
 serde_json = { version = "1.0.64" }
 tokio = { version = "1.8.1", features = ["macros", "rt-multi-thread"] }

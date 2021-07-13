@@ -79,7 +79,7 @@ int main() {
     typedef bool (*test_func)(void);
 
     static test_func tests[] = {
-        test_list_quantum_processors,
+//        test_list_quantum_processors,
         test_run_program_on_qvm
     };
 

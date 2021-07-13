@@ -1,0 +1,29 @@
+name: Run Checks
+on: [push]
+
+jobs:
+  checks:
+    name: Run Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - uses: Swatinem/rust-cache@v1
+      - name: Install cargo-make
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug cargo-make
+      - name: Run CI
+        uses: actions-rs/cargo@v1
+        env:
+          CARGO_MAKE_RUN_CHECK_FORMAT: true
+          CARGO_MAKE_RUN_CLIPPY: true
+          CARGO_MAKE_BUILD_EXAMPLES: true
+        with:
+          command: make
+          args: workspace-ci-flow
