@@ -1,3 +1,12 @@
 [tasks.lint]
 workspace = false
 dependencies = ["clippy-flow"]
+
+[tasks.deny]
+workspace = false
+install_crate = "cargo-deny"
+command = "cargo"
+args = ["deny", "--all-features", "check"]
+
+[tasks.pre-workspace-ci-flow]
+alias = "deny"

@@ -1,8 +1,8 @@
 
 [tasks.pre-test]
-command = "docker"
-args = ["compose", "up", "-d"]
+command = "docker-compose"
+args = ["up", "-d"]
 
 [tasks.post-test]
-command = "docker"
-args = ["compose", "down"]
+command = "docker-compose"
+args = ["down"]

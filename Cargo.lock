@@ -40,7 +40,7 @@ checksum = "b700ce4376041dcd0a327fd0097c41095743c4c8af8887265942faf1100bd040"
 
 [[package]]
 name = "c-lib"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "http",
  "libc",
@@ -65,7 +65,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
 name = "cli"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "qcs-api",
  "qcs-util",
@@ -721,7 +721,7 @@ dependencies = [
 
 [[package]]
 name = "qvm-api"
-version = "0.1.0"
+version = "0.0.0"
 dependencies = [
  "futures-retry",
  "qcs-util",

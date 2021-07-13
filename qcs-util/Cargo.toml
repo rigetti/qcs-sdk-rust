@@ -3,11 +3,12 @@ name = "qcs-util"
 description = "Utilities for interacting with the generated qcs-api crate."
 version = "0.0.0"
 edition = "2018"
+license = "Apache-2.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qcs-api = {path = "../qcs-api"}
+qcs-api = { version = "0.0.0", path = "../qcs-api"}
 toml = "0.5.8"
 dirs = "3.0.2"
 tokio = { version = "1.7.1", features = ["fs", "macros"] }

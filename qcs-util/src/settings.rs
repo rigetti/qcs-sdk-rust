@@ -2,10 +2,8 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
-use crate::ConfigError;
-
-pub(crate) async fn load() -> Result<Settings, ConfigError> {
-    _load().await.map_err(ConfigError::from)
+pub(crate) async fn load() -> Settings {
+    _load().await.unwrap_or_else(|_| Settings::default())
 }
 
 async fn _load() -> Result<Settings, Error> {
