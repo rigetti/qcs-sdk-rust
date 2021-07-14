@@ -15,7 +15,7 @@ fn compare_native_quil_to_expected_output() {
         &Configuration::default(),
     )
     .expect("Could not compile");
-    assert_eq!(output.quil, EXPECTED_H0_OUTPUT);
+    assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
 }
 
 const BELL_STATE: &str = r##"DECLARE ro BIT[2]
@@ -32,7 +32,7 @@ async fn run_compiled_bell_state_on_qvm() {
     let config = Configuration::default();
     let output =
         compile_program(BELL_STATE, &isa_fixtures::aspen_9(), &config).expect("Could not compile");
-    let results = qvm::run_program(&output.quil, 10, "ro")
+    let results = qvm::run_program(&String::from(output), 10, "ro")
         .await
         .expect("Could not run program on QVM");
     for shot in results {

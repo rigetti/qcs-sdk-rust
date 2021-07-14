@@ -10,7 +10,6 @@ use serde::{Deserialize, Serialize};
 use qcs_api::models::InstructionSetArchitecture;
 
 mod isa;
-mod rpcq;
 
 use isa::CompilerIsa;
 use rpcq::RPCRequest;
@@ -31,15 +30,26 @@ pub fn compile_program(
     quil: &str,
     isa: &InstructionSetArchitecture,
     config: &qcs_util::Configuration,
-) -> Result<QuilcResponse, CompileError> {
+) -> Result<NativeQuil, CompileError> {
     let endpoint = &config.quilc_url;
     let params = QuilcParams::new(quil, isa)?;
-    let request = RPCRequest::new(String::from("quil_to_native_quil"), params);
-    rpcq::send_request(&request, endpoint).map_err(CompileError::from)
+    let request = RPCRequest::new("quil_to_native_quil", params);
+    rpcq::Client::new(endpoint)?
+        .run_request::<_, QuilcResponse>(&request)
+        .map(|response| NativeQuil(response.quil))
+        .map_err(CompileError::from)
+}
+
+pub struct NativeQuil(String);
+
+impl From<NativeQuil> for String {
+    fn from(native_quil: NativeQuil) -> String {
+        native_quil.0
+    }
 }
 
 #[derive(Deserialize)]
-pub struct QuilcResponse {
+struct QuilcResponse {
     pub quil: String,
 }
 
