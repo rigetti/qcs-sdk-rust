@@ -1,0 +1,6 @@
+[env]
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = ""  # Disable --all-features to avoid manual tests in CI for now
+
+[tasks.manual]
+env = {CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all-features"}
+run_task = [{name = "test-flow"}]

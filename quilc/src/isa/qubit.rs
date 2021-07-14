@@ -320,7 +320,6 @@ const MEASURE_DEFAULT_DURATION: f64 = 2000.0;
 const MEASURE_DEFAULT_FIDELITY: f64 = 0.90;
 
 /// Process a "MEASURE" operation.
-// TODO: Switch to arrays from Vecs for efficiency if they're all fixed size?
 fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
     let fidelity = characteristics
         .iter()

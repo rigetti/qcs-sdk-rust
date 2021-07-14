@@ -11,6 +11,7 @@ use qcs_api::apis::configuration as api;
 use crate::secrets::Secrets;
 use crate::settings::{AuthServer, Pyquil, Settings};
 
+pub mod engagement;
 mod secrets;
 mod settings;
 

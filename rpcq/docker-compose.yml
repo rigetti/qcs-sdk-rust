@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  quilc:
+    image: rigetti/quilc
+    command: -S
+    ports:
+      - '5555:5555'

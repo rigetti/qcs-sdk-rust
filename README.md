@@ -27,6 +27,8 @@ Most development tasks are automated with cargo-make (like make, but you can hav
 
 The best way to go about this is via `makers` or `cargo make` with no task. This will default to `dev-test-flow` which formats all code, builds, and tests everything.
 
+Any tests which cannot be run in CI should be run with `makers manual`. These tests require configured QCS credentials with access to internal functions, as well as a connection to the Rigetti VPN.
+
 ### Linting
 
 `makers clippy-flow` from the workspace level will lint all crates except generated ones (where `#![allow(clippy::all)]` should be included).
@@ -41,4 +43,4 @@ For new crates, the following code block should be added to the top of the `main
 
 ## Release
 
-Before release, `makers manual` must be run in order to run tests against live QCS/QPUs as there is no safe, automated way to test some of this. As of right now these tests __must__ be run locally and not from CI.
+Before release, `makers manual` must be run in order to run tests against live QCS/QPUs.
