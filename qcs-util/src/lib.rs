@@ -7,6 +7,8 @@ use futures::future::try_join;
 use serde::{Deserialize, Serialize};
 
 use qcs_api::apis::configuration as api;
+pub use secrets::SECRETS_PATH_VAR;
+pub use settings::SETTINGS_PATH_VAR;
 
 use crate::secrets::Secrets;
 use crate::settings::{AuthServer, Pyquil, Settings};
@@ -35,7 +37,7 @@ pub struct Configuration {
     pub qvm_url: String,
 }
 
-const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
+pub const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
 
 impl Configuration {
     fn new(settings: Settings, mut secrets: Secrets) -> Result<Self> {
@@ -51,14 +53,16 @@ impl Configuration {
                 profile_name
             )
         })?;
-        let auth_server = auth_servers.remove(&profile_name).ok_or_else(|| {
-            eyre!(
-                "Expected profile {} in settings.auth_servers but it didn't exist",
-                profile_name
-            )
-        })?;
+        let auth_server = auth_servers
+            .remove(&profile.auth_server_name)
+            .ok_or_else(|| {
+                eyre!(
+                    "Expected auth server {} in settings.auth_servers but it didn't exist",
+                    &profile.auth_server_name
+                )
+            })?;
 
-        let credential = secrets.credentials.remove(&profile_name);
+        let credential = secrets.credentials.remove(&profile.credentials_name);
         let (access_token, refresh_token) = match credential {
             Some(secrets::Credential {
                 token_payload: Some(token_payload),
@@ -101,6 +105,7 @@ impl Configuration {
             .await
             .wrap_err("While requesting a new access token using refresh token")?;
         let response_data: TokenResponse = resp
+            .error_for_status()?
             .json()
             .await
             .wrap_err("While decoding response from auth server")?;

@@ -5,12 +5,12 @@ edition = "2018"
 license = "Apache-2.0"
 
 [dependencies]
-thiserror = "1.0.26"
 qcs-api = { version = "0.0.0", path = "../qcs-api"}
 qcs-util = { version = "0.0.0", path = "../qcs-util" }
 rpcq = { version = "0.0.0", path = "../rpcq" }
 serde = { version = "1.0.126", features = ["derive"] }
 lazy_static = "1.4.0"
+eyre = "0.6.5"
 
 [dev-dependencies]
 float-cmp = "0.8.0"

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
+use eyre::{eyre, Report, Result, WrapErr};
 use serde::{Serialize, Serializer};
 
 use qcs_api::models;
@@ -10,7 +11,6 @@ use qcs_api::models::Characteristic;
 use crate::isa::operator::{
     Arguments, OperatorMap, Parameters, PERFECT_DURATION, PERFECT_FIDELITY,
 };
-use crate::isa::Error;
 
 use super::Operator;
 
@@ -44,14 +44,14 @@ impl Edge {
         &mut self,
         op_name: &str,
         characteristics: &[Characteristic],
-    ) -> Result<(), Error> {
+    ) -> Result<()> {
         let operator = match GATE_PARAMS.get_key_value(op_name) {
             Some((key, params)) => basic_gates(key, params, characteristics),
             _ => {
                 if op_name == "WILDCARD" {
                     WILDCARD
                 } else {
-                    return Err(Error::BadOperator);
+                    return Err(eyre!("Unknown operator {}", op_name));
                 }
             }
         };
@@ -114,10 +114,13 @@ impl EdgeId {
 }
 
 impl TryFrom<&Vec<i32>> for EdgeId {
-    type Error = Error;
+    type Error = Report;
 
-    fn try_from(node_ids: &Vec<i32>) -> Result<Self, Error> {
-        let node_ids: [i32; 2] = node_ids.as_slice().try_into().map_err(|_| Error::BadEdge)?;
+    fn try_from(node_ids: &Vec<i32>) -> Result<Self> {
+        let node_ids: [i32; 2] = node_ids
+            .as_slice()
+            .try_into()
+            .wrap_err_with(|| eyre!("Edges must have exactly 2 nodes, got {:?}", node_ids))?;
         Ok(Self::new(node_ids))
     }
 }
@@ -172,7 +175,7 @@ mod describe_edge_id {
         ];
         for input in inputs {
             let result = EdgeId::try_from(&input);
-            assert!(matches!(result, Err(Error::BadEdge)));
+            assert!(result.is_err());
         }
     }
 
@@ -185,7 +188,7 @@ mod describe_edge_id {
 }
 
 /// Convert the QCS ISA representation of edges to the quilc form [`Edge`]
-pub(crate) fn convert_edges(edges: &[models::Edge]) -> Result<HashMap<EdgeId, Edge>, Error> {
+pub(crate) fn convert_edges(edges: &[models::Edge]) -> Result<HashMap<EdgeId, Edge>> {
     edges
         .iter()
         .map(|edge| {

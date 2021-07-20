@@ -4,6 +4,7 @@ version = "0.0.0"
 edition = "2018"
 
 [dependencies]
+eyre = "0.6.5"
 rmp-serde = "0.15.5"
 serde = { version = "1.0.126", features = ["derive"] }
 thiserror = "1.0.26"

@@ -20,20 +20,28 @@ pub(crate) fn execute(
         credentials,
         ..
     } = engagement;
-    let credentials = Credentials {
-        client_secret_key: credentials.client_secret,
-        client_public_key: credentials.client_public,
-        server_public_key: credentials.server_public,
+
+    // This is a hack to allow testing without credentials since ZAP is absurd
+    let client = if credentials.server_public.is_empty() {
+        Client::new(&address).wrap_err("Unable to connect to the QPU (Lodgepole)")?
+    } else {
+        let credentials = Credentials {
+            client_secret_key: credentials.client_secret,
+            client_public_key: credentials.client_public,
+            server_public_key: credentials.server_public,
+        };
+        Client::new_with_credentials(&address, &credentials)
+            .wrap_err("Unable to connect to the QPU (Lodgepole)")?
     };
-    let client = Client::new_with_credentials(&address, &credentials)
-        .wrap_err("Unable to connect to the QPU (Lodgepole)")?;
+
+    // let client = Client::new(&address).unwrap();
     let job_id: String = client
         .run_request(&params.into())
         .wrap_err("While attempting to send the program to the QPU (Lodgepole)")?;
     let get_buffers_request = GetBuffersRequest::new(job_id);
     client
         .run_request(&get_buffers_request.into())
-        .wrap_err("While attempting to receive resuts from to the QPU (Lodgepole)")
+        .wrap_err("While attempting to receive results from to the QPU (Lodgepole)")
 }
 
 #[derive(Serialize, Debug)]
@@ -146,6 +154,7 @@ impl Buffer {
     }
 }
 
+/// The types of data for an individual register that can come back from a QPU.
 #[derive(Debug, PartialEq)]
 pub enum QPUResult {
     F64(Vec<f64>),

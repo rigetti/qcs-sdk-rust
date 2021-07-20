@@ -8,13 +8,13 @@ use std::str::FromStr;
 
 use eyre::{eyre, Result, WrapErr};
 
+pub use lodgepole::QPUResult;
+use lodgepole::{execute, Buffer};
 use qcs_api::apis::quantum_processors_api as qpu_api;
 use qcs_api::models::InstructionSetArchitecture;
 use qcs_util::engagement::get;
 use qcs_util::Configuration;
 use translation::translate;
-
-use crate::lodgepole::{execute, Buffer, QPUResult};
 
 mod lodgepole;
 mod translation;

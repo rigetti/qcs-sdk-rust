@@ -4,6 +4,7 @@ use std::convert::TryFrom;
 use serde::Serialize;
 
 use edge::Edge;
+use eyre::{eyre, Report, Result};
 use qcs_api::models::InstructionSetArchitecture;
 
 use crate::isa::edge::{convert_edges, EdgeId};
@@ -13,8 +14,6 @@ use crate::isa::qubit::Qubit;
 mod edge;
 mod operator;
 mod qubit;
-
-// use qubit::qubit_site_op;
 
 /// Restructuring of a [`models::InstructionSetArchitecture`] for sending to quilc
 #[derive(Serialize, Debug)]
@@ -26,9 +25,9 @@ pub(crate) struct CompilerIsa {
 }
 
 impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
-    type Error = Error;
+    type Error = Report;
 
-    fn try_from(isa: &InstructionSetArchitecture) -> Result<Self, Self::Error> {
+    fn try_from(isa: &InstructionSetArchitecture) -> Result<Self> {
         let mut qubits = Qubit::from_nodes(&isa.architecture.nodes);
 
         let mut edges = convert_edges(&isa.architecture.edges)?;
@@ -42,15 +41,24 @@ impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
             match (&op.node_count, &site.node_ids.len()) {
                 (Some(1), 1) => {
                     let id = &site.node_ids[0];
-                    let qubit = qubits.get_mut(id).ok_or(Error::BadOperator)?;
+                    let qubit = qubits.get_mut(id).ok_or_else(
+                        || eyre!("Operation {} is defined for Qubit {} but that Qubit does not exist", op.name, id)
+                    )?;
                     qubit.add_operation(&op.name, &site.characteristics, &isa.benchmarks)?;
                 }
                 (Some(2), 2) => {
                     let id = EdgeId::try_from(&site.node_ids)?;
-                    let edge = edges.get_mut(&id).ok_or(Error::BadOperator)?;
+                    let edge = edges.get_mut(&id).ok_or_else(
+                        || eyre!("Operation {} is defined for Edge {} but that Edge does not exist", op.name, id)
+                    )?;
                     edge.add_operation(&op.name, &site.characteristics)?;
                 }
-                _ => return Err(Error::BadOperator),
+                item => {
+                    return Err(eyre!(
+                        "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
+                        Got {:?} while parsing operation {} at site {:?}", item, op.name, site.node_ids
+                    ))
+                },
             }
         }
 
@@ -61,20 +69,6 @@ impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
         let edges = edges.into_iter().map(|(k, v)| (k.to_string(), v)).collect();
         Ok(Self { qubits, edges })
     }
-}
-
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    #[error("Operation {op_name} has undeclared node {node_id}")]
-    MissingNode { op_name: String, node_id: String },
-    #[error("Invalid edge size")]
-    BadEdge,
-    #[error("When processing operations, invalid node counts were found")]
-    OperationNodeCounts,
-    #[error("Expected a benchmark that did not exist")]
-    MissingBenchmark,
-    #[error("Encountered an unknown operator name")]
-    BadOperator,
 }
 
 #[cfg(test)]
