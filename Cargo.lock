@@ -42,10 +42,10 @@ checksum = "b700ce4376041dcd0a327fd0097c41095743c4c8af8887265942faf1100bd040"
 name = "c-lib"
 version = "0.0.0"
 dependencies = [
+ "eyre",
  "http",
  "libc",
  "qvm",
- "thiserror",
  "tokio",
 ]
 
@@ -773,10 +773,11 @@ dependencies = [
  "dirs",
  "eyre",
  "futures",
+ "log",
  "qcs-api",
  "reqwest",
  "serde",
- "thiserror",
+ "tempfile",
  "tokio",
  "toml 0.5.8",
 ]
@@ -829,12 +830,12 @@ dependencies = [
 name = "qvm"
 version = "0.0.0"
 dependencies = [
+ "eyre",
  "futures-retry",
  "qcs-util",
  "reqwest",
  "serde",
  "serde_json",
- "thiserror",
  "tokio",
 ]
 

@@ -1,33 +1,58 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use eyre::{Result, WrapErr};
+use serde::{Deserialize, Serialize};
 
-pub(crate) async fn load() -> Secrets {
-    _load().await.unwrap_or_else(|_| Secrets::default())
+use crate::path::path_from_env_or_home;
+
+const VAR: &str = "QCS_SECRETS_FILE_PATH";
+
+pub(crate) async fn load() -> Result<Secrets> {
+    let path = path_from_env_or_home(VAR, "secrets.toml")
+        .wrap_err("When determining secrets config path")?;
+    let content = tokio::fs::read_to_string(&path)
+        .await
+        .wrap_err_with(|| format!("While reading secrets from {}", path.to_string_lossy()))?;
+    Ok(toml::from_str(&content)
+        .wrap_err_with(|| format!("While parsing secrets from {}", path.to_string_lossy()))?)
 }
 
-async fn _load() -> Result<Secrets, Error> {
-    let home = dirs::home_dir().ok_or(Error::HomeDirectory)?;
-    let content = tokio::fs::read_to_string(home.join(".qcs").join("secrets.toml")).await?;
-    Ok(toml::from_str(&content)?)
+#[cfg(test)]
+mod describe_load {
+    use std::io::Write;
+
+    use tempfile::NamedTempFile;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn it_returns_default_if_missing_path() {
+        std::env::set_var(VAR, "/blah/doesnt_exist.toml");
+
+        let settings = load().await;
+
+        assert!(settings.is_err())
+    }
+
+    #[tokio::test]
+    async fn it_loads_from_env_var_path() {
+        let mut file = NamedTempFile::new().expect("Failed to create temporary settings file");
+        let mut secrets = Secrets::default();
+        secrets
+            .credentials
+            .insert("test".to_string(), Credential::default());
+        let secrets_string = toml::to_string(&secrets).expect("Could not serialize test settings");
+        file.write(secrets_string.as_bytes())
+            .expect("Failed to write test settings");
+        std::env::set_var(VAR, file.path());
+
+        let loaded = load().await.expect("Failed to load secrets");
+
+        assert_eq!(secrets, loaded)
+    }
 }
 
-/// Errors that can occur when attempting to load secrets.
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    /// The default settings path is in the home directory. It's possible, depending on platform,
-    /// that the home directory couldn't be determined.
-    #[error("Could not determine a home directory to read config from")]
-    HomeDirectory,
-    /// There was no `.qcs/secrets.toml` file in the home directory.
-    #[error("Could read ~/.qcs/secrets.toml")]
-    Path(#[from] std::io::Error),
-    /// The secrets file existed but could not be parsed.
-    #[error("Could not parse secrets file")]
-    Parse(#[from] toml::de::Error),
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct Secrets {
     pub credentials: HashMap<String, Credential>,
 }
@@ -46,12 +71,12 @@ fn default_credentials() -> HashMap<String, Credential> {
     map
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
 pub(crate) struct Credential {
     pub token_payload: Option<TokenPayload>,
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
 pub(crate) struct TokenPayload {
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,

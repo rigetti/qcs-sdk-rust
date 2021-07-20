@@ -1,33 +1,57 @@
 use std::collections::HashMap;
 
-use serde::Deserialize;
+use eyre::{Result, WrapErr};
+use serde::{Deserialize, Serialize};
 
-pub(crate) async fn load() -> Settings {
-    _load().await.unwrap_or_else(|_| Settings::default())
+use crate::path::path_from_env_or_home;
+
+const VAR: &str = "QCS_SETTINGS_FILE_PATH";
+
+pub(crate) async fn load() -> Result<Settings> {
+    let path = path_from_env_or_home(VAR, "settings.toml")
+        .wrap_err("When determining settings config path")?;
+    let content = tokio::fs::read_to_string(&path)
+        .await
+        .wrap_err_with(|| format!("When reading settings from {}", path.to_string_lossy()))?;
+    Ok(toml::from_str(&content)
+        .wrap_err_with(|| format!("When parsing settings from {}", path.to_string_lossy()))?)
 }
 
-async fn _load() -> Result<Settings, Error> {
-    let home = dirs::home_dir().ok_or(Error::HomeDirectory)?;
-    let content = tokio::fs::read_to_string(home.join(".qcs").join("settings.toml")).await?;
-    Ok(toml::from_str(&content)?)
+#[cfg(test)]
+mod describe_load {
+    use std::io::Write;
+
+    use tempfile::NamedTempFile;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn it_returns_default_if_missing_path() {
+        std::env::set_var(VAR, "/blah/doesnt_exist.toml");
+
+        let settings = load().await;
+
+        assert!(settings.is_err())
+    }
+
+    #[tokio::test]
+    async fn it_loads_from_env_var_path() {
+        let mut file = NamedTempFile::new().expect("Failed to create temporary settings file");
+        let mut settings = Settings::default();
+        settings.default_profile_name = "THIS IS A TEST".to_string();
+        let settings_string =
+            toml::to_string(&settings).expect("Could not serialize test settings");
+        file.write(settings_string.as_bytes())
+            .expect("Failed to write test settings");
+        std::env::set_var(VAR, file.path());
+
+        let loaded = load().await.expect("Failed to load settings");
+
+        assert_eq!(settings, loaded)
+    }
 }
 
-/// Errors that can occur when attempting to load settings.
-#[derive(thiserror::Error, Debug)]
-pub enum Error {
-    /// The default settings path is in the home directory. It's possible, depending on platform,
-    /// that the home directory couldn't be determined.
-    #[error("Could not determine a home directory to read config from")]
-    HomeDirectory,
-    /// There was no `.qcs/settings.toml` file in the home directory.
-    #[error("Could read ~/.qcs/settings.toml")]
-    Path(#[from] std::io::Error),
-    /// The settings file existed but could not be parsed.
-    #[error("Could not parse settings file")]
-    Parse(#[from] toml::de::Error),
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct Settings {
     /// Which profile to select settings from when none is specified.
     pub default_profile_name: String,
@@ -60,7 +84,7 @@ fn default_auth_servers() -> HashMap<String, AuthServer> {
     map
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct Profile {
     /// URL of the QCS API to use for all API calls
     pub api_url: String,
@@ -81,12 +105,12 @@ impl Default for Profile {
     }
 }
 
-#[derive(Deserialize, Debug, Default)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
 pub(crate) struct Applications {
     pub pyquil: Pyquil,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct Pyquil {
     pub qvm_url: String,
     pub quilc_url: String,
@@ -101,7 +125,7 @@ impl Default for Pyquil {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct AuthServer {
     pub(crate) client_id: String,
     pub(crate) issuer: String,

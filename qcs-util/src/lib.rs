@@ -2,9 +2,9 @@
 #![deny(clippy::pedantic)]
 #![forbid(unsafe_code)]
 
-use futures::future::join;
+use eyre::{eyre, Result, WrapErr};
+use futures::future::try_join;
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 use qcs_api::apis::configuration as api;
 
@@ -12,6 +12,7 @@ use crate::secrets::Secrets;
 use crate::settings::{AuthServer, Pyquil, Settings};
 
 pub mod engagement;
+mod path;
 mod secrets;
 mod settings;
 
@@ -20,8 +21,8 @@ mod settings;
 ///
 /// # Errors
 /// See [`ConfigError`] for details on individual errors that can occur.
-pub async fn get_configuration() -> Result<Configuration, ConfigError> {
-    let (settings, secrets) = join(settings::load(), secrets::load()).await;
+pub async fn get_configuration() -> Result<Configuration> {
+    let (settings, secrets) = try_join(settings::load(), secrets::load()).await?;
     Configuration::new(settings, secrets)
 }
 
@@ -34,17 +35,28 @@ pub struct Configuration {
     pub qvm_url: String,
 }
 
+const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
+
 impl Configuration {
-    fn new(settings: Settings, mut secrets: Secrets) -> Result<Self, ConfigError> {
+    fn new(settings: Settings, mut secrets: Secrets) -> Result<Self> {
         let Settings {
-            default_profile_name: profile_name,
+            default_profile_name,
             mut profiles,
             mut auth_servers,
         } = settings;
-        let profile = profiles.remove(&profile_name).ok_or(ConfigError::Profile)?;
-        let auth_server = auth_servers
-            .remove(&profile_name)
-            .ok_or(ConfigError::Profile)?;
+        let profile_name = std::env::var(PROFILE_NAME_VAR).unwrap_or(default_profile_name);
+        let profile = profiles.remove(&profile_name).ok_or_else(|| {
+            eyre!(
+                "Expected profile {} in settings.profiles but it didn't exist",
+                profile_name
+            )
+        })?;
+        let auth_server = auth_servers.remove(&profile_name).ok_or_else(|| {
+            eyre!(
+                "Expected profile {} in settings.auth_servers but it didn't exist",
+                profile_name
+            )
+        })?;
 
         let credential = secrets.credentials.remove(&profile_name);
         let (access_token, refresh_token) = match credential {
@@ -74,8 +86,10 @@ impl Configuration {
     /// 1. There is no `refresh_token` set, so no new `access_token` can be fetched.
     /// 2. Could not reach the configured auth server.
     /// 3. The response from the auth server was invalid.
-    pub async fn refresh(mut self) -> Result<Self, ConfigError> {
-        let refresh_token = self.refresh_token.ok_or(ConfigError::RefreshToken)?;
+    pub async fn refresh(mut self) -> Result<Self> {
+        let refresh_token = self
+            .refresh_token
+            .ok_or_else(|| eyre!("No refresh token is in secrets"))?;
         let token_url = format!("{}/v1/token", &self.auth_server.issuer);
         let data = TokenRequest::new(&self.auth_server.client_id, &refresh_token);
         let resp = self
@@ -85,9 +99,11 @@ impl Configuration {
             .form(&data)
             .send()
             .await
-            .map_err(|_| ConfigError::RefreshToken)?;
-        let response_data: TokenResponse =
-            resp.json().await.map_err(|_| ConfigError::RefreshToken)?;
+            .wrap_err("While requesting a new access token using refresh token")?;
+        let response_data: TokenResponse = resp
+            .json()
+            .await
+            .wrap_err("While decoding response from auth server")?;
         self.api_config.bearer_access_token = Some(response_data.access_token);
         self.refresh_token = Some(response_data.refresh_token);
         Ok(self)
@@ -134,21 +150,4 @@ impl Default for Configuration {
             refresh_token: None,
         }
     }
-}
-
-/// Errors that can occur when attempting to load configuration.
-#[derive(Error, Debug)]
-pub enum ConfigError {
-    /// There was a problem loading the settings file.
-    #[error("Could not load settings")]
-    Settings(#[from] settings::Error),
-    /// There was a problem loading the secrets file.
-    #[error("Could not load secrets")]
-    Secrets(#[from] secrets::Error),
-    /// The specified `default_profile_name` in Settings did not correspond to a profile
-    #[error("Default profile did not exist")]
-    Profile,
-    /// There was no refresh token configured, so a new access token could not be retrieved.
-    #[error("No refresh token is configured")]
-    RefreshToken,
 }

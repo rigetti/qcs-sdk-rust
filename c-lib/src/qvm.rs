@@ -1,10 +1,11 @@
-use std::ffi::CStr;
-use std::ptr;
+use std::collections::HashMap;
+use std::ffi::{CStr, CString};
+use std::ptr::null_mut;
 
+use eyre::{eyre, Report, Result, WrapErr};
 use libc::{c_char, c_uchar, c_ushort};
 
-use qvm::{run_program, QVMError};
-use std::collections::HashMap;
+use qvm::run_program;
 
 /// Given a Quil program as a string, run that program on a local QVM.
 ///
@@ -70,31 +71,31 @@ pub unsafe extern "C" fn run_program_on_qvm(
     num_shots: c_ushort,
     register_name: *mut c_char,
 ) -> QVMResponse {
+    match _run_program_on_qvm(program, num_shots, register_name) {
+        Ok(data) => QVMResponse::from_data(data),
+        Err(error) => QVMResponse::from(error),
+    }
+}
+
+/// Implements the actual logic of [`run_program_on_qvm`] but with `?` support.
+unsafe fn _run_program_on_qvm(
+    program: *mut c_char,
+    num_shots: c_ushort,
+    register_name: *mut c_char,
+) -> Result<Vec<Vec<u8>>> {
     // SAFETY: If program is not a valid null-terminated string, this is UB
     let program = CStr::from_ptr(program);
     // SAFETY: If register is not a valid null-terminated string, this is UB
     let register = CStr::from_ptr(register_name);
-    let program = match program.to_str() {
-        Ok(program) => program,
-        Err(std::str::Utf8Error { .. }) => {
-            return QVMResponse::from_error(QVMStatus::ProgramIsNotUtf8)
-        }
-    };
-    let register = match register.to_str() {
-        Ok(register) => register,
-        Err(std::str::Utf8Error { .. }) => {
-            return QVMResponse::from_error(QVMStatus::RegisterIsNotUtf8)
-        }
-    };
-    let rt = match tokio::runtime::Runtime::new() {
-        Ok(rt) => rt,
-        Err(_) => return QVMResponse::from_error(QVMStatus::CannotMakeRequest),
-    };
+    let program = program
+        .to_str()
+        .wrap_err("Could not decode program as UTF-8")?;
+    let register = register
+        .to_str()
+        .wrap_err("Could not decode register as UTF-8")?;
+    let rt = tokio::runtime::Runtime::new().wrap_err("Failed to create tokio runtime")?;
     let fut = run_program(program, num_shots, register);
-    match rt.block_on(fut) {
-        Ok(data) => QVMResponse::from_data(data),
-        Err(error) => QVMResponse::from(error),
-    }
+    rt.block_on(fut)
 }
 
 /// Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
@@ -103,7 +104,7 @@ pub unsafe extern "C" fn run_program_on_qvm(
 /// This function should only be called with the result of [`run_program_on_qvm`]
 #[no_mangle]
 pub unsafe extern "C" fn free_qvm_response(response: QVMResponse) {
-    let rust_managed: qvm::QVMResponse = response.into_api_response();
+    let rust_managed = response.into_api_response();
     drop(rust_managed);
 }
 
@@ -143,22 +144,13 @@ pub struct QVMResponse {
     /// How many bits were measured in the program in one shot. This is the inner dimension of
     /// `results_by_shot`.
     pub shot_length: c_ushort,
-    /// Tells you whether or not the request to the QVM was successful. If the status
-    /// code is [`QVMStatus::Success`], then `results_by_shot` will be populated.
-    /// If not, `results_by_shot` will be `NULL`.
-    pub status_code: QVMStatus,
+    /// If this string is populated, there was an error. The string contains a description of that
+    /// error and `results_by_shot` is `NULL`. If this string is `NULL`, the other fields contain
+    /// data.
+    pub error: *mut c_char,
 }
 
 impl QVMResponse {
-    fn from_error(status_code: QVMStatus) -> Self {
-        Self {
-            results_by_shot: ptr::null_mut(),
-            number_of_shots: 0,
-            shot_length: 0,
-            status_code,
-        }
-    }
-
     fn from_data(data: Vec<Vec<u8>>) -> Self {
         // Shots was passed into QVM originally as a u16 so this is safe.
         #[allow(clippy::cast_possible_truncation)]
@@ -182,17 +174,28 @@ impl QVMResponse {
             results_by_shot: ptr,
             number_of_shots,
             shot_length,
-            status_code: QVMStatus::Success,
+            error: null_mut(),
         }
     }
 
-    unsafe fn into_api_response(self) -> qvm::QVMResponse {
+    unsafe fn into_api_response(self) -> Result<qvm::QVMResponse> {
         let Self {
             results_by_shot,
             number_of_shots,
             shot_length,
-            status_code,
+            error,
         } = self;
+
+        if results_by_shot.is_null() {
+            if error.is_null() {
+                return Err(eyre!("Unknown error"));
+            }
+            // SAFETY: If this was manually constructed with a null-terminated string, bad things
+            // will happen here. Proper usage should only see an error message here that was
+            // constructed from `QVMResponse::from`
+            let c_string = CString::from_raw(error);
+            return Err(eyre!(c_string.into_string()?));
+        }
 
         // SAFETY: If any of these pieces are wrong, this will read arbitrary memory
         let results: Vec<*mut u8> = Vec::from_raw_parts(
@@ -210,63 +213,19 @@ impl QVMResponse {
         let mut registers = HashMap::with_capacity(1);
         registers.insert("ro".to_string(), results);
 
-        drop(status_code);
-
-        qvm::QVMResponse { registers }
+        Ok(qvm::QVMResponse { registers })
     }
 }
 
-impl From<QVMStatus> for QVMResponse {
-    fn from(status: QVMStatus) -> Self {
+impl From<Report> for QVMResponse {
+    fn from(err: Report) -> Self {
+        let c_string = CString::new(err.to_string()).expect("Rust strings aren't null!");
+        let ptr = c_string.into_raw();
         Self {
-            results_by_shot: ptr::null_mut(),
+            results_by_shot: null_mut(),
             number_of_shots: 0,
             shot_length: 0,
-            status_code: status,
+            error: ptr,
         }
     }
-}
-
-impl From<QVMError> for QVMResponse {
-    fn from(error: QVMError) -> Self {
-        let status = match error {
-            QVMError::ShotsMismatch | QVMError::InconsistentShots => {
-                QVMStatus::InconsistentShotLength
-            }
-            QVMError::RegisterMissing => QVMStatus::NoResults,
-            QVMError::Connection(_) => QVMStatus::UnableToCommunicateWithQVM,
-            QVMError::Configuration(_) => QVMStatus::ConfigError,
-        };
-        Self {
-            results_by_shot: ptr::null_mut(),
-            number_of_shots: 0,
-            shot_length: 0,
-            status_code: status,
-        }
-    }
-}
-
-/// Codes indicating the possible results of calling [`run_program_on_qvm`]. Every [`QVMResponse`]
-/// will have one of these statuses in their `status_code` field. Note that in the generated C
-/// headers, each variant will be prefixed with `QVMStatus` to prevent naming conflicts
-/// (e.g. `QVMStatus_Success`).
-#[repr(u8)]
-pub enum QVMStatus {
-    /// Program was run successfully, the [`QVMResponse`] containing this has valid data in other fields.
-    Success = 0,
-    /// The Program provided was not valid UTF-8 and could not be decoded for processing.
-    ProgramIsNotUtf8 = 1,
-    /// Something prevented this library from attempting to make the request, if this happens
-    /// it's probably a bug.
-    CannotMakeRequest = 2,
-    /// QVM did not respond with a results in the specified register.
-    NoResults = 3,
-    /// One or more shots had differing numbers of result registers, this could be a bug with QVM.
-    InconsistentShotLength = 5,
-    /// A request to QVM was attempted but failed, is it running?
-    UnableToCommunicateWithQVM = 6,
-    /// The provided `register_name` was not valid UTF-8
-    RegisterIsNotUtf8 = 7,
-    /// Configuration could not be loaded, so QVM could not be contacted
-    ConfigError = 8,
 }

@@ -8,49 +8,6 @@
 
 
 /**
- * Codes indicating the possible results of calling [`run_program_on_qvm`]. Every [`QVMResponse`]
- * will have one of these statuses in their `status_code` field. Note that in the generated C
- * headers, each variant will be prefixed with `QVMStatus` to prevent naming conflicts
- * (e.g. `QVMStatus_Success`).
- */
-enum QVMStatus {
-    /**
-     * Program was run successfully, the [`QVMResponse`] containing this has valid data in other fields.
-     */
-    QVMStatus_Success = 0,
-    /**
-     * The Program provided was not valid UTF-8 and could not be decoded for processing.
-     */
-    QVMStatus_ProgramIsNotUtf8 = 1,
-    /**
-     * Something prevented this library from attempting to make the request, if this happens
-     * it's probably a bug.
-     */
-    QVMStatus_CannotMakeRequest = 2,
-    /**
-     * QVM did not respond with a results in the specified register.
-     */
-    QVMStatus_NoResults = 3,
-    /**
-     * One or more shots had differing numbers of result registers, this could be a bug with QVM.
-     */
-    QVMStatus_InconsistentShotLength = 5,
-    /**
-     * A request to QVM was attempted but failed, is it running?
-     */
-    QVMStatus_UnableToCommunicateWithQVM = 6,
-    /**
-     * The provided `register_name` was not valid UTF-8
-     */
-    QVMStatus_RegisterIsNotUtf8 = 7,
-    /**
-     * Configuration could not be loaded, so QVM could not be contacted
-     */
-    QVMStatus_ConfigError = 8,
-};
-typedef uint8_t QVMStatus;
-
-/**
  * The return value of [`run_program_on_qvm`].
  *
  * # Safety
@@ -94,11 +51,11 @@ typedef struct QVMResponse {
      */
     unsigned short shot_length;
     /**
-     * Tells you whether or not the request to the QVM was successful. If the status
-     * code is [`QVMStatus::Success`], then `results_by_shot` will be populated.
-     * If not, `results_by_shot` will be `NULL`.
+     * If this string is populated, there was an error. The string contains a description of that
+     * error and `results_by_shot` is `NULL`. If this string is `NULL`, the other fields contain
+     * data.
      */
-    QVMStatus status_code;
+    char *error;
 } QVMResponse;
 
 /**

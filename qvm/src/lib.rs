@@ -4,8 +4,9 @@
 
 use std::collections::HashMap;
 
+use eyre::{eyre, Result, WrapErr};
+use qcs_util::Configuration;
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 /// Take in a Quil program as a string `program` and attempt to run it on QVM.
 ///
@@ -18,33 +19,52 @@ use thiserror::Error;
 ///
 /// # Errors
 /// See [`QVMError`] for possible errors that can occur.
-pub async fn run_program(
-    program: &str,
-    shots: u16,
-    register: &str,
-) -> Result<Vec<Vec<u8>>, QVMError> {
+pub async fn run_program(program: &str, shots: u16, register: &str) -> Result<Vec<Vec<u8>>> {
     if shots == 0 {
-        return Err(QVMError::RegisterMissing);
+        return Err(eyre!("A non-zero number of shots must be provided."));
     }
-    let config = qcs_util::get_configuration().await?;
+    let config = qcs_util::get_configuration()
+        .await
+        .unwrap_or_else(|_| Configuration::default());
     let request = QVMRequest::new(program, shots, register);
 
     let client = reqwest::Client::new();
-    let response = client.post(&config.qvm_url).json(&request).send().await?;
+    let response = client
+        .post(&config.qvm_url)
+        .json(&request)
+        .send()
+        .await
+        .wrap_err("While sending data to the QVM")?;
 
-    let QVMResponse { mut registers } = response.json().await?;
-    let mut data = registers
-        .remove(register)
-        .ok_or(QVMError::RegisterMissing)?;
+    let QVMResponse { mut registers } = response
+        .json()
+        .await
+        .wrap_err("While decoding QVM response")?;
+    let mut data = registers.remove(register).ok_or_else(|| {
+        eyre!(
+            "Could not find register {} in the QVM response, did you measure to it?",
+            register
+        )
+    })?;
 
     if data.len() != shots as usize {
-        return Err(QVMError::ShotsMismatch);
+        return Err(eyre!(
+            "Expected {} shots but received {}",
+            shots,
+            data.len()
+        ));
     }
     data.shrink_to_fit();
     let shot_len = data[0].len();
-    for shot in &mut data {
+    for (shot_num, shot) in data.iter_mut().enumerate() {
         if shot.len() != shot_len {
-            return Err(QVMError::InconsistentShots);
+            return Err(eyre!(
+                "Each shot must have the same amount of data. However, shot 0 had \
+                {shot_len} entries and shot {shot_num} had {this_shot_len} entries.",
+                shot_len = shot_len,
+                shot_num = shot_num,
+                this_shot_len = shot.len(),
+            ));
         }
         shot.shrink_to_fit();
     }
@@ -57,21 +77,6 @@ pub async fn run_program(
 pub struct QVMResponse {
     #[serde(flatten)]
     pub registers: HashMap<String, Vec<Vec<u8>>>,
-}
-
-/// The return value of [`run_program_on_qvm`] if there is an error.
-#[derive(Error, Debug)]
-pub enum QVMError {
-    #[error("Unable to connect to QVM")]
-    Connection(#[from] reqwest::Error),
-    #[error("Could not read configuration")]
-    Configuration(#[from] qcs_util::ConfigError),
-    #[error("The specified register was not present in the results from QVM")]
-    RegisterMissing,
-    #[error("The returned number of shots from QVM does not match the requested number")]
-    ShotsMismatch,
-    #[error("Not every shot contained the same amount of data.")]
-    InconsistentShots,
 }
 
 #[derive(Serialize)]
