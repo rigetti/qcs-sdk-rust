@@ -14,16 +14,16 @@ bool test_run_program_on_qvm() {
     unsigned int shots = 2;
     QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
 
-    if (response.status_code != QVMStatus_Success) {
-        printf("\ntest_run_program_on_qvm failed: Response status code was %d\n\n", response.status_code);
+    if (response.error != NULL) {
+        printf("\ntest_run_program_on_qvm failed with %s\n\n", response.error);
         return false;
     }
 
     if (response.number_of_shots != shots) {
         printf(
             "\ntest_run_program_on_qvm failed: Response number of shots was %d, expected %d\n\n",
-            response.status_code,
-            response.number_of_shots
+            response.number_of_shots,
+            shots
         );
         return false;
     }

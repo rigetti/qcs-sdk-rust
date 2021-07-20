@@ -12,7 +12,6 @@ qcs-api = { version = "0.0.0", path = "../qcs-api"}
 toml = "0.5.8"
 dirs = "3.0.2"
 tokio = { version = "1.7.1", features = ["fs", "macros"] }
-thiserror = "1.0.25"
 serde = { version = "1.0.126", features = ["derive"] }
 futures = "0.3.15"
 eyre = "0.6.5"
@@ -25,3 +24,7 @@ features = ["json", "multipart", "rustls-tls"]
 
 [features]
 manual_tests = []
+
+[dev-dependencies]
+log = "0.4.14"
+tempfile = "3.2.0"

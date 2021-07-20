@@ -8,8 +8,8 @@ license = "Apache-2.0"
 reqwest = { version = "0.11.4", features = ["rustls", "json"] }
 serde = { version = "1.0.126", features = ["derive"] }
 serde_json = "1.0.64"
-thiserror = "1.0.25"
 qcs-util = { version = "0.0.0", path = "../qcs-util" }
+eyre = "0.6.5"
 
 [dev-dependencies]
 futures-retry = "0.6.0"

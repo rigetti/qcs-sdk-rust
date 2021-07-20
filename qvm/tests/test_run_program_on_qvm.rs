@@ -1,6 +1,7 @@
 //! These are the integration tests for [`qvm_api::run_program_on_qvm`].
 //! In order to run them, QVM's web server must be running at localhost:5000.
 
+use eyre::Report;
 use futures_retry::{ErrorHandler, RetryPolicy};
 use qvm::*;
 use std::time::Duration;
@@ -37,17 +38,14 @@ pub struct RetryHandler {
     max_attempts: usize,
 }
 
-impl ErrorHandler<QVMError> for RetryHandler {
-    type OutError = QVMError;
+impl ErrorHandler<Report> for RetryHandler {
+    type OutError = Report;
 
-    fn handle(&mut self, attempt: usize, e: QVMError) -> RetryPolicy<QVMError> {
+    fn handle(&mut self, attempt: usize, e: Report) -> RetryPolicy<Report> {
         if attempt == self.max_attempts {
             eprintln!("Timed out talking to QVM");
             return RetryPolicy::ForwardError(e);
         }
-        match e {
-            QVMError::Connection(_) => RetryPolicy::WaitRetry(Duration::from_secs(5)),
-            _ => RetryPolicy::ForwardError(e),
-        }
+        RetryPolicy::WaitRetry(Duration::from_secs(5))
     }
 }
