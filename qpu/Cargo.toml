@@ -20,7 +20,3 @@ uuid = { version = "0.8.2", features = ["v4"] }
 hex = "0.4.3"
 rmp-serde = "0.15.5"
 tokio = { version = "1.8.1", features = ["macros"] }
-qcs-util = { version = "0.0.0", path = "../qcs-util", features = ["manual_tests"] }
-
-[features]
-qcs_tests = []
