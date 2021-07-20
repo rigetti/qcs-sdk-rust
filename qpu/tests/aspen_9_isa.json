@@ -1,0 +1,4495 @@
+{
+  "architecture": {
+    "edges": [
+      {
+        "node_ids": [
+          0,
+          1
+        ]
+      },
+      {
+        "node_ids": [
+          10,
+          11
+        ]
+      },
+      {
+        "node_ids": [
+          20,
+          21
+        ]
+      },
+      {
+        "node_ids": [
+          30,
+          31
+        ]
+      },
+      {
+        "node_ids": [
+          1,
+          2
+        ]
+      },
+      {
+        "node_ids": [
+          11,
+          12
+        ]
+      },
+      {
+        "node_ids": [
+          21,
+          22
+        ]
+      },
+      {
+        "node_ids": [
+          31,
+          32
+        ]
+      },
+      {
+        "node_ids": [
+          2,
+          3
+        ]
+      },
+      {
+        "node_ids": [
+          12,
+          13
+        ]
+      },
+      {
+        "node_ids": [
+          22,
+          23
+        ]
+      },
+      {
+        "node_ids": [
+          32,
+          33
+        ]
+      },
+      {
+        "node_ids": [
+          3,
+          4
+        ]
+      },
+      {
+        "node_ids": [
+          13,
+          14
+        ]
+      },
+      {
+        "node_ids": [
+          23,
+          24
+        ]
+      },
+      {
+        "node_ids": [
+          33,
+          34
+        ]
+      },
+      {
+        "node_ids": [
+          4,
+          5
+        ]
+      },
+      {
+        "node_ids": [
+          14,
+          15
+        ]
+      },
+      {
+        "node_ids": [
+          24,
+          25
+        ]
+      },
+      {
+        "node_ids": [
+          34,
+          35
+        ]
+      },
+      {
+        "node_ids": [
+          5,
+          6
+        ]
+      },
+      {
+        "node_ids": [
+          15,
+          16
+        ]
+      },
+      {
+        "node_ids": [
+          25,
+          26
+        ]
+      },
+      {
+        "node_ids": [
+          35,
+          36
+        ]
+      },
+      {
+        "node_ids": [
+          6,
+          7
+        ]
+      },
+      {
+        "node_ids": [
+          16,
+          17
+        ]
+      },
+      {
+        "node_ids": [
+          26,
+          27
+        ]
+      },
+      {
+        "node_ids": [
+          36,
+          37
+        ]
+      },
+      {
+        "node_ids": [
+          7,
+          0
+        ]
+      },
+      {
+        "node_ids": [
+          17,
+          10
+        ]
+      },
+      {
+        "node_ids": [
+          27,
+          20
+        ]
+      },
+      {
+        "node_ids": [
+          37,
+          30
+        ]
+      },
+      {
+        "node_ids": [
+          2,
+          15
+        ]
+      },
+      {
+        "node_ids": [
+          12,
+          25
+        ]
+      },
+      {
+        "node_ids": [
+          22,
+          35
+        ]
+      },
+      {
+        "node_ids": [
+          1,
+          16
+        ]
+      },
+      {
+        "node_ids": [
+          11,
+          26
+        ]
+      },
+      {
+        "node_ids": [
+          21,
+          36
+        ]
+      }
+    ],
+    "family": "Aspen",
+    "nodes": [
+      {
+        "node_id": 0
+      },
+      {
+        "node_id": 10
+      },
+      {
+        "node_id": 20
+      },
+      {
+        "node_id": 30
+      },
+      {
+        "node_id": 1
+      },
+      {
+        "node_id": 11
+      },
+      {
+        "node_id": 21
+      },
+      {
+        "node_id": 31
+      },
+      {
+        "node_id": 2
+      },
+      {
+        "node_id": 12
+      },
+      {
+        "node_id": 22
+      },
+      {
+        "node_id": 32
+      },
+      {
+        "node_id": 3
+      },
+      {
+        "node_id": 13
+      },
+      {
+        "node_id": 23
+      },
+      {
+        "node_id": 33
+      },
+      {
+        "node_id": 4
+      },
+      {
+        "node_id": 14
+      },
+      {
+        "node_id": 24
+      },
+      {
+        "node_id": 34
+      },
+      {
+        "node_id": 5
+      },
+      {
+        "node_id": 15
+      },
+      {
+        "node_id": 25
+      },
+      {
+        "node_id": 35
+      },
+      {
+        "node_id": 6
+      },
+      {
+        "node_id": 16
+      },
+      {
+        "node_id": 26
+      },
+      {
+        "node_id": 36
+      },
+      {
+        "node_id": 7
+      },
+      {
+        "node_id": 17
+      },
+      {
+        "node_id": 27
+      },
+      {
+        "node_id": 37
+      }
+    ]
+  },
+  "benchmarks": [
+    {
+      "characteristics": [],
+      "name": "randomized_benchmark_1q",
+      "node_count": 1,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": 0.0000873150855778037,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990014768242277
+            }
+          ],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00012217517130854244,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9989476368905135
+            }
+          ],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0002366968194445901,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9986668479374058
+            }
+          ],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.01384571628704429,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9284759496076576
+            }
+          ],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.001196663930422238,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9781665691238797
+            }
+          ],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0001549777210615458,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9988513580060256
+            }
+          ],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00014263619046711899,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.999067926457613
+            }
+          ],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.002419988573926701,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9975005110338343
+            }
+          ],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0002051442479213487,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9975863310043617
+            }
+          ],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0000966507113457637,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9987920996598936
+            }
+          ],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.001,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.995
+            }
+          ],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.033865872960939084,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9101559576214623
+            }
+          ],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00005722942225922073,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9994368887748502
+            }
+          ],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00010504994111381637,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990873195939498
+            }
+          ],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00018518705476169785,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9992947355694914
+            }
+          ],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0007461947456058444,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.991498471830458
+            }
+          ],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0001154890721783987,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9975364503140911
+            }
+          ],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00018386005888028296,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9986661688177298
+            }
+          ],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00014086170764231775,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9992878727851684
+            }
+          ],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0003997170830167558,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9958065340925156
+            }
+          ],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00019659608664435033,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9991465698983135
+            }
+          ],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00009751793682274665,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9983382253979842
+            }
+          ],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00029126343489787107,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9991884500270085
+            }
+          ],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00015837462362310896,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9976101961550574
+            }
+          ],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.015580033368863978,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8787430035816047
+            }
+          ],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.000358193979832841,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.997632218222324
+            }
+          ],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00003282346327086156,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9982609453772381
+            }
+          ],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00013031842689615315,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9985235880380974
+            }
+          ],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0001584726199598884,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9992413354046864
+            }
+          ],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00012001789212572259,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9993158553426053
+            }
+          ],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00014084268927341739,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9967169325473852
+            }
+          ],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0001469935047973231,
+              "name": "fRB",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9979959217153511
+            }
+          ],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "randomized_benchmark_simultaneous_1q",
+      "node_count": 32,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": 0.0003027733686289284,
+              "name": "fRB",
+              "node_ids": [
+                0
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9956911241370838
+            },
+            {
+              "error": 0.00020559289885021452,
+              "name": "fRB",
+              "node_ids": [
+                10
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9972497131262977
+            },
+            {
+              "error": 0.0005859843431324783,
+              "name": "fRB",
+              "node_ids": [
+                20
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9912757508610891
+            },
+            {
+              "error": 0.024427809257256537,
+              "name": "fRB",
+              "node_ids": [
+                30
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9132668401111969
+            },
+            {
+              "error": 0.0005125506721987902,
+              "name": "fRB",
+              "node_ids": [
+                1
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9922152028519878
+            },
+            {
+              "error": 0.00027200429611328597,
+              "name": "fRB",
+              "node_ids": [
+                11
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9960821887586349
+            },
+            {
+              "error": 0.0003778472032010296,
+              "name": "fRB",
+              "node_ids": [
+                21
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9952119888853121
+            },
+            {
+              "error": 0.0002403274649799045,
+              "name": "fRB",
+              "node_ids": [
+                31
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9929429050177485
+            },
+            {
+              "error": 0.0004125442351765128,
+              "name": "fRB",
+              "node_ids": [
+                2
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9964576207406768
+            },
+            {
+              "error": 0.0001607832647604307,
+              "name": "fRB",
+              "node_ids": [
+                12
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.996273752890589
+            },
+            {
+              "error": 0.0005565809461486038,
+              "name": "fRB",
+              "node_ids": [
+                22
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9897791444791393
+            },
+            {
+              "error": 0.018995210011787146,
+              "name": "fRB",
+              "node_ids": [
+                32
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9285853880650918
+            },
+            {
+              "error": 0.002285213317023564,
+              "name": "fRB",
+              "node_ids": [
+                3
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9862658810593543
+            },
+            {
+              "error": 0.00012842978932735204,
+              "name": "fRB",
+              "node_ids": [
+                13
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9977491274740715
+            },
+            {
+              "error": 0.00016716801439897348,
+              "name": "fRB",
+              "node_ids": [
+                23
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9949333206470985
+            },
+            {
+              "error": 0.0006380965912491433,
+              "name": "fRB",
+              "node_ids": [
+                33
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9937531086259636
+            },
+            {
+              "error": 0.00015936537495834122,
+              "name": "fRB",
+              "node_ids": [
+                4
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.997147138640965
+            },
+            {
+              "error": 0.00023232075995980944,
+              "name": "fRB",
+              "node_ids": [
+                14
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9955546437860257
+            },
+            {
+              "error": 0.0004102474085235699,
+              "name": "fRB",
+              "node_ids": [
+                24
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9901538618812872
+            },
+            {
+              "error": 0.0004889128999154067,
+              "name": "fRB",
+              "node_ids": [
+                34
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9926544549045435
+            },
+            {
+              "error": 0.0002674196681415298,
+              "name": "fRB",
+              "node_ids": [
+                5
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9977686564218975
+            },
+            {
+              "error": 0.005937655686359531,
+              "name": "fRB",
+              "node_ids": [
+                15
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9980511260782481
+            },
+            {
+              "error": 0.0005357257862667702,
+              "name": "fRB",
+              "node_ids": [
+                25
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9942399931539552
+            },
+            {
+              "error": 0.00048321158265132095,
+              "name": "fRB",
+              "node_ids": [
+                35
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9944029599880508
+            },
+            {
+              "error": 0.007146239406374326,
+              "name": "fRB",
+              "node_ids": [
+                6
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9497333887218421
+            },
+            {
+              "error": 0.00020027103878689876,
+              "name": "fRB",
+              "node_ids": [
+                16
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9950276337064929
+            },
+            {
+              "error": 0.00031709928063301216,
+              "name": "fRB",
+              "node_ids": [
+                26
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9947121928139245
+            },
+            {
+              "error": 0.0006532289887478496,
+              "name": "fRB",
+              "node_ids": [
+                36
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9947683616173041
+            },
+            {
+              "error": 0.022911791114375378,
+              "name": "fRB",
+              "node_ids": [
+                7
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9155866315726131
+            },
+            {
+              "error": 0.00019133006997190227,
+              "name": "fRB",
+              "node_ids": [
+                17
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9977503427092118
+            },
+            {
+              "error": 0.0005477107392676936,
+              "name": "fRB",
+              "node_ids": [
+                27
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9929038151407719
+            },
+            {
+              "error": 0.057827633602007884,
+              "name": "fRB",
+              "node_ids": [
+                37
+              ],
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.6867671510714974
+            }
+          ],
+          "node_ids": [
+            0,
+            10,
+            20,
+            30,
+            1,
+            11,
+            21,
+            31,
+            2,
+            12,
+            22,
+            32,
+            3,
+            13,
+            23,
+            33,
+            4,
+            14,
+            24,
+            34,
+            5,
+            15,
+            25,
+            35,
+            6,
+            16,
+            26,
+            36,
+            7,
+            17,
+            27,
+            37
+          ]
+        }
+      ]
+    }
+  ],
+  "instructions": [
+    {
+      "characteristics": [],
+      "name": "RESET",
+      "node_count": 1,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.995
+            }
+          ],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9975
+            }
+          ],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9955000000000002
+            }
+          ],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.997
+            }
+          ],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9685000000000001
+            }
+          ],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9935
+            }
+          ],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.998
+            }
+          ],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9995
+            }
+          ],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9395
+            }
+          ],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.993
+            }
+          ],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9975
+            }
+          ],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9985
+            }
+          ],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9865
+            }
+          ],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9995
+            }
+          ],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9935
+            }
+          ],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.973
+            }
+          ],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9855000000000002
+            }
+          ],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.997
+            }
+          ],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9915
+            }
+          ],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.998
+            }
+          ],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9890000000000001
+            }
+          ],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9995
+            }
+          ],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9990000000000001
+            }
+          ],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9845
+            }
+          ],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9895
+            }
+          ],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.982
+            }
+          ],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fAR",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9665
+            }
+          ],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "I",
+      "node_count": 1,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "RX",
+      "node_count": 1,
+      "parameters": [
+        {
+          "name": "theta"
+        }
+      ],
+      "sites": [
+        {
+          "characteristics": [],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "RZ",
+      "node_count": 1,
+      "parameters": [
+        {
+          "name": "theta"
+        }
+      ],
+      "sites": [
+        {
+          "characteristics": [],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "CZ",
+      "node_count": 2,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": 0.004830941881624935,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9655245463369166
+            }
+          ],
+          "node_ids": [
+            10,
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005201125287728403,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9723391985382439
+            }
+          ],
+          "node_ids": [
+            20,
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008811426423502727,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8579174999621574
+            }
+          ],
+          "node_ids": [
+            30,
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0053923542146693945,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9830429821883002
+            }
+          ],
+          "node_ids": [
+            11,
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0064238833954682025,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9639006605394667
+            }
+          ],
+          "node_ids": [
+            21,
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005341620848032355,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9055504269193293
+            }
+          ],
+          "node_ids": [
+            31,
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007496130562883716,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.879442138576829
+            }
+          ],
+          "node_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006051411885179254,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9760734681101292
+            }
+          ],
+          "node_ids": [
+            12,
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011738113866324751,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9381255057648658
+            }
+          ],
+          "node_ids": [
+            22,
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00551275647477613,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8976175101196088
+            }
+          ],
+          "node_ids": [
+            32,
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0036744694393935694,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9777402514839095
+            }
+          ],
+          "node_ids": [
+            3,
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.015262316522559107,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8966647555225451
+            }
+          ],
+          "node_ids": [
+            13,
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0035814575989375807,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9791479362958461
+            }
+          ],
+          "node_ids": [
+            23,
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006482788633604818,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9592185249936653
+            }
+          ],
+          "node_ids": [
+            33,
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.004190014459503417,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9819570607006214
+            }
+          ],
+          "node_ids": [
+            4,
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.013722191738106489,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8699135846798165
+            }
+          ],
+          "node_ids": [
+            14,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007733893128446775,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9449289506988741
+            }
+          ],
+          "node_ids": [
+            24,
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.004916478467611092,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9709691754023249
+            }
+          ],
+          "node_ids": [
+            34,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0089013733736634,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8545654421583718
+            }
+          ],
+          "node_ids": [
+            5,
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009719503932498924,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9307211076366546
+            }
+          ],
+          "node_ids": [
+            25,
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.01125280937754377,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9449140011934883
+            }
+          ],
+          "node_ids": [
+            35,
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008753553340407073,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8432331321286316
+            }
+          ],
+          "node_ids": [
+            6,
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009061313234519374,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.807268483090248
+            }
+          ],
+          "node_ids": [
+            26,
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.014523354102634008,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8411617533266275
+            }
+          ],
+          "node_ids": [
+            36,
+            37
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005262368975009693,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8934083716043216
+            }
+          ],
+          "node_ids": [
+            7,
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0024769750611011434,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9868856204274469
+            }
+          ],
+          "node_ids": [
+            17,
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007384640161023536,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9487279010075419
+            }
+          ],
+          "node_ids": [
+            27,
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0059974437233750975,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.883117578766347
+            }
+          ],
+          "node_ids": [
+            37,
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.014397660410908454,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8409478024899799
+            }
+          ],
+          "node_ids": [
+            2,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.002407984690340209,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9846461604370009
+            }
+          ],
+          "node_ids": [
+            12,
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011395249555693463,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9743912993252486
+            }
+          ],
+          "node_ids": [
+            22,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0120339547615457,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8083484941531955
+            }
+          ],
+          "node_ids": [
+            11,
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.02135195131501996,
+              "name": "fCZ",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8553182565070833
+            }
+          ],
+          "node_ids": [
+            21,
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "CPHASE",
+      "node_count": 2,
+      "parameters": [
+        {
+          "name": "theta"
+        }
+      ],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": 0.99,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.01
+            }
+          ],
+          "node_ids": [
+            0,
+            1
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007304492065332175,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9523968083470723
+            }
+          ],
+          "node_ids": [
+            10,
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008953505709088988,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9578145832747853
+            }
+          ],
+          "node_ids": [
+            20,
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011965246473384514,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.82855057059291
+            }
+          ],
+          "node_ids": [
+            30,
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009725675040407741,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9529677407566465
+            }
+          ],
+          "node_ids": [
+            11,
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011241779928100855,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9328955031519043
+            }
+          ],
+          "node_ids": [
+            21,
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00850760813089764,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8672412814346131
+            }
+          ],
+          "node_ids": [
+            31,
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009609234303560497,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8622961842658053
+            }
+          ],
+          "node_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.019538132439603187,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9363066127570603
+            }
+          ],
+          "node_ids": [
+            12,
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011272574255445747,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9529769141153664
+            }
+          ],
+          "node_ids": [
+            22,
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0074716584268073784,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8784980357528805
+            }
+          ],
+          "node_ids": [
+            32,
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005272076816340293,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9127413051950594
+            }
+          ],
+          "node_ids": [
+            3,
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.013133032383099437,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8260155229345169
+            }
+          ],
+          "node_ids": [
+            13,
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.014031566931081027,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9427403721117412
+            }
+          ],
+          "node_ids": [
+            23,
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007059913818801856,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.962681916404059
+            }
+          ],
+          "node_ids": [
+            33,
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0077477559693877075,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9582700865807312
+            }
+          ],
+          "node_ids": [
+            4,
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006575937572915795,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8894255540363747
+            }
+          ],
+          "node_ids": [
+            14,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005710178088851459,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8905320195507429
+            }
+          ],
+          "node_ids": [
+            24,
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006734040029278485,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9586876150686443
+            }
+          ],
+          "node_ids": [
+            34,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.010277680309826575,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.826202204606399
+            }
+          ],
+          "node_ids": [
+            5,
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007133184623005986,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8787091237767245
+            }
+          ],
+          "node_ids": [
+            25,
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00675593914901185,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9543523933846084
+            }
+          ],
+          "node_ids": [
+            35,
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00902454758484856,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8536377914573313
+            }
+          ],
+          "node_ids": [
+            6,
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.011521689011151642,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8098619542054368
+            }
+          ],
+          "node_ids": [
+            26,
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.004207505115595404,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9771326895108403
+            }
+          ],
+          "node_ids": [
+            36,
+            37
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00840554554719608,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8583608975095097
+            }
+          ],
+          "node_ids": [
+            7,
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0029685228141068483,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9823290880376047
+            }
+          ],
+          "node_ids": [
+            17,
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005597177282612233,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9035226776351485
+            }
+          ],
+          "node_ids": [
+            27,
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009490161439945898,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8309201064261597
+            }
+          ],
+          "node_ids": [
+            37,
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.012588000655864287,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8285562349078477
+            }
+          ],
+          "node_ids": [
+            2,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.010686184220839827,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8511569626123875
+            }
+          ],
+          "node_ids": [
+            22,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009561967526448669,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.7955999962677089
+            }
+          ],
+          "node_ids": [
+            11,
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.010069469460473029,
+              "name": "fCPHASE",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9579542454434009
+            }
+          ],
+          "node_ids": [
+            21,
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "XY",
+      "node_count": 2,
+      "parameters": [
+        {
+          "name": "theta"
+        }
+      ],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": 0.005740168327371748,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9705950060139689
+            }
+          ],
+          "node_ids": [
+            0,
+            1
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00442895765380816,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9784501719436262
+            }
+          ],
+          "node_ids": [
+            10,
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007891057646743456,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9488254611121434
+            }
+          ],
+          "node_ids": [
+            20,
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.014425313206223797,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.7618651530286145
+            }
+          ],
+          "node_ids": [
+            30,
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008237814656841834,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9818022437384036
+            }
+          ],
+          "node_ids": [
+            11,
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008299931600240068,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9548675240974294
+            }
+          ],
+          "node_ids": [
+            21,
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.010111325995488958,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8591886954346813
+            }
+          ],
+          "node_ids": [
+            31,
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00520480574738863,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9027378069089788
+            }
+          ],
+          "node_ids": [
+            2,
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.002478155529105184,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9896554638443327
+            }
+          ],
+          "node_ids": [
+            12,
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009735743924998385,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9300767034163138
+            }
+          ],
+          "node_ids": [
+            22,
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009693713417526258,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9487378643352371
+            }
+          ],
+          "node_ids": [
+            32,
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005776800935776559,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9491870786733688
+            }
+          ],
+          "node_ids": [
+            3,
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0057684942586688015,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9538337466627906
+            }
+          ],
+          "node_ids": [
+            13,
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0035740549411147505,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9731077110790547
+            }
+          ],
+          "node_ids": [
+            23,
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005249558282827613,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9796675480713294
+            }
+          ],
+          "node_ids": [
+            33,
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006081854723736387,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9691972114080092
+            }
+          ],
+          "node_ids": [
+            4,
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0065694404235296724,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9654911232867834
+            }
+          ],
+          "node_ids": [
+            14,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007855142906860933,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9583982713991073
+            }
+          ],
+          "node_ids": [
+            24,
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005989636975320065,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9672788462340833
+            }
+          ],
+          "node_ids": [
+            34,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0188439584906257,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.7527066634702364
+            }
+          ],
+          "node_ids": [
+            5,
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.012312494454013986,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8182136734824926
+            }
+          ],
+          "node_ids": [
+            25,
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.00693305299565808,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9598367211257248
+            }
+          ],
+          "node_ids": [
+            35,
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.007313255660156796,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8574552651528831
+            }
+          ],
+          "node_ids": [
+            6,
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.01069581506896482,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.7875085250195251
+            }
+          ],
+          "node_ids": [
+            16,
+            17
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.01029176576743963,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8040749019209398
+            }
+          ],
+          "node_ids": [
+            26,
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0038304020753838707,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9676569077270954
+            }
+          ],
+          "node_ids": [
+            36,
+            37
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0054941076228791665,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8902673467161003
+            }
+          ],
+          "node_ids": [
+            7,
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.008053635630606024,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9554616980286827
+            }
+          ],
+          "node_ids": [
+            17,
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.004097908479428094,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.913518761034807
+            }
+          ],
+          "node_ids": [
+            27,
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.005964875355137356,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8809993889096304
+            }
+          ],
+          "node_ids": [
+            37,
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006619701901622641,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9687728230073873
+            }
+          ],
+          "node_ids": [
+            2,
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.0054871155056741006,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9791009909597939
+            }
+          ],
+          "node_ids": [
+            12,
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009351052877258322,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9719786316589188
+            }
+          ],
+          "node_ids": [
+            22,
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.006604699431481489,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.8760258654432441
+            }
+          ],
+          "node_ids": [
+            1,
+            16
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": 0.009831822104757816,
+              "name": "fXY",
+              "node_ids": null,
+              "parameter_values": [
+                3.141592653589793
+              ],
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.936196253993223
+            }
+          ],
+          "node_ids": [
+            21,
+            36
+          ]
+        }
+      ]
+    },
+    {
+      "characteristics": [],
+      "name": "MEASURE",
+      "node_count": 1,
+      "parameters": [],
+      "sites": [
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9689999999999999
+            }
+          ],
+          "node_ids": [
+            0
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.963
+            }
+          ],
+          "node_ids": [
+            10
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.983
+            }
+          ],
+          "node_ids": [
+            20
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9319999999999999
+            }
+          ],
+          "node_ids": [
+            30
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9570000000000001
+            }
+          ],
+          "node_ids": [
+            1
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.897
+            }
+          ],
+          "node_ids": [
+            11
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.958
+            }
+          ],
+          "node_ids": [
+            21
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.973
+            }
+          ],
+          "node_ids": [
+            31
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.93
+            }
+          ],
+          "node_ids": [
+            2
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.98
+            }
+          ],
+          "node_ids": [
+            12
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.96
+            }
+          ],
+          "node_ids": [
+            22
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.879
+            }
+          ],
+          "node_ids": [
+            32
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.938
+            }
+          ],
+          "node_ids": [
+            3
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.973
+            }
+          ],
+          "node_ids": [
+            13
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.978
+            }
+          ],
+          "node_ids": [
+            23
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.893
+            }
+          ],
+          "node_ids": [
+            33
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.977
+            }
+          ],
+          "node_ids": [
+            4
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9339999999999999
+            }
+          ],
+          "node_ids": [
+            14
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.966
+            }
+          ],
+          "node_ids": [
+            24
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.977
+            }
+          ],
+          "node_ids": [
+            34
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9510000000000001
+            }
+          ],
+          "node_ids": [
+            5
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9239999999999999
+            }
+          ],
+          "node_ids": [
+            15
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.972
+            }
+          ],
+          "node_ids": [
+            25
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.963
+            }
+          ],
+          "node_ids": [
+            35
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.845
+            }
+          ],
+          "node_ids": [
+            6
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.956
+            }
+          ],
+          "node_ids": [
+            16
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.976
+            }
+          ],
+          "node_ids": [
+            26
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.944
+            }
+          ],
+          "node_ids": [
+            36
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.882
+            }
+          ],
+          "node_ids": [
+            7
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.932
+            }
+          ],
+          "node_ids": [
+            17
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.9359999999999999
+            }
+          ],
+          "node_ids": [
+            27
+          ]
+        },
+        {
+          "characteristics": [
+            {
+              "error": null,
+              "name": "fRO",
+              "node_ids": null,
+              "parameter_values": null,
+              "timestamp": "1970-01-01T00:00:00+00:00",
+              "value": 0.955
+            }
+          ],
+          "node_ids": [
+            37
+          ]
+        }
+      ]
+    }
+  ],
+  "name": "Aspen-9"
+}
+

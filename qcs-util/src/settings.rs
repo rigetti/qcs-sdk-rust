@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::path::path_from_env_or_home;
 
-const VAR: &str = "QCS_SETTINGS_FILE_PATH";
+pub const SETTINGS_PATH_VAR: &str = "QCS_SETTINGS_FILE_PATH";
 
 pub(crate) async fn load() -> Result<Settings> {
-    let path = path_from_env_or_home(VAR, "settings.toml")
+    let path = path_from_env_or_home(SETTINGS_PATH_VAR, "settings.toml")
         .wrap_err("When determining settings config path")?;
     let content = tokio::fs::read_to_string(&path)
         .await
@@ -27,7 +27,7 @@ mod describe_load {
 
     #[tokio::test]
     async fn it_returns_default_if_missing_path() {
-        std::env::set_var(VAR, "/blah/doesnt_exist.toml");
+        std::env::set_var(SETTINGS_PATH_VAR, "/blah/doesnt_exist.toml");
 
         let settings = load().await;
 
@@ -43,7 +43,7 @@ mod describe_load {
             toml::to_string(&settings).expect("Could not serialize test settings");
         file.write(settings_string.as_bytes())
             .expect("Failed to write test settings");
-        std::env::set_var(VAR, file.path());
+        std::env::set_var(SETTINGS_PATH_VAR, file.path());
 
         let loaded = load().await.expect("Failed to load settings");
 
@@ -88,8 +88,8 @@ fn default_auth_servers() -> HashMap<String, AuthServer> {
 pub(crate) struct Profile {
     /// URL of the QCS API to use for all API calls
     pub api_url: String,
-    auth_server_name: String,
-    credentials_name: String,
+    pub auth_server_name: String,
+    pub credentials_name: String,
     #[serde(default)]
     pub applications: Applications,
 }

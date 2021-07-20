@@ -5,10 +5,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::path::path_from_env_or_home;
 
-const VAR: &str = "QCS_SECRETS_FILE_PATH";
+pub const SECRETS_PATH_VAR: &str = "QCS_SECRETS_FILE_PATH";
 
 pub(crate) async fn load() -> Result<Secrets> {
-    let path = path_from_env_or_home(VAR, "secrets.toml")
+    let path = path_from_env_or_home(SECRETS_PATH_VAR, "secrets.toml")
         .wrap_err("When determining secrets config path")?;
     let content = tokio::fs::read_to_string(&path)
         .await
@@ -27,7 +27,7 @@ mod describe_load {
 
     #[tokio::test]
     async fn it_returns_default_if_missing_path() {
-        std::env::set_var(VAR, "/blah/doesnt_exist.toml");
+        std::env::set_var(SECRETS_PATH_VAR, "/blah/doesnt_exist.toml");
 
         let settings = load().await;
 
@@ -44,7 +44,7 @@ mod describe_load {
         let secrets_string = toml::to_string(&secrets).expect("Could not serialize test settings");
         file.write(secrets_string.as_bytes())
             .expect("Failed to write test settings");
-        std::env::set_var(VAR, file.path());
+        std::env::set_var(SECRETS_PATH_VAR, file.path());
 
         let loaded = load().await.expect("Failed to load secrets");
 

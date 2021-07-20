@@ -1,0 +1,12 @@
+default_profile_name = "default"
+
+[profiles]
+[profiles.default]
+auth_server_name = "default"
+credentials_name = "default"
+api_url = "http://localhost:8000"
+
+[auth_servers]
+[auth_servers.default]
+client_id = "default_client_id"
+issuer = "http://localhost:8001"

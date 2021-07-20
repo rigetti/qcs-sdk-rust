@@ -5,14 +5,14 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
+use eyre::{Report, Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
+use isa::CompilerIsa;
 use qcs_api::models::InstructionSetArchitecture;
+use rpcq::RPCRequest;
 
 mod isa;
-
-use isa::CompilerIsa;
-use rpcq::RPCRequest;
 
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
@@ -30,14 +30,16 @@ pub fn compile_program(
     quil: &str,
     isa: &InstructionSetArchitecture,
     config: &qcs_util::Configuration,
-) -> Result<NativeQuil, CompileError> {
+) -> Result<NativeQuil> {
     let endpoint = &config.quilc_url;
-    let params = QuilcParams::new(quil, isa)?;
+    let params =
+        QuilcParams::new(quil, isa).wrap_err("When creating parameters to send to Quilc")?;
     let request = RPCRequest::new("quil_to_native_quil", params);
-    rpcq::Client::new(endpoint)?
+    rpcq::Client::new(endpoint)
+        .wrap_err("When connecting to Quilc")?
         .run_request::<_, QuilcResponse>(&request)
         .map(|response| NativeQuil(response.quil))
-        .map_err(CompileError::from)
+        .wrap_err("When sending program to Quilc")
 }
 
 pub struct NativeQuil(String);
@@ -62,7 +64,7 @@ struct QuilcParams {
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: &InstructionSetArchitecture) -> Result<Self, CompileError> {
+    fn new(quil: &str, isa: &InstructionSetArchitecture) -> Result<Self> {
         Ok(Self {
             protoquil: None,
             args: [NativeQuilRequest::new(quil, isa)?],
@@ -79,7 +81,7 @@ struct NativeQuilRequest {
 }
 
 impl NativeQuilRequest {
-    fn new(quil: &str, isa: &InstructionSetArchitecture) -> Result<Self, CompileError> {
+    fn new(quil: &str, isa: &InstructionSetArchitecture) -> Result<Self> {
         Ok(Self {
             quil: String::from(quil),
             target_device: TargetDevice::try_from(isa)?,
@@ -96,23 +98,13 @@ struct TargetDevice {
 }
 
 impl TryFrom<&InstructionSetArchitecture> for TargetDevice {
-    type Error = CompileError;
+    type Error = Report;
 
-    fn try_from(isa: &InstructionSetArchitecture) -> Result<Self, Self::Error> {
+    fn try_from(isa: &InstructionSetArchitecture) -> Result<Self> {
         Ok(Self {
-            isa: CompilerIsa::try_from(isa)?,
+            isa: CompilerIsa::try_from(isa)
+                .wrap_err("When converting ISA to a form that Quilc can understand")?,
             specs: HashMap::new(),
         })
     }
-}
-
-/// The possible errors that can occur when calling [`compile_program`]
-#[derive(thiserror::Error, Debug)]
-pub enum CompileError {
-    /// There was a problem communicating with the quilc API, is it running?
-    #[error("Could not communicate with quilc")]
-    Communication(#[from] rpcq::Error),
-    /// A problem converting the [`InstructionSetArchitecture`] to a quilc-compatible form.
-    #[error("Unable to convert the ISA from QCS to something quilc can understand")]
-    IsaConversion(#[from] isa::Error),
 }
