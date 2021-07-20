@@ -1,6 +1,3 @@
-[env]
-CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = ""  # Disable --all-features to avoid manual tests in CI for now
-
 [tasks.pre-test]
 command = "docker-compose"
 args = ["up", "-d"]
@@ -8,7 +5,3 @@ args = ["up", "-d"]
 [tasks.post-test]
 command = "docker-compose"
 args = ["down"]
-
-[tasks.manual]
-env = {CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--all-features"}
-run_task = [{name = "test-flow"}]

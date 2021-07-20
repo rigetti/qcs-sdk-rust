@@ -773,7 +773,6 @@ dependencies = [
  "dirs",
  "eyre",
  "futures",
- "log",
  "qcs-api",
  "reqwest",
  "serde",
