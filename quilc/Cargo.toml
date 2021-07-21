@@ -1,8 +1,12 @@
 [package]
 name = "quilc"
+description = "Bindings to the quilc RPCQ API for use from Rust."
 version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
+categories = ["api-bindings", "compilers"]
 
 [dependencies]
 qcs-api = { version = "0.0.0", path = "../qcs-api"}

@@ -1,5 +1,6 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
+#![deny(clippy::cargo)]
 #![forbid(unsafe_code)]
 
 use std::collections::HashMap;
@@ -10,6 +11,7 @@ use eyre::{eyre, Result, WrapErr};
 
 pub use lodgepole::QPUResult;
 use lodgepole::{execute, Buffer};
+use log::{info, trace};
 use qcs_api::apis::quantum_processors_api as qpu_api;
 use qcs_api::models::InstructionSetArchitecture;
 use qcs_util::engagement::get;
@@ -44,12 +46,16 @@ pub async fn run_program(
     register: &str,
     quantum_processor_id: &str,
 ) -> Result<Vec<QPUResult>> {
+    info!("Running program on {}", quantum_processor_id);
     let (isa, config) = get_isa(quantum_processor_id).await?;
+    trace!("Fetched ISA successfully");
     let native_quil = quilc::compile_program(quil, &isa, &config)
         .wrap_err("When attempting to compile your program to Native Quil")?;
+    trace!("Converted to Native Quil successfully");
     let executable = translate(native_quil, shots, quantum_processor_id, &config)
         .await
         .wrap_err("Could not convert native quil to executable")?;
+    trace!("Translation complete.");
     let ro_sources = executable
         .ro_sources
         .ok_or_else(|| eyre!("No read out sources were defined, did you forget to `MEASURE`?"))?;
@@ -60,8 +66,10 @@ pub async fn run_program(
         .wrap_err(
             "Could not get an engagement for the requested QPU. Do you have an active reservation?",
         )?;
+    trace!("Engagement retrieved.");
 
     let buffers = execute(executable.program, engagement)?;
+    trace!("Program executed.");
     process_buffers(buffers, buffer_names)
 }
 

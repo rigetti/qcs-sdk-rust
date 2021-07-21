@@ -1,7 +1,12 @@
 [package]
 name = "rpcq"
+description = "A tiny, incomplete RPCQ implementation for interfacing with quilc and lodgepole"
 version = "0.0.0"
 edition = "2018"
+license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["pyquil", "rpcq", "Rigetti", "Quil", "Quantum"]
+categories = ["api-bindings"]
 
 [dependencies]
 eyre = "0.6.5"
