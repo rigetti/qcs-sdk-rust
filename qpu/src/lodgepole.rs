@@ -3,6 +3,7 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
 use eyre::{eyre, Result, WrapErr};
+use log::{debug, trace, warn};
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 use serde_bytes::ByteBuf;
@@ -23,6 +24,10 @@ pub(crate) fn execute(
 
     // This is a hack to allow testing without credentials since ZAP is absurd
     let client = if credentials.server_public.is_empty() {
+        warn!(
+            "Connecting to Lodgepole on {} with no credentials.",
+            &address
+        );
         Client::new(&address).wrap_err("Unable to connect to the QPU (Lodgepole)")?
     } else {
         let credentials = Credentials {
@@ -30,6 +35,7 @@ pub(crate) fn execute(
             client_public_key: credentials.client_public,
             server_public_key: credentials.server_public,
         };
+        trace!("Connecting to Lodgepole at {} with credentials", &address);
         Client::new_with_credentials(&address, &credentials)
             .wrap_err("Unable to connect to the QPU (Lodgepole)")?
     };
@@ -38,6 +44,7 @@ pub(crate) fn execute(
     let job_id: String = client
         .run_request(&params.into())
         .wrap_err("While attempting to send the program to the QPU (Lodgepole)")?;
+    debug!("Received job ID {} from Lodgepole", &job_id);
     let get_buffers_request = GetBuffersRequest::new(job_id);
     client
         .run_request(&get_buffers_request.into())

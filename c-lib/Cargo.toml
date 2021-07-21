@@ -1,8 +1,12 @@
 [package]
 name = "c-lib"
+description = "C bindings to the `qpu` and `qvm` crates."
 version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["C", "SDK", "Rigetti", "Quil", "Quantum"]
+categories = ["api-bindings", "compilers", "science"]
 
 [lib]
 name = "qcs"

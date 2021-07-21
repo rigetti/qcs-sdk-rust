@@ -1,11 +1,16 @@
 [package]
 name = "qpu"
+description = "High level interface for running Quil on a QPU"
 version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
+categories = ["api-bindings", "compilers", "science"]
 
 [dependencies]
 eyre = "0.6.5"
+log = "0.4.14"
 num = "0.4.0"
 qcs-api = { version = "0.0.0", path = "../qcs-api" }
 qcs-util = { version = "0.0.0", path = "../qcs-util" }

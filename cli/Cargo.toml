@@ -1,12 +1,19 @@
 [package]
 name = "cli"
+description = "A CLI for accessing the qpu and qvm crates, only used for smoke testing today."
 version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["CLI", "Rigetti", "Quil", "Quantum", "QCS"]
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 tokio = { version = "1.7.1", features = ["macros", "rt-multi-thread"] }
-qcs-api = { version = "0.0.0",path = "../qcs-api" }
-qcs-util = { version = "0.0.0", path = "../qcs-util" }
+qpu = {version = "0.0.0", path = "../qpu"}
+qvm = {version = "0.0.0", path = "../qvm"}
+structopt = "0.3.22"
+clap = "2.33.3"
+env_logger = "0.9.0"

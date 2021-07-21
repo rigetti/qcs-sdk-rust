@@ -1,8 +1,12 @@
 [package]
 name = "qcs-api"
+description = "Auto-generated bindings to the QCS OpenAPI"
 version = "0.0.0"
 edition = "2018"
 license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["API", "QCS", "Rigetti"]
+categories = ["api-bindings"]
 
 [dependencies]
 serde = "^1.0"
