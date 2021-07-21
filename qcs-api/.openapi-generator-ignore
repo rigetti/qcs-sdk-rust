@@ -4,3 +4,4 @@ git_push.sh
 .travis.yml
 .gitignore
 docs/
+src/lib.rs

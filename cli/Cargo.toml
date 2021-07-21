@@ -12,8 +12,7 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 tokio = { version = "1.7.1", features = ["macros", "rt-multi-thread"] }
-qpu = {version = "0.0.0", path = "../qpu"}
-qvm = {version = "0.0.0", path = "../qvm"}
+qcs = {version = "0.0.0", path = "../qcs"}
 structopt = "0.3.22"
 clap = "2.33.3"
 env_logger = "0.9.0"

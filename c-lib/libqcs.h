@@ -8,10 +8,10 @@
 
 
 /**
- * The return value of [`run_program_on_qvm`].
+ * The return value of [`run_program_on_qvm`] or [`run_program_on_qpu`].
  *
  * # Safety
- * In order to properly free the memory allocated in this struct, call [`free_qvm_response`]
+ * In order to properly free the memory allocated in this struct, call [`free_program_result`]
  * with any instances created.
  *
  * # Example
@@ -23,9 +23,9 @@
  * and you run that program 3 times (shots)
  *
  * ```C
- * QVMResponse response = run_program_on_qvm(program, 3, "ro");
+ * ProgramResult result = run_program_on_qvm(program, 3, "ro");
  * ```
- * If `status_code` is `Success` then `results_by_shot` will look something like:
+ * If `error` is `NULL` then `results_by_shot` will look something like:
  *
  * ```
  * results_by_shot = [[0, 0], [0, 0], [0, 0]]
@@ -33,13 +33,13 @@
  *
  * where `results_by_shot[shot][bit]` can access the value of `ro[bit]` for a given `shot`.
  */
-typedef struct QVMResponse {
+typedef struct ProgramResult {
     /**
      * A 2-D array of integers containing the measurements into register provided as
      * `register_name`. There will be one value per declared space in the register per "shot"
      * (run of the program).
      */
-    unsigned char **results_by_shot;
+    char **results_by_shot;
     /**
      * The number of times the program ran (should be the same as the `num_shots` param to
      * [`run_program_on_qvm`]. This is the outer dimension of `results_by_shot`.
@@ -56,7 +56,7 @@ typedef struct QVMResponse {
      * data.
      */
     char *error;
-} QVMResponse;
+} ProgramResult;
 
 /**
  * Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
@@ -64,33 +64,42 @@ typedef struct QVMResponse {
  * # Safety
  * This function should only be called with the result of [`run_program_on_qvm`]
  */
-void free_qvm_response(struct QVMResponse response);
+void free_program_result(struct ProgramResult response);
 
 /**
- * Given a Quil program as a string, run that program on a local QVM.
+ * Given a Quil program as a string, run that program on a QPU
  *
  * # Safety
  *
  * In order to run this function safely, you must provide the return value from this
- * function to [`free_qvm_response`] once you're done with it. The inputs `program` and
- * `register_name` must be valid, nul-terminated, non-null strings which remain constant for
- * the duration of this function.
+ * function to [`crate::free_program_result`] once you're done with it. The inputs `program`,
+ * `register_name`, and `qpu_id` must be valid, nul-terminated, non-null strings which remain
+ * constant for the duration of this function.
  *
  * # Usage
  *
- * In order to execute, QVM must be running at <http://localhost:5000>.
+ * In order to execute, you must have an active reservation for the QPU you're targeting.
+ *
+ * ## Configuration
+ *
+ * Valid settings and secrets must be set either in ~/.qcs or by setting the OS environment
+ * variables `QCS_SECRETS_FILE_PATH` and `QCS_SETTINGS_FILE_PATH` for secrets and settings
+ * respectively. `QCS_PROFILE_NAME` can also be used to choose a different profile in those
+ * configuration files.
  *
  * # Arguments
  *
  * 1. `program`: A string containing a valid Quil program. Any measurements that you'd like
  * to get back out must be in a register matching `register_name`. For example, if you have
  * `MEASURE 0 ro[0]` then `register_name` should be `"ro"`.
- * 2. `num_shots` is the number of times you'd like to run the program.
- * 3. `register_name`:
+ * 2. `num_shots`: the number of times you'd like to run the program.
+ * 3. `register_name`: the name of the register in the `program` that is being measured to.
+ * 4. `qpu_id`: the ID of the QPU to run on (e.g. `"Aspen-9"`)
  *
  * # Errors
- * This program will return a [`QVMResponse`] with a `status_code` corresponding to any errors that
- * occur. See [`QVMStatus`] for more details on possible errors.
+ *
+ * This program will return a [`crate::ProgramResult`] with an `error` attribute which will be
+ * `NULL` if successful or a human readable description of the error that occurred.
  *
  * # Example
  *
@@ -107,10 +116,73 @@ void free_qvm_response(struct QVMResponse response);
  *
  * int main() {
  *     uint8_t shots = 10;
- *     QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
+ *     ProgramResult response = run_program_on_qpu(BELL_STATE_PROGRAM, shots, "ro", "Aspen-9");
  *
- *     if (response.status_code != QVMStatus_Success) {
- *         // Something went wrong running the program
+ *     if (response.error != NULL) {
+ *         printf("An error occurred when running the program:\n\t%s", response.error);
+ *         return 1;
+ *     }
+ *
+ *     for (int shot = 0; shot < response.number_of_shots; shot++) {
+ *         int bit_0 = response.results_by_shot[shot][0];
+ *         int bit_1 = response.results_by_shot[shot][1];
+ *         // With this program, bit_0 should always equal bit_1
+ *     }
+ *
+ *     free_qpu_response(response);
+ *
+ *     return 0;
+ * }
+ * ```
+ */
+struct ProgramResult run_program_on_qpu(char *program, unsigned short num_shots, char *register_name, char *qpu_id);
+
+/**
+ * Given a Quil program as a string, run that program on a local QVM.
+ *
+ * # Safety
+ *
+ * In order to run this function safely, you must provide the return value from this
+ * function to [`crate::free_program_result`] once you're done with it. The inputs `program` and
+ * `register_name` must be valid, nul-terminated, non-null strings which remain constant for
+ * the duration of this function.
+ *
+ * # Usage
+ *
+ * In order to execute, QVM must be running at <http://localhost:5000>.
+ *
+ * # Arguments
+ *
+ * 1. `program`: A string containing a valid Quil program. Any measurements that you'd like
+ * to get back out must be in a register matching `register_name`. For example, if you have
+ * `MEASURE 0 ro[0]` then `register_name` should be `"ro"`.
+ * 2. `num_shots`: the number of times you'd like to run the program.
+ * 3. `register_name`: the name of the register in the `program` that is being measured to.
+ *
+ * # Errors
+ *
+ * This program will return a [`ProgramResult`] with a `error` attribute. That `error` attribute will
+ * either be `NULL` if successful, or a human readable description of the error that occurred.
+ *
+ * # Example
+ *
+ * ```c
+ * #include <stdio.h>
+ * #include "../libqcs.h"
+ *
+ * char* BELL_STATE_PROGRAM =
+ *         "DECLARE ro BIT[2]\n"
+ *         "H 0\n"
+ *         "CNOT 0 1\n"
+ *         "MEASURE 0 ro[0]\n"
+ *         "MEASURE 1 ro[1]\n";
+ *
+ * int main() {
+ *     uint8_t shots = 10;
+ *     ProgramResult response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
+ *
+ *     if (response.error != NULL) {
+ *         printf("An error occurred when running the program:\n\t%s", response.error);
  *         return 1;
  *     }
  *
@@ -126,4 +198,4 @@ void free_qvm_response(struct QVMResponse response);
  * }
  * ```
  */
-struct QVMResponse run_program_on_qvm(char *program, unsigned short num_shots, char *register_name);
+struct ProgramResult run_program_on_qvm(char *program, unsigned short num_shots, char *register_name);

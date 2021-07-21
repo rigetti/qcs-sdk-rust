@@ -12,10 +12,11 @@ char* BELL_STATE_PROGRAM =
 
 bool test_run_program_on_qvm() {
     unsigned int shots = 2;
-    QVMResponse response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
+    ProgramResult response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
 
     if (response.error != NULL) {
         printf("\ntest_run_program_on_qvm failed with %s\n\n", response.error);
+        free_program_result(response);
         return false;
     }
 
@@ -25,6 +26,7 @@ bool test_run_program_on_qvm() {
             response.number_of_shots,
             shots
         );
+        free_program_result(response);
         return false;
     }
 
@@ -38,11 +40,12 @@ bool test_run_program_on_qvm() {
                 bit_0,
                 bit_1
             );
+            free_program_result(response);
             return false;
         }
     }
 
-    free_qvm_response(response);
+    free_program_result(response);
 
     return true;
 }
