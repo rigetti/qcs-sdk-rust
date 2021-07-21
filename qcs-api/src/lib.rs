@@ -1,5 +1,3 @@
-#![allow(clippy::all)] // Prevent linting of generated code
-
 #[macro_use]
 extern crate serde_derive;
 
