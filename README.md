@@ -6,22 +6,19 @@ A work in progress implementation of pyQuil-like features in Rust.
 
 These are the top level crates intended for use by third parties.
 
-- [c-lib](./c-lib/README.md): The C-API bindings to `qvm` and `qpu`.
-- [qpu](./qpu/README.md): For running programs on a QPU.
-- [qvm](./qvm/README.md): For running programs on QVM.
+- [qcs]: For running programs on a QPU or QVM from Rust.
+- [c-lib]: The C-API bindings to `qcs` allowing consumption directly from C or other languages that speak C.
 
 ### Internal
 
 These are auxiliary crates not intended for use outside of development.
 
 - [qcs-api](./qcs-api/README.md): A generated OpenAPI client for QCS.
-- [qcs-util](./qcs-util/README.md): Manual functions for interacting with QCS API (e.g. authentication).
 - [cli](./cli/README.md): A toy CLI for testing QCS things during development.
-- [quilc](./quilc/README.md): An interface to `quilc`, used by `qpu`.
 
 ## Development
 
-Most development tasks are automated with cargo-make (like make, but you can have dependencies on other Rust tools and a _ton_ of useful tasks are built in). Install cargo-make by doing `cargo install cargo-make`. Then you can invoke it with either `cargo make <task>` or `makers <task>`. Tasks are defined in files called `Makefile.toml`. If a task is defined in the top level (workspace) file with `workspace = False` then it will only be run once. Otherwise, cargo-make will attempt to run that command for each crate.
+Most development tasks are automated with [cargo-make] (like make, but you can have dependencies on other Rust tools and a _ton_ of useful tasks are built in). Install cargo-make by doing `cargo install cargo-make`. Then you can invoke it with either `cargo make <task>` or `makers <task>`. Tasks are defined in files called `Makefile.toml`. If a task is defined in the top level (workspace) file with `workspace = False` then it will only be run once. Otherwise, cargo-make will attempt to run that command for each crate.
 
 ### Running Tests
 
@@ -41,6 +38,19 @@ For new crates, the following code block should be added to the top of the `main
 #![forbid(unsafe_code)]
 ```
 
+### Documentation
+
+Docs format vary from crate to crate. `makers docs` builds the documentation for every crate. 
+
+`makers serve-docs` builds and hosts the docs for __public crates only__. This command should be run in the directory of the crate you wish to view docs for, not at the project root.
+
+For [qcs], this is a normal rustdoc build for the public API. For [c-lib], docs are built using [mdbook].
+
 ## Release
 
 Before release, `makers manual` must be run in order to run tests against live QCS/QPUs.
+
+[cargo-make]: https://sagiegurari.github.io/cargo-make/
+[c-lib]: ./c-lib/README.md
+[qcs]: ./qcs/README.md
+[mdbook]: https://rust-lang.github.io/mdBook/

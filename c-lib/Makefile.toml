@@ -51,3 +51,20 @@ args = ["up", "-d"]
 [tasks.post-test]
 command = "docker-compose"
 args = ["down"]
+
+[tasks.mdbook]
+install_crate = { crate_name = "mdbook", binary = "mdbook", test_arg = "help" }
+
+[tasks.mdbook-linkcheck]
+install_crate = { crate_name = "mdbook-linkcheck", binary = "mdbook-linkcheck", test_arg = "--help" }
+
+[tasks.docs]
+dependencies = ["mdbook", "mdbook-linkcheck"]
+command = "mdbook"
+args = ["build", "docs"]
+
+[tasks.serve-docs]
+dependencies = ["mdbook", "mdbook-linkcheck"]
+install_crate = { crate_name = "mdbook", binary = "mdbook", test_arg = "help" }
+command = "mdbook"
+args = ["serve", "docs", "--open"]

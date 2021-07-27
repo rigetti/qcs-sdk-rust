@@ -14,10 +14,12 @@ use std::ptr::null_mut;
 mod qpu;
 mod qvm;
 
+// ANCHOR: free_program_result
 /// Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
 ///
 /// # Safety
 /// This function should only be called with the result of [`run_program_on_qvm`]
+// ANCHOR_END: free_program_result
 #[no_mangle]
 pub unsafe extern "C" fn free_program_result(response: ProgramResult) {
     let rust_managed = response.into_rust();

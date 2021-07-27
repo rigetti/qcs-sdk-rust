@@ -42,7 +42,13 @@ mod translation;
 /// The generic type `ResultType`. Built-in supported types are `Vec<Vec<f64>>` and `Vec<Vec<u16>>`
 ///
 /// # Errors
-/// See [`Error`] for possible error conditions.
+/// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
+///
+/// 1. You are not authenticated for QCS
+/// 1. Your credentials don't have an active reservation for the QPU you requested
+/// 1. [quilc] was not running.
+///
+/// [quilc]: https://github.com/quil-lang/quilc
 pub async fn run_program(
     quil: &str,
     shots: u16,

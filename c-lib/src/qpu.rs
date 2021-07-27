@@ -38,40 +38,6 @@ use crate::ProgramResult;
 ///
 /// This program will return a [`crate::ProgramResult`] with an `error` attribute which will be
 /// `NULL` if successful or a human readable description of the error that occurred.
-///
-/// # Example
-///
-/// ```c
-/// #include <stdio.h>
-/// #include "../libqcs.h"
-///
-/// char* BELL_STATE_PROGRAM =
-///         "DECLARE ro BIT[2]\n"
-///         "H 0\n"
-///         "CNOT 0 1\n"
-///         "MEASURE 0 ro[0]\n"
-///         "MEASURE 1 ro[1]\n";
-///
-/// int main() {
-///     uint8_t shots = 10;
-///     ProgramResult response = run_program_on_qpu(BELL_STATE_PROGRAM, shots, "ro", "Aspen-9");
-///
-///     if (response.error != NULL) {
-///         printf("An error occurred when running the program:\n\t%s", response.error);
-///         return 1;
-///     }
-///
-///     for (int shot = 0; shot < response.number_of_shots; shot++) {
-///         int bit_0 = response.results_by_shot[shot][0];
-///         int bit_1 = response.results_by_shot[shot][1];
-///         // With this program, bit_0 should always equal bit_1
-///     }
-///
-///     free_qpu_response(response);
-///
-///     return 0;
-/// }
-/// ```
 #[no_mangle]
 pub unsafe extern "C" fn run_program_on_qpu(
     program: *mut c_char,

@@ -1,0 +1,10 @@
+[book]
+authors = ["Dylan Anthony"]
+language = "en"
+multilingual = false
+src = "src"
+title = "QCS C-SDK"
+
+[output.html]
+
+[output.linkcheck]
