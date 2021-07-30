@@ -69,11 +69,9 @@ impl ProgramResult {
         match data {
             qcs::ProgramResult::I8(data) => ProgramResult::from(data),
             qcs::ProgramResult::F64(data) => ProgramResult::from(data),
-            _ => {
-                return Self::from(eyre!(
-                    "Only BIT, OCTET, and REAL DECLARE instructions are currently supported."
-                ));
-            }
+            _ => Self::from(eyre!(
+                "Only BIT, OCTET, and REAL DECLARE instructions are currently supported."
+            )),
         }
     }
 
@@ -87,7 +85,7 @@ impl ProgramResult {
                 // will happen here. Proper usage should only see an error message here that was
                 // constructed from `QVMResponse::from`
                 let c_string = CString::from_raw(error);
-                return Err(eyre!(c_string.into_string()?));
+                Err(eyre!(c_string.into_string()?))
             }
             ProgramResult::Byte {
                 data_per_shot,

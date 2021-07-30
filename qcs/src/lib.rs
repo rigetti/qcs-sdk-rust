@@ -153,7 +153,7 @@ fn transpose<T>(mut data: Vec<Vec<T>>, len: u16) -> Vec<Vec<T>> {
     for _ in 0..len {
         let mut new_inner = Vec::with_capacity(data.len());
         for old_inner in &mut data {
-            new_inner.push(old_inner.remove(0))
+            new_inner.push(old_inner.remove(0));
         }
         results.push(new_inner);
     }

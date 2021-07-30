@@ -104,7 +104,7 @@ fn process_buffers(
         })?;
         results.push(
             Register::try_from(buffer).wrap_err("Could not convert buffer into requested type")?,
-        )
+        );
     }
     Ok(results)
 }
