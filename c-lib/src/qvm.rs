@@ -27,8 +27,7 @@ use libc::{c_char, c_ushort};
 ///
 /// # Errors
 ///
-/// This program will return a [`ProgramResult`] with a `error` attribute. That `error` attribute will
-/// either be `NULL` if successful, or a human readable description of the error that occurred.
+/// This program will return a [`crate::ProgramResult::Error`] if an error occurs.
 #[no_mangle]
 pub unsafe extern "C" fn run_program_on_qvm(
     program: *mut c_char,

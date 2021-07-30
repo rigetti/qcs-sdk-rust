@@ -15,119 +15,156 @@ char *BELL_STATE_PROGRAM =
         "MEASURE 1 ro[1]\n";
 // ANCHOR_END: program
 
-bool fail(ProgramResult programResult) {
-    // The ProgramResult should always be freed to avoid memory leakage, even in case of an error!
+bool fail(
+        const char *testName,
+        char *message,
+        ProgramResult programResult
+) {
+    printf("❌ %s failed: %s\n", testName, message);
     free_program_result(programResult);
     return false;
 }
 
-bool succeed(ProgramResult programResult) {
+bool succeed(const char *testName, ProgramResult programResult) {
+    printf("✅ %s succeeded.\n", testName);
+    // ANCHOR: free
     free_program_result(programResult);
+    // ANCHOR_END: free
     return true;
 }
 
 bool test_bell_state() {
+    const char *TEST_NAME = "test_bell_state";
+
     // ANCHOR: run
     unsigned int shots = 3;
-    ProgramResult response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
+    ProgramResult result = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
     // ANCHOR_END: run
 
     // ANCHOR: errors
-    if (response.tag == ProgramResult_Error) {
-        printf("❌ test_bell_state failed with %s\n", response.error);
-        return fail(response);
+    if (result.tag == ProgramResult_Error) {
+        return fail(
+                TEST_NAME,
+                result.error,
+                result
+        );
     }
     // ANCHOR_END: errors
 
-    if (response.tag != ProgramResult_Byte) {
-        printf(
-                "❌ test_bell_state failed: Expected type Byte, got tag  %d\n",
-                response.tag
+    // ANCHOR: byte_check
+    if (result.tag != ProgramResult_Byte) {
+        char message[50];
+        sprintf(message, "Expected type Byte, got tag  %d", result.tag);
+        return fail(
+                TEST_NAME,
+                message,
+                result
         );
-        return fail(response);
     }
+    // ANCHOR_END: byte_check
 
-    if (response.byte.number_of_shots != shots) {
-        printf(
-                "❌ test_bell_state failed: Response number of shots was %d, expected %d\n",
-                response.byte.number_of_shots,
-                shots
+    if (result.byte.number_of_shots != shots) {
+        char message[50];
+        sprintf(message, "Response number of shots was %d, expected %d", result.byte.number_of_shots, shots);
+        return fail(
+                TEST_NAME,
+                message,
+                result
         );
-        return fail(response);
     }
 
     // ANCHOR: results
-    for (int shot = 0; shot < response.byte.number_of_shots; shot++) {
+    for (int shot = 0; shot < result.byte.number_of_shots; shot++) {
         // In our case, we measured two entangled qubits, so we expect their values to be equal.
-        int bit_0 = response.byte.data_per_shot[shot][0];
-        int bit_1 = response.byte.data_per_shot[shot][1];
+        int bit_0 = result.byte.data_per_shot[shot][0];
+        int bit_1 = result.byte.data_per_shot[shot][1];
         if (bit_0 != bit_1) {
-            printf(
-                    "❌ test_bell_state failed: In shot %d, got |%d%d\n",
+            char message[50];
+            sprintf(
+                    message,
+                    "in shot %d, got |%d%d",
                     shot,
                     bit_0,
                     bit_1
             );
-            return fail(response);
+            return fail(
+                    TEST_NAME,
+                    message,
+                    result
+            );
         }
     }
     // ANCHOR_END: results
 
-    // ANCHOR: free
-    free_program_result(response);
-    // ANCHOR_END: free
-
-    printf("✅ test_bell_state succeeded.\n");
-    return true;
+    return succeed(TEST_NAME, result);
 }
 // ANCHOR_END: all
 
 char *PROGRAM_WITHOUT_MEASUREMENT = "X 0";
 
 bool test_error() {
-    unsigned int shots = 1;
-    ProgramResult response = run_program_on_qvm(PROGRAM_WITHOUT_MEASUREMENT, shots, "raw");
+    const char *TEST_NAME = "test_error";
 
-    if (response.tag != ProgramResult_Error) {
-        printf("❌ test_error did not receive error response.\n");
-        return fail(response);
+    unsigned int shots = 1;
+    ProgramResult result = run_program_on_qvm(PROGRAM_WITHOUT_MEASUREMENT, shots, "raw");
+
+    if (result.tag != ProgramResult_Error) {
+        return fail(
+                TEST_NAME,
+                "did not receive error result.",
+                result
+        );
     }
 
-    printf("✅ test_error succeeded.\n");
-
-    return succeed(response);
+    return succeed(TEST_NAME, result);
 }
 
+// ANCHOR: test_real_data
 char *REAL_MEMORY_PROGRAM =
         "DECLARE mem REAL[1]\n"
         "MOVE mem[0] 3.141\n";
 
 bool test_real_data() {
-    unsigned int shots = 2;
-    ProgramResult response = run_program_on_qvm(REAL_MEMORY_PROGRAM, shots, "mem");
+    const char *TEST_NAME = "test_real_data";
 
-    if (response.tag != ProgramResult_Real) {
-        printf("❌ test_real_data failed with tag %d, error: %s\n", response.tag, response.error);
-        return fail(response);
+    unsigned int shots = 2;
+    ProgramResult result = run_program_on_qvm(REAL_MEMORY_PROGRAM, shots, "mem");
+
+    if (result.tag != ProgramResult_Real) {
+        char message[50];
+        sprintf(message, "Got incorrect tag %d", result.tag);
+        return fail(
+                TEST_NAME,
+                message,
+                result
+        );
     }
 
-    for (int shot = 0; shot < shots; shot++) {
-        double *data = response.real.data_per_shot[shot];
-        for (int slot = 0; slot < response.real.shot_length; slot++) {
+    // ANCHOR: real_shot_check
+    for (int shot = 0; shot < result.real.number_of_shots; shot++) {
+        double *data = result.real.data_per_shot[shot];
+        for (int slot = 0; slot < result.real.shot_length; slot++) {
             if (data[slot] != 3.141) {
-                printf(
-                        "❌ test_real_data failed: Found %f in slot %d\n",
+                char message[50];
+                sprintf(
+                        message,
+                        "Found %f in slot %d, expected 3.141",
                         data[slot],
                         slot
                 );
-                return fail(response);
+                return fail(
+                        TEST_NAME,
+                        message,
+                        result
+                );
             }
         }
     }
+    // ANCHOR_END: real_shot_check
 
-    printf("✅ test_real_data succeeded.\n");
-    return succeed(response);
+    return succeed(TEST_NAME, result);
 }
+// ANCHOR_END: test_real_data
 
 int main() {
     bool failing = false;
