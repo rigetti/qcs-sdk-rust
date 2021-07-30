@@ -11,6 +11,7 @@
 use enum_as_inner::EnumAsInner;
 use eyre::{eyre, Result, WrapErr};
 use num::complex::Complex32;
+use serde::Deserialize;
 
 use crate::qpu::Register;
 
@@ -68,7 +69,8 @@ pub mod qvm;
 /// }
 ///
 /// ```
-#[derive(Debug, EnumAsInner, PartialEq)]
+#[derive(Debug, Deserialize, EnumAsInner, PartialEq)]
+#[serde(untagged)]
 pub enum ProgramResult {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
     I8(Vec<Vec<i8>>),
@@ -77,6 +79,7 @@ pub enum ProgramResult {
     /// Corresponds to the Quil `INTEGER` type.
     I16(Vec<Vec<i16>>),
     /// Results containing complex numbers.
+    #[serde(skip)]
     Complex32(Vec<Vec<Complex32>>),
 }
 

@@ -33,29 +33,33 @@
  *
  * where `results_by_shot[shot][bit]` can access the value of `ro[bit]` for a given `shot`.
  */
-typedef struct ProgramResult {
-    /**
-     * A 2-D array of integers containing the measurements into register provided as
-     * `register_name`. There will be one value per declared space in the register per "shot"
-     * (run of the program).
-     */
-    char **results_by_shot;
-    /**
-     * The number of times the program ran (should be the same as the `num_shots` param to
-     * [`run_program_on_qvm`]. This is the outer dimension of `results_by_shot`.
-     */
+typedef enum ProgramResult_Tag {
+    ProgramResult_Error,
+    ProgramResult_Byte,
+    ProgramResult_Real,
+} ProgramResult_Tag;
+
+typedef struct ProgramResult_Byte_Body {
     unsigned short number_of_shots;
-    /**
-     * How many bits were measured in the program in one shot. This is the inner dimension of
-     * `results_by_shot`.
-     */
     unsigned short shot_length;
-    /**
-     * If this string is populated, there was an error. The string contains a description of that
-     * error and `results_by_shot` is `NULL`. If this string is `NULL`, the other fields contain
-     * data.
-     */
-    char *error;
+    char **data_per_shot;
+} ProgramResult_Byte_Body;
+
+typedef struct ProgramResult_Real_Body {
+    unsigned short number_of_shots;
+    unsigned short shot_length;
+    double **data_per_shot;
+} ProgramResult_Real_Body;
+
+typedef struct ProgramResult {
+    ProgramResult_Tag tag;
+    union {
+        struct {
+            char *error;
+        };
+        ProgramResult_Byte_Body byte;
+        ProgramResult_Real_Body real;
+    };
 } ProgramResult;
 
 /**
@@ -100,40 +104,6 @@ void free_program_result(struct ProgramResult response);
  *
  * This program will return a [`crate::ProgramResult`] with an `error` attribute which will be
  * `NULL` if successful or a human readable description of the error that occurred.
- *
- * # Example
- *
- * ```c
- * #include <stdio.h>
- * #include "../libqcs.h"
- *
- * char* BELL_STATE_PROGRAM =
- *         "DECLARE ro BIT[2]\n"
- *         "H 0\n"
- *         "CNOT 0 1\n"
- *         "MEASURE 0 ro[0]\n"
- *         "MEASURE 1 ro[1]\n";
- *
- * int main() {
- *     uint8_t shots = 10;
- *     ProgramResult response = run_program_on_qpu(BELL_STATE_PROGRAM, shots, "ro", "Aspen-9");
- *
- *     if (response.error != NULL) {
- *         printf("An error occurred when running the program:\n\t%s", response.error);
- *         return 1;
- *     }
- *
- *     for (int shot = 0; shot < response.number_of_shots; shot++) {
- *         int bit_0 = response.results_by_shot[shot][0];
- *         int bit_1 = response.results_by_shot[shot][1];
- *         // With this program, bit_0 should always equal bit_1
- *     }
- *
- *     free_qpu_response(response);
- *
- *     return 0;
- * }
- * ```
  */
 struct ProgramResult run_program_on_qpu(char *program, unsigned short num_shots, char *register_name, char *qpu_id);
 
@@ -163,39 +133,5 @@ struct ProgramResult run_program_on_qpu(char *program, unsigned short num_shots,
  *
  * This program will return a [`ProgramResult`] with a `error` attribute. That `error` attribute will
  * either be `NULL` if successful, or a human readable description of the error that occurred.
- *
- * # Example
- *
- * ```c
- * #include <stdio.h>
- * #include "../libqcs.h"
- *
- * char* BELL_STATE_PROGRAM =
- *         "DECLARE ro BIT[2]\n"
- *         "H 0\n"
- *         "CNOT 0 1\n"
- *         "MEASURE 0 ro[0]\n"
- *         "MEASURE 1 ro[1]\n";
- *
- * int main() {
- *     uint8_t shots = 10;
- *     ProgramResult response = run_program_on_qvm(BELL_STATE_PROGRAM, shots, "ro");
- *
- *     if (response.error != NULL) {
- *         printf("An error occurred when running the program:\n\t%s", response.error);
- *         return 1;
- *     }
- *
- *     for (int shot = 0; shot < response.number_of_shots; shot++) {
- *         int bit_0 = response.results_by_shot[shot][0];
- *         int bit_1 = response.results_by_shot[shot][1];
- *         // With this program, bit_0 should always equal bit_1
- *     }
- *
- *     free_qvm_response(response);
- *
- *     return 0;
- * }
- * ```
  */
 struct ProgramResult run_program_on_qvm(char *program, unsigned short num_shots, char *register_name);

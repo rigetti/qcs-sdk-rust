@@ -58,42 +58,18 @@ pub async fn run_program(program: &str, shots: u16, register: &str) -> Result<Pr
         .json()
         .await
         .wrap_err("While decoding QVM response")?;
-    let mut data = registers.remove(register).ok_or_else(|| {
+    registers.remove(register).ok_or_else(|| {
         eyre!(
             "Could not find register {} in the QVM response, did you measure to it?",
             register
         )
-    })?;
-
-    if data.len() != shots as usize {
-        return Err(eyre!(
-            "Expected {} shots but received {}",
-            shots,
-            data.len()
-        ));
-    }
-    data.shrink_to_fit();
-    let shot_len = data[0].len();
-    for (shot_num, shot) in data.iter_mut().enumerate() {
-        if shot.len() != shot_len {
-            return Err(eyre!(
-                "Each shot must have the same amount of data. However, shot 0 had \
-                {shot_len} entries and shot {shot_num} had {this_shot_len} entries.",
-                shot_len = shot_len,
-                shot_num = shot_num,
-                this_shot_len = shot.len(),
-            ));
-        }
-        shot.shrink_to_fit();
-    }
-
-    Ok(ProgramResult::I8(data))
+    })
 }
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct QVMResponse {
     #[serde(flatten)]
-    pub registers: HashMap<String, Vec<Vec<i8>>>,
+    pub registers: HashMap<String, ProgramResult>,
 }
 
 #[derive(Serialize)]
