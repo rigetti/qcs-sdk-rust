@@ -39,7 +39,7 @@ mod translation;
 ///
 /// # Returns
 ///
-/// The generic type `ResultType`. Built-in supported types are `Vec<Vec<f64>>` and `Vec<Vec<u16>>`
+/// [`ProgramResult`].
 ///
 /// # Errors
 /// All errors are human readable by way of [`mod@eyre`]. Some common errors are:

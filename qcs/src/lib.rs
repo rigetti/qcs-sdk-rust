@@ -57,8 +57,8 @@ pub mod qvm;
 ///     let result: ProgramResult = qvm::run_program(PROGRAM, 4, "ro").await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     let data = result.into_i8().unwrap();
-///     // In this case, we ran the program for 4 shots, so we know the length is 4.///
-///     assert_eq!(data.len(), 4);///
+///     // In this case, we ran the program for 4 shots, so we know the length is 4.
+///     assert_eq!(data.len(), 4);
 ///     for shot in data {
 ///         // Each shot will contain all the memory, in order, for the vector (or "register") we
 ///         // requested the results of. In this case, "ro".

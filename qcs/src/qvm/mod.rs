@@ -19,7 +19,7 @@ use crate::ProgramResult;
 /// 2. `shots`: The number of times the program should run.
 /// 3. `register`: The name of the register containing results that should be read out from QVM.
 ///
-/// Returns: [`ProgramResult::I8`] (no other types currently supported via QVM).
+/// Returns: [`ProgramResult`].
 ///
 /// # Errors
 ///
