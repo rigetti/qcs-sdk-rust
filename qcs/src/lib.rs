@@ -11,6 +11,7 @@
 use enum_as_inner::EnumAsInner;
 use eyre::{eyre, Result, WrapErr};
 use num::complex::Complex32;
+use serde::Deserialize;
 
 use crate::qpu::Register;
 
@@ -56,8 +57,8 @@ pub mod qvm;
 ///     let result: ProgramResult = qvm::run_program(PROGRAM, 4, "ro").await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     let data = result.into_i8().unwrap();
-///     // In this case, we ran the program for 4 shots, so we know the length is 4.///
-///     assert_eq!(data.len(), 4);///
+///     // In this case, we ran the program for 4 shots, so we know the length is 4.
+///     assert_eq!(data.len(), 4);
 ///     for shot in data {
 ///         // Each shot will contain all the memory, in order, for the vector (or "register") we
 ///         // requested the results of. In this case, "ro".
@@ -68,7 +69,8 @@ pub mod qvm;
 /// }
 ///
 /// ```
-#[derive(Debug, EnumAsInner, PartialEq)]
+#[derive(Debug, Deserialize, EnumAsInner, PartialEq)]
+#[serde(untagged)]
 pub enum ProgramResult {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
     I8(Vec<Vec<i8>>),
@@ -77,6 +79,7 @@ pub enum ProgramResult {
     /// Corresponds to the Quil `INTEGER` type.
     I16(Vec<Vec<i16>>),
     /// Results containing complex numbers.
+    #[serde(skip)]
     Complex32(Vec<Vec<Complex32>>),
 }
 
@@ -150,7 +153,7 @@ fn transpose<T>(mut data: Vec<Vec<T>>, len: u16) -> Vec<Vec<T>> {
     for _ in 0..len {
         let mut new_inner = Vec::with_capacity(data.len());
         for old_inner in &mut data {
-            new_inner.push(old_inner.remove(0))
+            new_inner.push(old_inner.remove(0));
         }
         results.push(new_inner);
     }

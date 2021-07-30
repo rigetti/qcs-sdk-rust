@@ -5,3 +5,7 @@ args = ["up", "-d"]
 [tasks.post-test]
 command = "docker-compose"
 args = ["down"]
+
+[tasks.serve-docs]
+command = "cargo"
+args = ["doc", "--open"]

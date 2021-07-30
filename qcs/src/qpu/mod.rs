@@ -39,10 +39,16 @@ mod translation;
 ///
 /// # Returns
 ///
-/// The generic type `ResultType`. Built-in supported types are `Vec<Vec<f64>>` and `Vec<Vec<u16>>`
+/// [`ProgramResult`].
 ///
 /// # Errors
-/// See [`Error`] for possible error conditions.
+/// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
+///
+/// 1. You are not authenticated for QCS
+/// 1. Your credentials don't have an active reservation for the QPU you requested
+/// 1. [quilc] was not running.
+///
+/// [quilc]: https://github.com/quil-lang/quilc
 pub async fn run_program(
     quil: &str,
     shots: u16,
@@ -98,7 +104,7 @@ fn process_buffers(
         })?;
         results.push(
             Register::try_from(buffer).wrap_err("Could not convert buffer into requested type")?,
-        )
+        );
     }
     Ok(results)
 }
