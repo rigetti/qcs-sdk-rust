@@ -32,6 +32,8 @@ mod describe_load {
 
         let settings = load().await;
 
+        std::env::remove_var(SETTINGS_PATH_VAR);
+
         assert!(settings.is_err())
     }
 
@@ -126,7 +128,7 @@ impl Default for Pyquil {
     }
 }
 
-#[derive(Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, Debug, PartialEq, Serialize)]
 pub(crate) struct AuthServer {
     pub(crate) client_id: String,
     pub(crate) issuer: String,

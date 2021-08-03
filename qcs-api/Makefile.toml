@@ -17,3 +17,6 @@ args = [
     "-o",
     "/local",
 ]
+
+[tasks.manual]
+alias = "empty"

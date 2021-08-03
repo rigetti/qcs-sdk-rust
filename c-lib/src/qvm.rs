@@ -1,17 +1,14 @@
-use std::ffi::CStr;
-
-use crate::ProgramResult;
 use eyre::{Result, WrapErr};
-use libc::{c_char, c_ushort};
+
+use crate::{Executable, ExecutionResult};
 
 /// Given a Quil program as a string, run that program on a local QVM.
 ///
 /// # Safety
 ///
-/// In order to run this function safely, you must provide the return value from this
-/// function to [`crate::free_program_result`] once you're done with it. The inputs `program` and
-/// `register_name` must be valid, nul-terminated, non-null strings which remain constant for
-/// the duration of this function.
+/// 1. You must provide the return value from this function to [`crate::free_execution_result`] once
+///    you're done with it.
+/// 2. `executable` must be the valid, non-NULL result of [`crate::executable_from_quil`]
 ///
 /// # Usage
 ///
@@ -27,36 +24,32 @@ use libc::{c_char, c_ushort};
 ///
 /// # Errors
 ///
-/// This program will return a [`crate::ProgramResult::Error`] if an error occurs.
+/// This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
 #[no_mangle]
-pub unsafe extern "C" fn run_program_on_qvm(
-    program: *mut c_char,
-    num_shots: c_ushort,
-    register_name: *mut c_char,
-) -> ProgramResult {
-    match _run_program_on_qvm(program, num_shots, register_name) {
-        Ok(data) => ProgramResult::from_rust(data),
-        Err(error) => ProgramResult::from(error),
+pub unsafe extern "C" fn execute_on_qvm(executable: *mut Executable) -> ExecutionResult {
+    match _execute_on_qvm(executable) {
+        Ok(data) => ExecutionResult::from_rust(data),
+        Err(error) => ExecutionResult::from(error),
     }
 }
 
-/// Implements the actual logic of [`run_program_on_qvm`] but with `?` support.
-unsafe fn _run_program_on_qvm(
-    program: *mut c_char,
-    num_shots: c_ushort,
-    register_name: *mut c_char,
-) -> Result<qcs::ProgramResult> {
-    // SAFETY: If program is not a valid null-terminated string, this is UB
-    let program = CStr::from_ptr(program);
-    // SAFETY: If register is not a valid null-terminated string, this is UB
-    let register = CStr::from_ptr(register_name);
-    let program = program
-        .to_str()
-        .wrap_err("Could not decode program as UTF-8")?;
-    let register = register
-        .to_str()
-        .wrap_err("Could not decode register as UTF-8")?;
-    let rt = tokio::runtime::Runtime::new().wrap_err("Failed to create tokio runtime")?;
-    let fut = qcs::qvm::run_program(program, num_shots, register);
-    rt.block_on(fut)
+/// Implements the actual logic of [`execute_on_qvm`] but with `?` support.
+unsafe fn _execute_on_qvm(executable: *mut Executable) -> Result<qcs::ExecutionResult, String> {
+    // SAFETY: If this wasn't constructed already, was already freed, or is NULL, bad things
+    // happen here.
+    let mut executable = Box::from_raw(executable);
+
+    let result = match &mut executable.inner {
+        Err(e) => Err(format!("{:?}", e)),
+        Ok(inner) => {
+            let rt = tokio::runtime::Runtime::new()
+                .wrap_err("Failed to create tokio runtime")
+                .map_err(|e| format!("{:?}", e))?;
+            let fut = inner.execute_on_qvm();
+            rt.block_on(fut).map_err(|e| format!("{:?}", e))
+        }
+    };
+
+    Box::into_raw(executable);
+    result
 }

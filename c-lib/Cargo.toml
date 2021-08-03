@@ -15,6 +15,5 @@ crate-type = ["cdylib"]
 [dependencies]
 eyre = "0.6.5"
 http = "0.2.4"
-libc = "0.2.97"
 qcs = { version = "0.0.0", path = "../qcs" }
 tokio = { version = "1.7.1", features = ["rt-multi-thread"] }

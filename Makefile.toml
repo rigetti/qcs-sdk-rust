@@ -14,5 +14,24 @@ args = ["deny", "--all-features", "check"]
 [tasks.pre-workspace-ci-flow]
 alias = "deny"
 
-[tasks.manual]
-alias = "empty"
+[tasks.mdbook]
+install_crate = { crate_name = "mdbook", binary = "mdbook", test_arg = "help" }
+
+[tasks.mdbook-linkcheck]
+install_crate = { crate_name = "mdbook-linkcheck", binary = "mdbook-linkcheck", test_arg = "--help" }
+
+[tasks.mdbook-mermaid]
+install_crate = { crate_name = "mdbook-mermaid", binary = "mdbook-mermaid", test_arg = "--help" }
+
+[tasks.book]
+workspace = false
+dependencies = ["mdbook", "mdbook-linkcheck", "mdbook-mermaid"]
+command = "mdbook"
+args = ["build", "book"]
+
+[tasks.serve-book]
+workspace = false
+dependencies = ["mdbook", "mdbook-linkcheck", "mdbook-mermaid"]
+install_crate = { crate_name = "mdbook", binary = "mdbook", test_arg = "help" }
+command = "mdbook"
+args = ["serve", "book", "--open"]

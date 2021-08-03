@@ -8,10 +8,18 @@
 
 
 /**
- * The return value of [`run_program_on_qvm`] or [`run_program_on_qpu`].
+ * Holds the state required to execute a program.
+ * Intentionally opaque to C.
+ */
+// ANCHOR: Executable
+typedef struct Executable Executable;
+// ANCHOR_END: Executable
+
+/**
+ * The return value of [`execute_on_qvm`] or [`execute_on_qpu`].
  *
  * # Safety
- * In order to properly free the memory allocated in this struct, call [`free_program_result`]
+ * In order to properly free the memory allocated in this struct, call [`free_execution_result`]
  * with any instances created.
  *
  * # Example
@@ -23,7 +31,7 @@
  * and you run that program 3 times (shots)
  *
  * ```C
- * ProgramResult result = run_program_on_qvm(program, 3, "ro");
+ * ExecutionResult result = run_program_on_qvm(program, 3, "ro");
  * ```
  * If `error` is `NULL` then `results_by_shot` will look something like:
  *
@@ -33,64 +41,78 @@
  *
  * where `results_by_shot[shot][bit]` can access the value of `ro[bit]` for a given `shot`.
  */
-// ANCHOR: ProgramResult_Tag
-typedef enum ProgramResult_Tag {
-    ProgramResult_Error,
-    ProgramResult_Byte,
-    ProgramResult_Real,
-} ProgramResult_Tag;
-// ANCHOR_END: ProgramResult_Tag
+// ANCHOR: ExecutionResult_Tag
+typedef enum ExecutionResult_Tag {
+    ExecutionResult_Error,
+    ExecutionResult_Byte,
+    ExecutionResult_Real,
+} ExecutionResult_Tag;
+// ANCHOR_END: ExecutionResult_Tag
 
-// ANCHOR: ProgramResult_Byte_Body
-typedef struct ProgramResult_Byte_Body {
+// ANCHOR: ExecutionResult_Byte_Body
+typedef struct ExecutionResult_Byte_Body {
     unsigned short number_of_shots;
     unsigned short shot_length;
     char **data_per_shot;
-} ProgramResult_Byte_Body;
-// ANCHOR_END: ProgramResult_Byte_Body
+} ExecutionResult_Byte_Body;
+// ANCHOR_END: ExecutionResult_Byte_Body
 
-// ANCHOR: ProgramResult_Real_Body
-typedef struct ProgramResult_Real_Body {
+// ANCHOR: ExecutionResult_Real_Body
+typedef struct ExecutionResult_Real_Body {
     unsigned short number_of_shots;
     unsigned short shot_length;
     double **data_per_shot;
-} ProgramResult_Real_Body;
-// ANCHOR_END: ProgramResult_Real_Body
+} ExecutionResult_Real_Body;
+// ANCHOR_END: ExecutionResult_Real_Body
 
-// ANCHOR: ProgramResult
-typedef struct ProgramResult {
-    ProgramResult_Tag tag;
+// ANCHOR: ExecutionResult
+typedef struct ExecutionResult {
+    ExecutionResult_Tag tag;
     union {
         // ANCHOR: error
         struct {
             char *error;
         };
         // ANCHOR_END: error
-        ProgramResult_Byte_Body byte;
-        ProgramResult_Real_Body real;
+        ExecutionResult_Byte_Body byte;
+        ExecutionResult_Real_Body real;
     };
-} ProgramResult;
-// ANCHOR_END: ProgramResult
+} ExecutionResult;
+// ANCHOR_END: ExecutionResult
 
 /**
- * Frees the memory of a [`QVMResponse`] as allocated by [`run_program_on_qvm`]
+ * Constructs an [`Executable`] and returns a raw pointer to it.
  *
  * # Safety
- * This function should only be called with the result of [`run_program_on_qvm`]
+ *
+ * 1. The result of this function must later be passed to [`free_executable`] or the memory will be leaked.
+ * 2. `quil` must be a valid, non-NULL, nul-terminated string which must remain constant and valid until [`free_executable`] is called.
+ *
+ * # Arguments
+ *
+ * 1. `quil`: A string containing a valid Quil program
+ *
+ * # Errors
+ *
+ * If an error occurs in this function, NULL will be returned.
+ *
+ * 1. The contents of `quil` were not valid UTF-8. In this case, the returned value will be NULL.
  */
-// ANCHOR: free_program_result
-void free_program_result(struct ProgramResult response);
-// ANCHOR_END: free_program_result
+// ANCHOR: executable_from_quil
+struct Executable *executable_from_quil(char *quil);
+// ANCHOR_END: executable_from_quil
 
 /**
- * Given a Quil program as a string, run that program on a QPU
+ * Run an executable (created by [`crate::executable_from_quil`]) on a real QPU.
  *
  * # Safety
  *
- * In order to run this function safely, you must provide the return value from this
- * function to [`crate::free_program_result`] once you're done with it. The inputs `program`,
- * `register_name`, and `qpu_id` must be valid, nul-terminated, non-null strings which remain
- * constant for the duration of this function.
+ * 1. You must provide the return value from this function to [`crate::free_execution_result`]
+ *     once you're done with it.
+ * 2. The input `qpu_id` must be valid, nul-terminated, non-null strings which remain constant for
+ *     the duration of this function.
+ * 3. `executable` must be the non-NULL result of a call to [`crate::executable_from_quil`] and
+ *     must not be freed during the execution of this function.
  *
  * # Usage
  *
@@ -105,30 +127,25 @@ void free_program_result(struct ProgramResult response);
  *
  * # Arguments
  *
- * 1. `program`: A string containing a valid Quil program. Any measurements that you'd like
- * to get back out must be in a register matching `register_name`. For example, if you have
- * `MEASURE 0 ro[0]` then `register_name` should be `"ro"`.
- * 2. `num_shots`: the number of times you'd like to run the program.
- * 3. `register_name`: the name of the register in the `program` that is being measured to.
- * 4. `qpu_id`: the ID of the QPU to run on (e.g. `"Aspen-9"`)
+ * 1. `executable`: the result of a call to [`crate::executable_from_quil`]
+ * 2. `qpu_id`: the ID of the QPU to run on (e.g. `"Aspen-9"`)
  *
  * # Errors
  *
- * This program will return a [`crate::ProgramResult::Error`] if an error occurs.
+ * This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
  */
-// ANCHOR: run_program_on_qpu
-struct ProgramResult run_program_on_qpu(char *program, unsigned short num_shots, char *register_name, char *qpu_id);
-// ANCHOR_END: run_program_on_qpu
+// ANCHOR: execute_on_qpu
+struct ExecutionResult execute_on_qpu(struct Executable *executable, char *qpu_id);
+// ANCHOR_END: execute_on_qpu
 
 /**
  * Given a Quil program as a string, run that program on a local QVM.
  *
  * # Safety
  *
- * In order to run this function safely, you must provide the return value from this
- * function to [`crate::free_program_result`] once you're done with it. The inputs `program` and
- * `register_name` must be valid, nul-terminated, non-null strings which remain constant for
- * the duration of this function.
+ * 1. You must provide the return value from this function to [`crate::free_execution_result`] once
+ *    you're done with it.
+ * 2. `executable` must be the valid, non-NULL result of [`crate::executable_from_quil`]
  *
  * # Usage
  *
@@ -144,8 +161,89 @@ struct ProgramResult run_program_on_qpu(char *program, unsigned short num_shots,
  *
  * # Errors
  *
- * This program will return a [`crate::ProgramResult::Error`] if an error occurs.
+ * This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
  */
-// ANCHOR: run_program_on_qvm
-struct ProgramResult run_program_on_qvm(char *program, unsigned short num_shots, char *register_name);
-// ANCHOR_END: run_program_on_qvm
+// ANCHOR: execute_on_qvm
+struct ExecutionResult execute_on_qvm(struct Executable *executable);
+// ANCHOR_END: execute_on_qvm
+
+/**
+ * Free an [`Executable`]
+ *
+ * # Safety
+ *
+ * 1. Only call this with the non-null output of [`executable_from_quil`].
+ * 2. Only call this function once per executable if you don't want to double-free your memory.
+ */
+// ANCHOR: free_executable
+void free_executable(struct Executable *executable);
+// ANCHOR_END: free_executable
+
+/**
+ * Frees the memory of a [`ExecutionResult`] as allocated by [`execute_on_qvm`] or [`execute_on_qpu`]
+ *
+ * # Safety
+ * This function should only be called with the result of one of the above functions.
+ */
+// ANCHOR: free_execution_result
+void free_execution_result(struct ExecutionResult response);
+// ANCHOR_END: free_execution_result
+
+/**
+ * Set the memory location to read out of.
+ *
+ * # Safety
+ *
+ * 1. `executable` must be the result of [`executable_from_quil`]
+ * 2. `name` must be a valid, non-NULL, nul-terminated string. It must also live until `executable`
+ *     is freed.
+ *
+ * # Arguments
+ *
+ * 1. `executable`: The [`Executable`] to set the parameter on.
+ * 2. `name`: The name of the memory region to read out of. Must match a Quil `DECLARE`
+ *     statement exactly.
+ */
+// ANCHOR: read_from
+void read_from(struct Executable *executable, char *name);
+// ANCHOR_END: read_from
+
+/**
+ * Set the value of a parameter for parametric execution.
+ *
+ * # Safety
+ *
+ * 1. `executable` must be the non-NULL result of [`executable_from_quil`]
+ * 2. `name` must be a valid, non-NULL, nul-terminated string. It must also live until `executable`
+ *     is freed.
+ *
+ * # Arguments
+ *
+ * 1. `executable`: The [`Executable`] to set the parameter on.
+ * 2. `name`: The name of the memory region to set, must match a Quil `DECLARE` statement exactly.
+ * 3. `index`: The index into the named memory region to set.
+ * 3. `value`: The value to set the parameter to.
+ *
+ * # Errors
+ *
+ * If an error occurs, the return value of this function will be non-null
+ */
+// ANCHOR: set_param
+void set_param(struct Executable *executable, char *name, unsigned int index, double value);
+// ANCHOR_END: set_param
+
+/**
+ * Set the program to run multiple times on the QPU.
+ *
+ * # Safety
+ *
+ * 1. `executable` must be the result of [`executable_from_quil`]
+ *
+ * # Arguments
+ *
+ * 1. `executable`: The [`Executable`] to set the parameter on.
+ * 2. `shots`: The number of times to run the program for each execution.
+ */
+// ANCHOR: wrap_in_shots
+void wrap_in_shots(struct Executable *executable, unsigned short shots);
+// ANCHOR_END: wrap_in_shots

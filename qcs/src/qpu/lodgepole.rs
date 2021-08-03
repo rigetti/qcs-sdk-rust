@@ -11,13 +11,16 @@ use serde_bytes::ByteBuf;
 
 use qcs_api::models::EngagementWithCredentials;
 
+use crate::executable::Parameters;
+
 use super::rpcq::{Client, Credentials, RPCRequest};
 
 pub(crate) fn execute(
-    program: String,
-    engagement: EngagementWithCredentials,
+    program: &str,
+    engagement: &EngagementWithCredentials,
+    patch_values: &Parameters,
 ) -> Result<HashMap<String, Buffer>> {
-    let params = QPUParams::from_program(program);
+    let params = QPUParams::from_program(program, patch_values);
     let EngagementWithCredentials {
         address,
         credentials,
@@ -28,67 +31,68 @@ pub(crate) fn execute(
     let client = if credentials.server_public.is_empty() {
         warn!(
             "Connecting to Lodgepole on {} with no credentials.",
-            &address
+            address
         );
-        Client::new(&address).wrap_err("Unable to connect to the QPU (Lodgepole)")?
+        Client::new(address).wrap_err("Unable to connect to the QPU (Lodgepole)")?
     } else {
         let credentials = Credentials {
-            client_secret_key: credentials.client_secret,
-            client_public_key: credentials.client_public,
-            server_public_key: credentials.server_public,
+            client_secret_key: &credentials.client_secret,
+            client_public_key: &credentials.client_public,
+            server_public_key: &credentials.server_public,
         };
         trace!("Connecting to Lodgepole at {} with credentials", &address);
-        Client::new_with_credentials(&address, &credentials)
+        Client::new_with_credentials(address, &credentials)
             .wrap_err("Unable to connect to the QPU (Lodgepole)")?
     };
 
-    // let client = Client::new(&address).unwrap();
+    let request = RPCRequest::from(&params);
     let job_id: String = client
-        .run_request(&params.into())
+        .run_request(&request)
         .wrap_err("While attempting to send the program to the QPU (Lodgepole)")?;
     debug!("Received job ID {} from Lodgepole", &job_id);
     let get_buffers_request = GetBuffersRequest::new(job_id);
     client
-        .run_request(&get_buffers_request.into())
+        .run_request(&RPCRequest::from(&get_buffers_request))
         .wrap_err("While attempting to receive results from to the QPU (Lodgepole)")
 }
 
 #[derive(Serialize, Debug)]
-struct QPUParams {
-    request: QPURequest,
+struct QPUParams<'request> {
+    request: QPURequest<'request>,
     priority: u8,
 }
 
-impl QPUParams {
-    fn from_program(program: String) -> Self {
+impl<'request> QPUParams<'request> {
+    fn from_program(program: &'request str, patch_values: PatchValues<'request>) -> Self {
         Self {
-            request: QPURequest::from_program(program),
+            request: QPURequest::from_program(program, patch_values),
             priority: 1,
         }
     }
 }
 
-impl From<QPUParams> for RPCRequest<QPUParams> {
-    fn from(params: QPUParams) -> Self {
+impl<'params> From<&'params QPUParams<'params>> for RPCRequest<'params, QPUParams<'params>> {
+    fn from(params: &'params QPUParams) -> Self {
         RPCRequest::new("execute_qpu_request", params)
     }
 }
 
+type PatchValues<'request> = &'request HashMap<&'request str, Vec<f64>>;
+
 #[derive(Serialize, Debug)]
 #[serde(tag = "_type")]
-struct QPURequest {
+struct QPURequest<'request> {
     id: String,
-    program: String,
-    patch_values: HashMap<String, Vec<f64>>,
+    program: &'request str,
+    patch_values: PatchValues<'request>,
 }
 
-impl QPURequest {
-    fn from_program(program: String) -> Self {
+impl<'request> QPURequest<'request> {
+    fn from_program(program: &'request str, patch_values: PatchValues<'request>) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
             program,
-            // TODO: Read `pyquil.api._qpu.QPU._build_patch_values` and implement arithmetic
-            patch_values: HashMap::new(),
+            patch_values,
         }
     }
 }
@@ -105,8 +109,8 @@ impl GetBuffersRequest {
     }
 }
 
-impl From<GetBuffersRequest> for RPCRequest<GetBuffersRequest> {
-    fn from(req: GetBuffersRequest) -> Self {
+impl<'request> From<&'request GetBuffersRequest> for RPCRequest<'request, GetBuffersRequest> {
+    fn from(req: &'request GetBuffersRequest) -> Self {
         RPCRequest::new("get_buffers", req)
     }
 }

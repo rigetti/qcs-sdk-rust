@@ -32,6 +32,7 @@ mod describe_load {
 
         let settings = load().await;
 
+        std::env::remove_var(SECRETS_PATH_VAR);
         assert!(settings.is_err())
     }
 

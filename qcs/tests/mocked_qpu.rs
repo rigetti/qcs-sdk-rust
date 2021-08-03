@@ -4,7 +4,7 @@
 use std::thread;
 
 use qcs::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
-use qcs::{qpu, ProgramResult};
+use qcs::{Executable, ExecutionResult};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -21,19 +21,21 @@ const QPU_ID: &str = "Aspen-9";
 #[tokio::test]
 async fn successful_bell_state() {
     setup().await;
-    let result = qpu::run_program(BELL_STATE, 2, "ro", QPU_ID)
+    let result = Executable::from_quil(BELL_STATE)
+        .with_shots(2)
+        .execute_on_qpu(QPU_ID)
         .await
         .expect("Failed to run program that should be successful");
-    assert_eq!(result, ProgramResult::I8(vec![vec![0, 0], vec![1, 1]]));
+    assert_eq!(result, ExecutionResult::I8(vec![vec![0, 0], vec![1, 1]]));
 }
 
 async fn setup() {
     env_logger::init();
+    std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
+    std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
     thread::spawn(lodgepole::run);
     tokio::spawn(auth_server::run());
     tokio::spawn(mock_qcs::run());
-    std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
-    std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
 }
 
 mod auth_server {

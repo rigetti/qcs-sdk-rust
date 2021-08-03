@@ -119,9 +119,9 @@ allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 allow-git = []
 
 # Uncomment this stuff to use Git dependencies in the future
-# [sources.allow-org]
+ [sources.allow-org]
 # 1 or more github.com organizations to allow git sources for
-# github = ["rigetti"]
+ github = ["rigetti"]
 # 1 or more gitlab.com organizations to allow git sources for
 # gitlab = [""]
 # 1 or more bitbucket.org organizations to allow git sources for

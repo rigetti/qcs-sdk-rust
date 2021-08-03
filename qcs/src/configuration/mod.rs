@@ -22,6 +22,7 @@ mod secrets;
 mod settings;
 
 /// All the config data that's parsed from config sources
+#[derive(Clone, Debug)]
 pub(crate) struct Configuration {
     api_config: api::Configuration,
     auth_server: AuthServer,

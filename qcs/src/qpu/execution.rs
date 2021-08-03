@@ -1,0 +1,229 @@
+//! Contains QPU-specific executable stuff.
+
+use std::collections::HashMap;
+use std::convert::TryFrom;
+
+use eyre::{eyre, Report, Result, WrapErr};
+use log::trace;
+use quil::expression::Expression;
+
+use qcs_api::models::EngagementWithCredentials;
+
+use crate::configuration::Configuration;
+use crate::executable::Parameters;
+use crate::qpu::get_isa;
+use crate::qpu::quilc::NativeQuilProgram;
+use crate::qpu::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
+use crate::ExecutionResult;
+
+use super::lodgepole::execute;
+use super::quilc;
+use super::{build_executable, process_buffers, BufferName};
+
+/// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
+/// updated with fresh parameters in order to re-run the same program against the same QPU with the
+/// same number of shots.
+pub(crate) struct Execution<'a> {
+    program: RewrittenProgram,
+    pub(crate) quantum_processor_id: &'a str,
+    pub(crate) shots: u16,
+    // All the stuff needed to actually make requests to QCS, lazily initialized
+    qcs: Option<Qcs>,
+}
+
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("problem communicating with QCS")]
+    Qcs(#[source] Report),
+    #[error("problem processing the provided Quil")]
+    Quil(#[from] Report),
+}
+
+struct Qcs {
+    buffer_names: Vec<BufferName>,
+    engagement: EngagementWithCredentials,
+    executable: String,
+}
+
+impl<'a> Execution<'a> {
+    /// Construct a new [`Execution`] to prepare for running on a real QPU.
+    /// This will immediately convert the provided `quil` into a form that QPUs can understand.
+    ///
+    /// # Arguments
+    ///
+    /// * `quil`: The raw Quil program to eventually be run on a QPU.
+    /// * `shots`: The number of times to run this program with each call to [`Execution::run`].
+    /// * `quantum_processor_id`: The QPU this Quil will be run on and should be compiled for.
+    /// * `config`: A [`Configuration`] instance provided by the user which contains connection info
+    ///     for QCS and the `quilc` compiler.
+    ///
+    /// returns: Result<Execution, Report>
+    ///
+    /// # Errors
+    ///
+    /// All errors will be human readable by way of [`eyre`]. Some potential issues:
+    ///
+    /// 1. Unable to fetch ISA from QCS for the provided QPU. Either the QCS connection details in
+    ///     `config` are wrong or that QPU does not exist.
+    /// 1. Unable to compile the program to Native Quil. This probably means the `quil` is invalid.
+    /// 1. Unable to parse the Native Quil that was output by `quilc`. This is probably a bug.
+    /// 1. Unable to rewrite the Native Quil for a QPU. This may mean that the `quil` was invalid
+    ///     for the QPU or that there is a bug in this library.
+    pub(crate) async fn new(
+        quil: &str,
+        shots: u16,
+        quantum_processor_id: &'a str,
+        config: &Configuration,
+    ) -> Result<Execution<'a>, Error> {
+        let isa = get_isa(quantum_processor_id, config)
+            .await
+            .map_err(Error::Qcs)?;
+        let native_quil = quilc::compile_program(quil, &isa, config)
+            .wrap_err("When attempting to compile your program to Native Quil")?;
+        trace!("Converted to Native Quil successfully");
+
+        let program =
+            NativeQuilProgram::try_from(native_quil).wrap_err("Unable to parse provided Quil")?;
+
+        Ok(Self {
+            program: RewrittenProgram::try_from(program)
+                .wrap_err("When rewriting program for QPU")?,
+            quantum_processor_id,
+            shots,
+            qcs: None,
+        })
+    }
+
+    /// Run on a real QPU and wait for the results.
+    pub(crate) async fn run(
+        &mut self,
+        params: &Parameters<'_>,
+        register: &str,
+        config: &Configuration,
+    ) -> Result<ExecutionResult, Error> {
+        let qcs = self.refresh_qcs(register, config).await?;
+
+        let result = self
+            .get_substitutions(params)
+            .map_err(|e| Error::Quil(e.wrap_err("When setting provided parameters")))
+            .and_then(|patch_values| {
+                execute(&qcs.executable, &qcs.engagement, &patch_values)
+                    .map_err(|e| Error::Qcs(e.wrap_err("When executing program.")))
+            })
+            .and_then(|buffers| {
+                process_buffers(buffers, &qcs.buffer_names)
+                    .wrap_err("When processing execution results")
+                    .map_err(Error::from)
+            })
+            .and_then(|registers| {
+                ExecutionResult::try_from_registers(registers, self.shots)
+                    .wrap_err("When decoding execution results")
+                    .map_err(Error::from)
+            });
+
+        self.qcs = Some(qcs);
+        result
+    }
+
+    /// Take or create a [`Qcs`] for this [`Execution`]. This fetches / updates engagements, builds
+    /// the executable, and prepares (from the executable) the mapping of returned values into what
+    /// the user expects to see.
+    async fn refresh_qcs(&mut self, register: &str, config: &Configuration) -> Result<Qcs, Error> {
+        if let Some(qcs) = self.qcs.take() {
+            return Ok(qcs);
+        }
+
+        let response = build_executable(
+            self.program.to_string(),
+            self.shots,
+            self.quantum_processor_id,
+            config,
+        )
+        .await
+        .wrap_err("When building executable")
+        .map_err(Error::Qcs)?;
+        let ro_sources = response.ro_sources.ok_or_else(|| {
+            eyre!("No read out sources were defined, did you forget to `MEASURE`?")
+        })?;
+        let buffer_names = BufferName::from_ro_sources(ro_sources, register)
+            .wrap_err("When parsing executable.")?;
+        let engagement = super::engagement::get(
+            Some(String::from(self.quantum_processor_id)),
+            config,
+        )
+        .await
+        .wrap_err(
+            "Could not get an engagement for the requested QPU. Do you have an active reservation?",
+        )
+        .map_err(Error::Qcs)?;
+        Ok(Qcs {
+            buffer_names,
+            engagement,
+            executable: response.program,
+        })
+    }
+
+    /// Take the user-provided map of [`Parameters`] and produce the map of substitutions which
+    /// should be given to QCS with the executable.
+    ///
+    /// # Example
+    ///
+    /// If there was a Quil program:
+    ///
+    /// ```quil
+    /// DECLARE theta REAL
+    ///
+    /// RX(theta) 0
+    /// RX(theta + 1) 0
+    /// RX(theta + 2) 0
+    /// ```
+    ///
+    /// It would be converted  (in [`Execution::new`]) to something like:
+    ///
+    /// ```quil
+    /// DECLARE __SUBST REAL[2]
+    /// DECLARE theta REAL[1]
+    ///
+    /// RX(theta) 0
+    /// RX(__SUBST[0]) 0
+    /// RX(__SUBST[1]) 0
+    /// ```
+    ///
+    /// Because QPUs do not evaluate expressions themselves. This function creates the values for
+    /// `__SUBST` by calculating the original expressions given the user-provided params (in this
+    /// case just `theta`).
+    fn get_substitutions<'params>(
+        &self,
+        params: &'params Parameters,
+    ) -> Result<Parameters<'params>> {
+        let mut patch_values = params.clone();
+        let values = self
+            .program
+            .substitutions
+            .iter()
+            .map(|substitution: &Expression| {
+                substitution
+                    .evaluate(&HashMap::new(), params)
+                    .map(|complex| complex.re)
+                    .map_err(|_| eyre!("Could not evaluate expression {}", substitution))
+            })
+            .collect::<Result<Vec<f64>>>()?;
+        patch_values.insert(SUBSTITUTION_NAME, values);
+        Ok(patch_values)
+    }
+}
+
+#[cfg(test)]
+mod describe_execution {
+    // use super::*;
+
+    // fn build_execution(quil: &str) -> Execution {
+    //     Execution {
+    //         program: Program::from_str(quil).unwrap(),
+    //         quantum_processor_id: "",
+    //         shots: 0,
+    //         qcs: None,
+    //         substitutions: Substitutions::new(),
+    //     }
+    // }
+}
