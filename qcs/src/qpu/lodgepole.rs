@@ -175,7 +175,7 @@ pub(crate) enum Register {
     F64(Vec<f64>),
     /// Corresponds to the NumPy `int16` type, contains a vector of `i16`.
     I16(Vec<i16>),
-    /// Corresponds to the NumPy `complex64` type, contains a vector of [`num::Complex32`].
+    /// Corresponds to the NumPy `complex64` type, contains a vector of [`num::complex::Complex32`].
     Complex32(Vec<Complex32>),
     /// Corresponds to the NumPy `int8` type, contains a vector of `i8`.
     I8(Vec<i8>),

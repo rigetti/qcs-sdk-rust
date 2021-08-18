@@ -5,8 +5,8 @@
 #![forbid(unsafe_code)]
 
 //! This crate is the primary Rust API for interacting with Rigetti products. Specifically, this
-//! crate allows you to run Quil programs against real QPUs using [`qpu::run_program`] or a QVM
-//! using [`qvm::run_program`].
+//! crate allows you to run Quil programs against real QPUs or a QVM
+//! using [`Executable`].
 
 pub use executable::Executable;
 pub use execution_result::ExecutionResult;

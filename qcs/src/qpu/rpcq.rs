@@ -122,7 +122,7 @@ where
 }
 
 impl<'params, T: Serialize> RPCRequest<'params, T> {
-    /// Construct a new [`RPCRequest`] to send via [`send_request`]
+    /// Construct a new [`RPCRequest`] to send via [`Client::run_request`] or [`Client::send`].
     ///
     /// # Arguments
     ///
@@ -130,10 +130,6 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
     /// * `params`: The parameters to send. This must implement [`serde::Serialize`].
     ///
     /// returns: `RPCRequest<T>` where `T` is the type you passed in as `params`.
-    ///
-    /// # Examples
-    ///
-    /// See [`send_request`].
     pub fn new(method: &'static str, params: &'params T) -> Self {
         Self {
             method,

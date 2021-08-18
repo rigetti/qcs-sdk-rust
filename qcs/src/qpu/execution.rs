@@ -61,7 +61,7 @@ impl<'a> Execution<'a> {
     ///
     /// # Errors
     ///
-    /// All errors will be human readable by way of [`eyre`]. Some potential issues:
+    /// All errors will be human readable by way of [`mod@eyre`]. Some potential issues:
     ///
     /// 1. Unable to fetch ISA from QCS for the provided QPU. Either the QCS connection details in
     ///     `config` are wrong or that QPU does not exist.

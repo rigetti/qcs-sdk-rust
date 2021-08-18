@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use serde::ser::SerializeSeq;
 use serde::{Serialize, Serializer};
 
-/// Contains all the operators for a single Site ([`Qubit`] or [`Edge`]) organized to allow
+/// Contains all the operators for a single Site ([`super::qubit::Qubit`] or [`super::edge::Edge`]) organized to allow
 /// deduplication by name
 #[derive(Debug)]
 pub(crate) struct OperatorMap(HashSet<&'static str>, Vec<Operator>);
@@ -37,7 +37,7 @@ impl OperatorMap {
         true
     }
 
-    /// Works just like [`add`] but it only adds a single operator.
+    /// Works just like [`Self::add`] but it only adds a single operator.
     pub(crate) fn add_one(&mut self, operator: Operator) -> bool {
         if !self.0.insert(operator.name()) {
             return false;

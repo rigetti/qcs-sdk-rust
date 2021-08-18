@@ -13,7 +13,7 @@ mod edge;
 mod operator;
 mod qubit;
 
-/// Restructuring of a [`models::InstructionSetArchitecture`] for sending to quilc
+/// Restructuring of an [`InstructionSetArchitecture`] for sending to quilc
 #[derive(Serialize, Debug)]
 pub(crate) struct CompilerIsa {
     #[serde(rename = "1Q")]

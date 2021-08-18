@@ -1,5 +1,5 @@
 //! This module contains all the functionality for running Quil programs on a real QPU. Specifically,
-//! the [`run_program`] function in this module.
+//! the [`Execution`] struct in this module.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -190,6 +190,13 @@ mod describe_buffer_name {
     }
 }
 
+/// Query QCS for the ISA of the provided `quantum_processor_id`.
+///
+/// # Errors
+///
+/// 1. Problem communicating with QCS
+/// 2. Unauthenticated
+/// 3. Expired token
 async fn get_isa(
     quantum_processor_id: &str,
     config: &Configuration,

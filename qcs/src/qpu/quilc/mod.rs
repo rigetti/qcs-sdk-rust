@@ -20,7 +20,8 @@ mod isa;
 /// # Arguments
 ///
 /// * `program`: The Quil program to compile.
-/// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform
+/// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
+///     [`super::get_isa`].
 ///
 /// returns: `eyre::Result<NativeQuil>`
 ///
@@ -30,7 +31,6 @@ mod isa;
 /// recoverable at runtime. This function can fail generally if the provided ISA cannot be converted
 /// into a form that `quilc` recognizes, if `quilc` cannot be contacted, or if the program cannot
 /// be converted by `quilc`.
-/// ```
 pub(crate) fn compile_program(
     quil: &str,
     isa: &InstructionSetArchitecture,

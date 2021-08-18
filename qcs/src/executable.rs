@@ -1,3 +1,6 @@
+//! This module contains the public-facing API for executing programs. [`Executable`] is the how
+//! users will interact with QCS, quilc, and QVM.
+
 use std::collections::HashMap;
 
 use eyre::{eyre, Result, WrapErr};
@@ -25,7 +28,6 @@ use crate::{qpu, qvm, ExecutionResult};
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     // Here we indicate to `qcs` that the `"ro"` register contains the data we'd like in our `ExecutionResult`
 ///     let result: ExecutionResult = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     let data = result.into_i8().unwrap();
@@ -33,7 +35,7 @@ use crate::{qpu, qvm, ExecutionResult};
 ///     assert_eq!(data.len(), 4);
 ///     for shot in data {
 ///         // Each shot will contain all the memory, in order, for the vector (or "register") we
-///         // requested the results of. In this case, "ro".
+///         // requested the results of. In this case, "ro" (the default).
 ///         assert_eq!(shot.len(), 2);
 ///         // In the case of this particular program, we know ro[0] should equal ro[1]
 ///         assert_eq!(shot[0], shot[1]);
@@ -41,6 +43,13 @@ use crate::{qpu, qvm, ExecutionResult};
 /// }
 ///
 /// ```
+///
+/// # A Note on Lifetimes
+///
+/// This structure utilizes multiple lifetimes for the sake of runtime efficiency.
+/// You should be able to largely ignore these, just keep in mind that any borrowed data passed to
+/// the methods most likely needs to live as long as this struct. Check individual methods for
+/// specifics. If only using `'static` strings then everything should just work.
 pub struct Executable<'executable, 'execution> {
     quil: &'executable str,
     shots: u16,
@@ -51,12 +60,23 @@ pub struct Executable<'executable, 'execution> {
     qvm: Option<qvm::Execution>,
 }
 
-pub(crate) type ParamName<'a> = &'a str;
-pub(crate) type Parameters<'a> = HashMap<ParamName<'a>, Vec<f64>>;
+pub(crate) type Parameters<'a> = HashMap<&'a str, Vec<f64>>;
 
 impl<'executable> Executable<'executable, '_> {
-    /// Create an `Executable` from a string containing a  [quil](https://github.com/quil-lang/quil)
-    /// program.
+    /// Create an [`Executable`] from a string containing a  [quil](https://github.com/quil-lang/quil)
+    /// program. No additional work is done in this function, so the `quil` may actually be invalid.
+    ///
+    /// The constructed [`Executable`] defaults to "ro" as a read-out register and 1 for the number
+    /// of shots. Those can be overridden using [`Executable::read_from`] and
+    /// [`Executable::with_shots`] respectively.
+    ///
+    /// Note that changing the program for an associated [`Executable`] is not allowed, you'll have to
+    /// create a new [`Executable`] if you want to run a different program.
+    ///
+    /// # Arguments
+    ///
+    /// 1. `quil` is a string slice representing the original program to be run. The returned
+    ///     [`Executable`] will only live as long as this reference.
     #[must_use]
     pub fn from_quil(quil: &'executable str) -> Self {
         Self {
@@ -71,7 +91,32 @@ impl<'executable> Executable<'executable, '_> {
     }
 
     /// Specify the memory region or "register" to return results from. This must correspond to a
-    /// `DECLARE` statement in the provided Quil program.
+    /// `DECLARE` statement in the provided Quil program. If this method is never called, it's
+    /// assumed that a register called "ro" is declared and should be read from.
+    ///
+    /// # Arguments
+    ///
+    /// 1. `register` is a string reference of the name of the register to read from. The lifetime
+    ///     of this reference shoud be the lifetime of the [`Executable`], which is the lifetime of
+    ///     the `quil` argument to [`Executable::from_quil`].
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use qcs::Executable;
+    ///
+    /// const PROGRAM: &str = r#"
+    /// DECLARE mem REAL[1]
+    /// MOVE mem[0] 3.141
+    /// "#;
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let result = Executable::from_quil(PROGRAM).read_from("mem").execute_on_qvm().await.unwrap();
+    ///     let data = result.into_f64().unwrap();
+    ///     assert_eq!(data[0][0], 3.141);
+    /// }
+    /// ```
     #[must_use]
     pub fn read_from(mut self, register: &'executable str) -> Self {
         self.register = register;
@@ -79,14 +124,42 @@ impl<'executable> Executable<'executable, '_> {
     }
 
     /// Sets a concrete value for [parametric compilation].
+    /// The validity of parameters is not checked until execution.
+    ///
+    /// # Arguments
+    ///
+    /// 1. `param_name`: Reference to the name of the parameter which should correspond to a
+    ///     `DECLARE` statement in the Quil program. The lifetime of the reference should be the
+    ///     same as the [`Executable`]: that is the same as the `quil` param to [`Executable::from_quil`].
+    /// 2. `index`: The index into the memory vector that you're setting.
+    /// 3. `value`: The value to set for the specified memory.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// use qcs::Executable;
+    ///
+    /// const PROGRAM: &str = "DECLARE theta REAL[2]";
+    ///
+    /// #[tokio::main]
+    /// async fn main() {
+    ///     let mut exe = Executable::from_quil(PROGRAM)
+    ///         .read_from("theta");
+    ///     
+    ///     for theta in 0..2 {
+    ///         let theta = theta as f64;
+    ///         let result = exe
+    ///             .with_parameter("theta", 0, theta)
+    ///             .with_parameter("theta", 1, theta * 2.0)
+    ///             .execute_on_qvm().await.unwrap();
+    ///         let data = result.into_f64().unwrap();
+    ///         assert_eq!(data[0][0], theta);
+    ///         assert_eq!(data[0][1], theta * 2.0);
+    ///     }
+    /// }
+    /// ```
     ///
     /// [parametric compilation]: https://pyquil-docs.rigetti.com/en/stable/basics.html?highlight=parametric#parametric-compilation
-    ///
-    /// # Errors
-    ///
-    /// 1. Quil could not be parsed to search for parameters.
-    /// 2. `param_name` was not declared in the Quil program (i.e. missing `DECLARE` statement or misspelled name)
-    /// 3. Tried to set an incorrect number of values for the allocated memory (e.g. `DECLARE mem BIT[2]` but passed `vec![0.0]`.
     pub fn with_parameter(
         &mut self,
         param_name: &'executable str,
@@ -115,14 +188,14 @@ impl<'executable> Executable<'executable, '_> {
 }
 
 impl Executable<'_, '_> {
-    /// Specify a number of times to run the program in this execution. Defaults to 1 run or "shot".
+    /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
     #[must_use]
     pub fn with_shots(mut self, shots: u16) -> Self {
         self.shots = shots;
         self
     }
 
-    /// Execute on a QVM which must be available at `config.qvm_url`.
+    /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
     ///
     /// # Warning
     ///
@@ -142,7 +215,7 @@ impl Executable<'_, '_> {
     ///
     /// QVM must be running and accessible for this function to succeed. The address can be defined by
     /// the `<profile>.applications.pyquil.qvm_url` setting in your QCS `settings.toml`. More info on
-    /// configuration in [`crate::configuration`].
+    /// configuration [here][`crate::configuration`].
     ///
     /// ## Execution Errors
     ///
@@ -162,6 +235,7 @@ impl Executable<'_, '_> {
         result
     }
 
+    /// Remove and return `self.config` if set. Otherwise, load it from disk.
     async fn take_or_load_config(&mut self) -> Configuration {
         if let Some(config) = self.config.take() {
             config
@@ -174,6 +248,7 @@ impl Executable<'_, '_> {
 }
 
 impl<'execution> Executable<'_, 'execution> {
+    /// Remove and return `self.qpu` if it's set and still valid. Otherwise, create a new one.
     async fn qpu_for_id(&mut self, id: &'execution str) -> Result<qpu::Execution<'execution>> {
         if let Some(qpu) = self.qpu.take() {
             if qpu.quantum_processor_id == id && qpu.shots == self.shots {
@@ -199,12 +274,14 @@ impl<'execution> Executable<'_, 'execution> {
     /// Execute on a real QPU
     ///
     /// # Arguments
-    /// 1. `quantum_processor_id`: The name of the QPU to run on.
+    /// 1. `quantum_processor_id`: The name of the QPU to run on. This parameter affects the
+    ///     lifetime of the [`Executable`]. The [`Executable`] will only live as long as the last
+    ///     parameter passed into this function.
     ///
     /// # Warning
     ///
     /// This function is `async` because of the HTTP client under the hood, but it will block your
-    /// thread waiting on the RPCQ-based functions.
+    /// thread waiting on the RPCQ-based services.
     ///
     /// # Returns
     ///
@@ -216,6 +293,8 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. You are not authenticated for QCS
     /// 1. Your credentials don't have an active reservation for the QPU you requested
     /// 1. [quilc] was not running.
+    /// 1. The `quil` that this [`Executable`] was constructed with was invalid.
+    /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu(

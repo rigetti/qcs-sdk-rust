@@ -1,6 +1,7 @@
 use std::str::FromStr;
 
 use eyre::{eyre, Result, WrapErr};
+use quil::instruction::{ArithmeticOperand, Instruction, MemoryReference, Move};
 use quil::Program;
 
 use crate::configuration::Configuration;
@@ -8,7 +9,6 @@ use crate::executable::Parameters;
 use crate::ExecutionResult;
 
 use super::{QVMRequest, QVMResponse};
-use quil::instruction::{ArithmeticOperand, Instruction, MemoryReference, Move};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -17,6 +17,8 @@ pub(crate) struct Execution {
 }
 
 impl Execution {
+    /// Construct a new [`Execution`] from Quil. Immediately parses the Quil and returns an error if
+    /// there are any problems.
     pub(crate) fn new(quil: &str) -> Result<Self> {
         let program = Program::from_str(quil).wrap_err("Unable to parse Quil")?;
         Ok(Self { program })
@@ -31,6 +33,7 @@ impl Execution {
     /// 1. `shots`: The number of times the program should run.
     /// 2. `register`: The name of the register containing results that should be read out from QVM.
     /// 3. `params`: Values to substitute for parameters in Quil.
+    /// 4. `config`: A configuration object containing the connection URL of QVM.
     ///
     /// Returns: [`ExecutionResult`].
     ///
@@ -132,8 +135,9 @@ impl Execution {
 
 #[cfg(test)]
 mod describe_execution {
-    use super::*;
     use std::collections::HashMap;
+
+    use super::*;
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {

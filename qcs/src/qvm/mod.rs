@@ -1,5 +1,5 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
-//! the [`run_program`] function in this module.
+//! the [`Execution`] struct in this module.
 
 use std::collections::HashMap;
 
