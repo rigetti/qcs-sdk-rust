@@ -109,17 +109,20 @@ impl Client {
 /// Construct this using [`RPCRequest::new`]
 #[derive(Serialize)]
 #[serde(tag = "_type")]
-pub(crate) struct RPCRequest<T = HashMap<String, String>> {
+pub(crate) struct RPCRequest<'params, T = HashMap<String, String>>
+where
+    T: Serialize,
+{
     method: &'static str,
-    params: T,
+    params: &'params T,
     id: String,
     jsonrpc: &'static str,
     client_timeout: u8,
     client_key: Option<String>,
 }
 
-impl<T> RPCRequest<T> {
-    /// Construct a new [`RPCRequest`] to send via [`send_request`]
+impl<'params, T: Serialize> RPCRequest<'params, T> {
+    /// Construct a new [`RPCRequest`] to send via [`Client::run_request`] or [`Client::send`].
     ///
     /// # Arguments
     ///
@@ -127,11 +130,7 @@ impl<T> RPCRequest<T> {
     /// * `params`: The parameters to send. This must implement [`serde::Serialize`].
     ///
     /// returns: `RPCRequest<T>` where `T` is the type you passed in as `params`.
-    ///
-    /// # Examples
-    ///
-    /// See [`send_request`].
-    pub fn new(method: &'static str, params: T) -> Self {
+    pub fn new(method: &'static str, params: &'params T) -> Self {
         Self {
             method,
             params,
@@ -144,10 +143,10 @@ impl<T> RPCRequest<T> {
 }
 
 /// Credentials for connecting to RPCQ Server
-pub(crate) struct Credentials {
-    pub client_secret_key: String,
-    pub client_public_key: String,
-    pub server_public_key: String,
+pub(crate) struct Credentials<'a> {
+    pub client_secret_key: &'a str,
+    pub client_public_key: &'a str,
+    pub server_public_key: &'a str,
 }
 
 #[derive(Deserialize, Debug)]

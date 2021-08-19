@@ -1,18 +1,20 @@
 use std::ffi::CStr;
 
 use eyre::{Result, WrapErr};
-use libc::{c_char, c_ushort};
+use std::os::raw::c_char;
 
-use crate::ProgramResult;
+use crate::{Executable, ExecutionResult};
 
-/// Given a Quil program as a string, run that program on a QPU
+/// Run an executable (created by [`crate::executable_from_quil`]) on a real QPU.
 ///
 /// # Safety
 ///
-/// In order to run this function safely, you must provide the return value from this
-/// function to [`crate::free_program_result`] once you're done with it. The inputs `program`,
-/// `register_name`, and `qpu_id` must be valid, nul-terminated, non-null strings which remain
-/// constant for the duration of this function.
+/// 1. You must provide the return value from this function to [`crate::free_execution_result`]
+///     once you're done with it.
+/// 2. The input `qpu_id` must be valid, nul-terminated, non-null strings which remain constant for
+///     the duration of this function.
+/// 3. `executable` must be the non-NULL result of a call to [`crate::executable_from_quil`] and
+///     must not be freed during the execution of this function.
 ///
 /// # Usage
 ///
@@ -27,55 +29,49 @@ use crate::ProgramResult;
 ///
 /// # Arguments
 ///
-/// 1. `program`: A string containing a valid Quil program. Any measurements that you'd like
-/// to get back out must be in a register matching `register_name`. For example, if you have
-/// `MEASURE 0 ro[0]` then `register_name` should be `"ro"`.
-/// 2. `num_shots`: the number of times you'd like to run the program.
-/// 3. `register_name`: the name of the register in the `program` that is being measured to.
-/// 4. `qpu_id`: the ID of the QPU to run on (e.g. `"Aspen-9"`)
+/// 1. `executable`: the result of a call to [`crate::executable_from_quil`]
+/// 2. `qpu_id`: the ID of the QPU to run on (e.g. `"Aspen-9"`)
 ///
 /// # Errors
 ///
-/// This program will return a [`crate::ProgramResult::Error`] if an error occurs.
+/// This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
 #[no_mangle]
-pub unsafe extern "C" fn run_program_on_qpu(
-    program: *mut c_char,
-    num_shots: c_ushort,
-    register_name: *mut c_char,
+pub unsafe extern "C" fn execute_on_qpu(
+    executable: *mut Executable,
     qpu_id: *mut c_char,
-) -> ProgramResult {
-    match _run_program_on_qpu(program, num_shots, register_name, qpu_id) {
-        Ok(data) => ProgramResult::from_rust(data),
-        Err(error) => ProgramResult::from(error),
+) -> ExecutionResult {
+    match _execute_on_qpu(executable, qpu_id) {
+        Ok(data) => ExecutionResult::from_rust(data),
+        Err(error) => ExecutionResult::from(error),
     }
 }
 
-/// Implements the actual logic of [`run_program_on_qpu`] but with `?` support.
-unsafe fn _run_program_on_qpu(
-    program: *mut c_char,
-    num_shots: c_ushort,
-    register_name: *mut c_char,
+/// Implements the actual logic of [`execute_on_qpu`] but with `?` support.
+unsafe fn _execute_on_qpu(
+    executable: *mut Executable,
     qpu_id: *mut c_char,
-) -> Result<qcs::ProgramResult> {
-    // SAFETY: If program is not a valid null-terminated string, this is UB
-    let program = CStr::from_ptr(program);
-    let program = program
-        .to_str()
-        .wrap_err("Could not decode program as UTF-8")?;
-
-    // SAFETY: If register is not a valid null-terminated string, this is UB
-    let register = CStr::from_ptr(register_name);
-    let register = register
-        .to_str()
-        .wrap_err("Could not decode register as UTF-8")?;
-
+) -> Result<qcs::ExecutionResult, String> {
     // SAFETY: If qpu_id is not a valid null-terminated string, this is UB
     let qpu_id = CStr::from_ptr(qpu_id);
     let qpu_id = qpu_id
         .to_str()
-        .wrap_err("Could not decode register as UTF-8")?;
+        .map_err(|_| String::from("Could not decode register as UTF-8"))?;
 
-    let rt = tokio::runtime::Runtime::new().wrap_err("Failed to create tokio runtime")?;
-    let fut = qcs::qpu::run_program(program, num_shots, register, qpu_id);
-    rt.block_on(fut)
+    // SAFETY: If this wasn't constructed already, was already freed, or is NULL, bad things
+    // happen here.
+    let mut executable = Box::from_raw(executable);
+
+    let result = match &mut executable.inner {
+        Err(e) => Err(format!("{:?}", e)),
+        Ok(inner) => {
+            let rt = tokio::runtime::Runtime::new()
+                .wrap_err("Failed to create tokio runtime")
+                .map_err(|e| format!("{:?}", e))?;
+            let fut = inner.execute_on_qpu(qpu_id);
+            rt.block_on(fut).map_err(|e| format!("{:?}", e))
+        }
+    };
+
+    Box::into_raw(executable);
+    result
 }

@@ -1,5 +1,7 @@
 //! This module is used for loading configuration that will be used to connect either to real QPUs
-//! (and supporting services) or the QVM. By default, all settings are loaded from files located
+//! (and supporting services) or the QVM.
+//!
+//! By default, all settings are loaded from files located
 //! under your home directory in a `.qcs` folder. `settings.toml` will be used to load general
 //! settings (e.g. which URLs to connect to) and `secrets.toml` will be used to load tokens for
 //! authentication. Both "settings" and "secrets" files should contain profiles. The
@@ -22,6 +24,7 @@ mod secrets;
 mod settings;
 
 /// All the config data that's parsed from config sources
+#[derive(Clone, Debug)]
 pub(crate) struct Configuration {
     api_config: api::Configuration,
     auth_server: AuthServer,

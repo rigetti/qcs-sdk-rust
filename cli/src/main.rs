@@ -35,13 +35,19 @@ async fn main() {
     let quil = std::fs::read_to_string(opt.file).unwrap();
     match opt.qpu {
         QPU::Aspen9 => {
-            let result = qcs::qpu::run_program(&quil, opt.shots, "ro", "Aspen-9")
+            let result = qcs::Executable::from_quil(&quil)
+                .with_shots(opt.shots)
+                .execute_on_qpu("Aspen-9")
                 .await
                 .unwrap();
             println!("{:#?}", result);
         }
         QPU::QVM => {
-            let result = qcs::qvm::run_program(&quil, opt.shots, "ro").await.unwrap();
+            let result = qcs::Executable::from_quil(&quil)
+                .with_shots(opt.shots)
+                .execute_on_qvm()
+                .await
+                .unwrap();
             println!("{:#?}", result);
         }
     }

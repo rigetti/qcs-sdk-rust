@@ -1,90 +1,42 @@
 //! This module contains all the functionality for running Quil programs on a real QPU. Specifically,
-//! the [`run_program`] function in this module.
+//! the [`Execution`] struct in this module.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::str::FromStr;
 
 use eyre::{eyre, Result, WrapErr};
-use log::{info, trace};
+use log::trace;
 
-use engagement::get;
-use lodgepole::{execute, Buffer};
+pub(crate) use execution::{Error, Execution};
+use lodgepole::Buffer;
 use qcs_api::apis::quantum_processors_api as qpu_api;
-use qcs_api::models::InstructionSetArchitecture;
+use qcs_api::models::{InstructionSetArchitecture, TranslateNativeQuilToEncryptedBinaryResponse};
 use translation::translate;
 
 use crate::configuration::Configuration;
 pub(crate) use crate::qpu::lodgepole::Register;
-use crate::ProgramResult;
+use crate::qpu::rewrite_arithmetic::RewrittenQuil;
 
 mod engagement;
+mod execution;
 mod lodgepole;
 mod quilc;
+mod rewrite_arithmetic;
 mod rpcq;
 mod translation;
 
-/// Run a Quil program on a real QPU
-///
-/// # Arguments
-/// 1. `quil`: The Quil program as a string,
-/// 2. `shots`: The number of times the program should run.
-/// 3. `register`: The name of the register containing results that should be read out from QVM.
-/// 4. `quantum_processor_id`: The name of the QPU to run on.
-///
-/// # Warning
-///
-/// This function is `async` because of the HTTP client under the hood, but it will block your
-/// thread waiting on the RPCQ-based functions.
-///
-/// # Returns
-///
-/// [`ProgramResult`].
-///
-/// # Errors
-/// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
-///
-/// 1. You are not authenticated for QCS
-/// 1. Your credentials don't have an active reservation for the QPU you requested
-/// 1. [quilc] was not running.
-///
-/// [quilc]: https://github.com/quil-lang/quilc
-pub async fn run_program(
-    quil: &str,
+async fn build_executable(
+    quil: RewrittenQuil,
     shots: u16,
-    register: &str,
     quantum_processor_id: &str,
-) -> Result<ProgramResult> {
-    info!("Running program on {}", quantum_processor_id);
-    let (isa, config) = get_isa(quantum_processor_id).await?;
-    trace!("Fetched ISA successfully");
-    let native_quil = quilc::compile_program(quil, &isa, &config)
-        .wrap_err("When attempting to compile your program to Native Quil")?;
-    trace!("Converted to Native Quil successfully");
-    let executable = translate(native_quil, shots, quantum_processor_id, &config)
+    config: &Configuration,
+) -> Result<TranslateNativeQuilToEncryptedBinaryResponse> {
+    let executable = translate(quil, shots, quantum_processor_id, config)
         .await
         .wrap_err("Could not convert native quil to executable")?;
     trace!("Translation complete.");
-    let ro_sources = executable
-        .ro_sources
-        .ok_or_else(|| eyre!("No read out sources were defined, did you forget to `MEASURE`?"))?;
-    let buffer_names = BufferName::from_ro_sources(ro_sources, register)?;
-
-    let engagement = get(Some(quantum_processor_id.to_string()), &config)
-        .await
-        .wrap_err(
-            "Could not get an engagement for the requested QPU. Do you have an active reservation?",
-        )?;
-    trace!("Engagement retrieved.");
-
-    let buffers = execute(executable.program, engagement)?;
-    trace!("Program executed.");
-    ProgramResult::try_from_registers(process_buffers(buffers, buffer_names)?, shots)
-}
-
-#[cfg(test)]
-mod descibe_run_program {
-    // TODO: Write a test against test servers which checks e2e
+    Ok(executable)
 }
 
 /// Process the buffers that come back from a Lodgepole QPU call and map them to the
@@ -92,7 +44,7 @@ mod descibe_run_program {
 /// requested structure.
 fn process_buffers(
     mut buffers: HashMap<String, Buffer>,
-    buffer_names: Vec<BufferName>,
+    buffer_names: &[BufferName],
 ) -> Result<Vec<Register>> {
     let mut results = Vec::with_capacity(buffer_names.len());
     for buffer_name in buffer_names {
@@ -117,6 +69,10 @@ struct BufferName {
 
 impl BufferName {
     /// Turn the translation service's `ro_sources` output into a Vec of [`BufferName`]
+    ///
+    /// # Errors
+    ///
+    /// 1. No buffers were found for the requested register.
     fn from_ro_sources(ro_sources: Vec<Vec<String>>, register: &str) -> Result<Vec<BufferName>> {
         let mut buffer_names: Vec<BufferName> = ro_sources
             .into_iter()
@@ -234,24 +190,18 @@ mod describe_buffer_name {
     }
 }
 
+/// Query QCS for the ISA of the provided `quantum_processor_id`.
+///
+/// # Errors
+///
+/// 1. Problem communicating with QCS
+/// 2. Unauthenticated
+/// 3. Expired token
 async fn get_isa(
     quantum_processor_id: &str,
-) -> Result<(InstructionSetArchitecture, Configuration)> {
-    let mut config = Configuration::load()
+    config: &Configuration,
+) -> Result<InstructionSetArchitecture> {
+    qpu_api::get_instruction_set_architecture(config.as_ref(), quantum_processor_id)
         .await
-        .wrap_err("Error loading configuration")?;
-    let initial =
-        qpu_api::get_instruction_set_architecture(config.as_ref(), quantum_processor_id).await;
-    if let Ok(data) = initial {
-        Ok((data, config))
-    } else {
-        config = config
-            .refresh()
-            .await
-            .wrap_err("Error refreshing your QCS credentials.")?;
-        let data = qpu_api::get_instruction_set_architecture(config.as_ref(), quantum_processor_id)
-            .await
-            .wrap_err("Could not load data for the requested quantum processor")?;
-        Ok((data, config))
-    }
+        .wrap_err("Could not load data for the requested quantum processor")
 }

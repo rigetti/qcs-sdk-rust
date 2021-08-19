@@ -1,19 +1,19 @@
 # Installation
 
-## C Library
+## C SDK
 
 ### Download Artifacts
 
 > TODO: talk about where to download artifacts from
 
-In order to use the C SDK, you'll need a few things:
+To avoid building from source, you can download these things:
 
 1. The dynamic library for your platform
-1. The `libqcs.h` header file
+1. The [`libqcs.h`] header file
 
 ### Build from Source
 
-Checkout the [GitHub Repo README] for instructions.
+Check out the [GitHub Repo README] for instructions.
 
 ## Services
 
@@ -23,3 +23,4 @@ Full usage of this library requires [quilc] and [qvm] to be available on local w
 [quilc]: https://github.com/quil-lang/quilc
 [qvm]: https://github.com/quil-lang/qvm
 [docker-compose file]: https://github.com/rigetti/qcs-sdk-rust/blob/main/qcs/docker-compose.yml
+[`libqcs.h`]: https://github.com/rigetti/qcs-sdk-rust/blob/main/c-lib/libqcs.h
