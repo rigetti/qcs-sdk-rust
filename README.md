@@ -20,6 +20,8 @@ These are auxiliary crates not intended for use outside of development.
 
 Most development tasks are automated with [cargo-make] (like make, but you can have dependencies on other Rust tools and a _ton_ of useful tasks are built in). Install cargo-make by doing `cargo install cargo-make`. Then you can invoke it with either `cargo make <task>` or `makers <task>`. Tasks are defined in files called `Makefile.toml`. If a task is defined in the top level (workspace) file with `workspace = False` then it will only be run once. Otherwise, cargo-make will attempt to run that command for each crate.
 
+In order to run all checks exactly the same way that CI does, use `makers workspace-ci-flow` from the project root (workspace).
+
 ### Running Tests
 
 The best way to go about this is via `makers` or `cargo make` with no task. This will default to `dev-test-flow` which formats all code, builds, and tests everything.
@@ -28,7 +30,7 @@ Any tests which cannot be run in CI should be run with `makers manual`. These te
 
 ### Linting
 
-`makers clippy-flow` from the workspace level will lint all crates except generated ones (where `#![allow(clippy::all)]` should be included).
+`makers lint` from the workspace level will lint all crates except generated ones (where `#![allow(clippy::all)]` should be included).
 
 For new crates, the following code block should be added to the top of the `main.rs` or `lib.rs`, except the unsafe lint if you need unsafe code (e.g. the c-lib crate):
 
@@ -38,13 +40,13 @@ For new crates, the following code block should be added to the top of the `main
 #![forbid(unsafe_code)]
 ```
 
+### 
+
 ### Documentation
 
-Docs format vary from crate to crate. `makers docs` builds the documentation for every crate. 
+To build the docs.rs-style docs, run `makers docs`. Only the [qcs] crate will have published docs in this format, so it's usually not worth running this at the workspace level. From within the [qcs] crate you can also do `makers serve-docs` to launch a local webserver for viewing immediately.
 
-`makers serve-docs` builds and hosts the docs for __public crates only__. This command should be run in the directory of the crate you wish to view docs for, not at the project root.
-
-For [qcs], this is a normal rustdoc build for the public API. For [c-lib], docs are built using [mdbook].
+[c-lib] is documented using [mdBook]. At the workspace level, you can use `makers book` to build it or `makers serve-book` to run a local webserver which will watch for _some_ changes.
 
 ## Release
 
