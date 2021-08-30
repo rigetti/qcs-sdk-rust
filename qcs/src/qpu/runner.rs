@@ -29,31 +29,28 @@ pub(crate) fn execute(
 
     // This is a hack to allow testing without credentials since ZAP is absurd
     let client = if credentials.server_public.is_empty() {
-        warn!(
-            "Connecting to Lodgepole on {} with no credentials.",
-            address
-        );
-        Client::new(address).wrap_err("Unable to connect to the QPU (Lodgepole)")?
+        warn!("Connecting to QPU on {} with no credentials.", address);
+        Client::new(address).wrap_err("Unable to connect to the QPU")?
     } else {
         let credentials = Credentials {
             client_secret_key: &credentials.client_secret,
             client_public_key: &credentials.client_public,
             server_public_key: &credentials.server_public,
         };
-        trace!("Connecting to Lodgepole at {} with credentials", &address);
+        trace!("Connecting to QPU at {} with credentials", &address);
         Client::new_with_credentials(address, &credentials)
-            .wrap_err("Unable to connect to the QPU (Lodgepole)")?
+            .wrap_err("Unable to connect to the QPU")?
     };
 
     let request = RPCRequest::from(&params);
     let job_id: String = client
         .run_request(&request)
-        .wrap_err("While attempting to send the program to the QPU (Lodgepole)")?;
-    debug!("Received job ID {} from Lodgepole", &job_id);
+        .wrap_err("While attempting to send the program to the QPU")?;
+    debug!("Received job ID {} from QPU", &job_id);
     let get_buffers_request = GetBuffersRequest::new(job_id);
     client
         .run_request(&RPCRequest::from(&get_buffers_request))
-        .wrap_err("While attempting to receive results from to the QPU (Lodgepole)")
+        .wrap_err("While attempting to receive results from the QPU")
 }
 
 #[derive(Serialize, Debug)]
@@ -340,7 +337,7 @@ mod describe_buffer {
     #[test]
     fn it_deserializes_properly() {
         // Real response data for a Bell State program retrieved from Aspen 9
-        let hex = std::fs::read_to_string("tests/bell_state.hex")
+        let hex = std::fs::read_to_string("tests/bell_state_response_data.hex")
             .expect("Unable to load Aspen-9 Bell State raw response");
         let data = hex::decode(hex).unwrap();
         let resp: RPCResponse<HashMap<String, Buffer>> =

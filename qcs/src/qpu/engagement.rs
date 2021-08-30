@@ -6,9 +6,6 @@ use qcs_api::models::{CreateEngagementRequest, EngagementWithCredentials};
 use crate::configuration::Configuration;
 
 /// Try to get an engagement for a QPU
-///
-/// # Errors
-/// Any connection issues with QCS, though most likely you don't have an active reservation.
 pub(crate) async fn get(
     quantum_processor_id: Option<String>,
     config: &Configuration,

@@ -37,13 +37,13 @@ use crate::qpu::quilc::NativeQuilProgram;
 /// will be converted to something like
 ///
 /// ```quil
-/// DECLARE __P1 REAL[1]
+/// DECLARE __SUBST REAL[1]
 /// DECLARE theta REAL[1]
-/// RZ(__P1[0]) 0
+/// RZ(__SUBST[0]) 0
 /// ```
 ///
-/// where `__P1[0]` will be recalculated for each parameter set that is run and passed as a
-/// distinct parameter from theta. Note that the value of `__P1[0]` will actually be
+/// where `__SUBST[0]` will be recalculated for each parameter set that is run and passed as a
+/// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
 pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions)> {
     let mut substitutions = Substitutions::new();

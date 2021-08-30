@@ -33,7 +33,7 @@ async fn setup() {
     env_logger::init();
     std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
     std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
-    thread::spawn(lodgepole::run);
+    thread::spawn(qpu::run);
     tokio::spawn(auth_server::run());
     tokio::spawn(mock_qcs::run());
 }
@@ -152,7 +152,7 @@ mod mock_qcs {
     }
 }
 
-mod lodgepole {
+mod qpu {
     use std::collections::HashMap;
 
     use log::{debug, error};
