@@ -10,6 +10,7 @@ use std::os::raw::{c_char, c_double, c_uint, c_ushort};
 
 pub use crate::qpu::execute_on_qpu;
 pub use crate::qvm::execute_on_qvm;
+use std::mem::ManuallyDrop;
 
 mod qpu;
 mod qvm;
@@ -299,18 +300,15 @@ impl From<Vec<Vec<i8>>> for ExecutionResult {
         #[allow(clippy::cast_possible_truncation)]
         let shot_length = data[0].len() as u16;
 
-        let mut results: Vec<*mut i8> = IntoIterator::into_iter(data)
+        let results: Vec<*mut i8> = IntoIterator::into_iter(data)
             .map(|mut shot| {
-                let ptr = shot.as_mut_ptr();
-                std::mem::forget(shot);
-                ptr
+                shot.shrink_to_fit();
+                ManuallyDrop::new(shot).as_mut_ptr()
             })
             .collect();
-        let ptr = results.as_mut_ptr();
-        std::mem::forget(results);
         #[allow(clippy::cast_possible_truncation)]
         Self::Byte {
-            data_per_shot: ptr,
+            data_per_shot: ManuallyDrop::new(results).as_mut_ptr(),
             number_of_shots,
             shot_length,
         }
@@ -328,19 +326,15 @@ impl From<Vec<Vec<f64>>> for ExecutionResult {
         let shot_length = data[0].len() as u16;
 
         data.shrink_to_fit();
-        let mut results: Vec<*mut f64> = IntoIterator::into_iter(data)
+        let results: Vec<*mut f64> = IntoIterator::into_iter(data)
             .map(|mut shot| {
                 shot.shrink_to_fit();
-                let ptr = shot.as_mut_ptr();
-                std::mem::forget(shot);
-                ptr
+                ManuallyDrop::new(shot).as_mut_ptr()
             })
             .collect();
-        let ptr = results.as_mut_ptr();
-        std::mem::forget(results);
         #[allow(clippy::cast_possible_truncation)]
         Self::Real {
-            data_per_shot: ptr,
+            data_per_shot: ManuallyDrop::new(results).as_mut_ptr(),
             number_of_shots,
             shot_length,
         }

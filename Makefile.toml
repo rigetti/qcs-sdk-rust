@@ -12,7 +12,7 @@ command = "cargo"
 args = ["deny", "--all-features", "check"]
 
 [tasks.pre-workspace-ci-flow]
-alias = "deny"
+dependencies = ["deny", "lint"]
 
 [tasks.mdbook]
 install_crate = { crate_name = "mdbook", binary = "mdbook", test_arg = "help" }

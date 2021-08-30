@@ -16,8 +16,8 @@ use crate::qpu::quilc::NativeQuilProgram;
 use crate::qpu::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
 use crate::ExecutionResult;
 
-use super::lodgepole::execute;
 use super::quilc;
+use super::runner::execute;
 use super::{build_executable, process_buffers, BufferName};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
@@ -204,8 +204,16 @@ impl<'a> Execution<'a> {
             .map(|substitution: &Expression| {
                 substitution
                     .evaluate(&HashMap::new(), params)
-                    .map(|complex| complex.re)
                     .map_err(|_| eyre!("Could not evaluate expression {}", substitution))
+                    .and_then(|complex| {
+                        if complex.im == 0.0 {
+                            Ok(complex.re)
+                        } else {
+                            Err(eyre!(
+                                "Cannot substitute imaginary numbers for QPU execution"
+                            ))
+                        }
+                    })
             })
             .collect::<Result<Vec<f64>>>()?;
         patch_values.insert(SUBSTITUTION_NAME, values);

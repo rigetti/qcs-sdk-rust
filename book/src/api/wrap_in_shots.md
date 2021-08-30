@@ -2,8 +2,6 @@
 
 Set the [`Executable`] to run multiple times per execution on the QPU. If this option is not set, the [`Executable`] will be run one time per execution.
 
-> This is **far more efficient** than looping through multiple calls to [`execute_on_qpu`]. As long as nothing in the [`Executable`] needs to change between runs, always prefer multiple shots to multiple executions.
-
 ## Definition
 
 ```C

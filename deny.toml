@@ -37,9 +37,7 @@ allow = [
     "Apache-2.0",
     "ISC",
     "MIT",
-    # TODO: Get approval on these as they are not in Confluence
-    "MPL-2.0",  # https://www.mozilla.org/en-US/MPL/
-    "OpenSSL",  # https://www.openssl.org/source/license-openssl-ssleay.txt
+    "OpenSSL",
 ]
 # List of explictly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
@@ -69,9 +67,7 @@ confidence-threshold = 0.8
 # Allow 1 or more licenses on a per-crate basis, so that particular licenses
 # aren't accepted for every possible crate as with the normal allow list
 exceptions = [
-    # Each entry is the crate and version constraint, and its specific allow
-    # list
-    #{ allow = ["Zlib"], name = "adler32", version = "*" },
+    { allow = ["MPL-2.0"], name = "webpki-roots", version = "*" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,

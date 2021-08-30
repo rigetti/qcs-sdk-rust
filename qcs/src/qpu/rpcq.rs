@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zmq::{Context, Socket, SocketType};
 
-/// A minimal RPCQ client that does just enough to talk to `quilc` and Lodgepole
+/// A minimal RPCQ client that does just enough to talk to `quilc` and QPU endpoints
 pub(crate) struct Client {
     socket: Socket,
 }

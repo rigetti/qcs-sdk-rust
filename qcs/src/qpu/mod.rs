@@ -9,21 +9,21 @@ use eyre::{eyre, Result, WrapErr};
 use log::trace;
 
 pub(crate) use execution::{Error, Execution};
-use lodgepole::Buffer;
 use qcs_api::apis::quantum_processors_api as qpu_api;
 use qcs_api::models::{InstructionSetArchitecture, TranslateNativeQuilToEncryptedBinaryResponse};
+use runner::Buffer;
 use translation::translate;
 
 use crate::configuration::Configuration;
-pub(crate) use crate::qpu::lodgepole::Register;
 use crate::qpu::rewrite_arithmetic::RewrittenQuil;
+pub(crate) use crate::qpu::runner::Register;
 
 mod engagement;
 mod execution;
-mod lodgepole;
 mod quilc;
 mod rewrite_arithmetic;
 mod rpcq;
+mod runner;
 mod translation;
 
 async fn build_executable(
@@ -39,7 +39,7 @@ async fn build_executable(
     Ok(executable)
 }
 
-/// Process the buffers that come back from a Lodgepole QPU call and map them to the
+/// Process the buffers that come back from a QPU call and map them to the
 /// `buffer_names` provided by the translation service, then attempt to fit that data into the (generic)
 /// requested structure.
 fn process_buffers(
