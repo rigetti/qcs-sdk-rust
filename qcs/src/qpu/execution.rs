@@ -220,18 +220,3 @@ impl<'a> Execution<'a> {
         Ok(patch_values)
     }
 }
-
-#[cfg(test)]
-mod describe_execution {
-    // use super::*;
-
-    // fn build_execution(quil: &str) -> Execution {
-    //     Execution {
-    //         program: Program::from_str(quil).unwrap(),
-    //         quantum_processor_id: "",
-    //         shots: 0,
-    //         qcs: None,
-    //         substitutions: Substitutions::new(),
-    //     }
-    // }
-}
