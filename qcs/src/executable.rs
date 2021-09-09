@@ -28,9 +28,10 @@ use crate::{qpu, qvm, ExecutionResult};
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let result: ExecutionResult = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
+///     let mut result = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
-///     let data = result.into_i8().unwrap();
+///     // "ro" is the only source read from by default if you don't specify a .read_from()
+///     let data = result.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
 ///     // In this case, we ran the program for 4 shots, so we know the length is 4.
 ///     assert_eq!(data.len(), 4);
 ///     for shot in data {
@@ -53,7 +54,7 @@ use crate::{qpu, qvm, ExecutionResult};
 pub struct Executable<'executable, 'execution> {
     quil: &'executable str,
     shots: u16,
-    register: &'executable str,
+    readouts: Option<Vec<&'executable str>>,
     params: Parameters<'executable>,
     config: Option<Configuration>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -82,7 +83,7 @@ impl<'executable> Executable<'executable, '_> {
         Self {
             quil,
             shots: 1,
-            register: "ro",
+            readouts: None,
             params: Parameters::new(),
             config: None,
             qpu: None,
@@ -90,36 +91,58 @@ impl<'executable> Executable<'executable, '_> {
         }
     }
 
-    /// Specify the memory region or "register" to return results from. This must correspond to a
-    /// `DECLARE` statement in the provided Quil program. If this method is never called, it's
-    /// assumed that a register called "ro" is declared and should be read from.
+    /// Specify a memory region or "register" to read results from. This must correspond to a
+    /// `DECLARE` statement in the provided Quil program. You can call this register multiple times
+    /// if you need to read multiple registers. If this method is never called, it's
+    /// assumed that a single register called "ro" is declared and should be read from.
     ///
     /// # Arguments
     ///
-    /// 1. `register` is a string reference of the name of the register to read from. The lifetime
-    ///     of this reference shoud be the lifetime of the [`Executable`], which is the lifetime of
+    /// 1. `register` is a string reference of the name of a register to read from. The lifetime
+    ///     of this reference should be the lifetime of the [`Executable`], which is the lifetime of
     ///     the `quil` argument to [`Executable::from_quil`].
     ///
     /// # Example
     ///
+    /// TODO: An example of reading from multiple registers
     /// ```rust
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
-    /// DECLARE mem REAL[1]
-    /// MOVE mem[0] 3.141
+    /// DECLARE first REAL[1]
+    /// DECLARE second REAL[1]
+    ///
+    /// MOVE first[0] 3.141
+    /// MOVE second[0] 1.234
     /// "#;
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let result = Executable::from_quil(PROGRAM).read_from("mem").execute_on_qvm().await.unwrap();
-    ///     let data = result.into_f64().unwrap();
-    ///     assert_eq!(data[0][0], 3.141);
+    ///     let mut result = Executable::from_quil(PROGRAM)
+    ///         .read_from("first")
+    ///         .read_from("second")
+    ///         .execute_on_qvm()
+    ///         .await
+    ///         .unwrap();
+    ///     let first = result
+    ///         .remove("first")
+    ///         .expect("Did not receive first buffer")
+    ///         .into_f64()
+    ///         .expect("Received incorrect data type for first");
+    ///     let second = result
+    ///         .remove("second")
+    ///         .expect("Did not receive second buffer")
+    ///         .into_f64()
+    ///         .expect("Received incorrect data type for second");
+    ///     assert_eq!(first[0][0], 3.141);
+    ///     assert_eq!(second[0][0], 1.234);
     /// }
     /// ```
     #[must_use]
     pub fn read_from(mut self, register: &'executable str) -> Self {
-        self.register = register;
+        let mut readouts = self.readouts.take().unwrap_or_else(Vec::new);
+        readouts.push(register);
+        self.readouts = Some(readouts);
         self
     }
 
@@ -148,11 +171,11 @@ impl<'executable> Executable<'executable, '_> {
     ///     
     ///     for theta in 0..2 {
     ///         let theta = theta as f64;
-    ///         let result = exe
+    ///         let mut result = exe
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let data = result.into_f64().unwrap();
+    ///         let data = result.remove("theta").expect("Could not read theta").into_f64().unwrap();
     ///         assert_eq!(data[0][0], theta);
     ///         assert_eq!(data[0][1], theta * 2.0);
     ///     }
@@ -195,6 +218,10 @@ impl Executable<'_, '_> {
         self
     }
 
+    fn get_readouts(&self) -> &[&str] {
+        return self.readouts.as_ref().map_or(&["ro"], |v| v.as_slice());
+    }
+
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
     ///
     /// # Warning
@@ -204,7 +231,7 @@ impl Executable<'_, '_> {
     ///
     /// # Returns
     ///
-    /// [`ExecutionResult`].
+    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
     ///
     /// # Errors
     ///
@@ -220,7 +247,7 @@ impl Executable<'_, '_> {
     /// ## Execution Errors
     ///
     /// A number of errors could occur if `program` is malformed.
-    pub async fn execute_on_qvm(&mut self) -> Result<ExecutionResult> {
+    pub async fn execute_on_qvm(&mut self) -> Result<HashMap<Box<str>, ExecutionResult>> {
         let config = self.take_or_load_config().await;
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -228,7 +255,7 @@ impl Executable<'_, '_> {
             qvm::Execution::new(self.quil)?
         };
         let result = qvm
-            .run(self.shots, self.register, &self.params, &config)
+            .run(self.shots, self.get_readouts(), &self.params, &config)
             .await;
         self.qvm = Some(qvm);
         self.config = Some(config);
@@ -285,7 +312,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Returns
     ///
-    /// [`ExecutionResult`].
+    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
     ///
     /// # Errors
     /// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
@@ -300,18 +327,20 @@ impl<'execution> Executable<'_, 'execution> {
     pub async fn execute_on_qpu(
         &mut self,
         quantum_processor_id: &'execution str,
-    ) -> Result<ExecutionResult> {
+    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
         let mut config = self.take_or_load_config().await;
 
-        let response = match qpu.run(&self.params, self.register, &config).await {
+        let readouts = self.get_readouts();
+
+        let response = match qpu.run(&self.params, readouts, &config).await {
             Ok(result) => Ok(result),
             Err(qpu::Error::Qcs(_)) => {
                 config = config
                     .refresh()
                     .await
                     .wrap_err("When refreshing authentication token")?;
-                qpu.run(&self.params, self.register, &config).await
+                qpu.run(&self.params, readouts, &config).await
             }
             err => err,
         };

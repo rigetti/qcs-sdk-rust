@@ -11,14 +11,14 @@ use qcs_api::models::EngagementWithCredentials;
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
-use crate::qpu::get_isa;
 use crate::qpu::quilc::NativeQuilProgram;
 use crate::qpu::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
+use crate::qpu::{get_isa, organize_ro_sources};
 use crate::ExecutionResult;
 
 use super::quilc;
 use super::runner::execute;
-use super::{build_executable, process_buffers, BufferName};
+use super::{build_executable, process_buffers};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -40,7 +40,8 @@ pub(crate) enum Error {
 }
 
 struct Qcs {
-    buffer_names: Vec<BufferName>,
+    /// A mapping of the register name declared in a program to the list of corresponding Buffer names
+    buffer_names: HashMap<Box<str>, Vec<String>>,
     engagement: EngagementWithCredentials,
     executable: String,
 }
@@ -98,10 +99,10 @@ impl<'a> Execution<'a> {
     pub(crate) async fn run(
         &mut self,
         params: &Parameters<'_>,
-        register: &str,
+        readouts: &[&str],
         config: &Configuration,
-    ) -> Result<ExecutionResult, Error> {
-        let qcs = self.refresh_qcs(register, config).await?;
+    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+        let qcs = self.refresh_qcs(readouts, config).await?;
 
         let result = self
             .get_substitutions(params)
@@ -128,7 +129,11 @@ impl<'a> Execution<'a> {
     /// Take or create a [`Qcs`] for this [`Execution`]. This fetches / updates engagements, builds
     /// the executable, and prepares (from the executable) the mapping of returned values into what
     /// the user expects to see.
-    async fn refresh_qcs(&mut self, register: &str, config: &Configuration) -> Result<Qcs, Error> {
+    async fn refresh_qcs(
+        &mut self,
+        readouts: &[&str],
+        config: &Configuration,
+    ) -> Result<Qcs, Error> {
         if let Some(qcs) = self.qcs.take() {
             return Ok(qcs);
         }
@@ -145,8 +150,8 @@ impl<'a> Execution<'a> {
         let ro_sources = response.ro_sources.ok_or_else(|| {
             eyre!("No read out sources were defined, did you forget to `MEASURE`?")
         })?;
-        let buffer_names = BufferName::from_ro_sources(ro_sources, register)
-            .wrap_err("When parsing executable.")?;
+        let buffer_names =
+            organize_ro_sources(ro_sources, readouts).wrap_err("When parsing executable.")?;
         let engagement = super::engagement::get(
             Some(String::from(self.quantum_processor_id)),
             config,

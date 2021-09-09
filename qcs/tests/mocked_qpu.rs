@@ -3,6 +3,8 @@
 
 use std::thread;
 
+use maplit::hashmap;
+
 use qcs::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
 use qcs::{Executable, ExecutionResult};
 
@@ -26,7 +28,10 @@ async fn successful_bell_state() {
         .execute_on_qpu(QPU_ID)
         .await
         .expect("Failed to run program that should be successful");
-    assert_eq!(result, ExecutionResult::I8(vec![vec![0, 0], vec![1, 1]]));
+    assert_eq!(
+        result,
+        hashmap! {Box::from(String::from("ro")) => ExecutionResult::I8(vec![vec![0, 0], vec![1, 1]])}
+    );
 }
 
 async fn setup() {

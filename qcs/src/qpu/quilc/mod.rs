@@ -177,12 +177,17 @@ MEASURE 1 ro[1]
         let config = Configuration::default();
         let output =
             compile_program(BELL_STATE, &aspen_9_isa(), &config).expect("Could not compile");
-        let results = crate::qvm::Execution::new(&String::from(output))
+        let mut results = crate::qvm::Execution::new(&String::from(output))
             .unwrap()
-            .run(10, "ro", &Default::default(), &Configuration::default())
+            .run(10, &["ro"], &Default::default(), &Configuration::default())
             .await
             .expect("Could not run program on QVM");
-        for shot in results.into_i8().unwrap() {
+        for shot in results
+            .remove("ro")
+            .expect("Did not receive ro buffer")
+            .into_i8()
+            .unwrap()
+        {
             assert_eq!(shot.len(), 2);
             assert_eq!(shot[0], shot[1]);
         }
