@@ -29,7 +29,9 @@ async fn main() {
             .with_parameter("theta", 0, theta)
             .execute_on_qpu("Aspen-9")
             .await
-            .expect("Failed to execute");
+            .expect("Failed to execute")
+            .remove("ro")
+            .expect("Missing ro register");
         parametric_measurements.append(&mut result.into_i8().unwrap()[0])
     }
 

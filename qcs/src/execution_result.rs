@@ -4,6 +4,7 @@ use num::complex::Complex32;
 use serde::Deserialize;
 
 use crate::qpu::Register;
+use std::collections::HashMap;
 
 /// Data resulting from [`Executable::execute_on_qvm`][`crate::Executable::execute_on_qvm`] or
 /// [`Executable::execute_on_qpu`][`crate::Executable::execute_on_qpu`].
@@ -36,19 +37,28 @@ pub enum ExecutionResult {
 }
 
 impl ExecutionResult {
-    pub(crate) fn try_from_registers(registers: Vec<Register>, shots: u16) -> Result<Self> {
-        if registers.is_empty() {
-            return Err(eyre!(
-                "No data received for register, did you forget to MEASURE to it?"
-            ));
-        }
-        let first_register = registers.get(0).expect("Length checked above");
-        match first_register {
-            Register::I8(_) => Self::try_from_i8_registers(registers, shots),
-            Register::I16(_) => Self::try_from_i16_registers(registers, shots),
-            Register::F64(_) => Self::try_from_f64_registers(registers, shots),
-            Register::Complex32(_) => Self::try_from_complex32_registers(registers, shots),
-        }
+    pub(crate) fn try_from_registers(
+        registers_by_name: HashMap<Box<str>, Vec<Register>>,
+        shots: u16,
+    ) -> Result<HashMap<Box<str>, Self>> {
+        registers_by_name
+            .into_iter()
+            .map(|(register_name, registers)| {
+                if registers.is_empty() {
+                    return Err(eyre!(
+                        "No data received for register, did you forget to MEASURE to it?"
+                    ));
+                }
+                let first_register = registers.get(0).expect("Length checked above");
+                match first_register {
+                    Register::I8(_) => Self::try_from_i8_registers(registers, shots),
+                    Register::I16(_) => Self::try_from_i16_registers(registers, shots),
+                    Register::F64(_) => Self::try_from_f64_registers(registers, shots),
+                    Register::Complex32(_) => Self::try_from_complex32_registers(registers, shots),
+                }
+                .map(|execution_result| (register_name, execution_result))
+            })
+            .collect()
     }
 
     fn try_from_i8_registers(registers: Vec<Register>, number_of_shots: u16) -> Result<Self> {
@@ -116,60 +126,94 @@ fn transpose<T>(mut data: Vec<Vec<T>>, len: u16) -> Vec<Vec<T>> {
 mod describe_program_results {
     use super::*;
 
+    use maplit::hashmap;
+
     #[test]
     fn it_converts_from_i8_registers() {
-        let registers = vec![Register::I8(vec![1, 2, 3]), Register::I8(vec![4, 5, 6])];
+        let registers = hashmap! {
+            Box::from(String::from("ro")) => vec![Register::I8(vec![1, 2, 3]), Register::I8(vec![4, 5, 6])]
+        };
         let results = ExecutionResult::try_from_registers(registers, 3).unwrap();
-        let expected = ExecutionResult::I8(vec![vec![1, 4], vec![2, 5], vec![3, 6]]);
+        let expected = hashmap! {
+            Box::from(String::from("ro")) => ExecutionResult::I8(vec![vec![1, 4], vec![2, 5], vec![3, 6]])
+        };
         assert_eq!(results, expected);
     }
 
     #[test]
     fn it_converts_from_i16_registers() {
-        let registers = vec![Register::I16(vec![1, 2, 3]), Register::I16(vec![4, 5, 6])];
+        let registers = hashmap! {
+            Box::from(String::from("ro")) => vec![Register::I16(vec![1, 2, 3]), Register::I16(vec![4, 5, 6])]
+        };
         let results = ExecutionResult::try_from_registers(registers, 3).unwrap();
-        let expected = ExecutionResult::I16(vec![vec![1, 4], vec![2, 5], vec![3, 6]]);
+        let expected = hashmap! {
+            Box::from(String::from("ro")) => ExecutionResult::I16(vec![vec![1, 4], vec![2, 5], vec![3, 6]])
+        };
         assert_eq!(results, expected);
     }
 
     #[test]
     fn it_converts_from_f64_registers() {
-        let registers = vec![
-            Register::F64(vec![1.0, 2.0, 3.0]),
-            Register::F64(vec![4.0, 5.0, 6.0]),
-        ];
+        let registers = hashmap! {
+            Box::from(String::from("ro")) => vec![
+                Register::F64(vec![1.0, 2.0, 3.0]),
+                Register::F64(vec![4.0, 5.0, 6.0]),
+            ]
+        };
         let results = ExecutionResult::try_from_registers(registers, 3).unwrap();
-        let expected = ExecutionResult::F64(vec![vec![1.0, 4.0], vec![2.0, 5.0], vec![3.0, 6.0]]);
+        let expected = hashmap! {
+            Box::from(String::from("ro")) => ExecutionResult::F64(vec![vec![1.0, 4.0], vec![2.0, 5.0], vec![3.0, 6.0]])
+        };
         assert_eq!(results, expected);
     }
 
     #[test]
     fn it_converts_from_complex32_registers() {
-        let registers = vec![
-            Register::Complex32(vec![
-                Complex32::from(1.0),
-                Complex32::from(2.0),
-                Complex32::from(3.0),
-            ]),
-            Register::Complex32(vec![
-                Complex32::from(4.0),
-                Complex32::from(5.0),
-                Complex32::from(6.0),
-            ]),
-        ];
+        let registers = hashmap! {
+            Box::from(String::from("ro")) => vec![
+                Register::Complex32(vec![
+                    Complex32::from(1.0),
+                    Complex32::from(2.0),
+                    Complex32::from(3.0),
+                ]),
+                Register::Complex32(vec![
+                    Complex32::from(4.0),
+                    Complex32::from(5.0),
+                    Complex32::from(6.0),
+                ]),
+            ]
+        };
         let results = ExecutionResult::try_from_registers(registers, 3).unwrap();
-        let expected = ExecutionResult::Complex32(vec![
-            vec![Complex32::from(1.0), Complex32::from(4.0)],
-            vec![Complex32::from(2.0), Complex32::from(5.0)],
-            vec![Complex32::from(3.0), Complex32::from(6.0)],
-        ]);
+        let expected = hashmap! {
+            Box::from(String::from("ro")) => ExecutionResult::Complex32(vec![
+                vec![Complex32::from(1.0), Complex32::from(4.0)],
+                vec![Complex32::from(2.0), Complex32::from(5.0)],
+                vec![Complex32::from(3.0), Complex32::from(6.0)],
+            ])
+        };
         assert_eq!(results, expected);
     }
 
     #[test]
     fn it_errors_on_mismatch_types() {
-        let registers = vec![Register::I8(vec![1, 2, 3]), Register::I16(vec![4, 5, 6])];
+        let registers = hashmap! {
+            Box::from(String::from("ro")) => vec![Register::I8(vec![1, 2, 3]), Register::I16(vec![4, 5, 6])]
+        };
         let results = ExecutionResult::try_from_registers(registers, 3);
         assert!(results.is_err());
+    }
+
+    #[test]
+    fn it_handles_mixed_types() {
+        let registers = hashmap! {
+            Box::from(String::from("first")) => vec![Register::I8(vec![1, 2, 3]), Register::I8(vec![4, 5, 6])],
+            Box::from(String::from("second")) => vec![Register::I16(vec![1, 2, 3]), Register::I16(vec![4, 5, 6])],
+        };
+        let results = ExecutionResult::try_from_registers(registers, 3).unwrap();
+        let expected = hashmap! {
+            Box::from(String::from("first")) => ExecutionResult::I8(vec![vec![1, 4], vec![2, 5], vec![3, 6]]),
+            Box::from(String::from("second")) => ExecutionResult::I16(vec![vec![1, 4], vec![2, 5], vec![3, 6]]),
+        };
+        assert_eq!(results, expected);
     }
 }

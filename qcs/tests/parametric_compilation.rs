@@ -25,12 +25,18 @@ async fn basic_substitution() {
 
     for i in 0..=200 {
         let theta = step * f64::from(i);
-        let result = exe
+        let mut result = exe
             .with_parameter("theta", 0, theta)
             .execute_on_qvm()
             .await
             .expect("Failed to execute");
-        parametric_measurements.append(&mut result.into_i8().unwrap()[0])
+        parametric_measurements.append(
+            &mut result
+                .remove("ro")
+                .expect("Missing ro register")
+                .into_i8()
+                .unwrap()[0],
+        )
     }
 
     for measurement in parametric_measurements {

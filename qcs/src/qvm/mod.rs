@@ -19,18 +19,17 @@ struct QVMResponse {
 
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
-struct QVMRequest {
+struct QVMRequest<'request> {
     quil_instructions: String,
-    addresses: HashMap<String, bool>,
+    addresses: HashMap<&'request str, bool>,
     trials: u16,
     #[serde(rename = "type")]
     request_type: RequestType,
 }
 
-impl QVMRequest {
-    fn new(program: &str, shots: u16, register: &str) -> Self {
-        let mut addresses = HashMap::new();
-        addresses.insert(register.to_string(), true);
+impl<'request> QVMRequest<'request> {
+    fn new(program: &str, shots: u16, readouts: &[&'request str]) -> Self {
+        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (*v, true)).collect();
         Self {
             quil_instructions: program.to_string(),
             addresses,
@@ -53,13 +52,13 @@ mod describe_qvm_request {
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = QVMRequest::new(program, 1, "ro");
+        let request = QVMRequest::new(program, 1, &[]);
         assert_eq!(&request.quil_instructions, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = QVMRequest::new("H 0", 10, "ro");
+        let request = QVMRequest::new("H 0", 10, &["ro"]);
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),

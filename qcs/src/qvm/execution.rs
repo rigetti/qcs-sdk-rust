@@ -9,6 +9,7 @@ use crate::executable::Parameters;
 use crate::ExecutionResult;
 
 use super::{QVMRequest, QVMResponse};
+use std::collections::HashMap;
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -54,10 +55,10 @@ impl Execution {
     pub(crate) async fn run(
         &mut self,
         shots: u16,
-        register: &str,
+        readouts: &[&str],
         params: &Parameters<'_>,
         config: &Configuration,
-    ) -> Result<ExecutionResult> {
+    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
         if shots == 0 {
             return Err(eyre!("A non-zero number of shots must be provided."));
         }
@@ -95,7 +96,7 @@ impl Execution {
                 instruction_count += 1;
             }
         }
-        let result = self.execute(shots, register, config).await;
+        let result = self.execute(shots, readouts, config).await;
         for _ in 0..instruction_count {
             self.program.instructions.remove(0);
         }
@@ -105,10 +106,10 @@ impl Execution {
     async fn execute(
         &self,
         shots: u16,
-        register: &str,
+        readouts: &[&str],
         config: &Configuration,
-    ) -> Result<ExecutionResult> {
-        let request = QVMRequest::new(&self.program.to_string(true), shots, register);
+    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
+        let request = QVMRequest::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
         let response = client
@@ -118,18 +119,19 @@ impl Execution {
             .await
             .wrap_err("While sending data to the QVM")?;
 
-        let QVMResponse { mut registers } = response
+        response
             .error_for_status()
             .wrap_err("Received error status from QVM")?
-            .json()
+            .json::<QVMResponse>()
             .await
-            .wrap_err("While decoding QVM response")?;
-        registers.remove(register).ok_or_else(|| {
-            eyre!(
-                "Could not find register {} in the QVM response, did you measure to it?",
-                register
-            )
-        })
+            .map(|response| {
+                response
+                    .registers
+                    .into_iter()
+                    .map(|(key, value)| (key.into_boxed_str(), value))
+                    .collect()
+            })
+            .wrap_err("While decoding QVM response")
     }
 }
 
@@ -146,7 +148,7 @@ mod describe_execution {
         let mut params = HashMap::new();
         params.insert("doesnt_exist", vec![0.0]);
 
-        let result = exe.run(1, "ro", &params, &Configuration::default()).await;
+        let result = exe.run(1, &[], &params, &Configuration::default()).await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
         } else {
@@ -161,7 +163,7 @@ mod describe_execution {
         let mut params = HashMap::new();
         params.insert("ro", vec![0.0]);
 
-        let result = exe.run(1, "ro", &params, &Configuration::default()).await;
+        let result = exe.run(1, &[], &params, &Configuration::default()).await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));
