@@ -1,6 +1,7 @@
 use eyre::{Result, WrapErr};
 
 use crate::{Executable, ExecutionResult};
+use std::collections::HashMap;
 
 /// Given a Quil program as a string, run that program on a local QVM.
 ///
@@ -28,13 +29,15 @@ use crate::{Executable, ExecutionResult};
 #[no_mangle]
 pub unsafe extern "C" fn execute_on_qvm(executable: *mut Executable) -> ExecutionResult {
     match _execute_on_qvm(executable) {
-        Ok(data) => ExecutionResult::from_rust(data),
+        Ok(data) => ExecutionResult::from_data(data),
         Err(error) => ExecutionResult::from(error),
     }
 }
 
 /// Implements the actual logic of [`execute_on_qvm`] but with `?` support.
-unsafe fn _execute_on_qvm(executable: *mut Executable) -> Result<qcs::ExecutionResult, String> {
+unsafe fn _execute_on_qvm(
+    executable: *mut Executable,
+) -> Result<HashMap<Box<str>, qcs::ExecutionResult>, String> {
     // SAFETY: If this wasn't constructed already, was already freed, or is NULL, bad things
     // happen here.
     let mut executable = Box::from_raw(executable);

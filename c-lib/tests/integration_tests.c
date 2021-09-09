@@ -63,10 +63,23 @@ bool test_bell_state() {
     }
     // ANCHOR_END: errors
 
+    // TODO: Add this piece to tutorial
+    //ANCHOR: get_data
+    const ExecutionData *ro = get_data(result.handle, "ro");
+    if (ro == NULL) {
+        return fail(
+                TEST_NAME,
+                "ro register was not in result",
+                exe,
+                &result
+        );
+    }
+    // ANCHOR_END: get_data
+
     // ANCHOR: byte_check
-    if (result.tag != ExecutionResult_Byte) {
+    if (ro->data.tag != DataType_Byte) {
         char message[50];
-        sprintf(message, "Expected type Byte, got tag  %d", result.tag);
+        sprintf(message, "Expected type Byte, got tag  %d", ro->data.tag);
         return fail(
                 TEST_NAME,
                 message,
@@ -76,9 +89,9 @@ bool test_bell_state() {
     }
     // ANCHOR_END: byte_check
 
-    if (result.byte.number_of_shots != shots) {
+    if (ro->number_of_shots != shots) {
         char message[50];
-        sprintf(message, "Response number of shots was %d, expected %d", result.byte.number_of_shots, shots);
+        sprintf(message, "Response number of shots was %d, expected %d", ro->number_of_shots, shots);
         return fail(
                 TEST_NAME,
                 message,
@@ -88,10 +101,11 @@ bool test_bell_state() {
     }
 
     // ANCHOR: results
-    for (int shot = 0; shot < result.byte.number_of_shots; shot++) {
+    // TODO: change this to use dimensions
+    for (int shot = 0; shot < ro->number_of_shots; shot++) {
         // In our case, we measured two entangled qubits, so we expect their values to be equal.
-        int bit_0 = result.byte.data_per_shot[shot][0];
-        int bit_1 = result.byte.data_per_shot[shot][1];
+        int bit_0 = ro->data.byte[shot][0];
+        int bit_1 = ro->data.byte[shot][0];
         if (bit_0 != bit_1) {
             char message[50];
             sprintf(
@@ -138,24 +152,25 @@ bool test_error() {
 // ANCHOR: test_real_data
 // ANCHOR: real_memory_program
 char *REAL_MEMORY_PROGRAM =
-        "DECLARE mem REAL[1]\n"
-        "MOVE mem[0] 3.141\n";
+        "DECLARE first REAL[1]\n"
+        "DECLARE second OCTET[1]\n"
+        "MOVE first[0] 3.141\n"
+        "MOVE second[0] 2\n";
 // ANCHOR_END: real_memory_program
 
 bool test_real_data_type() {
     const char *TEST_NAME = "test_real_data_type";
 
     // ANCHOR: read_from
-    unsigned int shots = 2;
     Executable *exe = executable_from_quil(REAL_MEMORY_PROGRAM);
-    wrap_in_shots(exe, shots);
-    read_from(exe, "mem");
+    read_from(exe, "first");
+    read_from(exe, "second");
     ExecutionResult result = execute_on_qvm(exe);
     // ANCHOR_END: read_from
 
-    if (result.tag != ExecutionResult_Real) {
+    if (result.tag == ExecutionResult_Error) {
         char message[50];
-        sprintf(message, "Got incorrect tag %d", result.tag);
+        sprintf(message, "received error %s", result.error);
         return fail(
                 TEST_NAME,
                 message,
@@ -164,28 +179,58 @@ bool test_real_data_type() {
         );
     }
 
-    // ANCHOR: real_shot_check
-    for (int shot = 0; shot < result.real.number_of_shots; shot++) {
-        double *data = result.real.data_per_shot[shot];
-        for (int slot = 0; slot < result.real.shot_length; slot++) {
-            if (data[slot] != 3.141) {
-                char message[50];
-                sprintf(
-                        message,
-                        "Found %f in slot %d, expected 3.141",
-                        data[slot],
-                        slot
-                );
-                return fail(
-                        TEST_NAME,
-                        message,
-                        exe,
-                        &result
-                );
-            }
-        }
+    // TODO: include multiple reads in docs
+    // ANCHOR: get_multiple
+    const ExecutionData *first = get_data(result.handle, "first");
+    const ExecutionData *second = get_data(result.handle, "second");
+    // ANCHOR_END: get_multiple
+    // TODO: Test asking for the wrong register
+
+    if (first == NULL || first->data.tag != DataType_Real) {
+        return fail(
+                TEST_NAME,
+                "first register did not contain real data",
+                exe,
+                &result
+        );
     }
-    // ANCHOR_END: real_shot_check
+    if (second == NULL || second->data.tag != DataType_Byte) {
+        return fail(
+                TEST_NAME,
+                "second register did not contain byte data",
+                exe,
+                &result
+        );
+    }
+
+    if (first->data.real[0][0] != 3.141) {
+        char message[50];
+        sprintf(
+                message,
+                "Found %f in first, expected 3.141",
+                first->data.real[0][0]
+        );
+        return fail(
+                TEST_NAME,
+                message,
+                exe,
+                &result
+        );
+    }
+    if (second->data.byte[0][0] != 2) {
+        char message[50];
+        sprintf(
+                message,
+                "Found %d in first, expected 2",
+                second->data.byte[0][0]
+        );
+        return fail(
+                TEST_NAME,
+                message,
+                exe,
+                &result
+        );
+    }
 
     return succeed(TEST_NAME, exe, &result);
 }
@@ -229,7 +274,8 @@ bool test_parametrization() {
                     &result
             );
         }
-        found_one |= result.byte.data_per_shot[0][0];
+        const ExecutionData *ro = get_data(result.handle, "ro");
+        found_one |= ro->data.byte[0][0];
         // Free intermediate results
         // ANCHOR: free_execution_result
         free_execution_result(result);

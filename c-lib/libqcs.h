@@ -16,57 +16,52 @@ typedef struct Executable Executable;
 /**
  * The return value of [`execute_on_qvm`] or [`execute_on_qpu`].
  *
- * # Safety
- * In order to properly free the memory allocated in this struct, call [`free_execution_result`]
- * with any instances created.
- *
- * # Example
- * If you have a Quil program with an "ro" register containing two items:
- *
- * ```quil
- * DECLARE ro BIT[2]
- * ```
- * and you run that program 3 times (shots)
- *
- * ```C
- * ExecutionResult result = run_program_on_qvm(program, 3, "ro");
- * ```
- * If `error` is `NULL` then `results_by_shot` will look something like:
- *
- * ```
- * results_by_shot = [[0, 0], [0, 0], [0, 0]]
- * ```
- *
- * where `results_by_shot[shot][bit]` can access the value of `ro[bit]` for a given `shot`.
+ * Holds result data internally, intentionally opaque to C since it uses a map internally
  */
+typedef struct ResultHandle ResultHandle;
+
 typedef enum ExecutionResult_Tag {
+    ExecutionResult_Handle,
     ExecutionResult_Error,
-    ExecutionResult_Byte,
-    ExecutionResult_Real,
 } ExecutionResult_Tag;
-
-typedef struct ExecutionResult_Byte_Body {
-    unsigned short number_of_shots;
-    unsigned short shot_length;
-    char **data_per_shot;
-} ExecutionResult_Byte_Body;
-
-typedef struct ExecutionResult_Real_Body {
-    unsigned short number_of_shots;
-    unsigned short shot_length;
-    double **data_per_shot;
-} ExecutionResult_Real_Body;
 
 typedef struct ExecutionResult {
     ExecutionResult_Tag tag;
     union {
         struct {
+            struct ResultHandle *handle;
+        };
+        struct {
             char *error;
         };
-        ExecutionResult_Byte_Body byte;
-        ExecutionResult_Real_Body real;
     };
 } ExecutionResult;
+
+typedef enum DataType_Tag {
+    DataType_Byte,
+    DataType_Real,
+} DataType_Tag;
+
+typedef struct DataType {
+    DataType_Tag tag;
+    union {
+        struct {
+            char **byte;
+        };
+        struct {
+            double **real;
+        };
+    };
+} DataType;
+
+/**
+ * The contents of a single register within a [`ResultHandle`], fetched with [`get_data`]
+ */
+typedef struct ExecutionData {
+    unsigned short number_of_shots;
+    unsigned short shot_length;
+    struct DataType data;
+} ExecutionData;
 
 /**
  * Constructs an [`Executable`] and returns a raw pointer to it.
@@ -160,12 +155,17 @@ struct ExecutionResult execute_on_qvm(struct Executable *executable);
 void free_executable(struct Executable *executable);
 
 /**
- * Frees the memory of a [`ExecutionResult`] as allocated by [`execute_on_qvm`] or [`execute_on_qpu`]
+ * Frees the memory of an [`ExecutionResult`] as allocated by [`execute_on_qvm`] or [`execute_on_qpu`]
  *
  * # Safety
  * This function should only be called with the result of one of the above functions.
  */
-void free_execution_result(struct ExecutionResult response);
+void free_execution_result(struct ExecutionResult result);
+
+/**
+ * Return a pointer to the [`ExecutionResult`] for a specific register or null if the register is not found.
+ */
+const struct ExecutionData *get_data(const struct ResultHandle *handle, const char *name);
 
 /**
  * Set the memory location to read out of.
