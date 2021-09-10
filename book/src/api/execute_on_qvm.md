@@ -25,13 +25,11 @@ In order to execute, QVM must be running at <http://localhost:5000> (unless you'
 This program will return the [`Error`] variant of [`ExecutionResult`] with a human-readable description of the error. Some common errors:
 
 1. QVM was not running or not reachable.
-3. A syntax error in the provided Quil `program`.
-4. There was no data to read (improper or missing [`read_from`] option).
-5. The type of the register is not supported by the implemented [`Variants`].
+2. A syntax error in the provided Quil `program`.
+3. There was no data to read (improper or missing [`read_from`] option).
 
 [`Executable`]: executable.md
 [`free_execution_result`]: free_execution_result.md
 [`ExecutionResult`]: execution_result.md
 [`Error`]: execution_result.md#error
-[`Variants`]: execution_result.md#variants
 [`read_from`]: read_from.md

@@ -86,7 +86,7 @@ struct BufferName {
 ///
 /// # Errors
 ///
-/// 1. No buffers found for a provided ro_source.
+/// 1. No buffers found for a provided `ro_source`.
 /// 2. There was a gap in the readout memory which must be contiguous.
 ///
 /// # Arguments
@@ -120,7 +120,7 @@ fn organize_ro_sources(
     ro_sources: Vec<Vec<String>>,
     readouts: &[&str],
 ) -> Result<HashMap<Box<str>, Vec<String>>> {
-    let readout_set: HashSet<&str> = readouts.iter().map(|v| *v).collect();
+    let readout_set: HashSet<&str> = readouts.iter().copied().collect();
 
     // First, collect the unordered list of buffers since we have no guarantee of what order
     // translation returned them in.

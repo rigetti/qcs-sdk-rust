@@ -63,7 +63,6 @@ bool test_bell_state() {
     }
     // ANCHOR_END: errors
 
-    // TODO: Add this piece to tutorial
     //ANCHOR: get_data
     const ExecutionData *ro = get_data(result.handle, "ro");
     if (ro == NULL) {
@@ -100,8 +99,18 @@ bool test_bell_state() {
         );
     }
 
+    if (ro->shot_length != 2) {
+        char message[50];
+        sprintf(message, "expected shot_length of 2, got %d", ro->shot_length);
+        return fail(
+                TEST_NAME,
+                message,
+                exe,
+                &result
+        );
+    }
+
     // ANCHOR: results
-    // TODO: change this to use dimensions
     for (int shot = 0; shot < ro->number_of_shots; shot++) {
         // In our case, we measured two entangled qubits, so we expect their values to be equal.
         int bit_0 = ro->data.byte[shot][0];
@@ -179,7 +188,6 @@ bool test_real_data_type() {
         );
     }
 
-    // TODO: include multiple reads in docs
     // ANCHOR: get_multiple
     const ExecutionData *first = get_data(result.handle, "first");
     const ExecutionData *second = get_data(result.handle, "second");

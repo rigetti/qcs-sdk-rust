@@ -33,13 +33,11 @@ This program will return the [`Error`] variant of [`ExecutionResult`] with a hum
 2. Authenticated user has no active reservation for the requested `qpu_id`.
 3. A syntax error in the provided [Quil] when calling [`executable_from_quil`].
 4. There was no data to read (improper or missing [`read_from`] option).
-5. The type of the register is not supported by the implemented [`Variants`].
 
 [`Executable`]: executable.md
 [`free_execution_result`]: free_execution_result.md
 [`ExecutionResult`]: execution_result.md
 [`Error`]: execution_result.md#error
-[`Variants`]: execution_result.md#variants
 [configuration]: #configuration
 [`executable_from_quil`]: executable_from_quil.md
 [Quil]: https://github.com/quil-lang/quil
