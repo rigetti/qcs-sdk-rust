@@ -1,6 +1,6 @@
 # read_from
 
-Set the memory location to read out of for an [`Executable`]. If not set, the [`Executable`] assumes a default of "ro".
+Set the memory location to read out of for an [`Executable`]. If not set, the [`Executable`] assumes a default of "ro". You can call this function multiple times to read from multiple registers. The first time you call the function, the default of "ro" is not longer relevant.
 
 ## Definition
 
@@ -26,7 +26,7 @@ With a program like this one:
     {{#include ../../../c-lib/tests/integration_tests.c:real_memory_program}}
 ```
 
-We've declared a region called `mem` that we'd like to read out of. Since it is not called "ro" (the default), we need to specify that that's where results should be collected from.
+We've declared a region called `first` and another called `second`—both of which we'd like to read out of. Since we are not using a single register called `"ro"` (the default), we need to specify where to read from.
 
 ```C
 {{#include ../../../c-lib/tests/integration_tests.c:read_from}}

@@ -208,6 +208,10 @@ impl From<String> for ExecutionResult {
 pub struct ResultHandle(HashMap<Box<str>, ExecutionData>);
 
 /// Return a pointer to the [`ExecutionResult`] for a specific register or null if the register is not found.
+///
+/// # Safety
+/// All inputs must be non-null. `name` must be a nul-terminated string. `handle` must be the result
+/// of a non-error call to [`execute_on_qvm`] or [`execute_on_qpu`]
 #[no_mangle]
 pub unsafe extern "C" fn get_data(
     handle: *const ResultHandle,
