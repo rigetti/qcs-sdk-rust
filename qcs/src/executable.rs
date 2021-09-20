@@ -54,7 +54,7 @@ use crate::{qpu, qvm, ExecutionResult};
 pub struct Executable<'executable, 'execution> {
     quil: &'executable str,
     shots: u16,
-    readouts: Option<Vec<&'executable str>>,
+    readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters<'executable>,
     config: Option<Configuration>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -83,7 +83,7 @@ impl<'executable> Executable<'executable, '_> {
         Self {
             quil,
             shots: 1,
-            readouts: None,
+            readout_memory_region_names: None,
             params: Parameters::new(),
             config: None,
             qpu: None,
@@ -139,9 +139,12 @@ impl<'executable> Executable<'executable, '_> {
     /// ```
     #[must_use]
     pub fn read_from(mut self, register: &'executable str) -> Self {
-        let mut readouts = self.readouts.take().unwrap_or_else(Vec::new);
+        let mut readouts = self
+            .readout_memory_region_names
+            .take()
+            .unwrap_or_else(Vec::new);
         readouts.push(register);
-        self.readouts = Some(readouts);
+        self.readout_memory_region_names = Some(readouts);
         self
     }
 
@@ -218,7 +221,10 @@ impl Executable<'_, '_> {
     }
 
     fn get_readouts(&self) -> &[&str] {
-        return self.readouts.as_ref().map_or(&["ro"], |v| v.as_slice());
+        return self
+            .readout_memory_region_names
+            .as_ref()
+            .map_or(&["ro"], |v| v.as_slice());
     }
 
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
