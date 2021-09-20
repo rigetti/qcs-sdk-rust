@@ -11,27 +11,20 @@
  * Holds the state required to execute a program.
  * Intentionally opaque to C.
  */
-// ANCHOR: Executable
 typedef struct Executable Executable;
-// ANCHOR_END: Executable
 
 /**
  * The return value of [`execute_on_qvm`] or [`execute_on_qpu`].
  *
  * Holds result data internally, intentionally opaque to C since it uses a map internally
  */
-// ANCHOR: ResultHandle
 typedef struct ResultHandle ResultHandle;
-// ANCHOR_END: ResultHandle
 
-// ANCHOR: ExecutionResult_Tag
 typedef enum ExecutionResult_Tag {
     ExecutionResult_Handle,
     ExecutionResult_Error,
 } ExecutionResult_Tag;
-// ANCHOR_END: ExecutionResult_Tag
 
-// ANCHOR: ExecutionResult
 typedef struct ExecutionResult {
     ExecutionResult_Tag tag;
     union {
@@ -43,16 +36,12 @@ typedef struct ExecutionResult {
         };
     };
 } ExecutionResult;
-// ANCHOR_END: ExecutionResult
 
-// ANCHOR: DataType_Tag
 typedef enum DataType_Tag {
     DataType_Byte,
     DataType_Real,
 } DataType_Tag;
-// ANCHOR_END: DataType_Tag
 
-// ANCHOR: DataType
 typedef struct DataType {
     DataType_Tag tag;
     union {
@@ -64,18 +53,15 @@ typedef struct DataType {
         };
     };
 } DataType;
-// ANCHOR_END: DataType
 
 /**
  * The contents of a single register within a [`ResultHandle`], fetched with [`get_data`]
  */
-// ANCHOR: ExecutionData
 typedef struct ExecutionData {
     unsigned short number_of_shots;
     unsigned short shot_length;
     struct DataType data;
 } ExecutionData;
-// ANCHOR_END: ExecutionData
 
 /**
  * Constructs an [`Executable`] and returns a raw pointer to it.
@@ -95,9 +81,7 @@ typedef struct ExecutionData {
  *
  * 1. The contents of `quil` were not valid UTF-8. In this case, the returned value will be NULL.
  */
-// ANCHOR: executable_from_quil
 struct Executable *executable_from_quil(char *quil);
-// ANCHOR_END: executable_from_quil
 
 /**
  * Run an executable (created by [`crate::executable_from_quil`]) on a real QPU.
@@ -131,9 +115,7 @@ struct Executable *executable_from_quil(char *quil);
  *
  * This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
  */
-// ANCHOR: execute_on_qpu
 struct ExecutionResult execute_on_qpu(struct Executable *executable, char *qpu_id);
-// ANCHOR_END: execute_on_qpu
 
 /**
  * Given a Quil program as a string, run that program on a local QVM.
@@ -160,9 +142,7 @@ struct ExecutionResult execute_on_qpu(struct Executable *executable, char *qpu_i
  *
  * This program will return a [`crate::ExecutionResult::Error`] if an error occurs.
  */
-// ANCHOR: execute_on_qvm
 struct ExecutionResult execute_on_qvm(struct Executable *executable);
-// ANCHOR_END: execute_on_qvm
 
 /**
  * Free an [`Executable`]
@@ -172,9 +152,7 @@ struct ExecutionResult execute_on_qvm(struct Executable *executable);
  * 1. Only call this with the non-null output of [`executable_from_quil`].
  * 2. Only call this function once per executable if you don't want to double-free your memory.
  */
-// ANCHOR: free_executable
 void free_executable(struct Executable *executable);
-// ANCHOR_END: free_executable
 
 /**
  * Frees the memory of an [`ExecutionResult`] as allocated by [`execute_on_qvm`] or [`execute_on_qpu`]
@@ -182,9 +160,7 @@ void free_executable(struct Executable *executable);
  * # Safety
  * This function should only be called with the result of one of the above functions.
  */
-// ANCHOR: free_execution_result
 void free_execution_result(struct ExecutionResult result);
-// ANCHOR_END: free_execution_result
 
 /**
  * Return a pointer to the [`ExecutionResult`] for a specific register or null if the register is not found.
@@ -193,9 +169,7 @@ void free_execution_result(struct ExecutionResult result);
  * All inputs must be non-null. `name` must be a nul-terminated string. `handle` must be the result
  * of a non-error call to [`execute_on_qvm`] or [`execute_on_qpu`]
  */
-// ANCHOR: get_data
 const struct ExecutionData *get_data(const struct ResultHandle *handle, const char *name);
-// ANCHOR_END: get_data
 
 /**
  * Set the memory location to read out of.
@@ -212,9 +186,7 @@ const struct ExecutionData *get_data(const struct ResultHandle *handle, const ch
  * 2. `register`: The name of the memory region to read out of. Must match a Quil `DECLARE`
  *     statement exactly.
  */
-// ANCHOR: read_from
 void read_from(struct Executable *executable, char *name);
-// ANCHOR_END: read_from
 
 /**
  * Set the value of a parameter for parametric execution.
@@ -236,9 +208,7 @@ void read_from(struct Executable *executable, char *name);
  *
  * If an error occurs, the return value of this function will be non-null
  */
-// ANCHOR: set_param
 void set_param(struct Executable *executable, char *name, unsigned int index, double value);
-// ANCHOR_END: set_param
 
 /**
  * Set the program to run multiple times on the QPU.
@@ -252,6 +222,4 @@ void set_param(struct Executable *executable, char *name, unsigned int index, do
  * 1. `executable`: The [`Executable`] to set the parameter on.
  * 2. `shots`: The number of times to run the program for each execution.
  */
-// ANCHOR: wrap_in_shots
 void wrap_in_shots(struct Executable *executable, unsigned short shots);
-// ANCHOR_END: wrap_in_shots

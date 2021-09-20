@@ -178,11 +178,9 @@ bool test_real_data_type() {
     // ANCHOR_END: read_from
 
     if (result.tag == ExecutionResult_Error) {
-        char message[50];
-        sprintf(message, "received error %s", result.error);
         return fail(
                 TEST_NAME,
-                message,
+                result.error,
                 exe,
                 &result
         );
@@ -192,7 +190,6 @@ bool test_real_data_type() {
     const ExecutionData *first = get_data(result.handle, "first");
     const ExecutionData *second = get_data(result.handle, "second");
     // ANCHOR_END: get_multiple
-    // TODO: Test asking for the wrong register
 
     if (first == NULL || first->data.tag != DataType_Real) {
         return fail(
@@ -243,6 +240,52 @@ bool test_real_data_type() {
     return succeed(TEST_NAME, exe, &result);
 }
 // ANCHOR_END: test_real_data
+
+bool test_read_from_nonexistent_register() {
+    const char *TEST_NAME = "test_read_from_nonexistent_register";
+
+    Executable *exe = executable_from_quil(REAL_MEMORY_PROGRAM);
+    read_from(exe, "nonexistent");
+    ExecutionResult result = execute_on_qvm(exe);
+
+    if (result.tag != ExecutionResult_Error) {
+        return fail(
+                TEST_NAME,
+                "expected an error but did not receive one",
+                exe,
+                &result
+        );
+    }
+    return succeed(TEST_NAME, exe, &result);
+}
+
+bool test_get_data_from_nonexistent_register() {
+    const char *TEST_NAME = "test_get_data_from_nonexistent_register";
+    Executable *exe = executable_from_quil(REAL_MEMORY_PROGRAM);
+    read_from(exe, "first");
+    ExecutionResult result = execute_on_qvm(exe);
+
+    if (result.tag == ExecutionResult_Error) {
+        return fail(
+                TEST_NAME,
+                result.error,
+                exe,
+                &result
+        );
+    }
+
+    const ExecutionData *nonexistent = get_data(result.handle, "nonexistent");
+
+    if (nonexistent != NULL) {
+        return fail(
+                TEST_NAME,
+                "expected NULL when reading a register that doesn't exist",
+                exe,
+                &result
+        );
+    }
+    return succeed(TEST_NAME, exe, &result);
+}
 
 // ANCHOR: parametrization
 // ANCHOR: parametrized_program
@@ -344,7 +387,9 @@ int main() {
             test_real_data_type,
             test_parametrization,
             test_param_does_not_exist,
-            test_param_wrong_size
+            test_param_wrong_size,
+            test_read_from_nonexistent_register,
+            test_get_data_from_nonexistent_register
     };
 
     printf("\n\n🧪RUNNING C INTEGRATION TESTS🧪\n\n");
