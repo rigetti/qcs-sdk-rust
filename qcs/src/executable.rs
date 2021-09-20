@@ -104,7 +104,6 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// # Example
     ///
-    /// TODO: An example of reading from multiple registers
     /// ```rust
     /// use qcs::Executable;
     ///
