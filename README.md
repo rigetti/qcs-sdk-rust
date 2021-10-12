@@ -1,4 +1,8 @@
+# qcs-sdk-rust
+
 A work in progress implementation of pyQuil-like features in Rust.
+
+> For the C-bindings to this library, check out [qcs-sdk-c](https://github.com/rigetti/qcs-sdk-c)
 
 ## Crates
 
@@ -7,7 +11,6 @@ A work in progress implementation of pyQuil-like features in Rust.
 These are the top level crates intended for use by third parties.
 
 - [qcs]: For running programs on a QPU or QVM from Rust.
-- [c-lib]: The C-API bindings to `qcs` allowing consumption directly from C or other languages that speak C.
 
 ### Internal
 
@@ -32,7 +35,7 @@ Any tests which cannot be run in CI should be run with `makers manual`. These te
 
 `makers lint` from the workspace level will lint all crates except generated ones (where `#![allow(clippy::all)]` should be included).
 
-For new crates, the following code block should be added to the top of the `main.rs` or `lib.rs`, except the unsafe lint if you need unsafe code (e.g. the c-lib crate):
+For new crates, the following code block should be added to the top of the `main.rs` or `lib.rs`:
 
 ```rust
 #![deny(clippy::all)]
@@ -46,13 +49,9 @@ For new crates, the following code block should be added to the top of the `main
 
 To build the docs.rs-style docs, run `makers docs`. Only the [qcs] crate will have published docs in this format, so it's usually not worth running this at the workspace level. From within the [qcs] crate you can also do `makers serve-docs` to launch a local webserver for viewing immediately.
 
-[c-lib] is documented using [mdBook]. At the workspace level, you can use `makers book` to build it or `makers serve-book` to run a local webserver which will watch for _some_ changes.
-
 ## Release
 
 Before release, `makers manual` must be run in order to run tests against live QCS/QPUs.
 
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
-[c-lib]: ./c-lib/README.md
 [qcs]: ./qcs/README.md
-[mdbook]: https://rust-lang.github.io/mdBook/
