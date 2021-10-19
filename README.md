@@ -25,6 +25,14 @@ Most development tasks are automated with [cargo-make] (like make, but you can h
 
 In order to run all checks exactly the same way that CI does, use `makers workspace-ci-flow` from the project root (workspace).
 
+### Dependencies
+
+Because this library relies on [ØMQ], [`cmake`] is required:
+
+- macOS [Homebrew] : `brew install cmake`
+- Windows [Chocolatey]: `choco install cmake`
+- Debian: `apt install cmake`
+
 ### Running Tests
 
 The best way to go about this is via `makers` or `cargo make` with no task. This will default to `dev-test-flow` which formats all code, builds, and tests everything.
