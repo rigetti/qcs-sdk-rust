@@ -9,6 +9,8 @@ plugins:
           release: minor
         - tag: Update
           release: patch
+        - tag: Upgrade
+          release: patch
         - tag: New
           release: patch
   - - '@semantic-release/release-notes-generator'

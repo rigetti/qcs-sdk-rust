@@ -3,13 +3,15 @@ use std::convert::TryFrom;
 use eyre::{eyre, Report, Result};
 use indexmap::set::IndexSet;
 use num::complex::Complex64;
-use quil::expression::{Expression, InfixOperator};
-use quil::instruction::{
-    AttributeValue, FrameIdentifier, Gate, Instruction, MemoryReference, ScalarType, SetFrequency,
-    SetPhase, SetScale, ShiftFrequency, ShiftPhase, Vector,
+use quil_rs::{
+    expression::{Expression, InfixOperator},
+    instruction::{
+        AttributeValue, FrameIdentifier, Gate, Instruction, MemoryReference, ScalarType,
+        SetFrequency, SetPhase, SetScale, ShiftFrequency, ShiftPhase, Vector,
+    },
+    program::{FrameSet, MemoryRegion},
+    Program,
 };
-use quil::program::{FrameSet, MemoryRegion};
-use quil::Program;
 
 use crate::qpu::quilc::NativeQuilProgram;
 

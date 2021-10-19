@@ -133,7 +133,7 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "clap",
  "env_logger",
@@ -1072,7 +1072,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1088,7 +1088,7 @@ dependencies = [
  "maplit",
  "num",
  "qcs-api",
- "quil",
+ "quil-rs",
  "reqwest",
  "rmp-serde",
  "serde",
@@ -1105,7 +1105,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "reqwest",
  "serde",
@@ -1121,9 +1121,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
-name = "quil"
-version = "0.5.3"
-source = "git+https://github.com/rigetti/quil-rust.git?branch=sdk-requirements#747a9d6dc55eca86fa6c8ccd8924ab6afee124ff"
+name = "quil-rs"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "99eb6a9f67b64905b282ba9cb06452e3e1bcc46bf9ee46bddf366e6528947da1"
 dependencies = [
  "indexmap",
  "lexical",

@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 
 use eyre::{eyre, Report, Result, WrapErr};
 use log::trace;
-use quil::expression::Expression;
+use quil_rs::expression::Expression;
 
 use qcs_api::models::EngagementWithCredentials;
 

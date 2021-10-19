@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use std::str::FromStr;
 
 use eyre::{Report, Result, WrapErr};
-use quil::Program;
+use quil_rs::Program;
 use serde::{Deserialize, Serialize};
 
 use isa::CompilerIsa;
@@ -60,7 +60,7 @@ impl From<NativeQuil> for String {
 /// A wrapper around [`Program`] which indicates it has been converted to `NativeQuil` (has been run
 /// through `quilc` and therefore is suitable to use on QPUs.
 #[derive(Debug, PartialEq)]
-pub struct NativeQuilProgram(Program);
+pub(super) struct NativeQuilProgram(Program);
 
 impl TryFrom<NativeQuil> for NativeQuilProgram {
     type Error = Report;

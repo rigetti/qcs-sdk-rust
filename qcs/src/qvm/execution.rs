@@ -1,15 +1,17 @@
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use eyre::{eyre, Result, WrapErr};
-use quil::instruction::{ArithmeticOperand, Instruction, MemoryReference, Move};
-use quil::Program;
+use quil_rs::{
+    instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
+    Program,
+};
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
 use crate::ExecutionResult;
 
 use super::{QVMRequest, QVMResponse};
-use std::collections::HashMap;
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
