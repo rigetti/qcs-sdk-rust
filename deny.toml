@@ -25,7 +25,7 @@ notice = "deny"
 # A list of advisory IDs to ignore. Note that ignored advisories will still
 # output a note when they are encountered.
 ignore = [
-    #"RUSTSEC-0000-0000",
+    "RUSTSEC-2020-0071",  # This is an issue inherited from warp which is only used for testing
 ]
 
 # This section is considered when running `cargo deny check licenses`
