@@ -38,6 +38,7 @@ allow = [
     "ISC",
     "MIT",
     "OpenSSL",
+    "BSD-3-Clause",
 ]
 # List of explictly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
