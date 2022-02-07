@@ -224,7 +224,7 @@ impl Executable<'_, '_> {
         return self
             .readout_memory_region_names
             .as_ref()
-            .map_or(&["ro"], |v| v.as_slice());
+            .map_or(&["ro"], Vec::as_slice);
     }
 
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
