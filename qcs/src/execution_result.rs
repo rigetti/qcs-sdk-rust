@@ -1,7 +1,7 @@
 use enum_as_inner::EnumAsInner;
 use eyre::{eyre, Result, WrapErr};
 use num::complex::Complex32;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use crate::qpu::Register;
 use std::collections::HashMap;
@@ -22,7 +22,7 @@ use std::collections::HashMap;
 /// Typically you will already know what type of data the `ExecutionResult` _should_ have, so you can
 /// use the [`mod@enum_as_inner`] methods (e.g. [`ExecutionResult::into_i8`]) in order to
 /// convert any variant type to its inner data.
-#[derive(Debug, Deserialize, EnumAsInner, PartialEq)]
+#[derive(Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum ExecutionResult {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
