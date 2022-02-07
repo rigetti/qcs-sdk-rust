@@ -1,6 +1,7 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 #![deny(clippy::cargo)]
+#![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
 #![deny(missing_docs)]
 #![forbid(unsafe_code)]
 
