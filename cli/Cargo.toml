@@ -12,8 +12,8 @@ publish = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.7.1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.16.1", features = ["macros", "rt-multi-thread"] }
 qcs = {version ="0.0.2", path = "../qcs"}
-structopt = "0.3.22"
-clap = "2.33.3"
+structopt = "0.3.26"
+clap = "2.34.0"
 env_logger = "0.9.0"
