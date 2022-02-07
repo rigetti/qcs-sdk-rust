@@ -272,9 +272,10 @@ impl Executable<'_, '_> {
         if let Some(config) = self.config.take() {
             config
         } else {
-            Configuration::load()
-                .await
-                .unwrap_or_else(|_| Configuration::default())
+            Configuration::load().await.unwrap_or_else(|e| {
+                log::error!("Got an error when loading config: {:#?}", e);
+                Configuration::default()
+            })
         }
     }
 }
