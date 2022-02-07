@@ -133,7 +133,7 @@ dependencies = [
 
 [[package]]
 name = "cli"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "clap",
  "env_logger",
@@ -1057,7 +1057,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1090,7 +1090,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "reqwest",
  "serde",

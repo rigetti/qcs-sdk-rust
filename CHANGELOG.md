@@ -1,17 +1,5 @@
 ## [0.0.3](https://github.com/rigetti/qcs-sdk-rust/compare/v0.0.2...v0.0.3) (2022-02-07)
 
-
-### chore
-
-* Fix cargo deny (#24) [skip ci] ([15647ee](https://github.com/rigetti/qcs-sdk-rust/commit/15647ee74463dc3ed0b682749f9648cb8ee50113)), closes [#24](https://github.com/rigetti/qcs-sdk-rust/issues/24)
-
-### Chore
-
-* Allow BSD-3-Clause dependencies ([86880e1](https://github.com/rigetti/qcs-sdk-rust/commit/86880e1c03b118818bb2aef543c6e48fc6df8e9e))
-* Clippy warnings ([5028ce2](https://github.com/rigetti/qcs-sdk-rust/commit/5028ce232d3ba96608544059e0cc168244be1899))
-* Update locked dependencies for testing ([23cffe9](https://github.com/rigetti/qcs-sdk-rust/commit/23cffe98d18d6b33f39e101ae4878692092d1782))
-* Update semantic-release to solve error installing. ([595f24f](https://github.com/rigetti/qcs-sdk-rust/commit/595f24fecd7fff020a3ebab64f8796c822290997))
-
 ### Docs
 
 * Update qcs crate README to be more descriptive on crates.io. Move build instructions into workspace README. (#25) ([9d3af44](https://github.com/rigetti/qcs-sdk-rust/commit/9d3af44acee42a4ac03e1ff0fdc3582db985d9ce)), closes [#25](https://github.com/rigetti/qcs-sdk-rust/issues/25)
