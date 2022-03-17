@@ -14,7 +14,7 @@ manual-tests = []
 [dependencies]
 dirs = "4.0.0"
 enum-as-inner = "0.3.3"
-eyre = "0.6.6"
+eyre = "0.6.7"
 futures = "0.3.21"
 indexmap = "1.8.0"
 lazy_static = "1.4.0"
