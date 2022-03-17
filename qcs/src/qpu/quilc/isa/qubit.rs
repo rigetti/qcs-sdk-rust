@@ -155,7 +155,7 @@ fn rx_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>> {
     });
 
     gates.extend(
-        IntoIter::new([PI, -PI, FRAC_PI_2, -FRAC_PI_2]).map(|param| Operator::Gate {
+        IntoIterator::into_iter([PI, -PI, FRAC_PI_2, -FRAC_PI_2]).map(|param| Operator::Gate {
             operator,
             parameters: Parameters::Float(param),
             arguments: Arguments::Int(node_id),
