@@ -153,5 +153,5 @@ pub(crate) struct Credentials<'a> {
 #[serde(tag = "_type")]
 pub(crate) enum RPCResponse<T> {
     RPCReply { id: String, result: T },
-    RPCError { id: String, error: String },
+    RPCError { error: String },
 }

@@ -139,10 +139,7 @@ impl<'executable> Executable<'executable, '_> {
     /// ```
     #[must_use]
     pub fn read_from(mut self, register: &'executable str) -> Self {
-        let mut readouts = self
-            .readout_memory_region_names
-            .take()
-            .unwrap_or_else(Vec::new);
+        let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
         readouts.push(register);
         self.readout_memory_region_names = Some(readouts);
         self
