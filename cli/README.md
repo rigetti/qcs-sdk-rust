@@ -1,1 +1,0 @@
-For testing various API implementations, but could also be a general purpose CLI at some point.

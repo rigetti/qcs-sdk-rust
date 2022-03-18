@@ -22,6 +22,8 @@
       "github>whitesource/merge-confidence:beta",
       "config:base",
       "github>whitesource/log4j-remediations"
-      ]
-   }
+    ],
+    "commitMessagePrefix": "chore:",
+    "rangeStrategy": "widen"
+  }
 }
