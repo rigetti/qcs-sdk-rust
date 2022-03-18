@@ -2,8 +2,9 @@
 //! users will interact with QCS, quilc, and QVM.
 
 use std::collections::HashMap;
+use std::time::Duration;
 
-use eyre::{eyre, Result, WrapErr};
+use eyre::{eyre, Report, Result, WrapErr};
 
 use crate::configuration::Configuration;
 use crate::{qpu, qvm, ExecutionResult};
@@ -288,7 +289,7 @@ impl<'execution> Executable<'_, 'execution> {
         let mut config = self.take_or_load_config().await;
         let result = match qpu::Execution::new(self.quil, self.shots, id, &config).await {
             Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs(_)) => {
+            Err(qpu::Error::Qcs { .. }) => {
                 config = config
                     .refresh()
                     .await
@@ -330,7 +331,7 @@ impl<'execution> Executable<'_, 'execution> {
     pub async fn execute_on_qpu(
         &mut self,
         quantum_processor_id: &'execution str,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
+    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
         let mut config = self.take_or_load_config().await;
 
@@ -338,7 +339,10 @@ impl<'execution> Executable<'_, 'execution> {
 
         let response = match qpu.run(&self.params, readouts, &config).await {
             Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs(_)) => {
+            Err(qpu::Error::Qcs {
+                retry_after: None, ..
+            }) => {
+                // If retry_after is set, don't retry now
                 config = config
                     .refresh()
                     .await
@@ -349,8 +353,37 @@ impl<'execution> Executable<'_, 'execution> {
         };
 
         self.qpu = Some(qpu);
-        response.wrap_err_with(|| eyre!("When executing on {}", quantum_processor_id))
+        match response {
+            Ok(result) => Ok(result),
+            Err(qpu::Error::Qcs {
+                source,
+                retry_after,
+            }) => {
+                match retry_after {
+                    Some(duration) => {
+                        // retry_after could mean maintenance which requires recompile
+                        self.qpu = None;
+                        Err(Error::Retry {
+                            source,
+                            after: duration,
+                        })
+                    }
+                    None => Err(source.into()),
+                }
+            }
+            Err(quil_err @ qpu::Error::Quil { .. }) => Err(Error::from(
+                eyre!(quil_err).wrap_err("When compiling for the QPU"),
+            )),
+        }
     }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("An error that is due to a temporary problem and should be retried.")]
+    Retry { source: Report, after: Duration },
+    #[error("A fatal error that should not be retried.")]
+    Fatal(#[from] Report),
 }
 
 #[cfg(test)]

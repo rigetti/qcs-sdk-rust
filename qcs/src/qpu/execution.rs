@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::time::Duration;
 
 use eyre::{eyre, Report, Result, WrapErr};
 use log::trace;
@@ -13,7 +14,7 @@ use crate::configuration::Configuration;
 use crate::executable::Parameters;
 use crate::qpu::quilc::NativeQuilProgram;
 use crate::qpu::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
-use crate::qpu::{get_isa, organize_ro_sources};
+use crate::qpu::{engagement, get_isa, organize_ro_sources};
 use crate::ExecutionResult;
 
 use super::quilc;
@@ -34,7 +35,10 @@ pub(crate) struct Execution<'a> {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("problem communicating with QCS")]
-    Qcs(#[source] Report),
+    Qcs {
+        source: Report,
+        retry_after: Option<Duration>,
+    },
     #[error("problem processing the provided Quil")]
     Quil(#[from] Report),
 }
@@ -78,7 +82,10 @@ impl<'a> Execution<'a> {
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, config)
             .await
-            .map_err(Error::Qcs)?;
+            .map_err(|err| Error::Qcs {
+                source: err.wrap_err("When getting ISA"),
+                retry_after: None,
+            })?;
         let native_quil = quilc::compile_program(quil, &isa, config)
             .wrap_err("When attempting to compile your program to Native Quil")?;
         trace!("Converted to Native Quil successfully");
@@ -108,8 +115,10 @@ impl<'a> Execution<'a> {
             .get_substitutions(params)
             .map_err(|e| Error::Quil(e.wrap_err("When setting provided parameters")))
             .and_then(|patch_values| {
-                execute(&qcs.executable, &qcs.engagement, &patch_values)
-                    .map_err(|e| Error::Qcs(e.wrap_err("When executing program.")))
+                execute(&qcs.executable, &qcs.engagement, &patch_values).map_err(|e| Error::Qcs {
+                    source: e.wrap_err("When executing program."),
+                    retry_after: None,
+                })
             })
             .and_then(|buffers| {
                 process_buffers(buffers, &qcs.buffer_names)
@@ -146,21 +155,27 @@ impl<'a> Execution<'a> {
         )
         .await
         .wrap_err("When building executable")
-        .map_err(Error::Qcs)?;
+        .map_err(|err| Error::Qcs {
+            source: err,
+            retry_after: None,
+        })?;
         let ro_sources = response.ro_sources.ok_or_else(|| {
             eyre!("No read out sources were defined, did you forget to `MEASURE`?")
         })?;
         let buffer_names =
             organize_ro_sources(ro_sources, readouts).wrap_err("When parsing executable.")?;
-        let engagement = super::engagement::get(
-            Some(String::from(self.quantum_processor_id)),
-            config,
-        )
-        .await
-        .wrap_err(
-            "Could not get an engagement for the requested QPU. Do you have an active reservation?",
-        )
-        .map_err(Error::Qcs)?;
+        let engagement = engagement::get(String::from(self.quantum_processor_id), config)
+            .await
+            .map_err(|e| match e {
+                engagement::Error::QuantumProcessorUnavailable(duration) => Error::Qcs {
+                    source: eyre!(e),
+                    retry_after: Some(duration),
+                },
+                e => Error::Qcs {
+                    source: eyre!(e),
+                    retry_after: None,
+                },
+            })?;
         Ok(Qcs {
             buffer_names,
             engagement,

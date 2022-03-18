@@ -174,12 +174,12 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let config = Configuration::default();
+        let config = Configuration::load().await.unwrap_or_default();
         let output =
             compile_program(BELL_STATE, &aspen_9_isa(), &config).expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&String::from(output))
             .unwrap()
-            .run(10, &["ro"], &Default::default(), &Configuration::default())
+            .run(10, &["ro"], &HashMap::default(), &config)
             .await
             .expect("Could not run program on QVM");
         for shot in results
