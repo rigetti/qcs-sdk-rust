@@ -1,3 +1,13 @@
+## [0.1.0](https://github.com/rigetti/qcs-sdk-rust/compare/v0.0.3...v0.1.0) (2022-03-18)
+
+### Breaking Changes
+
+* The error type of `Executable::execute_on_qpu` and `Executable::execute_on_qvm` has changed.
+
+### Features
+
+* You can now tell the difference between an error which warrants a retry (`Error::Retry`) and an error which is fatal (`Error::Fatal`).
+
 ## [0.0.3](https://github.com/rigetti/qcs-sdk-rust/compare/v0.0.2...v0.0.3) (2022-02-07)
 
 ### Docs
