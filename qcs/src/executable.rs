@@ -250,7 +250,7 @@ impl Executable<'_, '_> {
     /// ## Execution Errors
     ///
     /// A number of errors could occur if `program` is malformed.
-    pub async fn execute_on_qvm(&mut self) -> Result<HashMap<Box<str>, ExecutionResult>> {
+    pub async fn execute_on_qvm(&mut self) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
         let config = self.take_or_load_config().await;
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -262,7 +262,7 @@ impl Executable<'_, '_> {
             .await;
         self.qvm = Some(qvm);
         self.config = Some(config);
-        result
+        result.map_err(Error::from)
     }
 
     /// Remove and return `self.config` if set. Otherwise, load it from disk.
