@@ -210,6 +210,8 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
+type ExecuteResult = Result<HashMap<Box<str>, ExecutionResult>, Error>;
+
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
     #[must_use]
@@ -250,7 +252,7 @@ impl Executable<'_, '_> {
     /// ## Execution Errors
     ///
     /// A number of errors could occur if `program` is malformed.
-    pub async fn execute_on_qvm(&mut self) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+    pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
         let config = self.take_or_load_config().await;
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -328,10 +330,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(
-        &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+    pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
         let mut config = self.take_or_load_config().await;
 
