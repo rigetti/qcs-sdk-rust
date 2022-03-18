@@ -377,10 +377,19 @@ impl<'execution> Executable<'_, 'execution> {
     }
 }
 
+/// The possible errors which can be returned by [`Executable::execute_on_qpu`] and
+/// [`Executable::execute_on_qvm`]..
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// An error that is due to a temporary problem and should be retried after `after` [`Duration`].
     #[error("An error that is due to a temporary problem and should be retried.")]
-    Retry { source: Report, after: Duration },
+    Retry {
+        /// The error itself
+        source: Report,
+        /// The [`Duration`] to wait before retrying
+        after: Duration,
+    },
+    /// An error which is due to a permanent problem and should not be retried.
     #[error("A fatal error that should not be retried.")]
     Fatal(#[from] Report),
 }
