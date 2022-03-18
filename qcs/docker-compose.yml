@@ -5,7 +5,7 @@ services:
     image: rigetti/qvm
     command: -S
     ports:
-      - '5000:5000'
+      - '5001:5000'
   quilc:
     image: rigetti/quilc
     command: -S
