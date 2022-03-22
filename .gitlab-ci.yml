@@ -3,6 +3,10 @@
 stages:
   - test
 
+default:
+  tags:
+    - ec2-docker
+
 run-examples:
   stage: test
   image: rust
