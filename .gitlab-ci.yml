@@ -10,5 +10,10 @@ default:
 run-examples:
   stage: test
   image: rust
+  before_script:
+    - rustc --version
+    - cargo --version
+    - apt update
+    - apt install cmake -y
   script:
     - cargo run --example parametric_compilation
