@@ -27,12 +27,12 @@ async fn main() {
         let theta = step * f64::from(i);
         let result = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-9")
+            .execute_on_qpu("Aspen-11")
             .await
             .expect("Failed to execute")
             .remove("ro")
             .expect("Missing ro register");
-        parametric_measurements.append(&mut result.into_i8().unwrap()[0])
+        parametric_measurements.append(&mut result.into_i16().unwrap()[0])
     }
 
     for measurement in parametric_measurements {

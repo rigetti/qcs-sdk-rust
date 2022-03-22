@@ -1,0 +1,10 @@
+# Runs tests that require a connection to a real QPU
+
+stages:
+  - test
+
+run-examples:
+  stage: test
+  image: rust
+  script:
+    - cargo run --example parametric_compilation
