@@ -10,6 +10,13 @@ default:
 run-examples:
   stage: test
   image: rust
+  services:
+    - alias: qvm
+      name: rigetti/qvm
+      command: [ "-S" ]
+    - alias: quilc
+      name: rigetti/quilc
+      command: [ "-S" ]
   before_script:
     - rustc --version
     - cargo --version
