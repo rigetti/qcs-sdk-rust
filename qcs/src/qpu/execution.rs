@@ -12,7 +12,7 @@ use qcs_api::models::EngagementWithCredentials;
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
-use crate::qpu::quilc::NativeQuilProgram;
+use crate::qpu::quilc::{NativeQuil, NativeQuilProgram};
 use crate::qpu::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
 use crate::qpu::{engagement, get_isa, organize_ro_sources};
 use crate::ExecutionResult;
@@ -79,6 +79,7 @@ impl<'a> Execution<'a> {
         shots: u16,
         quantum_processor_id: &'a str,
         config: &Configuration,
+        skip_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, config)
             .await
@@ -86,9 +87,15 @@ impl<'a> Execution<'a> {
                 source: err.wrap_err("When getting ISA"),
                 retry_after: None,
             })?;
-        let native_quil = quilc::compile_program(quil, &isa, config)
-            .wrap_err("When attempting to compile your program to Native Quil")?;
-        trace!("Converted to Native Quil successfully");
+
+        let native_quil = if skip_quilc {
+            trace!("Skipping conversion to Native Quil");
+            NativeQuil::assume_native_quil(String::from(quil))
+        } else {
+            trace!("Converting to Native Quil");
+            quilc::compile_program(quil, &isa, config)
+                .wrap_err("When attempting to compile your program to Native Quil")?
+        };
 
         let program =
             NativeQuilProgram::try_from(native_quil).wrap_err("Unable to parse provided Quil")?;

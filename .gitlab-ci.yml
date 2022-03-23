@@ -24,3 +24,4 @@ run-examples:
     - apt install cmake -y
   script:
     - cargo run --example parametric_compilation
+    - cargo run --example quil_t
