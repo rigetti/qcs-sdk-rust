@@ -222,7 +222,8 @@ impl Executable<'_, '_> {
         self
     }
 
-    /// If set, the Executable is assumed to be native quil and wil skip calls to quilc.
+    /// If set, the Executable will be compiled using `quilc` prior to compilation on QCS. If not set, the program
+    /// is treated as native quil and will not be sent to `quilc`.
     #[must_use]
     pub fn compile_with_quilc(mut self, compile: bool) -> Self {
         self.compile_with_quilc = compile;
