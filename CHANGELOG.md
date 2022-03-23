@@ -1,3 +1,8 @@
+## [0.1.1](https://github.com/rigetti/qcs-sdk-rust/compare/v0.1.0...v0.1.1) (2022-03-23)
+
+### Features
+* Add `compile_with_quilc` option on `Executable` to support Quil-T. by @dbanty in [#57](https://github.com/rigetti/qcs-sdk-rust/pull/57)
+
 ## [0.1.0](https://github.com/rigetti/qcs-sdk-rust/compare/v0.0.3...v0.1.0) (2022-03-18)
 
 ### Breaking Changes
