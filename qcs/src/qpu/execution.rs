@@ -79,7 +79,7 @@ impl<'a> Execution<'a> {
         shots: u16,
         quantum_processor_id: &'a str,
         config: &Configuration,
-        skip_quilc: bool,
+        compile_with_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, config)
             .await
@@ -88,13 +88,13 @@ impl<'a> Execution<'a> {
                 retry_after: None,
             })?;
 
-        let native_quil = if skip_quilc {
-            trace!("Skipping conversion to Native Quil");
-            NativeQuil::assume_native_quil(String::from(quil))
-        } else {
+        let native_quil = if compile_with_quilc {
             trace!("Converting to Native Quil");
             quilc::compile_program(quil, &isa, config)
                 .wrap_err("When attempting to compile your program to Native Quil")?
+        } else {
+            trace!("Skipping conversion to Native Quil");
+            NativeQuil::assume_native_quil(String::from(quil))
         };
 
         let program =

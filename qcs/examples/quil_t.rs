@@ -18,7 +18,7 @@ async fn main() {
     let exe = Executable::from_quil(PROGRAM);
 
     let result = exe
-        .skip_quilc()
+        .compile_with_quilc(false)
         .execute_on_qpu("Aspen-11")
         .await
         .expect("Failed to execute")

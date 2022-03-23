@@ -57,7 +57,7 @@ pub struct Executable<'executable, 'execution> {
     shots: u16,
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters<'executable>,
-    skip_quilc: bool,
+    compile_with_quilc: bool,
     config: Option<Configuration>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -87,7 +87,7 @@ impl<'executable> Executable<'executable, '_> {
             shots: 1,
             readout_memory_region_names: None,
             params: Parameters::new(),
-            skip_quilc: false,
+            compile_with_quilc: true,
             config: None,
             qpu: None,
             qvm: None,
@@ -224,8 +224,8 @@ impl Executable<'_, '_> {
 
     /// If set, the Executable is assumed to be native quil and wil skip calls to quilc.
     #[must_use]
-    pub fn skip_quilc(mut self) -> Self {
-        self.skip_quilc = true;
+    pub fn compile_with_quilc(mut self, compile: bool) -> Self {
+        self.compile_with_quilc = compile;
         self
     }
 
@@ -299,14 +299,17 @@ impl<'execution> Executable<'_, 'execution> {
         }
         let mut config = self.take_or_load_config().await;
         let result =
-            match qpu::Execution::new(self.quil, self.shots, id, &config, self.skip_quilc).await {
+            match qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
+                .await
+            {
                 Ok(result) => Ok(result),
                 Err(qpu::Error::Qcs { .. }) => {
                     config = config
                         .refresh()
                         .await
                         .wrap_err("When refreshing authentication token")?;
-                    qpu::Execution::new(self.quil, self.shots, id, &config, self.skip_quilc).await
+                    qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
+                        .await
                 }
                 err => err,
             };
@@ -435,7 +438,7 @@ mod describe_qpu_for_id {
                 shots,
                 "Aspen-9",
                 &exe.take_or_load_config().await,
-                exe.skip_quilc,
+                exe.compile_with_quilc,
             )
             .await
             .unwrap(),
