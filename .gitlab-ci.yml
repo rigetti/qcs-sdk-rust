@@ -1,0 +1,27 @@
+# Runs tests that require a connection to a real QPU
+
+stages:
+  - test
+
+default:
+  tags:
+    - ec2-docker
+
+run-examples:
+  stage: test
+  image: rust
+  services:
+    - alias: qvm
+      name: rigetti/qvm
+      command: [ "-S" ]
+    - alias: quilc
+      name: rigetti/quilc
+      command: [ "-S" ]
+  before_script:
+    - rustc --version
+    - cargo --version
+    - apt update
+    - apt install cmake -y
+  script:
+    - cargo run --example parametric_compilation
+    - cargo run --example quil_t

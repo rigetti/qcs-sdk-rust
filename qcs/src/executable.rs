@@ -57,6 +57,7 @@ pub struct Executable<'executable, 'execution> {
     shots: u16,
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters<'executable>,
+    compile_with_quilc: bool,
     config: Option<Configuration>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -86,6 +87,7 @@ impl<'executable> Executable<'executable, '_> {
             shots: 1,
             readout_memory_region_names: None,
             params: Parameters::new(),
+            compile_with_quilc: true,
             config: None,
             qpu: None,
             qvm: None,
@@ -220,6 +222,14 @@ impl Executable<'_, '_> {
         self
     }
 
+    /// If set, the Executable will be compiled using `quilc` prior to compilation on QCS. If not set, the program
+    /// is treated as native quil and will not be sent to `quilc`.
+    #[must_use]
+    pub fn compile_with_quilc(mut self, compile: bool) -> Self {
+        self.compile_with_quilc = compile;
+        self
+    }
+
     fn get_readouts(&self) -> &[&str] {
         return self
             .readout_memory_region_names
@@ -289,17 +299,21 @@ impl<'execution> Executable<'_, 'execution> {
             }
         }
         let mut config = self.take_or_load_config().await;
-        let result = match qpu::Execution::new(self.quil, self.shots, id, &config).await {
-            Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs { .. }) => {
-                config = config
-                    .refresh()
-                    .await
-                    .wrap_err("When refreshing authentication token")?;
-                qpu::Execution::new(self.quil, self.shots, id, &config).await
-            }
-            err => err,
-        };
+        let result =
+            match qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
+                .await
+            {
+                Ok(result) => Ok(result),
+                Err(qpu::Error::Qcs { .. }) => {
+                    config = config
+                        .refresh()
+                        .await
+                        .wrap_err("When refreshing authentication token")?;
+                    qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
+                        .await
+                }
+                err => err,
+            };
         self.config = Some(config);
         result.wrap_err_with(|| eyre!("When executing on {}", id))
     }
@@ -420,9 +434,15 @@ mod describe_qpu_for_id {
         let shots = 17;
         exe.shots = shots;
         exe.qpu = Some(
-            qpu::Execution::new("", shots, "Aspen-9", &exe.take_or_load_config().await)
-                .await
-                .unwrap(),
+            qpu::Execution::new(
+                "",
+                shots,
+                "Aspen-9",
+                &exe.take_or_load_config().await,
+                exe.compile_with_quilc,
+            )
+            .await
+            .unwrap(),
         );
         // Load config with no credentials to prevent creating a new Execution if it tries
         exe.config = Some(Configuration::default());

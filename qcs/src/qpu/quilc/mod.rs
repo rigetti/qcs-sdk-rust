@@ -51,6 +51,13 @@ pub(crate) fn compile_program(
 /// Quil which has been processed through `quilc`.
 pub struct NativeQuil(String);
 
+impl NativeQuil {
+    /// Cast a String to `NativeQuil` without checking or transforming it via `quilc`.
+    pub(super) fn assume_native_quil(quil: String) -> Self {
+        NativeQuil(quil)
+    }
+}
+
 impl From<NativeQuil> for String {
     fn from(native_quil: NativeQuil) -> String {
         native_quil.0
