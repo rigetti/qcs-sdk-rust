@@ -291,7 +291,7 @@ mod describe_rz_gates {
                 node_ids: vec![0, 1],
             }],
         };
-        let gates = rz_gates(node_id, &frb_sim_1q).expect("Failed to create RZ gates");
+        let gates = rz_gates(node_id);
         let expected = vec![Operator::Gate {
             arguments: Arguments::Int(1),
             duration: 0.01,
