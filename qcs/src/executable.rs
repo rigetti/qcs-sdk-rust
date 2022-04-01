@@ -2,6 +2,7 @@
 //! users will interact with QCS, quilc, and QVM.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 use std::time::Duration;
 
 use eyre::{eyre, Report, Result, WrapErr};
@@ -53,17 +54,17 @@ use crate::{qpu, qvm, ExecutionResult};
 /// the methods most likely needs to live as long as this struct. Check individual methods for
 /// specifics. If only using `'static` strings then everything should just work.
 pub struct Executable<'executable, 'execution> {
-    quil: &'executable str,
+    quil: Arc<str>,
     shots: u16,
     readout_memory_region_names: Option<Vec<&'executable str>>,
-    params: Parameters<'executable>,
+    params: Parameters,
     compile_with_quilc: bool,
-    config: Option<Configuration>,
+    config: Option<Arc<Configuration>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
 }
 
-pub(crate) type Parameters<'a> = HashMap<&'a str, Vec<f64>>;
+pub(crate) type Parameters = HashMap<Box<str>, Vec<f64>>;
 
 impl<'executable> Executable<'executable, '_> {
     /// Create an [`Executable`] from a string containing a  [quil](https://github.com/quil-lang/quil)
@@ -81,9 +82,9 @@ impl<'executable> Executable<'executable, '_> {
     /// 1. `quil` is a string slice representing the original program to be run. The returned
     ///     [`Executable`] will only live as long as this reference.
     #[must_use]
-    pub fn from_quil(quil: &'executable str) -> Self {
+    pub fn from_quil<Quil: Into<Arc<str>>>(quil: Quil) -> Self {
         Self {
-            quil,
+            quil: quil.into(),
             shots: 1,
             readout_memory_region_names: None,
             params: Parameters::new(),
@@ -185,28 +186,24 @@ impl<'executable> Executable<'executable, '_> {
     /// ```
     ///
     /// [parametric compilation]: https://pyquil-docs.rigetti.com/en/stable/basics.html?highlight=parametric#parametric-compilation
-    pub fn with_parameter(
+    pub fn with_parameter<Param: Into<Box<str>>>(
         &mut self,
-        param_name: &'executable str,
+        param_name: Param,
         index: usize,
         value: f64,
     ) -> &mut Self {
-        let values = if let Some(values) = self.params.get_mut(param_name) {
-            values
-        } else {
-            self.params.insert(param_name, vec![0.0; index]);
-            if let Some(values) = self.params.get_mut(param_name) {
-                values
-            } else {
-                unreachable!("Set in the line above")
-            }
-        };
+        let param_name = param_name.into();
+        let mut values = self
+            .params
+            .remove(&param_name)
+            .unwrap_or_else(|| vec![0.0; index]);
 
         if index + 1 > values.len() {
             values.resize(index + 1, 0.0);
         }
 
         values[index] = value;
+        self.params.insert(param_name, values);
 
         self
     }
@@ -241,8 +238,8 @@ impl Executable<'_, '_> {
     ///
     /// # Warning
     ///
-    /// This function is `async` because of the HTTP client under the hood, but it will block your
-    /// thread waiting on the RPCQ-based functions.
+    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
+    /// to avoid blocking shutdown of the runtime.
     ///
     /// # Returns
     ///
@@ -263,30 +260,39 @@ impl Executable<'_, '_> {
     ///
     /// A number of errors could occur if `program` is malformed.
     pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
-        let config = self.take_or_load_config().await;
+        let config = self.get_config().await;
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
         } else {
-            qvm::Execution::new(self.quil)?
+            qvm::Execution::new(&self.quil)?
         };
         let result = qvm
             .run(self.shots, self.get_readouts(), &self.params, &config)
             .await;
         self.qvm = Some(qvm);
-        self.config = Some(config);
         result.map_err(Error::from)
     }
 
-    /// Remove and return `self.config` if set. Otherwise, load it from disk.
-    async fn take_or_load_config(&mut self) -> Configuration {
-        if let Some(config) = self.config.take() {
-            config
+    /// Load `self.config` if not yet loaded, then return a reference to it.
+    async fn get_config(&mut self) -> Arc<Configuration> {
+        if let Some(config) = &self.config {
+            config.clone()
         } else {
-            Configuration::load().await.unwrap_or_else(|e| {
-                log::error!("Got an error when loading config: {:#?}", e);
+            let config = Arc::new(Configuration::load().await.unwrap_or_else(|e| {
+                log::warn!("Got an error when loading config: {:#?}", e);
                 Configuration::default()
-            })
+            }));
+            self.config = Some(config.clone());
+            config
         }
+    }
+
+    /// Refresh `self.config` and return it.
+    async fn refresh_config(&mut self) -> Result<Arc<Configuration>> {
+        let config = self.get_config().await.as_ref().clone();
+        let refreshed = Arc::new(config.refresh().await?);
+        self.config = Some(refreshed.clone());
+        Ok(refreshed)
     }
 }
 
@@ -298,23 +304,33 @@ impl<'execution> Executable<'_, 'execution> {
                 return Ok(qpu);
             }
         }
-        let mut config = self.take_or_load_config().await;
-        let result =
-            match qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
+        let mut config = self.get_config().await;
+        let result = match qpu::Execution::new(
+            self.quil.clone(),
+            self.shots,
+            id,
+            config.clone(),
+            self.compile_with_quilc,
+        )
+        .await
+        {
+            Ok(result) => Ok(result),
+            Err(qpu::Error::Qcs { .. }) => {
+                config = self
+                    .refresh_config()
+                    .await
+                    .wrap_err("When refreshing authentication token")?;
+                qpu::Execution::new(
+                    self.quil.clone(),
+                    self.shots,
+                    id,
+                    config,
+                    self.compile_with_quilc,
+                )
                 .await
-            {
-                Ok(result) => Ok(result),
-                Err(qpu::Error::Qcs { .. }) => {
-                    config = config
-                        .refresh()
-                        .await
-                        .wrap_err("When refreshing authentication token")?;
-                    qpu::Execution::new(self.quil, self.shots, id, &config, self.compile_with_quilc)
-                        .await
-                }
-                err => err,
-            };
-        self.config = Some(config);
+            }
+            err => err,
+        };
         result.wrap_err_with(|| eyre!("When executing on {}", id))
     }
 
@@ -327,8 +343,8 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Warning
     ///
-    /// This function is `async` because of the HTTP client under the hood, but it will block your
-    /// thread waiting on the RPCQ-based services.
+    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
+    /// to avoid blocking shutdown of the runtime.
     ///
     /// # Returns
     ///
@@ -346,21 +362,19 @@ impl<'execution> Executable<'_, 'execution> {
     /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
-        let mut config = self.take_or_load_config().await;
+        let mut config = self.get_config().await;
 
-        let readouts = self.get_readouts();
-
-        let response = match qpu.run(&self.params, readouts, &config).await {
+        let response = match qpu.run(&self.params, self.get_readouts(), &config).await {
             Ok(result) => Ok(result),
             Err(qpu::Error::Qcs {
                 retry_after: None, ..
             }) => {
                 // If retry_after is set, don't retry now
-                config = config
-                    .refresh()
+                config = self
+                    .refresh_config()
                     .await
                     .wrap_err("When refreshing authentication token")?;
-                qpu.run(&self.params, readouts, &config).await
+                qpu.run(&self.params, self.get_readouts(), &config).await
             }
             err => err,
         };

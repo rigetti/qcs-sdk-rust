@@ -2,11 +2,13 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::sync::Arc;
 use std::time::Duration;
 
 use eyre::{eyre, Report, Result, WrapErr};
 use log::trace;
 use quil_rs::expression::Expression;
+use tokio::task::spawn_blocking;
 
 use qcs_api::models::EngagementWithCredentials;
 
@@ -29,7 +31,7 @@ pub(crate) struct Execution<'a> {
     pub(crate) quantum_processor_id: &'a str,
     pub(crate) shots: u16,
     // All the stuff needed to actually make requests to QCS, lazily initialized
-    qcs: Option<Qcs>,
+    qcs: Option<Arc<Qcs>>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -75,13 +77,13 @@ impl<'a> Execution<'a> {
     /// 1. Unable to rewrite the Native Quil for a QPU. This may mean that the `quil` was invalid
     ///     for the QPU or that there is a bug in this library.
     pub(crate) async fn new(
-        quil: &str,
+        quil: Arc<str>,
         shots: u16,
         quantum_processor_id: &'a str,
-        config: &Configuration,
+        config: Arc<Configuration>,
         compile_with_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
-        let isa = get_isa(quantum_processor_id, config)
+        let isa = get_isa(quantum_processor_id, &config)
             .await
             .map_err(|err| Error::Qcs {
                 source: err.wrap_err("When getting ISA"),
@@ -90,11 +92,16 @@ impl<'a> Execution<'a> {
 
         let native_quil = if compile_with_quilc {
             trace!("Converting to Native Quil");
-            quilc::compile_program(quil, &isa, config)
-                .wrap_err("When attempting to compile your program to Native Quil")?
+            let thread_config = config.clone();
+            spawn_blocking(move || {
+                quilc::compile_program(&quil, &isa, &thread_config)
+                    .wrap_err("When attempting to compile your program to Native Quil")
+            })
+            .await
+            .map_err(|_| eyre!("Error in quilc thread."))??
         } else {
             trace!("Skipping conversion to Native Quil");
-            NativeQuil::assume_native_quil(String::from(quil))
+            NativeQuil::assume_native_quil(quil.to_string())
         };
 
         let program =
@@ -112,34 +119,41 @@ impl<'a> Execution<'a> {
     /// Run on a real QPU and wait for the results.
     pub(crate) async fn run(
         &mut self,
-        params: &Parameters<'_>,
+        params: &Parameters,
         readouts: &[&str],
         config: &Configuration,
     ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
         let qcs = self.refresh_qcs(readouts, config).await?;
+        let qcs_for_thread = qcs.clone();
 
-        let result = self
+        let patch_values = self
             .get_substitutions(params)
-            .map_err(|e| Error::Quil(e.wrap_err("When setting provided parameters")))
-            .and_then(|patch_values| {
-                execute(&qcs.executable, &qcs.engagement, &patch_values).map_err(|e| Error::Qcs {
-                    source: e.wrap_err("When executing program."),
-                    retry_after: None,
-                })
-            })
-            .and_then(|buffers| {
-                process_buffers(buffers, &qcs.buffer_names)
-                    .wrap_err("When processing execution results")
-                    .map_err(Error::from)
-            })
-            .and_then(|registers| {
-                ExecutionResult::try_from_registers(registers, self.shots)
-                    .wrap_err("When decoding execution results")
-                    .map_err(Error::from)
-            });
+            .map_err(|e| Error::Quil(e.wrap_err("When setting provided parameters")))?;
 
-        self.qcs = Some(qcs);
-        result
+        let buffers = spawn_blocking(move || {
+            execute(
+                &qcs_for_thread.executable,
+                &qcs_for_thread.engagement,
+                &patch_values,
+            )
+            .map_err(|e| Error::Qcs {
+                source: e.wrap_err("While executing"),
+                retry_after: None,
+            })
+        })
+        .await
+        .map_err(|_| Error::Qcs {
+            source: eyre!("Execution thread did not complete."),
+            retry_after: None,
+        })??;
+
+        let registers = process_buffers(buffers, &qcs.buffer_names)
+            .wrap_err("When processing execution results")
+            .map_err(Error::from)?;
+
+        ExecutionResult::try_from_registers(registers, self.shots)
+            .wrap_err("When decoding execution results")
+            .map_err(Error::from)
     }
 
     /// Take or create a [`Qcs`] for this [`Execution`]. This fetches / updates engagements, builds
@@ -149,9 +163,9 @@ impl<'a> Execution<'a> {
         &mut self,
         readouts: &[&str],
         config: &Configuration,
-    ) -> Result<Qcs, Error> {
-        if let Some(qcs) = self.qcs.take() {
-            return Ok(qcs);
+    ) -> Result<Arc<Qcs>, Error> {
+        if let Some(qcs) = &self.qcs {
+            return Ok(qcs.clone());
         }
 
         let response = build_executable(
@@ -183,11 +197,13 @@ impl<'a> Execution<'a> {
                     retry_after: None,
                 },
             })?;
-        Ok(Qcs {
+        let qcs = Arc::new(Qcs {
             buffer_names,
             engagement,
             executable: response.program,
-        })
+        });
+        self.qcs = Some(qcs.clone());
+        Ok(qcs)
     }
 
     /// Take the user-provided map of [`Parameters`] and produce the map of substitutions which
@@ -219,18 +235,19 @@ impl<'a> Execution<'a> {
     /// Because QPUs do not evaluate expressions themselves. This function creates the values for
     /// `__SUBST` by calculating the original expressions given the user-provided params (in this
     /// case just `theta`).
-    fn get_substitutions<'params>(
-        &self,
-        params: &'params Parameters,
-    ) -> Result<Parameters<'params>> {
-        let mut patch_values = params.clone();
+    fn get_substitutions(&self, params: &Parameters) -> Result<Parameters> {
+        // Convert into the format that quil-rs expects.
+        let params: HashMap<&str, Vec<f64>> = params
+            .iter()
+            .map(|(key, value)| (key.as_ref(), value.clone()))
+            .collect();
         let values = self
             .program
             .substitutions
             .iter()
             .map(|substitution: &Expression| {
                 substitution
-                    .evaluate(&HashMap::new(), params)
+                    .evaluate(&HashMap::new(), &params)
                     .map_err(|_| eyre!("Could not evaluate expression {}", substitution))
                     .and_then(|complex| {
                         if complex.im == 0.0 {
@@ -243,7 +260,12 @@ impl<'a> Execution<'a> {
                     })
             })
             .collect::<Result<Vec<f64>>>()?;
-        patch_values.insert(SUBSTITUTION_NAME, values);
+        // Convert back to the format that this library expects
+        let mut patch_values: Parameters = params
+            .into_iter()
+            .map(|(key, value)| (key.into(), value))
+            .collect();
+        patch_values.insert(SUBSTITUTION_NAME.into(), values);
         Ok(patch_values)
     }
 }

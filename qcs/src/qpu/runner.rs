@@ -60,7 +60,7 @@ struct QPUParams<'request> {
 }
 
 impl<'request> QPUParams<'request> {
-    fn from_program(program: &'request str, patch_values: PatchValues<'request>) -> Self {
+    fn from_program(program: &'request str, patch_values: &'request Parameters) -> Self {
         Self {
             request: QPURequest::from_program(program, patch_values),
             priority: 1,
@@ -74,18 +74,16 @@ impl<'params> From<&'params QPUParams<'params>> for RPCRequest<'params, QPUParam
     }
 }
 
-type PatchValues<'request> = &'request HashMap<&'request str, Vec<f64>>;
-
 #[derive(Serialize, Debug)]
 #[serde(tag = "_type")]
 struct QPURequest<'request> {
     id: String,
     program: &'request str,
-    patch_values: PatchValues<'request>,
+    patch_values: &'request Parameters,
 }
 
 impl<'request> QPURequest<'request> {
-    fn from_program(program: &'request str, patch_values: PatchValues<'request>) -> Self {
+    fn from_program(program: &'request str, patch_values: &'request Parameters) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
             program,
