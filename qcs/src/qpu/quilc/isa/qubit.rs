@@ -295,7 +295,7 @@ mod describe_rz_gates {
         let expected = vec![Operator::Gate {
             arguments: Arguments::Int(1),
             duration: 0.01,
-            fidelity: 0.9968326091766357,
+            fidelity: 1.0,
             operator: "RZ",
             parameters: Parameters::Underscore,
         }];
