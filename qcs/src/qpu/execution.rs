@@ -98,7 +98,7 @@ impl<'a> Execution<'a> {
                     .wrap_err("When attempting to compile your program to Native Quil")
             })
             .await
-            .map_err(|_| eyre!("Error in quilc thread."))??
+            .map_err(|_| eyre!("Task running quilc did not complete."))??
         } else {
             trace!("Skipping conversion to Native Quil");
             NativeQuil::assume_native_quil(quil.to_string())
