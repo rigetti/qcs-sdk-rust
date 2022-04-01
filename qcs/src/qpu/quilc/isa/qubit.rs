@@ -61,7 +61,7 @@ impl Qubit {
         let benchmarks = Benchmarks::try_from(benchmarks)?;
         let operators = match op_name {
             "RX" => rx_gates(self.id, benchmarks.frb_sim_1q)?,
-            "RZ" => rz_gates(self.id, benchmarks.frb_sim_1q)?,
+            "RZ" => rz_gates(self.id),
             "MEASURE" => measure(self.id, characteristics),
             "WILDCARD" => wildcard(self.id),
             "I" | "RESET" => vec![],
@@ -244,17 +244,14 @@ mod describe_rx_gates {
     }
 }
 
-fn rz_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>> {
-    let fidelity = fidelity(frb_sim_1q, node_id)
-        .wrap_err_with(|| format!("While adding RZ gate to Qubit {}", node_id))?;
-
-    Ok(vec![Operator::Gate {
+fn rz_gates(node_id: i32) -> Vec<Operator> {
+    vec![Operator::Gate {
         operator: "RZ",
         parameters: Parameters::Underscore,
-        fidelity,
+        fidelity: PERFECT_FIDELITY,
         duration: PERFECT_DURATION,
         arguments: Arguments::Int(node_id),
-    }])
+    }]
 }
 
 #[cfg(test)]
@@ -294,11 +291,11 @@ mod describe_rz_gates {
                 node_ids: vec![0, 1],
             }],
         };
-        let gates = rz_gates(node_id, &frb_sim_1q).expect("Failed to create RZ gates");
+        let gates = rz_gates(node_id);
         let expected = vec![Operator::Gate {
             arguments: Arguments::Int(1),
             duration: 0.01,
-            fidelity: 0.9968326091766357,
+            fidelity: 1.0,
             operator: "RZ",
             parameters: Parameters::Underscore,
         }];
