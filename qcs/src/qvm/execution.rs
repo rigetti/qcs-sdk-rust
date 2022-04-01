@@ -58,7 +58,7 @@ impl Execution {
         &mut self,
         shots: u16,
         readouts: &[&str],
-        params: &Parameters<'_>,
+        params: &Parameters,
         config: &Configuration,
     ) -> Result<HashMap<Box<str>, ExecutionResult>> {
         if shots == 0 {
@@ -69,7 +69,7 @@ impl Execution {
 
         let mut instruction_count = 0;
         for (name, values) in params {
-            match memory.get(*name) {
+            match memory.get(name.as_ref()) {
                 Some(region) => {
                     if region.size.length != values.len() as u64 {
                         return Err(eyre!(
@@ -89,7 +89,7 @@ impl Execution {
                     0,
                     Instruction::Move(Move {
                         destination: ArithmeticOperand::MemoryReference(MemoryReference {
-                            name: String::from(*name),
+                            name: name.to_string(),
                             index: index as u64,
                         }),
                         source: ArithmeticOperand::LiteralReal(*value),
@@ -139,16 +139,14 @@ impl Execution {
 
 #[cfg(test)]
 mod describe_execution {
-    use std::collections::HashMap;
-
-    use super::*;
+    use super::{Configuration, Execution, Parameters};
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
         let mut exe = Execution::new("DECLARE ro BIT").unwrap();
 
-        let mut params = HashMap::new();
-        params.insert("doesnt_exist", vec![0.0]);
+        let mut params = Parameters::new();
+        params.insert("doesnt_exist".into(), vec![0.0]);
 
         let result = exe.run(1, &[], &params, &Configuration::default()).await;
         if let Err(e) = result {
@@ -162,15 +160,15 @@ mod describe_execution {
     async fn it_errors_when_any_param_is_the_wrong_size() {
         let mut exe = Execution::new("DECLARE ro BIT[2]").unwrap();
 
-        let mut params = HashMap::new();
-        params.insert("ro", vec![0.0]);
+        let mut params = Parameters::new();
+        params.insert("ro".into(), vec![0.0]);
 
         let result = exe.run(1, &[], &params, &Configuration::default()).await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));
-            assert!(err_string.contains("1"));
-            assert!(err_string.contains("2"));
+            assert!(err_string.contains('1'));
+            assert!(err_string.contains('2'));
         } else {
             panic!("Expected an error but got none.");
         }

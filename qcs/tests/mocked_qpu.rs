@@ -43,6 +43,7 @@ async fn setup() {
     tokio::spawn(mock_qcs::run());
 }
 
+#[allow(dead_code)]
 mod auth_server {
     use serde::{Deserialize, Serialize};
     use warp::Filter;
@@ -74,6 +75,7 @@ mod auth_server {
     }
 }
 
+#[allow(dead_code)]
 mod mock_qcs {
     use serde::{Deserialize, Serialize};
     use warp::Filter;
@@ -157,6 +159,7 @@ mod mock_qcs {
     }
 }
 
+#[allow(dead_code)]
 mod qpu {
     use std::collections::HashMap;
 

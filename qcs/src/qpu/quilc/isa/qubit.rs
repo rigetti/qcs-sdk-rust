@@ -256,41 +256,12 @@ fn rz_gates(node_id: i32) -> Vec<Operator> {
 
 #[cfg(test)]
 mod describe_rz_gates {
-    use qcs_api::models::OperationSite;
-
-    use super::*;
+    use super::{rz_gates, Arguments, Operator, Parameters};
 
     /// This data is copied from the pyQuil ISA integration test.
     #[test]
     fn it_passes_the_pyquil_aspen_8_test() {
         let node_id = 1;
-        let frb_sim_1q = Operation {
-            characteristics: vec![],
-            name: "randomized_benchmark_simultaneous_1q".to_string(),
-            node_count: Some(30),
-            parameters: vec![],
-            sites: vec![OperationSite {
-                characteristics: vec![
-                    Characteristic {
-                        name: "fRB".to_string(),
-                        value: 0.989821537688075,
-                        error: Some(0.000699235456806402),
-                        node_ids: Some(vec![0]),
-                        parameter_values: None,
-                        timestamp: "1970-01-01T00:00:00+00:00".to_string(),
-                    },
-                    Characteristic {
-                        name: "fRB".to_string(),
-                        value: 0.996832638579018,
-                        error: Some(0.00010089678215399),
-                        node_ids: Some(vec![1]),
-                        timestamp: "1970-01-01T00:00:00+00:00".to_string(),
-                        parameter_values: None,
-                    },
-                ],
-                node_ids: vec![0, 1],
-            }],
-        };
         let gates = rz_gates(node_id);
         let expected = vec![Operator::Gate {
             arguments: Arguments::Int(1),
