@@ -1,21 +1,24 @@
 use std::collections::HashMap;
 
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
+
+use crate::configuration::LoadError;
 
 use super::path::path_from_env_or_home;
 
 /// Setting this environment variable will change which file is used for loading secrets
 pub const SECRETS_PATH_VAR: &str = "QCS_SECRETS_FILE_PATH";
 
-pub(crate) async fn load() -> Result<Secrets> {
-    let path = path_from_env_or_home(SECRETS_PATH_VAR, "secrets.toml")
-        .wrap_err("When determining secrets config path")?;
-    let content = tokio::fs::read_to_string(&path)
-        .await
-        .wrap_err_with(|| format!("While reading secrets from {}", path.to_string_lossy()))?;
-    Ok(toml::from_str(&content)
-        .wrap_err_with(|| format!("While parsing secrets from {}", path.to_string_lossy()))?)
+pub(crate) async fn load() -> Result<Secrets, LoadError> {
+    let path = path_from_env_or_home(SECRETS_PATH_VAR, "secrets.toml")?;
+    let content =
+        tokio::fs::read_to_string(&path)
+            .await
+            .map_err(|source| LoadError::FileOpenError {
+                path: path.clone(),
+                source,
+            })?;
+    toml::from_str(&content).map_err(|source| LoadError::FileParseError { path, source })
 }
 
 #[cfg(test)]

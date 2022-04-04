@@ -1,10 +1,10 @@
+use std::collections::HashMap;
+
 use enum_as_inner::EnumAsInner;
-use eyre::{eyre, Result, WrapErr};
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 
-use crate::qpu::Register;
-use std::collections::HashMap;
+use crate::qpu::{DecodeError, Register};
 
 /// Data resulting from [`Executable::execute_on_qvm`][`crate::Executable::execute_on_qvm`] or
 /// [`Executable::execute_on_qpu`][`crate::Executable::execute_on_qpu`].
@@ -40,16 +40,13 @@ impl ExecutionResult {
     pub(crate) fn try_from_registers(
         registers_by_name: HashMap<Box<str>, Vec<Register>>,
         shots: u16,
-    ) -> Result<HashMap<Box<str>, Self>> {
+    ) -> Result<HashMap<Box<str>, Self>, DecodeError> {
         registers_by_name
             .into_iter()
             .map(|(register_name, registers)| {
-                if registers.is_empty() {
-                    return Err(eyre!(
-                        "No data received for register, did you forget to MEASURE to it?"
-                    ));
-                }
-                let first_register = registers.get(0).expect("Length checked above");
+                let first_register = registers
+                    .get(0)
+                    .ok_or_else(|| DecodeError::MissingBuffer(register_name.to_string()))?;
                 match first_register {
                     Register::I8(_) => Self::try_from_i8_registers(registers, shots),
                     Register::I16(_) => Self::try_from_i16_registers(registers, shots),
@@ -61,32 +58,38 @@ impl ExecutionResult {
             .collect()
     }
 
-    fn try_from_i8_registers(registers: Vec<Register>, number_of_shots: u16) -> Result<Self> {
+    fn try_from_i8_registers(
+        registers: Vec<Register>,
+        number_of_shots: u16,
+    ) -> Result<Self, DecodeError> {
         let registers = registers
             .into_iter()
-            .map(|register| register.into_i8().map_err(|_| eyre!("Cannot convert")))
-            .collect::<Result<Vec<Vec<i8>>>>()
-            .wrap_err("One or more registers had the wrong type")?;
+            .map(|register| register.into_i8().map_err(|_| DecodeError::MixedTypes))
+            .collect::<Result<Vec<Vec<i8>>, DecodeError>>()?;
 
         Ok(Self::I8(transpose(registers, number_of_shots)))
     }
 
-    fn try_from_i16_registers(registers: Vec<Register>, number_of_shots: u16) -> Result<Self> {
+    fn try_from_i16_registers(
+        registers: Vec<Register>,
+        number_of_shots: u16,
+    ) -> Result<Self, DecodeError> {
         let registers = registers
             .into_iter()
-            .map(|register| register.into_i16().map_err(|_| eyre!("Cannot convert")))
-            .collect::<Result<Vec<Vec<i16>>>>()
-            .wrap_err("One or more registers had the wrong type")?;
+            .map(|register| register.into_i16().map_err(|_| DecodeError::MixedTypes))
+            .collect::<Result<Vec<Vec<i16>>, DecodeError>>()?;
 
         Ok(Self::I16(transpose(registers, number_of_shots)))
     }
 
-    fn try_from_f64_registers(registers: Vec<Register>, number_of_shots: u16) -> Result<Self> {
+    fn try_from_f64_registers(
+        registers: Vec<Register>,
+        number_of_shots: u16,
+    ) -> Result<Self, DecodeError> {
         let registers = registers
             .into_iter()
-            .map(|register| register.into_f64().map_err(|_| eyre!("Cannot convert")))
-            .collect::<Result<Vec<Vec<f64>>>>()
-            .wrap_err("One or more registers had the wrong type")?;
+            .map(|register| register.into_f64().map_err(|_| DecodeError::MixedTypes))
+            .collect::<Result<Vec<Vec<f64>>, DecodeError>>()?;
 
         Ok(Self::F64(transpose(registers, number_of_shots)))
     }
@@ -94,16 +97,15 @@ impl ExecutionResult {
     fn try_from_complex32_registers(
         registers: Vec<Register>,
         number_of_shots: u16,
-    ) -> Result<Self> {
+    ) -> Result<Self, DecodeError> {
         let registers = registers
             .into_iter()
             .map(|register| {
                 register
                     .into_complex32()
-                    .map_err(|_| eyre!("Cannot convert"))
+                    .map_err(|_| DecodeError::MixedTypes)
             })
-            .collect::<Result<Vec<Vec<Complex32>>>>()
-            .wrap_err("One or more registers had the wrong type")?;
+            .collect::<Result<Vec<Vec<Complex32>>, DecodeError>>()?;
 
         Ok(Self::Complex32(transpose(registers, number_of_shots)))
     }
@@ -124,9 +126,9 @@ fn transpose<T>(mut data: Vec<Vec<T>>, len: u16) -> Vec<Vec<T>> {
 
 #[cfg(test)]
 mod describe_program_results {
-    use super::*;
-
     use maplit::hashmap;
+
+    use super::*;
 
     #[test]
     fn it_converts_from_i8_registers() {

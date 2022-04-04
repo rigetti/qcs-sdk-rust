@@ -9,7 +9,8 @@
 //! can set the [`PROFILE_NAME_VAR`] to select a different profile. You can also use
 //! [`SECRETS_PATH_VAR`] and [`SETTINGS_PATH_VAR`] to change which files are loaded.
 
-use eyre::{eyre, Result, WrapErr};
+use std::path::PathBuf;
+
 use futures::future::try_join;
 use serde::{Deserialize, Serialize};
 
@@ -18,6 +19,8 @@ use secrets::Secrets;
 pub use secrets::SECRETS_PATH_VAR;
 pub use settings::SETTINGS_PATH_VAR;
 use settings::{AuthServer, Pyquil, Settings};
+
+use crate::configuration::LoadError::AuthServerNotFound;
 
 mod path;
 mod secrets;
@@ -36,14 +39,42 @@ pub(crate) struct Configuration {
 /// Setting this environment variable will change which profile is used from the loaded config files
 pub const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
 
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum RefreshError {
+    #[error("No refresh token is in secrets")]
+    NoRefreshToken,
+    #[error("Error fetching new token")]
+    FetchError(#[from] reqwest::Error),
+}
+
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum LoadError {
+    #[error("Expected profile {0} in settings.profiles but it didn't exist")]
+    ProfileNotFound(String),
+    #[error("Expected auth server {0} in settings.auth_servers but it didn't exist")]
+    AuthServerNotFound(String),
+    #[error("Failed to determine home directory. You can use an explicit path by setting the {env} environment variable")]
+    HomeDirError { env: String },
+    #[error("Could not open file at {path}")]
+    FileOpenError {
+        path: PathBuf,
+        source: std::io::Error,
+    },
+    #[error("Could not parse file at {path}")]
+    FileParseError {
+        path: PathBuf,
+        source: toml::de::Error,
+    },
+}
+
 impl Configuration {
     /// Attempt to load config files from ~/.qcs and create a Configuration object
     /// for use with qcs-api.
     ///
     /// # Errors
-    /// Errors are human-readable (using eyre) since generally they aren't recoverable at runtime.
-    /// Usually this function will error if one of the config files is missing or malformed.
-    pub(crate) async fn load() -> Result<Self> {
+    ///
+    /// See [`LoadError`].
+    pub(crate) async fn load() -> Result<Self, LoadError> {
         let (settings, secrets) = try_join(settings::load(), secrets::load()).await?;
         Self::new(settings, secrets)
     }
@@ -52,13 +83,9 @@ impl Configuration {
     ///
     /// # Errors
     ///
-    /// 1. There is no `refresh_token` set, so no new `access_token` can be fetched.
-    /// 2. Could not reach the configured auth server.
-    /// 3. The response from the auth server was invalid.
-    pub(crate) async fn refresh(mut self) -> Result<Self> {
-        let refresh_token = self
-            .refresh_token
-            .ok_or_else(|| eyre!("No refresh token is in secrets"))?;
+    /// See [`RefreshError`].
+    pub(crate) async fn refresh(mut self) -> Result<Self, RefreshError> {
+        let refresh_token = self.refresh_token.ok_or(RefreshError::NoRefreshToken)?;
         let token_url = format!("{}/v1/token", &self.auth_server.issuer);
         let data = TokenRequest::new(&self.auth_server.client_id, &refresh_token);
         let resp = self
@@ -67,39 +94,26 @@ impl Configuration {
             .post(token_url)
             .form(&data)
             .send()
-            .await
-            .wrap_err("While requesting a new access token using refresh token")?;
-        let response_data: TokenResponse = resp
-            .error_for_status()?
-            .json()
-            .await
-            .wrap_err("While decoding response from auth server")?;
+            .await?;
+        let response_data: TokenResponse = resp.error_for_status()?.json().await?;
         self.api_config.bearer_access_token = Some(response_data.access_token);
         self.refresh_token = Some(response_data.refresh_token);
         Ok(self)
     }
 
-    fn new(settings: Settings, mut secrets: Secrets) -> Result<Self> {
+    fn new(settings: Settings, mut secrets: Secrets) -> Result<Self, LoadError> {
         let Settings {
             default_profile_name,
             mut profiles,
             mut auth_servers,
         } = settings;
         let profile_name = std::env::var(PROFILE_NAME_VAR).unwrap_or(default_profile_name);
-        let profile = profiles.remove(&profile_name).ok_or_else(|| {
-            eyre!(
-                "Expected profile {} in settings.profiles but it didn't exist",
-                profile_name
-            )
-        })?;
+        let profile = profiles
+            .remove(&profile_name)
+            .ok_or(LoadError::ProfileNotFound(profile_name))?;
         let auth_server = auth_servers
             .remove(&profile.auth_server_name)
-            .ok_or_else(|| {
-                eyre!(
-                    "Expected auth server {} in settings.auth_servers but it didn't exist",
-                    &profile.auth_server_name
-                )
-            })?;
+            .ok_or_else(|| AuthServerNotFound(profile.auth_server_name.clone()))?;
 
         let credential = secrets.credentials.remove(&profile.credentials_name);
         let (access_token, refresh_token) = match credential {

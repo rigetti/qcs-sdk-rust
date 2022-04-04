@@ -1,6 +1,5 @@
 use std::convert::TryFrom;
 
-use eyre::{eyre, Report, Result};
 use indexmap::set::IndexSet;
 use num::complex::Complex64;
 use quil_rs::{
@@ -47,7 +46,7 @@ use crate::qpu::quilc::NativeQuilProgram;
 /// where `__SUBST[0]` will be recalculated for each parameter set that is run and passed as a
 /// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
-pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions)> {
+pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
     let mut substitutions = Substitutions::new();
     let Program {
         calibrations,
@@ -60,7 +59,7 @@ pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitut
     let instructions = instructions
         .into_iter()
         .map(|instruction| process_instruction(instruction, &mut substitutions, &frames))
-        .collect::<Result<Vec<Instruction>>>()?;
+        .collect::<Result<Vec<Instruction>, Error>>()?;
 
     if !substitutions.is_empty() {
         memory_regions.insert(
@@ -87,13 +86,24 @@ pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitut
     ))
 }
 
+/// All of the errors that can occur in this module.
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("No DEFFRAME for {0}")]
+    MissingDefFrame(String),
+    #[error("Unable to use SAMPLE-RATE {sample_rate} for frame {frame}")]
+    InvalidSampleRate { sample_rate: String, frame: String },
+    #[error("SAMPLE-RATE is required for frame {0}")]
+    MissingSampleRate(String),
+}
+
 pub(crate) const SUBSTITUTION_NAME: &str = "__SUBST";
 
 fn process_instruction(
     instruction: Instruction,
     substitutions: &mut Substitutions,
     frames: &FrameSet,
-) -> Result<Instruction> {
+) -> Result<Instruction, Error> {
     match instruction {
         Instruction::Gate(gate) => Ok(process_gate(gate, substitutions)),
         Instruction::SetScale(set_scale) => Ok(process_set_scale(set_scale, substitutions)),
@@ -188,25 +198,24 @@ fn process_frequency_expression(
     frame: &FrameIdentifier,
     frames: &FrameSet,
     substitutions: &mut Substitutions,
-) -> Result<Expression> {
+) -> Result<Expression, Error> {
     expression = expression.simplify();
     if matches!(expression, Expression::Number(_)) {
         return Ok(expression);
     }
     let attributes = frames
         .get(frame)
-        .ok_or_else(|| eyre!("No DEFFRAME for {}", frame))?;
+        .ok_or_else(|| Error::MissingDefFrame(frame.name.clone()))?;
     let sample_rate = match attributes.get("SAMPLE-RATE") {
         Some(AttributeValue::Expression(expression)) => expression,
-        Some(other) => {
-            return Err(eyre!(
-                "Unable to use SAMPLE-RATE {} for frame {}",
-                other,
-                frame
-            ));
+        Some(AttributeValue::String(sample_rate)) => {
+            return Err(Error::InvalidSampleRate {
+                sample_rate: sample_rate.clone(),
+                frame: frame.name.clone(),
+            });
         }
         None => {
-            return Err(eyre!("SAMPLE-RATE is required for frame {}", frame));
+            return Err(Error::MissingSampleRate(frame.name.clone()));
         }
     };
     if let Some(AttributeValue::Expression(center_frequency)) = attributes.get("CENTER-FREQUENCY") {
@@ -263,9 +272,9 @@ impl From<RewrittenQuil> for String {
 }
 
 impl TryFrom<NativeQuilProgram> for RewrittenProgram {
-    type Error = Report;
+    type Error = Error;
 
-    fn try_from(program: NativeQuilProgram) -> Result<Self> {
+    fn try_from(program: NativeQuilProgram) -> Result<Self, Self::Error> {
         let (inner, substitutions) = rewrite_arithmetic(program.into())?;
         Ok(Self {
             inner,
