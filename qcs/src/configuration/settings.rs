@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use super::path::path_from_env_or_home;
 use super::LoadError;
 
-/// Setting this environment variable will change which file is used for loading settings
+/// Setting the `QCS_SETTINGS_FILE_PATH` environment variable will change which file is used for loading settings
 pub const SETTINGS_PATH_VAR: &str = "QCS_SETTINGS_FILE_PATH";
 
 pub(crate) async fn load() -> Result<Settings, LoadError> {

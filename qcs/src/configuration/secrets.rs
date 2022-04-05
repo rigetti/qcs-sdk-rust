@@ -6,7 +6,7 @@ use crate::configuration::LoadError;
 
 use super::path::path_from_env_or_home;
 
-/// Setting this environment variable will change which file is used for loading secrets
+/// Setting the `QCS_SECRETS_FILE_PATH` environment variable will change which file is used for loading secrets
 pub const SECRETS_PATH_VAR: &str = "QCS_SECRETS_FILE_PATH";
 
 pub(crate) async fn load() -> Result<Secrets, LoadError> {
