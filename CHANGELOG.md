@@ -1,3 +1,18 @@
+## [0.2.0](https://github.com/rigetti/qcs-sdk-rust/compare/v0.1.1...v0.2.0) (2022-04-05)
+
+### Breaking Changes
+
+- Changed the error types returned from all fallible public functions. (#63)
+
+### Features
+
+- Return more detailed error types from all fallible functions. (#63)
+
+### Fixes
+
+- Sync RZ fidelity with pyQuil implementation. (#60)
+- Stop blocking the async runtime when connecting to quilc or a QPU. (#61)
+
 ## [0.1.1](https://github.com/rigetti/qcs-sdk-rust/compare/v0.1.0...v0.1.1) (2022-03-23)
 
 ### Features
