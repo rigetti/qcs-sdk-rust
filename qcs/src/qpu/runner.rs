@@ -55,8 +55,8 @@ pub(crate) fn execute(
 pub(crate) enum Error {
     #[error("Error connecting to the QPU")]
     Connection(#[source] RPCQError),
-    #[error("A bug in this library")]
-    Bug(#[source] RPCQError),
+    #[error("An error not expected to occur—if encountered it may indicate bug in this library")]
+    Unexpected(#[source] RPCQError),
     #[error("An error was returned from the QPU: {0}")]
     Qpu(String),
 }
@@ -69,7 +69,7 @@ impl From<RPCQError> for Error {
             | RPCQError::ResponseIdMismatch => Self::Connection(err),
             RPCQError::AuthSetup(_)
             | RPCQError::Serialization(_)
-            | RPCQError::Deserialization(_) => Self::Bug(err),
+            | RPCQError::Deserialization(_) => Self::Unexpected(err),
             RPCQError::Response(message) => Self::Qpu(message),
         }
     }

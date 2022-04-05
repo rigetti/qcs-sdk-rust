@@ -464,7 +464,7 @@ impl From<qpu::ExecutionError> for Error {
             ExecutionError::Unauthorized => Self::Authentication,
             ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
             ExecutionError::Quil(message) => Self::Compilation(message),
-            ExecutionError::Bug(inner) => Self::Unexpected(format!("{:?}", inner)),
+            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::Qcs(message) => Self::Unexpected(message),
         }

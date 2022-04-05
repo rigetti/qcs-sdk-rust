@@ -48,8 +48,8 @@ pub(crate) enum Error {
     Qcs(String),
     #[error("problem processing the provided Quil: {0}")]
     Quil(String),
-    #[error("An error likely caused by a bug in this library or QCS")]
-    Bug(#[from] Bug),
+    #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
+    Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
 }
@@ -57,7 +57,7 @@ pub(crate) enum Error {
 impl From<quilc::Error> for Error {
     fn from(source: quilc::Error) -> Self {
         match source {
-            quilc::Error::Isa(source) => Self::Bug(Bug::Isa(format!("{:?}", source))),
+            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{:?}", source))),
             quilc::Error::QuilcConnection(uri, details) => Self::Quilc {
                 uri,
                 details: format!("{:?}", details),
@@ -77,7 +77,9 @@ impl From<engagement::Error> for Error {
             engagement::Error::Connection(_) => Self::QcsCommunication,
             engagement::Error::Schema(_)
             | engagement::Error::Unknown(_)
-            | engagement::Error::Internal(_) => Self::Bug(Bug::Qcs(format!("{:?}", source))),
+            | engagement::Error::Internal(_) => {
+                Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
+            }
         }
     }
 }
@@ -86,16 +88,18 @@ impl From<runner::Error> for Error {
     fn from(source: runner::Error) -> Self {
         match source {
             runner::Error::Connection(_) => Self::QcsCommunication,
-            runner::Error::Bug(err) => Self::Bug(Bug::Qcs(format!("{:?}", err))),
+            runner::Error::Unexpected(err) => {
+                Self::Unexpected(Unexpected::Qcs(format!("{:?}", err)))
+            }
             runner::Error::Qpu(err) => Self::Qcs(err),
         }
     }
 }
 
-/// Errors that are likely due to bugs in this library or QCS.
+/// Errors that are not expected to be returned—if they show up, it may be a bug in this library.
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Bug {
-    #[error("Task running {task_name} did not complete. This is likely a bug.")]
+pub(crate) enum Unexpected {
+    #[error("Task running {task_name} did not complete.")]
     TaskError {
         task_name: &'static str,
         source: JoinError,
@@ -111,7 +115,9 @@ impl From<qpu::IsaError> for Error {
         match source {
             IsaError::QpuNotFound => Self::QpuNotFound,
             IsaError::Unauthorized => Self::Unauthorized,
-            IsaError::QcsError(source) => Self::Bug(Bug::Qcs(format!("{:?}", source))),
+            IsaError::QcsError(source) => {
+                Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
+            }
             IsaError::QcsCommunicationError(_) => Self::QcsCommunication,
         }
     }
@@ -122,10 +128,12 @@ impl From<TranslationError> for Error {
         match source {
             TranslationError::ProgramIssue(inner) => Self::Quil(format!("{:?}", inner)),
             TranslationError::Connection(_) => Self::QcsCommunication,
-            TranslationError::SerializationBug(inner) => {
-                Self::Bug(Bug::Qcs(format!("{:?}", inner)))
+            TranslationError::Serialization(inner) => {
+                Self::Unexpected(Unexpected::Qcs(format!("{:?}", inner)))
             }
-            TranslationError::Unknown(inner) => Self::Bug(Bug::Qcs(format!("{:?}", inner))),
+            TranslationError::Unknown(inner) => {
+                Self::Unexpected(Unexpected::Qcs(format!("{:?}", inner)))
+            }
             TranslationError::Unauthorized => Self::Unauthorized,
         }
     }
@@ -133,7 +141,7 @@ impl From<TranslationError> for Error {
 
 impl From<DecodeError> for Error {
     fn from(source: DecodeError) -> Self {
-        Self::Bug(Bug::Qcs(format!("{:?}", source)))
+        Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
     }
 }
 
@@ -183,7 +191,7 @@ impl<'a> Execution<'a> {
             spawn_blocking(move || quilc::compile_program(&quil, isa, &thread_config))
                 .await
                 .map_err(|source| {
-                    Error::Bug(Bug::TaskError {
+                    Error::Unexpected(Unexpected::TaskError {
                         task_name: "quilc",
                         source,
                     })
@@ -226,7 +234,7 @@ impl<'a> Execution<'a> {
             .map_err(Error::from)
         })
         .await
-        .map_err(|source| Bug::TaskError {
+        .map_err(|source| Unexpected::TaskError {
             task_name: "qpu",
             source,
         })??;

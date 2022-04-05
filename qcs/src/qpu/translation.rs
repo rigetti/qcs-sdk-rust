@@ -41,7 +41,7 @@ pub(crate) enum Error {
     #[error("Problem connecting to QCS")]
     Connection(#[source] ApiError),
     #[error("Serialization failed, this is likely a bug in this library")]
-    SerializationBug(#[from] serde_json::Error),
+    Serialization(#[from] serde_json::Error),
     #[error("Unauthorized request")]
     Unauthorized,
     #[error("An unknown error occurred, this is likely a bug in this library: {0}")]
