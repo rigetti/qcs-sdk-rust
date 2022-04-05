@@ -1,21 +1,23 @@
 use std::collections::HashMap;
 
-use eyre::{Result, WrapErr};
 use serde::{Deserialize, Serialize};
 
 use super::path::path_from_env_or_home;
+use super::LoadError;
 
-/// Setting this environment variable will change which file is used for loading settings
+/// Setting the `QCS_SETTINGS_FILE_PATH` environment variable will change which file is used for loading settings
 pub const SETTINGS_PATH_VAR: &str = "QCS_SETTINGS_FILE_PATH";
 
-pub(crate) async fn load() -> Result<Settings> {
-    let path = path_from_env_or_home(SETTINGS_PATH_VAR, "settings.toml")
-        .wrap_err("When determining settings config path")?;
-    let content = tokio::fs::read_to_string(&path)
-        .await
-        .wrap_err_with(|| format!("When reading settings from {}", path.to_string_lossy()))?;
-    Ok(toml::from_str(&content)
-        .wrap_err_with(|| format!("When parsing settings from {}", path.to_string_lossy()))?)
+pub(crate) async fn load() -> Result<Settings, LoadError> {
+    let path = path_from_env_or_home(SETTINGS_PATH_VAR, "settings.toml")?;
+    let content =
+        tokio::fs::read_to_string(&path)
+            .await
+            .map_err(|source| LoadError::FileOpenError {
+                path: path.clone(),
+                source,
+            })?;
+    toml::from_str(&content).map_err(|source| LoadError::FileParseError { path, source })
 }
 
 #[cfg(test)]

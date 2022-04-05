@@ -5,9 +5,8 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
-use eyre::{eyre, Report, Result, WrapErr};
-
-use crate::configuration::Configuration;
+use crate::configuration::{Configuration, LoadError, RefreshError};
+use crate::qpu::ExecutionError;
 use crate::{qpu, qvm, ExecutionResult};
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
@@ -247,20 +246,9 @@ impl Executable<'_, '_> {
     ///
     /// # Errors
     ///
-    /// All errors are returned in a human-readable format using [`mod@eyre`] since usually they aren't
-    /// recoverable at runtime and should just be logged for handling manually.
-    ///
-    /// ## QVM Connection Errors
-    ///
-    /// QVM must be running and accessible for this function to succeed. The address can be defined by
-    /// the `<profile>.applications.pyquil.qvm_url` setting in your QCS `settings.toml`. More info on
-    /// configuration [here][`crate::configuration`].
-    ///
-    /// ## Execution Errors
-    ///
-    /// A number of errors could occur if `program` is malformed.
+    /// See [`Error`].
     pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
-        let config = self.get_config().await;
+        let config = self.get_config().await.unwrap_or_default();
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
         } else {
@@ -274,22 +262,19 @@ impl Executable<'_, '_> {
     }
 
     /// Load `self.config` if not yet loaded, then return a reference to it.
-    async fn get_config(&mut self) -> Arc<Configuration> {
+    async fn get_config(&mut self) -> Result<Arc<Configuration>, Error> {
         if let Some(config) = &self.config {
-            config.clone()
+            Ok(config.clone())
         } else {
-            let config = Arc::new(Configuration::load().await.unwrap_or_else(|e| {
-                log::warn!("Got an error when loading config: {:#?}", e);
-                Configuration::default()
-            }));
+            let config = Arc::new(Configuration::load().await?);
             self.config = Some(config.clone());
-            config
+            Ok(config)
         }
     }
 
     /// Refresh `self.config` and return it.
-    async fn refresh_config(&mut self) -> Result<Arc<Configuration>> {
-        let config = self.get_config().await.as_ref().clone();
+    async fn refresh_config(&mut self) -> Result<Arc<Configuration>, Error> {
+        let config = self.get_config().await?.as_ref().clone();
         let refreshed = Arc::new(config.refresh().await?);
         self.config = Some(refreshed.clone());
         Ok(refreshed)
@@ -298,14 +283,17 @@ impl Executable<'_, '_> {
 
 impl<'execution> Executable<'_, 'execution> {
     /// Remove and return `self.qpu` if it's set and still valid. Otherwise, create a new one.
-    async fn qpu_for_id(&mut self, id: &'execution str) -> Result<qpu::Execution<'execution>> {
+    async fn qpu_for_id(
+        &mut self,
+        id: &'execution str,
+    ) -> Result<qpu::Execution<'execution>, Error> {
         if let Some(qpu) = self.qpu.take() {
             if qpu.quantum_processor_id == id && qpu.shots == self.shots {
                 return Ok(qpu);
             }
         }
-        let mut config = self.get_config().await;
-        let result = match qpu::Execution::new(
+        let mut config = self.get_config().await?;
+        match qpu::Execution::new(
             self.quil.clone(),
             self.shots,
             id,
@@ -314,12 +302,9 @@ impl<'execution> Executable<'_, 'execution> {
         )
         .await
         {
-            Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs { .. }) => {
-                config = self
-                    .refresh_config()
-                    .await
-                    .wrap_err("When refreshing authentication token")?;
+            Ok(qpu) => Ok(qpu),
+            Err(ExecutionError::Unauthorized) => {
+                config = self.refresh_config().await?;
                 qpu::Execution::new(
                     self.quil.clone(),
                     self.shots,
@@ -328,10 +313,10 @@ impl<'execution> Executable<'_, 'execution> {
                     self.compile_with_quilc,
                 )
                 .await
+                .map_err(Error::from)
             }
-            err => err,
-        };
-        result.wrap_err_with(|| eyre!("When executing on {}", id))
+            Err(err) => Err(Error::from(err)),
+        }
     }
 
     /// Execute on a real QPU
@@ -362,46 +347,24 @@ impl<'execution> Executable<'_, 'execution> {
     /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
-        let mut config = self.get_config().await;
+        let mut config = self.get_config().await?;
 
         let response = match qpu.run(&self.params, self.get_readouts(), &config).await {
-            Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs {
-                retry_after: None, ..
-            }) => {
-                // If retry_after is set, don't retry now
-                config = self
-                    .refresh_config()
-                    .await
-                    .wrap_err("When refreshing authentication token")?;
+            Ok(response) => Ok(response),
+            Err(ExecutionError::Unauthorized) => {
+                config = self.refresh_config().await?;
                 qpu.run(&self.params, self.get_readouts(), &config).await
             }
-            err => err,
+            Err(err) => Err(err),
         };
 
-        self.qpu = Some(qpu);
-        match response {
-            Ok(result) => Ok(result),
-            Err(qpu::Error::Qcs {
-                source,
-                retry_after,
-            }) => {
-                match retry_after {
-                    Some(duration) => {
-                        // retry_after could mean maintenance which requires recompile
-                        self.qpu = None;
-                        Err(Error::Retry {
-                            source,
-                            after: duration,
-                        })
-                    }
-                    None => Err(source.into()),
-                }
-            }
-            Err(quil_err @ qpu::Error::Quil { .. }) => Err(Error::from(
-                eyre!(quil_err).wrap_err("When compiling for the QPU"),
-            )),
-        }
+        self.qpu = if let Err(ExecutionError::QpuUnavailable(_)) = response {
+            // Could mean maintenance which requires recompile
+            None
+        } else {
+            Some(qpu)
+        };
+        response.map_err(Error::from)
     }
 }
 
@@ -409,17 +372,116 @@ impl<'execution> Executable<'_, 'execution> {
 /// [`Executable::execute_on_qvm`]..
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// An error that is due to a temporary problem and should be retried after `after` [`Duration`].
-    #[error("An error that is due to a temporary problem and should be retried.")]
-    Retry {
-        /// The error itself
-        source: Report,
-        /// The [`Duration`] to wait before retrying
-        after: Duration,
-    },
-    /// An error which is due to a permanent problem and should not be retried.
-    #[error("A fatal error that should not be retried.")]
-    Fatal(#[from] Report),
+    /// Communicating with QCS requires appropriate settings and secrets files. By default, these
+    /// should be `$HOME/.qcs/settings.toml` and `$HOME/.qcs/secrets.toml`, though those files can
+    /// be overridden by setting the `QCS_SETTINGS_FILE_PATH` and `QCS_SECRETS_FILE_PATH`
+    /// environment variables.
+    ///
+    /// This error can occur when one of those files is required but missing or there is a problem
+    /// with the contents of those files.
+    #[error("There was a problem related to your QCS settings: {0}")]
+    Settings(String),
+    /// This error occurs when the SDK was unable to authenticate a request to QCS. This could mean
+    /// that your credentials are invalid or expired, or that you do not have access to the requested
+    /// QPU.
+    #[error("Could not authenticate a request to QCS for the requested QPU.")]
+    Authentication,
+    /// The requested QPU was not found. Either the QPU does not exist or you do not have access to it.
+    #[error("The requested QPU was not found.")]
+    QpuNotFound,
+    /// This happens when the QPU is down for maintenance and not accepting new jobs. If you receive
+    /// this error, internal compilation caches will have been cleared as programs should be recompiled
+    /// with new settings after a maintenance window. If you are mid-experiment, you might want to
+    /// start over.
+    #[error("QPU currently unavailable, retry after {} seconds", .0.as_secs())]
+    QpuUnavailable(Duration),
+    /// Indicates a problem connecting to an external service. Check your network connection and
+    /// ensure that any required local services (e.g., `qvm` or `quilc`) are running.
+    #[error("Error connecting to service {0:?}")]
+    Connection(Service),
+    /// There was some problem with the provided Quil program. This could be a syntax error with
+    /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
+    /// some parameters.
+    #[error("There was a problem compiling the Quil program: {0}")]
+    Compilation(String),
+    /// This error returns when a runtime check that _should_ always pass fails. This most likely
+    /// indicates a bug in the SDK and should be reported to
+    /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
+    #[error("An unexpected error occurred, please open an issue on GitHub: {0:?}")]
+    Unexpected(String),
+}
+
+#[derive(Debug)]
+/// The external services that this SDK may connect to. Used to differentiate between networking
+/// issues in [`Error::Connection`].
+pub enum Service {
+    /// The open source [`quilc`](https://github.com/quil-lang/quilc) compiler.
+    ///
+    /// This compiler must be running before calling [`Executable::execute_on_qpu`] unless the
+    /// [`Executable::compile_with_quilc`] option is set to `false`. By default, it's assumed that
+    /// this is running on `tcp://localhost:5555`, but this can be overridden via
+    /// `[profiles.<profile_name>.applications.pyquil.quilc_url]` in your `.qcs/settings.toml` file.
+    Quilc,
+    /// The open source [`qvm`](https://github.com/quil-lang/qvm) simulator.
+    ///
+    /// This simulator must be running before calling [`Executable::execute_on_qvm`]. By default,
+    /// it's assumed that this is running on `http://localhost:5000`, but this can be overridden via
+    /// `[profiles.<profile_name>.applications.pyquil.qvm_url]` in your `.qcs/settings.toml` file.
+    Qvm,
+    /// The connection to [`QCS`](https://docs.rigetti.com/qcs/), the API for authentication,
+    /// QPU lookup, and translation.
+    ///
+    /// You should be able to reach this service as long as you have a connection to the internet.
+    Qcs,
+    /// The connection to the QPU itself. You can only connect to the QPU from an authorized network
+    /// (like QCS JupyterLab).
+    Qpu,
+}
+
+impl From<LoadError> for Error {
+    fn from(err: LoadError) -> Self {
+        Self::Settings(format!("{}", err))
+    }
+}
+
+impl From<RefreshError> for Error {
+    fn from(err: RefreshError) -> Self {
+        match err {
+            RefreshError::NoRefreshToken => Self::Settings(String::from(
+                "No `refresh_token` was found in your QCS secrets file for the selected profile. \
+                    You can change profiles with the `QCS_PROFILE_NAME` environment variable.",
+            )),
+            RefreshError::FetchError(_) => Self::Authentication,
+        }
+    }
+}
+
+impl From<qpu::ExecutionError> for Error {
+    fn from(err: ExecutionError) -> Self {
+        match err {
+            ExecutionError::QpuNotFound => Self::QpuNotFound,
+            ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
+            ExecutionError::Unauthorized => Self::Authentication,
+            ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
+            ExecutionError::Quil(message) => Self::Compilation(message),
+            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
+            ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
+            ExecutionError::Qcs(message) => Self::Unexpected(message),
+        }
+    }
+}
+
+impl From<qvm::Error> for Error {
+    fn from(err: qvm::Error) -> Self {
+        match err {
+            qvm::Error::QvmCommunication { .. } => Self::Connection(Service::Qvm),
+            qvm::Error::Parsing(_)
+            | qvm::Error::ShotsMustBePositive
+            | qvm::Error::RegionSizeMismatch { .. }
+            | qvm::Error::RegionNotFound { .. }
+            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{}", err)),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -431,7 +493,7 @@ mod describe_qpu_for_id {
     async fn it_refreshes_auth_token() {
         let mut exe = Executable::from_quil("");
         // Default config has no auth, so it should try to refresh
-        exe.config = Some(Configuration::default());
+        exe.config = Some(Arc::new(Configuration::default()));
         let result = exe.qpu_for_id("blah").await;
         let err = if let Err(err) = result {
             err
@@ -449,17 +511,17 @@ mod describe_qpu_for_id {
         exe.shots = shots;
         exe.qpu = Some(
             qpu::Execution::new(
-                "",
+                "".into(),
                 shots,
                 "Aspen-9",
-                &exe.take_or_load_config().await,
+                exe.get_config().await.unwrap_or_default(),
                 exe.compile_with_quilc,
             )
             .await
             .unwrap(),
         );
         // Load config with no credentials to prevent creating a new Execution if it tries
-        exe.config = Some(Configuration::default());
+        exe.config = Some(Arc::new(Configuration::default()));
 
         assert!(exe.qpu_for_id("Aspen-9").await.is_ok());
     }
@@ -491,7 +553,7 @@ mod describe_qpu_for_id {
         // Cache so we can verify cache is not used.
         exe.qpu = Some(qpu);
         // Load config with no credentials to prevent creating the new Execution (which would fail anyway)
-        exe.config = Some(Configuration::default());
+        exe.config = Some(Arc::new(Configuration::default()));
         let result = exe.qpu_for_id("Aspen-8").await;
 
         assert!(matches!(result, Err(_)));
@@ -507,7 +569,7 @@ mod describe_take_or_load_config {
     #[tokio::test]
     async fn it_returns_cached_values() {
         let mut exe = Executable::from_quil("");
-        let mut config = Configuration::default();
+        let mut config = Arc::new(Configuration::default());
         config.quilc_url = String::from("test");
         exe.config = Some(config.clone());
         let gotten = exe.take_or_load_config().await;

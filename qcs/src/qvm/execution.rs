@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
-use eyre::{eyre, Result, WrapErr};
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     Program,
@@ -11,7 +10,7 @@ use crate::configuration::Configuration;
 use crate::executable::Parameters;
 use crate::ExecutionResult;
 
-use super::{QVMRequest, QVMResponse};
+use super::{Request, Response};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -22,8 +21,8 @@ pub(crate) struct Execution {
 impl Execution {
     /// Construct a new [`Execution`] from Quil. Immediately parses the Quil and returns an error if
     /// there are any problems.
-    pub(crate) fn new(quil: &str) -> Result<Self> {
-        let program = Program::from_str(quil).wrap_err("Unable to parse Quil")?;
+    pub(crate) fn new(quil: &str) -> Result<Self, Error> {
+        let program = Program::from_str(quil).map_err(|e| Error::Parsing(format!("{}", e)))?;
         Ok(Self { program })
     }
 
@@ -60,9 +59,9 @@ impl Execution {
         readouts: &[&str],
         params: &Parameters,
         config: &Configuration,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
+    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
         if shots == 0 {
-            return Err(eyre!("A non-zero number of shots must be provided."));
+            return Err(Error::ShotsMustBePositive);
         }
 
         let memory = &self.program.memory_regions;
@@ -72,16 +71,15 @@ impl Execution {
             match memory.get(name.as_ref()) {
                 Some(region) => {
                     if region.size.length != values.len() as u64 {
-                        return Err(eyre!(
-                            "Declared region {} has size {} but parameters have size {}.",
-                            name,
-                            region.size.length,
-                            values.len()
-                        ));
+                        return Err(Error::RegionSizeMismatch {
+                            name: name.clone(),
+                            declared: region.size.length,
+                            parameters: values.len(),
+                        });
                     }
                 }
                 None => {
-                    return Err(eyre!("Could not find region {} for parameter. Are you missing a DECLARE instruction?", name));
+                    return Err(Error::RegionNotFound { name: name.clone() });
                 }
             }
             for (index, value) in values.iter().enumerate() {
@@ -110,8 +108,8 @@ impl Execution {
         shots: u16,
         readouts: &[&str],
         config: &Configuration,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>> {
-        let request = QVMRequest::new(&self.program.to_string(true), shots, readouts);
+    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+        let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
         let response = client
@@ -119,22 +117,50 @@ impl Execution {
             .json(&request)
             .send()
             .await
-            .wrap_err("While sending data to the QVM")?;
+            .map_err(|source| Error::QvmCommunication {
+                qvm_url: config.qvm_url.clone(),
+                source,
+            })?;
 
-        response
-            .error_for_status()
-            .wrap_err("Received error status from QVM")?
-            .json::<QVMResponse>()
-            .await
-            .map(|response| {
-                response
-                    .registers
-                    .into_iter()
-                    .map(|(key, value)| (key.into_boxed_str(), value))
-                    .collect()
-            })
-            .wrap_err("While decoding QVM response")
+        match response.json::<Response>().await {
+            Err(source) => Err(Error::QvmCommunication {
+                qvm_url: config.qvm_url.clone(),
+                source,
+            }),
+            Ok(Response::Success(response)) => Ok(response
+                .registers
+                .into_iter()
+                .map(|(key, value)| (key.into_boxed_str(), value))
+                .collect()),
+            Ok(Response::Failure(response)) => Err(Error::Qvm {
+                message: response.status,
+            }),
+        }
     }
+}
+
+/// All of the errors that can occur when running a Quil program on QVM.
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("Error parsing Quil program: {0}")]
+    Parsing(String),
+    #[error("Shots must be a positive integer.")]
+    ShotsMustBePositive,
+    #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
+    RegionSizeMismatch {
+        name: Box<str>,
+        declared: u64,
+        parameters: usize,
+    },
+    #[error("Could not find region {name} for parameter. Are you missing a DECLARE instruction?")]
+    RegionNotFound { name: Box<str> },
+    #[error("Could not communicate with QVM at {qvm_url}")]
+    QvmCommunication {
+        qvm_url: String,
+        source: reqwest::Error,
+    },
+    #[error("QVM reported a problem running your program: {message}")]
+    Qvm { message: String },
 }
 
 #[cfg(test)]

@@ -3,7 +3,6 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
 use enum_as_inner::EnumAsInner;
-use eyre::{eyre, Result, WrapErr};
 use log::{debug, trace, warn};
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
@@ -13,13 +12,14 @@ use qcs_api::models::EngagementWithCredentials;
 
 use crate::executable::Parameters;
 
-use super::rpcq::{Client, Credentials, RPCRequest};
+use super::rpcq::{Client, Credentials, Error as RPCQError, RPCRequest};
 
+/// Execute compiled program on a QPU.
 pub(crate) fn execute(
     program: &str,
     engagement: &EngagementWithCredentials,
     patch_values: &Parameters,
-) -> Result<HashMap<String, Buffer>> {
+) -> Result<HashMap<String, Buffer>, Error> {
     let params = QPUParams::from_program(program, patch_values);
     let EngagementWithCredentials {
         address,
@@ -30,7 +30,7 @@ pub(crate) fn execute(
     // This is a hack to allow testing without credentials since ZAP is absurd
     let client = if credentials.server_public.is_empty() {
         warn!("Connecting to QPU on {} with no credentials.", address);
-        Client::new(address).wrap_err("Unable to connect to the QPU")?
+        Client::new(address)?
     } else {
         let credentials = Credentials {
             client_secret_key: &credentials.client_secret,
@@ -38,19 +38,41 @@ pub(crate) fn execute(
             server_public_key: &credentials.server_public,
         };
         trace!("Connecting to QPU at {} with credentials", &address);
-        Client::new_with_credentials(address, &credentials)
-            .wrap_err("Unable to connect to the QPU")?
+        Client::new_with_credentials(address, &credentials)?
     };
 
     let request = RPCRequest::from(&params);
-    let job_id: String = client
-        .run_request(&request)
-        .wrap_err("While attempting to send the program to the QPU")?;
+    let job_id: String = client.run_request(&request)?;
     debug!("Received job ID {} from QPU", &job_id);
     let get_buffers_request = GetBuffersRequest::new(job_id);
     client
         .run_request(&RPCRequest::from(&get_buffers_request))
-        .wrap_err("While attempting to receive results from the QPU")
+        .map_err(Error::from)
+}
+
+/// All of the possible errors for this module
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("Error connecting to the QPU")]
+    Connection(#[source] RPCQError),
+    #[error("An error not expected to occur—if encountered it may indicate bug in this library")]
+    Unexpected(#[source] RPCQError),
+    #[error("An error was returned from the QPU: {0}")]
+    Qpu(String),
+}
+
+impl From<RPCQError> for Error {
+    fn from(err: RPCQError) -> Self {
+        match err {
+            RPCQError::SocketCreation(_)
+            | RPCQError::Communication(_)
+            | RPCQError::ResponseIdMismatch => Self::Connection(err),
+            RPCQError::AuthSetup(_)
+            | RPCQError::Serialization(_)
+            | RPCQError::Deserialization(_) => Self::Unexpected(err),
+            RPCQError::Response(message) => Self::Qpu(message),
+        }
+    }
 }
 
 #[derive(Serialize, Debug)]
@@ -141,23 +163,36 @@ impl Display for DataType {
     }
 }
 
+/// Errors that can occur when decoding the results from the QPU
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum DecodeError {
+    #[error("Only 1-dimensional buffer shapes are currently supported")]
+    InvalidShape,
+    #[error("Expected buffer length {expected}, got {actual}")]
+    BufferLength { expected: usize, actual: usize },
+    #[error("Missing expected buffer named {0}, did you forget to MEASURE?")]
+    MissingBuffer(String),
+    #[error("This SDK expects contiguous memory, but {register}[{index}] was missing.")]
+    ContiguousMemory { register: String, index: usize },
+    #[error("A single register should have the same type for all shots, got mixed types.")]
+    MixedTypes,
+}
+
 impl Buffer {
-    fn check_shape(&self) -> eyre::Result<()> {
+    fn check_shape(&self) -> Result<(), DecodeError> {
         if self.shape.len() == 1 {
             Ok(())
         } else {
-            Err(eyre!(
-                "Only 1-dimensional buffer shapes are currently supported"
-            ))
+            Err(DecodeError::InvalidShape)
         }
     }
 
-    fn assert_len(&self, expected: usize) -> eyre::Result<()> {
+    fn assert_len(&self, expected: usize) -> Result<(), DecodeError> {
         let actual = self.data.len();
         if expected == actual {
             Ok(())
         } else {
-            Err(eyre!("Expected buffer length {}, got {}", expected, actual,))
+            Err(DecodeError::BufferLength { expected, actual })
         }
     }
 }
@@ -178,7 +213,7 @@ pub(crate) enum Register {
 
 #[allow(clippy::cast_possible_wrap)]
 impl TryFrom<Buffer> for Register {
-    type Error = eyre::Error;
+    type Error = DecodeError;
 
     fn try_from(buffer: Buffer) -> Result<Register, Self::Error> {
         const NUM_BYTES_IN_F64: usize = 8;

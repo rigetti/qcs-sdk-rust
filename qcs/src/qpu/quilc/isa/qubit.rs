@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use std::f64::consts::{FRAC_PI_2, PI};
 
-use eyre::{eyre, Result, WrapErr};
 use serde::Serialize;
 
 use qcs_api::models::{Characteristic, Node, Operation};
@@ -56,22 +56,34 @@ impl Qubit {
         &mut self,
         op_name: &str,
         characteristics: &[Characteristic],
-        benchmarks: &[Operation],
-    ) -> Result<()> {
-        let benchmarks = Benchmarks::try_from(benchmarks)?;
+        frb_sim_1q: &FrbSim1q,
+    ) -> Result<(), Error> {
         let operators = match op_name {
-            "RX" => rx_gates(self.id, benchmarks.frb_sim_1q)?,
+            "RX" => rx_gates(self.id, frb_sim_1q)?,
             "RZ" => rz_gates(self.id),
             "MEASURE" => measure(self.id, characteristics),
             "WILDCARD" => wildcard(self.id),
             "I" | "RESET" => vec![],
-            unknown => return Err(eyre!("Unknown operator {}", unknown)),
+            unknown => return Err(Error::UnknownOperator(String::from(unknown))),
         };
         if self.gates.add(&operators) {
             self.dead = false;
         }
         Ok(())
     }
+}
+
+/// All the errors that can occur within this module.
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("Required benchmark `randomized_benchmark_simultaneous_1q` was not present")]
+    MissingBenchmark,
+    #[error("Benchmark `randomized_benchmark_simultaneous_1q` must have a single call site")]
+    InvalidBenchmark,
+    #[error("Benchmark missing for qubit {0}")]
+    MissingBenchmarkForQubit(i32),
+    #[error("Unknown operator {0}")]
+    UnknownOperator(String),
 }
 
 impl From<&Node> for Qubit {
@@ -119,29 +131,44 @@ mod describe_qubit {
     }
 }
 
-/// Contains the post-filtered, categorized benchmarks for later usage
-struct Benchmarks<'a> {
-    frb_sim_1q: &'a Operation,
+pub(crate) struct FrbSim1q(Vec<Characteristic>);
+
+impl TryFrom<Vec<Operation>> for FrbSim1q {
+    type Error = Error;
+
+    fn try_from(ops: Vec<Operation>) -> Result<FrbSim1q, Error> {
+        const BENCH_NAME: &str = "randomized_benchmark_simultaneous_1q";
+        let mut operation = ops
+            .into_iter()
+            .find(|op| op.name == BENCH_NAME)
+            .ok_or(Error::MissingBenchmark)?;
+        if operation.sites.len() != 1 {
+            return Err(Error::InvalidBenchmark);
+        }
+        let site = operation.sites.remove(0);
+
+        Ok(Self(site.characteristics))
+    }
 }
 
-impl<'a> Benchmarks<'a> {
-    fn try_from(ops: &'a [Operation]) -> Result<Benchmarks<'a>> {
-        const BENCH_NAME: &str = "randomized_benchmark_simultaneous_1q";
-        let frb_sim_1q = ops.iter().find(|op| op.name == BENCH_NAME).ok_or_else(|| {
-            eyre!(
-                "Parsing ISA requires a benchmark called '{}' which is missing",
-                BENCH_NAME
-            )
-        })?;
-        Ok(Self { frb_sim_1q })
+impl FrbSim1q {
+    fn fidelity_for_qubit(&self, qubit: i32) -> Result<f64, Error> {
+        self.0
+            .iter()
+            .find(|characteristic| {
+                characteristic.node_ids.as_ref().map_or(false, |node_ids| {
+                    node_ids.len() == 1 && node_ids[0] == qubit
+                })
+            })
+            .map(|characteristic| characteristic.value.into())
+            .ok_or(Error::MissingBenchmarkForQubit(qubit))
     }
 }
 
 const DEFAULT_DURATION_RX: f64 = 50.0;
 
-fn rx_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>> {
-    let fidelity = fidelity(frb_sim_1q, node_id)
-        .wrap_err_with(|| format!("While adding RX gate to Qubit {}", node_id))?;
+fn rx_gates(node_id: i32, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
+    let fidelity = frb_sim_1q.fidelity_for_qubit(node_id)?;
 
     let mut gates = Vec::with_capacity(5);
     let operator = "RX";
@@ -167,41 +194,30 @@ fn rx_gates(node_id: i32, frb_sim_1q: &Operation) -> Result<Vec<Operator>> {
 
 #[cfg(test)]
 mod describe_rx_gates {
-    use qcs_api::models::OperationSite;
-
     use super::*;
 
     /// This data is copied from the pyQuil ISA integration test.
     #[test]
     fn it_passes_the_pyquil_aspen_8_test() {
         let node_id = 1;
-        let frb_sim_1q = Operation {
-            characteristics: vec![],
-            name: "randomized_benchmark_simultaneous_1q".to_string(),
-            node_count: Some(30),
-            parameters: vec![],
-            sites: vec![OperationSite {
-                characteristics: vec![
-                    Characteristic {
-                        name: "fRB".to_string(),
-                        value: 0.989821537688075,
-                        error: Some(0.000699235456806402),
-                        node_ids: Some(vec![0]),
-                        parameter_values: None,
-                        timestamp: "1970-01-01T00:00:00+00:00".to_string(),
-                    },
-                    Characteristic {
-                        name: "fRB".to_string(),
-                        value: 0.996832638579018,
-                        error: Some(0.00010089678215399),
-                        node_ids: Some(vec![1]),
-                        timestamp: "1970-01-01T00:00:00+00:00".to_string(),
-                        parameter_values: None,
-                    },
-                ],
-                node_ids: vec![0, 1],
-            }],
-        };
+        let frb_sim_1q = FrbSim1q(vec![
+            Characteristic {
+                name: "fRB".to_string(),
+                value: 0.989_821_537_688_075,
+                error: Some(0.000_699_235_456_806_402),
+                node_ids: Some(vec![0]),
+                parameter_values: None,
+                timestamp: "1970-01-01T00:00:00+00:00".to_string(),
+            },
+            Characteristic {
+                name: "fRB".to_string(),
+                value: 0.996_832_638_579_018,
+                error: Some(0.000_100_896_782_153_99),
+                node_ids: Some(vec![1]),
+                timestamp: "1970-01-01T00:00:00+00:00".to_string(),
+                parameter_values: None,
+            },
+        ]);
         let gates = rx_gates(node_id, &frb_sim_1q).expect("Failed to create RX gates");
         let expected = vec![
             Operator::Gate {
@@ -214,28 +230,28 @@ mod describe_rx_gates {
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
-                fidelity: 0.9968326091766357,
+                fidelity: 0.996_832_609_176_635_7,
                 operator: "RX",
                 parameters: Parameters::Float(PI),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
-                fidelity: 0.9968326091766357,
+                fidelity: 0.996_832_609_176_635_7,
                 operator: "RX",
                 parameters: Parameters::Float(-PI),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
-                fidelity: 0.9968326091766357,
+                fidelity: 0.996_832_609_176_635_7,
                 operator: "RX",
                 parameters: Parameters::Float(FRAC_PI_2),
             },
             Operator::Gate {
                 arguments: Arguments::Int(1),
                 duration: 50.0,
-                fidelity: 0.9968326091766357,
+                fidelity: 0.996_832_609_176_635_7,
                 operator: "RX",
                 parameters: Parameters::Float(-FRAC_PI_2),
             },
@@ -272,22 +288,6 @@ mod describe_rz_gates {
         }];
         assert_eq!(gates, expected);
     }
-}
-
-fn fidelity(frb_sim_1q: &Operation, node_id: i32) -> Result<f64> {
-    let site = frb_sim_1q
-        .sites
-        .get(0)
-        .ok_or_else(|| eyre!("frb_sim_1q benchmark should have exactly 1 site, it has none."))?;
-    site.characteristics
-        .iter()
-        .find(|characteristic| {
-            characteristic.node_ids.as_ref().map_or(false, |node_ids| {
-                node_ids.len() == 1 && node_ids[0] == node_id
-            })
-        })
-        .map(|characteristic| characteristic.value.into())
-        .ok_or_else(|| eyre!("No frb_sim_1q benchmark for qubit {}", node_id))
 }
 
 const MEASURE_DEFAULT_DURATION: f64 = 2000.0;
@@ -340,14 +340,14 @@ mod describe_measure {
             Operator::Measure {
                 operator: "MEASURE",
                 duration: 2000.0,
-                fidelity: 0.9810000061988831,
+                fidelity: 0.981_000_006_198_883_1,
                 qubit: 0,
                 target: Some("_"),
             },
             Operator::Measure {
                 operator: "MEASURE",
                 duration: 2000.0,
-                fidelity: 0.9810000061988831,
+                fidelity: 0.981_000_006_198_883_1,
                 qubit: 0,
                 target: None,
             },

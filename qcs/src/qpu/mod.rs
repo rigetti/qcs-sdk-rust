@@ -1,23 +1,27 @@
 //! This module contains all the functionality for running Quil programs on a real QPU. Specifically,
 //! the [`Execution`] struct in this module.
 
+use core::mem;
 use std::collections::{HashMap, HashSet};
 use std::convert::TryFrom;
 use std::str::FromStr;
 
-use eyre::{eyre, Result, WrapErr};
 use log::trace;
+use reqwest::StatusCode;
 
-pub(crate) use execution::{Error, Execution};
-use qcs_api::apis::quantum_processors_api as qpu_api;
+pub(crate) use execution::{Error as ExecutionError, Execution};
+use qcs_api::apis::quantum_processors_api::{
+    get_instruction_set_architecture, GetInstructionSetArchitectureError,
+};
+use qcs_api::apis::Error as QcsError;
 use qcs_api::models::{InstructionSetArchitecture, TranslateNativeQuilToEncryptedBinaryResponse};
 use runner::Buffer;
-use translation::translate;
+use translation::{translate, Error as TranslationError};
 
 use crate::configuration::Configuration;
 use crate::qpu::rewrite_arithmetic::RewrittenQuil;
+pub(crate) use crate::qpu::runner::DecodeError;
 pub(crate) use crate::qpu::runner::Register;
-use core::mem;
 
 mod engagement;
 mod execution;
@@ -32,10 +36,8 @@ async fn build_executable(
     shots: u16,
     quantum_processor_id: &str,
     config: &Configuration,
-) -> Result<TranslateNativeQuilToEncryptedBinaryResponse> {
-    let executable = translate(quil, shots, quantum_processor_id, config)
-        .await
-        .wrap_err("Could not convert native quil to executable")?;
+) -> Result<TranslateNativeQuilToEncryptedBinaryResponse, TranslationError> {
+    let executable = translate(quil, shots, quantum_processor_id, config).await?;
     trace!("Translation complete.");
     Ok(executable)
 }
@@ -46,25 +48,17 @@ async fn build_executable(
 fn process_buffers(
     mut buffers: HashMap<String, Buffer>,
     buffer_names: &HashMap<Box<str>, Vec<String>>,
-) -> Result<HashMap<Box<str>, Vec<Register>>> {
+) -> Result<HashMap<Box<str>, Vec<Register>>, DecodeError> {
     buffer_names
         .iter()
         .map(|(register_name, buffer_names)| {
-            let registers: Result<Vec<Register>> = buffer_names
+            let registers: Result<Vec<Register>, DecodeError> = buffer_names
                 .iter()
                 .map(|buffer_name| {
                     buffers
                         .remove(buffer_name)
-                        .ok_or_else(|| {
-                            eyre!(
-                                "Response from QPU did not include expected buffer named {}",
-                                buffer_name
-                            )
-                        })
-                        .and_then(|buffer| {
-                            Register::try_from(buffer)
-                                .wrap_err("Could not convert buffer into requested type")
-                        })
+                        .ok_or_else(|| DecodeError::MissingBuffer(buffer_name.clone()))
+                        .and_then(Register::try_from)
                 })
                 .collect();
             registers.map(|registers| (register_name.clone(), registers))
@@ -119,7 +113,7 @@ struct BufferName {
 fn organize_ro_sources(
     ro_sources: Vec<Vec<String>>,
     readouts: &[&str],
-) -> Result<HashMap<Box<str>, Vec<String>>> {
+) -> Result<HashMap<Box<str>, Vec<String>>, DecodeError> {
     let readout_set: HashSet<&str> = readouts.iter().copied().collect();
 
     // First, collect the unordered list of buffers since we have no guarantee of what order
@@ -162,9 +156,7 @@ fn organize_ro_sources(
         .collect();
 
     if buffer_names.is_empty() {
-        return Err(eyre!(
-            "No buffers were found for requested readouts, at least one is required. Only a readout named 'ro' is currently supported."
-        ));
+        return Err(DecodeError::MissingBuffer(String::from("ro")));
     }
 
     // Sort so that we have one register at a time in ascending index order, making the organization
@@ -179,10 +171,10 @@ fn organize_ro_sources(
     // Reorganize and validate all the BufferNames
     let first = buffer_names.remove(0);
     if first.index != 0 {
-        return Err(eyre!(
-            "This method requires contiguous memory, but {register}[0] was missing.",
-            register = first.register_name,
-        ));
+        return Err(DecodeError::ContiguousMemory {
+            register: first.register_name,
+            index: 0,
+        });
     }
     let mut current_index = 1;
     let mut current_register_name = first.register_name;
@@ -204,11 +196,10 @@ fn organize_ro_sources(
         }
 
         if current_index != index {
-            return Err(eyre!(
-                "This method requires contiguous memory, but {register}[{current_index}] was missing.",
-                register = current_register_name,
-                current_index = current_index,
-            ));
+            return Err(DecodeError::ContiguousMemory {
+                register: current_register_name,
+                index: current_index,
+            });
         }
         current_index += 1;
         current_names.push(buffer_name);
@@ -218,10 +209,7 @@ fn organize_ro_sources(
 
     for expected_readout in readout_set {
         if !results.contains_key(expected_readout) {
-            return Err(eyre!(
-                "No buffers were found for requested readout {}",
-                expected_readout
-            ));
+            return Err(DecodeError::MissingBuffer(String::from(expected_readout)));
         }
     }
 
@@ -230,9 +218,9 @@ fn organize_ro_sources(
 
 #[cfg(test)]
 mod describe_organize_ro_sources {
-    use super::*;
-
     use maplit::hashmap;
+
+    use super::*;
 
     #[test]
     fn it_converts_from_translation_ro_sources() {
@@ -301,8 +289,39 @@ mod describe_organize_ro_sources {
 async fn get_isa(
     quantum_processor_id: &str,
     config: &Configuration,
-) -> Result<InstructionSetArchitecture> {
-    qpu_api::get_instruction_set_architecture(config.as_ref(), quantum_processor_id)
+) -> Result<InstructionSetArchitecture, IsaError> {
+    get_instruction_set_architecture(config.as_ref(), quantum_processor_id)
         .await
-        .wrap_err("Could not load data for the requested quantum processor")
+        .map_err(IsaError::from)
+}
+
+/// The errors that can occur when fetching the ISA of a QPU.
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum IsaError {
+    #[error("QPU not found")]
+    QpuNotFound,
+    #[error("Unauthorized, refresh credentials and try again.")]
+    Unauthorized,
+    #[error("Problem understanding QCS, this is likely a bug")]
+    QcsError(#[source] QcsError<GetInstructionSetArchitectureError>),
+    #[error("Problem communicating with QCS")]
+    QcsCommunicationError(#[from] std::io::Error),
+}
+
+impl From<QcsError<GetInstructionSetArchitectureError>> for IsaError {
+    fn from(error: QcsError<GetInstructionSetArchitectureError>) -> Self {
+        match error {
+            QcsError::ResponseError(content) if content.status == StatusCode::NOT_FOUND => {
+                IsaError::QpuNotFound
+            }
+            QcsError::ResponseError(content)
+                if content.status == StatusCode::UNAUTHORIZED
+                    || content.status == StatusCode::FORBIDDEN =>
+            {
+                IsaError::Unauthorized
+            }
+            QcsError::Io(io_error) => io_error.into(),
+            error => IsaError::QcsError(error),
+        }
+    }
 }

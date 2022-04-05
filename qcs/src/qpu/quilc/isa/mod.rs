@@ -1,13 +1,14 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use eyre::{eyre, Report, Result};
 use serde::Serialize;
 
 use edge::{convert_edges, Edge, EdgeId};
 use operator::Operator;
 use qcs_api::models::InstructionSetArchitecture;
 use qubit::Qubit;
+
+use crate::qpu::quilc::isa::qubit::FrbSim1q;
 
 mod edge;
 mod operator;
@@ -22,10 +23,10 @@ pub(crate) struct CompilerIsa {
     edges: HashMap<String, Edge>,
 }
 
-impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
-    type Error = Report;
+impl TryFrom<InstructionSetArchitecture> for CompilerIsa {
+    type Error = Error;
 
-    fn try_from(isa: &InstructionSetArchitecture) -> Result<Self> {
+    fn try_from(isa: InstructionSetArchitecture) -> Result<Self, Error> {
         let mut qubits = Qubit::from_nodes(&isa.architecture.nodes);
 
         let mut edges = convert_edges(&isa.architecture.edges)?;
@@ -34,29 +35,31 @@ impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
             .instructions
             .iter()
             .flat_map(|op| op.sites.iter().map(move |site| (op, site)));
+        let frb_sim_1q = FrbSim1q::try_from(isa.benchmarks)?;
 
         for (op, site) in site_ops {
             match (&op.node_count, &site.node_ids.len()) {
                 (Some(1), 1) => {
                     let id = &site.node_ids[0];
-                    let qubit = qubits.get_mut(id).ok_or_else(
-                        || eyre!("Operation {} is defined for Qubit {} but that Qubit does not exist", op.name, id)
-                    )?;
-                    qubit.add_operation(&op.name, &site.characteristics, &isa.benchmarks)?;
+                    let qubit = qubits
+                        .get_mut(id)
+                        .ok_or_else(|| Error::QubitDoesNotExist(String::from(&op.name), *id))?;
+                    qubit.add_operation(&op.name, &site.characteristics, &frb_sim_1q)?;
                 }
                 (Some(2), 2) => {
                     let id = EdgeId::try_from(&site.node_ids)?;
-                    let edge = edges.get_mut(&id).ok_or_else(
-                        || eyre!("Operation {} is defined for Edge {} but that Edge does not exist", op.name, id)
-                    )?;
+                    let edge = edges
+                        .get_mut(&id)
+                        .ok_or_else(|| Error::EdgeDoesNotExist(String::from(&op.name), id))?;
                     edge.add_operation(&op.name, &site.characteristics)?;
                 }
-                item => {
-                    return Err(eyre!(
-                        "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
-                        Got {:?} while parsing operation {} at site {:?}", item, op.name, site.node_ids
+                (node_count, node_ids) => {
+                    return Err(Error::IncorrectNodes(
+                        (*node_count, *node_ids),
+                        String::from(&op.name),
+                        site.node_ids.clone(),
                     ))
-                },
+                }
             }
         }
 
@@ -67,6 +70,24 @@ impl TryFrom<&InstructionSetArchitecture> for CompilerIsa {
         let edges = edges.into_iter().map(|(k, v)| (k.to_string(), v)).collect();
         Ok(Self { qubits, edges })
     }
+}
+
+/// All the errors that can occur from within this module
+#[derive(Debug, thiserror::Error)]
+pub(crate) enum Error {
+    #[error("Operation {0} is defined for Qubit {1} but that Qubit does not exist")]
+    QubitDoesNotExist(String, i32),
+    #[error("Operation {0} is defined for Edge {1} but that Edge does not exist")]
+    EdgeDoesNotExist(String, EdgeId),
+    #[error(
+        "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
+                        Got {0:?} while parsing operation {1} at site {2:?}"
+    )]
+    IncorrectNodes((Option<i32>, usize), String, Vec<i32>),
+    #[error(transparent)]
+    Qubit(#[from] qubit::Error),
+    #[error(transparent)]
+    Edge(#[from] edge::Error),
 }
 
 #[cfg(test)]
@@ -99,7 +120,7 @@ mod describe_compiler_isa {
                         second_f64,
                         F64Margin {
                             ulps: 1,
-                            epsilon: 0.0000001
+                            epsilon: 0.000_000_1
                         }
                     )
                 }
@@ -155,7 +176,7 @@ mod describe_compiler_isa {
             serde_json::from_str(&expected_json).expect("Could not deserialize Aspen-8 output");
 
         let compiler_isa =
-            CompilerIsa::try_from(&qcs_isa).expect("Could not convert ISA to CompilerIsa");
+            CompilerIsa::try_from(qcs_isa).expect("Could not convert ISA to CompilerIsa");
         let serialized =
             serde_json::to_value(&compiler_isa).expect("Unable to serialize CompilerIsa");
 

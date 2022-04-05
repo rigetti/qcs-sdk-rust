@@ -5,21 +5,34 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-pub(crate) use execution::Execution;
+pub(crate) use execution::{Error, Execution};
 
 use crate::ExecutionResult;
 
 mod execution;
 
 #[derive(Debug, Deserialize)]
-struct QVMResponse {
+#[serde(untagged)]
+pub(super) enum Response {
+    Success(Success),
+    Failure(Failure),
+}
+
+#[derive(Debug, Deserialize)]
+pub(super) struct Success {
     #[serde(flatten)]
     pub registers: HashMap<String, ExecutionResult>,
 }
 
+#[derive(Debug, Deserialize)]
+pub(super) struct Failure {
+    /// The message from QVM describing what went wrong.
+    pub status: String,
+}
+
 #[derive(Serialize)]
 #[serde(rename_all = "kebab-case")]
-struct QVMRequest<'request> {
+struct Request<'request> {
     quil_instructions: String,
     addresses: HashMap<&'request str, bool>,
     trials: u16,
@@ -27,7 +40,7 @@ struct QVMRequest<'request> {
     request_type: RequestType,
 }
 
-impl<'request> QVMRequest<'request> {
+impl<'request> Request<'request> {
     fn new(program: &str, shots: u16, readouts: &[&'request str]) -> Self {
         let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (*v, true)).collect();
         Self {
@@ -46,19 +59,19 @@ enum RequestType {
 }
 
 #[cfg(test)]
-mod describe_qvm_request {
-    use super::*;
+mod describe_request {
+    use super::Request;
 
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = QVMRequest::new(program, 1, &[]);
+        let request = Request::new(program, 1, &[]);
         assert_eq!(&request.quil_instructions, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = QVMRequest::new("H 0", 10, &["ro"]);
+        let request = Request::new("H 0", 10, &["ro"]);
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
