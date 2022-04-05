@@ -380,12 +380,12 @@ pub enum Error {
     /// This error can occur when one of those files is required but missing or there is a problem
     /// with the contents of those files.
     #[error("There was a problem related to your QCS settings: {0}")]
-    SettingsError(String),
+    Settings(String),
     /// This error occurs when the SDK was unable to authenticate a request to QCS. This could mean
     /// that your credentials are invalid or expired, or that you do not have access to the requested
     /// QPU.
     #[error("Could not authenticate a request to QCS for the requested QPU.")]
-    AuthenticationError,
+    Authentication,
     /// The requested QPU was not found. Either the QPU does not exist or you do not have access to it.
     #[error("The requested QPU was not found.")]
     QpuNotFound,
@@ -403,7 +403,7 @@ pub enum Error {
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
     #[error("There was a problem compiling the Quil program: {0}")]
-    CompilationError(String),
+    Compilation(String),
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
     /// indicates a bug in the SDK and should be reported to
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
@@ -440,18 +440,18 @@ pub enum Service {
 
 impl From<LoadError> for Error {
     fn from(err: LoadError) -> Self {
-        Self::SettingsError(format!("{}", err))
+        Self::Settings(format!("{}", err))
     }
 }
 
 impl From<RefreshError> for Error {
     fn from(err: RefreshError) -> Self {
         match err {
-            RefreshError::NoRefreshToken => Self::SettingsError(String::from(
+            RefreshError::NoRefreshToken => Self::Settings(String::from(
                 "No `refresh_token` was found in your QCS secrets file for the selected profile. \
                     You can change profiles with the `QCS_PROFILE_NAME` environment variable.",
             )),
-            RefreshError::FetchError(_) => Self::AuthenticationError,
+            RefreshError::FetchError(_) => Self::Authentication,
         }
     }
 }
@@ -461,9 +461,9 @@ impl From<qpu::ExecutionError> for Error {
         match err {
             ExecutionError::QpuNotFound => Self::QpuNotFound,
             ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
-            ExecutionError::Unauthorized => Self::AuthenticationError,
+            ExecutionError::Unauthorized => Self::Authentication,
             ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
-            ExecutionError::Quil(message) => Self::CompilationError(message),
+            ExecutionError::Quil(message) => Self::Compilation(message),
             ExecutionError::Bug(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::Qcs(message) => Self::Unexpected(message),
@@ -479,7 +479,7 @@ impl From<qvm::Error> for Error {
             | qvm::Error::ShotsMustBePositive
             | qvm::Error::RegionSizeMismatch { .. }
             | qvm::Error::RegionNotFound { .. }
-            | qvm::Error::Qvm { .. } => Self::CompilationError(format!("{}", err)),
+            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{}", err)),
         }
     }
 }
