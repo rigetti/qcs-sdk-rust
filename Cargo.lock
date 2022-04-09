@@ -1029,9 +1029,9 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quil-rs"
-version = "0.8.7"
+version = "0.8.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1eb28e83613383f23c66feb36720971a1d02a251d5b226e3325d4e5a97a52f96"
+checksum = "754f653afcf48bde3e2d89b43ed285b81313f27362e068dcbf0741f8269b46fb"
 dependencies = [
  "indexmap",
  "lexical",
