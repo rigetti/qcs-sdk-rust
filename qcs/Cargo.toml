@@ -28,7 +28,7 @@ serde_bytes = "0.11.5"
 serde_json = "1.0.79"
 thiserror = "1.0.30"
 tokio = { version = "1.17.0", features = ["fs"] }
-toml = "0.5.8"
+toml = "0.5.9"
 uuid = { version = "0.8.2", features = ["v4"] }
 zmq = { version = "0.9.2", features = ["vendored"] }
 
