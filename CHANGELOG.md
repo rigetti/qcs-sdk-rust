@@ -1,3 +1,7 @@
+## [0.2.1](https://github.com/rigetti/qcs-sdk-rust/compare/v0.2.0...v0.2.1) (2022-05-31)
+
+Maintenance release, updating dependencies only.
+
 ## [0.2.0](https://github.com/rigetti/qcs-sdk-rust/compare/v0.1.1...v0.2.0) (2022-04-05)
 
 ### Breaking Changes
