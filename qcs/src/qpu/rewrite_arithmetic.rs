@@ -146,7 +146,7 @@ fn process_gate(mut gate: Gate, substitutions: &mut Substitutions) -> Instructio
         .parameters
         .into_iter()
         .map(|mut expression| {
-            expression = expression.simplify();
+            expression = expression.into_simplified();
             if matches!(expression, Expression::Number(_)) {
                 return expression;
             }
@@ -168,11 +168,11 @@ fn divide_2_pi(expression: Expression) -> Expression {
             right: Box::new(Expression::PiConstant),
         }),
     }
-    .simplify()
+    .into_simplified()
 }
 
 fn process_set_scale(mut set_scale: SetScale, substitutions: &mut Substitutions) -> Instruction {
-    set_scale.scale = set_scale.scale.simplify();
+    set_scale.scale = set_scale.scale.into_simplified();
     if matches!(set_scale.scale, Expression::Number(_)) {
         return Instruction::SetScale(set_scale);
     }
@@ -184,7 +184,7 @@ fn process_set_scale(mut set_scale: SetScale, substitutions: &mut Substitutions)
         operator: InfixOperator::Slash,
         right: Box::new(Expression::Number(Complex64::from(8.0))),
     }
-    .simplify();
+    .into_simplified();
 
     Instruction::SetScale(SetScale {
         frame,
@@ -199,7 +199,7 @@ fn process_frequency_expression(
     frames: &FrameSet,
     substitutions: &mut Substitutions,
 ) -> Result<Expression, Error> {
-    expression = expression.simplify();
+    expression = expression.into_simplified();
     if matches!(expression, Expression::Number(_)) {
         return Ok(expression);
     }
