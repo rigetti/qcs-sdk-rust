@@ -35,7 +35,7 @@ async fn successful_bell_state() {
 }
 
 async fn setup() {
-    env_logger::init();
+    simple_logger::init_with_env().unwrap();
     std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
     std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
     thread::spawn(qpu::run);
