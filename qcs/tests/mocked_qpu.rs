@@ -2,11 +2,12 @@
 //! the `qcs` crate.
 
 use std::thread;
+use std::time::Duration;
 
 use maplit::hashmap;
 
 use qcs::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
-use qcs::{Executable, ExecutionResult};
+use qcs::{Executable, RegisterData};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -29,9 +30,10 @@ async fn successful_bell_state() {
         .await
         .expect("Failed to run program that should be successful");
     assert_eq!(
-        result,
-        hashmap! {Box::from(String::from("ro")) => ExecutionResult::I8(vec![vec![0, 0], vec![1, 1]])}
+        result.registers,
+        hashmap! {Box::from(String::from("ro")) => RegisterData::I8(vec![vec![0, 0], vec![1, 1]])}
     );
+    assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 }
 
 async fn setup() {
@@ -183,7 +185,7 @@ mod qpu {
     #[serde(untagged)]
     enum Params {
         QPUParams { request: QPURequest, priority: u8 },
-        GetBuffersRequest { job_id: String, wait: bool },
+        GetExecutionResultsRequest { job_id: String, wait: bool },
     }
 
     #[derive(Deserialize, Debug)]
@@ -207,6 +209,12 @@ mod qpu {
         shape: (usize,),
         data: [u8; 2],
         dtype: String,
+    }
+
+    #[derive(Serialize, Debug, PartialEq)]
+    pub struct GetExecutionResultsResponse {
+        buffers: HashMap<&'static str, Buffer>,
+        execution_duration_microseconds: u64,
     }
 
     pub(crate) fn run() {
@@ -238,9 +246,9 @@ mod qpu {
                             id: qpu_request.id,
                             result: "1",
                         }),
-                        Params::GetBuffersRequest { .. } => {
-                            let mut resp = HashMap::new();
-                            resp.insert(
+                        Params::GetExecutionResultsRequest { .. } => {
+                            let mut buffers = HashMap::new();
+                            buffers.insert(
                                 "q0",
                                 Buffer {
                                     shape: (2,),
@@ -248,7 +256,7 @@ mod qpu {
                                     dtype: "int8".to_string(),
                                 },
                             );
-                            resp.insert(
+                            buffers.insert(
                                 "q1",
                                 Buffer {
                                     shape: (2,),
@@ -256,6 +264,10 @@ mod qpu {
                                     dtype: "int8".to_string(),
                                 },
                             );
+                            let resp = GetExecutionResultsResponse {
+                                buffers,
+                                execution_duration_microseconds: 8675,
+                            };
                             Box::new(RPCResponse::RPCReply {
                                 id: qpu_request.id,
                                 result: resp,

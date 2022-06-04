@@ -8,7 +8,7 @@ use quil_rs::{
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
-use crate::ExecutionResult;
+use crate::RegisterData;
 
 use super::{Request, Response};
 
@@ -59,7 +59,7 @@ impl Execution {
         readouts: &[&str],
         params: &Parameters,
         config: &Configuration,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -108,7 +108,7 @@ impl Execution {
         shots: u16,
         readouts: &[&str],
         config: &Configuration,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();

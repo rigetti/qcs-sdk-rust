@@ -7,14 +7,14 @@ use std::time::Duration;
 
 use crate::configuration::{Configuration, LoadError, RefreshError};
 use crate::qpu::ExecutionError;
-use crate::{qpu, qvm, ExecutionResult};
+use crate::{qpu, qvm, ExecutionData};
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
 ///
 /// # Example
 ///
 /// ```rust
-/// use qcs::{Executable, ExecutionResult};
+/// use qcs::{Executable, RegisterData};
 ///
 ///
 /// const PROGRAM: &str = r##"
@@ -32,7 +32,7 @@ use crate::{qpu, qvm, ExecutionResult};
 ///     let mut result = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
-///     let data = result.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
+///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
 ///     // In this case, we ran the program for 4 shots, so we know the length is 4.
 ///     assert_eq!(data.len(), 4);
 ///     for shot in data {
@@ -127,11 +127,13 @@ impl<'executable> Executable<'executable, '_> {
     ///         .await
     ///         .unwrap();
     ///     let first = result
+    ///         .registers
     ///         .remove("first")
     ///         .expect("Did not receive first buffer")
     ///         .into_f64()
     ///         .expect("Received incorrect data type for first");
     ///     let second = result
+    ///         .registers
     ///         .remove("second")
     ///         .expect("Did not receive second buffer")
     ///         .into_f64()
@@ -177,7 +179,7 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let data = result.remove("theta").expect("Could not read theta").into_f64().unwrap();
+    ///         let data = result.registers.remove("theta").expect("Could not read theta").into_f64().unwrap();
     ///         assert_eq!(data[0][0], theta);
     ///         assert_eq!(data[0][1], theta * 2.0);
     ///     }
@@ -208,7 +210,7 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-type ExecuteResult = Result<HashMap<Box<str>, ExecutionResult>, Error>;
+type ExecuteResult = Result<ExecutionData, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -258,7 +260,10 @@ impl Executable<'_, '_> {
             .run(self.shots, self.get_readouts(), &self.params, &config)
             .await;
         self.qvm = Some(qvm);
-        result.map_err(Error::from)
+        result.map_err(Error::from).map(|registers| ExecutionData {
+            registers,
+            duration: None,
+        })
     }
 
     /// Load `self.config` if not yet loaded, then return a reference to it.

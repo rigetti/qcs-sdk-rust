@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 pub(crate) use execution::{Error, Execution};
 
-use crate::ExecutionResult;
+use crate::RegisterData;
 
 mod execution;
 
@@ -21,7 +21,7 @@ pub(super) enum Response {
 #[derive(Debug, Deserialize)]
 pub(super) struct Success {
     #[serde(flatten)]
-    pub registers: HashMap<String, ExecutionResult>,
+    pub registers: HashMap<String, RegisterData>,
 }
 
 #[derive(Debug, Deserialize)]

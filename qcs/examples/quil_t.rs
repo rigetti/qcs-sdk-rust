@@ -22,6 +22,7 @@ async fn main() {
         .execute_on_qpu("Aspen-11")
         .await
         .expect("Failed to execute")
+        .registers
         .remove("ro")
         .expect("Missing ro register");
 

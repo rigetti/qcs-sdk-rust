@@ -1,3 +1,5 @@
+//! Interface to the QPU's API.
+
 use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
@@ -19,7 +21,7 @@ pub(crate) fn execute(
     program: &str,
     engagement: &EngagementWithCredentials,
     patch_values: &Parameters,
-) -> Result<HashMap<String, Buffer>, Error> {
+) -> Result<GetExecutionResultsResponse, Error> {
     let params = QPUParams::from_program(program, patch_values);
     let EngagementWithCredentials {
         address,
@@ -44,7 +46,7 @@ pub(crate) fn execute(
     let request = RPCRequest::from(&params);
     let job_id: String = client.run_request(&request)?;
     debug!("Received job ID {} from QPU", &job_id);
-    let get_buffers_request = GetBuffersRequest::new(job_id);
+    let get_buffers_request = GetExecutionResultsRequest::new(job_id);
     client
         .run_request(&RPCRequest::from(&get_buffers_request))
         .map_err(Error::from)
@@ -115,21 +117,30 @@ impl<'request> QPURequest<'request> {
 }
 
 #[derive(Serialize, Debug)]
-struct GetBuffersRequest {
+struct GetExecutionResultsRequest {
     job_id: String,
     wait: bool,
 }
 
-impl GetBuffersRequest {
+impl GetExecutionResultsRequest {
     fn new(job_id: String) -> Self {
         Self { job_id, wait: true }
     }
 }
 
-impl<'request> From<&'request GetBuffersRequest> for RPCRequest<'request, GetBuffersRequest> {
-    fn from(req: &'request GetBuffersRequest) -> Self {
-        RPCRequest::new("get_buffers", req)
+impl<'request> From<&'request GetExecutionResultsRequest>
+    for RPCRequest<'request, GetExecutionResultsRequest>
+{
+    fn from(req: &'request GetExecutionResultsRequest) -> Self {
+        RPCRequest::new("get_execution_results", req)
     }
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate) struct GetExecutionResultsResponse {
+    pub(crate) buffers: HashMap<String, Buffer>,
+    #[serde(default)]
+    pub(crate) execution_duration_microseconds: Option<u64>,
 }
 
 /// The raw form of the data which comes back from an execution.

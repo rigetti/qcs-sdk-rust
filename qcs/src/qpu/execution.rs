@@ -13,7 +13,7 @@ use qcs_api::models::EngagementWithCredentials;
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
-use crate::{qpu, ExecutionResult};
+use crate::{ExecutionData, RegisterData};
 
 use super::quilc::{self, NativeQuil, NativeQuilProgram};
 use super::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
@@ -110,8 +110,8 @@ pub(crate) enum Unexpected {
     Qcs(String),
 }
 
-impl From<qpu::IsaError> for Error {
-    fn from(source: qpu::IsaError) -> Self {
+impl From<IsaError> for Error {
+    fn from(source: IsaError) -> Self {
         match source {
             IsaError::QpuNotFound => Self::QpuNotFound,
             IsaError::Unauthorized => Self::Unauthorized,
@@ -219,13 +219,13 @@ impl<'a> Execution<'a> {
         params: &Parameters,
         readouts: &[&str],
         config: &Configuration,
-    ) -> Result<HashMap<Box<str>, ExecutionResult>, Error> {
+    ) -> Result<ExecutionData, Error> {
         let qcs = self.refresh_qcs(readouts, config).await?;
         let qcs_for_thread = qcs.clone();
 
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
 
-        let buffers = spawn_blocking(move || {
+        let response = spawn_blocking(move || {
             execute(
                 &qcs_for_thread.executable,
                 &qcs_for_thread.engagement,
@@ -239,9 +239,14 @@ impl<'a> Execution<'a> {
             source,
         })??;
 
-        let registers = process_buffers(buffers, &qcs.buffer_names)?;
-
-        ExecutionResult::try_from_registers(registers, self.shots).map_err(Error::from)
+        let registers = process_buffers(response.buffers, &qcs.buffer_names)?;
+        let register_data = RegisterData::try_from_registers(registers, self.shots)?;
+        Ok(ExecutionData {
+            registers: register_data,
+            duration: response
+                .execution_duration_microseconds
+                .map(Duration::from_micros),
+        })
     }
 
     /// Take or create a [`Qcs`] for this [`Execution`]. This fetches / updates engagements, builds
