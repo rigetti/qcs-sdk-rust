@@ -1,3 +1,13 @@
+## [0.3.0](https://github.com/rigetti/qcs-sdk-rust/compare/v0.2.2...v0.2.3) (2022-06-04)
+
+### Breaking Changes
+
+- The return type of `Executable::execute_on_qpu` and `Executable::execute_on_qvm` is a new `ExecutionData` struct. The previous result map is now stored on `ExecutionData::registers` with the renamed `RegisterData` type (previously `ExecutionResult`). (#90)
+
+### Features
+
+- Return billable QPU execution time in results. (#90)
+
 ## [0.2.2](https://github.com/rigetti/qcs-sdk-rust/compare/v0.2.1...v0.2.2) (2022-06-02)
 
 Maintenance release, updating dependencies only.
