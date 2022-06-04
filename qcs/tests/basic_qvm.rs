@@ -27,11 +27,13 @@ async fn test_bell_state() {
         .expect("Could not run on QVM");
 
     let first: Vec<Vec<i8>> = data
+        .registers
         .remove("first")
         .expect("Missing first buffer")
         .into_i8()
         .expect("Produced wrong data type");
     let second: Vec<Vec<i8>> = data
+        .registers
         .remove("second")
         .expect("Missing second buffer")
         .into_i8()

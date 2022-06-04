@@ -32,6 +32,7 @@ async fn basic_substitution() {
             .expect("Failed to execute");
         parametric_measurements.append(
             &mut result
+                .registers
                 .remove("ro")
                 .expect("Missing ro register")
                 .into_i8()

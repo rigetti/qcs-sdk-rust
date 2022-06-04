@@ -10,10 +10,12 @@
 //! using [`Executable`].
 
 pub use executable::{Error, Executable, Service};
-pub use execution_result::ExecutionResult;
+pub use execution_data::ExecutionData;
+pub use register_data::RegisterData;
 
 pub mod configuration;
 mod executable;
-mod execution_result;
+mod execution_data;
 mod qpu;
 mod qvm;
+mod register_data;
