@@ -358,7 +358,7 @@ RZ(__SUBST[1]) 0
         assert_eq!(substitutions.len(), 2);
         assert_eq!(
             substitutions[0].to_string(),
-            "((3.0*theta[0])/6.283185307179586)"
+            "((3*theta[0])/6.283185307179586)"
         );
         assert_eq!(
             substitutions[1].to_string(),
@@ -388,7 +388,7 @@ SET-SCALE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/8.0)");
+        assert_eq!(substitutions[0].to_string(), "(theta[0]/8)");
     }
 
     #[test]
@@ -425,8 +425,8 @@ SET-FREQUENCY 1 "rf" __SUBST[1]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        assert_eq!(substitutions[0].to_string(), "((theta[0]-10.0)/20.0)");
-        assert_eq!(substitutions[1].to_string(), "(theta[0]/20.0)");
+        assert_eq!(substitutions[0].to_string(), "((theta[0]-10)/20)");
+        assert_eq!(substitutions[1].to_string(), "(theta[0]/20)");
     }
 
     #[test]
