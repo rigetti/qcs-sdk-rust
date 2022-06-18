@@ -22,7 +22,7 @@ impl Execution {
     /// Construct a new [`Execution`] from Quil. Immediately parses the Quil and returns an error if
     /// there are any problems.
     pub(crate) fn new(quil: &str) -> Result<Self, Error> {
-        let program = Program::from_str(quil).map_err(|e| Error::Parsing(format!("{}", e)))?;
+        let program = Program::from_str(quil).map_err(Error::Parsing)?;
         Ok(Self { program })
     }
 

@@ -201,12 +201,10 @@ impl<'a> Execution<'a> {
             NativeQuil::assume_native_quil(quil.to_string())
         };
 
-        let program =
-            NativeQuilProgram::try_from(native_quil).map_err(|e| Error::Quil(format!("{}", e)))?;
+        let program = NativeQuilProgram::try_from(native_quil).map_err(Error::Quil)?;
 
         Ok(Self {
-            program: RewrittenProgram::try_from(program)
-                .map_err(|e| Error::Quil(format!("{}", e)))?,
+            program: RewrittenProgram::try_from(program).map_err(|e| Error::Quil(e.to_string()))?,
             quantum_processor_id,
             shots,
             qcs: None,
