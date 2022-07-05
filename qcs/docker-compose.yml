@@ -8,6 +8,6 @@ services:
       - '5000:5000'
   quilc:
     image: rigetti/quilc
-    command: -S
+    command: -S -P
     ports:
       - '5555:5555'
