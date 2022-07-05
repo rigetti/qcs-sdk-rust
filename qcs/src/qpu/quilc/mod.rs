@@ -168,9 +168,8 @@ mod tests {
 
     use super::*;
 
-    const EXPECTED_H0_OUTPUT: &str = r#"MEASURE 0                               # Entering rewiring: #(0 1)
-HALT                                    # Exiting rewiring: #(0 1)
-"#;
+    const EXPECTED_H0_OUTPUT: &str =
+        "MEASURE 0                               # Entering/exiting rewiring: (#(0 1) . #(0 1))\n";
 
     fn aspen_9_isa() -> InstructionSetArchitecture {
         serde_json::from_reader(File::open("tests/aspen_9_isa.json").unwrap()).unwrap()
