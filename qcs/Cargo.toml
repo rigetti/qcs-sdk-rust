@@ -20,7 +20,7 @@ lazy_static = "1.4.0"
 log = "0.4.17"
 num = "0.4.0"
 qcs-api = { version = "0.0.6", path = "../qcs-api" }
-quil-rs = "0.12.0"
+quil-rs = "0.12.1"
 reqwest = { version = "0.11.11", features = ["rustls", "json"] }
 rmp-serde = "1.1.0"
 serde = { version = "1.0.137", features = ["derive"] }
@@ -37,7 +37,7 @@ erased-serde = "0.3.21"
 float-cmp = "0.9.0"
 hex = "0.4.3"
 maplit = "1.0.2"
-simple_logger = { version = "2.1.0", default-features = false }
+simple_logger = { version = "2.2.0", default-features = false }
 tempfile = "3.3.0"
 tokio = { version = "1.19.2", features = ["macros", "rt-multi-thread"] }
 warp = "0.3.2"
