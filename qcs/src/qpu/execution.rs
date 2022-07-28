@@ -2,22 +2,22 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use log::trace;
+use log::{trace, warn};
 use quil_rs::expression::Expression;
 use tokio::task::{spawn_blocking, JoinError};
 
-use qcs_api::models::EngagementWithCredentials;
-
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
+use crate::qpu::runner::JobId;
 use crate::{ExecutionData, RegisterData};
 
 use super::quilc::{self, NativeQuil, NativeQuilProgram};
 use super::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
-use super::runner::{self, execute, DecodeError};
+use super::rpcq::Client;
+use super::runner::{self, retrieve_results, submit, DecodeError};
 use super::translation::Error as TranslationError;
 use super::{
     build_executable, engagement, get_isa, organize_ro_sources, process_buffers, IsaError,
@@ -52,6 +52,10 @@ pub(crate) enum Error {
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
+    #[error(
+        "The program must first be submitted through the same Executable before retrieving results"
+    )]
+    ProgramNotSubmitted,
 }
 
 impl From<quilc::Error> for Error {
@@ -148,7 +152,7 @@ impl From<DecodeError> for Error {
 struct Qcs {
     /// A mapping of the register name declared in a program to the list of corresponding Buffer names
     buffer_names: HashMap<Box<str>, Vec<String>>,
-    engagement: EngagementWithCredentials,
+    rpcq_client: Mutex<Client>,
     executable: String,
 }
 
@@ -212,24 +216,35 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn run(
+    pub(crate) async fn submit(
         &mut self,
         params: &Parameters,
         readouts: &[&str],
         config: &Configuration,
-    ) -> Result<ExecutionData, Error> {
+    ) -> Result<JobId, Error> {
         let qcs = self.refresh_qcs(readouts, config).await?;
         let qcs_for_thread = qcs.clone();
 
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
 
+        spawn_blocking(move || {
+            let guard = qcs_for_thread.rpcq_client.lock().unwrap();
+            submit(&qcs_for_thread.executable, &patch_values, &guard).map_err(Error::from)
+        })
+        .await
+        .map_err(|source| Unexpected::TaskError {
+            task_name: "qpu",
+            source,
+        })?
+    }
+
+    pub(crate) async fn retrieve_results(&self, job_id: JobId) -> Result<ExecutionData, Error> {
+        let qcs = self.qcs.clone().ok_or(Error::ProgramNotSubmitted)?;
+        let qcs_for_thread = qcs.clone();
+
         let response = spawn_blocking(move || {
-            execute(
-                &qcs_for_thread.executable,
-                &qcs_for_thread.engagement,
-                &patch_values,
-            )
-            .map_err(Error::from)
+            let guard = qcs_for_thread.rpcq_client.lock().unwrap();
+            retrieve_results(job_id, &guard).map_err(Error::from)
         })
         .await
         .map_err(|source| Unexpected::TaskError {
@@ -273,9 +288,15 @@ impl<'a> Execution<'a> {
         })?;
         let buffer_names = organize_ro_sources(ro_sources, readouts)?;
         let engagement = engagement::get(String::from(self.quantum_processor_id), config).await?;
+        let rpcq_client = Client::try_from(&engagement)
+            .map_err(|e| {
+                warn!("Unable to connect to QPU via RPCQ: {:?}", e);
+                Error::QcsCommunication
+            })
+            .map(Mutex::new)?;
         let qcs = Arc::new(Qcs {
             buffer_names,
-            engagement,
+            rpcq_client,
             executable: response.program,
         });
         self.qcs = Some(qcs.clone());

@@ -21,6 +21,7 @@ use translation::{translate, Error as TranslationError};
 use crate::configuration::Configuration;
 use crate::qpu::rewrite_arithmetic::RewrittenQuil;
 pub(crate) use crate::qpu::runner::DecodeError;
+pub(crate) use crate::qpu::runner::JobId;
 pub(crate) use crate::qpu::runner::Register;
 
 mod engagement;

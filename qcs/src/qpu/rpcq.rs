@@ -1,5 +1,8 @@
+use log::{trace, warn};
 use std::collections::HashMap;
+use std::convert::TryFrom;
 
+use qcs_api::models::EngagementWithCredentials;
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -24,10 +27,7 @@ impl Client {
     }
 
     /// Construct a new [`Client`] with authentication.
-    pub(crate) fn new_with_credentials(
-        endpoint: &str,
-        credentials: &Credentials,
-    ) -> Result<Self, Error> {
+    fn new_with_credentials(endpoint: &str, credentials: &Credentials) -> Result<Self, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
@@ -101,6 +101,30 @@ impl Client {
     }
 }
 
+impl TryFrom<&EngagementWithCredentials> for Client {
+    type Error = Error;
+
+    fn try_from(engagement: &EngagementWithCredentials) -> Result<Self, Error> {
+        let EngagementWithCredentials {
+            address,
+            credentials,
+            ..
+        } = engagement;
+        if credentials.server_public.is_empty() {
+            warn!("Connecting to QPU on {} with no credentials.", address);
+            Client::new(address)
+        } else {
+            let credentials = Credentials {
+                client_secret_key: &credentials.client_secret,
+                client_public_key: &credentials.client_public,
+                server_public_key: &credentials.server_public,
+            };
+            trace!("Connecting to QPU at {} with credentials", &address);
+            Client::new_with_credentials(address, &credentials)
+        }
+    }
+}
+
 /// All of the possible errors for this module
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
@@ -159,7 +183,7 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
 }
 
 /// Credentials for connecting to RPCQ Server
-pub(crate) struct Credentials<'a> {
+struct Credentials<'a> {
     pub client_secret_key: &'a str,
     pub client_public_key: &'a str,
     pub server_public_key: &'a str,

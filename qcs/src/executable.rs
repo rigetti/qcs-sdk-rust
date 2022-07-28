@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::configuration::{Configuration, LoadError, RefreshError};
-use crate::qpu::ExecutionError;
+use crate::qpu::{ExecutionError, JobId};
 use crate::{qpu, qvm, ExecutionData};
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
@@ -324,7 +324,7 @@ impl<'execution> Executable<'_, 'execution> {
         }
     }
 
-    /// Execute on a real QPU
+    /// Compile the program and execute it on a QPU, waiting for results.
     ///
     /// # Arguments
     /// 1. `quantum_processor_id`: The name of the QPU to run on. This parameter affects the
@@ -351,18 +351,37 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
+        let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
+        self.retrieve_results(job_handle).await
+    }
+
+    /// Compile and submit the program to a QPU, but do not wait for execution to complete.
+    ///
+    /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
+    /// results.
+    ///
+    /// # Errors
+    ///
+    /// See [`Executable::execute_on_qpu`].
+    pub async fn submit_to_qpu(
+        &mut self,
+        quantum_processor_id: &'execution str,
+    ) -> Result<JobHandle<'execution>, Error> {
         let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
         let mut config = self.get_config().await?;
 
-        let response = match qpu.run(&self.params, self.get_readouts(), &config).await {
+        let response = match qpu.submit(&self.params, self.get_readouts(), &config).await {
             Ok(response) => Ok(response),
             Err(ExecutionError::Unauthorized) => {
                 config = self.refresh_config().await?;
-                qpu.run(&self.params, self.get_readouts(), &config).await
+                qpu.submit(&self.params, self.get_readouts(), &config).await
             }
             Err(err) => Err(err),
-        };
-
+        }
+        .map(|job_id| JobHandle {
+            job_id,
+            quantum_processor_id,
+        });
         self.qpu = if let Err(ExecutionError::QpuUnavailable(_)) = response {
             // Could mean maintenance which requires recompile
             None
@@ -370,6 +389,18 @@ impl<'execution> Executable<'_, 'execution> {
             Some(qpu)
         };
         response.map_err(Error::from)
+    }
+
+    /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
+    ///
+    /// # Errors
+    ///
+    /// See [`Executable::execute_on_qpu`].
+    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecuteResult {
+        let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
+        qpu.retrieve_results(job_handle.job_id)
+            .await
+            .map_err(Error::from)
     }
 }
 
@@ -414,6 +445,11 @@ pub enum Error {
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
     #[error("An unexpected error occurred, please open an issue on GitHub: {0:?}")]
     Unexpected(String),
+    /// Occurs when [`Executable::retrieve_results`] is called with an invalid [`JobHandle`].
+    /// Calling functions on [`Executable`] between [`Executable::submit_to_qpu`] and
+    /// [`Executable::retrieve_results`] can invalidate the handle.
+    #[error("The job handle was not valid")]
+    InvalidJobHandle,
 }
 
 #[derive(Debug)]
@@ -461,7 +497,7 @@ impl From<RefreshError> for Error {
     }
 }
 
-impl From<qpu::ExecutionError> for Error {
+impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
             ExecutionError::QpuNotFound => Self::QpuNotFound,
@@ -472,6 +508,7 @@ impl From<qpu::ExecutionError> for Error {
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::Qcs(message) => Self::Unexpected(message),
+            ExecutionError::ProgramNotSubmitted => Self::InvalidJobHandle,
         }
     }
 }
@@ -486,6 +523,20 @@ impl From<qvm::Error> for Error {
             | qvm::Error::RegionNotFound { .. }
             | qvm::Error::Qvm { .. } => Self::Compilation(format!("{}", err)),
         }
+    }
+}
+
+/// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
+/// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
+pub struct JobHandle<'executable> {
+    job_id: JobId,
+    quantum_processor_id: &'executable str,
+}
+
+impl JobHandle<'_> {
+    /// The string representation of the QCS Job ID. Useful for debugging.
+    pub fn job_id(&self) -> &str {
+        self.job_id.0.as_str()
     }
 }
 

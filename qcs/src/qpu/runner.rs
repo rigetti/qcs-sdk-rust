@@ -5,48 +5,34 @@ use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
 use enum_as_inner::EnumAsInner;
-use log::{debug, trace, warn};
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 use serde_bytes::ByteBuf;
 
-use qcs_api::models::EngagementWithCredentials;
-
 use crate::executable::Parameters;
 
-use super::rpcq::{Client, Credentials, Error as RPCQError, RPCRequest};
+use super::rpcq::{Client, Error as RPCQError, RPCRequest};
+
+/// The QCS Job ID. Useful for debugging or retrieving results later.
+pub(crate) struct JobId(pub(crate) String);
 
 /// Execute compiled program on a QPU.
-pub(crate) fn execute(
+pub(crate) fn submit(
     program: &str,
-    engagement: &EngagementWithCredentials,
     patch_values: &Parameters,
-) -> Result<GetExecutionResultsResponse, Error> {
+    client: &Client,
+) -> Result<JobId, Error> {
     let params = QPUParams::from_program(program, patch_values);
-    let EngagementWithCredentials {
-        address,
-        credentials,
-        ..
-    } = engagement;
-
-    // This is a hack to allow testing without credentials since ZAP is absurd
-    let client = if credentials.server_public.is_empty() {
-        warn!("Connecting to QPU on {} with no credentials.", address);
-        Client::new(address)?
-    } else {
-        let credentials = Credentials {
-            client_secret_key: &credentials.client_secret,
-            client_public_key: &credentials.client_public,
-            server_public_key: &credentials.server_public,
-        };
-        trace!("Connecting to QPU at {} with credentials", &address);
-        Client::new_with_credentials(address, &credentials)?
-    };
-
     let request = RPCRequest::from(&params);
     let job_id: String = client.run_request(&request)?;
-    debug!("Received job ID {} from QPU", &job_id);
-    let get_buffers_request = GetExecutionResultsRequest::new(job_id);
+    Ok(JobId(job_id))
+}
+
+pub(crate) fn retrieve_results(
+    job_id: JobId,
+    client: &Client,
+) -> Result<GetExecutionResultsResponse, Error> {
+    let get_buffers_request = GetExecutionResultsRequest::new(job_id.0);
     client
         .run_request(&RPCRequest::from(&get_buffers_request))
         .map_err(Error::from)
