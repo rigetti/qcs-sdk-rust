@@ -1,4 +1,4 @@
-//! Efficiently submit multiple, separate circuits to the same QPU, then wait for all results.
+//! Submit a program to a QPU but don't immediately wait for the result.
 
 use qcs::Executable;
 
