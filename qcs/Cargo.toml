@@ -1,7 +1,7 @@
 [package]
 name = "qcs"
 description = "High level interface for running Quil on a QPU"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2018"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
@@ -19,7 +19,7 @@ indexmap = "1.9.1"
 lazy_static = "1.4.0"
 log = "0.4.17"
 num = "0.4.0"
-qcs-api = { version = "0.0.6", path = "../qcs-api" }
+qcs-api = { version = "0.0.7", path = "../qcs-api" }
 quil-rs = "0.12.2"
 reqwest = { version = "0.11.11", features = ["rustls", "json"] }
 rmp-serde = "1.1.0"

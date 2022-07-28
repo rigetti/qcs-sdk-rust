@@ -1,3 +1,9 @@
+## [0.3.3](https://github.com/rigetti/qcs-sdk-rust/compare/v0.3.2...v0.3.3) (2022-07-28)
+
+### Features
+
+- Added `Executable::submit_to_qpu` and `Executable::retrieve_results` methods to allow splitting program submission and result retrieval into separate steps. This also enables logging of the QCS job ID for easier debugging.
+
 ## [0.3.2](https://github.com/rigetti/qcs-sdk-rust/compare/v0.3.1...v0.3.2) (2022-06-18)
 
 Maintenance release, updating dependencies only.
