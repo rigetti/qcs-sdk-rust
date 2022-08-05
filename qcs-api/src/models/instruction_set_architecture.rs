@@ -10,11 +10,11 @@
 
 /// InstructionSetArchitecture : The native instruction set architecture of a quantum processor, annotated with characteristics.  The operations described by the `instructions` field are named by their QUIL instruction name, while the operation described by the `benchmarks` field are named by their benchmark routine and are a future extension point that will be populated in future iterations.  The characteristics that annotate both instructions and benchmarks assist the user to generate the best native QUIL program for a desired task, and so are provided as part of the native ISA.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct InstructionSetArchitecture {
     /// The architecture of the quantum processor.
     #[serde(rename = "architecture")]
-    pub architecture: Box<crate::models::Architecture>,
+    pub architecture: Option<Box<crate::models::Architecture>>,
     /// The list of benchmarks that have characterized the quantum processor.
     #[serde(rename = "benchmarks")]
     pub benchmarks: Vec<crate::models::Operation>,
@@ -29,13 +29,17 @@ pub struct InstructionSetArchitecture {
 impl InstructionSetArchitecture {
     /// The native instruction set architecture of a quantum processor, annotated with characteristics.  The operations described by the `instructions` field are named by their QUIL instruction name, while the operation described by the `benchmarks` field are named by their benchmark routine and are a future extension point that will be populated in future iterations.  The characteristics that annotate both instructions and benchmarks assist the user to generate the best native QUIL program for a desired task, and so are provided as part of the native ISA.
     pub fn new(
-        architecture: crate::models::Architecture,
+        architecture: Option<crate::models::Architecture>,
         benchmarks: Vec<crate::models::Operation>,
         instructions: Vec<crate::models::Operation>,
         name: String,
     ) -> InstructionSetArchitecture {
         InstructionSetArchitecture {
-            architecture: Box::new(architecture),
+            architecture: if let Some(x) = architecture {
+                Some(Box::new(x))
+            } else {
+                None
+            },
             benchmarks,
             instructions,
             name,

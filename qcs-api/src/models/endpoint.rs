@@ -10,7 +10,7 @@
 
 /// Endpoint : An Endpoint is the entry point for remote access to a QuantumProcessor.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Endpoint {
     /// Network address at which the endpoint is locally reachable
     #[serde(rename = "address")]

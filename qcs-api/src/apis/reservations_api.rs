@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `create_reservation`
+/// struct for typed errors of method [`create_reservation`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CreateReservationError {
@@ -25,7 +25,7 @@ pub enum CreateReservationError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `delete_reservation`
+/// struct for typed errors of method [`delete_reservation`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum DeleteReservationError {
@@ -35,7 +35,7 @@ pub enum DeleteReservationError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `find_available_reservations`
+/// struct for typed errors of method [`find_available_reservations`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum FindAvailableReservationsError {
@@ -44,7 +44,7 @@ pub enum FindAvailableReservationsError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_group_reservations`
+/// struct for typed errors of method [`list_group_reservations`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListGroupReservationsError {
@@ -53,7 +53,7 @@ pub enum ListGroupReservationsError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_reservations`
+/// struct for typed errors of method [`list_reservations`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListReservationsError {
@@ -67,17 +67,19 @@ pub async fn create_reservation(
     configuration: &configuration::Configuration,
     create_reservation_request: crate::models::CreateReservationRequest,
 ) -> Result<crate::models::Reservation, Error<CreateReservationError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/reservations", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/reservations", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
     local_var_req_builder = local_var_req_builder.json(&create_reservation_request);
@@ -107,21 +109,23 @@ pub async fn delete_reservation(
     configuration: &configuration::Configuration,
     reservation_id: i32,
 ) -> Result<crate::models::Reservation, Error<DeleteReservationError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/reservations/{reservationId}",
-        configuration.base_path,
+        local_var_configuration.base_path,
         reservationId = reservation_id
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::DELETE, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -155,9 +159,14 @@ pub async fn find_available_reservations(
     page_token: Option<&str>,
 ) -> Result<crate::models::FindAvailableReservationsResponse, Error<FindAvailableReservationsError>>
 {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/reservations:findAvailable", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!(
+        "{}/v1/reservations:findAvailable",
+        local_var_configuration.base_path
+    );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
@@ -174,11 +183,11 @@ pub async fn find_available_reservations(
     local_var_req_builder =
         local_var_req_builder.query(&[("startTimeFrom", &start_time_from.to_string())]);
     local_var_req_builder = local_var_req_builder.query(&[("duration", &duration.to_string())]);
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -212,11 +221,13 @@ pub async fn list_group_reservations(
     page_token: Option<&str>,
     show_deleted: Option<&str>,
 ) -> Result<crate::models::ListReservationsResponse, Error<ListGroupReservationsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/groups/{groupName}/reservations",
-        configuration.base_path,
+        local_var_configuration.base_path,
         groupName = crate::apis::urlencode(group_name)
     );
     let mut local_var_req_builder =
@@ -242,11 +253,11 @@ pub async fn list_group_reservations(
         local_var_req_builder =
             local_var_req_builder.query(&[("showDeleted", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -279,9 +290,11 @@ pub async fn list_reservations(
     page_token: Option<&str>,
     show_deleted: Option<&str>,
 ) -> Result<crate::models::ListReservationsResponse, Error<ListReservationsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/reservations", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/reservations", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
@@ -305,11 +318,11 @@ pub async fn list_reservations(
         local_var_req_builder =
             local_var_req_builder.query(&[("showDeleted", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 

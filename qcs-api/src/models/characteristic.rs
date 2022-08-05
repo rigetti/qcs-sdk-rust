@@ -10,7 +10,7 @@
 
 /// Characteristic : A measured characteristic of an operation.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Characteristic {
     /// The error in the characteristic value, or None otherwise.
     #[serde(rename = "error", skip_serializing_if = "Option::is_none")]

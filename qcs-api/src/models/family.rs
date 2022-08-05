@@ -30,3 +30,9 @@ impl ToString for Family {
         }
     }
 }
+
+impl Default for Family {
+    fn default() -> Family {
+        Self::None
+    }
+}

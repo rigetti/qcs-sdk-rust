@@ -10,7 +10,7 @@
 
 /// EngagementCredentials : Credentials are the ZeroMQ CURVE Keys used to encrypt the connection with the Quantum Processor Endpoint.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct EngagementCredentials {
     #[serde(rename = "clientPublic")]
     pub client_public: String,

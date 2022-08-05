@@ -10,7 +10,7 @@
 
 /// CreateEndpointParameters : A publicly available set of parameters for defining an endpoint.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct CreateEndpointParameters {
     /// Public identifier for a quantum processor [example: Aspen-1]
     #[serde(rename = "quantumProcessorId")]
