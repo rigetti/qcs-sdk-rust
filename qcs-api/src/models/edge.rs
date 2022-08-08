@@ -10,7 +10,7 @@
 
 /// Edge : A degree-two logical connection in the quantum processor's architecture.  The existence of an edge in the ISA `Architecture` does not necessarily mean that a given 2Q operation will be available on the edge. This information is conveyed by the presence of the two `node_id` values in instances of `Instruction`.  Note that edges are undirected in this model. Thus edge :math:`(a, b)` is equivalent to edge :math:`(b, a)`.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Edge {
     /// The integer ids of the computational nodes at the two ends of the edge. Order is not important; an architecture edge is treated as undirected.
     #[serde(rename = "node_ids")]

@@ -9,7 +9,6 @@ src/apis/mod.rs
 src/apis/quantum_processors_api.rs
 src/apis/reservations_api.rs
 src/apis/translation_api.rs
-src/lib.rs
 src/models/account_type.rs
 src/models/add_group_user_request.rs
 src/models/architecture.rs

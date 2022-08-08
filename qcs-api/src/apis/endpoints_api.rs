@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `create_endpoint`
+/// struct for typed errors of method [`create_endpoint`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CreateEndpointError {
@@ -23,7 +23,7 @@ pub enum CreateEndpointError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `delete_endpoint`
+/// struct for typed errors of method [`delete_endpoint`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum DeleteEndpointError {
@@ -33,7 +33,7 @@ pub enum DeleteEndpointError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `get_default_endpoint`
+/// struct for typed errors of method [`get_default_endpoint`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetDefaultEndpointError {
@@ -42,7 +42,7 @@ pub enum GetDefaultEndpointError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `get_endpoint`
+/// struct for typed errors of method [`get_endpoint`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetEndpointError {
@@ -51,7 +51,7 @@ pub enum GetEndpointError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_endpoints`
+/// struct for typed errors of method [`list_endpoints`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListEndpointsError {
@@ -64,17 +64,19 @@ pub async fn create_endpoint(
     configuration: &configuration::Configuration,
     create_endpoint_parameters: crate::models::CreateEndpointParameters,
 ) -> Result<crate::models::Endpoint, Error<CreateEndpointError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/endpoints", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/endpoints", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
     local_var_req_builder = local_var_req_builder.json(&create_endpoint_parameters);
@@ -104,21 +106,23 @@ pub async fn delete_endpoint(
     configuration: &configuration::Configuration,
     endpoint_id: &str,
 ) -> Result<serde_json::Value, Error<DeleteEndpointError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/endpoints/{endpointId}",
-        configuration.base_path,
+        local_var_configuration.base_path,
         endpointId = crate::apis::urlencode(endpoint_id)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::DELETE, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -147,21 +151,23 @@ pub async fn get_default_endpoint(
     configuration: &configuration::Configuration,
     quantum_processor_id: &str,
 ) -> Result<crate::models::Endpoint, Error<GetDefaultEndpointError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/quantumProcessors/{quantumProcessorId}/endpoints:getDefault",
-        configuration.base_path,
+        local_var_configuration.base_path,
         quantumProcessorId = crate::apis::urlencode(quantum_processor_id)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -190,21 +196,23 @@ pub async fn get_endpoint(
     configuration: &configuration::Configuration,
     endpoint_id: &str,
 ) -> Result<crate::models::Endpoint, Error<GetEndpointError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/endpoints/{endpointId}",
-        configuration.base_path,
+        local_var_configuration.base_path,
         endpointId = crate::apis::urlencode(endpoint_id)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -235,9 +243,11 @@ pub async fn list_endpoints(
     page_size: Option<i32>,
     page_token: Option<&str>,
 ) -> Result<crate::models::ListEndpointsResponse, Error<ListEndpointsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/endpoints", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/endpoints", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
@@ -253,11 +263,11 @@ pub async fn list_endpoints(
         local_var_req_builder =
             local_var_req_builder.query(&[("pageToken", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 

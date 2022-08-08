@@ -10,7 +10,7 @@
 
 /// EngagementWithCredentials : An engagement is the authorization of a user to execute work on a Quantum Processor Endpoint.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct EngagementWithCredentials {
     /// User ID or group name on behalf of which the engagement is made.
     #[serde(rename = "accountId", skip_serializing_if = "Option::is_none")]

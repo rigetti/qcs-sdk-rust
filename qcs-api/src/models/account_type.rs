@@ -27,3 +27,9 @@ impl ToString for AccountType {
         }
     }
 }
+
+impl Default for AccountType {
+    fn default() -> AccountType {
+        Self::Group
+    }
+}

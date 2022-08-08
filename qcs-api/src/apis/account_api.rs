@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `add_group_user`
+/// struct for typed errors of method [`add_group_user`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AddGroupUserError {
@@ -22,7 +22,7 @@ pub enum AddGroupUserError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_group_users`
+/// struct for typed errors of method [`list_group_users`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListGroupUsersError {
@@ -31,7 +31,7 @@ pub enum ListGroupUsersError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_user_groups`
+/// struct for typed errors of method [`list_user_groups`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListUserGroupsError {
@@ -39,7 +39,7 @@ pub enum ListUserGroupsError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `remove_group_user`
+/// struct for typed errors of method [`remove_group_user`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RemoveGroupUserError {
@@ -53,17 +53,19 @@ pub async fn add_group_user(
     configuration: &configuration::Configuration,
     add_group_user_request: crate::models::AddGroupUserRequest,
 ) -> Result<(), Error<AddGroupUserError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/groups:addUser", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/groups:addUser", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
     local_var_req_builder = local_var_req_builder.json(&add_group_user_request);
@@ -95,11 +97,13 @@ pub async fn list_group_users(
     page_size: Option<i32>,
     page_token: Option<&str>,
 ) -> Result<crate::models::ListGroupUsersResponse, Error<ListGroupUsersError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/groups/{groupName}/users",
-        configuration.base_path,
+        local_var_configuration.base_path,
         groupName = crate::apis::urlencode(group_name)
     );
     let mut local_var_req_builder =
@@ -113,11 +117,11 @@ pub async fn list_group_users(
         local_var_req_builder =
             local_var_req_builder.query(&[("pageToken", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -148,11 +152,13 @@ pub async fn list_user_groups(
     page_size: Option<i32>,
     page_token: Option<&str>,
 ) -> Result<crate::models::ListGroupsResponse, Error<ListUserGroupsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/users/{userId}/groups",
-        configuration.base_path,
+        local_var_configuration.base_path,
         userId = crate::apis::urlencode(user_id)
     );
     let mut local_var_req_builder =
@@ -166,11 +172,11 @@ pub async fn list_user_groups(
         local_var_req_builder =
             local_var_req_builder.query(&[("pageToken", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -199,17 +205,19 @@ pub async fn remove_group_user(
     configuration: &configuration::Configuration,
     remove_group_user_request: crate::models::RemoveGroupUserRequest,
 ) -> Result<(), Error<RemoveGroupUserError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/groups:removeUser", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/groups:removeUser", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
     local_var_req_builder = local_var_req_builder.json(&remove_group_user_request);

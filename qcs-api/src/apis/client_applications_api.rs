@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `check_client_application`
+/// struct for typed errors of method [`check_client_application`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum CheckClientApplicationError {
@@ -22,7 +22,7 @@ pub enum CheckClientApplicationError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `get_client_application`
+/// struct for typed errors of method [`get_client_application`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetClientApplicationError {
@@ -30,7 +30,7 @@ pub enum GetClientApplicationError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_client_applications`
+/// struct for typed errors of method [`list_client_applications`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListClientApplicationsError {
@@ -42,13 +42,18 @@ pub async fn check_client_application(
     configuration: &configuration::Configuration,
     check_client_application_request: crate::models::CheckClientApplicationRequest,
 ) -> Result<crate::models::CheckClientApplicationResponse, Error<CheckClientApplicationError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/clientApplications:check", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!(
+        "{}/v1/clientApplications:check",
+        local_var_configuration.base_path
+    );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
@@ -79,17 +84,19 @@ pub async fn get_client_application(
     configuration: &configuration::Configuration,
     client_application_name: &str,
 ) -> Result<crate::models::ClientApplication, Error<GetClientApplicationError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/clientApplications/{clientApplicationName}",
-        configuration.base_path,
+        local_var_configuration.base_path,
         clientApplicationName = crate::apis::urlencode(client_application_name)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
@@ -118,13 +125,18 @@ pub async fn get_client_application(
 pub async fn list_client_applications(
     configuration: &configuration::Configuration,
 ) -> Result<crate::models::ListClientApplicationsResponse, Error<ListClientApplicationsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/clientApplications", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!(
+        "{}/v1/clientApplications",
+        local_var_configuration.base_path
+    );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }

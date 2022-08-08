@@ -10,7 +10,7 @@
 
 /// OperationSite : A site for an operation, with its site-dependent characteristics.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct OperationSite {
     /// The list of site-dependent characteristics of this operation.
     #[serde(rename = "characteristics")]

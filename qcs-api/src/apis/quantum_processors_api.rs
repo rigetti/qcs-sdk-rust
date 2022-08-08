@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `get_instruction_set_architecture`
+/// struct for typed errors of method [`get_instruction_set_architecture`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetInstructionSetArchitectureError {
@@ -22,7 +22,7 @@ pub enum GetInstructionSetArchitectureError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `get_quantum_processor`
+/// struct for typed errors of method [`get_quantum_processor`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetQuantumProcessorError {
@@ -31,7 +31,7 @@ pub enum GetQuantumProcessorError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `list_quantum_processors`
+/// struct for typed errors of method [`list_quantum_processors`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum ListQuantumProcessorsError {
@@ -44,21 +44,23 @@ pub async fn get_instruction_set_architecture(
     configuration: &configuration::Configuration,
     quantum_processor_id: &str,
 ) -> Result<crate::models::InstructionSetArchitecture, Error<GetInstructionSetArchitectureError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/quantumProcessors/{quantumProcessorId}/instructionSetArchitecture",
-        configuration.base_path,
+        local_var_configuration.base_path,
         quantumProcessorId = crate::apis::urlencode(quantum_processor_id)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -87,21 +89,23 @@ pub async fn get_quantum_processor(
     configuration: &configuration::Configuration,
     quantum_processor_id: &str,
 ) -> Result<crate::models::QuantumProcessor, Error<GetQuantumProcessorError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/quantumProcessors/{quantumProcessorId}",
-        configuration.base_path,
+        local_var_configuration.base_path,
         quantumProcessorId = crate::apis::urlencode(quantum_processor_id)
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -131,9 +135,11 @@ pub async fn list_quantum_processors(
     page_size: Option<i32>,
     page_token: Option<&str>,
 ) -> Result<crate::models::ListQuantumProcessorsResponse, Error<ListQuantumProcessorsError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/quantumProcessors", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/quantumProcessors", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
@@ -145,11 +151,11 @@ pub async fn list_quantum_processors(
         local_var_req_builder =
             local_var_req_builder.query(&[("pageToken", &local_var_str.to_string())]);
     }
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 

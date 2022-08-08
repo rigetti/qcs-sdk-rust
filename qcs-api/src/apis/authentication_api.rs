@@ -13,7 +13,7 @@ use reqwest;
 use super::{configuration, Error};
 use crate::apis::ResponseContent;
 
-/// struct for typed errors of method `auth_email_password_reset_token`
+/// struct for typed errors of method [`auth_email_password_reset_token`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AuthEmailPasswordResetTokenError {
@@ -21,7 +21,7 @@ pub enum AuthEmailPasswordResetTokenError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `auth_get_user`
+/// struct for typed errors of method [`auth_get_user`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AuthGetUserError {
@@ -30,7 +30,7 @@ pub enum AuthGetUserError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `auth_reset_password`
+/// struct for typed errors of method [`auth_reset_password`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AuthResetPasswordError {
@@ -39,7 +39,7 @@ pub enum AuthResetPasswordError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method `auth_reset_password_with_token`
+/// struct for typed errors of method [`auth_reset_password_with_token`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum AuthResetPasswordWithTokenError {
@@ -55,16 +55,18 @@ pub async fn auth_email_password_reset_token(
         crate::models::AuthEmailPasswordResetTokenRequest,
     >,
 ) -> Result<(), Error<AuthEmailPasswordResetTokenError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
+
+    let local_var_client = &local_var_configuration.client;
 
     let local_var_uri_str = format!(
         "{}/v1/auth:emailPasswordResetToken",
-        configuration.base_path
+        local_var_configuration.base_path
     );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
@@ -94,17 +96,19 @@ pub async fn auth_email_password_reset_token(
 pub async fn auth_get_user(
     configuration: &configuration::Configuration,
 ) -> Result<crate::models::User, Error<AuthGetUserError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/auth:getUser", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!("{}/v1/auth:getUser", local_var_configuration.base_path);
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::GET, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
 
@@ -133,17 +137,22 @@ pub async fn auth_reset_password(
     configuration: &configuration::Configuration,
     auth_reset_password_request: crate::models::AuthResetPasswordRequest,
 ) -> Result<(), Error<AuthResetPasswordError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/auth:resetPassword", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!(
+        "{}/v1/auth:resetPassword",
+        local_var_configuration.base_path
+    );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }
-    if let Some(ref local_var_token) = configuration.bearer_access_token {
+    if let Some(ref local_var_token) = local_var_configuration.bearer_access_token {
         local_var_req_builder = local_var_req_builder.bearer_auth(local_var_token.to_owned());
     };
     local_var_req_builder = local_var_req_builder.json(&auth_reset_password_request);
@@ -173,13 +182,18 @@ pub async fn auth_reset_password_with_token(
     configuration: &configuration::Configuration,
     auth_reset_password_with_token_request: crate::models::AuthResetPasswordWithTokenRequest,
 ) -> Result<(), Error<AuthResetPasswordWithTokenError>> {
-    let local_var_client = &configuration.client;
+    let local_var_configuration = configuration;
 
-    let local_var_uri_str = format!("{}/v1/auth:resetPasswordWithToken", configuration.base_path);
+    let local_var_client = &local_var_configuration.client;
+
+    let local_var_uri_str = format!(
+        "{}/v1/auth:resetPasswordWithToken",
+        local_var_configuration.base_path
+    );
     let mut local_var_req_builder =
         local_var_client.request(reqwest::Method::POST, local_var_uri_str.as_str());
 
-    if let Some(ref local_var_user_agent) = configuration.user_agent {
+    if let Some(ref local_var_user_agent) = local_var_configuration.user_agent {
         local_var_req_builder =
             local_var_req_builder.header(reqwest::header::USER_AGENT, local_var_user_agent.clone());
     }

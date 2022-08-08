@@ -10,7 +10,7 @@
 
 /// RemoveGroupUserRequest : Must provide either `userId` or `userEmail` and `groupId` or `groupName`.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct RemoveGroupUserRequest {
     #[serde(rename = "groupId", skip_serializing_if = "Option::is_none")]
     pub group_id: Option<String>,

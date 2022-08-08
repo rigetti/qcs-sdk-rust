@@ -10,7 +10,7 @@
 
 /// AuthResetPasswordWithTokenRequest : Token may be requested with AuthEmailPasswordResetToken.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct AuthResetPasswordWithTokenRequest {
     #[serde(rename = "newPassword")]
     pub new_password: String,

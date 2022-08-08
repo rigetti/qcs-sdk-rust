@@ -16,6 +16,8 @@ args = [
     "/local/qcs_public.yaml",
     "-o",
     "/local",
+    "-t",
+    "/local/custom_templates",  # Only needed until https://github.com/OpenAPITools/openapi-generator/pull/10778 is merged/released
 ]
 
 [tasks.manual]

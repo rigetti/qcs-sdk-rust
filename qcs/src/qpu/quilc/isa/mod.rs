@@ -27,9 +27,10 @@ impl TryFrom<InstructionSetArchitecture> for CompilerIsa {
     type Error = Error;
 
     fn try_from(isa: InstructionSetArchitecture) -> Result<Self, Error> {
-        let mut qubits = Qubit::from_nodes(&isa.architecture.nodes);
+        let architecture = isa.architecture.ok_or(Error::MissingArchitecture)?;
+        let mut qubits = Qubit::from_nodes(&architecture.nodes);
 
-        let mut edges = convert_edges(&isa.architecture.edges)?;
+        let mut edges = convert_edges(&architecture.edges)?;
 
         let site_ops = isa
             .instructions
@@ -88,6 +89,8 @@ pub(crate) enum Error {
     Qubit(#[from] qubit::Error),
     #[error(transparent)]
     Edge(#[from] edge::Error),
+    #[error("Could not find the architecture for the QPU")]
+    MissingArchitecture,
 }
 
 #[cfg(test)]

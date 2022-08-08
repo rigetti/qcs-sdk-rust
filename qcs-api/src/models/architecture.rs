@@ -10,14 +10,14 @@
 
 /// Architecture : Represents the logical underlying architecture of a quantum processor.  The architecture is defined in detail by the nodes and edges that constitute the quantum processor. This defines the set of all nodes that could be operated upon, and indicates to some approximation their physical layout. The main purpose of this is to support geometry calculations that are independent of the available operations, and rendering ISA-based information. Architecture layouts are defined by the `family`, as follows.  The \"Aspen\" family of quantum processor indicates a 2D planar grid layout of octagon unit cells. The `node_id` in this architecture is computed as :math:`100 p_y + 10 p_x + p_u` where :math:`p_y` is the zero-based Y position in the unit cell grid, :math:`p_x` is the zero-based X position in the unit cell grid, and :math:`p_u` is the zero-based position in the octagon unit cell and always ranges from 0 to 7. This scheme has a natural size limit of a 10x10 unit cell grid, which permits the architecture to scale up to 800 nodes.  Note that the operations that are actually available are defined entirely by `Operation` instances. The presence of a node or edge in the `Architecture` model provides no guarantee that any 1Q or 2Q operation will be available to users writing QUIL programs.
 
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Architecture {
     /// A list of all computational edges in the instruction set architecture.
     #[serde(rename = "edges")]
     pub edges: Vec<crate::models::Edge>,
     /// The architecture family. The nodes and edges conform to this family.
     #[serde(rename = "family")]
-    pub family: Box<crate::models::Family>,
+    pub family: Option<Box<crate::models::Family>>,
     /// A list of all computational nodes in the instruction set architecture.
     #[serde(rename = "nodes")]
     pub nodes: Vec<crate::models::Node>,
@@ -27,12 +27,16 @@ impl Architecture {
     /// Represents the logical underlying architecture of a quantum processor.  The architecture is defined in detail by the nodes and edges that constitute the quantum processor. This defines the set of all nodes that could be operated upon, and indicates to some approximation their physical layout. The main purpose of this is to support geometry calculations that are independent of the available operations, and rendering ISA-based information. Architecture layouts are defined by the `family`, as follows.  The \"Aspen\" family of quantum processor indicates a 2D planar grid layout of octagon unit cells. The `node_id` in this architecture is computed as :math:`100 p_y + 10 p_x + p_u` where :math:`p_y` is the zero-based Y position in the unit cell grid, :math:`p_x` is the zero-based X position in the unit cell grid, and :math:`p_u` is the zero-based position in the octagon unit cell and always ranges from 0 to 7. This scheme has a natural size limit of a 10x10 unit cell grid, which permits the architecture to scale up to 800 nodes.  Note that the operations that are actually available are defined entirely by `Operation` instances. The presence of a node or edge in the `Architecture` model provides no guarantee that any 1Q or 2Q operation will be available to users writing QUIL programs.
     pub fn new(
         edges: Vec<crate::models::Edge>,
-        family: crate::models::Family,
+        family: Option<crate::models::Family>,
         nodes: Vec<crate::models::Node>,
     ) -> Architecture {
         Architecture {
             edges,
-            family: Box::new(family),
+            family: if let Some(x) = family {
+                Some(Box::new(x))
+            } else {
+                None
+            },
             nodes,
         }
     }
