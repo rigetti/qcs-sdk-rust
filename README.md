@@ -1,23 +1,12 @@
 # qcs-sdk-rust
 
-A work in progress implementation of pyQuil-like features in Rust.
+The `qcs` crate is a high-level interface to Rigetti's [Quantum Cloud Services], allowing Rust developers to run [Quil] programs on Rigetti's [QPUs]. This crate is a Rust port of [`pyQuil`], though it currently has a much smaller feature set.
 
 > For the C-bindings to this library, check out [qcs-sdk-c](https://github.com/rigetti/qcs-sdk-c)
 
-## Crates
+## Documentation
 
-### Public
-
-These are the top level crates intended for use by third parties.
-
-- [qcs]: For running programs on a QPU or QVM from Rust.
-
-### Internal
-
-These are auxiliary crates not intended for use outside of development.
-
-- [qcs-api](./qcs-api/README.md): A generated OpenAPI client for QCS.
-- [cli](./cli/README.md): A toy CLI for testing QCS things during development.
+This crate is documented primarily via [rustdoc] comments and examples, which are available on [docs.rs].
 
 ## Development
 
@@ -51,8 +40,6 @@ For new crates, the following code block should be added to the top of the `main
 #![forbid(unsafe_code)]
 ```
 
-### 
-
 ### Documentation
 
 To build the docs.rs-style docs, run `makers docs`. Only the [qcs] crate will have published docs in this format, so it's usually not worth running this at the workspace level. From within the [qcs] crate you can also do `makers serve-docs` to launch a local webserver for viewing immediately.
@@ -63,3 +50,10 @@ Before release, `makers manual` must be run in order to run tests against live Q
 
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
 [qcs]: ./qcs/README.md
+
+[Quantum Cloud Services]: https://docs.rigetti.com/qcs/
+[Quil]: https://github.com/quil-lang/quil
+[QPUs]: https://qcs.rigetti.com/qpus/
+[`pyQuil`]: https://github.com/rigetti/pyquil
+[rustdoc]: https://doc.rust-lang.org/rustdoc/index.html
+[docs.rs]: https://docs.rs/qcs
