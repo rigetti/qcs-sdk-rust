@@ -26,4 +26,4 @@ jobs:
           CARGO_MAKE_BUILD_EXAMPLES: true
         with:
           command: make
-          args: workspace-ci-flow
+          args: ci-flow
