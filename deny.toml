@@ -83,7 +83,7 @@ license-files = [
 [licenses.private]
 # If true, ignores workspace crates that aren't published, or are only
 # published to private registries
-ignore = true
+ignore = false
 
 # This section is considered when running `cargo deny check bans`.
 # More documentation about the 'bans' section can be found here:
