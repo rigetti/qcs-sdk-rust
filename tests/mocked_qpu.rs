@@ -149,7 +149,7 @@ mod mock_qcs {
                     endpoint_id: "".to_string(),
                     expires_at: "".to_string(),
                     minimum_priority: None,
-                    quantum_processor_id: "".to_string(),
+                    quantum_processor_ids: None,
                     tags: None,
                     user_id: "".to_string(),
                 })
