@@ -9,7 +9,7 @@
 //! crate allows you to run Quil programs against real QPUs or a QVM
 //! using [`Executable`].
 
-pub use executable::{Error, Executable, Service};
+pub use executable::{Error, Executable, JobHandle, Service};
 pub use execution_data::ExecutionData;
 pub use register_data::RegisterData;
 
