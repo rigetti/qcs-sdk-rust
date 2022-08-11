@@ -1,3 +1,14 @@
+## 0.6.0
+
+### Breaking Changes
+
+- added `#[must_use]` to `JobHandle::job_id` at clippy's
+suggestion.
+
+### Features
+
+- export JobHandle and derive traits on it (#129)
+
 ## 0.5.0
 
 ### Breaking Changes
