@@ -529,6 +529,7 @@ impl From<qvm::Error> for Error {
 
 /// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
 /// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct JobHandle<'executable> {
     job_id: JobId,
     quantum_processor_id: &'executable str,
@@ -536,6 +537,7 @@ pub struct JobHandle<'executable> {
 
 impl JobHandle<'_> {
     /// The string representation of the QCS Job ID. Useful for debugging.
+    #[must_use]
     pub fn job_id(&self) -> &str {
         self.job_id.0.as_str()
     }
