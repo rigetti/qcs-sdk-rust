@@ -12,7 +12,7 @@ use super::operator::{
 };
 
 /// Represents a connection between two qubits.
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub(crate) struct Edge {
     #[serde(rename = "ids")]
     id: EdgeId,

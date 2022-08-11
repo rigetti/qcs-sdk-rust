@@ -14,6 +14,7 @@ use crate::executable::Parameters;
 use super::rpcq::{Client, Error as RPCQError, RPCRequest};
 
 /// The QCS Job ID. Useful for debugging or retrieving results later.
+#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub(crate) struct JobId(pub(crate) String);
 
 /// Execute compiled program on a QPU.
@@ -63,7 +64,7 @@ impl From<RPCQError> for Error {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct QPUParams<'request> {
     request: QPURequest<'request>,
     priority: u8,
@@ -84,7 +85,7 @@ impl<'params> From<&'params QPUParams<'params>> for RPCRequest<'params, QPUParam
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, PartialEq, Clone)]
 #[serde(tag = "_type")]
 struct QPURequest<'request> {
     id: String,
@@ -102,7 +103,7 @@ impl<'request> QPURequest<'request> {
     }
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, Eq, PartialEq, Hash)]
 struct GetExecutionResultsRequest {
     job_id: String,
     wait: bool,
@@ -122,7 +123,7 @@ impl<'request> From<&'request GetExecutionResultsRequest>
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub(crate) struct GetExecutionResultsResponse {
     pub(crate) buffers: HashMap<String, Buffer>,
     #[serde(default)]
@@ -133,14 +134,14 @@ pub(crate) struct GetExecutionResultsResponse {
 ///
 /// Generally this should not be used directly, but converted into an appropriate
 /// 2-D array.
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, PartialEq, Clone, Eq)]
 pub(crate) struct Buffer {
     shape: Vec<usize>,
     data: ByteBuf,
     dtype: DataType,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum DataType {
     Float64,

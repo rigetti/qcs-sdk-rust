@@ -67,7 +67,7 @@ fn process_buffers(
         .collect()
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash)]
 struct BufferName {
     register_name: String,
     buffer_name: String,

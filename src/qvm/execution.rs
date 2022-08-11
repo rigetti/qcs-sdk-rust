@@ -14,6 +14,7 @@ use super::{Request, Response};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Execution {
     program: Program,
 }

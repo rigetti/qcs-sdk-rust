@@ -15,7 +15,7 @@ mod operator;
 mod qubit;
 
 /// Restructuring of an [`InstructionSetArchitecture`] for sending to quilc
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub(crate) struct CompilerIsa {
     #[serde(rename = "1Q")]
     qubits: HashMap<String, Qubit>,

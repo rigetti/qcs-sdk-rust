@@ -5,7 +5,7 @@ use serde::{Serialize, Serializer};
 
 /// Contains all the operators for a single Site ([`super::qubit::Qubit`] or [`super::edge::Edge`]) organized to allow
 /// deduplication by name
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct OperatorMap(HashSet<&'static str>, Vec<Operator>);
 
 impl OperatorMap {
@@ -270,7 +270,7 @@ mod describe_parameters {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Arguments {
     Int(i32),
     Underscores,

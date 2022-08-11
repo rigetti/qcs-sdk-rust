@@ -67,6 +67,7 @@ impl Error {
 
 /// A wrapper around a [`String`] which indicates the string contains valid Native Quil. That is,
 /// Quil which has been processed through `quilc`.
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct NativeQuil(String);
 
 impl NativeQuil {
@@ -84,7 +85,7 @@ impl From<NativeQuil> for String {
 
 /// A wrapper around [`Program`] which indicates it has been converted to `NativeQuil` (has been run
 /// through `quilc` and therefore is suitable to use on QPUs.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub(super) struct NativeQuilProgram(Program);
 
 impl TryFrom<NativeQuil> for NativeQuilProgram {
@@ -102,13 +103,13 @@ impl From<NativeQuilProgram> for Program {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcResponse {
     pub quil: String,
 }
 
 /// The top level params that get passed to quilc
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 struct QuilcParams {
     protoquil: Option<bool>,
     #[serde(rename = "*args")]
@@ -125,7 +126,7 @@ impl QuilcParams {
 }
 
 /// The expected request structure for sending Quil to quilc to be compiled
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 struct NativeQuilRequest {
     quil: String,
@@ -142,7 +143,7 @@ impl NativeQuilRequest {
 }
 
 /// Description of a device to compile for, part of [`NativeQuilRequest`]
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 struct TargetDevice {
     isa: CompilerIsa,

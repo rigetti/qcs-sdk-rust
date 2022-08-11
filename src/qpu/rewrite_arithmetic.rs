@@ -258,11 +258,13 @@ fn substitution(expression: Expression, substitutions: &mut Substitutions) -> Ex
     Expression::Address(reference)
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct RewrittenProgram {
     inner: Program,
     pub(crate) substitutions: Substitutions,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
 pub(crate) struct RewrittenQuil(String);
 
 impl From<RewrittenQuil> for String {
