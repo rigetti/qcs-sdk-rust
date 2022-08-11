@@ -183,6 +183,7 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
 }
 
 /// Credentials for connecting to RPCQ Server
+#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 struct Credentials<'a> {
     pub client_secret_key: &'a str,
     pub client_public_key: &'a str,

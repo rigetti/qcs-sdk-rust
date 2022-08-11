@@ -57,7 +57,7 @@ mod describe_load {
     }
 }
 
-#[derive(Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Secrets {
     pub credentials: HashMap<String, Credential>,
 }
@@ -76,12 +76,12 @@ fn default_credentials() -> HashMap<String, Credential> {
     map
 }
 
-#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Credential {
     pub token_payload: Option<TokenPayload>,
 }
 
-#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct TokenPayload {
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,

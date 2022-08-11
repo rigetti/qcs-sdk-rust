@@ -56,7 +56,7 @@ mod describe_load {
     }
 }
 
-#[derive(Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Settings {
     /// Which profile to select settings from when none is specified.
     pub default_profile_name: String,
@@ -89,7 +89,7 @@ fn default_auth_servers() -> HashMap<String, AuthServer> {
     map
 }
 
-#[derive(Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Profile {
     /// URL of the QCS API to use for all API calls
     pub api_url: String,
@@ -110,12 +110,12 @@ impl Default for Profile {
     }
 }
 
-#[derive(Deserialize, Debug, Default, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, Default, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Applications {
     pub pyquil: Pyquil,
 }
 
-#[derive(Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Deserialize, Debug, PartialEq, Serialize, Clone, Eq)]
 pub(crate) struct Pyquil {
     pub qvm_url: String,
     pub quilc_url: String,
@@ -130,7 +130,7 @@ impl Default for Pyquil {
     }
 }
 
-#[derive(Clone, Deserialize, Debug, PartialEq, Serialize)]
+#[derive(Clone, Deserialize, Debug, PartialEq, Serialize, Eq)]
 pub(crate) struct AuthServer {
     pub(crate) client_id: String,
     pub(crate) issuer: String,

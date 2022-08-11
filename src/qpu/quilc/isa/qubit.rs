@@ -10,7 +10,7 @@ use super::operator::{Arguments, OperatorMap, Parameters, PERFECT_DURATION, PERF
 use super::Operator;
 
 /// Represents a single Qubit on a QPU and its capabilities. Needed by quilc for optimization.
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 pub(crate) struct Qubit {
     id: i32,
     #[serde(skip_serializing_if = "is_false")]
@@ -131,6 +131,7 @@ mod describe_qubit {
     }
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct FrbSim1q(Vec<Characteristic>);
 
 impl TryFrom<Vec<Operation>> for FrbSim1q {

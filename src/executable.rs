@@ -52,6 +52,7 @@ use crate::{qpu, qvm, ExecutionData};
 /// You should be able to largely ignore these, just keep in mind that any borrowed data passed to
 /// the methods most likely needs to live as long as this struct. Check individual methods for
 /// specifics. If only using `'static` strings then everything should just work.
+#[derive(Clone)]
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
     shots: u16,
@@ -452,7 +453,7 @@ pub enum Error {
     InvalidJobHandle,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 /// The external services that this SDK may connect to. Used to differentiate between networking
 /// issues in [`Error::Connection`].
 pub enum Service {

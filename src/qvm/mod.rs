@@ -11,26 +11,26 @@ use crate::RegisterData;
 
 mod execution;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(untagged)]
 pub(super) enum Response {
     Success(Success),
     Failure(Failure),
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
 pub(super) struct Success {
     #[serde(flatten)]
     pub registers: HashMap<String, RegisterData>,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub(super) struct Failure {
     /// The message from QVM describing what went wrong.
     pub status: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 struct Request<'request> {
     quil_instructions: String,
@@ -52,7 +52,7 @@ impl<'request> Request<'request> {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 enum RequestType {
     Multishot,

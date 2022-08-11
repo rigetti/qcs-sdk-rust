@@ -137,7 +137,7 @@ impl Configuration {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Copy, Clone, Eq, PartialEq)]
 struct TokenRequest<'a> {
     grant_type: &'static str,
     client_id: &'a str,
@@ -154,7 +154,7 @@ impl<'a> TokenRequest<'a> {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, Eq, PartialEq)]
 struct TokenResponse {
     refresh_token: String,
     access_token: String,
