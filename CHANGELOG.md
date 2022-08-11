@@ -1,3 +1,13 @@
+## 0.4.0
+
+### Breaking Changes
+
+- Regenerate API client with latest generator (#114)
+
+### Features
+
+- derive more traits on types (#125)
+
 ## [0.3.3](https://github.com/rigetti/qcs-sdk-rust/compare/v0.3.2...v0.3.3) (2022-07-28)
 
 ### Features
