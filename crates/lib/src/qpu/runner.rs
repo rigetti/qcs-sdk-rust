@@ -15,7 +15,7 @@ use super::rpcq::{Client, Error as RPCQError, RPCRequest};
 
 /// The QCS Job ID. Useful for debugging or retrieving results later.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub(crate) struct JobId(pub(crate) String);
+pub struct JobId(pub(crate) String);
 
 /// Execute compiled program on a QPU.
 pub(crate) fn submit(
@@ -41,7 +41,7 @@ pub(crate) fn retrieve_results(
 
 /// All of the possible errors for this module
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Error connecting to the QPU")]
     Connection(#[source] RPCQError),
     #[error("An error not expected to occur—if encountered it may indicate bug in this library")]

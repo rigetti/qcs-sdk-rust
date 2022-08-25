@@ -8,7 +8,7 @@ use qcs_api::models::{CreateEngagementRequest, EngagementWithCredentials, Error 
 use crate::configuration::Configuration;
 
 /// Try to get an engagement for a QPU
-pub(super) async fn get(
+pub(crate) async fn get(
     quantum_processor_id: String,
     config: &Configuration,
 ) -> Result<EngagementWithCredentials, Error> {
@@ -82,7 +82,7 @@ async fn create_engagement(
 const DEFAULT_RETRY_AFTER: Duration = Duration::from_secs(15 /* minutes */ * 60);
 
 #[derive(thiserror::Error, Debug)]
-pub(super) enum Error {
+pub enum Error {
     #[error("the QPU is unavailable, try again after {} seconds", .0.as_secs())]
     QuantumProcessorUnavailable(Duration),
     #[error("Received an unauthorized response, try refreshing the token")]

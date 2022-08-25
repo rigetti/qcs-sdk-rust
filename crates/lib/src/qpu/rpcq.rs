@@ -127,7 +127,7 @@ impl TryFrom<&EngagementWithCredentials> for Client {
 
 /// All of the possible errors for this module
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Could not create a socket.")]
     SocketCreation(#[source] zmq::Error),
     #[error("Failed while trying to set up auth. This is likely a bug in this library.")]

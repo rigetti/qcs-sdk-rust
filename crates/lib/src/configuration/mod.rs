@@ -28,7 +28,7 @@ mod settings;
 
 /// All the config data that's parsed from config sources
 #[derive(Clone, Debug)]
-pub(crate) struct Configuration {
+pub struct Configuration {
     api_config: api::Configuration,
     auth_server: AuthServer,
     refresh_token: Option<String>,
@@ -40,7 +40,7 @@ pub(crate) struct Configuration {
 pub const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
 
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum RefreshError {
+pub enum RefreshError {
     #[error("No refresh token is in secrets")]
     NoRefreshToken,
     #[error("Error fetching new token")]
@@ -48,7 +48,7 @@ pub(crate) enum RefreshError {
 }
 
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum LoadError {
+pub enum LoadError {
     #[error("Expected profile {0} in settings.profiles but it didn't exist")]
     ProfileNotFound(String),
     #[error("Expected auth server {0} in settings.auth_servers but it didn't exist")]
@@ -74,7 +74,7 @@ impl Configuration {
     /// # Errors
     ///
     /// See [`LoadError`].
-    pub(crate) async fn load() -> Result<Self, LoadError> {
+    pub async fn load() -> Result<Self, LoadError> {
         let (settings, secrets) = try_join(settings::load(), secrets::load()).await?;
         Self::new(settings, secrets)
     }
@@ -84,7 +84,7 @@ impl Configuration {
     /// # Errors
     ///
     /// See [`RefreshError`].
-    pub(crate) async fn refresh(mut self) -> Result<Self, RefreshError> {
+    pub async fn refresh(mut self) -> Result<Self, RefreshError> {
         let refresh_token = self.refresh_token.ok_or(RefreshError::NoRefreshToken)?;
         let token_url = format!("{}/v1/token", &self.auth_server.issuer);
         let data = TokenRequest::new(&self.auth_server.client_id, &refresh_token);

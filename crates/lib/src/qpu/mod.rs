@@ -24,12 +24,12 @@ pub(crate) use crate::qpu::runner::DecodeError;
 pub(crate) use crate::qpu::runner::JobId;
 pub(crate) use crate::qpu::runner::Register;
 
-mod engagement;
+pub(crate) mod engagement;
 mod execution;
 mod quilc;
 mod rewrite_arithmetic;
-mod rpcq;
-mod runner;
+pub(crate) mod rpcq;
+pub(crate) mod runner;
 mod translation;
 
 async fn build_executable(
