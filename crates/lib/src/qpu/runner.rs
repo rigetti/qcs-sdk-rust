@@ -124,10 +124,10 @@ impl<'request> From<&'request GetExecutionResultsRequest>
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
-pub(crate) struct GetExecutionResultsResponse {
-    pub(crate) buffers: HashMap<String, Buffer>,
+pub struct GetExecutionResultsResponse {
+    pub buffers: HashMap<String, Buffer>,
     #[serde(default)]
-    pub(crate) execution_duration_microseconds: Option<u64>,
+    pub execution_duration_microseconds: Option<u64>,
 }
 
 /// The raw form of the data which comes back from an execution.
@@ -135,7 +135,7 @@ pub(crate) struct GetExecutionResultsResponse {
 /// Generally this should not be used directly, but converted into an appropriate
 /// 2-D array.
 #[derive(Deserialize, Debug, PartialEq, Clone, Eq)]
-pub(crate) struct Buffer {
+pub struct Buffer {
     shape: Vec<usize>,
     data: ByteBuf,
     dtype: DataType,
@@ -143,7 +143,7 @@ pub(crate) struct Buffer {
 
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub(crate) enum DataType {
+pub enum DataType {
     Float64,
     Int16,
     Complex64,
