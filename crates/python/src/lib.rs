@@ -1,25 +1,26 @@
-use qcs::qpu::rpcq::Client;
-use qcs::Executable;
+use qcs::api;
+use ::qcs::configuration::Configuration;
 use std::collections::HashMap;
 
 use pyo3::prelude::*;
 
 #[pyfunction]
-fn submit(program: &str, patch_values: HashMap<String, f64>) -> PyResult<String> {
-    let engagement = engagement::get(String::from(self.quantum_processor_id), config).await?;
-    let rpcq_client = Client::try_from(&engagement)
-        .map_err(|e| {
-            warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-            Error::QcsCommunication
-        })
-        .map(Mutex::new)?;
-    let executable = Executable::from_quil(program);
-
-    Ok("".to_string())
+fn submit(
+    py: Python<'_>,
+    program: String,
+    _patch_values: HashMap<String, Vec<f64>>,
+    quantum_processor_id: String,
+) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        let values = HashMap::new();
+        let config = Configuration::load().await.unwrap();
+        let job_id = api::submit(&program, values, &quantum_processor_id, &config).await.unwrap();
+        Ok(Python::with_gil(|_py| job_id))
+    })
 }
 
 #[pymodule]
-fn qcs_(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(execute, m)?)?;
+fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(submit, m)?)?;
     Ok(())
 }
