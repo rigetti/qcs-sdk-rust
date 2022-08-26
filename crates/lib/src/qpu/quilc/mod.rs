@@ -68,7 +68,7 @@ impl Error {
 /// A wrapper around a [`String`] which indicates the string contains valid Native Quil. That is,
 /// Quil which has been processed through `quilc`.
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct NativeQuil(String);
+pub struct NativeQuil(pub String);
 
 impl NativeQuil {
     /// Cast a String to `NativeQuil` without checking or transforming it via `quilc`.

@@ -26,7 +26,7 @@ pub(crate) use crate::qpu::runner::Register;
 
 pub(crate) mod engagement;
 mod execution;
-mod quilc;
+pub(crate) mod quilc;
 mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
@@ -287,7 +287,7 @@ mod describe_organize_ro_sources {
 /// 1. Problem communicating with QCS
 /// 2. Unauthenticated
 /// 3. Expired token
-async fn get_isa(
+pub(crate) async fn get_isa(
     quantum_processor_id: &str,
     config: &Configuration,
 ) -> Result<InstructionSetArchitecture, IsaError> {
