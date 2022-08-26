@@ -2,7 +2,11 @@ use log::warn;
 
 use crate::{
     configuration::Configuration,
-    qpu::{engagement, rpcq::Client, runner::{self, GetExecutionResultsResponse, JobId, Error}},
+    qpu::{
+        engagement,
+        rpcq::Client,
+        runner::{self, Error, GetExecutionResultsResponse, JobId},
+    },
 };
 use std::{collections::HashMap, convert::TryFrom, sync::Mutex};
 
@@ -23,11 +27,8 @@ pub async fn submit(
         })
         .map(Mutex::new)?;
 
-    let job_id: runner::JobId;
-    {
-        let c = rpcq_client.lock().unwrap();
-        job_id = runner::submit(program, &patch_values, &c)?;
-    }
+    let client = rpcq_client.lock().unwrap();
+    let job_id = runner::submit(program, &patch_values, &client)?;
 
     Ok(job_id.0)
 }
@@ -47,6 +48,6 @@ pub async fn retrieve_results(
         })
         .map(Mutex::new)?;
 
-    let c = rpcq_client.lock().unwrap();
-    runner::retrieve_results(JobId(job_id.to_string()), &c)
+    let client = rpcq_client.lock().unwrap();
+    runner::retrieve_results(JobId(job_id.to_string()), &client)
 }
