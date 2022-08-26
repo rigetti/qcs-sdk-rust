@@ -265,7 +265,7 @@ pub(crate) struct RewrittenProgram {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Hash)]
-pub(crate) struct RewrittenQuil(String);
+pub(crate) struct RewrittenQuil(pub String);
 
 impl From<RewrittenQuil> for String {
     fn from(quil: RewrittenQuil) -> String {

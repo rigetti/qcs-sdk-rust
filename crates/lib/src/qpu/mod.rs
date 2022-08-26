@@ -19,7 +19,7 @@ use runner::Buffer;
 use translation::{translate, Error as TranslationError};
 
 use crate::configuration::Configuration;
-use crate::qpu::rewrite_arithmetic::RewrittenQuil;
+pub(crate) use crate::qpu::rewrite_arithmetic::RewrittenQuil;
 pub(crate) use crate::qpu::runner::DecodeError;
 pub(crate) use crate::qpu::runner::JobId;
 pub(crate) use crate::qpu::runner::Register;
@@ -30,7 +30,7 @@ mod quilc;
 mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
-mod translation;
+pub(crate) mod translation;
 
 async fn build_executable(
     quil: RewrittenQuil,

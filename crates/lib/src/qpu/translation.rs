@@ -35,7 +35,7 @@ pub(crate) async fn translate(
 
 /// Errors that can occur during Translation
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Provided program could not be translated: {}", .0.message)]
     ProgramIssue(QcsError),
     #[error("Problem connecting to QCS")]
