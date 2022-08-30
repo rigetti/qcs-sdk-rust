@@ -1112,6 +1112,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pythonize"
+version = "0.16.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "af9dc8ab903e422af4752dc4ad0d176147a71c9c1c982e1a513ba7a6438c1635"
+dependencies = [
+ "pyo3",
+ "serde",
+]
+
+[[package]]
 name = "qcs"
 version = "0.6.0"
 dependencies = [
@@ -1162,6 +1172,7 @@ version = "0.1.0"
 dependencies = [
  "pyo3",
  "pyo3-asyncio",
+ "pythonize",
  "qcs",
  "tokio",
 ]

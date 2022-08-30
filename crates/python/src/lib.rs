@@ -1,7 +1,6 @@
 use ::qcs::configuration::Configuration;
 use pythonize::pythonize;
 use qcs::api;
-use qcs_api::models::TranslateNativeQuilToEncryptedBinaryResponse;
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyException, prelude::*};
@@ -91,3 +90,12 @@ fn retrieve_results(
         Ok(results)
     })
 }
+
+#[pymodule]		
+ fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {		
+     m.add_function(wrap_pyfunction!(compile, m)?)?;		
+     m.add_function(wrap_pyfunction!(translate, m)?)?;		
+     m.add_function(wrap_pyfunction!(submit, m)?)?;		
+     m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;		
+     Ok(())		
+ }

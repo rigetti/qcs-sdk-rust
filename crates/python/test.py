@@ -2,7 +2,7 @@ import asyncio
 import numpy as np
 import qcs
 
-QPU_ID = "Aspen-12"
+QPU_ID = "Aspen-11"
 
 program = """
 DECLARE ro BIT
