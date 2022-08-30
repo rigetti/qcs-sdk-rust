@@ -46,7 +46,7 @@ async fn build_executable(
 /// Process the buffers that come back from a QPU call and map them to the
 /// `buffer_names` provided by the translation service, then attempt to fit that data into the (generic)
 /// requested structure.
-fn process_buffers(
+pub(crate) fn process_buffers(
     mut buffers: HashMap<String, Buffer>,
     buffer_names: &HashMap<Box<str>, Vec<String>>,
 ) -> Result<HashMap<Box<str>, Vec<Register>>, DecodeError> {

@@ -91,11 +91,11 @@ fn retrieve_results(
     })
 }
 
-#[pymodule]		
- fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {		
-     m.add_function(wrap_pyfunction!(compile, m)?)?;		
-     m.add_function(wrap_pyfunction!(translate, m)?)?;		
-     m.add_function(wrap_pyfunction!(submit, m)?)?;		
-     m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;		
-     Ok(())		
- }
+#[pymodule]
+fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(compile, m)?)?;
+    m.add_function(wrap_pyfunction!(translate, m)?)?;
+    m.add_function(wrap_pyfunction!(submit, m)?)?;
+    m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;
+    Ok(())
+}
