@@ -123,7 +123,7 @@ impl<'request> From<&'request GetExecutionResultsRequest>
     }
 }
 
-#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, Eq, PartialEq)]
 pub struct GetExecutionResultsResponse {
     pub buffers: HashMap<String, Buffer>,
     #[serde(default)]
@@ -134,14 +134,14 @@ pub struct GetExecutionResultsResponse {
 ///
 /// Generally this should not be used directly, but converted into an appropriate
 /// 2-D array.
-#[derive(Deserialize, Debug, PartialEq, Clone, Eq)]
+#[derive(Deserialize, Serialize, Debug, PartialEq, Clone, Eq)]
 pub struct Buffer {
-    shape: Vec<usize>,
-    data: ByteBuf,
-    dtype: DataType,
+    pub shape: Vec<usize>,
+    pub data: ByteBuf,
+    pub dtype: DataType,
 }
 
-#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum DataType {
     Float64,

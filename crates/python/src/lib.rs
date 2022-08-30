@@ -1,5 +1,7 @@
 use ::qcs::configuration::Configuration;
+use pythonize::pythonize;
 use qcs::api;
+use qcs_api::models::TranslateNativeQuilToEncryptedBinaryResponse;
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyException, prelude::*};
@@ -10,11 +12,7 @@ create_exception!(qcs, TranslationError, PyException);
 create_exception!(qcs, CompilationError, PyException);
 
 #[pyfunction]
-fn compile(
-    py: Python<'_>,
-    quil: String,
-    quantum_processor_id: String,
-) -> PyResult<&PyAny> {
+fn compile(py: Python<'_>, quil: String, quantum_processor_id: String) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = Configuration::load()
             .await
@@ -40,8 +38,10 @@ fn translate(
         let result = api::translate(&native_quil, num_shots, &quantum_processor_id, &config)
             .await
             .map_err(|e| TranslationError::new_err(e.to_string()))?;
-        // TODO: pass full results, not just program
-        Ok(Python::with_gil(|_py| result.program))
+        let result = Python::with_gil(|py| {
+            pythonize(py, &result).map_err(|e| TranslationError::new_err(e.to_string()))
+        })?;
+        Ok(result)
     })
 }
 
@@ -85,18 +85,9 @@ fn retrieve_results(
         let results = api::retrieve_results(&job_id, &quantum_processor_id, &config)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
-        println!("{:?}", results);
-        Ok(Python::with_gil(|_py| {
-            results.execution_duration_microseconds
-        }))
+        let results = Python::with_gil(|py| {
+            pythonize(py, &results).map_err(|e| ExecutionError::new_err(e.to_string()))
+        })?;
+        Ok(results)
     })
-}
-
-#[pymodule]
-fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(compile, m)?)?;
-    m.add_function(wrap_pyfunction!(translate, m)?)?;
-    m.add_function(wrap_pyfunction!(submit, m)?)?;
-    m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;
-    Ok(())
 }
