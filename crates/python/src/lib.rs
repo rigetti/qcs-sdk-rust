@@ -10,8 +10,11 @@ create_exception!(qcs, ExecutionError, PyException);
 create_exception!(qcs, TranslationError, PyException);
 create_exception!(qcs, CompilationError, PyException);
 
+// TODO Make these kw-only?
+// TODO Return something more flexible than just a string (a Result object)
 #[pyfunction]
 fn compile(py: Python<'_>, quil: String, quantum_processor_id: String) -> PyResult<&PyAny> {
+    // TODO This should probably take a ISA rather than a QPID.
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = Configuration::load()
             .await
