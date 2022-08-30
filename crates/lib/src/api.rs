@@ -11,7 +11,7 @@ use crate::{
         translation,
     },
 };
-use std::{collections::HashMap, convert::TryFrom, sync::Mutex, time::Duration};
+use std::{collections::HashMap, convert::TryFrom, sync::Mutex};
 
 /// Uses quilc to convert a Quil program to native Quil
 pub async fn compile(
