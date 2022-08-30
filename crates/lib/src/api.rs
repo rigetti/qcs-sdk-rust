@@ -1,5 +1,4 @@
 use log::warn;
-use qcs_api::models::TranslateNativeQuilToEncryptedBinaryResponse;
 use serde::Serialize;
 
 use crate::{
@@ -27,20 +26,40 @@ pub async fn compile(
         .map(|p| p.0)
 }
 
+#[derive(Clone, Debug, PartialEq, Default, Serialize)]
+pub struct TranslationResult {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub memory_descriptors:
+        Option<::std::collections::HashMap<String, qcs_api::models::ParameterSpec>>,
+    pub program: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ro_sources: Option<Vec<Vec<String>>>,
+    /// ISO8601 timestamp of the settings used to translate the program. Translation is deterministic; a program translated twice with the same settings by the same version of the service will have identical output.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub settings_timestamp: Option<String>,
+}
+
 /// Translates a native Quil program into an executable
 pub async fn translate(
     native_quil: &str,
     shots: u16,
     quantum_processor_id: &str,
     config: &Configuration,
-) -> Result<TranslateNativeQuilToEncryptedBinaryResponse, translation::Error> {
-    translation::translate(
+) -> Result<TranslationResult, translation::Error> {
+    let translation = translation::translate(
         qpu::RewrittenQuil(native_quil.to_string()),
         shots,
         quantum_processor_id,
         config,
     )
-    .await
+    .await?;
+
+    Ok(TranslationResult {
+        memory_descriptors: translation.memory_descriptors,
+        program: translation.program,
+        ro_sources: translation.ro_sources,
+        settings_timestamp: translation.settings_timestamp,
+    })
 }
 
 /// Submits an executable `program` to be run on the specified QPU
