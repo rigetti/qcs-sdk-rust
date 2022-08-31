@@ -29,6 +29,13 @@ fn compile(py: Python<'_>, quil: String, quantum_processor_isa: String) -> PyRes
 }
 
 #[pyfunction]
+fn rewrite_arithmetic(py: Python<'_>, native_quil: String) -> PyResult<PyObject> {
+    let result = api::rewrite_arithmetic(&native_quil).unwrap();
+    let pyed = pythonize(py, &result).unwrap();
+    Ok(pyed)
+}
+
+#[pyfunction]
 fn translate(
     py: Python<'_>,
     native_quil: String,
@@ -54,6 +61,7 @@ fn submit(
     py: Python<'_>,
     program: String,
     patch_values: HashMap<String, Vec<f64>>,
+    recalculation_table: Vec<String>,
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
@@ -68,7 +76,7 @@ fn submit(
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let job_id = api::submit(&program, patch_values, &quantum_processor_id, &config)
+        let job_id = api::submit(&program, patch_values, recalculation_table, &quantum_processor_id, &config)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| job_id))
@@ -99,6 +107,7 @@ fn retrieve_results(
 #[pymodule]
 fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compile, m)?)?;
+    m.add_function(wrap_pyfunction!(rewrite_arithmetic, m)?)?;
     m.add_function(wrap_pyfunction!(translate, m)?)?;
     m.add_function(wrap_pyfunction!(submit, m)?)?;
     m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;

@@ -1,5 +1,6 @@
 use log::warn;
 use qcs_api::models::InstructionSetArchitecture;
+use quil_rs::expression::Expression;
 use serde::Serialize;
 
 use crate::{
@@ -11,7 +12,7 @@ use crate::{
         translation,
     },
 };
-use std::{collections::HashMap, convert::TryFrom, sync::Mutex};
+use std::{collections::HashMap, convert::TryFrom, str::FromStr, sync::Mutex};
 
 // TODO Define qcs.get_compiler_isa_from_qcs_isa(qcs_isa: String)
 // Quilc expects a "compiler ISA" which is a restructured subset
@@ -28,6 +29,25 @@ pub async fn compile(
     quilc::compile_program(quil, quantum_processor_isa, config)
         .map_err(|e| e.into())
         .map(|p| p.0)
+}
+
+#[derive(Serialize)]
+pub struct RewriteArithmeticResult {
+    pub program: String,
+    pub recalculation_table: Vec<String>,
+}
+
+// TODO: real errors here; no unwrap
+pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
+    let program = quil_rs::program::Program::from_str(native_quil).unwrap();
+
+    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(program).unwrap();
+    let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
+
+    Ok(RewriteArithmeticResult {
+        program: program.to_string(true),
+        recalculation_table,
+    })
 }
 
 #[derive(Clone, Debug, PartialEq, Default, Serialize)]
@@ -70,9 +90,17 @@ pub async fn translate(
 pub async fn submit(
     program: &str,
     patch_values: HashMap<Box<str>, Vec<f64>>,
+    recalculation_table: Vec<String>,
     quantum_processor_id: &str,
     config: &Configuration,
 ) -> Result<String, runner::Error> {
+    let recalculation_table: Vec<Expression> = recalculation_table
+        .iter()
+        .map(|expr| Expression::from_str(expr))
+        .collect::<Result<_, _>>()
+        .map_err(|e| runner::Error::Qpu(format!("Unable to interpret recalc table: {:?}", e)))?;
+    dbg!(&recalculation_table);
+
     let engagement = engagement::get(String::from(quantum_processor_id), config)
         .await
         .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
