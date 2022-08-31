@@ -1174,6 +1174,8 @@ dependencies = [
  "pyo3-asyncio",
  "pythonize",
  "qcs",
+ "qcs-api",
+ "serde_json",
  "tokio",
 ]
 

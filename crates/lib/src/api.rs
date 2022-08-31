@@ -1,4 +1,5 @@
 use log::warn;
+use qcs_api::models::InstructionSetArchitecture;
 use serde::Serialize;
 
 use crate::{
@@ -12,16 +13,19 @@ use crate::{
 };
 use std::{collections::HashMap, convert::TryFrom, sync::Mutex};
 
+// TODO Define qcs.get_compiler_isa_from_qcs_isa(qcs_isa: String)
+// Quilc expects a "compiler ISA" which is a restructured subset
+// of the data in the QCS ISA. Having a SDK utility to convert
+// between the two seems less error-prone / surprising to the user
+// than trying to accept either type of ISA, or provide kwargs, etc.
+
 /// Uses quilc to convert a Quil program to native Quil
 pub async fn compile(
     quil: &str,
-    quantum_processor_id: &str,
+    quantum_processor_isa: InstructionSetArchitecture,
     config: &Configuration,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    let isa = qpu::get_isa(quantum_processor_id, config)
-        .await
-        .map_err(|e| e.to_string())?;
-    quilc::compile_program(quil, isa, config)
+    quilc::compile_program(quil, quantum_processor_isa, config)
         .map_err(|e| e.into())
         .map(|p| p.0)
 }

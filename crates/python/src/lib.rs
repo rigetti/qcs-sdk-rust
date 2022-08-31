@@ -1,6 +1,7 @@
 use ::qcs::configuration::Configuration;
 use pythonize::pythonize;
 use qcs::api;
+use qcs_api::models::instruction_set_architecture::InstructionSetArchitecture;
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyException, prelude::*};
@@ -13,13 +14,14 @@ create_exception!(qcs, CompilationError, PyException);
 // TODO Make these kw-only?
 // TODO Return something more flexible than just a string (a Result object)
 #[pyfunction]
-fn compile(py: Python<'_>, quil: String, quantum_processor_id: String) -> PyResult<&PyAny> {
-    // TODO This should probably take a ISA rather than a QPID.
+fn compile(py: Python<'_>, quil: String, quantum_processor_isa: String) -> PyResult<&PyAny> {
+    let quantum_processor_isa: InstructionSetArchitecture =
+        serde_json::from_str(&quantum_processor_isa).unwrap();
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::compile(&quil, &quantum_processor_id, &config)
+        let result = api::compile(&quil, quantum_processor_isa, &config)
             .await
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
