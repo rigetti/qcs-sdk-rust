@@ -122,6 +122,8 @@ pub fn build_patch_values(
     rewrite_arithmetic::get_substitutions(&substitutions, &memory)
 }
 
+pub type Complex64 = [f32; 2];
+
 /// Data from an individual register. Each variant contains a vector with the expected data type
 /// where each value in the vector corresponds to a shot.
 #[derive(Debug, PartialEq, Serialize)]
@@ -129,7 +131,7 @@ pub fn build_patch_values(
 pub enum Register {
     F64(Vec<f64>),
     I16(Vec<i16>),
-    Complex64(Vec<f32>),
+    Complex64(Vec<Complex64>),
     I8(Vec<i8>),
 }
 
@@ -139,7 +141,7 @@ impl From<qpu::runner::Register> for Register {
             runner::Register::F64(f) => Register::F64(f),
             runner::Register::I16(i) => Register::I16(i),
             runner::Register::Complex32(c) => {
-                Register::Complex64(c.iter().flat_map(|c| vec![c.re, c.im]).collect())
+                Register::Complex64(c.iter().map(|c| [c.re, c.im]).collect())
             }
             runner::Register::I8(i) => Register::I8(i),
         }
