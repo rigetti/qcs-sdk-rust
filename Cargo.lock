@@ -1167,7 +1167,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "qcs-python"
+name = "qcs-sdk-python"
 version = "0.1.0"
 dependencies = [
  "pyo3",

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "qcs-python"
+name = "qcs-sdk-python"
 version = "0.1.0-rc1"
 description = "Python interface for the QCS Rust SDK"
 license = "Apache-2.0"
