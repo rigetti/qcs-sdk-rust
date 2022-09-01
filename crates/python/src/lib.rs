@@ -92,14 +92,9 @@ fn submit(
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let job_id = api::submit(
-            &program,
-            patch_values,
-            &quantum_processor_id,
-            &config,
-        )
-        .await
-        .map_err(|e| ExecutionError::new_err(e.to_string()))?;
+        let job_id = api::submit(&program, patch_values, &quantum_processor_id, &config)
+            .await
+            .map_err(|e| ExecutionError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| job_id))
     })
 }
@@ -126,7 +121,7 @@ fn retrieve_results(
 }
 
 #[pymodule]
-fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn qcs_sdk(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compile, m)?)?;
     m.add_function(wrap_pyfunction!(rewrite_arithmetic, m)?)?;
     m.add_function(wrap_pyfunction!(translate, m)?)?;
