@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "qcs-python"
+version = "0.1.0-rc1"
+description = "Python interface for the QCS Rust SDK"
+license = "Apache-2.0"
+authors = [
+	"Mark Skilbeck <mark.skilbeck@rigetti.com>",
+	"Marquess Valdez <mvaldez@rigetti.com>",
+	"Randall Fulton <rfulton@rigetti.com>"
+]
+
+[tool.maturin]
+bindings = "pyo3"
+compatibility = "linux"
+
+[tool.poetry.dependencies]
+python = ">=3.8<3.10"
+
+[tool.poetry.dev-dependencies]
+maturin = "^0.13.2"
+
+[build-system]
+requires = ["maturin>=0.13,<0.14"]
+build-backend = "maturin"
