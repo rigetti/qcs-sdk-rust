@@ -6,16 +6,16 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use log::{trace, warn};
-use quil_rs::expression::Expression;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::configuration::Configuration;
 use crate::executable::Parameters;
+use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::{ExecutionData, RegisterData};
 
 use super::quilc::{self, NativeQuil, NativeQuilProgram};
-use super::rewrite_arithmetic::{RewrittenProgram, SUBSTITUTION_NAME};
+use super::rewrite_arithmetic::RewrittenProgram;
 use super::rpcq::Client;
 use super::runner::{self, retrieve_results, submit, DecodeError};
 use super::translation::Error as TranslationError;
@@ -226,7 +226,9 @@ impl<'a> Execution<'a> {
         let qcs = self.refresh_qcs(readouts, config).await?;
         let qcs_for_thread = qcs.clone();
 
+        dbg!(&params);
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
+        dbg!(&patch_values);
 
         spawn_blocking(move || {
             let guard = qcs_for_thread.rpcq_client.lock().unwrap();
@@ -334,36 +336,6 @@ impl<'a> Execution<'a> {
     /// `__SUBST` by calculating the original expressions given the user-provided params (in this
     /// case just `theta`).
     fn get_substitutions(&self, params: &Parameters) -> Result<Parameters, String> {
-        // Convert into the format that quil-rs expects.
-        let params: HashMap<&str, Vec<f64>> = params
-            .iter()
-            .map(|(key, value)| (key.as_ref(), value.clone()))
-            .collect();
-        let values = self
-            .program
-            .substitutions
-            .iter()
-            .map(|substitution: &Expression| {
-                substitution
-                    .evaluate(&HashMap::new(), &params)
-                    .map_err(|_| format!("Could not evaluate expression {}", substitution))
-                    .and_then(|complex| {
-                        if complex.im == 0.0 {
-                            Ok(complex.re)
-                        } else {
-                            Err(String::from(
-                                "Cannot substitute imaginary numbers for QPU execution",
-                            ))
-                        }
-                    })
-            })
-            .collect::<Result<Vec<f64>, String>>()?;
-        // Convert back to the format that this library expects
-        let mut patch_values: Parameters = params
-            .into_iter()
-            .map(|(key, value)| (key.into(), value))
-            .collect();
-        patch_values.insert(SUBSTITUTION_NAME.into(), values);
-        Ok(patch_values)
+        rewrite_arithmetic::get_substitutions(&self.program.substitutions, params)
     }
 }

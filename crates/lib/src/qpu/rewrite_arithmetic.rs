@@ -1,4 +1,4 @@
-use std::convert::TryFrom;
+use std::{collections::HashMap, convert::TryFrom};
 
 use indexmap::set::IndexSet;
 use num::complex::Complex64;
@@ -12,7 +12,7 @@ use quil_rs::{
     Program,
 };
 
-use crate::qpu::quilc::NativeQuilProgram;
+use crate::{executable::Parameters, qpu::quilc::NativeQuilProgram};
 
 /// A function for converting `program` into a form that Rigetti QPUs can understand.
 ///
@@ -84,6 +84,70 @@ pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitut
         },
         substitutions,
     ))
+}
+
+/// Take the user-provided map of [`Parameters`] and produce the map of substitutions which
+/// should be given to QCS with the executable.
+///
+/// # Example
+///
+/// If there was a Quil program:
+///
+/// ```quil
+/// DECLARE theta REAL
+///
+/// RX(theta) 0
+/// RX(theta + 1) 0
+/// RX(theta + 2) 0
+/// ```
+///
+/// It would be converted  (in [`Execution::new`]) to something like:
+///
+/// ```quil
+/// DECLARE __SUBST REAL[2]
+/// DECLARE theta REAL[1]
+///
+/// RX(theta) 0
+/// RX(__SUBST[0]) 0
+/// RX(__SUBST[1]) 0
+/// ```
+///
+/// Because QPUs do not evaluate expressions themselves. This function creates the values for
+/// `__SUBST` by calculating the original expressions given the user-provided params (in this
+/// case just `theta`).
+pub(crate) fn get_substitutions(
+    substitutions: &Substitutions,
+    params: &Parameters,
+) -> Result<Parameters, String> {
+    // Convert into the format that quil-rs expects.
+    let params: HashMap<&str, Vec<f64>> = params
+        .iter()
+        .map(|(key, value)| (key.as_ref(), value.clone()))
+        .collect();
+    let values = substitutions
+        .iter()
+        .map(|substitution: &Expression| {
+            substitution
+                .evaluate(&HashMap::new(), &params)
+                .map_err(|_| format!("Could not evaluate expression {}", substitution))
+                .and_then(|complex| {
+                    if complex.im == 0.0 {
+                        Ok(complex.re)
+                    } else {
+                        Err(String::from(
+                            "Cannot substitute imaginary numbers for QPU execution",
+                        ))
+                    }
+                })
+        })
+        .collect::<Result<Vec<f64>, String>>()?;
+    // Convert back to the format that this library expects
+    let mut patch_values: Parameters = params
+        .into_iter()
+        .map(|(key, value)| (key.into(), value))
+        .collect();
+    patch_values.insert(SUBSTITUTION_NAME.into(), values);
+    Ok(patch_values)
 }
 
 /// All of the errors that can occur in this module.

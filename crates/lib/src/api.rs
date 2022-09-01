@@ -7,6 +7,7 @@ use crate::{
     configuration::Configuration,
     qpu::{
         self, engagement, quilc,
+        rewrite_arithmetic::{self, Substitutions},
         rpcq::Client,
         runner::{self, JobId},
         translation,
@@ -115,6 +116,22 @@ pub async fn submit(
     let job_id = runner::submit(program, &patch_values, &client)?;
 
     Ok(job_id.0)
+}
+
+pub fn build_patch_values(
+    recalculation_table: Vec<String>,
+    memory: HashMap<Box<str>, Vec<f64>>,
+) -> Result<HashMap<Box<str>, Vec<f64>>, String> {
+    let substitutions: Substitutions = recalculation_table
+        .iter()
+        .map(|expr| Expression::from_str(expr))
+        .collect::<Result<_, _>>()
+        .map_err(|e| format!("Unable to interpret recalc table: {:?}", e))?;
+    let patch_values = rewrite_arithmetic::get_substitutions(&substitutions, &memory);
+    dbg!(&substitutions);
+    dbg!(&memory);
+    dbg!(&patch_values);
+    patch_values
 }
 
 /// Data from an individual register. Each variant contains a vector with the expected data type

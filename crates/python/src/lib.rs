@@ -76,9 +76,15 @@ fn submit(
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let job_id = api::submit(&program, patch_values, recalculation_table, &quantum_processor_id, &config)
-            .await
-            .map_err(|e| ExecutionError::new_err(e.to_string()))?;
+        let job_id = api::submit(
+            &program,
+            patch_values,
+            recalculation_table,
+            &quantum_processor_id,
+            &config,
+        )
+        .await
+        .map_err(|e| ExecutionError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| job_id))
     })
 }
@@ -104,6 +110,23 @@ fn retrieve_results(
     })
 }
 
+#[pyfunction]
+fn build_patch_values(
+    py: Python<'_>,
+    recalculation_table: Vec<String>,
+    memory: HashMap<String, Vec<f64>>,
+) -> PyResult<PyObject> {
+    let memory = memory
+        .iter()
+        .map(|(k, v)| (k.clone().into_boxed_str(), v.clone()))
+        .collect();
+    let patch_values = api::build_patch_values(recalculation_table, memory)
+        .map_err(|e| ExecutionError::new_err(e.to_string()))
+        .unwrap();
+    let patch_values = pythonize(py, &patch_values).unwrap();
+    Ok(patch_values)
+}
+
 #[pymodule]
 fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compile, m)?)?;
@@ -111,5 +134,6 @@ fn qcs(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(translate, m)?)?;
     m.add_function(wrap_pyfunction!(submit, m)?)?;
     m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;
+    m.add_function(wrap_pyfunction!(build_patch_values, m)?)?;
     Ok(())
 }
