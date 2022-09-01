@@ -226,9 +226,7 @@ impl<'a> Execution<'a> {
         let qcs = self.refresh_qcs(readouts, config).await?;
         let qcs_for_thread = qcs.clone();
 
-        dbg!(&params);
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
-        dbg!(&patch_values);
 
         spawn_blocking(move || {
             let guard = qcs_for_thread.rpcq_client.lock().unwrap();

@@ -91,17 +91,9 @@ pub async fn translate(
 pub async fn submit(
     program: &str,
     patch_values: HashMap<Box<str>, Vec<f64>>,
-    recalculation_table: Vec<String>,
     quantum_processor_id: &str,
     config: &Configuration,
 ) -> Result<String, runner::Error> {
-    let recalculation_table: Vec<Expression> = recalculation_table
-        .iter()
-        .map(|expr| Expression::from_str(expr))
-        .collect::<Result<_, _>>()
-        .map_err(|e| runner::Error::Qpu(format!("Unable to interpret recalc table: {:?}", e)))?;
-    dbg!(&recalculation_table);
-
     let engagement = engagement::get(String::from(quantum_processor_id), config)
         .await
         .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
@@ -127,11 +119,7 @@ pub fn build_patch_values(
         .map(|expr| Expression::from_str(expr))
         .collect::<Result<_, _>>()
         .map_err(|e| format!("Unable to interpret recalc table: {:?}", e))?;
-    let patch_values = rewrite_arithmetic::get_substitutions(&substitutions, &memory);
-    dbg!(&substitutions);
-    dbg!(&memory);
-    dbg!(&patch_values);
-    patch_values
+    rewrite_arithmetic::get_substitutions(&substitutions, &memory)
 }
 
 /// Data from an individual register. Each variant contains a vector with the expected data type

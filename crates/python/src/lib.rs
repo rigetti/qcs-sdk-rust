@@ -36,6 +36,23 @@ fn rewrite_arithmetic(py: Python<'_>, native_quil: String) -> PyResult<PyObject>
 }
 
 #[pyfunction]
+fn build_patch_values(
+    py: Python<'_>,
+    recalculation_table: Vec<String>,
+    memory: HashMap<String, Vec<f64>>,
+) -> PyResult<PyObject> {
+    let memory = memory
+        .iter()
+        .map(|(k, v)| (k.clone().into_boxed_str(), v.clone()))
+        .collect();
+    let patch_values = api::build_patch_values(recalculation_table, memory)
+        .map_err(ExecutionError::new_err)
+        .unwrap();
+    let patch_values = pythonize(py, &patch_values).unwrap();
+    Ok(patch_values)
+}
+
+#[pyfunction]
 fn translate(
     py: Python<'_>,
     native_quil: String,
@@ -61,7 +78,6 @@ fn submit(
     py: Python<'_>,
     program: String,
     patch_values: HashMap<String, Vec<f64>>,
-    recalculation_table: Vec<String>,
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
@@ -79,7 +95,6 @@ fn submit(
         let job_id = api::submit(
             &program,
             patch_values,
-            recalculation_table,
             &quantum_processor_id,
             &config,
         )
@@ -108,23 +123,6 @@ fn retrieve_results(
         })?;
         Ok(results)
     })
-}
-
-#[pyfunction]
-fn build_patch_values(
-    py: Python<'_>,
-    recalculation_table: Vec<String>,
-    memory: HashMap<String, Vec<f64>>,
-) -> PyResult<PyObject> {
-    let memory = memory
-        .iter()
-        .map(|(k, v)| (k.clone().into_boxed_str(), v.clone()))
-        .collect();
-    let patch_values = api::build_patch_values(recalculation_table, memory)
-        .map_err(|e| ExecutionError::new_err(e.to_string()))
-        .unwrap();
-    let patch_values = pythonize(py, &patch_values).unwrap();
-    Ok(patch_values)
 }
 
 #[pymodule]
