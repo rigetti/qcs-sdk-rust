@@ -16,7 +16,8 @@ create_exception!(qcs, CompilationError, PyException);
 #[pyfunction]
 fn compile(py: Python<'_>, quil: String, quantum_processor_isa: String) -> PyResult<&PyAny> {
     let quantum_processor_isa: InstructionSetArchitecture =
-        serde_json::from_str(&quantum_processor_isa).unwrap();
+        serde_json::from_str(&quantum_processor_isa)
+            .map_err(|e| CompilationError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = Configuration::load()
             .await
@@ -30,8 +31,8 @@ fn compile(py: Python<'_>, quil: String, quantum_processor_isa: String) -> PyRes
 
 #[pyfunction]
 fn rewrite_arithmetic(py: Python<'_>, native_quil: String) -> PyResult<PyObject> {
-    let result = api::rewrite_arithmetic(&native_quil).unwrap();
-    let pyed = pythonize(py, &result).unwrap();
+    let result = api::rewrite_arithmetic(&native_quil).map_err(TranslationError::new_err)?;
+    let pyed = pythonize(py, &result).map_err(|e| TranslationError::new_err(e.to_string()))?;
     Ok(pyed)
 }
 
@@ -42,13 +43,13 @@ fn build_patch_values(
     memory: HashMap<String, Vec<f64>>,
 ) -> PyResult<PyObject> {
     let memory = memory
-        .iter()
-        .map(|(k, v)| (k.clone().into_boxed_str(), v.clone()))
+        .into_iter()
+        .map(|(k, v)| (k.into_boxed_str(), v))
         .collect();
-    let patch_values = api::build_patch_values(recalculation_table, memory)
-        .map_err(ExecutionError::new_err)
-        .unwrap();
-    let patch_values = pythonize(py, &patch_values).unwrap();
+    let patch_values =
+        api::build_patch_values(recalculation_table, memory).map_err(TranslationError::new_err)?;
+    let patch_values =
+        pythonize(py, &patch_values).map_err(|e| TranslationError::new_err(e.to_string()))?;
     Ok(patch_values)
 }
 
@@ -86,8 +87,8 @@ fn submit(
         // instead of `String` directly, which normally would decrease
         // copies _and_ require less space, since str can't be extended.
         let patch_values = patch_values
-            .iter()
-            .map(|(k, v)| (k.clone().into_boxed_str(), v.clone()))
+            .into_iter()
+            .map(|(k, v)| (k.into_boxed_str(), v))
             .collect();
         let config = Configuration::load()
             .await
@@ -99,7 +100,6 @@ fn submit(
     })
 }
 
-// TODO: Need to figure out how to pass the results back to Python
 #[pyfunction]
 fn retrieve_results(
     py: Python<'_>,
