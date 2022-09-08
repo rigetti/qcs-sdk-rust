@@ -73,8 +73,8 @@ jobs:
         target: x86_64
         # openssl-sys requires libssl-dev, which isn't in the manylinux image
         # see: https://github.com/pypa/manylinux/issues/1195#issuecomment-932721624
-        manylinux: off
-        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
+        manylinux: 2014
+        args: -i ${{ matrix.python-version }} --release --manylinux 2014 --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
