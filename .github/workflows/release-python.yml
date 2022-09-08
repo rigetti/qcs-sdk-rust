@@ -51,6 +51,7 @@ jobs:
           name: wheels
           path: dist
   linux:
+    if: ${{ false }} # disable while testing other jobs
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -76,13 +77,56 @@ jobs:
       uses: messense/maturin-action@v1
       with:
         target: x86_64
-        manylinux: off # TODO: The manylinux container doesn't have OpenSSL libraries
+        # openssl-sys requires libssl-dev, which isn't in the manylinux image
+        # see: https://github.com/pypa/manylinux/issues/1195#issuecomment-932721624
+        manylinux: off
         args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
         name: wheels
         path: dist
+
+  windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+        target: [x64, x86]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: ${{ matrix.target }}
+      - name: Update rustup
+        run: rustup self update
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          default: true
+      - name: Build
+        if: matrix.target == 'x64'
+        run: cargo build --release
+      # - name: Tests
+      #   if: matrix.target == 'x64'
+      #   run: cargo test --no-default-features --release
+      - name: Build wheels
+        uses: messense/maturin-action@v1
+        with:
+          target: ${{ matrix.target }}
+          args: -i python --release --manifest-path crates/python/Cargo.toml --out dist
+      - name: Install built wheel
+        run: |
+          pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
+      - name: Upload wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: wheels
+          path: dist
+
     
   release:
     name: Release
