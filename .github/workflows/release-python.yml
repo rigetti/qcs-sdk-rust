@@ -75,7 +75,7 @@ jobs:
       with:
         target: x86_64
         manylinux: auto
-        args: -i ${{ matrix.python-version }} --release --out dist
+        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
