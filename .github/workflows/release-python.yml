@@ -26,8 +26,8 @@ jobs:
           default: true
       - name: Build
         run: cargo build --release
-      - name: Tests
-        run: cargo test --no-default-features --release
+      # - name: Tests
+      #   run: cargo test --no-default-features --release
       - name: Build wheels - x86_64
         uses: messense/maturin-action@v1
         with:
