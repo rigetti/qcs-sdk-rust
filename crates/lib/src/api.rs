@@ -90,10 +90,18 @@ pub async fn translate(
 /// Submits an executable `program` to be run on the specified QPU
 pub async fn submit(
     program: &str,
-    patch_values: HashMap<Box<str>, Vec<f64>>,
+    patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: &str,
     config: &Configuration,
 ) -> Result<String, runner::Error> {
+    // Is there a better way to map these patch_values keys? This
+    // negates the whole purpose of [`submit`] using `Box<str>`,
+    // instead of `String` directly, which normally would decrease
+    // copies _and_ require less space, since str can't be extended.
+    let patch_values = patch_values
+        .into_iter()
+        .map(|(k, v)| (k.into_boxed_str(), v))
+        .collect();
     let engagement = engagement::get(String::from(quantum_processor_id), config)
         .await
         .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;

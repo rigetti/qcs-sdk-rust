@@ -82,14 +82,6 @@ fn submit(
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        // Is there a better way to map these patch_values keys? This
-        // negates the whole purpose of [`submit`] using `Box<str>`,
-        // instead of `String` directly, which normally would decrease
-        // copies _and_ require less space, since str can't be extended.
-        let patch_values = patch_values
-            .into_iter()
-            .map(|(k, v)| (k.into_boxed_str(), v))
-            .collect();
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
