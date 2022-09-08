@@ -8,6 +8,7 @@ on:
 
 jobs:
   macos:
+    if: ${{ false }} # disable while testing other jobs
     runs-on: macos-11
     strategy:
       matrix:
@@ -49,6 +50,37 @@ jobs:
         with:
           name: wheels
           path: dist
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        default: true
+    - name: Build
+      run: cargo build --release
+    # - name: Tests
+    # run: cargo test --no-default-features --release
+    - uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build wheels
+      uses: messense/maturin-action@v1
+      with:
+        target: x86_64
+        manylinux: auto
+        args: -i ${{ matrix.python-version }} --release --out dist
+    - name: Upload wheels
+      uses: actions/upload-artifact@v2
+      with:
+        name: wheels
+        path: dist
     
   release:
     name: Release
