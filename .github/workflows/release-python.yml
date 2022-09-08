@@ -105,6 +105,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+          target: x86_64-pc-windows-msvc
           profile: minimal
           default: true
       - name: Build
