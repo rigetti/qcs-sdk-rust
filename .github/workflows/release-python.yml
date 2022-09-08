@@ -1,7 +1,9 @@
 name: Release Python
 
 on:
-  workflow_dispatch
+  push:
+    branches:
+      - 135-python-bindings-distribution
 
 jobs:
   macos:
