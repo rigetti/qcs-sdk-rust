@@ -619,3 +619,21 @@ mod describe_qpu_for_id {
         assert!(matches!(exe.qpu, None));
     }
 }
+
+#[cfg(test)]
+#[cfg(feature = "manual-tests")]
+mod describe_get_config {
+    use super::*;
+
+    #[tokio::test]
+    async fn it_returns_cached_values() {
+        let mut exe = Executable::from_quil("");
+        let mut config = Configuration::default();
+        config.quilc_url = String::from("test");
+        let config = Arc::new(config);
+        exe.config = Some(config.clone());
+        let gotten = exe.get_config().await.unwrap_or_default();
+        assert_eq!(gotten.quilc_url, config.quilc_url);
+        assert!(matches!(exe.config, None));
+    }
+}
