@@ -1,12 +1,12 @@
 use log::warn;
-use qcs_api::models::InstructionSetArchitecture;
 use quil_rs::expression::Expression;
 use serde::Serialize;
 
 use crate::{
     configuration::Configuration,
     qpu::{
-        self, engagement, quilc,
+        self, engagement,
+        quilc::{self, TargetDevice},
         rewrite_arithmetic::{self, Substitutions},
         rpcq::Client,
         runner::{self, JobId},
@@ -24,10 +24,10 @@ use std::{collections::HashMap, convert::TryFrom, str::FromStr, sync::Mutex};
 /// Uses quilc to convert a Quil program to native Quil
 pub async fn compile(
     quil: &str,
-    quantum_processor_isa: InstructionSetArchitecture,
+    target_device: TargetDevice,
     config: &Configuration,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    quilc::compile_program(quil, quantum_processor_isa, config)
+    quilc::compile_program(quil, target_device, config)
         .map_err(|e| e.into())
         .map(|p| p.0)
 }

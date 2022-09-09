@@ -17,6 +17,6 @@ pub mod api;
 pub mod configuration;
 mod executable;
 mod execution_data;
-mod qpu;
+pub mod qpu;
 mod qvm;
 mod register_data;

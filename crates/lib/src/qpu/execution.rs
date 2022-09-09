@@ -14,7 +14,7 @@ use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::{ExecutionData, RegisterData};
 
-use super::quilc::{self, NativeQuil, NativeQuilProgram};
+use super::quilc::{self, NativeQuil, NativeQuilProgram, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::rpcq::Client;
 use super::runner::{self, retrieve_results, submit, DecodeError};
@@ -189,11 +189,12 @@ impl<'a> Execution<'a> {
         compile_with_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, &config).await?;
+        let target_device = TargetDevice::try_from(isa)?;
 
         let native_quil = if compile_with_quilc {
             trace!("Converting to Native Quil");
             let thread_config = config.clone();
-            spawn_blocking(move || quilc::compile_program(&quil, isa, &thread_config))
+            spawn_blocking(move || quilc::compile_program(&quil, target_device, &thread_config))
                 .await
                 .map_err(|source| {
                     Error::Unexpected(Unexpected::TaskError {

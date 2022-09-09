@@ -1,7 +1,7 @@
 use ::qcs::configuration::Configuration;
 use pythonize::pythonize;
 use qcs::api;
-use qcs_api::models::instruction_set_architecture::InstructionSetArchitecture;
+use qcs::qpu::quilc::TargetDevice;
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyException, prelude::*};
@@ -14,15 +14,14 @@ create_exception!(qcs, CompilationError, PyException);
 // TODO Make these kw-only?
 // TODO Return something more flexible than just a string (a Result object)
 #[pyfunction]
-fn compile(py: Python<'_>, quil: String, quantum_processor_isa: String) -> PyResult<&PyAny> {
-    let quantum_processor_isa: InstructionSetArchitecture =
-        serde_json::from_str(&quantum_processor_isa)
-            .map_err(|e| CompilationError::new_err(e.to_string()))?;
+fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyAny> {
+    let target_device: TargetDevice = serde_json::from_str(&target_device)
+        .map_err(|e| CompilationError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = Configuration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::compile(&quil, quantum_processor_isa, &config)
+        let result = api::compile(&quil, target_device, &config)
             .await
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))

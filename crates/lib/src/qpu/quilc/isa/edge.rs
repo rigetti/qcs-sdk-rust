@@ -2,23 +2,22 @@ use std::collections::HashMap;
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
-use serde::{Serialize, Serializer};
+use serde::{Deserialize, Serialize, Serializer};
 
 use qcs_api::models;
 use qcs_api::models::Characteristic;
 
-use super::operator::{
-    Arguments, Operator, OperatorMap, Parameters, PERFECT_DURATION, PERFECT_FIDELITY,
-};
+use super::operator::{wildcard, Argument, Operator, Parameter};
 
 /// Represents a connection between two qubits.
-#[derive(Serialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Edge {
     #[serde(rename = "ids")]
     id: EdgeId,
     #[serde(skip_serializing_if = "is_false")]
+    #[serde(default)]
     dead: bool,
-    gates: OperatorMap,
+    gates: Vec<Operator>,
 }
 
 // Gross hack to not include `dead` if unneeded, to follow pyQuil's implementation
@@ -33,7 +32,7 @@ impl Edge {
         Self {
             id,
             dead: true,
-            gates: OperatorMap::new(),
+            gates: vec![],
         }
     }
 
@@ -43,26 +42,25 @@ impl Edge {
         characteristics: &[Characteristic],
     ) -> Result<(), Error> {
         let operator = match GATE_PARAMS.get_key_value(op_name) {
-            Some((key, params)) => basic_gates(key, params, characteristics),
+            Some((key, params)) => basic_gates(key.clone(), params, characteristics),
             _ => {
                 if op_name == "WILDCARD" {
-                    WILDCARD
+                    wildcard(None)
                 } else {
                     return Err(Error::UnknownOperator(String::from(op_name)));
                 }
             }
         };
 
-        if self.gates.add_one(operator) {
-            self.dead = false;
-        }
+        self.gates.push(operator);
+
         Ok(())
     }
 }
 
 /// All the error which can occur from within this module.
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Unknown operator: {0}")]
     UnknownOperator(String),
     #[error("Edges should have exactly 2 nodes, got {0}")]
@@ -78,12 +76,12 @@ mod describe_edge {
         let undead_qubit = Edge {
             id: EdgeId::new([1, 2]),
             dead: false,
-            gates: OperatorMap::new(),
+            gates: vec![],
         };
         let dead_qubit = Edge {
             id: EdgeId::new([1, 2]),
             dead: true,
-            gates: OperatorMap::new(),
+            gates: vec![],
         };
 
         let expected_dead = serde_json::json!({
@@ -109,11 +107,11 @@ mod describe_edge {
 /// key should look like `"{node_id_1}-{node_id_2}"`
 ///
 /// This struct enforces those things to make looking up of Edges easier when converting ISAs.
-#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
-pub(crate) struct EdgeId([i32; 2]);
+#[derive(Deserialize, Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub struct EdgeId([i32; 2]);
 
 impl EdgeId {
-    pub(crate) fn new(mut node_ids: [i32; 2]) -> Self {
+    pub fn new(mut node_ids: [i32; 2]) -> Self {
         node_ids.sort_unstable();
         Self(node_ids)
     }
@@ -238,31 +236,31 @@ mod describe_convert_edges {
 }
 
 lazy_static::lazy_static! {
-    static ref GATE_PARAMS: HashMap<&'static str, GateParams> = {
+    static ref GATE_PARAMS: HashMap<String, GateParams> = {
         let mut m = HashMap::new();
-        m.insert("CZ", GateParams{
+        m.insert("CZ".to_string(), GateParams{
             default_fidelity: 0.89,
             duration: 200.0,
-            characteristic_name: "fCZ",
-            parameters: Parameters::Empty,
+            characteristic_name: "fCZ".to_string(),
+            parameters: vec![],
         });
-        m.insert("ISWAP", GateParams{
+        m.insert("ISWAP".to_string(), GateParams{
             default_fidelity: 0.90,
             duration: 200.0,
-            characteristic_name: "fISWAP",
-            parameters: Parameters::Empty,
+            characteristic_name: "fISWAP".to_string(),
+            parameters: vec![],
         });
-        m.insert("CPHASE", GateParams{
+        m.insert("CPHASE".to_string(), GateParams{
             default_fidelity: 0.85,
             duration: 200.0,
-            characteristic_name: "fCPHASE",
-            parameters: Parameters::Theta,
+            characteristic_name: "fCPHASE".to_string(),
+            parameters: vec![Parameter::String("theta".to_owned())],
         });
-        m.insert("XY", GateParams{
+        m.insert("XY".to_string(), GateParams{
             default_fidelity: 0.86,
             duration: 200.0,
-            characteristic_name: "fXY",
-            parameters: Parameters::Theta,
+            characteristic_name: "fXY".to_string(),
+            parameters: vec![Parameter::String("theta".to_owned())],
         });
         m
     };
@@ -272,12 +270,12 @@ lazy_static::lazy_static! {
 struct GateParams {
     default_fidelity: f64,
     duration: f64,
-    characteristic_name: &'static str,
-    parameters: Parameters,
+    characteristic_name: String,
+    parameters: Vec<Parameter>,
 }
 
 fn basic_gates(
-    op_name: &'static str,
+    op_name: String,
     params: &GateParams,
     characteristics: &[Characteristic],
 ) -> Operator {
@@ -296,17 +294,9 @@ fn basic_gates(
 
     Operator::Gate {
         operator: op_name,
-        parameters: *parameters,
-        arguments: Arguments::Underscores,
+        parameters: parameters.clone(),
+        arguments: vec![Argument::String("_".to_string())],
         fidelity,
         duration: *duration,
     }
 }
-
-const WILDCARD: Operator = Operator::Gate {
-    operator: "_",
-    duration: PERFECT_DURATION,
-    fidelity: PERFECT_FIDELITY,
-    parameters: Parameters::Underscore,
-    arguments: Arguments::Underscores,
-};
