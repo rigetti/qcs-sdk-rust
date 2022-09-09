@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use edge::{convert_edges, Edge, EdgeId};
 use operator::Operator;
@@ -15,8 +15,8 @@ mod operator;
 mod qubit;
 
 /// Restructuring of an [`InstructionSetArchitecture`] for sending to quilc
-#[derive(Serialize, Debug, Clone, PartialEq)]
-pub(crate) struct CompilerIsa {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct CompilerIsa {
     #[serde(rename = "1Q")]
     qubits: HashMap<String, Qubit>,
     #[serde(rename = "2Q")]
@@ -75,7 +75,7 @@ impl TryFrom<InstructionSetArchitecture> for CompilerIsa {
 
 /// All the errors that can occur from within this module
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Operation {0} is defined for Qubit {1} but that Qubit does not exist")]
     QubitDoesNotExist(String, i32),
     #[error("Operation {0} is defined for Edge {1} but that Edge does not exist")]

@@ -26,7 +26,7 @@ pub(crate) use crate::qpu::runner::Register;
 
 pub(crate) mod engagement;
 mod execution;
-pub(crate) mod quilc;
+pub mod quilc;
 pub(crate) mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;

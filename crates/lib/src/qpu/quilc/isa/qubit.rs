@@ -2,20 +2,63 @@ use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::f64::consts::{FRAC_PI_2, PI};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use qcs_api::models::{Characteristic, Node, Operation};
 
-use super::operator::{Arguments, OperatorMap, Parameters, PERFECT_DURATION, PERFECT_FIDELITY};
-use super::Operator;
+use super::operator::{
+    wildcard, Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
+};
 
 /// Represents a single Qubit on a QPU and its capabilities. Needed by quilc for optimization.
-#[derive(Serialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Qubit {
     id: i32,
     #[serde(skip_serializing_if = "is_false")]
+    #[serde(default)]
     dead: bool,
-    gates: OperatorMap,
+    gates: Vec<Operator>,
+}
+
+#[cfg(test)]
+mod test_qubit_deser {
+    use super::Qubit;
+
+    #[test]
+    fn it_deserializes_a_sequence_of_gates() {
+        let s = r#"
+        {
+            "id": 0,
+            "gates": [
+              {
+                "operator": "RX",
+                "duration": 50,
+                "fidelity": 1,
+                "parameters": [
+                  0
+                ],
+                "arguments": [
+                  0
+                ],
+                "operator_type": "gate"
+              },
+              {
+                "operator": "RX",
+                "duration": 50,
+                "fidelity": 0.9839942081888577,
+                "parameters": [
+                  3.141592653589793
+                ],
+                "arguments": [
+                  0
+                ],
+                "operator_type": "gate"
+              }
+            ]
+          }          
+        "#;
+        serde_json::from_str::<Qubit>(s).expect("nope");
+    }
 }
 
 // Gross hack to not include `dead` if unneeded, to follow pyQuil's implementation
@@ -62,20 +105,18 @@ impl Qubit {
             "RX" => rx_gates(self.id, frb_sim_1q)?,
             "RZ" => rz_gates(self.id),
             "MEASURE" => measure(self.id, characteristics),
-            "WILDCARD" => wildcard(self.id),
+            "WILDCARD" => vec![wildcard(Some(self.id))],
             "I" | "RESET" => vec![],
             unknown => return Err(Error::UnknownOperator(String::from(unknown))),
         };
-        if self.gates.add(&operators) {
-            self.dead = false;
-        }
+        self.gates.extend(operators);
         Ok(())
     }
 }
 
 /// All the errors that can occur within this module.
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("Required benchmark `randomized_benchmark_simultaneous_1q` was not present")]
     MissingBenchmark,
     #[error("Benchmark `randomized_benchmark_simultaneous_1q` must have a single call site")]
@@ -91,7 +132,7 @@ impl From<&Node> for Qubit {
         Self {
             id: node.node_id,
             dead: true,
-            gates: OperatorMap::new(),
+            gates: vec![],
         }
     }
 }
@@ -105,12 +146,12 @@ mod describe_qubit {
         let undead_qubit = Qubit {
             id: 0,
             dead: false,
-            gates: OperatorMap::new(),
+            gates: vec![],
         };
         let dead_qubit = Qubit {
             id: 0,
             dead: true,
-            gates: OperatorMap::new(),
+            gates: vec![],
         };
 
         let expected_dead = serde_json::json!({
@@ -172,20 +213,20 @@ fn rx_gates(node_id: i32, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error>
     let fidelity = frb_sim_1q.fidelity_for_qubit(node_id)?;
 
     let mut gates = Vec::with_capacity(5);
-    let operator = "RX";
+    let operator = "RX".to_string();
     gates.push(Operator::Gate {
-        operator,
-        parameters: Parameters::Float(0.0),
-        arguments: Arguments::Int(node_id),
+        operator: operator.clone(),
+        parameters: vec![Parameter::Float(0.0)],
+        arguments: vec![Argument::Int(node_id)],
         fidelity: 1.0,
         duration: DEFAULT_DURATION_RX,
     });
 
     gates.extend(
         IntoIterator::into_iter([PI, -PI, FRAC_PI_2, -FRAC_PI_2]).map(|param| Operator::Gate {
-            operator,
-            parameters: Parameters::Float(param),
-            arguments: Arguments::Int(node_id),
+            operator: operator.clone(),
+            parameters: vec![Parameter::Float(param)],
+            arguments: vec![Argument::Int(node_id)],
             fidelity,
             duration: DEFAULT_DURATION_RX,
         }),
@@ -222,39 +263,39 @@ mod describe_rx_gates {
         let gates = rx_gates(node_id, &frb_sim_1q).expect("Failed to create RX gates");
         let expected = vec![
             Operator::Gate {
-                arguments: Arguments::Int(1),
+                arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 1.0,
-                operator: "RX",
-                parameters: Parameters::Float(0.0),
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(0.0)],
             },
             Operator::Gate {
-                arguments: Arguments::Int(1),
+                arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_609_176_635_7,
-                operator: "RX",
-                parameters: Parameters::Float(PI),
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(PI)],
             },
             Operator::Gate {
-                arguments: Arguments::Int(1),
+                arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_609_176_635_7,
-                operator: "RX",
-                parameters: Parameters::Float(-PI),
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-PI)],
             },
             Operator::Gate {
-                arguments: Arguments::Int(1),
+                arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_609_176_635_7,
-                operator: "RX",
-                parameters: Parameters::Float(FRAC_PI_2),
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(FRAC_PI_2)],
             },
             Operator::Gate {
-                arguments: Arguments::Int(1),
+                arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_609_176_635_7,
-                operator: "RX",
-                parameters: Parameters::Float(-FRAC_PI_2),
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-FRAC_PI_2)],
             },
         ];
         assert_eq!(gates, expected);
@@ -263,17 +304,17 @@ mod describe_rx_gates {
 
 fn rz_gates(node_id: i32) -> Vec<Operator> {
     vec![Operator::Gate {
-        operator: "RZ",
-        parameters: Parameters::Underscore,
+        operator: "RZ".to_string(),
+        parameters: vec![Parameter::String("_".to_owned())],
         fidelity: PERFECT_FIDELITY,
         duration: PERFECT_DURATION,
-        arguments: Arguments::Int(node_id),
+        arguments: vec![Argument::Int(node_id)],
     }]
 }
 
 #[cfg(test)]
 mod describe_rz_gates {
-    use super::{rz_gates, Arguments, Operator, Parameters};
+    use super::{rz_gates, Argument, Operator, Parameter};
 
     /// This data is copied from the pyQuil ISA integration test.
     #[test]
@@ -281,11 +322,11 @@ mod describe_rz_gates {
         let node_id = 1;
         let gates = rz_gates(node_id);
         let expected = vec![Operator::Gate {
-            arguments: Arguments::Int(1),
+            arguments: vec![Argument::Int(1)],
             duration: 0.01,
             fidelity: 1.0,
-            operator: "RZ",
-            parameters: Parameters::Underscore,
+            operator: "RZ".to_string(),
+            parameters: vec![Parameter::String("_".to_owned())],
         }];
         assert_eq!(gates, expected);
     }
@@ -305,14 +346,14 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 
     vec![
         Operator::Measure {
-            operator: "MEASURE",
+            operator: "MEASURE".to_string(),
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
             qubit: node_id,
-            target: Some("_"),
+            target: Some("_".to_string()),
         },
         Operator::Measure {
-            operator: "MEASURE",
+            operator: "MEASURE".to_string(),
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
             qubit: node_id,
@@ -339,14 +380,14 @@ mod describe_measure {
         let result = measure(0, &characteristics);
         let expected = vec![
             Operator::Measure {
-                operator: "MEASURE",
+                operator: "MEASURE".to_string(),
                 duration: 2000.0,
                 fidelity: 0.981_000_006_198_883_1,
                 qubit: 0,
-                target: Some("_"),
+                target: Some("_".to_string()),
             },
             Operator::Measure {
-                operator: "MEASURE",
+                operator: "MEASURE".to_string(),
                 duration: 2000.0,
                 fidelity: 0.981_000_006_198_883_1,
                 qubit: 0,
@@ -355,14 +396,4 @@ mod describe_measure {
         ];
         assert_eq!(result, expected)
     }
-}
-
-fn wildcard(node_id: i32) -> Vec<Operator> {
-    vec![Operator::Gate {
-        operator: "_",
-        duration: PERFECT_DURATION,
-        fidelity: PERFECT_FIDELITY,
-        parameters: Parameters::Underscore,
-        arguments: Arguments::Int(node_id),
-    }]
 }

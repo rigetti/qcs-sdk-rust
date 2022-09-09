@@ -1,144 +1,66 @@
-use std::collections::HashSet;
+use serde::{Deserialize, Serialize};
 
-use serde::ser::SerializeSeq;
-use serde::{Serialize, Serializer};
-
-/// Contains all the operators for a single Site ([`super::qubit::Qubit`] or [`super::edge::Edge`]) organized to allow
-/// deduplication by name
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct OperatorMap(HashSet<&'static str>, Vec<Operator>);
-
-impl OperatorMap {
-    pub(crate) fn new() -> Self {
-        Self(HashSet::new(), Vec::new())
-    }
-
-    /// Add a new batch of operators with a given name if no operators with that name have been
-    /// added yet.
-    ///
-    /// # Arguments
-    ///
-    /// * `name`: The name of the operators being added.
-    /// * `operators`: The list of operators to add.
-    ///
-    /// returns: true if the operators were inserted, false if they weren't (due to duplicates).
-    pub(crate) fn add(&mut self, operators: &[Operator]) -> bool {
-        if operators.is_empty() {
-            return false;
+pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
+    if let Some(node_id) = node_id {
+        Operator::Gate {
+            operator: "_".to_string(),
+            duration: PERFECT_DURATION,
+            fidelity: PERFECT_FIDELITY,
+            parameters: vec![Parameter::String("_".to_owned())],
+            arguments: vec![Argument::Int(node_id)],
         }
-        let name = operators[0].name();
-        if !operators.iter().all(|op| op.name() == name) {
-            return false;
+    } else {
+        Operator::Gate {
+            operator: "_".to_string(),
+            duration: PERFECT_DURATION,
+            fidelity: PERFECT_FIDELITY,
+            parameters: vec![Parameter::String("_".to_owned())],
+            arguments: vec![Argument::String("_".to_owned())],
         }
-        if !self.0.insert(name) {
-            return false;
-        }
-        self.1.extend(operators);
-        true
-    }
-
-    /// Works just like [`Self::add`] but it only adds a single operator.
-    pub(crate) fn add_one(&mut self, operator: Operator) -> bool {
-        if !self.0.insert(operator.name()) {
-            return false;
-        }
-        self.1.push(operator);
-        true
-    }
-}
-
-impl Serialize for OperatorMap {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        serializer.collect_seq(&self.1)
-    }
-}
-
-#[cfg(test)]
-mod describe_operator_map {
-    use super::*;
-
-    #[test]
-    fn it_serializes_as_a_list_of_operators() {
-        let mut map = OperatorMap::new();
-
-        let rx_1 = Operator::Gate {
-            operator: "RX",
-            duration: 50.0,
-            fidelity: 1.0,
-            parameters: Parameters::Float(0.0),
-            arguments: Arguments::Int(1),
-        };
-        let rx_2 = Operator::Gate {
-            operator: "RX",
-            duration: 50.0,
-            fidelity: 0.9,
-            parameters: Parameters::Float(0.9),
-            arguments: Arguments::Int(1),
-        };
-        map.add(&[rx_1.clone(), rx_2.clone()]);
-        let rz = Operator::Gate {
-            operator: "RZ",
-            duration: 0.01,
-            fidelity: 0.9,
-            parameters: Parameters::Underscore,
-            arguments: Arguments::Int(1),
-        };
-        map.add(&[rz]);
-        let serialized = serde_json::to_value(&map).expect("Could not serialize OperatorMap");
-        let expected =
-            serde_json::to_value([rx_1, rx_2, rz]).expect("Could not serialize vec of operators");
-        assert_eq!(serialized, expected);
-    }
-
-    #[test]
-    fn it_skips_duplicate_operators_with_the_same_name() {
-        let mut map = OperatorMap::new();
-
-        let rz = Operator::Gate {
-            operator: "RZ",
-            duration: 0.01,
-            fidelity: 0.9,
-            parameters: Parameters::Underscore,
-            arguments: Arguments::Int(1),
-        };
-        map.add(&[rz]);
-        map.add(&[rz]);
-        let serialized = serde_json::to_value(&map).expect("Could not serialize OperatorMap");
-        let expected =
-            serde_json::to_value(vec![rz]).expect("Could not serialize vec of operators");
-        assert_eq!(serialized, expected);
     }
 }
 
 /// Represents a single operation that can be performed on a Qubit or Edge
-#[derive(Serialize, Debug, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "operator_type")]
 #[serde(rename_all = "lowercase")]
 pub(crate) enum Operator {
     Gate {
-        operator: &'static str,
+        operator: String,
         duration: f64,
         fidelity: f64,
-        parameters: Parameters,
-        arguments: Arguments,
+        parameters: Vec<Parameter>,
+        arguments: Vec<Argument>,
     },
     Measure {
-        operator: &'static str,
+        operator: String,
         duration: f64,
         fidelity: f64,
         qubit: i32,
-        target: Option<&'static str>,
+        target: Option<String>,
     },
 }
 
-impl Operator {
-    pub(crate) fn name(&self) -> &'static str {
-        match self {
-            Operator::Gate { operator, .. } | Operator::Measure { operator, .. } => operator,
-        }
+#[cfg(test)]
+mod test_operator_deser {
+    use super::Operator;
+    #[test]
+    fn it_deserializes_an_operator() {
+        let s = r##"
+        {
+            "operator": "RX",
+            "duration": 50,
+            "fidelity": 1,
+            "parameters": [
+              0
+            ],
+            "arguments": [
+              0
+            ],
+            "operator_type": "gate"
+          }
+        "##;
+        serde_json::from_str::<Operator>(s).expect("nope");
     }
 }
 
@@ -151,11 +73,11 @@ mod describe_operator {
     #[test]
     fn it_serializes_gates_like_pyquil() {
         let gate_op = Operator::Gate {
-            arguments: Arguments::Int(1),
+            arguments: vec![Argument::Int(1)],
             duration: 0.5,
             fidelity: 0.5,
-            operator: "RZ",
-            parameters: Parameters::Underscore,
+            operator: "RZ".to_string(),
+            parameters: vec![Parameter::String("_".to_owned())],
         };
         let expected = serde_json::json!({
             "arguments": [1],
@@ -178,8 +100,8 @@ mod describe_operator {
             duration: 0.5,
             fidelity: 0.5,
             qubit: 1,
-            operator: "MEASURE",
-            target: Some("_"),
+            operator: "MEASURE".to_string(),
+            target: Some("_".to_string()),
         };
         let expected = serde_json::json!({
             "duration": 0.5,
@@ -202,7 +124,7 @@ mod describe_operator {
             duration: 0.5,
             fidelity: 0.5,
             qubit: 1,
-            operator: "MEASURE",
+            operator: "MEASURE".to_string(),
             target: None,
         };
         let expected = serde_json::json!({
@@ -219,25 +141,21 @@ mod describe_operator {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub(crate) enum Parameters {
-    Underscore,
-    Theta,
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub(crate) enum Parameter {
+    String(String),
     Float(f64),
-    Empty,
 }
 
-const UNDERSCORE: [&str; 1] = ["_"];
-const THETA: [&str; 1] = ["theta"];
+#[cfg(test)]
+mod test_parameters_deser {
+    use super::Parameter;
 
-impl Serialize for Parameters {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        match self {
-            Self::Underscore => serializer.collect_seq(UNDERSCORE),
-            Self::Theta => serializer.collect_seq(THETA),
-            Self::Float(element) => serializer.collect_seq([element]),
-            Self::Empty => serializer.collect_seq(Vec::new() as Vec<i32>),
-        }
+    #[test]
+    fn it_deserializes_parameters() {
+        let s = r##"[""]"##;
+        serde_json::from_str::<Vec<Parameter>>(s).expect("yo");
     }
 }
 
@@ -247,48 +165,26 @@ mod describe_parameters {
 
     #[test]
     fn it_serializes_underscore_as_list_of_strings() {
-        let p = Parameters::Underscore;
+        let p = Parameter::String("_".to_owned());
         let serialized = serde_json::to_value(p).expect("Could not serialize");
-        let expected = serde_json::json!(["_"]);
+        let expected = serde_json::json!("_");
         assert_eq!(expected, serialized);
     }
 
     #[test]
     fn it_serializes_one_float_as_list_of_numbers() {
-        let p = Parameters::Float(1.0);
+        let p = Parameter::Float(1.0);
         let serialized = serde_json::to_value(p).expect("Could not serialize");
-        let expected = serde_json::json!([1.0]);
-        assert_eq!(expected, serialized);
-    }
-
-    #[test]
-    fn it_serializes_empty_as_sequence() {
-        let p = Parameters::Empty;
-        let serialized = serde_json::to_value(p).expect("Could not serialize");
-        let expected = serde_json::json!([]);
+        let expected = serde_json::json!(1.0);
         assert_eq!(expected, serialized);
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Arguments {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub(crate) enum Argument {
     Int(i32),
-    Underscores,
-}
-
-const UNDERSCORES: [&str; 2] = ["_", "_"];
-
-impl Serialize for Arguments {
-    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-        match self {
-            Self::Underscores => serializer.collect_seq(UNDERSCORES),
-            Self::Int(int) => {
-                let mut seq = serializer.serialize_seq(Some(1))?;
-                seq.serialize_element(int)?;
-                seq.end()
-            }
-        }
-    }
+    String(String),
 }
 
 #[cfg(test)]
@@ -297,15 +193,15 @@ mod describe_arguments {
 
     #[test]
     fn it_serializes_underscores_as_list_of_strings() {
-        let p = Arguments::Underscores;
+        let p = vec![Argument::String("_".to_owned())];
         let serialized = serde_json::to_value(p).expect("Could not serialize");
-        let expected = serde_json::json!(["_", "_"]);
+        let expected = serde_json::json!(["_"]);
         assert_eq!(expected, serialized);
     }
 
     #[test]
     fn it_serializes_one_int_as_list_of_numbers() {
-        let p = Arguments::Int(1);
+        let p = vec![Argument::Int(1)];
         let serialized = serde_json::to_value(p).expect("Could not serialize");
         let expected = serde_json::json!([1]);
         assert_eq!(expected, serialized);
