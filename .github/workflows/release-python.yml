@@ -94,7 +94,7 @@ jobs:
       with:
         target: ${{ matrix.target }}
         manylinux: 2014
-        args: -i ${{ matrix.python }} --release --manifest-path crates/python/Cargo.toml --out dist --no-default-features --features=extension-module
+        args: -i ${{ matrix.python }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
