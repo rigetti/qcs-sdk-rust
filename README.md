@@ -16,6 +16,15 @@ Most development tasks are automated with [cargo-make] (like make, but you can h
 
 In order to run all checks exactly the same way that CI does, use `makers ci-flow` from the project root (workspace).
 
+
+### Commits
+
+Commits should follow the conventional commit syntax, with one of the following [scopes][scopes]:
+
+- `lib` or `rust`: changes to the rust SDK
+- `python`: changes to the Python bindings
+- No scope: changes to both crates
+
 ### Dependencies
 
 Because this library relies on [ØMQ], [`cmake`] is required:
@@ -49,3 +58,4 @@ To release the library crate or the bindings to Python, manually run the `releas
 [`pyQuil`]: https://github.com/rigetti/pyquil
 [rustdoc]: https://doc.rust-lang.org/rustdoc/index.html
 [docs.rs]: https://docs.rs/qcs
+[scopes]: https://www.conventionalcommits.org/en/v1.0.0/#commit-message-with-scope
