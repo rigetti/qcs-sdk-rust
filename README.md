@@ -2,6 +2,8 @@
 
 The `qcs` crate is a high-level interface to Rigetti's [Quantum Cloud Services], allowing Rust developers to run [Quil] programs on Rigetti's [QPUs]. This crate is a Rust port of [`pyQuil`], though it currently has a much smaller feature set.
 
+The `qcs-sdk-python` crate exposes some functionality of the `qcs` crate to Python using [pyo3](https://pyo3.rs/v0.17.1/).
+
 > For the C-bindings to this library, check out [qcs-sdk-c](https://github.com/rigetti/qcs-sdk-c)
 
 ## Documentation
@@ -38,7 +40,7 @@ To build the docs.rs-style docs, run `makers docs`. You can also do `makers serv
 
 ## Release
 
-To release this crate, manually run the `release` workflow in GitHub Actions.
+To release the library crate or the bindings to Python, manually run the `release` or `release python` workflow in GitHub Actions, respectively.
 
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
 [Quantum Cloud Services]: https://docs.rigetti.com/qcs/

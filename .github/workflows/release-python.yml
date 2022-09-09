@@ -11,7 +11,7 @@ jobs:
     runs-on: macos-11
     strategy:
       matrix:
-        python-version: ['3.7'] # [, '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7'] # [, '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10']
     steps:
     - uses: actions/checkout@v2
     - name: Install Rust
@@ -71,8 +71,6 @@ jobs:
       uses: messense/maturin-action@v1
       with:
         target: x86_64
-        # openssl-sys requires libssl-dev, which isn't in the manylinux image
-        # see: https://github.com/pypa/manylinux/issues/1195#issuecomment-932721624
         manylinux: 2014
         args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
