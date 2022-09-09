@@ -8,7 +8,6 @@ on:
 
 jobs:
   macos:
-    if: ${{ false }}  # disable while testing linux-arm
     runs-on: macos-11
     strategy:
       matrix:
@@ -49,7 +48,6 @@ jobs:
           name: wheels
           path: dist
   linux:
-    if: ${{ false }}  # disable while testing linux-arm
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -102,7 +100,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [ linux-arm ] # [ macos, linux, linux-arm ]
+    needs: [ macos, linux, linux-arm ]
     steps:
       - uses: actions/download-artifact@v2
       - uses: actions/setup-python@v2
