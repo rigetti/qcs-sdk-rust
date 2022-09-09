@@ -5,9 +5,9 @@ version = "0.1.2"
 description = "Python interface for the QCS Rust SDK"
 license = { text = "Apache-2.0" }
 authors = [
-	"Mark Skilbeck <mark.skilbeck@rigetti.com>",
-	"Marquess Valdez <mvaldez@rigetti.com>",
-	"Randall Fulton <rfulton@rigetti.com>"
+  { name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
+  { name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
+  { name = "Randall Fulton", email = "rfulton@rigetti.com" }
 ]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
