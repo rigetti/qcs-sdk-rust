@@ -25,6 +25,14 @@ classifiers = [
 [tool.poetry]
 name = "qcs-sdk-python"
 version = "0.1.3"
+description = "Python interface for the QCS Rust SDK"
+readme = "README.md"
+authors = [
+	"Rigetti Computing <softapps@rigetti.com>",
+	"Mark Skilbeck <mark.skilbeck@rigetti.com>",
+	"Marquess Valdez <mvaldez@rigetti.com>",
+	"Randall Fulton <rfulton@rigetti.com>",
+]
 
 [tool.maturin]
 bindings = "pyo3"
