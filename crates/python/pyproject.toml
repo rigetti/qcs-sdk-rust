@@ -1,6 +1,7 @@
-[tool.poetry]
+# This is the metadata Maturin uploads to PyPI on publish
+[project]
 name = "qcs-sdk-python"
-version = "0.1.0-rc1"
+version = "0.1.2"
 description = "Python interface for the QCS Rust SDK"
 license = "Apache-2.0"
 authors = [
@@ -8,6 +9,12 @@ authors = [
 	"Marquess Valdez <mvaldez@rigetti.com>",
 	"Randall Fulton <rfulton@rigetti.com>"
 ]
+
+# PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
+# We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
+[tool.poetry]
+name = "qcs-sdk-python"
+version = "0.1.2"
 
 [tool.maturin]
 bindings = "pyo3"
