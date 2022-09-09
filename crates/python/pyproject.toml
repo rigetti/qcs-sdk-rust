@@ -3,11 +3,21 @@
 name = "qcs-sdk-python"
 version = "0.1.3"
 description = "Python interface for the QCS Rust SDK"
+readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-  { name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
-  { name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
-  { name = "Randall Fulton", email = "rfulton@rigetti.com" }
+	{ name = "Rigetti Computing", email = "softapps@rigetti.com" }
+	{ name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
+	{ name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
+	{ name = "Randall Fulton", email = "rfulton@rigetti.com" },
+]
+classifiers = [
+	"Development Status :: 3 - Alpha",
+	"License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+	"Operating System :: OS Independent",
 ]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
