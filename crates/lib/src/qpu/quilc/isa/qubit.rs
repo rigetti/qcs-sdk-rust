@@ -110,6 +110,7 @@ impl Qubit {
             unknown => return Err(Error::UnknownOperator(String::from(unknown))),
         };
         self.gates.extend(operators);
+        self.dead = false;
         Ok(())
     }
 }
