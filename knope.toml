@@ -1,9 +1,12 @@
-[[packages]]
-versioned_files = [
-	"crates/lib/Cargo.toml",
-	"crates/python/Cargo.toml"
-]
-changelog = "CHANGELOG.md"
+[packages.lib]
+versioned_files = ["crates/lib/Cargo.toml"]
+changelog = "crates/lib/CHANGELOG.md"
+scopes = ["lib", "rust"]
+
+[packages.python]
+versioned_files = ["crates/python/Cargo.toml", "crates/python/pyproject.toml"]
+changelog = "crates/python/CHANGELOG.md"
+scopes = ["python"]
 
 [[workflows]]
 name = "release"
@@ -17,10 +20,7 @@ command = "cargo update -w"
 
 [[workflows.steps]]
 type = "Command"
-command = "git add Cargo.toml Cargo.lock crates/lib/Cargo.toml crates/python/Cargo.toml CHANGELOG.md && git commit -m \"chore: prepare release $version\" && git push"
-
-[workflows.steps.variables]
-"$version" = "Version"
+command = "git add Cargo.toml Cargo.lock crates/lib/Cargo.toml crates/python/Cargo.toml CHANGELOG.md && git commit -m \"chore: prepare new release(s)\" && git push"
 
 [[workflows.steps]]
 type = "Release"
@@ -34,10 +34,7 @@ prerelease_label = "rc"
 
 [[workflows.steps]]
 type = "Command"
-command = "cargo update -w && git add CHANGELOG.md Cargo.toml Cargo.lock crates/lib/Cargo.toml crates/python/Cargo.toml && git commit -m \"chore: prepare release $version\""
-
-[workflows.steps.variables]
-"$version" = "Version"
+command = "cargo update -w && git add CHANGELOG.md Cargo.toml Cargo.lock crates/lib/Cargo.toml crates/python/Cargo.toml && git commit -m \"chore: prepare new prerelease(s)\" && git push"
 
 [[workflows.steps]]
 type = "Release"
