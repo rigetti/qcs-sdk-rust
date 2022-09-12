@@ -20,6 +20,11 @@ command = "cargo update -w"
 
 [[workflows.steps]]
 type = "Command"
+variables = {"version" = "Version"}
+command = 'sed -i "s/^version = \".*\"$/version = \"$version\"/" crates/python/pyproject.toml'
+
+[[workflows.steps]]
+type = "Command"
 command = "git add Cargo.lock && git commit -m \"chore: prepare new release(s)\" && git push"
 
 [[workflows.steps]]
@@ -31,6 +36,11 @@ name = "prerelease"
 [[workflows.steps]]
 type = "PrepareRelease"
 prerelease_label = "rc"
+
+[[workflows.steps]]
+type = "Command"
+variables = {"version" = "Version"}
+command = 'sed -i "s/^version = \".*\"$/version = \"$version\"/" crates/python/pyproject.toml'
 
 [[workflows.steps]]
 type = "Command"
