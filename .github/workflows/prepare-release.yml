@@ -1,6 +1,5 @@
 name: Prepare Release
 
-# TODO: This should be changed to workflow-dispatch before being merged to main
 on:
   push:
     branches:
@@ -13,6 +12,10 @@ jobs:
     env:
       REMOTE_REPO: "https://${GITHUB_ACTOR}:${secrets.GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
     steps:
+    - name: Install Knope
+      uses: knope-dev/action@v1
+      with:
+        version: 0.6.0
     - uses: actions/checkout@v2
     - run: |
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
