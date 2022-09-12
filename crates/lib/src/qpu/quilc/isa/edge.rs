@@ -307,7 +307,7 @@ fn basic_gates(
     Operator::Gate {
         operator: op_name,
         parameters: parameters.clone(),
-        arguments: vec![Argument::String("_".to_string())],
+        arguments: vec![Argument::String("_".to_string()); 2],
         fidelity,
         duration: *duration,
     }
