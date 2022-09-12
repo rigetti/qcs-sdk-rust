@@ -3,8 +3,8 @@ name: Release Python
 # TODO: This should be changed to workflow-dispatch before being merged to main
 on:
   push:
-    branches:
-      - 135-python-bindings-distribution
+    tags:
+      - python/v*
 
 jobs:
   macos:
