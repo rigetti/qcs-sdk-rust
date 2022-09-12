@@ -15,12 +15,6 @@ use crate::{
 };
 use std::{collections::HashMap, convert::TryFrom, str::FromStr, sync::Mutex};
 
-// TODO Define qcs.get_compiler_isa_from_qcs_isa(qcs_isa: String)
-// Quilc expects a "compiler ISA" which is a restructured subset
-// of the data in the QCS ISA. Having a SDK utility to convert
-// between the two seems less error-prone / surprising to the user
-// than trying to accept either type of ISA, or provide kwargs, etc.
-
 /// Uses quilc to convert a Quil program to native Quil
 pub async fn compile(
     quil: &str,
@@ -38,11 +32,11 @@ pub struct RewriteArithmeticResult {
     pub recalculation_table: Vec<String>,
 }
 
-// TODO: real errors here; no unwrap
 pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
-    let program = quil_rs::program::Program::from_str(native_quil).unwrap();
+    let program = quil_rs::program::Program::from_str(native_quil)?;
 
-    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(program).unwrap();
+    let (program, subs) =
+        qpu::rewrite_arithmetic::rewrite_arithmetic(program).map_err(|e| e.to_string())?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
 
     Ok(RewriteArithmeticResult {
@@ -112,7 +106,9 @@ pub async fn submit(
         })
         .map(Mutex::new)?;
 
-    let client = rpcq_client.lock().unwrap();
+    let client = rpcq_client
+        .lock()
+        .map_err(|e| runner::Error::ClientLock(e.to_string()))?;
     let job_id = runner::submit(program, &patch_values, &client)?;
 
     Ok(job_id.0)
@@ -185,8 +181,10 @@ pub async fn retrieve_results(
         })
         .map(Mutex::new)?;
 
-    let client = rpcq_client.lock().unwrap();
-    let results = runner::retrieve_results(JobId(job_id.to_string()), &client).unwrap();
+    let client = rpcq_client
+        .lock()
+        .map_err(|e| runner::Error::ClientLock(e.to_string()))?;
+    let results = runner::retrieve_results(JobId(job_id.to_string()), &client)?;
     let execution_duration_microseconds = results.execution_duration_microseconds;
     let buffers = results
         .buffers

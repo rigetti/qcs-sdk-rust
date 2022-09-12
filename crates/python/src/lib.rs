@@ -11,8 +11,6 @@ create_exception!(qcs, ExecutionError, PyException);
 create_exception!(qcs, TranslationError, PyException);
 create_exception!(qcs, CompilationError, PyException);
 
-// TODO Make these kw-only?
-// TODO Return something more flexible than just a string (a Result object)
 #[pyfunction]
 fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyAny> {
     let target_device: TargetDevice = serde_json::from_str(&target_device)
