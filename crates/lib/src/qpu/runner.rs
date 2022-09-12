@@ -50,8 +50,6 @@ pub enum Error {
     Qpu(String),
     #[error("An error was encountered when claiming the client lock: {0}")]
     ClientLock(String),
-    #[error("Error when decoding register buffer")]
-    Decode(#[source] DecodeError),
 }
 
 impl From<RPCQError> for Error {

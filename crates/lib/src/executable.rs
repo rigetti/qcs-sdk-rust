@@ -560,7 +560,8 @@ mod describe_qpu_for_id {
             panic!("Expected an error!");
         };
         let result_string = format!("{:?}", err);
-        assert!(result_string.contains("refresh token"))
+        println!("{}", result_string);
+        assert!(result_string.contains("refresh_token"))
     }
 
     #[tokio::test]
