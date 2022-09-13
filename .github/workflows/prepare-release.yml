@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - 135-python-bindings-distribution
   workflow_dispatch:
     inputs:
       type:
