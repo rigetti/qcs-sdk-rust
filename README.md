@@ -51,6 +51,8 @@ To build the docs.rs-style docs, run `makers docs`. You can also do `makers serv
 
 To release the library crate or the bindings to Python, manually run the `release` or `release python` workflow in GitHub Actions, respectively.
 
+Pre-releases of the Python package happen automatically on merge to main.
+
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
 [Quantum Cloud Services]: https://docs.rigetti.com/qcs/
 [Quil]: https://github.com/quil-lang/quil
