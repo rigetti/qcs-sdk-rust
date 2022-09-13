@@ -109,7 +109,6 @@ jobs:
         env:
           MATURIN_USERNAME: ${{ secrets.PYPI_USERNAME }}
           MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-          MATURIN_REPOSITORY: testpypi
         uses: messense/maturin-action@v1
         with:
           command: upload 
