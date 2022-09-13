@@ -42,11 +42,6 @@ jobs:
       - name: Install wheel - universal2
         run: |
           pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
-      - name: Build wheel - arm64 for Python3.7
-        if: ${{ matrxi.python-version == '3.7' }}
-        uses: messense/maturin-action@v1
-        with:
-          args: -i python --release --target aarch64-apple-darwin --manifest-path crates/python/Cargo.toml --out dist
       - name: Upload wheels
         uses: actions/upload-artifact@v2
         with:
