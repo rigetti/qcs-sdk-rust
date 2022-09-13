@@ -78,7 +78,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [ macos, linux, linux-arm ]
+    needs: [ macos, linux ]
     steps:
       - uses: actions/download-artifact@v2
       - uses: actions/setup-python@v2
