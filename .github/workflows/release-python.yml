@@ -2,11 +2,14 @@ name: Release Python
 
 on:
   push:
+    branches:
+      - 135-python-bindings-distribution
     tags:
       - python/v*
 
 jobs:
   macos:
+    if: ${{ false }}
     runs-on: macos-11
     strategy:
       matrix:
@@ -50,7 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7'] # ['3.7', '3.8', '3.9', '3.10']
     steps:
     - uses: actions/checkout@v2
     - name: Install Rust
@@ -77,6 +80,7 @@ jobs:
         path: dist
 
   linux-arm:
+    if: ${{ false }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -99,7 +103,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [ macos, linux, linux-arm ]
+    needs: [ linux ] # [ macos, linux, linux-arm ]
     steps:
       - uses: actions/download-artifact@v2
       - uses: actions/setup-python@v2
