@@ -1,6 +1,5 @@
 name: Release Python
 
-# TODO: This should be changed to workflow-dispatch before being merged to main
 on:
   push:
     tags:
