@@ -18,7 +18,8 @@ jobs:
           cp knope-x86_64-unknown-linux-musl-$KNOPE_VERSION/knope $HOME/.cargo/bin
           rm -rf knope-x86_64-unknown-linux-musl-${KNOPE_VERSION}*
         env:
-          KNOPE_VERSION: v0.4.1
+          # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
+          KNOPE_VERSION: v0.6.1
       - name: Configure Git
         run: |
           git config --global user.name "${{ github.triggering_actor }}"
