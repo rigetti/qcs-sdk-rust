@@ -2,6 +2,8 @@ name: Release Python
 
 on:
   push:
+    branches:
+      - 135-python-bindings-distribution
     tags:
       - python/v*
 
@@ -23,8 +25,6 @@ jobs:
           target: aarch64-apple-darwin
           profile: minimal
           default: true
-      - name: Build
-        run: cargo build --release
       - name: Build wheels - x86_64
         uses: messense/maturin-action@v1
         with:
@@ -34,7 +34,7 @@ jobs:
         run: |
           pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
       - name: Build wheels - universal2
-        if: ${{ matrix.python-version >= '3.8' || matrix.python-version == '3.10' }}
+        if: ${{ matrix.python-version != '3.7' }}
         uses: messense/maturin-action@v1
         with:
           args: -i python --release --universal2 --manifest-path crates/python/Cargo.toml --out dist
@@ -51,6 +51,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
+        target: [x86_64, aarch64, armv7]
     steps:
     - uses: actions/checkout@v2
     - name: Install Rust
@@ -59,37 +60,15 @@ jobs:
         toolchain: stable
         profile: minimal
         default: true
-    - name: Build
-      run: cargo build --release
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
     - name: Build wheels
       uses: messense/maturin-action@v1
       with:
-        target: x86_64
-        manylinux: 2014
-        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
-    - name: Upload wheels
-      uses: actions/upload-artifact@v2
-      with:
-        name: wheels
-        path: dist
-
-  linux-arm:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python: ['3.7', '3.8', '3.9', '3.10']
-        target: [aarch64, armv7]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build wheels
-      uses: messense/maturin-action@v1
-      with:
         target: ${{ matrix.target }}
         manylinux: 2014
-        args: -i ${{ matrix.python }} --release --manifest-path crates/python/Cargo.toml --out dist
+        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v2
       with:
