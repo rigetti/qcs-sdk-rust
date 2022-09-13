@@ -23,11 +23,11 @@ type = "Command"
 command = "git add Cargo.lock && git commit -m \"chore: prepare new release(s)\""
 
 [[workflows.steps]]
-type = "Release"
+type = "Command"
+command = "git push"
 
 [[workflows.steps]]
-type = "Command"
-command = "git push && git push --tags"
+type = "Release"
 
 [[workflows]]
 name = "prerelease"
@@ -41,11 +41,11 @@ type = "Command"
 command = "cargo update -w && git add Cargo.lock && git commit -m \"chore: prepare new prerelease(s)\""
 
 [[workflows.steps]]
-type = "Release"
+type = "Command"
+command = "git push"
 
 [[workflows.steps]]
-type = "Command"
-command = "git push && git push --tags"
+type = "Release"
 
 [github]
 owner = "rigetti"
