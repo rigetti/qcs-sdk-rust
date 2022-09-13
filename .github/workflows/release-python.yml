@@ -23,7 +23,6 @@ jobs:
         with:
           toolchain: stable
           target: aarch64-apple-darwin
-          if: ${{ matrix.python-version != '3.7' }}
           profile: minimal
           default: true
       - name: Build wheels - x86_64
