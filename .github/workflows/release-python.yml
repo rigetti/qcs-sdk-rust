@@ -40,6 +40,7 @@ jobs:
         with:
           args: -i python --release --universal2 --manifest-path crates/python/Cargo.toml --out dist
       - name: Install wheel - universal2
+        if: matrix.python-version != '3.7'
         run: |
           pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
       - name: Upload wheels
