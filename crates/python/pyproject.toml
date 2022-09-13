@@ -24,7 +24,7 @@ classifiers = [
 # We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
 [tool.poetry]
 name = "qcs-sdk-python"
-version = "0.1.0-rc.0"
+version = "0.1.0-rc.1"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 authors = [
