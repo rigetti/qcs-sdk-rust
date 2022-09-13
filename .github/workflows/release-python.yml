@@ -27,20 +27,17 @@ jobs:
           profile: minimal
           default: true
       - name: Build wheels - x86_64
+        if: matrix.python-version == '3.7'
         uses: messense/maturin-action@v1
         with:
           target: x86_64
           args: -i python --release --manifest-path crates/python/Cargo.toml --out dist --sdist
-      - name: Install wheel - x86_64
-        run: |
-          pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
       - name: Build wheels - universal2
         if: matrix.python-version != '3.7'
         uses: messense/maturin-action@v1
         with:
           args: -i python --release --universal2 --manifest-path crates/python/Cargo.toml --out dist
-      - name: Install wheel - universal2
-        if: matrix.python-version != '3.7'
+      - name: Install wheel
         run: |
           pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
       - name: Upload wheels
