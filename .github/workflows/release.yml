@@ -14,8 +14,7 @@ jobs:
       - name: Install Knope
         uses: knope-dev/action@v1
         with:
-          # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
-          version: 0.6.1
+          version: 0.6.1 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
       - name: Configure Git
         run: |
           git config --global user.name "${{ github.triggering_actor }}"

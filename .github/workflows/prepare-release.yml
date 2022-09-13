@@ -14,7 +14,6 @@ on:
         options:
           - release
           - prerelease
-    
 
 jobs:
   prepare-release:
@@ -29,15 +28,14 @@ jobs:
     - name: Install Knope
       uses: knope-dev/action@v1
       with:
-        # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
-        version: 0.6.1
+        version: 0.6.1 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
     - run: |
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config user.name "github-actions[bot]"
         git remote set-url origin "${REMOTE_REPO}"
     - name: Prepare Prerelease
-    - run: knope prerelease
+      run: knope prerelease
       if: github.event_name == 'push'
     - name: Prepare Release
-    - run: knope ${{ inputs.type }}
+      run: knope ${{ inputs.type }}
       if: github.event_name == 'workflow_dispatch'
