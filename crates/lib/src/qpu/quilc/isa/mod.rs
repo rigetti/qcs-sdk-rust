@@ -4,7 +4,6 @@ use std::convert::TryFrom;
 use serde::{Deserialize, Serialize};
 
 use edge::{convert_edges, Edge, EdgeId};
-use operator::Operator;
 use qcs_api::models::InstructionSetArchitecture;
 use qubit::Qubit;
 

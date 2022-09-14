@@ -163,11 +163,9 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
-
-    use qcs_api::models::InstructionSetArchitecture;
-
     use super::*;
+    use qcs_api::models::InstructionSetArchitecture;
+    use std::fs::File;
 
     const EXPECTED_H0_OUTPUT: &str =
         "MEASURE 0                               # Entering/exiting rewiring: (#(0 1) . #(0 1))\n";
@@ -180,12 +178,16 @@ mod tests {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
-    //#[test]
-    // fn compare_native_quil_to_expected_output() {
-    //     let output = compile_program("MEASURE 0", qvm_isa(), &Configuration::default())
-    //         .expect("Could not compile");
-    //     assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
-    // }
+    #[test]
+    fn compare_native_quil_to_expected_output() {
+        let output = compile_program(
+            "MEASURE 0",
+            TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
+            &Configuration::default(),
+        )
+        .expect("Could not compile");
+        assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
+    }
 
     const BELL_STATE: &str = r##"DECLARE ro BIT[2]
 
@@ -196,24 +198,28 @@ MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "##;
 
-    // #[tokio::test]
-    // async fn run_compiled_bell_state_on_qvm() {
-    //     let config = Configuration::load().await.unwrap_or_default();
-    //     let output =
-    //         compile_program(BELL_STATE, aspen_9_isa(), &config).expect("Could not compile");
-    //     let mut results = crate::qvm::Execution::new(&String::from(output))
-    //         .unwrap()
-    //         .run(10, &["ro"], &HashMap::default(), &config)
-    //         .await
-    //         .expect("Could not run program on QVM");
-    //     for shot in results
-    //         .remove("ro")
-    //         .expect("Did not receive ro buffer")
-    //         .into_i8()
-    //         .unwrap()
-    //     {
-    //         assert_eq!(shot.len(), 2);
-    //         assert_eq!(shot[0], shot[1]);
-    //     }
-    // }
+    #[tokio::test]
+    async fn run_compiled_bell_state_on_qvm() {
+        let config = Configuration::load().await.unwrap_or_default();
+        let output = compile_program(
+            BELL_STATE,
+            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
+            &config,
+        )
+        .expect("Could not compile");
+        let mut results = crate::qvm::Execution::new(&String::from(output))
+            .unwrap()
+            .run(10, &["ro"], &HashMap::default(), &config)
+            .await
+            .expect("Could not run program on QVM");
+        for shot in results
+            .remove("ro")
+            .expect("Did not receive ro buffer")
+            .into_i8()
+            .unwrap()
+        {
+            assert_eq!(shot.len(), 2);
+            assert_eq!(shot[0], shot[1]);
+        }
+    }
 }

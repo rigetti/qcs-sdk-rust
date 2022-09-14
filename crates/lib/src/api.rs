@@ -32,6 +32,11 @@ pub struct RewriteArithmeticResult {
     pub recalculation_table: Vec<String>,
 }
 
+/// Rewrite parametric arithmetic such that all gate parameters are only memory
+/// references to newly declared memory location (`__SUBST`).
+///
+/// A "recalculation" table is provided which can be used to populate the memory
+/// when needed (see `build_patch_values`).
 pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
     let program = quil_rs::program::Program::from_str(native_quil)?;
 
@@ -114,6 +119,8 @@ pub async fn submit(
     Ok(job_id.0)
 }
 
+/// Evaluate the expressions in `recalculation_table` using the numeric values
+/// provided in `memory`.
 pub fn build_patch_values(
     recalculation_table: Vec<String>,
     memory: HashMap<Box<str>, Vec<f64>>,
