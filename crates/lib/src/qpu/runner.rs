@@ -11,6 +11,7 @@ use serde_bytes::ByteBuf;
 
 use crate::executable::Parameters;
 
+use super::engagement;
 use super::rpcq::{Client, Error as RPCQError, RPCRequest};
 
 /// The QCS Job ID. Useful for debugging or retrieving results later.
@@ -44,6 +45,8 @@ pub(crate) fn retrieve_results(
 pub enum Error {
     #[error("Error connecting to the QPU")]
     Connection(#[source] RPCQError),
+    #[error("Error getting engagement for QPU")]
+    Engagement(#[source] engagement::Error),
     #[error("An error not expected to occur—if encountered it may indicate bug in this library")]
     Unexpected(#[source] RPCQError),
     #[error("An error was returned from the QPU: {0}")]

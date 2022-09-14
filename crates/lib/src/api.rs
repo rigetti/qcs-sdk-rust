@@ -2,7 +2,7 @@
 //! and execution.
 
 use log::warn;
-use quil_rs::expression::Expression;
+use quil_rs::Program;
 use serde::Serialize;
 
 use crate::{
@@ -16,7 +16,7 @@ use crate::{
         translation,
     },
 };
-use std::{collections::HashMap, convert::TryFrom, str::FromStr, sync::Mutex};
+use std::{collections::HashMap, convert::TryFrom};
 
 /// Uses quilc to convert a Quil program to native Quil
 ///
@@ -55,7 +55,7 @@ pub struct RewriteArithmeticResult {
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
 pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
-    let program = quil_rs::program::Program::from_str(native_quil)?;
+    let program: Program = native_quil.parse()?;
 
     let (program, subs) =
         qpu::rewrite_arithmetic::rewrite_arithmetic(program).map_err(|e| e.to_string())?;
@@ -138,17 +138,12 @@ pub async fn submit(
     let engagement = engagement::get(String::from(quantum_processor_id), config)
         .await
         .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
-    let rpcq_client = Client::try_from(&engagement)
-        .map_err(|e| {
-            warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-            runner::Error::Qpu(format!("Unable to connect to QPU via RPCQ: {:?}", e))
-        })
-        .map(Mutex::new)?;
+    let rpcq_client = Client::try_from(&engagement).map_err(|e| {
+        warn!("Unable to connect to QPU via RPCQ: {:?}", e);
+        runner::Error::Connection(e)
+    })?;
 
-    let client = rpcq_client
-        .lock()
-        .map_err(|e| runner::Error::ClientLock(e.to_string()))?;
-    let job_id = runner::submit(program, &patch_values, &client)?;
+    let job_id = runner::submit(program, &patch_values, &rpcq_client)?;
 
     Ok(job_id.0)
 }
@@ -164,7 +159,7 @@ pub fn build_patch_values(
 ) -> Result<HashMap<Box<str>, Vec<f64>>, String> {
     let substitutions: Substitutions = recalculation_table
         .iter()
-        .map(|expr| Expression::from_str(expr))
+        .map(|expr| expr.parse())
         .collect::<Result<_, _>>()
         .map_err(|e| format!("Unable to interpret recalc table: {:?}", e))?;
     rewrite_arithmetic::get_substitutions(&substitutions, memory)
@@ -234,17 +229,12 @@ pub async fn retrieve_results(
     let engagement = engagement::get(String::from(quantum_processor_id), config)
         .await
         .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
-    let rpcq_client = Client::try_from(&engagement)
-        .map_err(|e| {
-            warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-            runner::Error::Qpu(format!("Unable to connect to QPU via RPCQ: {:?}", e))
-        })
-        .map(Mutex::new)?;
+    let rpcq_client = Client::try_from(&engagement).map_err(|e| {
+        warn!("Unable to connect to QPU via RPCQ: {:?}", e);
+        runner::Error::Qpu(format!("Unable to connect to QPU via RPCQ: {:?}", e))
+    })?;
 
-    let client = rpcq_client
-        .lock()
-        .map_err(|e| runner::Error::ClientLock(e.to_string()))?;
-    let results = runner::retrieve_results(JobId(job_id.to_string()), &client)?;
+    let results = runner::retrieve_results(JobId(job_id.to_string()), &rpcq_client)?;
     let execution_duration_microseconds = results.execution_duration_microseconds;
     let buffers = results
         .buffers

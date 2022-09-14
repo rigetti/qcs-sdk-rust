@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::configuration::{Configuration, LoadError, RefreshError};
-use crate::qpu::{ExecutionError, JobId};
+use crate::qpu::{engagement, ExecutionError, JobId};
 use crate::{qpu, qvm, ExecutionData};
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
@@ -451,6 +451,9 @@ pub enum Error {
     /// [`Executable::retrieve_results`] can invalidate the handle.
     #[error("The job handle was not valid")]
     InvalidJobHandle,
+    /// This error indicates that there was no current QPU engagement available for the user.
+    #[error("No engagement for QPU: {0}")]
+    NoEngagement(engagement::Error),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -501,6 +504,7 @@ impl From<RefreshError> for Error {
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
+            ExecutionError::NoEngagement(e) => Self::NoEngagement(e),
             ExecutionError::QpuNotFound => Self::QpuNotFound,
             ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
             ExecutionError::Unauthorized => Self::Authentication,

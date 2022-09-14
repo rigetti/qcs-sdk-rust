@@ -37,6 +37,8 @@ pub(crate) struct Execution<'a> {
 
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
+    #[error("No engagement for QPU: {0}")]
+    NoEngagement(engagement::Error),
     #[error("QPU not found")]
     QpuNotFound,
     #[error("QPU currently unavailable, retry after {} seconds", .0.as_secs())]
@@ -92,7 +94,9 @@ impl From<engagement::Error> for Error {
 impl From<runner::Error> for Error {
     fn from(source: runner::Error) -> Self {
         match source {
+            runner::Error::Engagement(e) => Self::NoEngagement(e),
             runner::Error::Connection(_) => Self::QcsCommunication,
+            //runner::Error::Engagement(_) => Self::
             runner::Error::Unexpected(err) => {
                 Self::Unexpected(Unexpected::Qcs(format!("{:?}", err)))
             }
