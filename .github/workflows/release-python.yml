@@ -2,8 +2,6 @@ name: Release Python
 
 on:
   push:
-    branches:
-      - 135-python-bindings-distribution
     tags:
       - python/v*
 
@@ -27,12 +25,14 @@ jobs:
           profile: minimal
           default: true
       - name: Build wheels - x86_64
+        # Python 3.7 does not support aarch64 so we only build it for x86_64
         if: matrix.python-version == '3.7'
         uses: messense/maturin-action@v1
         with:
           target: x86_64
           args: -i python --release --manifest-path crates/python/Cargo.toml --out dist --sdist
       - name: Build wheels - universal2
+        # universal2 supports both x86_64 and aarch64 so every Python > 3.7 only needs this wheel
         if: matrix.python-version != '3.7'
         uses: messense/maturin-action@v1
         with:
@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
-        target: [x86_64, aarch64, armv7]
+        target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
     - name: Install Rust
