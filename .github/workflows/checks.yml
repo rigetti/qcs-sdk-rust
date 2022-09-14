@@ -26,4 +26,4 @@ jobs:
           CARGO_MAKE_BUILD_EXAMPLES: true
         with:
           command: make
-          args: ci-flow
+          args: --cwd crates/lib --makefile Makefile.toml ci-flow
