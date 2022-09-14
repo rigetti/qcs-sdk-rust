@@ -546,7 +546,9 @@ impl JobHandle<'_> {
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_qpu_for_id {
-    use super::*;
+    use std::sync::Arc;
+
+    use crate::{configuration::Configuration, qpu, Executable};
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {
@@ -560,7 +562,7 @@ mod describe_qpu_for_id {
             panic!("Expected an error!");
         };
         let result_string = format!("{:?}", err);
-        assert!(result_string.contains("refresh_token"))
+        assert!(result_string.contains("refresh_token"));
     }
 
     #[tokio::test]
@@ -623,7 +625,9 @@ mod describe_qpu_for_id {
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_get_config {
-    use super::*;
+    use std::sync::Arc;
+
+    use crate::{configuration::Configuration, Executable};
 
     #[tokio::test]
     async fn it_returns_cached_values() {

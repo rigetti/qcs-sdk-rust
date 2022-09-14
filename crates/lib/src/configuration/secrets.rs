@@ -27,7 +27,7 @@ mod describe_load {
 
     use tempfile::NamedTempFile;
 
-    use super::*;
+    use super::{load, Credential, Secrets, SECRETS_PATH_VAR};
 
     #[tokio::test]
     async fn it_returns_default_if_missing_path() {
@@ -36,7 +36,7 @@ mod describe_load {
         let settings = load().await;
 
         std::env::remove_var(SECRETS_PATH_VAR);
-        assert!(settings.is_err())
+        assert!(settings.is_err());
     }
 
     #[tokio::test]
@@ -47,13 +47,14 @@ mod describe_load {
             .credentials
             .insert("test".to_string(), Credential::default());
         let secrets_string = toml::to_string(&secrets).expect("Could not serialize test settings");
-        file.write(secrets_string.as_bytes())
+        let _ = file
+            .write(secrets_string.as_bytes())
             .expect("Failed to write test settings");
         std::env::set_var(SECRETS_PATH_VAR, file.path());
 
         let loaded = load().await.expect("Failed to load secrets");
 
-        assert_eq!(secrets, loaded)
+        assert_eq!(secrets, loaded);
     }
 }
 

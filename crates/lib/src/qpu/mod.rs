@@ -221,7 +221,7 @@ fn organize_ro_sources(
 mod describe_organize_ro_sources {
     use maplit::hashmap;
 
-    use super::*;
+    use crate::qpu::organize_ro_sources;
 
     #[test]
     fn it_converts_from_translation_ro_sources() {

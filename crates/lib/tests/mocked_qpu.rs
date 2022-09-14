@@ -204,14 +204,14 @@ mod qpu {
         RPCError { id: String, error: String },
     }
 
-    #[derive(Serialize, Debug, PartialEq)]
+    #[derive(Serialize, Debug, PartialEq, Eq)]
     pub struct Buffer {
         shape: (usize,),
         data: [u8; 2],
         dtype: String,
     }
 
-    #[derive(Serialize, Debug, PartialEq)]
+    #[derive(Serialize, Debug, PartialEq, Eq)]
     pub struct GetExecutionResultsResponse {
         buffers: HashMap<&'static str, Buffer>,
         execution_duration_microseconds: u64,

@@ -1,3 +1,6 @@
+//! This module provides the functions and types necessary to compile a program
+//! using quilc.
+
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::str::FromStr;
@@ -5,7 +8,7 @@ use std::str::FromStr;
 use quil_rs::Program;
 use serde::{Deserialize, Serialize};
 
-use isa::CompilerIsa;
+use isa::Compiler;
 use qcs_api::models::InstructionSetArchitecture;
 
 use crate::configuration::Configuration;
@@ -36,7 +39,7 @@ pub(crate) fn compile_program(
     config: &Configuration,
 ) -> Result<NativeQuil, Error> {
     let endpoint = &config.quilc_url;
-    let params = QuilcParams::new(quil, isa)?;
+    let params = QuilcParams::new(quil, isa);
     let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
     rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.clone(), source))?
@@ -48,10 +51,13 @@ pub(crate) fn compile_program(
 /// All of the errors that can occur within this module.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// An ISA-related error.
     #[error("Problem converting ISA to quilc format. This is a bug in this library or in QCS.")]
     Isa(#[from] isa::Error),
+    /// An error when trying to connect to quilc.
     #[error("Problem connecting to quilc at {0}")]
     QuilcConnection(String, #[source] rpcq::Error),
+    /// An error when trying to compile using quilc.
     #[error("Problem compiling quil program: {0}")]
     QuilcCompilation(String),
 }
@@ -117,11 +123,11 @@ struct QuilcParams {
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: TargetDevice) -> Result<Self, Error> {
-        Ok(Self {
+    fn new(quil: &str, isa: TargetDevice) -> Self {
+        Self {
             protoquil: None,
-            args: [NativeQuilRequest::new(quil, isa)?],
-        })
+            args: [NativeQuilRequest::new(quil, isa)],
+        }
     }
 }
 
@@ -134,11 +140,11 @@ struct NativeQuilRequest {
 }
 
 impl NativeQuilRequest {
-    fn new(quil: &str, target_device: TargetDevice) -> Result<Self, Error> {
-        Ok(Self {
+    fn new(quil: &str, target_device: TargetDevice) -> Self {
+        Self {
             quil: String::from(quil),
             target_device,
-        })
+        }
     }
 }
 
@@ -146,7 +152,7 @@ impl NativeQuilRequest {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 pub struct TargetDevice {
-    isa: CompilerIsa,
+    isa: Compiler,
     specs: HashMap<String, String>,
 }
 
@@ -155,7 +161,7 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 
     fn try_from(isa: InstructionSetArchitecture) -> Result<Self, Self::Error> {
         Ok(Self {
-            isa: CompilerIsa::try_from(isa)?,
+            isa: Compiler::try_from(isa)?,
             specs: HashMap::new(),
         })
     }

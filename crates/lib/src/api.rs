@@ -1,3 +1,6 @@
+//! This module provides a small interface for doing compilation, translation,
+//! and execution.
+
 use log::warn;
 use quil_rs::expression::Expression;
 use serde::Serialize;
@@ -16,19 +19,28 @@ use crate::{
 use std::{collections::HashMap, convert::TryFrom, str::FromStr, sync::Mutex};
 
 /// Uses quilc to convert a Quil program to native Quil
-pub async fn compile(
+///
+/// # Errors
+///
+/// See [`quilc::compile_program`].
+pub fn compile(
     quil: &str,
     target_device: TargetDevice,
     config: &Configuration,
 ) -> Result<String, Box<dyn std::error::Error>> {
     quilc::compile_program(quil, target_device, config)
-        .map_err(|e| e.into())
+        .map_err(std::convert::Into::into)
         .map(|p| p.0)
 }
 
+/// The result of a call to [`rewrite_arithmetic`] which provides the
+/// information necessary to later patch-in memory values to a compiled program.
 #[derive(Serialize)]
 pub struct RewriteArithmeticResult {
+    /// The rewritten program
     pub program: String,
+    /// The expressions used to fill-in the `__SUBST` memory location. The
+    /// expression index in this vec is the same as that in `__SUBST`.
     pub recalculation_table: Vec<String>,
 }
 
@@ -37,6 +49,11 @@ pub struct RewriteArithmeticResult {
 ///
 /// A "recalculation" table is provided which can be used to populate the memory
 /// when needed (see `build_patch_values`).
+///
+/// # Errors
+///
+/// May return an error if the program fails to parse, or the parameter arithmetic
+/// cannot be rewritten.
 pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
     let program = quil_rs::program::Program::from_str(native_quil)?;
 
@@ -50,13 +67,18 @@ pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, 
     })
 }
 
+/// The result of a call to [`translate`] which provides information about the
+/// translated program.
 #[derive(Clone, Debug, PartialEq, Default, Serialize)]
 pub struct TranslationResult {
+    /// The memory defined in the program.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub memory_descriptors:
         Option<::std::collections::HashMap<String, qcs_api::models::ParameterSpec>>,
+    /// The translated program.
     pub program: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    /// The memory locations used for readout.
     pub ro_sources: Option<Vec<Vec<String>>>,
     /// ISO8601 timestamp of the settings used to translate the program. Translation is deterministic; a program translated twice with the same settings by the same version of the service will have identical output.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,6 +86,10 @@ pub struct TranslationResult {
 }
 
 /// Translates a native Quil program into an executable
+///
+/// # Errors
+///
+/// Returns a [`translation::Error`] if translation fails.
 pub async fn translate(
     native_quil: &str,
     shots: u16,
@@ -87,6 +113,14 @@ pub async fn translate(
 }
 
 /// Submits an executable `program` to be run on the specified QPU
+///
+/// # Errors
+///
+/// May return an error if
+/// * an engagement is not available
+/// * an RPCQ client cannot be built
+/// * the program cannot be submitted
+#[allow(clippy::implicit_hasher)]
 pub async fn submit(
     program: &str,
     patch_values: HashMap<String, Vec<f64>>,
@@ -121,18 +155,22 @@ pub async fn submit(
 
 /// Evaluate the expressions in `recalculation_table` using the numeric values
 /// provided in `memory`.
+///
+/// # Errors
+#[allow(clippy::implicit_hasher)]
 pub fn build_patch_values(
-    recalculation_table: Vec<String>,
-    memory: HashMap<Box<str>, Vec<f64>>,
+    recalculation_table: &[String],
+    memory: &HashMap<Box<str>, Vec<f64>>,
 ) -> Result<HashMap<Box<str>, Vec<f64>>, String> {
     let substitutions: Substitutions = recalculation_table
         .iter()
         .map(|expr| Expression::from_str(expr))
         .collect::<Result<_, _>>()
         .map_err(|e| format!("Unable to interpret recalc table: {:?}", e))?;
-    rewrite_arithmetic::get_substitutions(&substitutions, &memory)
+    rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
+/// A 64-bit complex number.
 pub type Complex64 = [f32; 2];
 
 /// Data from an individual register. Each variant contains a vector with the expected data type
@@ -140,9 +178,13 @@ pub type Complex64 = [f32; 2];
 #[derive(Debug, PartialEq, Serialize)]
 #[serde(untagged)] // Don't include the discriminant name in serialized output.
 pub enum Register {
+    /// A register of 64-bit floating point numbers
     F64(Vec<f64>),
+    /// A register of 16-bit integers
     I16(Vec<i16>),
+    /// A register of 64-bit complex numbers
     Complex64(Vec<Complex64>),
+    /// A register of 8-bit integers (bytes)
     I8(Vec<i8>),
 }
 
@@ -159,6 +201,7 @@ impl From<qpu::runner::Register> for Register {
     }
 }
 
+/// The execution readout data from a particular memory location.
 #[derive(Serialize)]
 pub struct ExecutionResult {
     shape: Vec<usize>,
@@ -166,6 +209,7 @@ pub struct ExecutionResult {
     dtype: String,
 }
 
+/// Execution readout data for all memory locations.
 #[derive(Serialize)]
 pub struct ExecutionResults {
     buffers: HashMap<String, ExecutionResult>,
@@ -173,6 +217,15 @@ pub struct ExecutionResults {
 }
 
 /// Fetches results for the corresponding job
+///
+/// # Errors
+///
+/// May error if an engagement is not available, an RPCQ client cannot be built,
+/// or retrieval of results fails.
+///
+/// # Panics
+///
+/// Panics if a [`Register`] cannot be constructed from a result buffer.
 pub async fn retrieve_results(
     job_id: &str,
     quantum_processor_id: &str,
@@ -199,6 +252,7 @@ pub async fn retrieve_results(
         .map(|(name, buffer)| {
             let shape = buffer.shape.clone();
             let dtype = buffer.dtype.to_string();
+            // TODO Get rid of this unwrap.
             let data = Register::from(qpu::runner::Register::try_from(buffer).unwrap());
             (name, ExecutionResult { shape, data, dtype })
         })

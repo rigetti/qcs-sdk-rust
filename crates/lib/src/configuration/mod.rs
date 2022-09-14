@@ -32,37 +32,55 @@ pub struct Configuration {
     api_config: api::Configuration,
     auth_server: AuthServer,
     refresh_token: Option<String>,
+    /// The URL for the quilc server.
     pub quilc_url: String,
+    /// The URL for the QVM server.
     pub qvm_url: String,
 }
 
 /// Setting this environment variable will change which profile is used from the loaded config files
 pub const PROFILE_NAME_VAR: &str = "QCS_PROFILE_NAME";
 
+/// Errors raised when attempting to refresh the user's token
 #[derive(Debug, thiserror::Error)]
 pub enum RefreshError {
+    /// Error due to no token available to refresh.
     #[error("No refresh token is in secrets")]
     NoRefreshToken,
+    /// Error when trying to fetch the new token.
     #[error("Error fetching new token")]
     FetchError(#[from] reqwest::Error),
 }
 
+/// Errors raised when attempting to load the user's configuration files.
 #[derive(Debug, thiserror::Error)]
 pub enum LoadError {
+    /// Error due to requested profile missing in the user's configuration.
     #[error("Expected profile {0} in settings.profiles but it didn't exist")]
     ProfileNotFound(String),
+    /// Error due to authentication server missing in the user's configuration.
     #[error("Expected auth server {0} in settings.auth_servers but it didn't exist")]
     AuthServerNotFound(String),
+    /// Error due to failing to find the user's home directory.
     #[error("Failed to determine home directory. You can use an explicit path by setting the {env} environment variable")]
-    HomeDirError { env: String },
+    HomeDirError {
+        /// Environment variable to set to configure the home directory.
+        env: String,
+    },
+    /// Error due to failing to open a file.
     #[error("Could not open file at {path}")]
     FileOpenError {
+        /// Path to file that could not be opened.
         path: PathBuf,
+        /// The source error.
         source: std::io::Error,
     },
+    /// Error due to failing to parse a file.
     #[error("Could not parse file at {path}")]
     FileParseError {
+        /// Path to file that could not be parsed.
         path: PathBuf,
+        /// Source error.
         source: toml::de::Error,
     },
 }

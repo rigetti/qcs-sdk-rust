@@ -359,7 +359,9 @@ impl RewrittenProgram {
 mod describe_rewrite_arithmetic {
     use std::str::FromStr;
 
-    use super::*;
+    use quil_rs::Program;
+
+    use crate::qpu::rewrite_arithmetic::rewrite_arithmetic;
 
     #[test]
     fn it_substitutes_gate_parameters() {

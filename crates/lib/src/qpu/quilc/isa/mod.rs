@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 
 use serde::{Deserialize, Serialize};
 
-use edge::{convert_edges, Edge, EdgeId};
+use edge::{convert_edges, Edge, Id};
 use qcs_api::models::InstructionSetArchitecture;
 use qubit::Qubit;
 
@@ -15,14 +15,14 @@ mod qubit;
 
 /// Restructuring of an [`InstructionSetArchitecture`] for sending to quilc
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct CompilerIsa {
+pub struct Compiler {
     #[serde(rename = "1Q")]
     qubits: HashMap<String, Qubit>,
     #[serde(rename = "2Q")]
     edges: HashMap<String, Edge>,
 }
 
-impl TryFrom<InstructionSetArchitecture> for CompilerIsa {
+impl TryFrom<InstructionSetArchitecture> for Compiler {
     type Error = Error;
 
     fn try_from(isa: InstructionSetArchitecture) -> Result<Self, Error> {
@@ -47,7 +47,7 @@ impl TryFrom<InstructionSetArchitecture> for CompilerIsa {
                     qubit.add_operation(&op.name, &site.characteristics, &frb_sim_1q)?;
                 }
                 (Some(2), 2) => {
-                    let id = EdgeId::try_from(&site.node_ids)?;
+                    let id = Id::try_from(&site.node_ids)?;
                     let edge = edges
                         .get_mut(&id)
                         .ok_or_else(|| Error::EdgeDoesNotExist(String::from(&op.name), id))?;
@@ -78,7 +78,7 @@ pub enum Error {
     #[error("Operation {0} is defined for Qubit {1} but that Qubit does not exist")]
     QubitDoesNotExist(String, i32),
     #[error("Operation {0} is defined for Edge {1} but that Edge does not exist")]
-    EdgeDoesNotExist(String, EdgeId),
+    EdgeDoesNotExist(String, Id),
     #[error(
         "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
                         Got {0:?} while parsing operation {1} at site {2:?}"
@@ -92,12 +92,13 @@ pub enum Error {
 
 #[cfg(test)]
 mod describe_compiler_isa {
-    use std::fs::read_to_string;
+    use std::{convert::TryFrom, fs::read_to_string};
 
     use float_cmp::{approx_eq, F64Margin};
+    use qcs_api::models::InstructionSetArchitecture;
     use serde_json::Value;
 
-    use super::*;
+    use super::Compiler;
 
     /// Compare two JSON values and make sure they are equivalent while allowing for some precision
     /// loss in numbers.
@@ -134,33 +135,32 @@ mod describe_compiler_isa {
                         break;
                     }
                     let cmp = json_is_equivalent(first_value, second_value.unwrap());
-                    if !cmp.is_ok() {
-                        return cmp;
-                    }
+                    cmp?;
                 }
                 !found_missing
             }
+            (Value::Array(first_array), Value::Array(second_array))
+                if first_array.len() != second_array.len() =>
+            {
+                false
+            }
             (Value::Array(first_array), Value::Array(second_array)) => {
-                if first_array.len() != second_array.len() {
-                    false
-                } else {
-                    let error = first_array.into_iter().zip(second_array).find(
-                        |(first_value, second_value)| {
-                            json_is_equivalent(first_value, second_value).is_err()
-                        },
-                    );
-                    if let Some(values) = error {
-                        return Err(values);
-                    }
-                    true
+                let error = first_array.iter().zip(second_array).find(
+                    |(first_value, second_value)| -> bool {
+                        json_is_equivalent(first_value, second_value).is_err()
+                    },
+                );
+                if let Some(values) = error {
+                    return Err(values);
                 }
+                true
             }
             (first, second) => first == second,
         };
-        if !equal {
-            Err((first, second))
-        } else {
+        if equal {
             Ok(())
+        } else {
+            Err((first, second))
         }
     }
 
@@ -176,7 +176,7 @@ mod describe_compiler_isa {
             serde_json::from_str(&expected_json).expect("Could not deserialize Aspen-8 output");
 
         let compiler_isa =
-            CompilerIsa::try_from(qcs_isa).expect("Could not convert ISA to CompilerIsa");
+            Compiler::try_from(qcs_isa).expect("Could not convert ISA to CompilerIsa");
         let serialized =
             serde_json::to_value(&compiler_isa).expect("Unable to serialize CompilerIsa");
 
