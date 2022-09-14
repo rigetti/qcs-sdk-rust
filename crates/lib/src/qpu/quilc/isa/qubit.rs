@@ -20,47 +20,6 @@ pub(crate) struct Qubit {
     gates: Vec<Operator>,
 }
 
-#[cfg(test)]
-mod test_qubit_deser {
-    use super::Qubit;
-
-    #[test]
-    fn it_deserializes_a_sequence_of_gates() {
-        let s = r#"
-        {
-            "id": 0,
-            "gates": [
-              {
-                "operator": "RX",
-                "duration": 50,
-                "fidelity": 1,
-                "parameters": [
-                  0
-                ],
-                "arguments": [
-                  0
-                ],
-                "operator_type": "gate"
-              },
-              {
-                "operator": "RX",
-                "duration": 50,
-                "fidelity": 0.9839942081888577,
-                "parameters": [
-                  3.141592653589793
-                ],
-                "arguments": [
-                  0
-                ],
-                "operator_type": "gate"
-              }
-            ]
-          }          
-        "#;
-        serde_json::from_str::<Qubit>(s).expect("nope");
-    }
-}
-
 // Gross hack to not include `dead` if unneeded, to follow pyQuil's implementation
 #[allow(clippy::trivially_copy_pass_by_ref)]
 fn is_false(val: &bool) -> bool {

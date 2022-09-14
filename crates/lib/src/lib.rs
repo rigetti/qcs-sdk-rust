@@ -1,4 +1,4 @@
-//#![deny(clippy::all)]
+#![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 #![deny(clippy::cargo)]
 #![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny

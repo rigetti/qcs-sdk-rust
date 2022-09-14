@@ -33,29 +33,6 @@ pub(crate) enum Operator {
 }
 
 #[cfg(test)]
-mod test_operator_deser {
-    use super::Operator;
-    #[test]
-    fn it_deserializes_an_operator() {
-        let s = r##"
-        {
-            "operator": "RX",
-            "duration": 50,
-            "fidelity": 1,
-            "parameters": [
-              0
-            ],
-            "arguments": [
-              0
-            ],
-            "operator_type": "gate"
-          }
-        "##;
-        serde_json::from_str::<Operator>(s).expect("nope");
-    }
-}
-
-#[cfg(test)]
 mod describe_operator {
     use crate::qpu::quilc::isa::operator::{Argument, Operator, Parameter};
 
