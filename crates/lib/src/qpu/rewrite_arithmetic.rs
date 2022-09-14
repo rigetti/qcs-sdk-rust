@@ -129,7 +129,7 @@ pub(crate) fn get_substitutions(
         .map(|substitution: &Expression| {
             substitution
                 .evaluate(&HashMap::new(), &params)
-                .map_err(|_| format!("Could not evaluate expression {}", substitution))
+                .map_err(|e| format!("Could not evaluate expression {}: {:?}", substitution, e))
                 .and_then(|complex| {
                     if complex.im == 0.0 {
                         Ok(complex.re)
