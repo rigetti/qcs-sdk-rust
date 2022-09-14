@@ -103,15 +103,6 @@ mod describe_edge {
         assert_eq!(undead, expected_undead);
         assert_eq!(dead, expected_dead);
     }
-
-    #[test]
-    fn it_deseria() {
-        // let edge = Edge {
-        //     id: EdgeId::new([0, 1]),
-        //     dead: todo!(),
-        //     gates: todo!(),
-        // }
-    }
 }
 
 /// The unique identifier of an [`Edge`] is defined by the sorted combination

@@ -1,22 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
-    if let Some(node_id) = node_id {
-        Operator::Gate {
-            operator: "_".to_string(),
-            duration: PERFECT_DURATION,
-            fidelity: PERFECT_FIDELITY,
-            parameters: vec![Parameter::String("_".to_owned())],
-            arguments: vec![Argument::Int(node_id)],
-        }
-    } else {
-        Operator::Gate {
-            operator: "_".to_string(),
-            duration: PERFECT_DURATION,
-            fidelity: PERFECT_FIDELITY,
-            parameters: vec![Parameter::String("_".to_owned())],
-            arguments: vec![Argument::String("_".to_owned())],
-        }
+    let arg = node_id.map_or(Argument::String("_".to_owned()), Argument::Int);
+    Operator::Gate {
+        operator: "_".to_string(),
+        duration: PERFECT_DURATION,
+        fidelity: PERFECT_FIDELITY,
+        parameters: vec![Parameter::String("_".to_owned())],
+        arguments: vec![arg],
     }
 }
 
