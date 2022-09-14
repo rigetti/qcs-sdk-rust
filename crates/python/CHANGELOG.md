@@ -1,6 +1,4 @@
-# Changelog
-
-## 0.1.0-rc1
+## 0.1.0
 
 ### Features
 This initial RC release exposes the following functions to Python:
