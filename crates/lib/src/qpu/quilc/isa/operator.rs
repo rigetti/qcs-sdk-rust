@@ -1,22 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
-    if let Some(node_id) = node_id {
-        Operator::Gate {
-            operator: "_".to_string(),
-            duration: PERFECT_DURATION,
-            fidelity: PERFECT_FIDELITY,
-            parameters: vec![Parameter::String("_".to_owned())],
-            arguments: vec![Argument::Int(node_id)],
-        }
-    } else {
-        Operator::Gate {
-            operator: "_".to_string(),
-            duration: PERFECT_DURATION,
-            fidelity: PERFECT_FIDELITY,
-            parameters: vec![Parameter::String("_".to_owned())],
-            arguments: vec![Argument::String("_".to_owned())],
-        }
+    let arg = node_id.map_or(Argument::String("_".to_owned()), Argument::Int);
+    Operator::Gate {
+        operator: "_".to_string(),
+        duration: PERFECT_DURATION,
+        fidelity: PERFECT_FIDELITY,
+        parameters: vec![Parameter::String("_".to_owned())],
+        arguments: vec![arg],
     }
 }
 
@@ -66,10 +57,10 @@ mod test_operator_deser {
 
 #[cfg(test)]
 mod describe_operator {
-    use super::*;
+    use crate::qpu::quilc::isa::operator::{Argument, Operator, Parameter};
 
-    /// This test copies some JSON data from the pyQuil ISA integration test to validate that
-    /// Operator::Gate is serialized correctly.
+    /// This test copies some JSON data from the pyQuil ISA integration test to
+    /// validate that [`Operator::Gate`] is serialized correctly.
     #[test]
     fn it_serializes_gates_like_pyquil() {
         let gate_op = Operator::Gate {
@@ -93,7 +84,7 @@ mod describe_operator {
     }
 
     /// This test copies some JSON data from the pyQuil ISA integration test to validate that
-    /// Operator::Measure is serialized correctly.
+    /// [`Operator::Measure`] is serialized correctly.
     #[test]
     fn it_serializes_measurements_like_pyquil() {
         let measure = Operator::Measure {
@@ -117,7 +108,7 @@ mod describe_operator {
     }
 
     /// This test copies some JSON data from the pyQuil ISA integration test to validate that
-    /// Operator::Measure is serialized correctly.
+    /// [`Operator::Measure`] is serialized correctly.
     #[test]
     fn it_serializes_measurements_with_null_targets_like_pyquil() {
         let measure = Operator::Measure {
@@ -161,7 +152,7 @@ mod test_parameters_deser {
 
 #[cfg(test)]
 mod describe_parameters {
-    use super::*;
+    use crate::qpu::quilc::isa::operator::Parameter;
 
     #[test]
     fn it_serializes_underscore_as_list_of_strings() {
@@ -189,7 +180,7 @@ pub(crate) enum Argument {
 
 #[cfg(test)]
 mod describe_arguments {
-    use super::*;
+    use crate::qpu::quilc::isa::operator::Argument;
 
     #[test]
     fn it_serializes_underscores_as_list_of_strings() {

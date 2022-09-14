@@ -26,7 +26,9 @@ mod describe_load {
 
     use tempfile::NamedTempFile;
 
-    use super::*;
+    use crate::configuration::{settings::load, SETTINGS_PATH_VAR};
+
+    use super::Settings;
 
     #[tokio::test]
     async fn it_returns_default_if_missing_path() {
@@ -36,23 +38,26 @@ mod describe_load {
 
         std::env::remove_var(SETTINGS_PATH_VAR);
 
-        assert!(settings.is_err())
+        assert!(settings.is_err());
     }
 
     #[tokio::test]
     async fn it_loads_from_env_var_path() {
         let mut file = NamedTempFile::new().expect("Failed to create temporary settings file");
-        let mut settings = Settings::default();
-        settings.default_profile_name = "THIS IS A TEST".to_string();
+        let settings = Settings {
+            default_profile_name: "THIS IS A TEST".to_string(),
+            ..Default::default()
+        };
         let settings_string =
             toml::to_string(&settings).expect("Could not serialize test settings");
-        file.write(settings_string.as_bytes())
+        let _ = file
+            .write(settings_string.as_bytes())
             .expect("Failed to write test settings");
         std::env::set_var(SETTINGS_PATH_VAR, file.path());
 
         let loaded = load().await.expect("Failed to load settings");
 
-        assert_eq!(settings, loaded)
+        assert_eq!(settings, loaded);
     }
 }
 

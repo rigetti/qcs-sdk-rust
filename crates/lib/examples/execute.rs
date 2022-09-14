@@ -12,8 +12,6 @@ MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "#;
 
-
-
 #[tokio::main]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
@@ -24,6 +22,6 @@ async fn main() {
         .execute_on_qpu("Aspen-11")
         .await
         .expect("Failed to execute");
-    
+
     dbg!(&result);
 }

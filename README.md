@@ -1,10 +1,10 @@
-# qcs-sdk-rust
+# QCS Rust SDK
 
-The `qcs` crate is a high-level interface to Rigetti's [Quantum Cloud Services], allowing Rust developers to run [Quil] programs on Rigetti's [QPUs]. This crate is a Rust port of [`pyQuil`], though it currently has a much smaller feature set.
+This repo provides two crates:
 
-The `qcs-sdk-python` crate exposes some functionality of the `qcs` crate to Python using [pyo3](https://pyo3.rs/v0.17.1/).
-
-> For the C-bindings to this library, check out [qcs-sdk-c](https://github.com/rigetti/qcs-sdk-c)
+- `qcs` which is the Rust SDK for executing quantum programs on Rigetti QPUs; and
+- `qcs-sdk-python` which defines, generates, and publishes the Python bindgins
+  to make use of the Rust SDK.
 
 ## Documentation
 
@@ -19,7 +19,7 @@ In order to run all checks exactly the same way that CI does, use `makers ci-flo
 
 ### Commits
 
-Commits should follow the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) syntax, with one of the following [scopes][scopes]:
+Commits should follow the conventional commit syntax, with one of the following [scopes][scopes]:
 
 - `lib` or `rust`: changes to the rust SDK
 - `python`: changes to the Python bindings

@@ -76,6 +76,6 @@ mod describe_request {
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
             serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0"})
-        )
+        );
     }
 }

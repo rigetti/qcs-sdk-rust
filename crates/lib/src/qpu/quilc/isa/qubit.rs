@@ -140,7 +140,7 @@ impl From<&Node> for Qubit {
 
 #[cfg(test)]
 mod describe_qubit {
-    use super::*;
+    use crate::qpu::quilc::isa::qubit::Qubit;
 
     #[test]
     fn it_skips_serializing_dead_if_false() {
@@ -237,7 +237,14 @@ fn rx_gates(node_id: i32, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error>
 
 #[cfg(test)]
 mod describe_rx_gates {
-    use super::*;
+    use std::f64::consts::{FRAC_PI_2, PI};
+
+    use qcs_api::models::Characteristic;
+
+    use crate::qpu::quilc::isa::{
+        operator::{Argument, Operator, Parameter},
+        qubit::{rx_gates, FrbSim1q},
+    };
 
     /// This data is copied from the pyQuil ISA integration test.
     #[test]
@@ -246,16 +253,16 @@ mod describe_rx_gates {
         let frb_sim_1q = FrbSim1q(vec![
             Characteristic {
                 name: "fRB".to_string(),
-                value: 0.989_821_537_688_075,
-                error: Some(0.000_699_235_456_806_402),
+                value: 0.989_821_55,
+                error: Some(0.000_699_235_5),
                 node_ids: Some(vec![0]),
                 parameter_values: None,
                 timestamp: "1970-01-01T00:00:00+00:00".to_string(),
             },
             Characteristic {
                 name: "fRB".to_string(),
-                value: 0.996_832_638_579_018,
-                error: Some(0.000_100_896_782_153_99),
+                value: 0.996_832_6,
+                error: Some(0.000_100_896_78),
                 node_ids: Some(vec![1]),
                 timestamp: "1970-01-01T00:00:00+00:00".to_string(),
                 parameter_values: None,
@@ -365,7 +372,11 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 
 #[cfg(test)]
 mod describe_measure {
-    use super::*;
+    use qcs_api::models::Characteristic;
+
+    use crate::qpu::quilc::isa::operator::Operator;
+
+    use super::measure;
 
     /// This test copies data from pyQuil's integration test for ISA conversion.
     #[test]
@@ -395,6 +406,6 @@ mod describe_measure {
                 target: None,
             },
         ];
-        assert_eq!(result, expected)
+        assert_eq!(result, expected);
     }
 }

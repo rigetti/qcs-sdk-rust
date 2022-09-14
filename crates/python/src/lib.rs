@@ -20,7 +20,6 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
         let result = api::compile(&quil, target_device, &config)
-            .await
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
     })
@@ -43,8 +42,8 @@ fn build_patch_values(
         .into_iter()
         .map(|(k, v)| (k.into_boxed_str(), v))
         .collect();
-    let patch_values =
-        api::build_patch_values(recalculation_table, memory).map_err(TranslationError::new_err)?;
+    let patch_values = api::build_patch_values(&recalculation_table, &memory)
+        .map_err(TranslationError::new_err)?;
     let patch_values =
         pythonize(py, &patch_values).map_err(|e| TranslationError::new_err(e.to_string()))?;
     Ok(patch_values)

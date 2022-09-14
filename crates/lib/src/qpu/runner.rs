@@ -289,11 +289,16 @@ impl TryFrom<Buffer> for Register {
 
 #[cfg(test)]
 mod describe_buffer {
-    use std::convert::TryInto;
+    use std::{collections::HashMap, convert::TryInto};
 
-    use crate::qpu::rpcq::RPCResponse;
+    use num::complex::Complex32;
+    use serde_bytes::ByteBuf;
 
-    use super::*;
+    use crate::qpu::{
+        rpcq::RPCResponse,
+        runner::{Buffer, DataType},
+        Register,
+    };
 
     #[test]
     fn it_converts_numpy_int16() {
@@ -377,7 +382,7 @@ mod describe_buffer {
             rmp_serde::from_read(data.as_slice()).unwrap();
         let mut buffers = match resp {
             RPCResponse::RPCReply { result, .. } => result,
-            _ => unreachable!(),
+            RPCResponse::RPCError { .. } => unreachable!(),
         };
         let q0 = buffers.remove("q0").expect("Could not find buffer q0");
         let q1 = buffers.remove("q1").expect("Could not find buffer q1");

@@ -127,8 +127,9 @@ fn transpose<T>(mut data: Vec<Vec<T>>, len: u16) -> Vec<Vec<T>> {
 #[cfg(test)]
 mod describe_program_results {
     use maplit::hashmap;
+    use num::complex::Complex32;
 
-    use super::*;
+    use crate::{qpu::Register, RegisterData};
 
     #[test]
     fn it_converts_from_i8_registers() {
