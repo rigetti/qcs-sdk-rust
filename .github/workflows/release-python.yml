@@ -3,7 +3,7 @@ name: Release Python
 on:
   push:
     tags:
-      - python/v*
+      - 'python/v**'
 
 jobs:
   macos:
