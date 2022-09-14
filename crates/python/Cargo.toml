@@ -1,0 +1,28 @@
+[package]
+name = "qcs-sdk-python"
+description = "Python bindings to qcs-sdk-rust"
+version = "0.1.4"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/rigetti/qcs-sdk-rust"
+keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
+categories = ["api-bindings", "compilers", "science", "emulators"]
+readme = "./README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "qcs_sdk"
+crate-type = ["cdylib"]
+
+[dependencies]
+qcs = { path = "../lib" }
+pyo3 = { version = "0.16", features = ["extension-module"] }
+pyo3-asyncio = { version = "0.16", features = ["tokio-runtime"] }
+pythonize = "0.16"
+tokio = "1.4"
+qcs-api = "0.2.1"
+serde_json = "1.0.85"
+
+[build-dependencies]
+pyo3-build-config = { version = "0.16" }

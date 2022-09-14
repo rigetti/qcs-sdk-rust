@@ -1,10 +1,8 @@
-# QCS Rust SDK
+# qcs-sdk-rust
 
-This repo provides two crates:
+The `qcs` crate is a high-level interface to Rigetti's [Quantum Cloud Services], allowing Rust developers to run [Quil] programs on Rigetti's [QPUs]. This crate is a Rust port of [`pyQuil`], though it currently has a much smaller feature set.
 
-- `qcs` which is the Rust SDK for executing quantum programs on Rigetti QPUs; and
-- `qcs-sdk-python` which defines, generates, and publishes the Python bindgins
-  to make use of the Rust SDK.
+> For the C-bindings to this library, check out [qcs-sdk-c](https://github.com/rigetti/qcs-sdk-c)
 
 ## Documentation
 
@@ -15,15 +13,6 @@ This crate is documented primarily via [rustdoc] comments and examples, which ar
 Most development tasks are automated with [cargo-make] (like make, but you can have dependencies on other Rust tools and a _ton_ of useful tasks are built in). Install cargo-make by doing `cargo install cargo-make`. Then you can invoke it with either `cargo make <task>` or `makers <task>`. Tasks are defined in files called `Makefile.toml`.
 
 In order to run all checks exactly the same way that CI does, use `makers ci-flow` from the project root (workspace).
-
-
-### Commits
-
-Commits should follow the conventional commit syntax, with one of the following [scopes][scopes]:
-
-- `lib` or `rust`: changes to the rust SDK
-- `python`: changes to the Python bindings
-- No scope: changes to both crates
 
 ### Dependencies
 
@@ -49,15 +38,12 @@ To build the docs.rs-style docs, run `makers docs`. You can also do `makers serv
 
 ## Release
 
-To release the library crate or the bindings to Python, manually run the `release` or `release python` workflow in GitHub Actions, respectively.
-
-Pre-releases of the Python package happen automatically on merge to main.
+To release this crate, manually run the `release` workflow in GitHub Actions.
 
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
-[Quantum Cloud Services]: https://docs.rigetti.com/qcs/
-[Quil]: https://github.com/quil-lang/quil
-[QPUs]: https://qcs.rigetti.com/qpus/
-[`pyQuil`]: https://github.com/rigetti/pyquil
+[quantum cloud services]: https://docs.rigetti.com/qcs/
+[quil]: https://github.com/quil-lang/quil
+[qpus]: https://qcs.rigetti.com/qpus/
+[`pyquil`]: https://github.com/rigetti/pyquil
 [rustdoc]: https://doc.rust-lang.org/rustdoc/index.html
 [docs.rs]: https://docs.rs/qcs
-[scopes]: https://www.conventionalcommits.org/en/v1.0.0/#commit-message-with-scope

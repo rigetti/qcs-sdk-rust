@@ -37,6 +37,7 @@ allow = [
     "MIT",
     "OpenSSL",
     "BSD-3-Clause",
+    "Unicode-DFS-2016",
 ]
 # List of explictly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
