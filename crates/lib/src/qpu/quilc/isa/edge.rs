@@ -52,6 +52,9 @@ impl Edge {
             }
         };
 
+        // If an edge has an operation, it's not dead.
+        self.dead = false;
+
         self.gates.push(operator);
 
         Ok(())
@@ -99,6 +102,15 @@ mod describe_edge {
 
         assert_eq!(undead, expected_undead);
         assert_eq!(dead, expected_dead);
+    }
+
+    #[test]
+    fn it_deseria() {
+        // let edge = Edge {
+        //     id: EdgeId::new([0, 1]),
+        //     dead: todo!(),
+        //     gates: todo!(),
+        // }
     }
 }
 
@@ -295,7 +307,7 @@ fn basic_gates(
     Operator::Gate {
         operator: op_name,
         parameters: parameters.clone(),
-        arguments: vec![Argument::String("_".to_string())],
+        arguments: vec![Argument::String("_".to_string()); 2],
         fidelity,
         duration: *duration,
     }

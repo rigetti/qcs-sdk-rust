@@ -97,6 +97,7 @@ impl From<runner::Error> for Error {
                 Self::Unexpected(Unexpected::Qcs(format!("{:?}", err)))
             }
             runner::Error::Qpu(err) => Self::Qcs(err),
+            runner::Error::ClientLock(err) => Self::Unexpected(Unexpected::Other(err)),
         }
     }
 }
@@ -113,6 +114,8 @@ pub(crate) enum Unexpected {
     Isa(String),
     #[error("Problem understanding QCS")]
     Qcs(String),
+    #[error("Unknown error")]
+    Other(String),
 }
 
 impl From<IsaError> for Error {
