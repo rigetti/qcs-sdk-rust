@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
-    let arg = node_id.map_or(Argument::String("_".to_owned()), Argument::Int);
+    let arg = node_id.map_or_else(|| Argument::String("_".to_owned()), Argument::Int);
     Operator::Gate {
         operator: "_".to_string(),
         duration: PERFECT_DURATION,
