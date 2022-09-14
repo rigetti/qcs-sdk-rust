@@ -572,7 +572,7 @@ mod describe_qpu_for_id {
             qpu::Execution::new(
                 "".into(),
                 shots,
-                "Aspen-9",
+                "Aspen-11",
                 exe.get_config().await.unwrap_or_default(),
                 exe.compile_with_quilc,
             )
@@ -582,7 +582,7 @@ mod describe_qpu_for_id {
         // Load config with no credentials to prevent creating a new Execution if it tries
         exe.config = Some(Arc::new(Configuration::default()));
 
-        assert!(exe.qpu_for_id("Aspen-9").await.is_ok());
+        assert!(exe.qpu_for_id("Aspen-11").await.is_ok());
     }
 
     #[tokio::test]
@@ -634,6 +634,5 @@ mod describe_get_config {
         exe.config = Some(config.clone());
         let gotten = exe.get_config().await.unwrap_or_default();
         assert_eq!(gotten.quilc_url, config.quilc_url);
-        assert!(matches!(exe.config, None));
     }
 }
