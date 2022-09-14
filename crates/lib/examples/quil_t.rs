@@ -21,10 +21,10 @@ async fn main() {
         .compile_with_quilc(false)
         .execute_on_qpu("Aspen-11")
         .await
-        .expect("Failed to execute")
+        .expect("Executed program on QPU")
         .registers
         .remove("ro")
-        .expect("Missing ro register");
+        .expect("Found ro register");
 
     assert!(result.as_i16().is_some());
 }

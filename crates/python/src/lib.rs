@@ -4,12 +4,12 @@ use qcs::api;
 use qcs::qpu::quilc::TargetDevice;
 use std::collections::HashMap;
 
-use pyo3::{create_exception, exceptions::PyException, prelude::*};
+use pyo3::{create_exception, exceptions::PyRuntimeError, prelude::*};
 
-create_exception!(qcs, InvalidConfigError, PyException);
-create_exception!(qcs, ExecutionError, PyException);
-create_exception!(qcs, TranslationError, PyException);
-create_exception!(qcs, CompilationError, PyException);
+create_exception!(qcs, InvalidConfigError, PyRuntimeError);
+create_exception!(qcs, ExecutionError, PyRuntimeError);
+create_exception!(qcs, TranslationError, PyRuntimeError);
+create_exception!(qcs, CompilationError, PyRuntimeError);
 
 #[pyfunction]
 fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyAny> {

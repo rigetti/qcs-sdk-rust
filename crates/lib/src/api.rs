@@ -30,7 +30,7 @@ pub fn compile(
 ) -> Result<String, Box<dyn std::error::Error>> {
     quilc::compile_program(quil, target_device, config)
         .map_err(std::convert::Into::into)
-        .map(|p| p.0)
+        .map(String::from)
 }
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the

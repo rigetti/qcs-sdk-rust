@@ -31,7 +31,7 @@ async fn main() {
             .with_parameter("theta", 0, theta)
             .execute_on_qpu("Aspen-11")
             .await
-            .expect("Failed to execute");
+            .expect("Executed program on QPU");
         total_execution_time += data
             .duration
             .expect("Aspen-11 should always report duration");

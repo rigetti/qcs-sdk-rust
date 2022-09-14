@@ -29,12 +29,12 @@ async fn basic_substitution() {
             .with_parameter("theta", 0, theta)
             .execute_on_qvm()
             .await
-            .expect("Failed to execute");
+            .expect("Executed on QPU");
         parametric_measurements.append(
             &mut result
                 .registers
                 .remove("ro")
-                .expect("Missing ro register")
+                .expect("Found ro register")
                 .into_i8()
                 .unwrap()[0],
         )

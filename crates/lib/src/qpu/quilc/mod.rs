@@ -74,7 +74,7 @@ impl Error {
 /// A wrapper around a [`String`] which indicates the string contains valid Native Quil. That is,
 /// Quil which has been processed through `quilc`.
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct NativeQuil(pub String);
+pub struct NativeQuil(String);
 
 impl NativeQuil {
     /// Cast a String to `NativeQuil` without checking or transforming it via `quilc`.
@@ -86,6 +86,12 @@ impl NativeQuil {
 impl From<NativeQuil> for String {
     fn from(native_quil: NativeQuil) -> String {
         native_quil.0
+    }
+}
+
+impl AsRef<str> for NativeQuil {
+    fn as_ref(&self) -> &str {
+        &self.0
     }
 }
 
