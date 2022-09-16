@@ -18,7 +18,9 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      - name: Run CI
+      - name: Install poetry
+        uses: snok/install-poetry@v1
+      - name: Run Rust CI
         uses: actions-rs/cargo@v1
         env:
           CARGO_MAKE_RUN_CHECK_FORMAT: true
@@ -27,3 +29,8 @@ jobs:
         with:
           command: make
           args: --cwd crates/lib --makefile Makefile.toml ci-flow
+      - name: Run Python CI
+        uses: actions-rs/cargo@v1
+        with:
+          command: make
+          args: --cwd crates/python --makefile Makefile.toml pytest-flow

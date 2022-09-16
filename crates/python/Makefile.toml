@@ -1,0 +1,31 @@
+[env]
+RUST_BACKTRACE = 0
+
+[tasks.pre-test-docker-up]
+command = "docker-compose"
+args = ["up", "-d"]
+
+[tasks.pre-test-poetry-install]
+command = "poetry"
+args = ["install"]
+
+[tasks.pre-test-install-lib]
+command = "poetry"
+args = ["run", "maturin", "develop"]
+
+[tasks.post-test]
+command = "docker-compose"
+args = ["down"]
+
+[tasks.test]
+command = "poetry"
+args = ["run", "pytest", "tests"]
+
+[tasks.pytest-flow]
+dependencies = [
+    "pre-test-docker-up",
+    "pre-test-poetry-install",
+    "pre-test-install-lib",
+    "test",
+    "post-test",
+]
