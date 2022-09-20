@@ -1,12 +1,14 @@
 name: Release Rust
 
 on:
-  push:
-    tags:
-      - 'lib/v**'
+  release:
+    types: [published]
+  workflow_dispatch:
+    description: "Manually publish release"
 
 jobs:
   release:
+    if: ${{ github.event_name == "workflow_dispatch" || startsWith(github.event.release.tag_name, "lib/v") }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
