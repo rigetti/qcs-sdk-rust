@@ -29,7 +29,7 @@ def compile(quil: str, target_device: str) -> Awaitable[str]:
     Uses quilc to convert a quil program to native Quil.
 
     Args:
-        quil (str): A quil program.
+        quil: A quil program.
         target_device: The device to target for nativization (e.g. "Aspen-M-2")
 
     Returns:
