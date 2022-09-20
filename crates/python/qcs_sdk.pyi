@@ -33,22 +33,22 @@ def compile(quil: str, target_device: str) -> Awaitable[str]:
         target_device: The device to target for nativization (e.g. "Aspen-M-2")
 
     Returns:
-        An Awaitable that resolves to a string containing a quil program native to the target device.
+        An Awaitable that resolves to the native Quil program.
     """
     ...
 
 def rewrite_arithmetic(native_quil: str) -> Awaitable[RewriteArithmeticResults]:
     """
     Rewrites parametric arithmetic such that all gate parameters are only memory references
-    to newly declared memory location (`__SUBST`).
+    to newly declared memory location (__SUBST).
 
     Args:
         native_quil: A quil program.
 
     Returns:
         An Awaitable that resolves to a dictionary containing two keys:
-            - "program": the rewritten program.
-            - "recalculation_table": A list of expressions used to populate memory (see build_patch_values).
+            - program: the rewritten program.
+            - recalculation_table: A list of expressions used to populate memory (see build_patch_values).
     """
     ...
 
@@ -81,10 +81,10 @@ def translate(
 
     Returns:
         An awaitable that resolves to a dictionary containing four keys:
-            - "memory_descriptors": The memory defined in the program.
-            - "program": The translated program.
-            - "ro_sources": The memory locations used for readout.
-            - "settings_timestamp": ISO8601 timestamp of the settings used to translate the program.
+            - memory_descriptors: The memory defined in the program.
+            - program: The translated program.
+            - ro_sources: The memory locations used for readout.
+            - settings_timestamp: ISO8601 timestamp of the settings used to translate the program.
                 Translation is deterministic; a program translated twice with the same settings by the
                 same version of the service will have identical output.
     """
@@ -118,7 +118,7 @@ def retrieve_results(
 
     Returns:
         An Awaitable that resolves to a dictionary describing the execution results:
-            - "buffers": A dictionary mapping memory buffers to their readout values.
-            - "execution_duration_microseconds": The duration in microseconds the job took to execute.
+            - buffers: A dictionary mapping memory buffers to their readout values.
+            - execution_duration_microseconds: The duration in microseconds the job took to execute.
     """
     ...
