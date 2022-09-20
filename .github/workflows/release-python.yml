@@ -9,7 +9,7 @@ on:
 
 jobs:
   macos:
-    if: ${{ github.event_name == "workflow_dispatch" || startsWith(github.event.release.tag_name, "python/v") }}
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v') }}
     runs-on: macos-11
     strategy:
       matrix:
@@ -49,7 +49,7 @@ jobs:
           name: wheels
           path: dist
   linux:
-    if: ${{ github.event_name == "workflow_dispatch" || startsWith(github.event.release.tag_name, "python/v") }}
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -79,7 +79,7 @@ jobs:
         path: dist
 
   release:
-    if: ${{ github.event_name == "workflow_dispatch" || startsWith(github.event.release.tag_name, "python/v") }}
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v') }}
     name: Release
     runs-on: ubuntu-latest
     needs: [ macos, linux ]
