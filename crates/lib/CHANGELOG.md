@@ -1,3 +1,9 @@
+## 0.7.1-rc.1
+
+### Features
+
+- python bindings (#145)
+
 ## 0.7.1-rc.0
 
 ### Features
