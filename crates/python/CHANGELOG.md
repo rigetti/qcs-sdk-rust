@@ -1,3 +1,10 @@
+## 0.2.1-rc.7
+
+### Features
+
+- add type hints
+- python bindings (#145)
+
 ## 0.2.1-rc.6
 
 ### Features
