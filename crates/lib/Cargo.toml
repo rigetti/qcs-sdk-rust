@@ -22,7 +22,7 @@ log = "0.4.17"
 num = "0.4.0"
 qcs-api = "0.2.1"
 quil-rs = "0.12.2"
-reqwest = { version = "0.11.11", default-features = false, features = ["rustls-tls", "json"] }
+reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.0"
 serde = { version = "1.0.143", features = ["derive"] }
 serde_bytes = "0.11.7"
