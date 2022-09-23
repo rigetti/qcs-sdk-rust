@@ -50,7 +50,7 @@ jobs:
         run: |
           pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
       - name: Upload wheels
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: wheels
           path: dist
@@ -80,7 +80,7 @@ jobs:
         manylinux: 2014
         args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: wheels
         path: dist
