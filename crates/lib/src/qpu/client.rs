@@ -54,10 +54,6 @@ impl QcsClient {
     ) -> Result<ControllerClient<RefreshService<Channel>>, GrpcEndpointError> {
         self.get_controller_endpoint(quantum_processor_id)
             .await
-            .map(|endpoint| {
-                dbg!(&endpoint);
-                endpoint
-            })
             .map(get_channel)
             .map(|channel| wrap_channel_with(channel, self.get_config()))
             .map(ControllerClient::new)
