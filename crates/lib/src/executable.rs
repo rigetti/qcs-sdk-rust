@@ -5,6 +5,9 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
+
 use crate::configuration::{Configuration, LoadError, RefreshError};
 use crate::qpu::{engagement, ExecutionError, JobId};
 use crate::{qpu, qvm, ExecutionData};
@@ -439,6 +442,9 @@ pub enum Error {
     /// There was some problem with the provided Quil program. This could be a syntax error with
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
+    #[error("There was a problem with the Quil program: {0}")]
+    Quil(ProgramError<Program>),
+    /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
@@ -509,11 +515,12 @@ impl From<ExecutionError> for Error {
             ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
             ExecutionError::Unauthorized => Self::Authentication,
             ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
-            ExecutionError::Quil(message) => Self::Compilation(message),
+            ExecutionError::Quil(message) => Self::Quil(message),
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::Qcs(message) => Self::Unexpected(message),
             ExecutionError::ProgramNotSubmitted => Self::InvalidJobHandle,
+            ExecutionError::Compilation { details } => Self::Compilation(details),
         }
     }
 }

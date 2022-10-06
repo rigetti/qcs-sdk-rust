@@ -6,6 +6,8 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use log::{trace, warn};
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::configuration::Configuration;
@@ -50,11 +52,23 @@ pub(crate) enum Error {
     #[error("QCS returned an unrecognized error: {0}")]
     Qcs(String),
     #[error("problem processing the provided Quil: {0}")]
-    Quil(String),
+    Quil(#[from] ProgramError<Program>),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
+    #[error("Problem when compiling program: {details}")]
+    Compilation { details: String },
+    #[error("Program when translating the program: {0}")]
+    Translation(String),
+    #[error("Program when rewriting arithmetic: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    #[error("Program when getting substitutions for program: {0}")]
+    Substitution(String),
+    #[error(
+        "Program is missing readout sources: did you forget to include a MEASURE instruction?"
+    )]
+    MissingRoSources,
     #[error(
         "The program must first be submitted through the same Executable before retrieving results"
     )]
@@ -69,7 +83,7 @@ impl From<quilc::Error> for Error {
                 uri,
                 details: format!("{:?}", details),
             },
-            quilc::Error::QuilcCompilation(details) => Self::Quil(details),
+            quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
         }
     }
 }
@@ -138,7 +152,7 @@ impl From<IsaError> for Error {
 impl From<TranslationError> for Error {
     fn from(source: TranslationError) -> Self {
         match source {
-            TranslationError::ProgramIssue(inner) => Self::Quil(format!("{:?}", inner)),
+            TranslationError::ProgramIssue(inner) => Self::Translation(format!("{:?}", inner)),
             TranslationError::Connection(_) => Self::QcsCommunication,
             TranslationError::Serialization(inner) => {
                 Self::Unexpected(Unexpected::Qcs(format!("{:?}", inner)))
@@ -217,7 +231,7 @@ impl<'a> Execution<'a> {
         let program = NativeQuilProgram::try_from(native_quil).map_err(Error::Quil)?;
 
         Ok(Self {
-            program: RewrittenProgram::try_from(program).map_err(|e| Error::Quil(e.to_string()))?,
+            program: RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?,
             quantum_processor_id,
             shots,
             qcs: None,
@@ -234,7 +248,9 @@ impl<'a> Execution<'a> {
         let qcs = self.refresh_qcs(readouts, config).await?;
         let qcs_for_thread = qcs.clone();
 
-        let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
+        let patch_values = self
+            .get_substitutions(params)
+            .map_err(Error::Substitution)?;
 
         spawn_blocking(move || {
             let guard = qcs_for_thread.rpcq_client.lock().unwrap();
@@ -290,11 +306,7 @@ impl<'a> Execution<'a> {
             config,
         )
         .await?;
-        let ro_sources = response.ro_sources.ok_or_else(|| {
-            Error::Quil(String::from(
-                "No readout sources defined, did you forget to MEASURE?",
-            ))
-        })?;
+        let ro_sources = response.ro_sources.ok_or_else(|| Error::MissingRoSources)?;
         let buffer_names = organize_ro_sources(ro_sources, readouts)?;
         let engagement = engagement::get(String::from(self.quantum_processor_id), config).await?;
         let rpcq_client = Client::try_from(&engagement)

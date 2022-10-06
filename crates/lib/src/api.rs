@@ -2,7 +2,7 @@
 //! and execution.
 
 use log::warn;
-use quil_rs::Program;
+use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
 
 use crate::{
@@ -33,6 +33,14 @@ pub fn compile(
         .map(String::from)
 }
 
+#[derive(thiserror::Error, Debug)]
+pub enum RewriteArithmeticError {
+    #[error("Could not parse program: {0}")]
+    Program(#[from] ProgramError<Program>),
+    #[error("Could not rewrite arithmetic: {0}")]
+    Rewrite(#[from] rewrite_arithmetic::Error),
+}
+
 /// The result of a call to [`rewrite_arithmetic`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
 #[derive(Serialize)]
@@ -54,11 +62,12 @@ pub struct RewriteArithmeticResult {
 ///
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
-pub fn rewrite_arithmetic(native_quil: &str) -> Result<RewriteArithmeticResult, String> {
+pub fn rewrite_arithmetic(
+    native_quil: &str,
+) -> Result<RewriteArithmeticResult, RewriteArithmeticError> {
     let program: Program = native_quil.parse()?;
 
-    let (program, subs) =
-        qpu::rewrite_arithmetic::rewrite_arithmetic(program).map_err(|e| e.to_string())?;
+    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(program)?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
 
     Ok(RewriteArithmeticResult {
