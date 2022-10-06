@@ -5,9 +5,13 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
-use crate::configuration::{Configuration, LoadError, RefreshError};
-use crate::qpu::{engagement, ExecutionError, JobId};
-use crate::{qpu, qvm, ExecutionData};
+use qcs_api_client_common::configuration::LoadError;
+
+use crate::execution_data::{ExecutionDataQPU, ExecutionDataQVM};
+use crate::qpu::client::QcsClient;
+use crate::qpu::runner::JobId;
+use crate::qpu::ExecutionError;
+use crate::{qpu, qvm};
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
 ///
@@ -59,7 +63,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters,
     compile_with_quilc: bool,
-    config: Option<Arc<Configuration>>,
+    client: Option<Arc<QcsClient>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
 }
@@ -89,7 +93,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
-            config: None,
+            client: None,
             qpu: None,
             qvm: None,
         }
@@ -200,7 +204,7 @@ impl<'executable> Executable<'executable, '_> {
             .remove(&param_name)
             .unwrap_or_else(|| vec![0.0; index]);
 
-        if index + 1 > values.len() {
+        if index >= values.len() {
             values.resize(index + 1, 0.0);
         }
 
@@ -211,7 +215,8 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-type ExecuteResult = Result<ExecutionData, Error>;
+type ExecuteResultQVM = Result<ExecutionDataQVM, Error>;
+type ExecuteResultQPU = Result<ExecutionDataQPU, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -250,8 +255,9 @@ impl Executable<'_, '_> {
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
-        let config = self.get_config().await.unwrap_or_default();
+    pub async fn execute_on_qvm(&mut self) -> ExecuteResultQVM {
+        let config = self.get_client().await?.get_config();
+
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
         } else {
@@ -261,29 +267,23 @@ impl Executable<'_, '_> {
             .run(self.shots, self.get_readouts(), &self.params, &config)
             .await;
         self.qvm = Some(qvm);
-        result.map_err(Error::from).map(|registers| ExecutionData {
-            registers,
-            duration: None,
-        })
+        result
+            .map_err(Error::from)
+            .map(|registers| ExecutionDataQVM {
+                registers,
+                duration: None,
+            })
     }
 
-    /// Load `self.config` if not yet loaded, then return a reference to it.
-    async fn get_config(&mut self) -> Result<Arc<Configuration>, Error> {
-        if let Some(config) = &self.config {
+    /// Load `self.client` if not yet loaded, then return a reference to it.
+    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
+        if let Some(config) = &self.client {
             Ok(config.clone())
         } else {
-            let config = Arc::new(Configuration::load().await?);
-            self.config = Some(config.clone());
-            Ok(config)
+            let client = Arc::new(QcsClient::load().await?);
+            self.client = Some(client.clone());
+            Ok(client)
         }
-    }
-
-    /// Refresh `self.config` and return it.
-    async fn refresh_config(&mut self) -> Result<Arc<Configuration>, Error> {
-        let config = self.get_config().await?.as_ref().clone();
-        let refreshed = Arc::new(config.refresh().await?);
-        self.config = Some(refreshed.clone());
-        Ok(refreshed)
     }
 }
 
@@ -298,31 +298,15 @@ impl<'execution> Executable<'_, 'execution> {
                 return Ok(qpu);
             }
         }
-        let mut config = self.get_config().await?;
-        match qpu::Execution::new(
+        qpu::Execution::new(
             self.quil.clone(),
             self.shots,
             id,
-            config.clone(),
+            self.get_client().await?,
             self.compile_with_quilc,
         )
         .await
-        {
-            Ok(qpu) => Ok(qpu),
-            Err(ExecutionError::Unauthorized) => {
-                config = self.refresh_config().await?;
-                qpu::Execution::new(
-                    self.quil.clone(),
-                    self.shots,
-                    id,
-                    config,
-                    self.compile_with_quilc,
-                )
-                .await
-                .map_err(Error::from)
-            }
-            Err(err) => Err(Error::from(err)),
-        }
+        .map_err(Error::from)
     }
 
     /// Compile the program and execute it on a QPU, waiting for results.
@@ -351,7 +335,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
+    pub async fn execute_on_qpu(
+        &mut self,
+        quantum_processor_id: &'execution str,
+    ) -> ExecuteResultQPU {
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -368,28 +355,22 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: &'execution str,
     ) -> Result<JobHandle<'execution>, Error> {
-        let mut qpu = self.qpu_for_id(quantum_processor_id).await?;
-        let mut config = self.get_config().await?;
+        let JobHandle {
+            job_id,
+            readout_map,
+            ..
+        } = self
+            .qpu_for_id(quantum_processor_id)
+            .await?
+            .submit(&self.params)
+            .await?;
 
-        let response = match qpu.submit(&self.params, self.get_readouts(), &config).await {
-            Ok(response) => Ok(response),
-            Err(ExecutionError::Unauthorized) => {
-                config = self.refresh_config().await?;
-                qpu.submit(&self.params, self.get_readouts(), &config).await
-            }
-            Err(err) => Err(err),
-        }
-        .map(|job_id| JobHandle {
+        // The unpacking/re-packing here is to avoid lifetime issues.
+        Ok(JobHandle {
             job_id,
             quantum_processor_id,
-        });
-        self.qpu = if let Err(ExecutionError::QpuUnavailable(_)) = response {
-            // Could mean maintenance which requires recompile
-            None
-        } else {
-            Some(qpu)
-        };
-        response.map_err(Error::from)
+            readout_map,
+        })
     }
 
     /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
@@ -397,9 +378,12 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecuteResult {
+    pub async fn retrieve_results(
+        &mut self,
+        job_handle: JobHandle<'execution>,
+    ) -> ExecuteResultQPU {
         let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
-        qpu.retrieve_results(job_handle.job_id)
+        qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
             .await
             .map_err(Error::from)
     }
@@ -451,9 +435,9 @@ pub enum Error {
     /// [`Executable::retrieve_results`] can invalidate the handle.
     #[error("The job handle was not valid")]
     InvalidJobHandle,
-    /// This error indicates that there was no current QPU engagement available for the user.
-    #[error("No engagement for QPU: {0}")]
-    NoEngagement(engagement::Error),
+    /// Occurs when failing to construct a [`QcsClient`].
+    #[error("The QCS client configuration failed to load")]
+    QcsClientFailure(#[from] LoadError),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -483,37 +467,15 @@ pub enum Service {
     Qpu,
 }
 
-impl From<LoadError> for Error {
-    fn from(err: LoadError) -> Self {
-        Self::Settings(format!("{}", err))
-    }
-}
-
-impl From<RefreshError> for Error {
-    fn from(err: RefreshError) -> Self {
-        match err {
-            RefreshError::NoRefreshToken => Self::Settings(String::from(
-                "No `refresh_token` was found in your QCS secrets file for the selected profile. \
-                    You can change profiles with the `QCS_PROFILE_NAME` environment variable.",
-            )),
-            RefreshError::FetchError(_) => Self::Authentication,
-        }
-    }
-}
-
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
-            ExecutionError::NoEngagement(e) => Self::NoEngagement(e),
-            ExecutionError::QpuNotFound => Self::QpuNotFound,
-            ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
-            ExecutionError::Unauthorized => Self::Authentication,
-            ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
             ExecutionError::Quil(message) => Self::Compilation(message),
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
-            ExecutionError::Qcs(message) => Self::Unexpected(message),
-            ExecutionError::ProgramNotSubmitted => Self::InvalidJobHandle,
+            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::IsaError(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{:?}", v)),
         }
     }
 }
@@ -533,17 +495,55 @@ impl From<qvm::Error> for Error {
 
 /// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
 /// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JobHandle<'executable> {
     job_id: JobId,
     quantum_processor_id: &'executable str,
+    readout_map: HashMap<String, String>,
 }
 
-impl JobHandle<'_> {
+impl<'a> JobHandle<'a> {
+    #[must_use]
+    pub(crate) fn new(
+        job_id: JobId,
+        quantum_processor_id: &'a str,
+        readout_map: HashMap<String, String>,
+    ) -> Self {
+        Self {
+            job_id,
+            quantum_processor_id,
+            readout_map,
+        }
+    }
+
     /// The string representation of the QCS Job ID. Useful for debugging.
     #[must_use]
     pub fn job_id(&self) -> &str {
         self.job_id.0.as_str()
+    }
+
+    /// The readout map from source readout memory locations to the
+    /// filter pipeline node which publishes the data.
+    #[must_use]
+    pub fn readout_map(&self) -> &HashMap<String, String> {
+        &self.readout_map
+    }
+}
+
+#[cfg(test)]
+mod describe_get_config {
+    use crate::Executable;
+
+    #[tokio::test]
+    async fn it_resizes_params_dynamically() {
+        let mut exe = Executable::from_quil("");
+        let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
+
+        exe.with_parameter("foo", 0, 0.0);
+        assert_eq!(foo_len(&mut exe), 1);
+
+        exe.with_parameter("foo", 10, 10.0);
+        assert_eq!(foo_len(&mut exe), 11);
     }
 }
 

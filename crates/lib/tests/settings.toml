@@ -5,6 +5,7 @@ default_profile_name = "default"
 auth_server_name = "default"
 credentials_name = "default"
 api_url = "http://localhost:8000"
+grpc_api_url = "http://localhost:8003"
 
 [auth_servers]
 [auth_servers.default]

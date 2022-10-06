@@ -1,75 +1,45 @@
-use reqwest::StatusCode;
+use std::collections::HashMap;
 
-use qcs_api::apis::translation_api as translation;
-use qcs_api::apis::translation_api::TranslateNativeQuilToEncryptedBinaryError;
-use qcs_api::apis::Error as UntypedApiError;
-use qcs_api::models::{
-    Error as QcsError, TranslateNativeQuilToEncryptedBinaryRequest,
-    TranslateNativeQuilToEncryptedBinaryResponse,
+use qcs_api_client_grpc::{
+    models::controller::EncryptedControllerJob,
+    services::translation::{
+        translate_quil_to_encrypted_controller_job_request::NumShots,
+        TranslateQuilToEncryptedControllerJobRequest,
+    },
 };
 
-use crate::configuration::Configuration;
-use crate::qpu::rewrite_arithmetic::RewrittenQuil;
+use super::client::{ClientGrpcError, QcsClient};
 
-type ApiError = UntypedApiError<TranslateNativeQuilToEncryptedBinaryError>;
+pub(crate) struct EncryptedTranslationResult {
+    pub(crate) job: EncryptedControllerJob,
+    pub(crate) readout_map: HashMap<String, String>,
+}
 
 pub(crate) async fn translate(
-    quil: RewrittenQuil,
-    shots: u16,
     quantum_processor_id: &str,
-    config: &Configuration,
-) -> Result<TranslateNativeQuilToEncryptedBinaryResponse, Error> {
-    let translation_request = TranslateNativeQuilToEncryptedBinaryRequest {
-        num_shots: shots.into(),
-        quil: quil.into(),
-        settings_timestamp: None,
+    quil_program: &str,
+    num_shots: u32,
+    client: &QcsClient,
+) -> Result<EncryptedTranslationResult, ClientGrpcError> {
+    let request = TranslateQuilToEncryptedControllerJobRequest {
+        quantum_processor_id: Some(quantum_processor_id.to_owned()),
+        num_shots: Some(NumShots::NumShotsValue(num_shots)),
+        quil_program: Some(quil_program.to_owned()),
     };
-    translation::translate_native_quil_to_encrypted_binary(
-        config.as_ref(),
-        quantum_processor_id,
-        translation_request,
-    )
-    .await
-    .map_err(Error::from)
-}
 
-/// Errors that can occur during Translation
-#[derive(Debug, thiserror::Error)]
-pub enum Error {
-    #[error("Provided program could not be translated: {}", .0.message)]
-    ProgramIssue(QcsError),
-    #[error("Problem connecting to QCS")]
-    Connection(#[source] ApiError),
-    #[error("Serialization failed, this is likely a bug in this library")]
-    Serialization(#[from] serde_json::Error),
-    #[error("Unauthorized request")]
-    Unauthorized,
-    #[error("An unknown error occurred, this is likely a bug in this library: {0}")]
-    Unknown(String),
-}
+    let response = client
+        .get_translation_client()?
+        .translate_quil_to_encrypted_controller_job(request)
+        .await?
+        .into_inner();
 
-impl From<ApiError> for Error {
-    fn from(error: ApiError) -> Self {
-        match error {
-            ApiError::Reqwest(_) | ApiError::Io(_) => Self::Connection(error),
-            ApiError::Serde(inner) => inner.into(),
-            ApiError::ResponseError(inner) => {
-                if matches!(
-                    inner.status,
-                    StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN
-                ) {
-                    Self::Unauthorized
-                } else {
-                    match inner.entity {
-                        Some(TranslateNativeQuilToEncryptedBinaryError::Status400(detail))
-                            if inner.status == StatusCode::BAD_REQUEST =>
-                        {
-                            Self::ProgramIssue(detail)
-                        }
-                        _ => Self::Unknown(inner.content),
-                    }
-                }
-            }
-        }
-    }
+    Ok(EncryptedTranslationResult {
+        job: response
+            .job
+            .ok_or_else(|| ClientGrpcError::ResponseEmpty("Encrypted Job".into()))?,
+        readout_map: response
+            .metadata
+            .ok_or_else(|| ClientGrpcError::ResponseEmpty("Job Metadata".into()))?
+            .readout_mappings,
+    })
 }

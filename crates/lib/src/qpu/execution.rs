@@ -2,26 +2,23 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::time::Duration;
 
-use log::{trace, warn};
+use log::trace;
 use tokio::task::{spawn_blocking, JoinError};
 
-use crate::configuration::Configuration;
 use crate::executable::Parameters;
-use crate::qpu::rewrite_arithmetic;
-use crate::qpu::runner::JobId;
-use crate::{ExecutionData, RegisterData};
+use crate::execution_data::{ExecutionDataQPU, MemoryReferenceParseError, ReadoutMap};
+use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
+use crate::JobHandle;
 
+use super::client::{ClientGrpcError, QcsClient};
 use super::quilc::{self, NativeQuil, NativeQuilProgram, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
-use super::rpcq::Client;
-use super::runner::{self, retrieve_results, submit, DecodeError};
-use super::translation::Error as TranslationError;
-use super::{
-    build_executable, engagement, get_isa, organize_ro_sources, process_buffers, IsaError,
-};
+use super::runner::{retrieve_results, submit};
+use super::translation::EncryptedTranslationResult;
+use super::{get_isa, IsaError};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -31,34 +28,23 @@ pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
     pub(crate) quantum_processor_id: &'a str,
     pub(crate) shots: u16,
-    // All the stuff needed to actually make requests to QCS, lazily initialized
-    qcs: Option<Arc<Qcs>>,
+    client: Arc<QcsClient>,
 }
 
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
-    #[error("No engagement for QPU: {0}")]
-    NoEngagement(engagement::Error),
-    #[error("QPU not found")]
-    QpuNotFound,
-    #[error("QPU currently unavailable, retry after {} seconds", .0.as_secs())]
-    QpuUnavailable(Duration),
-    #[error("Received unauthorized response from QCS, try refreshing credentials")]
-    Unauthorized,
-    #[error("Error communicating with QCS, check network connection and QCS status")]
-    QcsCommunication,
-    #[error("QCS returned an unrecognized error: {0}")]
-    Qcs(String),
     #[error("problem processing the provided Quil: {0}")]
     Quil(String),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
-    #[error(
-        "The program must first be submitted through the same Executable before retrieving results"
-    )]
-    ProgramNotSubmitted,
+    #[error("Problem using QCS API: {0}")]
+    QcsClient(#[from] ClientGrpcError),
+    #[error("Problem fetching ISA: {0}")]
+    IsaError(#[from] IsaError),
+    #[error("Problem parsing memory readout: {0}")]
+    ReadoutParse(#[from] MemoryReferenceParseError),
 }
 
 impl From<quilc::Error> for Error {
@@ -74,38 +60,6 @@ impl From<quilc::Error> for Error {
     }
 }
 
-impl From<engagement::Error> for Error {
-    fn from(source: engagement::Error) -> Self {
-        match source {
-            engagement::Error::QuantumProcessorUnavailable(duration) => {
-                Self::QpuUnavailable(duration)
-            }
-            engagement::Error::Unauthorized => Self::Unauthorized,
-            engagement::Error::Connection(_) => Self::QcsCommunication,
-            engagement::Error::Schema(_)
-            | engagement::Error::Unknown(_)
-            | engagement::Error::Internal(_) => {
-                Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
-            }
-        }
-    }
-}
-
-impl From<runner::Error> for Error {
-    fn from(source: runner::Error) -> Self {
-        match source {
-            runner::Error::Engagement(e) => Self::NoEngagement(e),
-            runner::Error::Connection(_) => Self::QcsCommunication,
-            //runner::Error::Engagement(_) => Self::
-            runner::Error::Unexpected(err) => {
-                Self::Unexpected(Unexpected::Qcs(format!("{:?}", err)))
-            }
-            runner::Error::Qpu(err) => Self::Qcs(err),
-            runner::Error::ClientLock(err) => Self::Unexpected(Unexpected::Other(err)),
-        }
-    }
-}
-
 /// Errors that are not expected to be returned—if they show up, it may be a bug in this library.
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Unexpected {
@@ -116,52 +70,6 @@ pub(crate) enum Unexpected {
     },
     #[error("Problem converting QCS ISA to quilc ISA")]
     Isa(String),
-    #[error("Problem understanding QCS")]
-    Qcs(String),
-    #[error("Unknown error")]
-    Other(String),
-}
-
-impl From<IsaError> for Error {
-    fn from(source: IsaError) -> Self {
-        match source {
-            IsaError::QpuNotFound => Self::QpuNotFound,
-            IsaError::Unauthorized => Self::Unauthorized,
-            IsaError::QcsError(source) => {
-                Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
-            }
-            IsaError::QcsCommunicationError(_) => Self::QcsCommunication,
-        }
-    }
-}
-
-impl From<TranslationError> for Error {
-    fn from(source: TranslationError) -> Self {
-        match source {
-            TranslationError::ProgramIssue(inner) => Self::Quil(format!("{:?}", inner)),
-            TranslationError::Connection(_) => Self::QcsCommunication,
-            TranslationError::Serialization(inner) => {
-                Self::Unexpected(Unexpected::Qcs(format!("{:?}", inner)))
-            }
-            TranslationError::Unknown(inner) => {
-                Self::Unexpected(Unexpected::Qcs(format!("{:?}", inner)))
-            }
-            TranslationError::Unauthorized => Self::Unauthorized,
-        }
-    }
-}
-
-impl From<DecodeError> for Error {
-    fn from(source: DecodeError) -> Self {
-        Self::Unexpected(Unexpected::Qcs(format!("{:?}", source)))
-    }
-}
-
-struct Qcs {
-    /// A mapping of the register name declared in a program to the list of corresponding Buffer names
-    buffer_names: HashMap<Box<str>, Vec<String>>,
-    rpcq_client: Mutex<Client>,
-    executable: String,
 }
 
 impl<'a> Execution<'a> {
@@ -192,16 +100,16 @@ impl<'a> Execution<'a> {
         quil: Arc<str>,
         shots: u16,
         quantum_processor_id: &'a str,
-        config: Arc<Configuration>,
+        client: Arc<QcsClient>,
         compile_with_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
-        let isa = get_isa(quantum_processor_id, &config).await?;
+        let isa = get_isa(quantum_processor_id, &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
         let native_quil = if compile_with_quilc {
             trace!("Converting to Native Quil");
-            let thread_config = config.clone();
-            spawn_blocking(move || quilc::compile_program(&quil, target_device, &thread_config))
+            let client = client.clone();
+            spawn_blocking(move || quilc::compile_program(&quil, target_device, &client))
                 .await
                 .map_err(|source| {
                     Error::Unexpected(Unexpected::TaskError {
@@ -219,97 +127,58 @@ impl<'a> Execution<'a> {
         Ok(Self {
             program: RewrittenProgram::try_from(program).map_err(|e| Error::Quil(e.to_string()))?,
             quantum_processor_id,
+            client,
             shots,
-            qcs: None,
         })
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(
-        &mut self,
-        params: &Parameters,
-        readouts: &[&str],
-        config: &Configuration,
-    ) -> Result<JobId, Error> {
-        let qcs = self.refresh_qcs(readouts, config).await?;
-        let qcs_for_thread = qcs.clone();
+    /// needs to also return readout_sources
+    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
+        // todo: return / persist readout sources
+        let EncryptedTranslationResult { job, readout_map } = translate(
+            self.quantum_processor_id,
+            &self.program.to_string().0,
+            self.shots.into(),
+            self.client.as_ref(),
+        )
+        .await?;
+        println!("done translating...");
 
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
 
-        spawn_blocking(move || {
-            let guard = qcs_for_thread.rpcq_client.lock().unwrap();
-            submit(&qcs_for_thread.executable, &patch_values, &guard).map_err(Error::from)
-        })
-        .await
-        .map_err(|source| Unexpected::TaskError {
-            task_name: "qpu",
-            source,
-        })?
+        let job_id = submit(
+            self.quantum_processor_id,
+            job,
+            &patch_values,
+            self.client.as_ref(),
+        )
+        .await?;
+
+        Ok(JobHandle::new(
+            job_id,
+            self.quantum_processor_id,
+            readout_map,
+        ))
     }
 
-    pub(crate) async fn retrieve_results(&self, job_id: JobId) -> Result<ExecutionData, Error> {
-        let qcs = self.qcs.clone().ok_or(Error::ProgramNotSubmitted)?;
-        let qcs_for_thread = qcs.clone();
+    pub(crate) async fn retrieve_results(
+        &self,
+        job_id: JobId,
+        readout_mappings: HashMap<String, String>,
+    ) -> Result<ExecutionDataQPU, Error> {
+        let response =
+            retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
 
-        let response = spawn_blocking(move || {
-            let guard = qcs_for_thread.rpcq_client.lock().unwrap();
-            retrieve_results(job_id, &guard).map_err(Error::from)
-        })
-        .await
-        .map_err(|source| Unexpected::TaskError {
-            task_name: "qpu",
-            source,
-        })??;
-
-        let registers = process_buffers(response.buffers, &qcs.buffer_names)?;
-        let register_data = RegisterData::try_from_registers(registers, self.shots)?;
-        Ok(ExecutionData {
-            registers: register_data,
+        Ok(ExecutionDataQPU {
+            readout_data: ReadoutMap::from_mappings_and_values(
+                &readout_mappings,
+                &response.readout_values,
+            )?,
             duration: response
                 .execution_duration_microseconds
                 .map(Duration::from_micros),
         })
-    }
-
-    /// Take or create a [`Qcs`] for this [`Execution`]. This fetches / updates engagements, builds
-    /// the executable, and prepares (from the executable) the mapping of returned values into what
-    /// the user expects to see.
-    async fn refresh_qcs(
-        &mut self,
-        readouts: &[&str],
-        config: &Configuration,
-    ) -> Result<Arc<Qcs>, Error> {
-        if let Some(qcs) = &self.qcs {
-            return Ok(qcs.clone());
-        }
-
-        let response = build_executable(
-            self.program.to_string(),
-            self.shots,
-            self.quantum_processor_id,
-            config,
-        )
-        .await?;
-        let ro_sources = response.ro_sources.ok_or_else(|| {
-            Error::Quil(String::from(
-                "No readout sources defined, did you forget to MEASURE?",
-            ))
-        })?;
-        let buffer_names = organize_ro_sources(ro_sources, readouts)?;
-        let engagement = engagement::get(String::from(self.quantum_processor_id), config).await?;
-        let rpcq_client = Client::try_from(&engagement)
-            .map_err(|e| {
-                warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-                Error::QcsCommunication
-            })
-            .map(Mutex::new)?;
-        let qcs = Arc::new(Qcs {
-            buffer_names,
-            rpcq_client,
-            executable: response.program,
-        });
-        self.qcs = Some(qcs.clone());
-        Ok(qcs)
     }
 
     /// Take the user-provided map of [`Parameters`] and produce the map of substitutions which

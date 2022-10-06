@@ -4,7 +4,7 @@ use std::f64::consts::{FRAC_PI_2, PI};
 
 use serde::{Deserialize, Serialize};
 
-use qcs_api::models::{Characteristic, Node, Operation};
+use qcs_api_client_openapi::models::{Characteristic, Node, Operation};
 
 use super::operator::{
     wildcard, Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
@@ -198,7 +198,7 @@ fn rx_gates(node_id: i32, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error>
 mod describe_rx_gates {
     use std::f64::consts::{FRAC_PI_2, PI};
 
-    use qcs_api::models::Characteristic;
+    use qcs_api_client_openapi::models::Characteristic;
 
     use crate::qpu::quilc::isa::{
         operator::{Argument, Operator, Parameter},
@@ -331,7 +331,7 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 
 #[cfg(test)]
 mod describe_measure {
-    use qcs_api::models::Characteristic;
+    use qcs_api_client_openapi::models::Characteristic;
 
     use crate::qpu::quilc::isa::operator::Operator;
 

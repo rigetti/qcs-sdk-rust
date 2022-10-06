@@ -4,8 +4,7 @@ use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize, Serializer};
 
-use qcs_api::models;
-use qcs_api::models::Characteristic;
+use qcs_api_client_openapi::models::{self, Characteristic};
 
 use super::operator::{wildcard, Argument, Operator, Parameter};
 
@@ -210,7 +209,7 @@ pub(crate) fn convert_edges(edges: &[models::Edge]) -> Result<HashMap<Id, Edge>,
 
 #[cfg(test)]
 mod describe_convert_edges {
-    use qcs_api::models;
+    use qcs_api_client_openapi::models;
 
     use crate::qpu::quilc::isa::edge::{convert_edges, Id};
 

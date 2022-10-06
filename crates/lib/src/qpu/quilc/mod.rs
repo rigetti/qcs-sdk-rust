@@ -9,11 +9,9 @@ use quil_rs::Program;
 use serde::{Deserialize, Serialize};
 
 use isa::Compiler;
-use qcs_api::models::InstructionSetArchitecture;
+use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
-use crate::configuration::Configuration;
-
-use super::rpcq;
+use super::{rpcq, QcsClient};
 
 mod isa;
 
@@ -36,16 +34,17 @@ mod isa;
 pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
-    config: &Configuration,
+    client: &QcsClient,
 ) -> Result<NativeQuil, Error> {
-    let endpoint = &config.quilc_url;
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
     let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
     rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.clone(), source))?
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?
         .run_request::<_, QuilcResponse>(&request)
         .map(|response| NativeQuil(response.quil))
-        .map_err(|source| Error::from_quilc_error(endpoint.clone(), source))
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))
 }
 
 /// All of the errors that can occur within this module.
@@ -78,7 +77,7 @@ pub struct NativeQuil(String);
 
 impl NativeQuil {
     /// Cast a String to `NativeQuil` without checking or transforming it via `quilc`.
-    pub(super) fn assume_native_quil(quil: String) -> Self {
+    pub fn assume_native_quil(quil: String) -> Self {
         NativeQuil(quil)
     }
 }
@@ -98,7 +97,7 @@ impl AsRef<str> for NativeQuil {
 /// A wrapper around [`Program`] which indicates it has been converted to `NativeQuil` (has been run
 /// through `quilc` and therefore is suitable to use on QPUs.
 #[derive(Debug, PartialEq, Clone)]
-pub(super) struct NativeQuilProgram(Program);
+pub struct NativeQuilProgram(Program);
 
 impl TryFrom<NativeQuil> for NativeQuilProgram {
     type Error = <Program as FromStr>::Err;
@@ -176,7 +175,8 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use qcs_api::models::InstructionSetArchitecture;
+    use qcs_api_client_common::ClientConfiguration;
+    use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use std::fs::File;
 
     const EXPECTED_H0_OUTPUT: &str =
@@ -195,7 +195,7 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &Configuration::default(),
+            &QcsClient::with_config(ClientConfiguration::default()),
         )
         .expect("Could not compile");
         assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
@@ -212,16 +212,17 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let config = Configuration::load().await.unwrap_or_default();
+        let config = ClientConfiguration::load().await.unwrap_or_default();
+        let client = QcsClient::with_config(config);
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            &config,
+            &client,
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&String::from(output))
             .unwrap()
-            .run(10, &["ro"], &HashMap::default(), &config)
+            .run(10, &["ro"], &HashMap::default(), &client.get_config())
             .await
             .expect("Could not run program on QVM");
         for shot in results
