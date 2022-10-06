@@ -104,7 +104,7 @@ fn retrieve_results(
     job_id: String,
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::local_future_into_py(py, async move {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
         let config = ClientConfiguration::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
