@@ -95,6 +95,7 @@ impl QcsClient {
             .await
     }
 
+    /// Get address for direction connection to Controller.
     async fn get_controller_default_endpoint(
         &self,
         quantum_processor_id: &str,
@@ -108,6 +109,7 @@ impl QcsClient {
             .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
     }
 
+    /// Get address for Gateway assigned to the provided `quantum_processor_id`, if one exists.
     async fn get_gateway_endpoint(
         &self,
         quantum_processor_id: &str,
