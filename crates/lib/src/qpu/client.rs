@@ -24,6 +24,7 @@ pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 #[derive(Clone)]
 pub struct QcsClient {
     config: ClientConfiguration,
+    /// When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.
     use_gateway: bool,
 }
 
@@ -84,35 +85,52 @@ impl QcsClient {
         quantum_processor_id: &str,
     ) -> Result<Uri, GrpcEndpointError> {
         if self.use_gateway {
-            let accessors = list_quantum_processor_accessors(
-                &self.get_openapi_client(),
-                quantum_processor_id,
-                Some(10),
-                None,
-            )
-            .await?;
-            let target = accessors
-                .accessors
-                .into_iter()
-                .find(|acc| {
-                    acc.live
-                        && acc.priority.unwrap_or(false)
-                        && acc.access_type.is_some()
-                        && acc.access_type.as_ref().unwrap().as_ref()
-                            == &QuantumProcessorAccessorType::GatewayV1
-                })
-                .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))?;
-            parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
-        } else {
-            let default_endpoint =
-                get_default_endpoint(&self.get_openapi_client(), quantum_processor_id).await?;
-            let addresses = default_endpoint.addresses.as_ref();
-            let grpc_address = addresses.grpc.as_ref();
-
-            grpc_address
-                .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))
-                .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
+            let gateway = self.get_gateway_endpoint(quantum_processor_id).await;
+            // when no gateway is available, we should fall through and attempt a direct connection
+            if gateway.is_ok() {
+                return gateway;
+            }
         }
+        self.get_controller_default_endpoint(quantum_processor_id)
+            .await
+    }
+
+    async fn get_controller_default_endpoint(
+        &self,
+        quantum_processor_id: &str,
+    ) -> Result<Uri, GrpcEndpointError> {
+        let default_endpoint =
+            get_default_endpoint(&self.get_openapi_client(), quantum_processor_id).await?;
+        let addresses = default_endpoint.addresses.as_ref();
+        let grpc_address = addresses.grpc.as_ref();
+        grpc_address
+            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))
+            .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
+    }
+
+    async fn get_gateway_endpoint(
+        &self,
+        quantum_processor_id: &str,
+    ) -> Result<Uri, GrpcEndpointError> {
+        let accessors = list_quantum_processor_accessors(
+            &self.get_openapi_client(),
+            quantum_processor_id,
+            Some(100),
+            None,
+        )
+        .await?;
+        let target = accessors
+            .accessors
+            .into_iter()
+            .find(|acc| {
+                acc.live
+                    && acc.priority.unwrap_or(false)
+                    && acc.access_type.is_some()
+                    && acc.access_type.as_ref().unwrap().as_ref()
+                        == &QuantumProcessorAccessorType::GatewayV1
+            })
+            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))?;
+        parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
     }
 }
 
