@@ -3,6 +3,7 @@
 
 # Local config
 .env
+venv/
 
 # JetBrains
 .idea
