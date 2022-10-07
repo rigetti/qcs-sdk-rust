@@ -114,25 +114,32 @@ impl QcsClient {
         &self,
         quantum_processor_id: &str,
     ) -> Result<Uri, GrpcEndpointError> {
-        let accessors = list_quantum_processor_accessors(
-            &self.get_openapi_client(),
-            quantum_processor_id,
-            Some(100),
-            None,
-        )
-        .await?;
-        let target = accessors
-            .accessors
-            .into_iter()
-            .find(|acc| {
-                acc.live
-                    && acc.priority.unwrap_or(false)
-                    && acc.access_type.is_some()
-                    && acc.access_type.as_ref().unwrap().as_ref()
-                        == &QuantumProcessorAccessorType::GatewayV1
-            })
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))?;
-        parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
+        // TODO: Env override is temporary, to allow for testing. Remove before merge.
+        let gateway_addr = if let Ok(addr) = std::env::var("GATEWAY_ADDR") {
+            addr
+        } else {
+            let accessors = list_quantum_processor_accessors(
+                &self.get_openapi_client(),
+                quantum_processor_id,
+                Some(100),
+                None,
+            )
+            .await?;
+            // TODO: paginate until target found or no more pages
+            let target = accessors
+                .accessors
+                .into_iter()
+                .find(|acc| {
+                    acc.live
+                        && acc.priority.unwrap_or(false)
+                        && acc.access_type.is_some()
+                        && acc.access_type.as_ref().unwrap().as_ref()
+                            == &QuantumProcessorAccessorType::GatewayV1
+                })
+                .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))?;
+            target.url
+        };
+        parse_uri(&gateway_addr).map_err(GrpcEndpointError::BadUri)
     }
 }
 
