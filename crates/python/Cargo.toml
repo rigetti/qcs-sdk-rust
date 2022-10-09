@@ -18,7 +18,7 @@ crate-type = ["cdylib"]
 [dependencies]
 qcs = { path = "../lib" }
 pyo3 = { version = "0.16", features = ["extension-module"] }
-pyo3-asyncio = { version = "0.16", features = ["tokio-runtime"] }
+pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
 pythonize = "0.16"
 tokio = "1.21"
 qcs-api = "0.2.1"
