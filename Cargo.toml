@@ -1,5 +1,3 @@
 [workspace]
 members = ["crates/*"]
 
-[patch.crates-io]
-quil-rs = { path = "../quil-rust" }
