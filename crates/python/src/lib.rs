@@ -27,7 +27,8 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
 
 #[pyfunction]
 fn rewrite_arithmetic(py: Python<'_>, native_quil: String) -> PyResult<PyObject> {
-    let result = api::rewrite_arithmetic(&native_quil).map_err(TranslationError::new_err)?;
+    let result = api::rewrite_arithmetic(&native_quil)
+        .map_err(|e| TranslationError::new_err(e.to_string()))?;
     let pyed = pythonize(py, &result).map_err(|e| TranslationError::new_err(e.to_string()))?;
     Ok(pyed)
 }

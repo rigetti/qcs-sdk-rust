@@ -33,10 +33,13 @@ pub fn compile(
         .map(String::from)
 }
 
+/// Collection of errors that can result from rewriting arithmetic.
 #[derive(thiserror::Error, Debug)]
 pub enum RewriteArithmeticError {
+    /// The Quil program could not be parsed.
     #[error("Could not parse program: {0}")]
     Program(#[from] ProgramError<Program>),
+    /// Parameteric arithmetic in the Quil program could not be rewritten.
     #[error("Could not rewrite arithmetic: {0}")]
     Rewrite(#[from] rewrite_arithmetic::Error),
 }

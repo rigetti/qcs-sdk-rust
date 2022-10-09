@@ -152,7 +152,7 @@ pub(crate) fn get_substitutions(
 
 /// All of the errors that can occur in this module.
 #[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
+pub enum Error {
     #[error("No DEFFRAME for {0}")]
     MissingDefFrame(String),
     #[error("Unable to use SAMPLE-RATE {sample_rate} for frame {frame}")]
