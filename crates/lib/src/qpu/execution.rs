@@ -133,7 +133,6 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    /// needs to also return readout_sources
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
         let EncryptedTranslationResult { job, readout_map } = translate(
             self.quantum_processor_id,
