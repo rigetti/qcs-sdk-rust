@@ -437,7 +437,7 @@ pub enum Error {
     InvalidJobHandle,
     /// Occurs when failing to construct a [`QcsClient`].
     #[error("The QCS client configuration failed to load")]
-    QcsClientFailure(#[from] LoadError),
+    QcsConfigLoadFailure(#[from] LoadError),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
