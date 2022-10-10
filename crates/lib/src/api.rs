@@ -75,10 +75,13 @@ pub fn rewrite_arithmetic(
     })
 }
 
+/// Errors that can happen during translation
 #[derive(Debug, thiserror::Error)]
 pub enum TranslationError {
+    /// The program could not be translated
     #[error("Could not translate quil: {0}")]
     Translate(#[from] ClientGrpcError),
+    /// The result of translation could not be deserialized
     #[error("Could not serialize translation result: {0}")]
     Serialize(#[from] serde_json::Error),
 }
@@ -146,17 +149,22 @@ pub async fn submit(
     Ok(job_id.0)
 }
 
+/// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
 pub enum SubmitError {
+    /// Failed to fetch the desired ISA
     #[error("Failed to fetch ISA: {0}")]
     IsaError(#[from] IsaError),
 
+    /// Failed a gRPC API call
     #[error("Failed a gRPC call: {0}")]
     GrpcError(#[from] ClientGrpcError),
 
+    /// Quilc compilation failed
     #[error("Failed quilc compilation: {0}")]
     QuilcError(#[from] quilc::Error),
 
+    /// Job could not be deserialized
     #[error("Failed to deserialize job: {0}")]
     DeserializeError(#[from] serde_json::Error),
 }
@@ -178,6 +186,8 @@ pub fn build_patch_values(
     rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
+/// A convenience type that describes a Complex-64 value whose real
+/// and imaginary parts of both f32.
 pub type Complex64 = [f32; 2];
 
 /// Data from an individual register. Each variant contains a vector with the expected data type
