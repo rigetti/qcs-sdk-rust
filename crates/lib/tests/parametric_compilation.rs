@@ -1,4 +1,4 @@
-//! This integration test implements the [Parametric Compilation example from pyQuil][example].
+//! This integration test implements the [Parametric Compilation example from pyQuil](example).
 //! [example]: https://pyquil-docs.rigetti.com/en/stable/basics.html?highlight=parametric#parametric-compilation
 
 use std::f64::consts::PI;

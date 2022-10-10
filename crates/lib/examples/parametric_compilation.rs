@@ -1,4 +1,4 @@
-//! This example implements the [Parametric Compilation example from pyQuil][pyquil] in Rust.
+//! This example implements the [Parametric Compilation example from pyQuil](pyquil) in Rust.
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/basics.html?highlight=parametric#parametric-compilation
 
 use std::f64::consts::PI;

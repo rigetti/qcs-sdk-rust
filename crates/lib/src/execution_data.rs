@@ -9,12 +9,12 @@ use quil_rs::instruction::MemoryReference;
 
 use crate::RegisterData;
 
-/// The result of executing an [`Executable`][crate::Executable] via
-/// [`Executable::execute_on_qvm`][crate::Executable::execute_on_qvm].
+/// The result of executing an [`Executable`](crate::Executable) via
+/// [`Executable::execute_on_qvm`](crate::Executable::execute_on_qvm).
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExecutionDataQVM {
     /// The data of all readout data that were read from
-    /// (via [`Executable::read_from`][crate::Executable::read_from]). Key is the name of the
+    /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
     /// register, value is the data of the register after execution.
     pub registers: HashMap<Box<str>, RegisterData>,
     /// The time it took to execute the program on the QPU, not including any network or queueing
@@ -95,12 +95,12 @@ impl From<HashMap<MemoryReference, ReadoutValues>> for ReadoutMap {
     }
 }
 
-/// The result of executing an [`Executable`][crate::Executable] via
-/// [`Executable::execute_on_qpu`][crate::Executable::execute_on_qpu].
+/// The result of executing an [`Executable`](crate::Executable) via
+/// [`Executable::execute_on_qpu`](crate::Executable::execute_on_qpu).
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExecutionDataQPU {
     /// The data of all readout data that were read from
-    /// (via [`Executable::read_from`][crate::Executable::read_from]). Key is the name of the
+    /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
     /// register, value is the data of the register after execution.
     pub readout_data: ReadoutMap,
     /// The time it took to execute the program on the QPU, not including any network or queueing

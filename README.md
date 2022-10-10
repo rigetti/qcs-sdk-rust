@@ -19,7 +19,7 @@ In order to run all checks exactly the same way that CI does, use `makers ci-flo
 
 ### Commits
 
-Commits should follow the conventional commit syntax, with one of the following [scopes][scopes]:
+Commits should follow the conventional commit syntax, with one of the following [scopes](scopes):
 
 - `lib` or `rust`: changes to the rust SDK
 - `python`: changes to the Python bindings

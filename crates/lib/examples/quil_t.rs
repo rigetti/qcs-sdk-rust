@@ -1,4 +1,4 @@
-//! This example runs a basic [Quil-T program from pyQuil][pyquil] in Rust.
+//! This example runs a basic [Quil-T program from pyQuil](pyquil) in Rust.
 //!
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/quilt_getting_started.html#Another-example:-a-simple-T1-experiment
 
