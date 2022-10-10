@@ -2,7 +2,6 @@ use pythonize::pythonize;
 use qcs::qpu::client::QcsClient;
 use qcs::qpu::quilc::TargetDevice;
 use qcs::{api, qpu::quilc::NativeQuil};
-use qcs_api_client_common::ClientConfiguration;
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyRuntimeError, prelude::*};
@@ -19,10 +18,9 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
         .map_err(|e| CompilationError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
         // TODO This doesn't need to be async.
-        let config = ClientConfiguration::load()
+        let client = QcsClient::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let client = QcsClient::with_config(config);
         let result = api::compile(&quil, target_device, &client)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
@@ -65,10 +63,9 @@ fn translate(
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let config = ClientConfiguration::load()
+        let client = QcsClient::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let client = QcsClient::with_config(config);
         let result = api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
             .await
             .map_err(|e| TranslationError::new_err(e.to_string()))?;
@@ -87,10 +84,9 @@ fn submit(
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let config = ClientConfiguration::load()
+        let client = QcsClient::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let client = QcsClient::with_config(config);
         let job_id = api::submit(&program, patch_values, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -105,10 +101,9 @@ fn retrieve_results(
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::local_future_into_py(py, async move {
-        let config = ClientConfiguration::load()
+        let client = QcsClient::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let client = QcsClient::with_config(config);
         let results = api::retrieve_results(&job_id, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
