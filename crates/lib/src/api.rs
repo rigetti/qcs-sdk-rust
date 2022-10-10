@@ -12,7 +12,7 @@ use serde::Serialize;
 use crate::qpu::{
     self,
     client::{ClientGrpcError, QcsClient},
-    quilc::{self, NativeQuilProgram, TargetDevice},
+    quilc::{self, TargetDevice},
     rewrite_arithmetic::{self, Substitutions},
     runner,
     translation::{self, EncryptedTranslationResult},
@@ -26,8 +26,8 @@ pub fn compile(
     client: &QcsClient,
 ) -> Result<String, Box<dyn std::error::Error>> {
     quilc::compile_program(quil, target, client)
-        .map_err(|e| e.into())
-        .map(String::from)
+        .map_err(Into::into)
+        .map(|p| p.to_string(true))
 }
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the
@@ -52,9 +52,9 @@ pub struct RewriteArithmeticResult {
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
 pub fn rewrite_arithmetic(
-    native_quil: NativeQuilProgram,
+    native_quil: quil_rs::Program,
 ) -> Result<RewriteArithmeticResult, rewrite_arithmetic::Error> {
-    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil.into())?;
+    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil)?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
 
     Ok(RewriteArithmeticResult {

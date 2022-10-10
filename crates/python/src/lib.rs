@@ -1,7 +1,7 @@
 use pythonize::pythonize;
+use qcs::api;
 use qcs::qpu::client::QcsClient;
 use qcs::qpu::quilc::TargetDevice;
-use qcs::{api, qpu::quilc::NativeQuil};
 use std::collections::HashMap;
 
 use pyo3::{create_exception, exceptions::PyRuntimeError, prelude::*};
@@ -28,9 +28,7 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
 
 #[pyfunction]
 fn rewrite_arithmetic(py: Python<'_>, native_quil: String) -> PyResult<PyObject> {
-    let native_program = NativeQuil::assume_native_quil(native_quil)
-        .try_into()
-        .map_err(TranslationError::new_err)?;
+    let native_program = native_quil.parse().map_err(TranslationError::new_err)?;
     let result = api::rewrite_arithmetic(native_program)
         .map_err(|e| RewriteArithmeticError::new_err(e.to_string()))?;
     let pyed = pythonize(py, &result).map_err(|e| TranslationError::new_err(e.to_string()))?;

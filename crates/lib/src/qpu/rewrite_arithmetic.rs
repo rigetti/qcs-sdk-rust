@@ -12,7 +12,7 @@ use quil_rs::{
     Program,
 };
 
-use crate::{executable::Parameters, qpu::quilc::NativeQuilProgram};
+use crate::executable::Parameters;
 
 /// A function for converting `program` into a form that Rigetti QPUs can understand.
 ///
@@ -337,11 +337,11 @@ impl From<RewrittenQuil> for String {
     }
 }
 
-impl TryFrom<NativeQuilProgram> for RewrittenProgram {
+impl TryFrom<quil_rs::Program> for RewrittenProgram {
     type Error = Error;
 
-    fn try_from(program: NativeQuilProgram) -> Result<Self, Self::Error> {
-        let (inner, substitutions) = rewrite_arithmetic(program.into())?;
+    fn try_from(program: quil_rs::Program) -> Result<Self, Self::Error> {
+        let (inner, substitutions) = rewrite_arithmetic(program)?;
         Ok(Self {
             inner,
             substitutions,
