@@ -190,12 +190,14 @@ mod tests {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
-    #[test]
-    fn compare_native_quil_to_expected_output() {
+    #[tokio::test]
+    async fn compare_native_quil_to_expected_output() {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &QcsClient::with_config(ClientConfiguration::default()),
+            &QcsClient::load()
+                .await
+                .expect("Should be able to load client"),
         )
         .expect("Could not compile");
         assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
