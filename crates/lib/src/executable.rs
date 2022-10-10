@@ -5,7 +5,11 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
+
 use crate::configuration::{Configuration, LoadError, RefreshError};
+use crate::qpu::rewrite_arithmetic;
 use crate::qpu::{engagement, ExecutionError, JobId};
 use crate::{qpu, qvm, ExecutionData};
 
@@ -439,8 +443,23 @@ pub enum Error {
     /// There was some problem with the provided Quil program. This could be a syntax error with
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
+    #[error("There was a problem with the Quil program: {0}")]
+    Quil(#[from] ProgramError<Program>),
+    /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),
+    /// There was a problem when translating the Quil program.
+    #[error("There was a problem translating the Quil program: {0}")]
+    Translation(String),
+    /// There was a problem when rewriting parameter arithmetic in the Quil program.
+    #[error("There was a problem rewriting parameter arithmetic in the Quil program: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    /// There was a problem when substituting parameters in the Quil program.
+    #[error("There was a problem substituting parameters in the Quil program: {0}")]
+    Substitution(String),
+    /// The Quil program is missing readout sources.
+    #[error("The Quil program is missing readout sources")]
+    MissingRoSources,
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
     /// indicates a bug in the SDK and should be reported to
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
@@ -509,11 +528,16 @@ impl From<ExecutionError> for Error {
             ExecutionError::QpuUnavailable(duration) => Self::QpuUnavailable(duration),
             ExecutionError::Unauthorized => Self::Authentication,
             ExecutionError::QcsCommunication => Self::Connection(Service::Qcs),
-            ExecutionError::Quil(message) => Self::Compilation(message),
+            ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::Qcs(message) => Self::Unexpected(message),
             ExecutionError::ProgramNotSubmitted => Self::InvalidJobHandle,
+            ExecutionError::Compilation { details } => Self::Compilation(details),
+            ExecutionError::Translation(message) => Self::Translation(message),
+            ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
+            ExecutionError::Substitution(message) => Self::Substitution(message),
+            ExecutionError::MissingRoSources => Self::MissingRoSources,
         }
     }
 }
