@@ -175,7 +175,6 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use qcs_api_client_common::ClientConfiguration;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use std::fs::File;
 
@@ -195,9 +194,7 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &QcsClient::load()
-                .await
-                .expect("Should be able to load client"),
+            &QcsClient::load().await.unwrap_or_default(),
         )
         .expect("Could not compile");
         assert_eq!(String::from(output), EXPECTED_H0_OUTPUT);
@@ -214,8 +211,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let config = ClientConfiguration::load().await.unwrap_or_default();
-        let client = QcsClient::with_config(config);
+        let client = QcsClient::load().await.unwrap_or_default();
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
