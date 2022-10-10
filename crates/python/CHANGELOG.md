@@ -1,3 +1,24 @@
+## 0.2.1-rc.20
+
+### Features
+
+- add type hints
+- python bindings (#145)
+
+## 0.2.1-rc.19
+
+### Features
+
+- add type hints
+- python bindings (#145)
+
+## 0.2.1-rc.18
+
+### Features
+
+- add type hints
+- python bindings (#145)
+
 ## 0.2.1-rc.17
 
 ### Features
