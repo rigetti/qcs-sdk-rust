@@ -22,12 +22,12 @@ async fn main() {
         .compile_with_quilc(false)
         .execute_on_qpu("Aspen-11")
         .await
-        .expect("Executed program on QPU")
+        .expect("Program should execute successfully")
         .readout_data
         .get_readout_values("ro", 0)
-        .expect("Found ro register")
+        .expect("Readout data should include 'ro'")
         .values
-        .unwrap();
+        .expect("Readout data should include values");
 
     match result {
         Values::IntegerValues(IntegerReadoutValues { values }) => assert!(!values.is_empty()),

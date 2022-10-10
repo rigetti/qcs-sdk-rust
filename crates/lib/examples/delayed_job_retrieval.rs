@@ -14,10 +14,10 @@ async fn main() {
     let job_handle = exe
         .submit_to_qpu("Aspen-11")
         .await
-        .expect("Failed to submit");
+        .expect("Program should be sucessfully submitted for execution");
     // Do some other stuff
     let _data = exe
         .retrieve_results(job_handle)
         .await
-        .expect("Failed to retrieve results");
+        .expect("Results should be successfully retrieved");
 }
