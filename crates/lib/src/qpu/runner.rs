@@ -31,7 +31,7 @@ pub(crate) fn params_into_job_execution_configuration(
                 str.as_ref().into(),
                 DataValue {
                     value: Some(Value::Real(RealDataValue {
-                        data: value.to_vec(),
+                        data: value.clone(),
                     })),
                 },
             )
