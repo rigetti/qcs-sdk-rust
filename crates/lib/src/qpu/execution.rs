@@ -135,7 +135,6 @@ impl<'a> Execution<'a> {
     /// Run on a real QPU and wait for the results.
     /// needs to also return readout_sources
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
-        // todo: return / persist readout sources
         let EncryptedTranslationResult { job, readout_map } = translate(
             self.quantum_processor_id,
             &self.program.to_string().0,
@@ -143,7 +142,6 @@ impl<'a> Execution<'a> {
             self.client.as_ref(),
         )
         .await?;
-        println!("done translating...");
 
         let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
 

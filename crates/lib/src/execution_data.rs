@@ -178,8 +178,6 @@ mod describe_readout_map {
         let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values)
             .expect("ReadoutMap should construct from mappings and values");
 
-        dbg!(&readout_map);
-
         let foo = readout_map
             .get_readout_values_for_field("foo")
             .unwrap()
