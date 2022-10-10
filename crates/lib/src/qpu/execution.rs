@@ -306,7 +306,7 @@ impl<'a> Execution<'a> {
             config,
         )
         .await?;
-        let ro_sources = response.ro_sources.ok_or_else(|| Error::MissingRoSources)?;
+        let ro_sources = response.ro_sources.ok_or(Error::MissingRoSources)?;
         let buffer_names = organize_ro_sources(ro_sources, readouts)?;
         let engagement = engagement::get(String::from(self.quantum_processor_id), config).await?;
         let rpcq_client = Client::try_from(&engagement)
