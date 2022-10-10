@@ -7,6 +7,7 @@ use qcs_api_client_grpc::{
     },
 };
 use quil_rs::expression::Expression;
+use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
 
 use crate::qpu::{
@@ -28,6 +29,17 @@ pub fn compile(
     quilc::compile_program(quil, target, client)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
+}
+
+/// Collection of errors that can result from rewriting arithmetic.
+#[derive(thiserror::Error, Debug)]
+pub enum RewriteArithmeticError {
+    /// The Quil program could not be parsed.
+    #[error("Could not parse program: {0}")]
+    Program(#[from] ProgramError<Program>),
+    /// Parameteric arithmetic in the Quil program could not be rewritten.
+    #[error("Could not rewrite arithmetic: {0}")]
+    Rewrite(#[from] rewrite_arithmetic::Error),
 }
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the

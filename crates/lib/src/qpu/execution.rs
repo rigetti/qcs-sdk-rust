@@ -6,6 +6,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use log::trace;
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
@@ -34,7 +36,7 @@ pub(crate) struct Execution<'a> {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("problem processing the provided Quil: {0}")]
-    Quil(String),
+    Quil(#[from] ProgramError<Program>),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
@@ -45,6 +47,12 @@ pub(crate) enum Error {
     IsaError(#[from] IsaError),
     #[error("Problem parsing memory readout: {0}")]
     ReadoutParse(#[from] MemoryReferenceParseError),
+    #[error("Problem when compiling program: {details}")]
+    Compilation { details: String },
+    #[error("Program when translating the program: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    #[error("Program when getting substitutions for program: {0}")]
+    Substitution(String),
 }
 
 impl From<quilc::Error> for Error {
@@ -55,9 +63,10 @@ impl From<quilc::Error> for Error {
                 uri,
                 details: format!("{:?}", details),
             },
-            quilc::Error::QuilcCompilation(details) | quilc::Error::Parse(details) => {
-                Self::Quil(details)
-            }
+            quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
+            quilc::Error::Parse(details) => Self::Compilation {
+                details: details.to_string(),
+            },
         }
     }
 }
@@ -125,7 +134,7 @@ impl<'a> Execution<'a> {
         };
 
         Ok(Self {
-            program: RewrittenProgram::try_from(program).map_err(|e| Error::Quil(e.to_string()))?,
+            program: RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?,
             quantum_processor_id,
             client,
             shots,
@@ -142,7 +151,9 @@ impl<'a> Execution<'a> {
         )
         .await?;
 
-        let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
+        let patch_values = self
+            .get_substitutions(params)
+            .map_err(Error::Substitution)?;
 
         let job_id = submit(
             self.quantum_processor_id,

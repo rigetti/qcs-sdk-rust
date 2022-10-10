@@ -9,9 +9,12 @@ use qcs_api_client_common::configuration::LoadError;
 
 use crate::execution_data::{ExecutionDataQPU, ExecutionDataQVM};
 use crate::qpu::client::QcsClient;
+use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
 use crate::{qpu, qvm};
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
 ///
@@ -423,8 +426,23 @@ pub enum Error {
     /// There was some problem with the provided Quil program. This could be a syntax error with
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
+    #[error("There was a problem with the Quil program: {0}")]
+    Quil(#[from] ProgramError<Program>),
+    /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),
+    /// There was a problem when translating the Quil program.
+    #[error("There was a problem translating the Quil program: {0}")]
+    Translation(String),
+    /// There was a problem when rewriting parameter arithmetic in the Quil program.
+    #[error("There was a problem rewriting parameter arithmetic in the Quil program: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    /// There was a problem when substituting parameters in the Quil program.
+    #[error("There was a problem substituting parameters in the Quil program: {0}")]
+    Substitution(String),
+    /// The Quil program is missing readout sources.
+    #[error("The Quil program is missing readout sources")]
+    MissingRoSources,
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
     /// indicates a bug in the SDK and should be reported to
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
@@ -470,12 +488,15 @@ pub enum Service {
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
-            ExecutionError::Quil(message) => Self::Compilation(message),
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::QcsClient(v) => Self::Unexpected(format!("{:?}", v)),
             ExecutionError::IsaError(v) => Self::Unexpected(format!("{:?}", v)),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::Quil(e) => Self::Quil(e),
+            ExecutionError::Compilation { details } => Self::Compilation(details),
+            ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
+            ExecutionError::Substitution(message) => Self::Substitution(message),
         }
     }
 }

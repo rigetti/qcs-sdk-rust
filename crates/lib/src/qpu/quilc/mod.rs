@@ -3,9 +3,8 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
-// use std::str::FromStr;
 
-// use quil_rs::Program;
+use quil_rs::program::{Program, ProgramError};
 use serde::{Deserialize, Serialize};
 
 use isa::Compiler;
@@ -65,7 +64,7 @@ pub enum Error {
     QuilcCompilation(String),
     /// An error when trying to parse the compiled program.
     #[error("Problem when trying to parse the compiled program: {0}")]
-    Parse(String),
+    Parse(ProgramError<Program>),
 }
 
 impl Error {
