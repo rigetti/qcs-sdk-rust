@@ -1,3 +1,11 @@
+## 0.2.1-rc.22
+
+### Features
+
+- upgrade quil-rs dependency and fix issues (#172)
+- add type hints
+- python bindings (#145)
+
 ## 0.2.1-rc.21
 
 ### Features
