@@ -17,7 +17,6 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
     let target_device: TargetDevice = serde_json::from_str(&target_device)
         .map_err(|e| CompilationError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        // TODO This doesn't need to be async.
         let client = QcsClient::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
