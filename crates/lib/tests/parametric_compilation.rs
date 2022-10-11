@@ -3,6 +3,7 @@
 
 use std::f64::consts::PI;
 
+use qcs::qpu::client::QcsClient;
 use qcs::Executable;
 
 const BASIC_SUBSTITUTION: &str = r#"
@@ -18,7 +19,7 @@ MEASURE 0 ro[0]
 
 #[tokio::test]
 async fn basic_substitution() {
-    let mut exe = Executable::from_quil(BASIC_SUBSTITUTION);
+    let mut exe = Executable::from_quil(BASIC_SUBSTITUTION).with_client(QcsClient::default());
     let mut parametric_measurements = Vec::with_capacity(200);
 
     let step = 2.0 * PI / 200.0;

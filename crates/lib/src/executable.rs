@@ -21,6 +21,7 @@ use quil_rs::Program;
 /// # Example
 ///
 /// ```rust
+/// use qcs::qpu::client::QcsClient;
 /// use qcs::{Executable, RegisterData};
 ///
 ///
@@ -36,7 +37,7 @@ use quil_rs::Program;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let mut result = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
+///     let mut result = Executable::from_quil(PROGRAM).with_client(QcsClient::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
@@ -116,6 +117,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
+    /// use qcs::qpu::client::QcsClient;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
@@ -129,6 +131,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result = Executable::from_quil(PROGRAM)
+    ///         .with_client(QcsClient::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
     ///         .read_from("second")
     ///         .execute_on_qvm()
@@ -172,6 +175,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
+    /// use qcs::qpu::client::QcsClient;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
@@ -179,6 +183,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut exe = Executable::from_quil(PROGRAM)
+    ///         .with_client(QcsClient::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
     ///     
     ///     for theta in 0..2 {
@@ -214,6 +219,17 @@ impl<'executable> Executable<'executable, '_> {
         values[index] = value;
         self.params.insert(param_name, values);
 
+        self
+    }
+
+    /// Override the client initialization with the provided client.
+    ///
+    /// # Arguments
+    ///
+    /// 1. `client`: A [`QcsClient`] to be used for all client calls.
+    pub fn with_client(mut self, client: QcsClient) -> Self {
+        let client = Arc::new(client);
+        self.client = Some(client);
         self
     }
 }
@@ -553,11 +569,11 @@ impl<'a> JobHandle<'a> {
 
 #[cfg(test)]
 mod describe_get_config {
-    use crate::Executable;
+    use crate::{qpu::QcsClient, Executable};
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("");
+        let mut exe = Executable::from_quil("").with_client(QcsClient::default());
         let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
