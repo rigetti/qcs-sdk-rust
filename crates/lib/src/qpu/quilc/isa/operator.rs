@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
     let arg = node_id.map_or_else(|| Argument::String("_".to_owned()), Argument::Int);
@@ -18,23 +18,47 @@ pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
 pub(crate) enum Operator {
     Gate {
         operator: String,
+        #[serde(deserialize_with = "deserialize_duration_null_default")]
         duration: f64,
+        #[serde(deserialize_with = "deserialize_fidelity_null_default")]
         fidelity: f64,
         parameters: Vec<Parameter>,
         arguments: Vec<Argument>,
     },
     Measure {
         operator: String,
+        #[serde(deserialize_with = "deserialize_duration_null_default")]
         duration: f64,
+        #[serde(deserialize_with = "deserialize_fidelity_null_default")]
         fidelity: f64,
         qubit: i32,
         target: Option<String>,
     },
 }
 
+/// Swap a ``null`` duration value with [`PERFECT_DURATION`]
+fn deserialize_duration_null_default<'de, D>(d: D) -> Result<f64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Deserialize::deserialize(d).map(|x: Option<_>| x.unwrap_or(PERFECT_DURATION))
+}
+
+/// Swap a ``null`` fidelity value with [`PERFECT_FIDELITY`]
+fn deserialize_fidelity_null_default<'de, D>(d: D) -> Result<f64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Deserialize::deserialize(d).map(|x: Option<_>| x.unwrap_or(PERFECT_FIDELITY))
+}
+
 #[cfg(test)]
 mod describe_operator {
-    use crate::qpu::quilc::isa::operator::{Argument, Operator, Parameter};
+    use serde_json::json;
+
+    use crate::qpu::quilc::isa::operator::{
+        Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
+    };
 
     /// This test copies some JSON data from the pyQuil ISA integration test to
     /// validate that [`Operator::Gate`] is serialized correctly.
@@ -107,6 +131,33 @@ mod describe_operator {
             serde_json::to_value(&measure).expect("Could not serialize Operation::Gate");
         assert_eq!(serialized, expected);
     }
+
+    #[test]
+    fn it_deserializes_null_fidelity_as_perfect_fidelity() {
+        let input = json!({
+            "duration": null,
+            "fidelity": null,
+            "operator": "MEASURE",
+            "operator_type": "measure",
+            "qubit": 1,
+            "target": null
+
+        });
+        let expected = json!({
+            "duration": PERFECT_DURATION,
+            "fidelity": PERFECT_FIDELITY,
+            "operator": "MEASURE",
+            "operator_type": "measure",
+            "qubit": 1,
+            "target": null
+
+        });
+        let gate: Operator = serde_json::from_value(input).expect("Operator should deserialize");
+        assert_eq!(
+            serde_json::to_value(gate).expect("Can convert Operator to Value"),
+            expected
+        );
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -114,17 +165,6 @@ mod describe_operator {
 pub(crate) enum Parameter {
     String(String),
     Float(f64),
-}
-
-#[cfg(test)]
-mod test_parameters_deser {
-    use super::Parameter;
-
-    #[test]
-    fn it_deserializes_parameters() {
-        let s = r##"[""]"##;
-        serde_json::from_str::<Vec<Parameter>>(s).expect("yo");
-    }
 }
 
 #[cfg(test)]
