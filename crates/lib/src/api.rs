@@ -1,3 +1,6 @@
+//! This module provides convenience functions to handle compilation,
+//! translation, parameter arithmetic rewriting, and results collection.
+
 use std::{collections::HashMap, str::FromStr};
 
 use qcs_api_client_grpc::{
@@ -12,7 +15,7 @@ use serde::Serialize;
 
 use crate::qpu::{
     self,
-    client::{ClientGrpcError, QcsClient},
+    client::{GrpcClientError, Qcs},
     quilc::{self, TargetDevice},
     rewrite_arithmetic::{self, Substitutions},
     runner,
@@ -24,7 +27,7 @@ use crate::qpu::{
 pub fn compile(
     quil: &str,
     target: TargetDevice,
-    client: &QcsClient,
+    client: &Qcs,
 ) -> Result<String, Box<dyn std::error::Error>> {
     quilc::compile_program(quil, target, client)
         .map_err(Into::into)
@@ -80,7 +83,7 @@ pub fn rewrite_arithmetic(
 pub enum TranslationError {
     /// The program could not be translated
     #[error("Could not translate quil: {0}")]
-    Translate(#[from] ClientGrpcError),
+    Translate(#[from] GrpcClientError),
     /// The result of translation could not be deserialized
     #[error("Could not serialize translation result: {0}")]
     Serialize(#[from] serde_json::Error),
@@ -106,7 +109,7 @@ pub async fn translate(
     native_quil: &str,
     shots: u16,
     quantum_processor_id: &str,
-    client: &QcsClient,
+    client: &Qcs,
 ) -> Result<TranslationResult, TranslationError> {
     let EncryptedTranslationResult { job, readout_map } =
         translation::translate(quantum_processor_id, native_quil, shots.into(), client).await?;
@@ -132,7 +135,7 @@ pub async fn submit(
     program: &str,
     patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: &str,
-    client: &QcsClient,
+    client: &Qcs,
 ) -> Result<String, SubmitError> {
     // Is there a better way to map these patch_values keys? This
     // negates the whole purpose of [`submit`] using `Box<str>`,
@@ -158,7 +161,7 @@ pub enum SubmitError {
 
     /// Failed a gRPC API call
     #[error("Failed a gRPC call: {0}")]
-    GrpcError(#[from] ClientGrpcError),
+    GrpcError(#[from] GrpcClientError),
 
     /// Quilc compilation failed
     #[error("Failed quilc compilation: {0}")]
@@ -281,8 +284,8 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 pub async fn retrieve_results(
     job_id: &str,
     quantum_processor_id: &str,
-    client: &QcsClient,
-) -> Result<ExecutionResults, ClientGrpcError> {
+    client: &Qcs,
+) -> Result<ExecutionResults, GrpcClientError> {
     let request = GetControllerJobResultsRequest {
         job_execution_id: Some(job_id.into()),
         target: Some(Target::QuantumProcessorId(quantum_processor_id.into())),
@@ -296,5 +299,5 @@ pub async fn retrieve_results(
         .into_inner()
         .result
         .map(ExecutionResults::from)
-        .ok_or_else(|| ClientGrpcError::ResponseEmpty("Controller Job Execution Results".into()))
+        .ok_or_else(|| GrpcClientError::ResponseEmpty("Controller Job Execution Results".into()))
 }

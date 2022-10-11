@@ -12,7 +12,7 @@ use crate::RegisterData;
 /// The result of executing an [`Executable`](crate::Executable) via
 /// [`Executable::execute_on_qvm`](crate::Executable::execute_on_qvm).
 #[derive(Debug, Clone, PartialEq)]
-pub struct ExecutionDataQVM {
+pub struct Qvm {
     /// The data of all readout data that were read from
     /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
     /// register, value is the data of the register after execution.
@@ -29,7 +29,7 @@ pub struct ExecutionDataQVM {
 pub struct ReadoutMap(HashMap<MemoryReference, ReadoutValues>);
 
 impl ReadoutMap {
-    /// Given a known readout field name and index, return the result's ReadoutValues, if any.
+    /// Given a known readout field name and index, return the result's [`ReadoutValues`], if any.
     pub fn get_readout_values(&self, field: &str, index: u64) -> Option<ReadoutValues> {
         let readout_values = self.0.get(&MemoryReference {
             name: String::from(field),
@@ -39,7 +39,7 @@ impl ReadoutMap {
         Some(readout_values.clone())
     }
 
-    /// Given a known readout field name, return the result's ReadoutValues for all indices, if any.
+    /// Given a known readout field name, return the result's [`ReadoutValues`] for all indices, if any.
     pub fn get_readout_values_for_field(
         &self,
         field: &str,
@@ -69,14 +69,14 @@ impl ReadoutMap {
     pub(crate) fn from_mappings_and_values(
         readout_mappings: &HashMap<String, String>,
         readout_values: &HashMap<String, ReadoutValues>,
-    ) -> Result<Self, MemoryReferenceParseError> {
+    ) -> Self {
         let result = readout_values
             .iter()
             .flat_map(|(readout_name, values)| {
                 readout_mappings
                     .iter()
                     .filter(|(_, program_alias)| *program_alias == readout_name)
-                    .map(|(program_name, _)| program_name.clone())
+                    .map(|(program_name, _)| program_name.as_ref())
                     .map(parse_readout_register)
                     .map(|reference| Ok((reference?, values.clone())))
                     .collect::<Result<Vec<_>, MemoryReferenceParseError>>()
@@ -85,7 +85,7 @@ impl ReadoutMap {
             .collect::<HashMap<_, _>>()
             .into();
 
-        Ok(result)
+        result
     }
 }
 
@@ -98,7 +98,7 @@ impl From<HashMap<MemoryReference, ReadoutValues>> for ReadoutMap {
 /// The result of executing an [`Executable`](crate::Executable) via
 /// [`Executable::execute_on_qpu`](crate::Executable::execute_on_qpu).
 #[derive(Debug, Clone, PartialEq)]
-pub struct ExecutionDataQPU {
+pub struct Qpu {
     /// The data of all readout data that were read from
     /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
     /// register, value is the data of the register after execution.
@@ -121,7 +121,7 @@ pub(crate) enum MemoryReferenceParseError {
 
 // Note: MemoryReference may have a from_string in the fututre
 fn parse_readout_register(
-    register_name: String,
+    register_name: &str,
 ) -> Result<MemoryReference, MemoryReferenceParseError> {
     let open_brace =
         register_name
@@ -161,9 +161,9 @@ mod describe_readout_map {
     #[test]
     fn it_converts_from_translation_readout_mappings() {
         let readout_mappings = hashmap! {
-            String::from("foo[1]") => String::from("qA"),
-            String::from("foo[2]") => String::from("qB"),
-            String::from("foo[0]") => String::from("qC"),
+            String::from("ro[1]") => String::from("qA"),
+            String::from("ro[2]") => String::from("qB"),
+            String::from("ro[0]") => String::from("qC"),
             String::from("bar[3]") => String::from("qD"),
             String::from("bar[5]") => String::from("qE"),
         };
@@ -175,16 +175,14 @@ mod describe_readout_map {
             String::from("qE") => dummy_readout_values(44),
         };
 
-        let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values)
-            .expect("ReadoutMap should construct from mappings and values");
-
-        let foo = readout_map
-            .get_readout_values_for_field("foo")
+        let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values);
+        let ro = readout_map
+            .get_readout_values_for_field("ro")
             .unwrap()
-            .expect("ReadoutMap should have field `foo`");
+            .expect("ReadoutMap should have field `ro`");
 
         assert_eq!(
-            foo,
+            ro,
             vec![
                 None,
                 Some(dummy_readout_values(11)),

@@ -1,3 +1,7 @@
+//! This module provides methods for getting clients for the
+//! desired API (e.g. ``gRPC`` or ``OpenAPI``) and will properly
+//! initialize those clients (e.g. with authentication metadata).
+
 use qcs_api_client_common::ClientConfiguration;
 use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
@@ -21,18 +25,22 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+/// A client providing helper functionality for accessing QCS APIs
 #[derive(Clone, Default)]
-pub struct QcsClient {
+pub struct Qcs {
     config: ClientConfiguration,
     /// When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.
     use_gateway: bool,
 }
 
-impl QcsClient {
+impl Qcs {
+    /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
     pub async fn load() -> Result<Self, LoadError> {
         ClientConfiguration::load().await.map(Self::with_config)
     }
 
+    /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
+    #[must_use]
     pub fn with_config(config: ClientConfiguration) -> Self {
         Self {
             config,
@@ -40,6 +48,8 @@ impl QcsClient {
         }
     }
 
+    /// Enable or disable the use of Gateway service for execution
+    #[must_use]
     pub fn with_use_gateway(mut self, use_gateway: bool) -> Self {
         self.use_gateway = use_gateway;
         self
@@ -143,42 +153,54 @@ impl QcsClient {
     }
 }
 
-/// Errors that may occur while trying to resolve a gRPC endpoint
+/// Errors that may occur while trying to resolve a ``gRPC`` endpoint
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcEndpointError {
+    /// Error due to a malformed URI
     #[error("Malformed URI for endpoint: {0}")]
     BadUri(#[from] GrpcError),
 
+    /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
     RequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
 
+    /// Error due to failure to get accessors for quantum processor
     #[error("Failed to get accessors for quantum processor: {0}")]
     AccessorRequestFailed(#[from] OpenApiError<ListQuantumProcessorAccessorsError>),
 
-    #[error("Missing gRPC endpoint for quantum processor {0:?}")]
+    /// Error due to missing gRPC endpoint for quantum processor
+    #[error("Missing gRPC endpoint for quantum processor {0}")]
     NoEndpoint(String),
 }
 
+/// Errors that may occur while trying to use a ``gRPC`` client
 #[derive(Debug, thiserror::Error)]
-pub enum ClientGrpcError {
+pub enum GrpcClientError {
+    /// Error due to failure to resolve the endpoint
     #[error("Failed to resolve the gRPC endoint: {0}")]
     EndpointNotResolved(#[from] GrpcEndpointError),
 
+    /// Error due to failure during request
     #[error("Call failed during gRPC request: {0}")]
     RequestFailed(#[from] Status),
 
+    /// Error due to response body missing required data
     #[error("Response body had missing data: {0}")]
     ResponseEmpty(String),
 
+    /// Error due to ``gRPC`` error
     #[error("gRPC error: {0}")]
     GrpcError(#[from] GrpcError),
 }
 
+/// Errors that may occur while trying to use a [`OpenAPI`] client
 #[derive(Debug, thiserror::Error)]
-pub enum ClientOpenApiError<T> {
+pub enum OpenApiClientError<T> {
+    /// Error due to request failure
     #[error("Call failed during http request: {0}")]
     RequestFailed(#[from] OpenApiError<T>),
 
+    /// Error due to empty response
     #[error("Response value was empty: {0}")]
     ResponseEmpty(String),
 }

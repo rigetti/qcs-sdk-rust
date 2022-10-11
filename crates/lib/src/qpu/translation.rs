@@ -8,7 +8,7 @@ use qcs_api_client_grpc::{
     },
 };
 
-use super::client::{ClientGrpcError, QcsClient};
+use super::client::{GrpcClientError, Qcs};
 
 pub(crate) struct EncryptedTranslationResult {
     pub(crate) job: EncryptedControllerJob,
@@ -19,8 +19,8 @@ pub(crate) async fn translate(
     quantum_processor_id: &str,
     quil_program: &str,
     num_shots: u32,
-    client: &QcsClient,
-) -> Result<EncryptedTranslationResult, ClientGrpcError> {
+    client: &Qcs,
+) -> Result<EncryptedTranslationResult, GrpcClientError> {
     let request = TranslateQuilToEncryptedControllerJobRequest {
         quantum_processor_id: Some(quantum_processor_id.to_owned()),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),
@@ -36,10 +36,10 @@ pub(crate) async fn translate(
     Ok(EncryptedTranslationResult {
         job: response
             .job
-            .ok_or_else(|| ClientGrpcError::ResponseEmpty("Encrypted Job".into()))?,
+            .ok_or_else(|| GrpcClientError::ResponseEmpty("Encrypted Job".into()))?,
         readout_map: response
             .metadata
-            .ok_or_else(|| ClientGrpcError::ResponseEmpty("Job Metadata".into()))?
+            .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Metadata".into()))?
             .readout_mappings,
     })
 }

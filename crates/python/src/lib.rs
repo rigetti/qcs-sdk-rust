@@ -1,6 +1,6 @@
 use pythonize::pythonize;
 use qcs::api;
-use qcs::qpu::client::QcsClient;
+use qcs::qpu::client::Qcs;
 use qcs::qpu::quilc::TargetDevice;
 use std::collections::HashMap;
 
@@ -17,7 +17,7 @@ fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyA
     let target_device: TargetDevice = serde_json::from_str(&target_device)
         .map_err(|e| CompilationError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = QcsClient::load()
+        let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
         let result = api::compile(&quil, target_device, &client)
@@ -62,7 +62,7 @@ fn translate(
     quantum_processor_id: String,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = QcsClient::load()
+        let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
         let result = api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
@@ -84,7 +84,7 @@ fn submit(
     use_gateway: bool,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = QcsClient::load()
+        let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
             .with_use_gateway(use_gateway);
@@ -103,7 +103,7 @@ fn retrieve_results(
     use_gateway: bool,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = QcsClient::load()
+        let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
             .with_use_gateway(use_gateway);
