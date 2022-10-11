@@ -15,13 +15,12 @@ MEASURE 1 ro[1]
 #[tokio::main]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
-    let theta = PI;
 
     let result = exe
-        .with_parameter("theta", 0, theta)
+        .with_parameter("theta", 0, PI)
         .execute_on_qpu("Aspen-11")
         .await
-        .expect("Executed on QPU");
+        .expect("Program should execute successfully");
 
     println!("{:?}", result);
 }

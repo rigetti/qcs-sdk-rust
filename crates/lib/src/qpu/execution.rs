@@ -6,6 +6,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use log::trace;
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
@@ -14,7 +16,7 @@ use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::JobHandle;
 
 use super::client::{ClientGrpcError, QcsClient};
-use super::quilc::{self, NativeQuil, NativeQuilProgram, TargetDevice};
+use super::quilc::{self, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -34,7 +36,7 @@ pub(crate) struct Execution<'a> {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("problem processing the provided Quil: {0}")]
-    Quil(String),
+    Quil(#[from] ProgramError<Program>),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
@@ -45,6 +47,12 @@ pub(crate) enum Error {
     IsaError(#[from] IsaError),
     #[error("Problem parsing memory readout: {0}")]
     ReadoutParse(#[from] MemoryReferenceParseError),
+    #[error("Problem when compiling program: {details}")]
+    Compilation { details: String },
+    #[error("Program when translating the program: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    #[error("Program when getting substitutions for program: {0}")]
+    Substitution(String),
 }
 
 impl From<quilc::Error> for Error {
@@ -55,7 +63,10 @@ impl From<quilc::Error> for Error {
                 uri,
                 details: format!("{:?}", details),
             },
-            quilc::Error::QuilcCompilation(details) => Self::Quil(details),
+            quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
+            quilc::Error::Parse(details) => Self::Compilation {
+                details: details.to_string(),
+            },
         }
     }
 }
@@ -106,7 +117,7 @@ impl<'a> Execution<'a> {
         let isa = get_isa(quantum_processor_id, &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
-        let native_quil = if compile_with_quilc {
+        let program = if compile_with_quilc {
             trace!("Converting to Native Quil");
             let client = client.clone();
             spawn_blocking(move || quilc::compile_program(&quil, target_device, &client))
@@ -119,13 +130,11 @@ impl<'a> Execution<'a> {
                 })??
         } else {
             trace!("Skipping conversion to Native Quil");
-            NativeQuil::assume_native_quil(quil.to_string())
+            quil.parse().map_err(Error::Quil)?
         };
 
-        let program = NativeQuilProgram::try_from(native_quil).map_err(Error::Quil)?;
-
         Ok(Self {
-            program: RewrittenProgram::try_from(program).map_err(|e| Error::Quil(e.to_string()))?,
+            program: RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?,
             quantum_processor_id,
             client,
             shots,
@@ -133,9 +142,7 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    /// needs to also return readout_sources
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
-        // todo: return / persist readout sources
         let EncryptedTranslationResult { job, readout_map } = translate(
             self.quantum_processor_id,
             &self.program.to_string().0,
@@ -143,9 +150,10 @@ impl<'a> Execution<'a> {
             self.client.as_ref(),
         )
         .await?;
-        println!("done translating...");
 
-        let patch_values = self.get_substitutions(params).map_err(Error::Quil)?;
+        let patch_values = self
+            .get_substitutions(params)
+            .map_err(Error::Substitution)?;
 
         let job_id = submit(
             self.quantum_processor_id,

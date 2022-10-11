@@ -1,4 +1,4 @@
-//! This example runs a basic [Quil-T program from pyQuil][pyquil] in Rust.
+//! This example runs a basic [Quil-T program from pyQuil](pyquil) in Rust.
 //!
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/quilt_getting_started.html#Another-example:-a-simple-T1-experiment
 
@@ -22,12 +22,12 @@ async fn main() {
         .compile_with_quilc(false)
         .execute_on_qpu("Aspen-11")
         .await
-        .expect("Executed program on QPU")
+        .expect("Program should execute successfully")
         .readout_data
         .get_readout_values("ro", 0)
-        .expect("Found ro register")
+        .expect("Readout data should include 'ro'")
         .values
-        .unwrap();
+        .expect("Readout data should include values");
 
     match result {
         Values::IntegerValues(IntegerReadoutValues { values }) => assert!(!values.is_empty()),

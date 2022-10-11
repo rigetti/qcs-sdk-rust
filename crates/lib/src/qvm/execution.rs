@@ -4,6 +4,7 @@ use std::str::FromStr;
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
+    program::ProgramError,
     Program,
 };
 
@@ -144,7 +145,7 @@ impl Execution {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("Error parsing Quil program: {0}")]
-    Parsing(String),
+    Parsing(#[from] ProgramError<Program>),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]

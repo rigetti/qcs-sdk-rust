@@ -7,12 +7,13 @@ use qcs_api_client_grpc::{
     },
 };
 use quil_rs::expression::Expression;
+use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
 
 use crate::qpu::{
     self,
     client::{ClientGrpcError, QcsClient},
-    quilc::{self, NativeQuilProgram, TargetDevice},
+    quilc::{self, TargetDevice},
     rewrite_arithmetic::{self, Substitutions},
     runner,
     translation::{self, EncryptedTranslationResult},
@@ -26,8 +27,19 @@ pub fn compile(
     client: &QcsClient,
 ) -> Result<String, Box<dyn std::error::Error>> {
     quilc::compile_program(quil, target, client)
-        .map_err(|e| e.into())
-        .map(String::from)
+        .map_err(Into::into)
+        .map(|p| p.to_string(true))
+}
+
+/// Collection of errors that can result from rewriting arithmetic.
+#[derive(thiserror::Error, Debug)]
+pub enum RewriteArithmeticError {
+    /// The Quil program could not be parsed.
+    #[error("Could not parse program: {0}")]
+    Program(#[from] ProgramError<Program>),
+    /// Parameteric arithmetic in the Quil program could not be rewritten.
+    #[error("Could not rewrite arithmetic: {0}")]
+    Rewrite(#[from] rewrite_arithmetic::Error),
 }
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the
@@ -52,9 +64,9 @@ pub struct RewriteArithmeticResult {
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
 pub fn rewrite_arithmetic(
-    native_quil: NativeQuilProgram,
+    native_quil: quil_rs::Program,
 ) -> Result<RewriteArithmeticResult, rewrite_arithmetic::Error> {
-    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil.into())?;
+    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil)?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
 
     Ok(RewriteArithmeticResult {
@@ -63,10 +75,13 @@ pub fn rewrite_arithmetic(
     })
 }
 
+/// Errors that can happen during translation
 #[derive(Debug, thiserror::Error)]
 pub enum TranslationError {
+    /// The program could not be translated
     #[error("Could not translate quil: {0}")]
     Translate(#[from] ClientGrpcError),
+    /// The result of translation could not be deserialized
     #[error("Could not serialize translation result: {0}")]
     Serialize(#[from] serde_json::Error),
 }
@@ -134,17 +149,22 @@ pub async fn submit(
     Ok(job_id.0)
 }
 
+/// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
 pub enum SubmitError {
+    /// Failed to fetch the desired ISA
     #[error("Failed to fetch ISA: {0}")]
     IsaError(#[from] IsaError),
 
+    /// Failed a gRPC API call
     #[error("Failed a gRPC call: {0}")]
     GrpcError(#[from] ClientGrpcError),
 
+    /// Quilc compilation failed
     #[error("Failed quilc compilation: {0}")]
     QuilcError(#[from] quilc::Error),
 
+    /// Job could not be deserialized
     #[error("Failed to deserialize job: {0}")]
     DeserializeError(#[from] serde_json::Error),
 }
@@ -166,6 +186,8 @@ pub fn build_patch_values(
     rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
+/// A convenience type that describes a Complex-64 value whose real
+/// and imaginary parts of both f32.
 pub type Complex64 = [f32; 2];
 
 /// Data from an individual register. Each variant contains a vector with the expected data type

@@ -2,12 +2,12 @@ use enum_as_inner::EnumAsInner;
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 
-/// Data resulting from [`Executable::execute_on_qvm`][`crate::Executable::execute_on_qvm`] or
-/// [`Executable::execute_on_qpu`][`crate::Executable::execute_on_qpu`].
+/// Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`) or
+/// [`Executable::execute_on_qpu`](`crate::Executable::execute_on_qpu`).
 ///
 /// This represents a single vector (or "register") of typed memory across some number of shots.
 /// The register corresponds to the usage of a `DECLARE` instruction in Quil, and the name of that
-/// register should be provided with [`Executable::read_from`][`crate::Executable::read_from`].
+/// register should be provided with [`Executable::read_from`](`crate::Executable::read_from`).
 ///
 /// There is a variant of this enum for each type of data that a register could hold.
 /// Any variant of an instance of `ExecutionResult` will contain a `Vec` with one entry for each shot,

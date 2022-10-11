@@ -31,7 +31,7 @@ pub(crate) fn params_into_job_execution_configuration(
                 str.as_ref().into(),
                 DataValue {
                     value: Some(Value::Real(RealDataValue {
-                        data: value.to_vec(),
+                        data: value.clone(),
                     })),
                 },
             )
@@ -94,9 +94,8 @@ pub(crate) async fn retrieve_results(
         .await?
         .get_controller_job_results(request)
         .await?
-        .get_ref()
+        .into_inner()
         .result
-        .to_owned()
         .ok_or_else(|| ClientGrpcError::ResponseEmpty("Job Execution Results".into()))
 }
 

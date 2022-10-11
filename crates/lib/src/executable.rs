@@ -6,18 +6,23 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
+use qcs_api_client_common::ClientConfiguration;
 
 use crate::execution_data::{ExecutionDataQPU, ExecutionDataQVM};
 use crate::qpu::client::QcsClient;
+use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
 use crate::{qpu, qvm};
+use quil_rs::program::ProgramError;
+use quil_rs::Program;
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
 ///
 /// # Example
 ///
 /// ```rust
+/// use qcs_api_client_common::ClientConfiguration;
 /// use qcs::{Executable, RegisterData};
 ///
 ///
@@ -33,7 +38,7 @@ use crate::{qpu, qvm};
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let mut result = Executable::from_quil(PROGRAM).with_shots(4).execute_on_qvm().await.unwrap();
+///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
@@ -63,6 +68,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters,
     compile_with_quilc: bool,
+    config: Option<ClientConfiguration>,
     client: Option<Arc<QcsClient>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -93,6 +99,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
+            config: None,
             client: None,
             qpu: None,
             qvm: None,
@@ -113,6 +120,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
+    /// use qcs_api_client_common::ClientConfiguration;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
@@ -126,6 +134,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result = Executable::from_quil(PROGRAM)
+    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
     ///         .read_from("second")
     ///         .execute_on_qvm()
@@ -169,6 +178,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
+    /// use qcs_api_client_common::ClientConfiguration;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
@@ -176,6 +186,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut exe = Executable::from_quil(PROGRAM)
+    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
     ///     
     ///     for theta in 0..2 {
@@ -211,6 +222,11 @@ impl<'executable> Executable<'executable, '_> {
         values[index] = value;
         self.params.insert(param_name, values);
 
+        self
+    }
+
+    pub fn with_config(mut self, config: ClientConfiguration) -> Self {
+        self.config = Some(config);
         self
     }
 }
@@ -256,7 +272,7 @@ impl Executable<'_, '_> {
     ///
     /// See [`Error`].
     pub async fn execute_on_qvm(&mut self) -> ExecuteResultQVM {
-        let config = self.get_client().await?.get_config();
+        let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -275,12 +291,23 @@ impl Executable<'_, '_> {
             })
     }
 
-    /// Load `self.client` if not yet loaded, then return a reference to it.
-    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
-        if let Some(config) = &self.client {
+    async fn get_config(&mut self) -> Result<ClientConfiguration, Error> {
+        if let Some(config) = &self.config {
             Ok(config.clone())
         } else {
-            let client = Arc::new(QcsClient::load().await?);
+            let config = ClientConfiguration::load().await?;
+            self.config = Some(config.clone());
+            Ok(config)
+        }
+    }
+
+    /// Load `self.client` if not yet loaded, then return a reference to it.
+    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
+        if let Some(client) = &self.client {
+            Ok(client.clone())
+        } else {
+            let config = self.get_config().await?;
+            let client = Arc::new(QcsClient::with_config(config));
             self.client = Some(client.clone());
             Ok(client)
         }
@@ -423,8 +450,23 @@ pub enum Error {
     /// There was some problem with the provided Quil program. This could be a syntax error with
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
+    #[error("There was a problem with the Quil program: {0}")]
+    Quil(#[from] ProgramError<Program>),
+    /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),
+    /// There was a problem when translating the Quil program.
+    #[error("There was a problem translating the Quil program: {0}")]
+    Translation(String),
+    /// There was a problem when rewriting parameter arithmetic in the Quil program.
+    #[error("There was a problem rewriting parameter arithmetic in the Quil program: {0}")]
+    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    /// There was a problem when substituting parameters in the Quil program.
+    #[error("There was a problem substituting parameters in the Quil program: {0}")]
+    Substitution(String),
+    /// The Quil program is missing readout sources.
+    #[error("The Quil program is missing readout sources")]
+    MissingRoSources,
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
     /// indicates a bug in the SDK and should be reported to
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
@@ -437,7 +479,7 @@ pub enum Error {
     InvalidJobHandle,
     /// Occurs when failing to construct a [`QcsClient`].
     #[error("The QCS client configuration failed to load")]
-    QcsClientFailure(#[from] LoadError),
+    QcsConfigLoadFailure(#[from] LoadError),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -470,12 +512,15 @@ pub enum Service {
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
-            ExecutionError::Quil(message) => Self::Compilation(message),
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::QcsClient(v) => Self::Unexpected(format!("{:?}", v)),
             ExecutionError::IsaError(v) => Self::Unexpected(format!("{:?}", v)),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::Quil(e) => Self::Quil(e),
+            ExecutionError::Compilation { details } => Self::Compilation(details),
+            ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
+            ExecutionError::Substitution(message) => Self::Substitution(message),
         }
     }
 }
@@ -532,11 +577,13 @@ impl<'a> JobHandle<'a> {
 
 #[cfg(test)]
 mod describe_get_config {
+    use qcs_api_client_openapi::common::ClientConfiguration;
+
     use crate::Executable;
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("");
+        let mut exe = Executable::from_quil("").with_config(ClientConfiguration::default());
         let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
