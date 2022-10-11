@@ -1,8 +1,8 @@
 //! This module contains all the functionality for running Quil programs on a real QPU. Specifically,
 //! the [`Execution`] struct in this module.
 
-use self::client::ClientOpenApiError;
-pub(crate) use client::QcsClient;
+use self::client::OpenApiClientError;
+pub(crate) use client::Qcs;
 pub(crate) use execution::{Error as ExecutionError, Execution};
 use qcs_api_client_openapi::{
     apis::quantum_processors_api::{
@@ -28,11 +28,12 @@ pub(crate) mod translation;
 /// 3. Expired token
 pub(crate) async fn get_isa(
     quantum_processor_id: &str,
-    client: &QcsClient,
+    client: &Qcs,
 ) -> Result<InstructionSetArchitecture, IsaError> {
     get_instruction_set_architecture(&client.get_openapi_client(), quantum_processor_id)
         .await
-        .map_err(ClientOpenApiError::RequestFailed)
+        .map_err(OpenApiClientError::RequestFailed)
 }
 
-pub type IsaError = ClientOpenApiError<GetInstructionSetArchitectureError>;
+/// Error raised due to failure to get an ISA
+pub type IsaError = OpenApiClientError<GetInstructionSetArchitectureError>;

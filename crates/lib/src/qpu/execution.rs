@@ -11,11 +11,11 @@ use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
-use crate::execution_data::{ExecutionDataQPU, MemoryReferenceParseError, ReadoutMap};
+use crate::execution_data::{MemoryReferenceParseError, Qpu, ReadoutMap};
 use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::JobHandle;
 
-use super::client::{ClientGrpcError, QcsClient};
+use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
@@ -30,7 +30,7 @@ pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
     pub(crate) quantum_processor_id: &'a str,
     pub(crate) shots: u16,
-    client: Arc<QcsClient>,
+    client: Arc<Qcs>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -42,7 +42,7 @@ pub(crate) enum Error {
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
     #[error("Problem using QCS API: {0}")]
-    QcsClient(#[from] ClientGrpcError),
+    QcsClient(#[from] GrpcClientError),
     #[error("Problem fetching ISA: {0}")]
     IsaError(#[from] IsaError),
     #[error("Problem parsing memory readout: {0}")]
@@ -111,7 +111,7 @@ impl<'a> Execution<'a> {
         quil: Arc<str>,
         shots: u16,
         quantum_processor_id: &'a str,
-        client: Arc<QcsClient>,
+        client: Arc<Qcs>,
         compile_with_quilc: bool,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, &client).await?;
@@ -174,15 +174,15 @@ impl<'a> Execution<'a> {
         &self,
         job_id: JobId,
         readout_mappings: HashMap<String, String>,
-    ) -> Result<ExecutionDataQPU, Error> {
+    ) -> Result<Qpu, Error> {
         let response =
             retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
 
-        Ok(ExecutionDataQPU {
+        Ok(Qpu {
             readout_data: ReadoutMap::from_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
-            )?,
+            ),
             duration: response
                 .execution_duration_microseconds
                 .map(Duration::from_micros),

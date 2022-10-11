@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use isa::Compiler;
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
-use super::{rpcq, QcsClient};
+use super::{rpcq, Qcs};
 
 mod isa;
 
@@ -33,7 +33,7 @@ mod isa;
 pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
-    client: &QcsClient,
+    client: &Qcs,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
@@ -155,7 +155,7 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &QcsClient::load().await.unwrap_or_default(),
+            &Qcs::load().await.unwrap_or_default(),
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -172,7 +172,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let client = QcsClient::load().await.unwrap_or_default();
+        let client = Qcs::load().await.unwrap_or_default();
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),

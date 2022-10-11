@@ -19,7 +19,7 @@ use qcs_api_client_grpc::{
 
 use crate::executable::Parameters;
 
-use super::client::{ClientGrpcError, QcsClient};
+use super::client::{GrpcClientError, Qcs};
 
 pub(crate) fn params_into_job_execution_configuration(
     params: &Parameters,
@@ -50,8 +50,8 @@ pub(crate) async fn submit(
     quantum_processor_id: &str,
     program: EncryptedControllerJob,
     patch_values: &Parameters,
-    client: &QcsClient,
-) -> Result<JobId, ClientGrpcError> {
+    client: &Qcs,
+) -> Result<JobId, GrpcClientError> {
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
@@ -72,14 +72,14 @@ pub(crate) async fn submit(
 
     job_execution_id
         .map(JobId)
-        .ok_or_else(|| ClientGrpcError::ResponseEmpty("Job Execution ID".into()))
+        .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution ID".into()))
 }
 
 pub(crate) async fn retrieve_results(
     job_id: JobId,
     quantum_processor_id: &str,
-    client: &QcsClient,
-) -> Result<ControllerJobExecutionResult, ClientGrpcError> {
+    client: &Qcs,
+) -> Result<ControllerJobExecutionResult, GrpcClientError> {
     let request = GetControllerJobResultsRequest {
         job_execution_id: Some(job_id.0),
         target: Some(
@@ -96,7 +96,7 @@ pub(crate) async fn retrieve_results(
         .await?
         .into_inner()
         .result
-        .ok_or_else(|| ClientGrpcError::ResponseEmpty("Job Execution Results".into()))
+        .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
 }
 
 /// Errors that can occur when decoding the results from the QPU

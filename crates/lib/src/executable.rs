@@ -8,8 +8,8 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
 
-use crate::execution_data::{ExecutionDataQPU, ExecutionDataQVM};
-use crate::qpu::client::QcsClient;
+use crate::execution_data;
+use crate::qpu::client::Qcs;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
@@ -69,7 +69,7 @@ pub struct Executable<'executable, 'execution> {
     params: Parameters,
     compile_with_quilc: bool,
     config: Option<ClientConfiguration>,
-    client: Option<Arc<QcsClient>>,
+    client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
 }
@@ -225,14 +225,16 @@ impl<'executable> Executable<'executable, '_> {
         self
     }
 
+    /// Set the default configuration to be used when constructing clients
+    #[must_use]
     pub fn with_config(mut self, config: ClientConfiguration) -> Self {
         self.config = Some(config);
         self
     }
 }
 
-type ExecuteResultQVM = Result<ExecutionDataQVM, Error>;
-type ExecuteResultQPU = Result<ExecutionDataQPU, Error>;
+type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
+type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -285,7 +287,7 @@ impl Executable<'_, '_> {
         self.qvm = Some(qvm);
         result
             .map_err(Error::from)
-            .map(|registers| ExecutionDataQVM {
+            .map(|registers| execution_data::Qvm {
                 registers,
                 duration: None,
             })
@@ -302,12 +304,12 @@ impl Executable<'_, '_> {
     }
 
     /// Load `self.client` if not yet loaded, then return a reference to it.
-    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
+    async fn get_client(&mut self) -> Result<Arc<Qcs>, Error> {
         if let Some(client) = &self.client {
             Ok(client.clone())
         } else {
             let config = self.get_config().await?;
-            let client = Arc::new(QcsClient::with_config(config));
+            let client = Arc::new(Qcs::with_config(config));
             self.client = Some(client.clone());
             Ok(client)
         }
