@@ -81,11 +81,13 @@ fn submit(
     program: String,
     patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: String,
+    use_gateway: bool,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
+            .with_use_gateway(use_gateway);
         let job_id = api::submit(&program, patch_values, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -98,11 +100,13 @@ fn retrieve_results(
     py: Python<'_>,
     job_id: String,
     quantum_processor_id: String,
+    use_gateway: bool,
 ) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::local_future_into_py(py, async move {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
+            .with_use_gateway(use_gateway);
         let results = api::retrieve_results(&job_id, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
