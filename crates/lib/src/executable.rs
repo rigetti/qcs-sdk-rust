@@ -6,6 +6,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
+use qcs_api_client_common::ClientConfiguration;
 
 use crate::execution_data::{ExecutionDataQPU, ExecutionDataQVM};
 use crate::qpu::client::QcsClient;
@@ -21,7 +22,7 @@ use quil_rs::Program;
 /// # Example
 ///
 /// ```rust
-/// use qcs::qpu::client::QcsClient;
+/// use qcs_api_client_common::ClientConfiguration;
 /// use qcs::{Executable, RegisterData};
 ///
 ///
@@ -37,7 +38,7 @@ use quil_rs::Program;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let mut result = Executable::from_quil(PROGRAM).with_client(QcsClient::default()).with_shots(4).execute_on_qvm().await.unwrap();
+///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
@@ -67,6 +68,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters,
     compile_with_quilc: bool,
+    config: Option<ClientConfiguration>,
     client: Option<Arc<QcsClient>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -97,6 +99,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
+            config: None,
             client: None,
             qpu: None,
             qvm: None,
@@ -117,7 +120,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs::qpu::client::QcsClient;
+    /// use qcs_api_client_common::ClientConfiguration;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
@@ -131,7 +134,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result = Executable::from_quil(PROGRAM)
-    ///         .with_client(QcsClient::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
     ///         .read_from("second")
     ///         .execute_on_qvm()
@@ -175,7 +178,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs::qpu::client::QcsClient;
+    /// use qcs_api_client_common::ClientConfiguration;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
@@ -183,7 +186,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut exe = Executable::from_quil(PROGRAM)
-    ///         .with_client(QcsClient::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
     ///     
     ///     for theta in 0..2 {
@@ -222,14 +225,8 @@ impl<'executable> Executable<'executable, '_> {
         self
     }
 
-    /// Override the client initialization with the provided client.
-    ///
-    /// # Arguments
-    ///
-    /// 1. `client`: A [`QcsClient`] to be used for all client calls.
-    pub fn with_client(mut self, client: QcsClient) -> Self {
-        let client = Arc::new(client);
-        self.client = Some(client);
+    pub fn with_config(mut self, config: ClientConfiguration) -> Self {
+        self.config = Some(config);
         self
     }
 }
@@ -275,7 +272,7 @@ impl Executable<'_, '_> {
     ///
     /// See [`Error`].
     pub async fn execute_on_qvm(&mut self) -> ExecuteResultQVM {
-        let config = self.get_client().await?.get_config();
+        let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -294,12 +291,23 @@ impl Executable<'_, '_> {
             })
     }
 
-    /// Load `self.client` if not yet loaded, then return a reference to it.
-    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
-        if let Some(config) = &self.client {
+    async fn get_config(&mut self) -> Result<ClientConfiguration, Error> {
+        if let Some(config) = &self.config {
             Ok(config.clone())
         } else {
-            let client = Arc::new(QcsClient::load().await?);
+            let config = ClientConfiguration::load().await?;
+            self.config = Some(config.clone());
+            Ok(config)
+        }
+    }
+
+    /// Load `self.client` if not yet loaded, then return a reference to it.
+    async fn get_client(&mut self) -> Result<Arc<QcsClient>, Error> {
+        if let Some(client) = &self.client {
+            Ok(client.clone())
+        } else {
+            let config = self.get_config().await?;
+            let client = Arc::new(QcsClient::with_config(config));
             self.client = Some(client.clone());
             Ok(client)
         }
@@ -569,11 +577,13 @@ impl<'a> JobHandle<'a> {
 
 #[cfg(test)]
 mod describe_get_config {
-    use crate::{qpu::QcsClient, Executable};
+    use qcs_api_client_openapi::common::ClientConfiguration;
+
+    use crate::Executable;
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("").with_client(QcsClient::default());
+        let mut exe = Executable::from_quil("").with_config(ClientConfiguration::default());
         let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
