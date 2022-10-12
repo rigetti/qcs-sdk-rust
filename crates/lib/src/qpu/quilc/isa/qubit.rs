@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use qcs_api_client_openapi::models::{Characteristic, Node, Operation};
 
 use super::operator::{
-    wildcard, Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
+    self, wildcard, Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
 };
 
 /// Represents a single Qubit on a QPU and its capabilities. Needed by quilc for optimization.
@@ -316,14 +316,14 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
             operator: "MEASURE".to_string(),
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
-            qubit: node_id,
+            qubit: operator::Qubit::Int(node_id),
             target: Some("_".to_string()),
         },
         Operator::Measure {
             operator: "MEASURE".to_string(),
             duration: MEASURE_DEFAULT_DURATION,
             fidelity,
-            qubit: node_id,
+            qubit: operator::Qubit::Int(node_id),
             target: None,
         },
     ]
@@ -333,7 +333,7 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 mod describe_measure {
     use qcs_api_client_openapi::models::Characteristic;
 
-    use crate::qpu::quilc::isa::operator::Operator;
+    use crate::qpu::quilc::isa::operator::{self, Operator};
 
     use super::measure;
 
@@ -354,14 +354,14 @@ mod describe_measure {
                 operator: "MEASURE".to_string(),
                 duration: 2000.0,
                 fidelity: 0.981_000_006_198_883_1,
-                qubit: 0,
+                qubit: operator::Qubit::Int(0),
                 target: Some("_".to_string()),
             },
             Operator::Measure {
                 operator: "MEASURE".to_string(),
                 duration: 2000.0,
                 fidelity: 0.981_000_006_198_883_1,
-                qubit: 0,
+                qubit: operator::Qubit::Int(0),
                 target: None,
             },
         ];
