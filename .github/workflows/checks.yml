@@ -11,6 +11,10 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+      - name: Install protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.20.1'
 
       - uses: Swatinem/rust-cache@v1
       - name: Install cargo-make

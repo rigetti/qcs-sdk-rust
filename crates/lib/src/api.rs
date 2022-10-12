@@ -1,36 +1,37 @@
-//! This module provides a small interface for doing compilation, translation,
-//! and execution.
+//! This module provides convenience functions to handle compilation,
+//! translation, parameter arithmetic rewriting, and results collection.
 
-use log::warn;
+use std::{collections::HashMap, str::FromStr};
+
+use qcs_api_client_grpc::{
+    models::controller::{readout_values, ControllerJobExecutionResult},
+    services::controller::{
+        get_controller_job_results_request::Target, GetControllerJobResultsRequest,
+    },
+};
+use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
 
-use crate::{
-    configuration::Configuration,
-    qpu::{
-        self, engagement,
-        quilc::{self, TargetDevice},
-        rewrite_arithmetic::{self, Substitutions},
-        rpcq::Client,
-        runner::{self, JobId},
-        translation,
-    },
+use crate::qpu::{
+    self,
+    client::{GrpcClientError, Qcs},
+    quilc::{self, TargetDevice},
+    rewrite_arithmetic::{self, Substitutions},
+    runner,
+    translation::{self, EncryptedTranslationResult},
+    IsaError,
 };
-use std::{collections::HashMap, convert::TryFrom};
 
 /// Uses quilc to convert a Quil program to native Quil
-///
-/// # Errors
-///
-/// See [`quilc::compile_program`].
 pub fn compile(
     quil: &str,
-    target_device: TargetDevice,
-    config: &Configuration,
+    target: TargetDevice,
+    client: &Qcs,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    quilc::compile_program(quil, target_device, config)
-        .map_err(std::convert::Into::into)
-        .map(String::from)
+    quilc::compile_program(quil, target, client)
+        .map_err(Into::into)
+        .map(|p| p.to_string(true))
 }
 
 /// Collection of errors that can result from rewriting arithmetic.
@@ -66,11 +67,9 @@ pub struct RewriteArithmeticResult {
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
 pub fn rewrite_arithmetic(
-    native_quil: &str,
-) -> Result<RewriteArithmeticResult, RewriteArithmeticError> {
-    let program: Program = native_quil.parse()?;
-
-    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(program)?;
+    native_quil: quil_rs::Program,
+) -> Result<RewriteArithmeticResult, rewrite_arithmetic::Error> {
+    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil)?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
 
     Ok(RewriteArithmeticResult {
@@ -79,22 +78,26 @@ pub fn rewrite_arithmetic(
     })
 }
 
+/// Errors that can happen during translation
+#[derive(Debug, thiserror::Error)]
+pub enum TranslationError {
+    /// The program could not be translated
+    #[error("Could not translate quil: {0}")]
+    Translate(#[from] GrpcClientError),
+    /// The result of translation could not be deserialized
+    #[error("Could not serialize translation result: {0}")]
+    Serialize(#[from] serde_json::Error),
+}
+
 /// The result of a call to [`translate`] which provides information about the
 /// translated program.
-#[derive(Clone, Debug, PartialEq, Default, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize)]
 pub struct TranslationResult {
-    /// The memory defined in the program.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub memory_descriptors:
-        Option<::std::collections::HashMap<String, qcs_api::models::ParameterSpec>>,
     /// The translated program.
     pub program: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The memory locations used for readout.
-    pub ro_sources: Option<Vec<Vec<String>>>,
-    /// ISO8601 timestamp of the settings used to translate the program. Translation is deterministic; a program translated twice with the same settings by the same version of the service will have identical output.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub settings_timestamp: Option<String>,
+    pub ro_sources: Option<HashMap<String, String>>,
 }
 
 /// Translates a native Quil program into an executable
@@ -106,21 +109,16 @@ pub async fn translate(
     native_quil: &str,
     shots: u16,
     quantum_processor_id: &str,
-    config: &Configuration,
-) -> Result<TranslationResult, translation::Error> {
-    let translation = translation::translate(
-        qpu::RewrittenQuil(native_quil.to_string()),
-        shots,
-        quantum_processor_id,
-        config,
-    )
-    .await?;
+    client: &Qcs,
+) -> Result<TranslationResult, TranslationError> {
+    let EncryptedTranslationResult { job, readout_map } =
+        translation::translate(quantum_processor_id, native_quil, shots.into(), client).await?;
+
+    let program = serde_json::to_string(&job)?;
 
     Ok(TranslationResult {
-        memory_descriptors: translation.memory_descriptors,
-        program: translation.program,
-        ro_sources: translation.ro_sources,
-        settings_timestamp: translation.settings_timestamp,
+        ro_sources: Some(readout_map),
+        program,
     })
 }
 
@@ -137,8 +135,8 @@ pub async fn submit(
     program: &str,
     patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: &str,
-    config: &Configuration,
-) -> Result<String, runner::Error> {
+    client: &Qcs,
+) -> Result<String, SubmitError> {
     // Is there a better way to map these patch_values keys? This
     // negates the whole purpose of [`submit`] using `Box<str>`,
     // instead of `String` directly, which normally would decrease
@@ -147,17 +145,31 @@ pub async fn submit(
         .into_iter()
         .map(|(k, v)| (k.into_boxed_str(), v))
         .collect();
-    let engagement = engagement::get(String::from(quantum_processor_id), config)
-        .await
-        .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
-    let rpcq_client = Client::try_from(&engagement).map_err(|e| {
-        warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-        runner::Error::Connection(e)
-    })?;
 
-    let job_id = runner::submit(program, &patch_values, &rpcq_client)?;
+    let job = serde_json::from_str(program)?;
+    let job_id = runner::submit(quantum_processor_id, job, &patch_values, client).await?;
 
     Ok(job_id.0)
+}
+
+/// Errors that may occur when submitting a program for execution
+#[derive(Debug, thiserror::Error)]
+pub enum SubmitError {
+    /// Failed to fetch the desired ISA
+    #[error("Failed to fetch ISA: {0}")]
+    IsaError(#[from] IsaError),
+
+    /// Failed a gRPC API call
+    #[error("Failed a gRPC call: {0}")]
+    GrpcError(#[from] GrpcClientError),
+
+    /// Quilc compilation failed
+    #[error("Failed quilc compilation: {0}")]
+    QuilcError(#[from] quilc::Error),
+
+    /// Job could not be deserialized
+    #[error("Failed to deserialize job: {0}")]
+    DeserializeError(#[from] serde_json::Error),
 }
 
 /// Evaluate the expressions in `recalculation_table` using the numeric values
@@ -171,13 +183,14 @@ pub fn build_patch_values(
 ) -> Result<HashMap<Box<str>, Vec<f64>>, String> {
     let substitutions: Substitutions = recalculation_table
         .iter()
-        .map(|expr| expr.parse())
+        .map(|expr| Expression::from_str(expr))
         .collect::<Result<_, _>>()
-        .map_err(|e| format!("Unable to interpret recalc table: {:?}", e))?;
+        .map_err(|e| format!("Unable to interpret recalculation table: {:?}", e))?;
     rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
-/// A 64-bit complex number.
+/// A convenience type that describes a Complex-64 value whose real
+/// and imaginary parts of both f32.
 pub type Complex64 = [f32; 2];
 
 /// Data from an individual register. Each variant contains a vector with the expected data type
@@ -189,6 +202,8 @@ pub enum Register {
     F64(Vec<f64>),
     /// A register of 16-bit integers
     I16(Vec<i16>),
+    /// A register of 32-bit integers
+    I32(Vec<i32>),
     /// A register of 64-bit complex numbers
     Complex64(Vec<Complex64>),
     /// A register of 8-bit integers (bytes)
@@ -216,6 +231,28 @@ pub struct ExecutionResult {
     dtype: String,
 }
 
+impl From<readout_values::Values> for ExecutionResult {
+    fn from(values: readout_values::Values) -> Self {
+        match values {
+            readout_values::Values::ComplexValues(c) => Self {
+                shape: vec![c.values.len(), 1],
+                dtype: "complex".into(),
+                data: Register::Complex64(
+                    c.values
+                        .iter()
+                        .map(|c| [c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0)])
+                        .collect(),
+                ),
+            },
+            readout_values::Values::IntegerValues(i) => Self {
+                shape: vec![i.values.len(), 1],
+                dtype: "integer".into(),
+                data: Register::I32(i.values),
+            },
+        }
+    }
+}
+
 /// Execution readout data for all memory locations.
 #[derive(Serialize)]
 pub struct ExecutionResults {
@@ -223,45 +260,49 @@ pub struct ExecutionResults {
     execution_duration_microseconds: Option<u64>,
 }
 
-/// Fetches results for the corresponding job
+impl From<ControllerJobExecutionResult> for ExecutionResults {
+    fn from(result: ControllerJobExecutionResult) -> Self {
+        let buffers = result
+            .readout_values
+            .into_iter()
+            .filter_map(|(key, value)| {
+                value
+                    .values
+                    .map(ExecutionResult::from)
+                    .map(|result| (key, result))
+            })
+            .collect();
+
+        Self {
+            buffers,
+            execution_duration_microseconds: result.execution_duration_microseconds,
+        }
+    }
+}
+
+/// Fetches results for the job
 ///
 /// # Errors
 ///
-/// May error if an engagement is not available, an RPCQ client cannot be built,
-/// or retrieval of results fails.
-///
-/// # Panics
-///
-/// Panics if a [`Register`] cannot be constructed from a result buffer.
+/// May error if a [`gRPC`] client cannot be constructed, or a [`gRPC`]
+/// call fails.
 pub async fn retrieve_results(
     job_id: &str,
     quantum_processor_id: &str,
-    config: &Configuration,
-) -> Result<ExecutionResults, runner::Error> {
-    let engagement = engagement::get(String::from(quantum_processor_id), config)
-        .await
-        .map_err(|e| runner::Error::Qpu(format!("Unable to get engagement: {:?}", e)))?;
-    let rpcq_client = Client::try_from(&engagement).map_err(|e| {
-        warn!("Unable to connect to QPU via RPCQ: {:?}", e);
-        runner::Error::Qpu(format!("Unable to connect to QPU via RPCQ: {:?}", e))
-    })?;
+    client: &Qcs,
+) -> Result<ExecutionResults, GrpcClientError> {
+    let request = GetControllerJobResultsRequest {
+        job_execution_id: Some(job_id.into()),
+        target: Some(Target::QuantumProcessorId(quantum_processor_id.into())),
+    };
 
-    let results = runner::retrieve_results(JobId(job_id.to_string()), &rpcq_client)?;
-    let execution_duration_microseconds = results.execution_duration_microseconds;
-    let buffers = results
-        .buffers
-        .into_iter()
-        .map(|(name, buffer)| {
-            let shape = buffer.shape.clone();
-            let dtype = buffer.dtype.to_string();
-            // TODO Get rid of this unwrap.
-            let data = Register::from(qpu::runner::Register::try_from(buffer).unwrap());
-            (name, ExecutionResult { shape, data, dtype })
-        })
-        .collect::<HashMap<_, _>>();
-
-    Ok(ExecutionResults {
-        buffers,
-        execution_duration_microseconds,
-    })
+    client
+        .get_controller_client(quantum_processor_id)
+        .await?
+        .get_controller_job_results(request)
+        .await?
+        .into_inner()
+        .result
+        .map(ExecutionResults::from)
+        .ok_or_else(|| GrpcClientError::ResponseEmpty("Controller Job Execution Results".into()))
 }

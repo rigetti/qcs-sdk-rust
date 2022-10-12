@@ -4,7 +4,7 @@ use std::convert::TryFrom;
 use serde::{Deserialize, Serialize};
 
 use edge::{convert_edges, Edge, Id};
-use qcs_api::models::InstructionSetArchitecture;
+use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use qubit::Qubit;
 
 use crate::qpu::quilc::isa::qubit::FrbSim1q;
@@ -95,7 +95,7 @@ mod describe_compiler_isa {
     use std::{convert::TryFrom, fs::read_to_string};
 
     use float_cmp::{approx_eq, F64Margin};
-    use qcs_api::models::InstructionSetArchitecture;
+    use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use serde_json::Value;
 
     use super::Compiler;

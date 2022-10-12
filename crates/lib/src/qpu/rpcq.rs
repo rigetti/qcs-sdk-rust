@@ -2,7 +2,7 @@ use log::{trace, warn};
 use std::collections::HashMap;
 use std::convert::TryFrom;
 
-use qcs_api::models::EngagementWithCredentials;
+use qcs_api_client_openapi::models::EngagementWithCredentials;
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};

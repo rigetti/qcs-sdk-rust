@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 use std::str::FromStr;
 
+use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     program::ProgramError,
     Program,
 };
 
-use crate::configuration::Configuration;
 use crate::executable::Parameters;
 use crate::RegisterData;
 
@@ -60,7 +60,7 @@ impl Execution {
         shots: u16,
         readouts: &[&str],
         params: &Parameters,
-        config: &Configuration,
+        config: &ClientConfiguration,
     ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
@@ -109,24 +109,24 @@ impl Execution {
         &self,
         shots: u16,
         readouts: &[&str],
-        config: &Configuration,
+        config: &ClientConfiguration,
     ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
         let response = client
-            .post(&config.qvm_url)
+            .post(config.qvm_url())
             .json(&request)
             .send()
             .await
             .map_err(|source| Error::QvmCommunication {
-                qvm_url: config.qvm_url.clone(),
+                qvm_url: config.qvm_url().into(),
                 source,
             })?;
 
         match response.json::<Response>().await {
             Err(source) => Err(Error::QvmCommunication {
-                qvm_url: config.qvm_url.clone(),
+                qvm_url: config.qvm_url().into(),
                 source,
             }),
             Ok(Response::Success(response)) => Ok(response
@@ -167,7 +167,7 @@ pub(crate) enum Error {
 
 #[cfg(test)]
 mod describe_execution {
-    use super::{Configuration, Execution, Parameters};
+    use super::{ClientConfiguration, Execution, Parameters};
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
@@ -176,7 +176,9 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("doesnt_exist".into(), vec![0.0]);
 
-        let result = exe.run(1, &[], &params, &Configuration::default()).await;
+        let result = exe
+            .run(1, &[], &params, &ClientConfiguration::default())
+            .await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
         } else {
@@ -191,7 +193,9 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("ro".into(), vec![0.0]);
 
-        let result = exe.run(1, &[], &params, &Configuration::default()).await;
+        let result = exe
+            .run(1, &[], &params, &ClientConfiguration::default())
+            .await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));
