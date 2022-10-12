@@ -24,7 +24,7 @@ async fn main() {
         .await
         .expect("Program should execute successfully")
         .readout_data
-        .get_readout_values("ro", 0)
+        .get_readout_values("ro".to_string(), 0)
         .expect("Readout data should include 'ro'")
         .values
         .expect("Readout data should include values");

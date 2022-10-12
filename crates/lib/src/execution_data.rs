@@ -29,11 +29,8 @@ pub struct ReadoutMap(HashMap<MemoryReference, ReadoutValues>);
 
 impl ReadoutMap {
     /// Given a known readout field name and index, return the result's [`ReadoutValues`], if any.
-    pub fn get_readout_values(&self, field: &str, index: u64) -> Option<ReadoutValues> {
-        let readout_values = self.0.get(&MemoryReference {
-            name: String::from(field),
-            index,
-        })?;
+    pub fn get_readout_values(&self, field: String, index: u64) -> Option<ReadoutValues> {
+        let readout_values = self.0.get(&MemoryReference { name: field, index })?;
 
         Some(readout_values.clone())
     }
