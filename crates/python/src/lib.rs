@@ -4,18 +4,23 @@ use qcs::qpu::client::Qcs;
 use qcs::qpu::quilc::TargetDevice;
 use std::collections::HashMap;
 
-use pyo3::{create_exception, exceptions::PyRuntimeError, prelude::*};
+use pyo3::{
+    create_exception,
+    exceptions::{PyRuntimeError, PyValueError},
+    prelude::*,
+};
 
 create_exception!(qcs, InvalidConfigError, PyRuntimeError);
 create_exception!(qcs, ExecutionError, PyRuntimeError);
 create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
+create_exception!(qcs, DeviceIsaError, PyValueError);
 
 #[pyfunction]
 fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyAny> {
-    let target_device: TargetDevice = serde_json::from_str(&target_device)
-        .map_err(|e| CompilationError::new_err(e.to_string()))?;
+    let target_device: TargetDevice =
+        serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await

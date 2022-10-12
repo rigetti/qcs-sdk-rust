@@ -31,9 +31,16 @@ pub(crate) enum Operator {
         duration: f64,
         #[serde(deserialize_with = "deserialize_fidelity_null_default")]
         fidelity: f64,
-        qubit: i32,
+        qubit: Qubit,
         target: Option<String>,
     },
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub(crate) enum Qubit {
+    Int(i32),
+    String(String),
 }
 
 /// Swap a ``null`` duration value with [`PERFECT_DURATION`]
@@ -57,7 +64,7 @@ mod describe_operator {
     use serde_json::json;
 
     use crate::qpu::quilc::isa::operator::{
-        Argument, Operator, Parameter, PERFECT_DURATION, PERFECT_FIDELITY,
+        Argument, Operator, Parameter, Qubit, PERFECT_DURATION, PERFECT_FIDELITY,
     };
 
     /// This test copies some JSON data from the pyQuil ISA integration test to
@@ -65,14 +72,14 @@ mod describe_operator {
     #[test]
     fn it_serializes_gates_like_pyquil() {
         let gate_op = Operator::Gate {
-            arguments: vec![Argument::Int(1)],
+            arguments: vec![Argument::String("_".to_string())],
             duration: 0.5,
             fidelity: 0.5,
             operator: "RZ".to_string(),
             parameters: vec![Parameter::String("_".to_owned())],
         };
         let expected = serde_json::json!({
-            "arguments": [1],
+            "arguments": ["_"],
             "duration": 0.5,
             "fidelity": 0.5,
             "operator": "RZ",
@@ -84,6 +91,32 @@ mod describe_operator {
         assert_eq!(serialized, expected);
     }
 
+    #[test]
+    fn it_deserializes_gates_like_quilc() {
+        let expected = Operator::Gate {
+            arguments: vec![
+                Argument::String("_".to_string()),
+                Argument::String("_".to_string()),
+            ],
+            duration: 0.5,
+            fidelity: 0.5,
+            operator: "RZ".to_string(),
+            parameters: vec![Parameter::String("_".to_owned())],
+        };
+        let input = json!({
+            "arguments": ["_", "_"],
+            "duration": 0.5,
+            "fidelity": 0.5,
+            "operator": "RZ",
+            "operator_type": "gate",
+            "parameters": ["_"]
+        });
+        let input = serde_json::to_string(&input).expect("It should serialize to string");
+        let actual =
+            serde_json::from_str::<Operator>(&input).expect("It should deserialize successfully");
+        assert_eq!(actual, expected);
+    }
+
     /// This test copies some JSON data from the pyQuil ISA integration test to validate that
     /// [`Operator::Measure`] is serialized correctly.
     #[test]
@@ -91,7 +124,7 @@ mod describe_operator {
         let measure = Operator::Measure {
             duration: 0.5,
             fidelity: 0.5,
-            qubit: 1,
+            qubit: Qubit::Int(1),
             operator: "MEASURE".to_string(),
             target: Some("_".to_string()),
         };
@@ -115,7 +148,7 @@ mod describe_operator {
         let measure = Operator::Measure {
             duration: 0.5,
             fidelity: 0.5,
-            qubit: 1,
+            qubit: Qubit::Int(1),
             operator: "MEASURE".to_string(),
             target: None,
         };
@@ -197,6 +230,8 @@ pub(crate) enum Argument {
 
 #[cfg(test)]
 mod describe_arguments {
+    use serde_json::json;
+
     use crate::qpu::quilc::isa::operator::Argument;
 
     #[test]
@@ -213,6 +248,14 @@ mod describe_arguments {
         let serialized = serde_json::to_value(p).expect("Could not serialize");
         let expected = serde_json::json!([1]);
         assert_eq!(expected, serialized);
+    }
+
+    #[test]
+    fn it_deserializes_underscore_arguments() {
+        let expected = Argument::String("_".to_string());
+        let actual =
+            serde_json::from_value::<Argument>(json!("_")).expect("Should deserialize from Value");
+        assert_eq!(actual, expected);
     }
 }
 
