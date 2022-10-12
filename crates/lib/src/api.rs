@@ -146,7 +146,7 @@ pub async fn submit(
         .map(|(k, v)| (k.into_boxed_str(), v))
         .collect();
 
-    let job = serde_json::from_str(program).map_err(SubmitError::DeserializeError)?;
+    let job = serde_json::from_str(program)?;
     let job_id = runner::submit(quantum_processor_id, job, &patch_values, client).await?;
 
     Ok(job_id.0)
