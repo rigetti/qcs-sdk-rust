@@ -52,10 +52,7 @@ impl ReadoutMap {
             }
         }
 
-        Ok(match readout_values.len() {
-            0 => None,
-            _ => Some(readout_values),
-        })
+        Ok((!readout_values.is_empty()).then_some(readout_values))
     }
 
     /// `readout_values` maps program-defined readout to result-defined readout, e.g.:
