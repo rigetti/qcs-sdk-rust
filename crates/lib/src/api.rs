@@ -280,7 +280,12 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
     }
 }
 
-/// Fetches results for the corresponding job
+/// Fetches results for the job
+///
+/// # Errors
+///
+/// May error if a [`gRPC`] client cannot be constructed, or a [`gRPC`]
+/// call fails.
 pub async fn retrieve_results(
     job_id: &str,
     quantum_processor_id: &str,

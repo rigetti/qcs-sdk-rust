@@ -13,9 +13,8 @@ use crate::RegisterData;
 /// [`Executable::execute_on_qvm`](crate::Executable::execute_on_qvm).
 #[derive(Debug, Clone, PartialEq)]
 pub struct Qvm {
-    /// The data of all readout data that were read from
-    /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
-    /// register, value is the data of the register after execution.
+    /// The readout data that was read from the [`Executable`](crate::Executable).
+    /// Key is the name of the register, value is the data of the register after execution.
     pub registers: HashMap<Box<str>, RegisterData>,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
