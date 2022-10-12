@@ -235,7 +235,7 @@ impl From<readout_values::Values> for ExecutionResult {
     fn from(values: readout_values::Values) -> Self {
         match values {
             readout_values::Values::ComplexValues(c) => Self {
-                shape: vec![1, c.values.len()],
+                shape: vec![c.values.len(), 1],
                 dtype: "complex".into(),
                 data: Register::Complex64(
                     c.values
@@ -245,7 +245,7 @@ impl From<readout_values::Values> for ExecutionResult {
                 ),
             },
             readout_values::Values::IntegerValues(i) => Self {
-                shape: vec![1, i.values.len()],
+                shape: vec![i.values.len(), 1],
                 dtype: "integer".into(),
                 data: Register::I32(i.values),
             },
