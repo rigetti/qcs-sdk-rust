@@ -1,3 +1,23 @@
+## 0.3.0-rc.4
+
+### Breaking Changes
+
+- RPCQ support has been dropped for translation and execution. Compilation (via quilc) still uses RPCQ.
+
+### Features
+
+- support gRPC translation and execution (#171)
+- upgrade quil-rs dependency and fix issues (#172)
+- add type hints
+- python bindings (#145)
+
+### Fixes
+
+- move protoc install action to later (#188)
+- bump qcs-api-client-common version (#187)
+- include github token when installing protoc (#186)
+- install protoc in github actions (#185)
+
 ## 0.3.0-rc.3
 
 ### Breaking Changes
