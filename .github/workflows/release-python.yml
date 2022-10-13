@@ -33,6 +33,10 @@ jobs:
           target: aarch64-apple-darwin
           profile: minimal
           default: true
+      - name: Install protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: '3.20.1'
       - name: Build wheels - x86_64
         # Python 3.7 does not support aarch64 so we only build it for x86_64
         if: matrix.python-version == '3.7'
@@ -63,6 +67,10 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10']
         target: [x86_64, aarch64]
     steps:
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        version: '3.20.1'
     - uses: actions/checkout@v2
     - name: Install Rust
       uses: actions-rs/toolchain@v1
