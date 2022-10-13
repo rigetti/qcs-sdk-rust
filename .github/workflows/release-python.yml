@@ -68,11 +68,6 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10']
         target: [x86_64, aarch64]
     steps:
-    - name: Install protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        version: '3.20.1'
     - uses: actions/checkout@v2
     - name: Install Rust
       uses: actions-rs/toolchain@v1
@@ -83,6 +78,11 @@ jobs:
     - uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
     - name: Build wheels
       uses: messense/maturin-action@v1
       with:
