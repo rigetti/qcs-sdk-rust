@@ -1,3 +1,19 @@
+## 0.8.0-rc.1
+
+### Breaking Changes
+
+- RPCQ support has been dropped for translation and execution. Compilation (via quilc) still uses RPCQ.
+
+### Features
+
+- support gRPC translation and execution (#171)
+- upgrade quil-rs dependency and fix issues (#172)
+- python bindings (#145)
+
+### Fixes
+
+- install protoc in github actions (#185)
+
 ## 0.8.0-rc.0
 
 ### Breaking Changes
