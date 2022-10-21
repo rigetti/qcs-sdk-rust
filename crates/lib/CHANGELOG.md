@@ -1,3 +1,9 @@
+## 0.8.1
+
+### Fixes
+
+- make grpc_api_url optional in settings.toml (#195)
+
 ## 0.8.1-rc.0
 
 ### Fixes
