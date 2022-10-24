@@ -82,7 +82,7 @@ def compile(quil: str, target_device: str) -> Awaitable[str]:
     """
     ...
 
-def rewrite_arithmetic(native_quil: str) -> Awaitable[RewriteArithmeticResults]:
+def rewrite_arithmetic(native_quil: str) -> RewriteArithmeticResults:
     """
     Rewrites parametric arithmetic such that all gate parameters are only memory references
     to a newly declared memory location (__SUBST).
@@ -91,13 +91,13 @@ def rewrite_arithmetic(native_quil: str) -> Awaitable[RewriteArithmeticResults]:
         native_quil: A Quil program.
 
     Returns:
-        An Awaitable that resolves to a dictionary with the rewritten program and recalculation table (see `RewriteArithmeticResults`).
+        A dictionary with the rewritten program and recalculation table (see `RewriteArithmeticResults`).
     """
     ...
 
 def build_patch_values(
     recalculation_table: RecalculationTable, memory: Memory
-) -> Awaitable[PatchValues]:
+) -> PatchValues:
     """
     Evaluate the expressions in recalculation_table using the numeric values
     provided in memory.
@@ -107,7 +107,7 @@ def build_patch_values(
         memory: A mapping of symbols to their values (e.g. `{"theta": [0.0]}`).
 
     Returns:
-        An Awaitable that resolves to a mapping of each symbol to the value it should be patched with.
+        A dictionary that maps each symbol to the value it should be patched with.
     """
     ...
 
