@@ -69,7 +69,7 @@ class ExecutionResults(TypedDict):
     The time spent executing the program.
     """
 
-def compile(quil: str, target_device: str) -> Awaitable[str]:
+async def compile(quil: str, target_device: str) -> Awaitable[str]:
     """
     Uses quilc to convert a quil program to native Quil.
 
@@ -111,7 +111,7 @@ def build_patch_values(
     """
     ...
 
-def translate(
+async def translate(
     native_quil: str, num_shots: int, quantum_processor_id: str
 ) -> Awaitable[TranslationResult]:
     """
@@ -127,7 +127,7 @@ def translate(
     """
     ...
 
-def submit(
+async def submit(
     program: str, patch_values: Dict[str, List[float]], quantum_processor_id: str
 ) -> Awaitable[str]:
     """
@@ -143,7 +143,7 @@ def submit(
     """
     ...
 
-def retrieve_results(
+async def retrieve_results(
     job_id: str, quantum_processor_id: str
 ) -> Awaitable[ExecutionResults]:
     """
