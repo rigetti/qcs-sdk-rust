@@ -1,7 +1,7 @@
 """
 The qcs_sdk module provides an interface to Rigetti Quantum Cloud Services. Allowing users to compile and run Quil programs on Rigetti quantum processors.
 """
-from typing import Any, Awaitable, Dict, List, Optional, TypedDict
+from typing import Any, Dict, List, Optional, TypedDict
 from numbers import Number
 
 RecalculationTable = List[str]
@@ -46,9 +46,9 @@ class ExecutionResult(TypedDict):
     The shape of the result data.
     """
 
-    data: List[Number]
+    data: List[Number | List[float]]
     """
-    The result data.
+    The result data. Complex numbers are represented as [real, imaginary].
     """
 
     dtype: str
