@@ -1,3 +1,9 @@
+## 0.3.2-rc.0
+
+### Fixes
+
+- add `async` to asynchronous function signatures, remove Awaitable from others (#198)
+
 ## 0.3.1
 
 ### Fixes
