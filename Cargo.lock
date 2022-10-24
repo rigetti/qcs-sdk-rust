@@ -1375,7 +1375,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.3.2-rc.0"
+version = "0.3.2-rc.1"
 dependencies = [
  "pyo3",
  "pyo3-asyncio",
