@@ -27,9 +27,10 @@ use crate::qpu::{
 pub fn compile(
     quil: &str,
     target: TargetDevice,
+    protoquil: Option<bool>,
     client: &Qcs,
 ) -> Result<String, Box<dyn std::error::Error>> {
-    quilc::compile_program(quil, target, client)
+    quilc::compile_program(quil, target, protoquil, client)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }

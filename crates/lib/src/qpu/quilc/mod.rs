@@ -33,11 +33,12 @@ mod isa;
 pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
+    protoquil: Option<bool>,
     client: &Qcs,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let params = QuilcParams::new(quil, isa);
+    let params = QuilcParams::new(quil, isa, protoquil);
     let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
@@ -90,9 +91,9 @@ struct QuilcParams {
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: TargetDevice) -> Self {
+    fn new(quil: &str, isa: TargetDevice, protoquil: Option<bool>) -> Self {
         Self {
-            protoquil: None,
+            protoquil,
             args: [NativeQuilRequest::new(quil, isa)],
         }
     }
@@ -155,6 +156,7 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
+            None,
             &Qcs::load().await.unwrap_or_default(),
         )
         .expect("Could not compile");
@@ -176,6 +178,7 @@ MEASURE 1 ro[1]
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
+            None,
             &client,
         )
         .expect("Could not compile");

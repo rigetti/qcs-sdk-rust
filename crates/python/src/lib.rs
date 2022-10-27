@@ -18,14 +18,19 @@ create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
 
 #[pyfunction]
-fn compile(py: Python<'_>, quil: String, target_device: String) -> PyResult<&PyAny> {
+fn compile(
+    py: Python<'_>,
+    quil: String,
+    target_device: String,
+    protoquil: Option<bool>,
+) -> PyResult<&PyAny> {
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::compile(&quil, target_device, &client)
+        let result = api::compile(&quil, target_device, protoquil, &client)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
     })

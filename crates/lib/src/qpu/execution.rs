@@ -120,7 +120,8 @@ impl<'a> Execution<'a> {
         let program = if compile_with_quilc {
             trace!("Converting to Native Quil");
             let client = client.clone();
-            spawn_blocking(move || quilc::compile_program(&quil, target_device, &client))
+            // TODO Support protoquil optional
+            spawn_blocking(move || quilc::compile_program(&quil, target_device, None, &client))
                 .await
                 .map_err(|source| {
                     Error::Unexpected(Unexpected::TaskError {
