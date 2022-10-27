@@ -1,3 +1,14 @@
+## 0.3.2-rc.2
+
+### Features
+
+- support loading quilc and qvm server URLs from environment variables (#200)
+
+### Fixes
+
+- remove awaitable annotation on async functions (#199)
+- add `async` to asynchronous function signatures, remove Awaitable from others (#198)
+
 ## 0.3.2-rc.1
 
 ### Fixes

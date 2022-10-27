@@ -1,3 +1,9 @@
+## 0.8.2-rc.0
+
+### Features
+
+- support loading quilc and qvm server URLs from environment variables (#200)
+
 ## 0.8.1
 
 ### Fixes
