@@ -1,3 +1,9 @@
+## 0.8.3-rc.0
+
+### Fixes
+
+- Add marker file to build types with bindings (#202)
+
 ## 0.8.2
 
 ### Features
