@@ -1,3 +1,9 @@
+## 0.3.3
+
+### Fixes
+
+- Add marker file to build types with bindings (#202)
+
 ## 0.3.3-rc.0
 
 ### Fixes
