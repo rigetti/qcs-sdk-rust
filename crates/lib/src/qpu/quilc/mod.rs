@@ -94,7 +94,7 @@ struct QuilcCompileProgramResponse {
     pub quil: String,
 }
 
-#[derive(Clone, Deserialize, Serialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcVersionResponse {
     pub quilc: String,
 }
