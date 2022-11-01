@@ -157,3 +157,9 @@ async def retrieve_results(
         An Awaitable that resolves to a dictionary describing the results of the execution and its duration (see `ExecutionResults`).
     """
     ...
+
+async def get_quilc_version() -> str:
+    """
+    Returns the version number of the running quilc server.
+    """
+    ...

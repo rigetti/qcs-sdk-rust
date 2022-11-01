@@ -1,6 +1,8 @@
 from unittest.mock import patch
 import pytest
 
+import re
+
 import qcs_sdk
 
 
@@ -30,7 +32,7 @@ def test_rewrite_arithmetic():
     rewritten_arithmetic = qcs_sdk.rewrite_arithmetic(native_quil)
     expected = {
         "program": "DECLARE __SUBST REAL[1]\nRX(__SUBST[0]) 0\n",
-        "recalculation_table": ['((2*theta[0])/6.283185307179586)'],
+        "recalculation_table": ["((2*theta[0])/6.283185307179586)"],
     }
     assert rewritten_arithmetic == expected
 
@@ -41,3 +43,9 @@ def test_build_patch_values():
     expected = {"theta": [2.0], "__SUBST": [1.0]}
     patch_values = qcs_sdk.build_patch_values(recalculation_table, memory)
     assert patch_values == expected
+
+
+@pytest.mark.asyncio
+async def test_get_quilc_version():
+    version = await qcs_sdk.get_quilc_version()
+    assert re.match(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$", version)

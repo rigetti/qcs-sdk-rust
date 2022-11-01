@@ -34,6 +34,11 @@ pub fn compile(
         .map(|p| p.to_string(true))
 }
 
+/// Gets the quilc version
+pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error>> {
+    quilc::get_version_info(client).map_err(Into::into)
+}
+
 /// Collection of errors that can result from rewriting arithmetic.
 #[derive(thiserror::Error, Debug)]
 pub enum RewriteArithmeticError {
