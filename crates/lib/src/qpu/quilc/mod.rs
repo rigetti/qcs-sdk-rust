@@ -53,7 +53,7 @@ pub(crate) fn compile_program(
 pub(crate) fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let binding: HashMap<&str, &str> = HashMap::new();
+    let binding: HashMap<String, String> = HashMap::new();
     let request = rpcq::RPCRequest::new("get_version_info", &binding);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;

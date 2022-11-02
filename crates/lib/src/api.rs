@@ -24,18 +24,20 @@ use crate::qpu::{
 };
 
 /// Uses quilc to convert a Quil program to native Quil
+/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: https://github.com/rigetti/quil-rs/issues/122
 pub fn compile(
     quil: &str,
     target: TargetDevice,
     client: &Qcs,
-) -> Result<String, Box<dyn std::error::Error>> {
+) -> Result<String, Box<dyn std::error::Error + 'static>> {
     quilc::compile_program(quil, target, client)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }
 
 /// Gets the quilc version
-pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error>> {
+/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: https://github.com/rigetti/quil-rs/issues/122
+pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error + 'static>> {
     quilc::get_version_info(client).map_err(Into::into)
 }
 
