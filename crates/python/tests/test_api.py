@@ -7,7 +7,6 @@ import qcs_sdk
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip
 async def test_compile(native_bitflip_program: str, device_2q: str):
     await qcs_sdk.compile(native_bitflip_program, device_2q)
 
