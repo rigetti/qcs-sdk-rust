@@ -24,7 +24,7 @@ use crate::qpu::{
 };
 
 /// Uses quilc to convert a Quil program to native Quil
-/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: https://github.com/rigetti/quil-rs/issues/122
+/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: <https://github.com/rigetti/quil-rs/issues/122>
 pub fn compile(
     quil: &str,
     target: TargetDevice,
@@ -36,7 +36,7 @@ pub fn compile(
 }
 
 /// Gets the quilc version
-/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: https://github.com/rigetti/quil-rs/issues/122
+/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it: <https://github.com/rigetti/quil-rs/issues/122>
 pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error + 'static>> {
     quilc::get_version_info(client).map_err(Into::into)
 }
