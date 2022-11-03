@@ -92,7 +92,7 @@ impl<'a> Execution<'a> {
     /// * `quil`: The raw Quil program to eventually be run on a QPU.
     /// * `shots`: The number of times to run this program with each call to [`Execution::run`].
     /// * `quantum_processor_id`: The QPU this Quil will be run on and should be compiled for.
-    /// * `client`: A [`qcs::qpu::client`] instance provided by the user which contains connection info
+    /// * `client`: A [`qcs::qpu::client::Qcs`] instance provided by the user which contains connection info
     ///     for QCS and the `quilc` compiler.
     /// * `compile_with_quilc`: A boolean that if set, will compile the given `quil` using `quilc`
     /// * `compiler_timeout`: How many seconds to wait for compilation to finish. Has no effect if
