@@ -342,7 +342,7 @@ impl<'execution> Executable<'_, 'execution> {
             id,
             self.get_client().await?,
             self.compile_with_quilc,
-            None,
+            self.compiler_timeout,
         )
         .await
         .map_err(Error::from)
