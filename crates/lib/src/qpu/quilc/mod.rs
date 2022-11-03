@@ -41,11 +41,24 @@ pub(crate) fn compile_program(
     let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilcResponse>(&request) {
+    match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
         Ok(response) => response
             .quil
             .parse::<quil_rs::Program>()
             .map_err(Error::Parse),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+pub(crate) fn get_version_info(client: &Qcs) -> Result<String, Error> {
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let binding: HashMap<String, String> = HashMap::new();
+    let request = rpcq::RPCRequest::new("get_version_info", &binding);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, QuilcVersionResponse>(&request) {
+        Ok(response) => Ok(response.quilc),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
 }
@@ -77,8 +90,13 @@ impl Error {
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-struct QuilcResponse {
+struct QuilcCompileProgramResponse {
     pub quil: String,
+}
+
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+struct QuilcVersionResponse {
+    pub quilc: String,
 }
 
 /// The top level params that get passed to quilc
@@ -138,6 +156,7 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 mod tests {
     use super::*;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
+    use regex::Regex;
     use std::fs::File;
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
@@ -193,5 +212,13 @@ MEASURE 1 ro[1]
             assert_eq!(shot.len(), 2);
             assert_eq!(shot[0], shot[1]);
         }
+    }
+
+    #[tokio::test]
+    async fn get_version_info_from_quilc() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let version = get_version_info(&client).expect("Should get version info from quilc");
+        let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
+        assert!(semver_re.is_match(&version));
     }
 }
