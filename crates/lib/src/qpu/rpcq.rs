@@ -188,7 +188,7 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
     /// * `seconds`: The number of seconds before timing out the request
     ///
     /// returns: `RPCRequest<T>` with the updated timeout.
-    pub fn with_timeout(mut self, seconds: u8) -> Self {
+    pub fn with_timeout(&mut self, seconds: u8) -> &mut Self {
         self.client_timeout = seconds;
         self
     }
