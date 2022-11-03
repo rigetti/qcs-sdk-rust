@@ -31,8 +31,9 @@ pub fn compile(
     quil: &str,
     target: TargetDevice,
     client: &Qcs,
+    timeout: Option<u8>,
 ) -> Result<String, Box<dyn std::error::Error + 'static>> {
-    quilc::compile_program(quil, target, client)
+    quilc::compile_program(quil, target, client, timeout)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }

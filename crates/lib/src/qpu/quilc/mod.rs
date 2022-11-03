@@ -34,11 +34,15 @@ pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
+    timeout: Option<u8>,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
-    let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
+    let mut request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
+    if let Some(seconds) = timeout {
+        request.with_timeout(seconds);
+    }
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
@@ -175,6 +179,7 @@ mod tests {
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
             &Qcs::load().await.unwrap_or_default(),
+            None,
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -196,6 +201,7 @@ MEASURE 1 ro[1]
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             &client,
+            None,
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))

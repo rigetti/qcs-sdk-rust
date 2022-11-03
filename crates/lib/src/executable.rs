@@ -68,6 +68,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters,
     compile_with_quilc: bool,
+    compiler_timeout: Option<u8>,
     config: Option<ClientConfiguration>,
     client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -99,6 +100,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
+            compiler_timeout: None,
             config: None,
             client: None,
             qpu: None,
@@ -252,6 +254,13 @@ impl Executable<'_, '_> {
         self
     }
 
+    /// If set, the value will override the default compiler timeout of 10s
+    #[must_use]
+    pub fn compiler_timeout(mut self, seconds: u8) -> Self {
+        self.compiler_timeout = Some(seconds);
+        self
+    }
+
     fn get_readouts(&self) -> &[&str] {
         return self
             .readout_memory_region_names
@@ -333,6 +342,7 @@ impl<'execution> Executable<'_, 'execution> {
             id,
             self.get_client().await?,
             self.compile_with_quilc,
+            None,
         )
         .await
         .map_err(Error::from)

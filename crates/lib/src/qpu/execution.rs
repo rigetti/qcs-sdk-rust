@@ -92,8 +92,11 @@ impl<'a> Execution<'a> {
     /// * `quil`: The raw Quil program to eventually be run on a QPU.
     /// * `shots`: The number of times to run this program with each call to [`Execution::run`].
     /// * `quantum_processor_id`: The QPU this Quil will be run on and should be compiled for.
-    /// * `config`: A [`Configuration`] instance provided by the user which contains connection info
+    /// * `client`: A [`qcs::qpu::client`] instance provided by the user which contains connection info
     ///     for QCS and the `quilc` compiler.
+    /// * `compile_with_quilc`: A boolean that if set, will compile the given `quil` using `quilc`
+    /// * `compiler_timeout`: How many seconds to wait for compilation to finish. Has no effect if
+    ///     `compile_with_quilc` is false.
     ///
     /// returns: Result<Execution, Report>
     ///
@@ -113,6 +116,7 @@ impl<'a> Execution<'a> {
         quantum_processor_id: &'a str,
         client: Arc<Qcs>,
         compile_with_quilc: bool,
+        compiler_timeout: Option<u8>,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
@@ -120,14 +124,16 @@ impl<'a> Execution<'a> {
         let program = if compile_with_quilc {
             trace!("Converting to Native Quil");
             let client = client.clone();
-            spawn_blocking(move || quilc::compile_program(&quil, target_device, &client))
-                .await
-                .map_err(|source| {
-                    Error::Unexpected(Unexpected::TaskError {
-                        task_name: "quilc",
-                        source,
-                    })
-                })??
+            spawn_blocking(move || {
+                quilc::compile_program(&quil, target_device, &client, compiler_timeout)
+            })
+            .await
+            .map_err(|source| {
+                Error::Unexpected(Unexpected::TaskError {
+                    task_name: "quilc",
+                    source,
+                })
+            })??
         } else {
             trace!("Skipping conversion to Native Quil");
             quil.parse().map_err(Error::Quil)?
