@@ -22,7 +22,7 @@ fn compile(
     py: Python<'_>,
     quil: String,
     target_device: String,
-    compiler_timeout: Option<u8>,
+    timeout: Option<u8>,
 ) -> PyResult<&PyAny> {
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
@@ -30,7 +30,7 @@ fn compile(
         let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::compile(&quil, target_device, &client, compiler_timeout)
+        let result = api::compile(&quil, target_device, &client, timeout)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
     })

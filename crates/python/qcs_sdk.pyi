@@ -69,13 +69,14 @@ class ExecutionResults(TypedDict):
     The time spent executing the program.
     """
 
-async def compile(quil: str, target_device: str) -> str:
+async def compile(quil: str, target_device: str, timeout: int=10) -> str:
     """
     Uses quilc to convert a quil program to native Quil.
 
     Args:
         quil: A Quil program.
         target_device: A JSON encoded description of the Quantum Abstract Machine Architecture.
+        timeout: The number of seconds to wait before timing out (default: 10).
 
     Returns:
         An Awaitable that resolves to the native Quil program.
