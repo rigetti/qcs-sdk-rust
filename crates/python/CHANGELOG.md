@@ -1,3 +1,9 @@
+## 0.3.4-rc.0
+
+### Features
+
+- add method for getting the version of the running quilc server (#206)
+
 ## 0.3.3
 
 ### Fixes
