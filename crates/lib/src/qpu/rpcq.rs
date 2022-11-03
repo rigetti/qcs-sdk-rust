@@ -180,6 +180,18 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
             client_key: None,
         }
     }
+
+    /// Sets the client timeout for the [`RPCRequest`].
+    ///
+    /// # Arguments
+    ///
+    /// * `seconds`: The number of seconds before timing out the request
+    ///
+    /// returns: `RPCRequest<T>` with the updated timeout.
+    pub fn with_timeout(mut self, seconds: u8) -> Self {
+        self.client_timeout = seconds;
+        self
+    }
 }
 
 /// Credentials for connecting to RPCQ Server
