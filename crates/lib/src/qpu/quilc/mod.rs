@@ -14,6 +14,9 @@ use super::{rpcq, Qcs};
 
 mod isa;
 
+/// Number of seconds to wait before timing out.
+pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
+
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
 /// # Arguments
@@ -21,7 +24,7 @@ mod isa;
 /// * `program`: The Quil program to compile.
 /// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
 ///     [`super::get_isa`].
-/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to 10.
+/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to 30.
 ///
 /// returns: `eyre::Result<quil_rs::Program>`
 ///
@@ -81,7 +84,9 @@ impl Default for CompilerOpts {
     /// Default compiler options
     /// * `timeout`: 30 seconds
     fn default() -> Self {
-        Self { timeout: Some(30) }
+        Self {
+            timeout: Some(DEFAULT_COMPILER_TIMEOUT),
+        }
     }
 }
 

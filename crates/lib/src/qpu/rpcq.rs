@@ -11,6 +11,8 @@ use zmq::{Context, Socket, SocketType};
 
 use crate::qpu::rpcq::Error::AuthSetup;
 
+pub(crate) const DEFAULT_CLIENT_TIMEOUT: u8 = 30;
+
 /// A minimal RPCQ client that does just enough to talk to `quilc` and QPU endpoints
 pub(crate) struct Client {
     socket: Socket,
@@ -176,7 +178,7 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
             params,
             id: Uuid::new_v4().to_string(),
             jsonrpc: "2.0",
-            client_timeout: Some(30),
+            client_timeout: Some(DEFAULT_CLIENT_TIMEOUT),
             client_key: None,
         }
     }

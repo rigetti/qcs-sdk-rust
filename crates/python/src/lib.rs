@@ -1,7 +1,7 @@
 use pythonize::pythonize;
 use qcs::api;
 use qcs::qpu::client::Qcs;
-use qcs::qpu::quilc::{CompilerOpts, TargetDevice};
+use qcs::qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT};
 use std::collections::HashMap;
 
 use pyo3::{
@@ -28,7 +28,7 @@ fn compile<'a>(
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
 
-    let mut compiler_timeout = Some(30);
+    let mut compiler_timeout = Some(DEFAULT_COMPILER_TIMEOUT);
     if let Some(kwargs) = kwds {
         if let Some(timeout_arg) = kwargs.get_item("timeout") {
             let timeout: Result<Option<u8>, _> = timeout_arg.extract();
