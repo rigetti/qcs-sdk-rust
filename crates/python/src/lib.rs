@@ -43,7 +43,7 @@ fn compile<'a>(
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
         let options = CompilerOpts::default().with_timeout(compiler_timeout);
-        let result = api::compile(&quil, target_device, &client, &options)
+        let result = api::compile(&quil, target_device, &client, options)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
     })

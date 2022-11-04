@@ -31,7 +31,7 @@ pub fn compile(
     quil: &str,
     target: TargetDevice,
     client: &Qcs,
-    options: &CompilerOpts,
+    options: CompilerOpts,
 ) -> Result<String, Box<dyn std::error::Error + 'static>> {
     quilc::compile_program(quil, target, client, options)
         .map_err(Into::into)

@@ -35,7 +35,7 @@ pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
-    options: &CompilerOpts,
+    options: CompilerOpts,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
@@ -64,11 +64,13 @@ pub struct CompilerOpts {
 impl CompilerOpts {
     /// Creates a new instance of [`CompilerOpts`] with zero values for each option.
     /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+    #[must_use]
     pub fn new() -> Self {
         Self { timeout: None }
     }
 
     /// Set the number of seconds to wait before timing out. If set to None, there is no timeout.
+    #[must_use]
     pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
         self.timeout = seconds;
         *self
@@ -208,7 +210,7 @@ mod tests {
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
             &Qcs::load().await.unwrap_or_default(),
-            &CompilerOpts::default(),
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -230,7 +232,7 @@ MEASURE 1 ro[1]
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             &client,
-            &CompilerOpts::default(),
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))
