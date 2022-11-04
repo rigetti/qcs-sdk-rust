@@ -69,7 +69,7 @@ impl CompilerOpts {
         Self { timeout: None }
     }
 
-    /// Set the number of seconds to wait before timing out. If set to None, there is no timeout.
+    /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
     #[must_use]
     pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
         self.timeout = seconds;
