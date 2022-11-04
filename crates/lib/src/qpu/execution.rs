@@ -16,7 +16,7 @@ use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::JobHandle;
 
 use super::client::{GrpcClientError, Qcs};
-use super::quilc::{self, TargetDevice};
+use super::quilc::{self, CompilerOpts, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -95,8 +95,8 @@ impl<'a> Execution<'a> {
     /// * `client`: A [`qcs::qpu::client::Qcs`] instance provided by the user which contains connection info
     ///     for QCS and the `quilc` compiler.
     /// * `compile_with_quilc`: A boolean that if set, will compile the given `quil` using `quilc`
-    /// * `compiler_timeout`: How many seconds to wait for compilation to finish. Has no effect if
-    ///     `compile_with_quilc` is false.
+    /// * `compiler_options`: A [`qcs::qpu::quilc::CompilerOpts`] instance with configuration
+    ///     options for quilc. Has no effect if `compile_with_quilc` is false
     ///
     /// returns: Result<Execution, Report>
     ///
@@ -116,7 +116,7 @@ impl<'a> Execution<'a> {
         quantum_processor_id: &'a str,
         client: Arc<Qcs>,
         compile_with_quilc: bool,
-        compiler_timeout: Option<u8>,
+        compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
@@ -125,7 +125,7 @@ impl<'a> Execution<'a> {
             trace!("Converting to Native Quil");
             let client = client.clone();
             spawn_blocking(move || {
-                quilc::compile_program(&quil, target_device, &client, compiler_timeout)
+                quilc::compile_program(&quil, target_device, &client, &compiler_options)
             })
             .await
             .map_err(|source| {

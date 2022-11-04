@@ -157,7 +157,7 @@ where
     params: &'params T,
     id: String,
     jsonrpc: &'static str,
-    client_timeout: u8,
+    client_timeout: Option<u8>,
     client_key: Option<String>,
 }
 
@@ -176,7 +176,7 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
             params,
             id: Uuid::new_v4().to_string(),
             jsonrpc: "2.0",
-            client_timeout: 10,
+            client_timeout: Some(30),
             client_key: None,
         }
     }
@@ -185,10 +185,10 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
     ///
     /// # Arguments
     ///
-    /// * `seconds`: The number of seconds before timing out the request
+    /// * `seconds`: The number of seconds to wait before timing out, or None for no timeout
     ///
     /// returns: `RPCRequest<T>` with the updated timeout.
-    pub fn with_timeout(&mut self, seconds: u8) -> &mut Self {
+    pub fn with_timeout(mut self, seconds: Option<u8>) -> Self {
         self.client_timeout = seconds;
         self
     }

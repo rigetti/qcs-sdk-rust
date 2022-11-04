@@ -1,13 +1,14 @@
 use pythonize::pythonize;
 use qcs::api;
 use qcs::qpu::client::Qcs;
-use qcs::qpu::quilc::TargetDevice;
+use qcs::qpu::quilc::{CompilerOpts, TargetDevice};
 use std::collections::HashMap;
 
 use pyo3::{
     create_exception,
     exceptions::{PyRuntimeError, PyValueError},
     prelude::*,
+    types::PyDict,
 };
 
 create_exception!(qcs, InvalidConfigError, PyRuntimeError);
@@ -17,20 +18,32 @@ create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
 
-#[pyfunction]
-fn compile(
-    py: Python<'_>,
+#[pyfunction(kwds = "**")]
+fn compile<'a>(
+    py: Python<'a>,
     quil: String,
     target_device: String,
-    timeout: Option<u8>,
-) -> PyResult<&PyAny> {
+    kwds: Option<&PyDict>,
+) -> PyResult<&'a PyAny> {
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
+
+    let mut compiler_timeout = Some(30);
+    if let Some(kwargs) = kwds {
+        if let Some(timeout_arg) = kwargs.get_item("timeout") {
+            let timeout: Result<Option<u8>, _> = timeout_arg.extract();
+            if let Ok(option) = timeout {
+                compiler_timeout = option
+            }
+        }
+    }
+
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::compile(&quil, target_device, &client, timeout)
+        let options = CompilerOpts::default().with_timeout(compiler_timeout);
+        let result = api::compile(&quil, target_device, &client, &options)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(Python::with_gil(|_py| result))
     })

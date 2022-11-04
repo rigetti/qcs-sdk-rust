@@ -35,15 +35,13 @@ pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
-    timeout: Option<u8>,
+    options: &CompilerOpts,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
-    let mut request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
-    if let Some(seconds) = timeout {
-        request.with_timeout(seconds);
-    }
+    let request =
+        rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
@@ -52,6 +50,36 @@ pub(crate) fn compile_program(
             .parse::<quil_rs::Program>()
             .map_err(Error::Parse),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+/// A set of options that determine the behavior of compiling programs with quilc
+#[derive(Clone, Copy, Debug)]
+pub struct CompilerOpts {
+    /// The number of seconds to wait before timing out. If unset, there is no timeout
+    timeout: Option<u8>,
+}
+
+/// Functions for building a [`CompilerOpts`] instance
+impl CompilerOpts {
+    /// Creates a new instance of [`CompilerOpts`] with zero values for each option.
+    /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+    pub fn new() -> Self {
+        Self { timeout: None }
+    }
+
+    /// Set the number of seconds to wait before timing out. If set to None, there is no timeout.
+    pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
+        self.timeout = seconds;
+        *self
+    }
+}
+
+impl Default for CompilerOpts {
+    /// Default compiler options
+    /// * `timeout`: 30 seconds
+    fn default() -> Self {
+        Self { timeout: Some(30) }
     }
 }
 
@@ -180,7 +208,7 @@ mod tests {
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
             &Qcs::load().await.unwrap_or_default(),
-            None,
+            &CompilerOpts::default(),
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -202,7 +230,7 @@ MEASURE 1 ro[1]
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             &client,
-            None,
+            &CompilerOpts::default(),
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))
