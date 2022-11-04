@@ -82,7 +82,7 @@ impl CompilerOpts {
 
 impl Default for CompilerOpts {
     /// Default compiler options
-    /// * `timeout`: 30 seconds
+    /// * `timeout`: See [`DEFAULT_COMPILER_TIMEOUT`]
     fn default() -> Self {
         Self {
             timeout: Some(DEFAULT_COMPILER_TIMEOUT),
