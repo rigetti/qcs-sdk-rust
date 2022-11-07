@@ -1,3 +1,9 @@
+## 0.9.0-rc.0
+
+### Breaking Changes
+
+- compiler timeout is now configurable
+
 ## 0.8.4
 
 ### Features

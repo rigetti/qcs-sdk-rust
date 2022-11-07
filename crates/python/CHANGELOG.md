@@ -1,3 +1,9 @@
+## 0.4.0-rc.0
+
+### Breaking Changes
+
+- compiler timeout is now configurable
+
 ## 0.3.4
 
 ### Features
