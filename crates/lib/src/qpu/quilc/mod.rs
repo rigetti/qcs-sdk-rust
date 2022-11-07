@@ -24,7 +24,7 @@ pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
 /// * `program`: The Quil program to compile.
 /// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
 ///     [`super::get_isa`].
-/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to 30.
+/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to [`DEFAULT_COMPILER_TIMEOUT`].
 ///
 /// returns: `eyre::Result<quil_rs::Program>`
 ///
