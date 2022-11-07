@@ -59,7 +59,7 @@ pub(crate) fn compile_program(
 /// A set of options that determine the behavior of compiling programs with quilc
 #[derive(Clone, Copy, Debug)]
 pub struct CompilerOpts {
-    /// The number of seconds to wait before timing out. If unset, there is no timeout
+    /// The number of seconds to wait before timing out. If `None`, there is no timeout.
     timeout: Option<u8>,
 }
 
