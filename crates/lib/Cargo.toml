@@ -47,4 +47,4 @@ simple_logger = { version = "2.3.0", default-features = false }
 tempfile = "3.3.0"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 warp = "0.3.3"
-regex = "1.6.0"
+regex = "1.7.0"
