@@ -14,6 +14,9 @@ use super::{rpcq, Qcs};
 
 mod isa;
 
+/// Number of seconds to wait before timing out.
+pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
+
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
 /// # Arguments
@@ -21,6 +24,7 @@ mod isa;
 /// * `program`: The Quil program to compile.
 /// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
 ///     [`super::get_isa`].
+/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to [`DEFAULT_COMPILER_TIMEOUT`].
 ///
 /// returns: `eyre::Result<quil_rs::Program>`
 ///
@@ -34,11 +38,13 @@ pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
+    options: CompilerOpts,
 ) -> Result<quil_rs::Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
-    let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
+    let request =
+        rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
@@ -47,6 +53,40 @@ pub(crate) fn compile_program(
             .parse::<quil_rs::Program>()
             .map_err(Error::Parse),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+/// A set of options that determine the behavior of compiling programs with quilc
+#[derive(Clone, Copy, Debug)]
+pub struct CompilerOpts {
+    /// The number of seconds to wait before timing out. If `None`, there is no timeout.
+    timeout: Option<u8>,
+}
+
+/// Functions for building a [`CompilerOpts`] instance
+impl CompilerOpts {
+    /// Creates a new instance of [`CompilerOpts`] with zero values for each option.
+    /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+    #[must_use]
+    pub fn new() -> Self {
+        Self { timeout: None }
+    }
+
+    /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
+    #[must_use]
+    pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
+        self.timeout = seconds;
+        *self
+    }
+}
+
+impl Default for CompilerOpts {
+    /// Default compiler options
+    /// * `timeout`: See [`DEFAULT_COMPILER_TIMEOUT`]
+    fn default() -> Self {
+        Self {
+            timeout: Some(DEFAULT_COMPILER_TIMEOUT),
+        }
     }
 }
 
@@ -175,6 +215,7 @@ mod tests {
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
             &Qcs::load().await.unwrap_or_default(),
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -196,6 +237,7 @@ MEASURE 1 ro[1]
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             &client,
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))

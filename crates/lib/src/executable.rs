@@ -10,6 +10,7 @@ use qcs_api_client_common::ClientConfiguration;
 
 use crate::execution_data;
 use crate::qpu::client::Qcs;
+use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
@@ -68,6 +69,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<&'executable str>>,
     params: Parameters,
     compile_with_quilc: bool,
+    compiler_options: CompilerOpts,
     config: Option<ClientConfiguration>,
     client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -99,6 +101,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
+            compiler_options: CompilerOpts::default(),
             config: None,
             client: None,
             qpu: None,
@@ -252,6 +255,13 @@ impl Executable<'_, '_> {
         self
     }
 
+    /// If set, the value will override the default compiler options
+    #[must_use]
+    pub fn compiler_options(mut self, options: CompilerOpts) -> Self {
+        self.compiler_options = options;
+        self
+    }
+
     fn get_readouts(&self) -> &[&str] {
         return self
             .readout_memory_region_names
@@ -333,6 +343,7 @@ impl<'execution> Executable<'_, 'execution> {
             id,
             self.get_client().await?,
             self.compile_with_quilc,
+            self.compiler_options,
         )
         .await
         .map_err(Error::from)

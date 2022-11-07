@@ -16,7 +16,7 @@ use serde::Serialize;
 use crate::qpu::{
     self,
     client::{GrpcClientError, Qcs},
-    quilc::{self, TargetDevice},
+    quilc::{self, CompilerOpts, TargetDevice},
     rewrite_arithmetic::{self, Substitutions},
     runner,
     translation::{self, EncryptedTranslationResult},
@@ -31,8 +31,9 @@ pub fn compile(
     quil: &str,
     target: TargetDevice,
     client: &Qcs,
+    options: CompilerOpts,
 ) -> Result<String, Box<dyn std::error::Error + 'static>> {
-    quilc::compile_program(quil, target, client)
+    quilc::compile_program(quil, target, client, options)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }

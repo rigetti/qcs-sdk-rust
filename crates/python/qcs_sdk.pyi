@@ -69,13 +69,16 @@ class ExecutionResults(TypedDict):
     The time spent executing the program.
     """
 
-async def compile(quil: str, target_device: str) -> str:
+async def compile(quil: str, target_device: str, *, timeout: int = 30) -> str:
     """
     Uses quilc to convert a quil program to native Quil.
 
     Args:
         quil: A Quil program.
         target_device: A JSON encoded description of the Quantum Abstract Machine Architecture.
+
+    Keyword Args:
+        timeout: The number of seconds to wait before timing out. If set to None, there is no timeout (default: 30).
 
     Returns:
         An Awaitable that resolves to the native Quil program.
@@ -143,9 +146,7 @@ async def submit(
     """
     ...
 
-async def retrieve_results(
-    job_id: str, quantum_processor_id: str
-) -> ExecutionResults:
+async def retrieve_results(job_id: str, quantum_processor_id: str) -> ExecutionResults:
     """
     Fetches results for the corresponding job ID.
 
