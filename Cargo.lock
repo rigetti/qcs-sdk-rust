@@ -1287,7 +1287,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.9.0-rc.0"
+version = "0.9.0"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1385,7 +1385,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.4.0-rc.0"
+version = "0.4.0"
 dependencies = [
  "pyo3",
  "pyo3-asyncio",
