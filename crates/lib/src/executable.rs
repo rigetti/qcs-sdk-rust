@@ -599,7 +599,7 @@ mod describe_get_config {
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
         let mut exe = Executable::from_quil("").with_config(ClientConfiguration::default());
-        let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
+        let foo_len = |exe: &mut Executable<'_, '_>| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
         assert_eq!(foo_len(&mut exe), 1);

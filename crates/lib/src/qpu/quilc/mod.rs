@@ -202,7 +202,7 @@ mod tests {
         serde_json::from_reader(File::open("tests/aspen_9_isa.json").unwrap()).unwrap()
     }
 
-    pub fn qvm_isa() -> InstructionSetArchitecture {
+    pub(crate) fn qvm_isa() -> InstructionSetArchitecture {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
