@@ -36,7 +36,9 @@ pub fn compile(
 }
 
 /// Gets the quilc version
-pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
+pub fn get_quilc_version(
+    client: &Qcs,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
     quilc::get_version_info(client).map_err(Into::into)
 }
 
