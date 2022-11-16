@@ -48,10 +48,7 @@ pub(crate) fn compile_program(
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
-        Ok(response) => response
-            .quil
-            .parse::<Program>()
-            .map_err(Error::Parse),
+        Ok(response) => response.quil.parse::<Program>().map_err(Error::Parse),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
 }

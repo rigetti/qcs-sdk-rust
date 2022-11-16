@@ -52,7 +52,7 @@
 //! using [`Executable`].
 
 pub use executable::{Error, Executable, ExecuteResultQPU, ExecuteResultQVM, JobHandle, Service};
-pub use execution_data::{Qvm, Qpu, ReadoutMap};
+pub use execution_data::{Qpu, Qvm, ReadoutMap};
 pub use register_data::RegisterData;
 
 pub mod api;
