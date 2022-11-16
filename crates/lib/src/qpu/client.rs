@@ -26,7 +26,7 @@ pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
 /// A client providing helper functionality for accessing QCS APIs
-#[derive(Clone, Default)]
+#[derive(Debug, Clone, Default)]
 pub struct Qcs {
     config: ClientConfiguration,
     /// When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.

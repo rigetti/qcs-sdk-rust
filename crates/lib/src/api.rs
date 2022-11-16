@@ -59,7 +59,7 @@ pub enum RewriteArithmeticError {
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct RewriteArithmeticResult {
     /// The rewritten program
     pub program: String,
@@ -236,7 +236,7 @@ impl From<qpu::runner::Register> for Register {
 }
 
 /// The execution readout data from a particular memory location.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct ExecutionResult {
     shape: Vec<usize>,
     data: Register,
@@ -266,7 +266,7 @@ impl From<readout_values::Values> for ExecutionResult {
 }
 
 /// Execution readout data for all memory locations.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct ExecutionResults {
     buffers: HashMap<String, ExecutionResult>,
     execution_duration_microseconds: Option<u64>,

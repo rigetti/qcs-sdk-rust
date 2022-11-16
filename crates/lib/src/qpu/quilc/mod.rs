@@ -131,12 +131,12 @@ impl Error {
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcCompileProgramResponse {
-    pub quil: String,
+    quil: String,
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcVersionResponse {
-    pub quilc: String,
+    quilc: String,
 }
 
 /// The top level params that get passed to quilc

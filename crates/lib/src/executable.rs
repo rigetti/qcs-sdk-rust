@@ -62,7 +62,7 @@ use quil_rs::Program;
 /// You should be able to largely ignore these, just keep in mind that any borrowed data passed to
 /// the methods most likely needs to live as long as this struct. Check individual methods for
 /// specifics. If only using `'static` strings then everything should just work.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
     shots: u16,
@@ -191,7 +191,7 @@ impl<'executable> Executable<'executable, '_> {
     ///     let mut exe = Executable::from_quil(PROGRAM)
     ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
-    ///     
+    ///
     ///     for theta in 0..2 {
     ///         let theta = theta as f64;
     ///         let mut result = exe
@@ -236,7 +236,9 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
+/// The [`Result`] from executing on the QVM.
 pub type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
+/// The [`Result`] from executing on a QPU.
 pub type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
 
 impl Executable<'_, '_> {

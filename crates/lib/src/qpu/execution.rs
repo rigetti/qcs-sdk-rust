@@ -25,7 +25,7 @@ use super::{get_isa, IsaError};
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
 /// same number of shots.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
     pub(crate) quantum_processor_id: &'a str,
