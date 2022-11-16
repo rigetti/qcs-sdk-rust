@@ -29,7 +29,7 @@ impl Client {
     }
 
     /// Construct a new [`Client`] with authentication.
-    fn new_with_credentials(endpoint: &str, credentials: &Credentials) -> Result<Self, Error> {
+    fn new_with_credentials(endpoint: &str, credentials: &Credentials<'_>) -> Result<Self, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
@@ -53,7 +53,7 @@ impl Client {
     /// * `request`: An [`RPCRequest`] containing some params.
     pub(crate) fn run_request<Request: Serialize, Response: DeserializeOwned>(
         &self,
-        request: &RPCRequest<Request>,
+        request: &RPCRequest<'_, Request>,
     ) -> Result<Response, Error> {
         self.send(request)?;
         self.receive::<Response>(&request.id)
@@ -66,7 +66,7 @@ impl Client {
     /// * `request`: An [`RPCRequest`] containing some params.
     pub(crate) fn send<Request: Serialize>(
         &self,
-        request: &RPCRequest<Request>,
+        request: &RPCRequest<'_, Request>,
     ) -> Result<(), Error> {
         let mut data = vec![];
         request

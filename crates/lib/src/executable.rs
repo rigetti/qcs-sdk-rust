@@ -236,8 +236,8 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
-type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
+pub type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
+pub type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".

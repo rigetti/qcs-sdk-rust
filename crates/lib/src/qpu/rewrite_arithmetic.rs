@@ -337,10 +337,10 @@ impl From<RewrittenQuil> for String {
     }
 }
 
-impl TryFrom<quil_rs::Program> for RewrittenProgram {
+impl TryFrom<Program> for RewrittenProgram {
     type Error = Error;
 
-    fn try_from(program: quil_rs::Program) -> Result<Self, Self::Error> {
+    fn try_from(program: Program) -> Result<Self, Self::Error> {
         let (inner, substitutions) = rewrite_arithmetic(program)?;
         Ok(Self {
             inner,

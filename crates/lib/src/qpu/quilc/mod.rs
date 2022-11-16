@@ -39,7 +39,7 @@ pub(crate) fn compile_program(
     isa: TargetDevice,
     client: &Qcs,
     options: CompilerOpts,
-) -> Result<quil_rs::Program, Error> {
+) -> Result<Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
@@ -50,7 +50,7 @@ pub(crate) fn compile_program(
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
         Ok(response) => response
             .quil
-            .parse::<quil_rs::Program>()
+            .parse::<Program>()
             .map_err(Error::Parse),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
