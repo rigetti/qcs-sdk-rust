@@ -2,8 +2,6 @@
 //! the [`Execution`] struct in this module.
 
 use self::client::OpenApiClientError;
-pub(crate) use client::Qcs;
-pub(crate) use execution::{Error as ExecutionError, Execution};
 use qcs_api_client_openapi::{
     apis::quantum_processors_api::{
         get_instruction_set_architecture, GetInstructionSetArchitectureError,
@@ -18,6 +16,9 @@ pub(crate) mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
 pub(crate) mod translation;
+
+pub use client::Qcs;
+pub(crate) use execution::{Error as ExecutionError, Execution};
 
 /// Query QCS for the ISA of the provided `quantum_processor_id`.
 ///

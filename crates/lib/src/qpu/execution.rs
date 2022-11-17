@@ -25,7 +25,7 @@ use super::{get_isa, IsaError};
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
 /// same number of shots.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
     pub(crate) quantum_processor_id: &'a str,
@@ -148,7 +148,7 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
+    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'_>, Error> {
         let EncryptedTranslationResult { job, readout_map } = translate(
             self.quantum_processor_id,
             &self.program.to_string().0,

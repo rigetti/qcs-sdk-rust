@@ -23,12 +23,14 @@ pub struct Qvm {
     pub duration: Option<Duration>,
 }
 
+/// A mapping of readout fields to their [`ReadoutValues`].
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<MemoryReference, ReadoutValues>);
 
 impl ReadoutMap {
     /// Given a known readout field name and index, return the result's [`ReadoutValues`], if any.
+    #[must_use]
     pub fn get_readout_values(&self, field: String, index: u64) -> Option<ReadoutValues> {
         let readout_values = self.0.get(&MemoryReference { name: field, index })?;
 
