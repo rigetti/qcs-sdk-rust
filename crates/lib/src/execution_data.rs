@@ -265,6 +265,7 @@ mod describe_readout_map {
     use maplit::hashmap;
     use ndarray::prelude::*;
     use std::collections::HashMap;
+    use test_case::test_case;
 
     use super::{ReadoutMap, ReadoutValue, ReadoutValues, RegisterData};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
@@ -342,5 +343,84 @@ mod describe_readout_map {
             [Some(ReadoutValue::Integer(1))],
         ]);
         assert_eq!(ro, expected);
+    }
+
+    #[test_case(0, 0 => Some(ReadoutValue::Integer(1)) ; "returns value when both indices are in bounds")]
+    #[test_case(1, 0 => None ; "returns None when row index is off by 1")]
+    #[test_case(0, 1 => None ; "returns None when column index is off by 1")]
+    fn get_value(row: usize, col: usize) -> Option<ReadoutValue> {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1]]),
+        };
+
+        ReadoutMap::from_register_data_map(&registers).get_value("ro", row, col)
+    }
+
+    #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct row when index is in bounds")]
+    #[test_case(2 => None ; "returns None when index is off by 1")]
+    fn get_values_by_memory_index(index: usize) -> Option<Vec<Option<ReadoutValue>>> {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1, 9], vec![2, 10]]),
+        };
+
+        ReadoutMap::from_register_data_map(&registers).get_values_by_memory_index("ro", index)
+    }
+
+    #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct column when index is in bounds")]
+    #[test_case(2 => None ; "returns None when index is off by 1")]
+    fn get_values_by_shot(shot_num: usize) -> Option<Vec<Option<ReadoutValue>>> {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1, 2], vec![3, 4]]),
+        };
+
+        ReadoutMap::from_register_data_map(&registers).get_values_by_shot("ro", shot_num)
+    }
+
+    #[test]
+    fn test_get_index_wise_matrix() {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
+        };
+
+        let expected = arr2(&[
+            [
+                Some(ReadoutValue::Integer(1)),
+                Some(ReadoutValue::Integer(2)),
+            ],
+            [
+                Some(ReadoutValue::Integer(3)),
+                Some(ReadoutValue::Integer(4)),
+            ],
+        ]);
+
+        let readout_data = ReadoutMap::from_register_data_map(&registers);
+        let matrix = readout_data
+            .get_index_wise_matrix("ro")
+            .expect("ReadoutMap should have ro");
+        assert_eq!(matrix, expected);
+    }
+
+    #[test]
+    fn test_get_shot_wise_matrix() {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
+        };
+
+        let expected = arr2(&[
+            [
+                Some(ReadoutValue::Integer(1)),
+                Some(ReadoutValue::Integer(3)),
+            ],
+            [
+                Some(ReadoutValue::Integer(2)),
+                Some(ReadoutValue::Integer(4)),
+            ],
+        ]);
+
+        let readout_data = ReadoutMap::from_register_data_map(&registers);
+        let matrix = readout_data
+            .get_shot_wise_matrix("ro")
+            .expect("ReadoutMap should have ro");
+        assert_eq!(matrix, expected);
     }
 }
