@@ -8,7 +8,6 @@ use std::time::Duration;
 use ndarray::prelude::*;
 
 use qcs_api_client_grpc::models::controller::{readout_values, ReadoutValues};
-use quil_rs::instruction::MemoryReference;
 
 use crate::RegisterData;
 
@@ -146,8 +145,7 @@ impl ReadoutMap {
                             .collect(),
                         None => Vec::new(),
                     };
-                    // TODO handle possible truncation
-                    let shape = (reference.index as usize + 1, row.len());
+                    let shape = (reference.index + 1, row.len());
                     let matrix = result
                         .0
                         .entry(reference.name)
@@ -160,8 +158,7 @@ impl ReadoutMap {
                         })
                         .or_insert_with(|| Array2::from_elem(shape, None));
                     for (shot_num, value) in row.iter().enumerate() {
-                        // TODO handle possible truncation
-                        matrix[[reference.index as usize, shot_num]] = *value;
+                        matrix[[reference.index, shot_num]] = *value;
                     }
                 });
         }
@@ -228,6 +225,11 @@ impl ReadoutMap {
     }
 }
 
+struct MemoryReference {
+    name: String,
+    index: usize,
+}
+
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum MemoryReferenceParseError {
     #[error("Could not parse memory reference: {reason}")]
@@ -256,7 +258,7 @@ fn parse_readout_register(
 
     Ok(MemoryReference {
         name: String::from(&register_name[..open_brace]),
-        index: u64::from_str(&register_name[open_brace + 1..close_brace])?,
+        index: usize::from_str(&register_name[open_brace + 1..close_brace])?,
     })
 }
 
