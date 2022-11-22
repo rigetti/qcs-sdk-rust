@@ -35,7 +35,7 @@ async fn basic_substitution() {
         parametric_measurements.push(
             result
                 .readout_data
-                .get_value("ro".to_string(), 0, 0)
+                .get_value("ro", 0, 0)
                 .expect("ro register should have a value in the first index and shot")
                 .into_i8()
                 .expect("should be type i8"),

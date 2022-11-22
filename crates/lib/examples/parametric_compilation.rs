@@ -38,7 +38,7 @@ async fn main() {
 
         let first_ro_values = data
             .readout_data
-            .get_values_by_shot("ro".to_string(), 0)
+            .get_values_by_shot("ro", 0)
             .expect("readout values should contain 'ro'");
 
         for value in first_ro_values.iter() {

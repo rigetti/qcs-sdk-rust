@@ -23,7 +23,7 @@ async fn main() {
         .await
         .expect("Program should execute successfully")
         .readout_data
-        .get_values_by_memory_index("ro".to_string(), 0)
+        .get_values_by_memory_index("ro", 0)
         .expect("Readout data should include 'ro'");
 
     for value in result.iter() {

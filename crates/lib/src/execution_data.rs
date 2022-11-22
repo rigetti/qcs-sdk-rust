@@ -55,11 +55,11 @@ impl ReadoutMap {
     /// doesn't exist
     pub fn get_value(
         &self,
-        register_name: String,
+        register_name: &str,
         index: usize,
         shot_num: usize,
     ) -> Option<ReadoutTypes> {
-        let register = self.0.get(&register_name);
+        let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if index > matrix.nrows() || shot_num > matrix.ncols() {
                 return None;
@@ -74,10 +74,10 @@ impl ReadoutMap {
     /// index across all shots.
     pub fn get_values_by_memory_index(
         &self,
-        register_name: String,
+        register_name: &str,
         index: usize,
     ) -> Option<Vec<Option<ReadoutTypes>>> {
-        let register = self.0.get(&register_name);
+        let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if index > matrix.nrows() {
                 return None;
@@ -91,10 +91,10 @@ impl ReadoutMap {
     /// Returns a vector containing all the values in the given register for a particular shot number.
     pub fn get_values_by_shot(
         &self,
-        register_name: String,
+        register_name: &str,
         shot: usize,
     ) -> Option<Vec<Option<ReadoutTypes>>> {
-        let register = self.0.get(&register_name);
+        let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if shot > matrix.ncols() {
                 return None;
@@ -108,23 +108,14 @@ impl ReadoutMap {
     /// Returns the matrix as a 2-dimensional array where the row is the memory index and the
     /// column is the shot number.
     pub fn get_index_wise_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
-        let register = self.0.get(register_name);
-        if let Some(matrix) = register {
-            Some(matrix)
-        } else {
-            None
-        }
+        self.0.get(register_name)
     }
 
     /// Returns the matrix as a 2-dimensional array where the row is the shot number, and the
     /// column is the memory index.
     pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
         let register = self.0.get(register_name);
-        if let Some(matrix) = register {
-            Some(matrix.clone().reversed_axes())
-        } else {
-            None
-        }
+        register.map(|matrix| matrix.clone().reversed_axes())
     }
 
     /// `readout_values` maps program-defined readout to result-defined readout, e.g.:
@@ -136,7 +127,7 @@ impl ReadoutMap {
         readout_values: &HashMap<String, ReadoutValues>,
     ) -> Self {
         let mut result = ReadoutMap(HashMap::new());
-        readout_values.iter().for_each(|(readout_name, values)| {
+        for (readout_name, values) in readout_values {
             readout_mappings
                 .iter()
                 .filter(|(_, program_alias)| *program_alias == readout_name)
@@ -160,6 +151,7 @@ impl ReadoutMap {
                             .collect(),
                         None => Vec::new(),
                     };
+                    // TODO handle possible truncation
                     let shape = (reference.index as usize + 1, row.len());
                     let matrix = result
                         .0
@@ -167,16 +159,17 @@ impl ReadoutMap {
                         .and_modify(|m| {
                             if shape.0 > m.nrows() {
                                 *m = Array2::from_shape_fn(shape, |(r, c)| {
-                                    m.get((r, c)).unwrap_or(&None).clone()
-                                })
+                                    *m.get((r, c)).unwrap_or(&None)
+                                });
                             }
                         })
                         .or_insert(Array2::from_elem(shape, None));
                     for (shot_num, value) in row.iter().enumerate() {
-                        matrix[[reference.index as usize, shot_num]] = value.clone();
+                        // TODO handle possible truncation
+                        matrix[[reference.index as usize, shot_num]] = *value;
                     }
                 });
-        });
+        }
 
         result
     }
@@ -188,37 +181,22 @@ impl ReadoutMap {
         for (name, data) in map {
             let shot_values: Vec<Vec<Option<ReadoutTypes>>> = match data {
                 RegisterData::I8(i8) => i8
-                    .into_iter()
-                    .map(|inner| {
-                        inner
-                            .into_iter()
-                            .map(|&i| Some(ReadoutTypes::I8(i)))
-                            .collect()
-                    })
+                    .iter()
+                    .map(|inner| inner.iter().map(|&i| Some(ReadoutTypes::I8(i))).collect())
                     .collect(),
                 RegisterData::I16(i16) => i16
-                    .into_iter()
-                    .map(|inner| {
-                        inner
-                            .into_iter()
-                            .map(|&i| Some(ReadoutTypes::I16(i)))
-                            .collect()
-                    })
+                    .iter()
+                    .map(|inner| inner.iter().map(|&i| Some(ReadoutTypes::I16(i))).collect())
                     .collect(),
                 RegisterData::F64(f64) => f64
-                    .into_iter()
-                    .map(|inner| {
-                        inner
-                            .into_iter()
-                            .map(|&f| Some(ReadoutTypes::F64(f)))
-                            .collect()
-                    })
+                    .iter()
+                    .map(|inner| inner.iter().map(|&f| Some(ReadoutTypes::F64(f))).collect())
                     .collect(),
                 RegisterData::Complex32(c32) => c32
-                    .into_iter()
+                    .iter()
                     .map(|inner| {
                         inner
-                            .into_iter()
+                            .iter()
                             .map(|&c| Some(ReadoutTypes::Complex32(c)))
                             .collect()
                     })
