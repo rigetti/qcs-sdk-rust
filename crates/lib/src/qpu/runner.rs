@@ -43,7 +43,7 @@ pub(crate) fn params_into_job_execution_configuration(
 
 /// The QCS Job ID. Useful for debugging or retrieving results later.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub struct JobId(pub(crate) String);
+pub(crate) struct JobId(pub(crate) String);
 
 /// Execute compiled program on a QPU.
 pub(crate) async fn submit(
@@ -132,15 +132,15 @@ impl Buffer {
 /// Generally this should not be used directly, but converted into an appropriate
 /// 2-D array.
 #[derive(Deserialize, Serialize, Debug, PartialEq, Clone, Eq)]
-pub struct Buffer {
-    pub shape: Vec<usize>,
-    pub data: ByteBuf,
-    pub dtype: DataType,
+struct Buffer {
+    shape: Vec<usize>,
+    data: ByteBuf,
+    dtype: DataType,
 }
 
 #[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
-pub enum DataType {
+enum DataType {
     Float64,
     Int16,
     Complex64,

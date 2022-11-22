@@ -39,7 +39,7 @@ pub(crate) fn compile_program(
     isa: TargetDevice,
     client: &Qcs,
     options: CompilerOpts,
-) -> Result<quil_rs::Program, Error> {
+) -> Result<Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa);
@@ -48,10 +48,7 @@ pub(crate) fn compile_program(
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
-        Ok(response) => response
-            .quil
-            .parse::<quil_rs::Program>()
-            .map_err(Error::Parse),
+        Ok(response) => response.quil.parse::<Program>().map_err(Error::Parse),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
 }
@@ -131,12 +128,12 @@ impl Error {
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcCompileProgramResponse {
-    pub quil: String,
+    quil: String,
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct QuilcVersionResponse {
-    pub quilc: String,
+    quilc: String,
 }
 
 /// The top level params that get passed to quilc
@@ -205,7 +202,7 @@ mod tests {
         serde_json::from_reader(File::open("tests/aspen_9_isa.json").unwrap()).unwrap()
     }
 
-    pub fn qvm_isa() -> InstructionSetArchitecture {
+    pub(crate) fn qvm_isa() -> InstructionSetArchitecture {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 

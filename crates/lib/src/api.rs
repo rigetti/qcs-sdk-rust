@@ -24,25 +24,21 @@ use crate::qpu::{
 };
 
 /// Uses quilc to convert a Quil program to native Quil
-/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it:
-/// <https://github.com/rigetti/quil-rs/issues/122>
-/// <https://github.com/rigetti/qcs-sdk-rust/issues/210>
 pub fn compile(
     quil: &str,
     target: TargetDevice,
     client: &Qcs,
     options: CompilerOpts,
-) -> Result<String, Box<dyn std::error::Error + 'static>> {
+) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
     quilc::compile_program(quil, target, client, options)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }
 
 /// Gets the quilc version
-/// TODO: Add `+ Send + Sync` to the error type once quil-rs supports it:
-/// <https://github.com/rigetti/quil-rs/issues/122>
-/// <https://github.com/rigetti/qcs-sdk-rust/issues/210>
-pub fn get_quilc_version(client: &Qcs) -> Result<String, Box<dyn std::error::Error + 'static>> {
+pub fn get_quilc_version(
+    client: &Qcs,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
     quilc::get_version_info(client).map_err(Into::into)
 }
 
@@ -59,7 +55,7 @@ pub enum RewriteArithmeticError {
 
 /// The result of a call to [`rewrite_arithmetic`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct RewriteArithmeticResult {
     /// The rewritten program
     pub program: String,
@@ -79,7 +75,7 @@ pub struct RewriteArithmeticResult {
 /// May return an error if the program fails to parse, or the parameter arithmetic
 /// cannot be rewritten.
 pub fn rewrite_arithmetic(
-    native_quil: quil_rs::Program,
+    native_quil: Program,
 ) -> Result<RewriteArithmeticResult, rewrite_arithmetic::Error> {
     let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil)?;
     let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
@@ -236,7 +232,7 @@ impl From<qpu::runner::Register> for Register {
 }
 
 /// The execution readout data from a particular memory location.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct ExecutionResult {
     shape: Vec<usize>,
     data: Register,
@@ -266,7 +262,7 @@ impl From<readout_values::Values> for ExecutionResult {
 }
 
 /// Execution readout data for all memory locations.
-#[derive(Serialize)]
+#[derive(Debug, Serialize)]
 pub struct ExecutionResults {
     buffers: HashMap<String, ExecutionResult>,
     execution_duration_microseconds: Option<u64>,

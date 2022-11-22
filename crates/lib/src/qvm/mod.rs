@@ -21,13 +21,13 @@ pub(super) enum Response {
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 pub(super) struct Success {
     #[serde(flatten)]
-    pub registers: HashMap<String, RegisterData>,
+    pub(super) registers: HashMap<String, RegisterData>,
 }
 
 #[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
 pub(super) struct Failure {
     /// The message from QVM describing what went wrong.
-    pub status: String,
+    pub(super) status: String,
 }
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]

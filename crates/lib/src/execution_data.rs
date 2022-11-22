@@ -46,13 +46,13 @@ pub enum ReadoutValue {
 /// for all memory indexes of a given shot.
 pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
+/// A mapping of readout fields to their [`ReadoutValues`].
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
 impl ReadoutMap {
-    /// Returns the individual value for the given memory index and shot number, or None, if it
-    /// doesn't exist
+    /// Returns a [`ReadoutValue`] for the given memory index and shot number, if any
     pub fn get_value(
         &self,
         register_name: &str,
@@ -70,7 +70,7 @@ impl ReadoutMap {
         }
     }
 
-    /// Returns a vector containing all the values in the given register at a particular memory
+    /// Returns a vector of the [`ReadoutValue`]s in the given register at a particular memory
     /// index across all shots.
     pub fn get_values_by_memory_index(
         &self,
@@ -88,7 +88,7 @@ impl ReadoutMap {
         }
     }
 
-    /// Returns a vector containing all the values in the given register for a particular shot number.
+    /// Returns a vector of the [`ReadoutValue`]s in the given register for a particular shot number.
     pub fn get_values_by_shot(
         &self,
         register_name: &str,
