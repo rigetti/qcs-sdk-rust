@@ -1,7 +1,6 @@
 use enum_as_inner::EnumAsInner;
 use num::complex::{Complex32, Complex64};
 use std::collections::HashMap;
-use std::convert::TryFrom;
 use std::num::ParseIntError;
 use std::str::FromStr;
 use std::time::Duration;
@@ -13,14 +12,11 @@ use quil_rs::instruction::MemoryReference;
 
 use crate::RegisterData;
 
-/// The result of executing an [`Executable`](crate::Executable) via
-/// [`Executable::execute_on_qvm`](crate::Executable::execute_on_qvm).
+/// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExecutionData {
     /// The readout data that was read from the [`Executable`](crate::Executable).
     /// Key is the name of the register, value is the data of the register after execution.
-    /// "ro" -> [[0, 1, 0, 1]] row = shot_num, col = memory index
-    /// ro[shot_num] = all values in memory for that shot
     pub readout_data: ReadoutMap,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
@@ -29,7 +25,7 @@ pub struct ExecutionData {
     pub duration: Option<Duration>,
 }
 
-/// Maybe this should just be I32, F64, Complex64? Simpler, but would be less efficient for QVM integer types.
+/// An enum representing every possible readout type
 #[derive(Clone, Copy, Debug, EnumAsInner, PartialEq)]
 pub enum ReadoutTypes {
     /// TODO
@@ -47,7 +43,7 @@ pub enum ReadoutTypes {
 }
 
 /// A matrix where rows are the values of a memory index across all shots, and columns are values
-/// for all indexes for a given shot.
+/// for all memory indexes of a given shot.
 pub type RegisterMatrix = Array2<Option<ReadoutTypes>>;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -55,6 +51,8 @@ pub type RegisterMatrix = Array2<Option<ReadoutTypes>>;
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
 impl ReadoutMap {
+    /// Returns the individual value for the given memory index and shot number, or None, if it
+    /// doesn't exist
     pub fn get_value(
         &self,
         register_name: String,
@@ -72,7 +70,8 @@ impl ReadoutMap {
         }
     }
 
-    /// Returns a list of values inside a register at the memory index across all shots
+    /// Returns a vector containing all the values in the given register at a particular memory
+    /// index across all shots.
     pub fn get_values_by_memory_index(
         &self,
         register_name: String,
@@ -89,7 +88,7 @@ impl ReadoutMap {
         }
     }
 
-    /// Returns the values at every memory index for a particular shot number
+    /// Returns a vector containing all the values in the given register for a particular shot number.
     pub fn get_values_by_shot(
         &self,
         register_name: String,
@@ -182,6 +181,8 @@ impl ReadoutMap {
         result
     }
 
+    /// Creates a new `ReadoutMap` from a mapping of register names (ie. "ro") to a 2-dimensional
+    /// vector containing rows of that registers memory values for each shot.
     pub fn from_register_data_map(map: &HashMap<Box<str>, RegisterData>) -> Self {
         let mut result = ReadoutMap(HashMap::new());
         for (name, data) in map {
@@ -224,8 +225,9 @@ impl ReadoutMap {
                     .collect(),
             };
             if !shot_values.is_empty() {
-                let nrows = shot_values.len();
-                let ncols = shot_values[0].len();
+                let nrows = shot_values[0].len();
+                let ncols = shot_values.len();
+                dbg!((nrows, ncols));
                 let matrix = Array2::from_shape_fn((nrows, ncols), |(index, shot_num)| {
                     shot_values[shot_num][index]
                 });
@@ -235,22 +237,6 @@ impl ReadoutMap {
 
         result
     }
-}
-
-/// The result of executing an [`Executable`](crate::Executable) via
-/// [`Executable::execute_on_qpu`](crate::Executable::execute_on_qpu).
-#[derive(Debug, Clone, PartialEq)]
-pub struct Qpu {
-    /// The data of all readout data that were read from
-    /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
-    /// register, value is the data of the register after execution.
-    /// "ro[index]" => [0, 0, 0, 0]
-    pub readout_data: ReadoutMap,
-    /// The time it took to execute the program on the QPU, not including any network or queueing
-    /// time. If paying for on-demand execution, this is the amount you will be billed for.
-    ///
-    /// This will always be `None` for QVM execution.
-    pub duration: Option<Duration>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -289,8 +275,9 @@ fn parse_readout_register(
 mod describe_readout_map {
     use maplit::hashmap;
     use ndarray::prelude::*;
+    use std::collections::HashMap;
 
-    use super::{ReadoutMap, ReadoutTypes, ReadoutValues};
+    use super::{ReadoutMap, ReadoutTypes, ReadoutValues, RegisterData};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
     use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
 
@@ -346,5 +333,25 @@ mod describe_readout_map {
         ]);
 
         assert_eq!(bar, expected);
+    }
+
+    #[test]
+    fn it_converts_from_register_data_map() {
+        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+            String::from("ro").into() => RegisterData::I8(vec![vec![1, 0, 1]]),
+        };
+
+        let readout_map = ReadoutMap::from_register_data_map(&registers);
+
+        let ro = readout_map
+            .get_index_wise_matrix("ro")
+            .expect("ReadoutMap should have ro");
+
+        let expected = arr2(&[
+            [Some(ReadoutTypes::I8(1))],
+            [Some(ReadoutTypes::I8(0))],
+            [Some(ReadoutTypes::I8(1))],
+        ]);
+        assert_eq!(ro, expected);
     }
 }
