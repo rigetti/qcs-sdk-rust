@@ -50,8 +50,8 @@
 //! This crate is the primary Rust API for interacting with Rigetti products. Specifically, this
 //! crate allows you to run Quil programs against real QPUs or a QVM
 //! using [`Executable`].
-//!
-pub use executable::{Error, Executable, ExecuteResult, JobHandle, Service};
+
+pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
 pub use execution_data::{ExecutionData, ReadoutMap, ReadoutValue, RegisterMatrix};
 pub use register_data::RegisterData;
 

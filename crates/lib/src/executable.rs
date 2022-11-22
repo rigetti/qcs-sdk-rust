@@ -237,7 +237,7 @@ impl<'executable> Executable<'executable, '_> {
 }
 
 /// The [`Result`] from executing on a QPU or QVM.
-pub type ExecuteResult = Result<execution_data::ExecutionData, Error>;
+pub type ExecutionResult = Result<execution_data::ExecutionData, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -283,7 +283,7 @@ impl Executable<'_, '_> {
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
+    pub async fn execute_on_qvm(&mut self) -> ExecutionResult {
         let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
@@ -375,7 +375,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
+    pub async fn execute_on_qpu(
+        &mut self,
+        quantum_processor_id: &'execution str,
+    ) -> ExecutionResult {
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -415,7 +418,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecuteResult {
+    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
         let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
         qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
             .await
