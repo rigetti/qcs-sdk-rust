@@ -30,6 +30,6 @@ async fn main() {
         value
             .expect("values should exist")
             .into_i8()
-            .expect("should be i32");
+            .expect("should be i8");
     }
 }

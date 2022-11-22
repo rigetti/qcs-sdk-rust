@@ -81,7 +81,7 @@ impl ReadoutMap {
     ) -> Option<Vec<Option<ReadoutValue>>> {
         let register = self.0.get(register_name);
         if let Some(matrix) = register {
-            if index > matrix.nrows() {
+            if index >= matrix.nrows() {
                 return None;
             }
             Some(matrix.row(index).to_vec())
@@ -168,7 +168,7 @@ impl ReadoutMap {
                                 });
                             }
                         })
-                        .or_insert(Array2::from_elem(shape, None));
+                        .or_insert_with(|| Array2::from_elem(shape, None));
                     for (shot_num, value) in row.iter().enumerate() {
                         // TODO handle possible truncation
                         matrix[[reference.index as usize, shot_num]] = *value;
