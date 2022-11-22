@@ -60,15 +60,10 @@ impl ReadoutMap {
         index: usize,
         shot_num: usize,
     ) -> Option<ReadoutValue> {
-        let register = self.0.get(register_name);
-        if let Some(matrix) = register {
-            if index > matrix.nrows() || shot_num > matrix.ncols() {
-                return None;
-            }
-            matrix[[index, shot_num]]
-        } else {
-            None
-        }
+        self.0
+            .get(register_name)
+            .and_then(|matrix| matrix.get((index, shot_num)))
+            .copied()?
     }
 
     /// Returns a vector of the [`ReadoutValue`]s in the given register at a particular memory
@@ -99,7 +94,7 @@ impl ReadoutMap {
     ) -> Option<Vec<Option<ReadoutValue>>> {
         let register = self.0.get(register_name);
         if let Some(matrix) = register {
-            if shot > matrix.ncols() {
+            if shot >= matrix.ncols() {
                 return None;
             }
             Some(matrix.column(shot).to_vec())
@@ -135,8 +130,9 @@ impl ReadoutMap {
         for (readout_name, values) in readout_values {
             readout_mappings
                 .iter()
-                .filter(|(_, program_alias)| *program_alias == readout_name)
-                .map(|(program_name, _)| program_name.as_ref())
+                .filter_map(|(program_name, program_alias)| {
+                    (program_alias == readout_name).then(|| program_name.as_ref())
+                })
                 .map(parse_readout_register)
                 .filter_map(Result::ok)
                 .for_each(|reference| {
@@ -164,7 +160,7 @@ impl ReadoutMap {
                         .and_modify(|m| {
                             if shape.0 > m.nrows() {
                                 *m = Array2::from_shape_fn(shape, |(r, c)| {
-                                    *m.get((r, c)).unwrap_or(&None)
+                                    m.get((r, c)).copied().flatten()
                                 });
                             }
                         })
