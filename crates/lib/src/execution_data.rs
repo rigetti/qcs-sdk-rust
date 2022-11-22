@@ -1,5 +1,5 @@
 use enum_as_inner::EnumAsInner;
-use num::complex::{Complex32, Complex64};
+use num::complex::Complex64;
 use std::collections::HashMap;
 use std::num::ParseIntError;
 use std::str::FromStr;
@@ -28,18 +28,12 @@ pub struct ExecutionData {
 /// An enum representing every possible readout type
 #[derive(Clone, Copy, Debug, EnumAsInner, PartialEq)]
 pub enum ReadoutValue {
-    /// TODO
-    I8(i8),
-    /// TODO
-    I16(i16),
-    /// TODO
-    I32(i32),
-    /// TODO
-    F64(f64),
-    /// TODO
-    Complex32(Complex32),
-    /// TODO
-    Complex64(Complex64),
+    /// An integer readout value
+    Integer(i32),
+    /// A real numbered readout value
+    Real(f64),
+    /// A complex numbered readout value
+    Complex(Complex64),
 }
 
 /// A matrix where rows are the values of a memory index across all shots, and columns are values
@@ -141,14 +135,14 @@ impl ReadoutMap {
                             .values
                             .clone()
                             .into_iter()
-                            .map(|i| Some(ReadoutValue::I32(i)))
+                            .map(|i| Some(ReadoutValue::Integer(i)))
                             .collect(),
                         Some(readout_values::Values::ComplexValues(comps)) => comps
                             .values
                             .clone()
                             .into_iter()
                             .map(|c| Complex64::new(c.real().into(), c.imaginary().into()))
-                            .map(|c| Some(ReadoutValue::Complex64(c)))
+                            .map(|c| Some(ReadoutValue::Complex(c)))
                             .collect(),
                         None => Vec::new(),
                     };
@@ -184,22 +178,37 @@ impl ReadoutMap {
             let shot_values: Vec<Vec<Option<ReadoutValue>>> = match data {
                 RegisterData::I8(i8) => i8
                     .iter()
-                    .map(|inner| inner.iter().map(|&i| Some(ReadoutValue::I8(i))).collect())
+                    .map(|inner| {
+                        inner
+                            .iter()
+                            .map(|&i| Some(ReadoutValue::Integer(i.into())))
+                            .collect()
+                    })
                     .collect(),
                 RegisterData::I16(i16) => i16
                     .iter()
-                    .map(|inner| inner.iter().map(|&i| Some(ReadoutValue::I16(i))).collect())
+                    .map(|inner| {
+                        inner
+                            .iter()
+                            .map(|&i| Some(ReadoutValue::Integer(i.into())))
+                            .collect()
+                    })
                     .collect(),
                 RegisterData::F64(f64) => f64
                     .iter()
-                    .map(|inner| inner.iter().map(|&f| Some(ReadoutValue::F64(f))).collect())
+                    .map(|inner| inner.iter().map(|&f| Some(ReadoutValue::Real(f))).collect())
                     .collect(),
                 RegisterData::Complex32(c32) => c32
                     .iter()
                     .map(|inner| {
                         inner
                             .iter()
-                            .map(|&c| Some(ReadoutValue::Complex32(c)))
+                            .map(|&c| {
+                                Some(ReadoutValue::Complex(Complex64::new(
+                                    c.re.into(),
+                                    c.im.into(),
+                                )))
+                            })
                             .collect()
                     })
                     .collect(),
@@ -293,8 +302,8 @@ mod describe_readout_map {
 
         let expected = arr2(&[
             [None],
-            [Some(ReadoutValue::I32(11))],
-            [Some(ReadoutValue::I32(22))],
+            [Some(ReadoutValue::Integer(11))],
+            [Some(ReadoutValue::Integer(22))],
         ]);
 
         assert_eq!(register, expected);
@@ -307,9 +316,9 @@ mod describe_readout_map {
             [None],
             [None],
             [None],
-            [Some(ReadoutValue::I32(33))],
+            [Some(ReadoutValue::Integer(33))],
             [None],
-            [Some(ReadoutValue::I32(44))],
+            [Some(ReadoutValue::Integer(44))],
         ]);
 
         assert_eq!(bar, expected);
@@ -328,9 +337,9 @@ mod describe_readout_map {
             .expect("ReadoutMap should have ro");
 
         let expected = arr2(&[
-            [Some(ReadoutValue::I8(1))],
-            [Some(ReadoutValue::I8(0))],
-            [Some(ReadoutValue::I8(1))],
+            [Some(ReadoutValue::Integer(1))],
+            [Some(ReadoutValue::Integer(0))],
+            [Some(ReadoutValue::Integer(1))],
         ]);
         assert_eq!(ro, expected);
     }

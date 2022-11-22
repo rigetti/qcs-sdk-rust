@@ -37,8 +37,8 @@ async fn basic_substitution() {
                 .readout_data
                 .get_value("ro", 0, 0)
                 .expect("ro register should have a value in the first index and shot")
-                .into_i8()
-                .expect("should be type i8"),
+                .into_integer()
+                .expect("should be integer"),
         )
     }
 

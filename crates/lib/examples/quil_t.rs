@@ -29,7 +29,7 @@ async fn main() {
     for value in result.iter() {
         value
             .expect("values should exist")
-            .into_i8()
-            .expect("should be i8");
+            .into_integer()
+            .expect("should be integers");
     }
 }

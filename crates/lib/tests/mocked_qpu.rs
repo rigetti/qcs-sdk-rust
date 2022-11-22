@@ -34,8 +34,14 @@ async fn successful_bell_state() {
             .get_index_wise_matrix("ro")
             .expect("should have values for `ro`"),
         arr2(&[
-            [Some(ReadoutValue::I32(0)), Some(ReadoutValue::I32(0))],
-            [Some(ReadoutValue::I32(1)), Some(ReadoutValue::I32(1))],
+            [
+                Some(ReadoutValue::Integer(0)),
+                Some(ReadoutValue::Integer(0))
+            ],
+            [
+                Some(ReadoutValue::Integer(1)),
+                Some(ReadoutValue::Integer(1))
+            ],
         ]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));

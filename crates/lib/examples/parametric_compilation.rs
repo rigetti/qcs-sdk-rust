@@ -45,8 +45,8 @@ async fn main() {
             parametric_measurements.push(
                 value
                     .expect("ro should have values")
-                    .into_i32()
-                    .expect("values should be i32"),
+                    .into_integer()
+                    .expect("values should be integers"),
             )
         }
     }
