@@ -12,7 +12,7 @@
 
 pub use executable::{Error, Executable, JobHandle, Service};
 pub use execution_data::ExecutionData;
-pub use execution_data::ReadoutTypes;
+pub use execution_data::ReadoutValue;
 pub use register_data::RegisterData;
 
 pub mod api;

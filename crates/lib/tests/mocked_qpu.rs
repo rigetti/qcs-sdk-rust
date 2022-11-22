@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use ndarray::arr2;
 
-use qcs::{Executable, ReadoutTypes};
+use qcs::{Executable, ReadoutValue};
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
 
 const BELL_STATE: &str = r#"
@@ -34,8 +34,8 @@ async fn successful_bell_state() {
             .get_index_wise_matrix("ro")
             .expect("should have values for `ro`"),
         arr2(&[
-            [Some(ReadoutTypes::I32(0)), Some(ReadoutTypes::I32(0))],
-            [Some(ReadoutTypes::I32(1)), Some(ReadoutTypes::I32(1))],
+            [Some(ReadoutValue::I32(0)), Some(ReadoutValue::I32(0))],
+            [Some(ReadoutValue::I32(1)), Some(ReadoutValue::I32(1))],
         ]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));

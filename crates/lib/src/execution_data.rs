@@ -27,7 +27,7 @@ pub struct ExecutionData {
 
 /// An enum representing every possible readout type
 #[derive(Clone, Copy, Debug, EnumAsInner, PartialEq)]
-pub enum ReadoutTypes {
+pub enum ReadoutValue {
     /// TODO
     I8(i8),
     /// TODO
@@ -44,7 +44,7 @@ pub enum ReadoutTypes {
 
 /// A matrix where rows are the values of a memory index across all shots, and columns are values
 /// for all memory indexes of a given shot.
-pub type RegisterMatrix = Array2<Option<ReadoutTypes>>;
+pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
@@ -58,7 +58,7 @@ impl ReadoutMap {
         register_name: &str,
         index: usize,
         shot_num: usize,
-    ) -> Option<ReadoutTypes> {
+    ) -> Option<ReadoutValue> {
         let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if index > matrix.nrows() || shot_num > matrix.ncols() {
@@ -76,7 +76,7 @@ impl ReadoutMap {
         &self,
         register_name: &str,
         index: usize,
-    ) -> Option<Vec<Option<ReadoutTypes>>> {
+    ) -> Option<Vec<Option<ReadoutValue>>> {
         let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if index > matrix.nrows() {
@@ -93,7 +93,7 @@ impl ReadoutMap {
         &self,
         register_name: &str,
         shot: usize,
-    ) -> Option<Vec<Option<ReadoutTypes>>> {
+    ) -> Option<Vec<Option<ReadoutValue>>> {
         let register = self.0.get(register_name);
         if let Some(matrix) = register {
             if shot > matrix.ncols() {
@@ -140,14 +140,14 @@ impl ReadoutMap {
                             .values
                             .clone()
                             .into_iter()
-                            .map(|i| Some(ReadoutTypes::I32(i)))
+                            .map(|i| Some(ReadoutValue::I32(i)))
                             .collect(),
                         Some(readout_values::Values::ComplexValues(comps)) => comps
                             .values
                             .clone()
                             .into_iter()
                             .map(|c| Complex64::new(c.real().into(), c.imaginary().into()))
-                            .map(|c| Some(ReadoutTypes::Complex64(c)))
+                            .map(|c| Some(ReadoutValue::Complex64(c)))
                             .collect(),
                         None => Vec::new(),
                     };
@@ -179,25 +179,25 @@ impl ReadoutMap {
     pub fn from_register_data_map(map: &HashMap<Box<str>, RegisterData>) -> Self {
         let mut result = ReadoutMap(HashMap::new());
         for (name, data) in map {
-            let shot_values: Vec<Vec<Option<ReadoutTypes>>> = match data {
+            let shot_values: Vec<Vec<Option<ReadoutValue>>> = match data {
                 RegisterData::I8(i8) => i8
                     .iter()
-                    .map(|inner| inner.iter().map(|&i| Some(ReadoutTypes::I8(i))).collect())
+                    .map(|inner| inner.iter().map(|&i| Some(ReadoutValue::I8(i))).collect())
                     .collect(),
                 RegisterData::I16(i16) => i16
                     .iter()
-                    .map(|inner| inner.iter().map(|&i| Some(ReadoutTypes::I16(i))).collect())
+                    .map(|inner| inner.iter().map(|&i| Some(ReadoutValue::I16(i))).collect())
                     .collect(),
                 RegisterData::F64(f64) => f64
                     .iter()
-                    .map(|inner| inner.iter().map(|&f| Some(ReadoutTypes::F64(f))).collect())
+                    .map(|inner| inner.iter().map(|&f| Some(ReadoutValue::F64(f))).collect())
                     .collect(),
                 RegisterData::Complex32(c32) => c32
                     .iter()
                     .map(|inner| {
                         inner
                             .iter()
-                            .map(|&c| Some(ReadoutTypes::Complex32(c)))
+                            .map(|&c| Some(ReadoutValue::Complex32(c)))
                             .collect()
                     })
                     .collect(),
@@ -255,7 +255,7 @@ mod describe_readout_map {
     use ndarray::prelude::*;
     use std::collections::HashMap;
 
-    use super::{ReadoutMap, ReadoutTypes, ReadoutValues, RegisterData};
+    use super::{ReadoutMap, ReadoutValue, ReadoutValues, RegisterData};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
     use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
 
@@ -291,8 +291,8 @@ mod describe_readout_map {
 
         let expected = arr2(&[
             [None],
-            [Some(ReadoutTypes::I32(11))],
-            [Some(ReadoutTypes::I32(22))],
+            [Some(ReadoutValue::I32(11))],
+            [Some(ReadoutValue::I32(22))],
         ]);
 
         assert_eq!(register, expected);
@@ -305,9 +305,9 @@ mod describe_readout_map {
             [None],
             [None],
             [None],
-            [Some(ReadoutTypes::I32(33))],
+            [Some(ReadoutValue::I32(33))],
             [None],
-            [Some(ReadoutTypes::I32(44))],
+            [Some(ReadoutValue::I32(44))],
         ]);
 
         assert_eq!(bar, expected);
@@ -326,9 +326,9 @@ mod describe_readout_map {
             .expect("ReadoutMap should have ro");
 
         let expected = arr2(&[
-            [Some(ReadoutTypes::I8(1))],
-            [Some(ReadoutTypes::I8(0))],
-            [Some(ReadoutTypes::I8(1))],
+            [Some(ReadoutValue::I8(1))],
+            [Some(ReadoutValue::I8(0))],
+            [Some(ReadoutValue::I8(1))],
         ]);
         assert_eq!(ro, expected);
     }
