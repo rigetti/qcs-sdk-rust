@@ -109,7 +109,7 @@ impl ReadoutMap {
     #[must_use]
     pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
         let register = self.0.get(register_name);
-        register.map(|matrix| matrix.clone().reversed_axes())
+        register.cloned().map(ArrayBase::reversed_axes)
     }
 
     /// `readout_values` maps program-defined readout to result-defined readout, e.g.:
