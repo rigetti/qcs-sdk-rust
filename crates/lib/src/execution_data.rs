@@ -53,6 +53,7 @@ pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
 impl ReadoutMap {
     /// Returns a [`ReadoutValue`] for the given memory index and shot number, if any
+    #[must_use]
     pub fn get_value(
         &self,
         register_name: &str,
@@ -72,6 +73,7 @@ impl ReadoutMap {
 
     /// Returns a vector of the [`ReadoutValue`]s in the given register at a particular memory
     /// index across all shots.
+    #[must_use]
     pub fn get_values_by_memory_index(
         &self,
         register_name: &str,
@@ -89,6 +91,7 @@ impl ReadoutMap {
     }
 
     /// Returns a vector of the [`ReadoutValue`]s in the given register for a particular shot number.
+    #[must_use]
     pub fn get_values_by_shot(
         &self,
         register_name: &str,
@@ -107,12 +110,14 @@ impl ReadoutMap {
 
     /// Returns the matrix as a 2-dimensional array where the row is the memory index and the
     /// column is the shot number.
+    #[must_use]
     pub fn get_index_wise_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
         self.0.get(register_name)
     }
 
     /// Returns the matrix as a 2-dimensional array where the row is the shot number, and the
     /// column is the memory index.
+    #[must_use]
     pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
         let register = self.0.get(register_name);
         register.map(|matrix| matrix.clone().reversed_axes())
@@ -176,6 +181,7 @@ impl ReadoutMap {
 
     /// Creates a new `ReadoutMap` from a mapping of register names (ie. "ro") to a 2-dimensional
     /// vector containing rows of that registers memory values for each shot.
+    #[must_use]
     pub fn from_register_data_map(map: &HashMap<Box<str>, RegisterData>) -> Self {
         let mut result = ReadoutMap(HashMap::new());
         for (name, data) in map {
