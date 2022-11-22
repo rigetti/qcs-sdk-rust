@@ -19,7 +19,7 @@ MEASURE 1 second
 async fn test_bell_state() {
     const SHOTS: u16 = 10;
 
-    let mut data = Executable::from_quil(PROGRAM)
+    let data = Executable::from_quil(PROGRAM)
         .with_config(ClientConfiguration::default())
         .with_shots(SHOTS)
         .read_from("first")
@@ -28,22 +28,23 @@ async fn test_bell_state() {
         .await
         .expect("Could not run on QVM");
 
-    let first: Vec<Vec<i8>> = data
-        .registers
-        .remove("first")
-        .expect("Missing first buffer")
-        .into_i8()
-        .expect("Produced wrong data type");
-    let second: Vec<Vec<i8>> = data
-        .registers
-        .remove("second")
-        .expect("Missing second buffer")
-        .into_i8()
-        .expect("Produced wrong data type");
+    let first = data
+        .readout_data
+        .get_shot_wise_matrix("first")
+        .expect("should have first register");
+
+    let second = data
+        .readout_data
+        .get_shot_wise_matrix("second")
+        .expect("should have second register");
+
+    assert_eq!(first.shape(), [1, 1]);
+    assert_eq!(second.shape(), [1, 1]);
 
     for (first, second) in first.into_iter().zip(second) {
-        assert_eq!(first.len(), 1);
-        assert_eq!(second.len(), 1);
-        assert_eq!(first[0], second[0]);
+        assert_eq!(
+            first.expect("should have value"),
+            second.expect("should have value")
+        );
     }
 }

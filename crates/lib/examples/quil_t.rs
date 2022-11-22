@@ -3,7 +3,6 @@
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/quilt_getting_started.html#Another-example:-a-simple-T1-experiment
 
 use qcs::Executable;
-use qcs_api_client_grpc::models::controller::{readout_values::Values, IntegerReadoutValues};
 
 /// This program doesn't do much, the main point is that it will fail if quilc is invoked.
 const PROGRAM: &str = r#"
@@ -24,13 +23,13 @@ async fn main() {
         .await
         .expect("Program should execute successfully")
         .readout_data
-        .get_readout_values("ro".to_string(), 0)
-        .expect("Readout data should include 'ro'")
-        .values
-        .expect("Readout data should include values");
+        .get_values_by_memory_index("ro".to_string(), 0)
+        .expect("Readout data should include 'ro'");
 
-    match result {
-        Values::IntegerValues(IntegerReadoutValues { values }) => assert!(!values.is_empty()),
-        _ => panic!("expected IntegerReadoutValues, got {:?}", result),
+    for value in result.iter() {
+        value
+            .expect("values should exist")
+            .into_i8()
+            .expect("should be i32");
     }
 }

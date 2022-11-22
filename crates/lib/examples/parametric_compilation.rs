@@ -5,7 +5,6 @@ use std::f64::consts::PI;
 use std::time::Duration;
 
 use qcs::Executable;
-use qcs_api_client_grpc::models::controller::{readout_values::Values, IntegerReadoutValues};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT
@@ -37,21 +36,18 @@ async fn main() {
             .duration
             .expect("Aspen-11 should always report duration");
 
-        let ro_readout_data = data
+        let first_ro_values = data
             .readout_data
-            .get_readout_values_for_field("ro")
-            .expect("readout values should contain 'ro'")
-            .expect("'ro' should contain readout values");
-        let first_ro_data = ro_readout_data
-            .first()
-            .expect("'ro' should contain at least one readout value")
-            .clone();
-        let first_ro_values = first_ro_data
-            .expect("first readout value should ")
-            .values
-            .expect("'ro' should have readout values");
-        if let Values::IntegerValues(IntegerReadoutValues { mut values }) = first_ro_values {
-            parametric_measurements.append(&mut values)
+            .get_values_by_shot("ro".to_string(), 0)
+            .expect("readout values should contain 'ro'");
+
+        for value in first_ro_values.iter() {
+            parametric_measurements.push(
+                value
+                    .expect("expect ro to have values")
+                    .into_i32()
+                    .expect(" values should be i32"),
+            )
         }
     }
 

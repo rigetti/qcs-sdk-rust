@@ -27,18 +27,18 @@ async fn basic_substitution() {
 
     for i in 0..=200 {
         let theta = step * f64::from(i);
-        let mut result = exe
+        let result = exe
             .with_parameter("theta", 0, theta)
             .execute_on_qvm()
             .await
             .expect("Executed on QPU");
-        parametric_measurements.append(
-            &mut result
-                .registers
-                .remove("ro")
-                .expect("Found ro register")
+        parametric_measurements.push(
+            result
+                .readout_data
+                .get_value("ro".to_string(), 0, 0)
+                .expect("ro register should have a value in the first index and shot")
                 .into_i8()
-                .unwrap()[0],
+                .expect("should be type i8"),
         )
     }
 

@@ -11,9 +11,9 @@ use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
-use crate::execution_data::{MemoryReferenceParseError, Qpu, ReadoutMap};
+use crate::execution_data::{MemoryReferenceParseError, ReadoutMap};
 use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
-use crate::JobHandle;
+use crate::{ExecutionData, JobHandle};
 
 use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, CompilerOpts, TargetDevice};
@@ -180,11 +180,11 @@ impl<'a> Execution<'a> {
         &self,
         job_id: JobId,
         readout_mappings: HashMap<String, String>,
-    ) -> Result<Qpu, Error> {
+    ) -> Result<ExecutionData, Error> {
         let response =
             retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
 
-        Ok(Qpu {
+        Ok(ExecutionData {
             readout_data: ReadoutMap::from_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,

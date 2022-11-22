@@ -1,10 +1,14 @@
+use enum_as_inner::EnumAsInner;
+use num::complex::{Complex32, Complex64};
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::num::{ParseIntError, TryFromIntError};
+use std::num::ParseIntError;
 use std::str::FromStr;
 use std::time::Duration;
 
-use qcs_api_client_grpc::models::controller::ReadoutValues;
+use ndarray::prelude::*;
+
+use qcs_api_client_grpc::models::controller::{readout_values, ReadoutValues};
 use quil_rs::instruction::MemoryReference;
 
 use crate::RegisterData;
@@ -12,10 +16,12 @@ use crate::RegisterData;
 /// The result of executing an [`Executable`](crate::Executable) via
 /// [`Executable::execute_on_qvm`](crate::Executable::execute_on_qvm).
 #[derive(Debug, Clone, PartialEq)]
-pub struct Qvm {
+pub struct ExecutionData {
     /// The readout data that was read from the [`Executable`](crate::Executable).
     /// Key is the name of the register, value is the data of the register after execution.
-    pub registers: HashMap<Box<str>, RegisterData>,
+    /// "ro" -> [[0, 1, 0, 1]] row = shot_num, col = memory index
+    /// ro[shot_num] = all values in memory for that shot
+    pub readout_data: ReadoutMap,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
     ///
@@ -23,36 +29,103 @@ pub struct Qvm {
     pub duration: Option<Duration>,
 }
 
+/// Maybe this should just be I32, F64, Complex64? Simpler, but would be less efficient for QVM integer types.
+#[derive(Clone, Copy, Debug, EnumAsInner, PartialEq)]
+pub enum ReadoutTypes {
+    /// TODO
+    I8(i8),
+    /// TODO
+    I16(i16),
+    /// TODO
+    I32(i32),
+    /// TODO
+    F64(f64),
+    /// TODO
+    Complex32(Complex32),
+    /// TODO
+    Complex64(Complex64),
+}
+
+/// A matrix where rows are the values of a memory index across all shots, and columns are values
+/// for all indexes for a given shot.
+pub type RegisterMatrix = Array2<Option<ReadoutTypes>>;
+
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
-pub struct ReadoutMap(HashMap<MemoryReference, ReadoutValues>);
+pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
 impl ReadoutMap {
-    /// Given a known readout field name and index, return the result's [`ReadoutValues`], if any.
-    pub fn get_readout_values(&self, field: String, index: u64) -> Option<ReadoutValues> {
-        let readout_values = self.0.get(&MemoryReference { name: field, index })?;
-
-        Some(readout_values.clone())
+    pub fn get_value(
+        &self,
+        register_name: String,
+        index: usize,
+        shot_num: usize,
+    ) -> Option<ReadoutTypes> {
+        let register = self.0.get(&register_name);
+        if let Some(matrix) = register {
+            if index > matrix.nrows() || shot_num > matrix.ncols() {
+                return None;
+            }
+            matrix[[index, shot_num]]
+        } else {
+            None
+        }
     }
 
-    /// Given a known readout field name, return the result's [`ReadoutValues`] for all indices, if any.
-    pub fn get_readout_values_for_field(
+    /// Returns a list of values inside a register at the memory index across all shots
+    pub fn get_values_by_memory_index(
         &self,
-        field: &str,
-    ) -> Result<Option<Vec<Option<ReadoutValues>>>, TryFromIntError> {
-        let mut readout_values = Vec::new();
-        for (memref, values) in &self.0 {
-            let MemoryReference { name, index } = memref;
-            let index = usize::try_from(*index)?;
-            if name == field {
-                if readout_values.len() <= index {
-                    readout_values.resize(index + 1, None);
-                }
-                readout_values[index] = Some(values.clone());
+        register_name: String,
+        index: usize,
+    ) -> Option<Vec<Option<ReadoutTypes>>> {
+        let register = self.0.get(&register_name);
+        if let Some(matrix) = register {
+            if index > matrix.nrows() {
+                return None;
             }
+            Some(matrix.row(index).to_vec())
+        } else {
+            None
         }
+    }
 
-        Ok((!readout_values.is_empty()).then_some(readout_values))
+    /// Returns the values at every memory index for a particular shot number
+    pub fn get_values_by_shot(
+        &self,
+        register_name: String,
+        shot: usize,
+    ) -> Option<Vec<Option<ReadoutTypes>>> {
+        let register = self.0.get(&register_name);
+        if let Some(matrix) = register {
+            if shot > matrix.ncols() {
+                return None;
+            }
+            Some(matrix.column(shot).to_vec())
+        } else {
+            None
+        }
+    }
+
+    /// Returns the matrix as a 2-dimensional array where the row is the memory index and the
+    /// column is the shot number.
+    pub fn get_index_wise_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
+        let register = self.0.get(register_name);
+        if let Some(matrix) = register {
+            Some(matrix)
+        } else {
+            None
+        }
+    }
+
+    /// Returns the matrix as a 2-dimensional array where the row is the shot number, and the
+    /// column is the memory index.
+    pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
+        let register = self.0.get(register_name);
+        if let Some(matrix) = register {
+            Some(matrix.clone().reversed_axes())
+        } else {
+            None
+        }
     }
 
     /// `readout_values` maps program-defined readout to result-defined readout, e.g.:
@@ -63,28 +136,104 @@ impl ReadoutMap {
         readout_mappings: &HashMap<String, String>,
         readout_values: &HashMap<String, ReadoutValues>,
     ) -> Self {
-        let result = readout_values
-            .iter()
-            .flat_map(|(readout_name, values)| {
-                readout_mappings
-                    .iter()
-                    .filter(|(_, program_alias)| *program_alias == readout_name)
-                    .map(|(program_name, _)| program_name.as_ref())
-                    .map(parse_readout_register)
-                    .map(|reference| Ok((reference?, values.clone())))
-                    .collect::<Result<Vec<_>, MemoryReferenceParseError>>()
-            })
-            .flatten()
-            .collect::<HashMap<_, _>>()
-            .into();
+        let mut result = ReadoutMap(HashMap::new());
+        readout_values.iter().for_each(|(readout_name, values)| {
+            readout_mappings
+                .iter()
+                .filter(|(_, program_alias)| *program_alias == readout_name)
+                .map(|(program_name, _)| program_name.as_ref())
+                .map(parse_readout_register)
+                .filter_map(Result::ok)
+                .for_each(|reference| {
+                    let row = match &values.values {
+                        Some(readout_values::Values::IntegerValues(ints)) => ints
+                            .values
+                            .clone()
+                            .into_iter()
+                            .map(|i| Some(ReadoutTypes::I32(i)))
+                            .collect(),
+                        Some(readout_values::Values::ComplexValues(comps)) => comps
+                            .values
+                            .clone()
+                            .into_iter()
+                            .map(|c| Complex64::new(c.real().into(), c.imaginary().into()))
+                            .map(|c| Some(ReadoutTypes::Complex64(c)))
+                            .collect(),
+                        None => Vec::new(),
+                    };
+                    let shape = (reference.index as usize + 1, row.len());
+                    let matrix = result
+                        .0
+                        .entry(reference.name)
+                        .and_modify(|m| {
+                            if shape.0 > m.nrows() {
+                                *m = Array2::from_shape_fn(shape, |(r, c)| {
+                                    m.get((r, c)).unwrap_or(&None).clone()
+                                })
+                            }
+                        })
+                        .or_insert(Array2::from_elem(shape, None));
+                    for (shot_num, value) in row.iter().enumerate() {
+                        matrix[[reference.index as usize, shot_num]] = value.clone();
+                    }
+                });
+        });
 
         result
     }
-}
 
-impl From<HashMap<MemoryReference, ReadoutValues>> for ReadoutMap {
-    fn from(map: HashMap<MemoryReference, ReadoutValues>) -> Self {
-        Self(map)
+    pub fn from_register_data_map(map: &HashMap<Box<str>, RegisterData>) -> Self {
+        let mut result = ReadoutMap(HashMap::new());
+        for (name, data) in map {
+            let shot_values: Vec<Vec<Option<ReadoutTypes>>> = match data {
+                RegisterData::I8(i8) => i8
+                    .into_iter()
+                    .map(|inner| {
+                        inner
+                            .into_iter()
+                            .map(|&i| Some(ReadoutTypes::I8(i)))
+                            .collect()
+                    })
+                    .collect(),
+                RegisterData::I16(i16) => i16
+                    .into_iter()
+                    .map(|inner| {
+                        inner
+                            .into_iter()
+                            .map(|&i| Some(ReadoutTypes::I16(i)))
+                            .collect()
+                    })
+                    .collect(),
+                RegisterData::F64(f64) => f64
+                    .into_iter()
+                    .map(|inner| {
+                        inner
+                            .into_iter()
+                            .map(|&f| Some(ReadoutTypes::F64(f)))
+                            .collect()
+                    })
+                    .collect(),
+                RegisterData::Complex32(c32) => c32
+                    .into_iter()
+                    .map(|inner| {
+                        inner
+                            .into_iter()
+                            .map(|&c| Some(ReadoutTypes::Complex32(c)))
+                            .collect()
+                    })
+                    .collect(),
+            };
+            if !shot_values.is_empty() {
+                let nrows = shot_values.len();
+                let ncols = shot_values[0].len();
+                let matrix = Array2::from_shape_fn((nrows, ncols), |(index, shot_num)| {
+                    shot_values[shot_num][index]
+                });
+                result.0.insert(name.to_string(), matrix);
+            }
+        }
+
+        result
     }
 }
 
@@ -95,6 +244,7 @@ pub struct Qpu {
     /// The data of all readout data that were read from
     /// (via [`Executable::read_from`](crate::Executable::read_from)). Key is the name of the
     /// register, value is the data of the register after execution.
+    /// "ro[index]" => [0, 0, 0, 0]
     pub readout_data: ReadoutMap,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
@@ -138,8 +288,9 @@ fn parse_readout_register(
 #[cfg(test)]
 mod describe_readout_map {
     use maplit::hashmap;
+    use ndarray::prelude::*;
 
-    use super::{ReadoutMap, ReadoutValues};
+    use super::{ReadoutMap, ReadoutTypes, ReadoutValues};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
     use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
 
@@ -169,35 +320,31 @@ mod describe_readout_map {
         };
 
         let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values);
-        let ro = readout_map
-            .get_readout_values_for_field("ro")
-            .unwrap()
-            .expect("ReadoutMap should have field `ro`");
+        let register = readout_map
+            .get_index_wise_matrix("ro")
+            .expect("ReadoutMap should have ro");
 
-        assert_eq!(
-            ro,
-            vec![
-                None,
-                Some(dummy_readout_values(11)),
-                Some(dummy_readout_values(22)),
-            ],
-        );
+        let expected = arr2(&[
+            [None],
+            [Some(ReadoutTypes::I32(11))],
+            [Some(ReadoutTypes::I32(22))],
+        ]);
+
+        assert_eq!(register, expected);
 
         let bar = readout_map
-            .get_readout_values_for_field("bar")
-            .unwrap()
+            .get_index_wise_matrix("bar")
             .expect("ReadoutMap should have field `bar`");
 
-        assert_eq!(
-            bar,
-            vec![
-                None,
-                None,
-                None,
-                Some(dummy_readout_values(33)),
-                None,
-                Some(dummy_readout_values(44))
-            ],
-        );
+        let expected = arr2(&[
+            [None],
+            [None],
+            [None],
+            [Some(ReadoutTypes::I32(33))],
+            [None],
+            [Some(ReadoutTypes::I32(44))],
+        ]);
+
+        assert_eq!(bar, expected);
     }
 }

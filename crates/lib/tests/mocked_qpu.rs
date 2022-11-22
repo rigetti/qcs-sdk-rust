@@ -3,11 +3,10 @@
 
 use std::time::Duration;
 
-use qcs::Executable;
+use ndarray::arr2;
+
+use qcs::{Executable, ReadoutTypes};
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
-use qcs_api_client_grpc::models::controller::{
-    readout_values::Values, IntegerReadoutValues, ReadoutValues,
-};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -32,21 +31,12 @@ async fn successful_bell_state() {
     assert_eq!(
         result
             .readout_data
-            .get_readout_values_for_field("ro")
-            .expect("should have values for `ro`")
-            .unwrap(),
-        vec![
-            Some(ReadoutValues {
-                values: Some(Values::IntegerValues(IntegerReadoutValues {
-                    values: vec![0, 0],
-                })),
-            }),
-            Some(ReadoutValues {
-                values: Some(Values::IntegerValues(IntegerReadoutValues {
-                    values: vec![1, 1],
-                })),
-            }),
-        ],
+            .get_index_wise_matrix("ro")
+            .expect("should have values for `ro`"),
+        arr2(&[
+            [Some(ReadoutTypes::I32(0)), Some(ReadoutTypes::I32(0))],
+            [Some(ReadoutTypes::I32(1)), Some(ReadoutTypes::I32(1))],
+        ]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 }

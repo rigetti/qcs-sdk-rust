@@ -8,7 +8,7 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
 
-use crate::execution_data;
+use crate::execution_data::{self, ReadoutMap};
 use crate::qpu::client::Qcs;
 use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
@@ -236,8 +236,7 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
-type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
+type ExecuteResult = Result<execution_data::ExecutionData, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -283,7 +282,7 @@ impl Executable<'_, '_> {
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm(&mut self) -> ExecuteResultQVM {
+    pub async fn execute_on_qvm(&mut self) -> ExecuteResult {
         let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
@@ -297,8 +296,8 @@ impl Executable<'_, '_> {
         self.qvm = Some(qvm);
         result
             .map_err(Error::from)
-            .map(|registers| execution_data::Qvm {
-                registers,
+            .map(|registers| execution_data::ExecutionData {
+                readout_data: ReadoutMap::from_register_data_map(&registers),
                 duration: None,
             })
     }
@@ -375,10 +374,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(
-        &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> ExecuteResultQPU {
+    pub async fn execute_on_qpu(&mut self, quantum_processor_id: &'execution str) -> ExecuteResult {
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -418,10 +414,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(
-        &mut self,
-        job_handle: JobHandle<'execution>,
-    ) -> ExecuteResultQPU {
+    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecuteResult {
         let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
         qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
             .await
