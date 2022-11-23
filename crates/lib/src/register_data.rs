@@ -2,8 +2,7 @@ use enum_as_inner::EnumAsInner;
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 
-/// Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`) or
-/// [`Executable::execute_on_qpu`](`crate::Executable::execute_on_qpu`).
+/// Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`)
 ///
 /// This represents a single vector (or "register") of typed memory across some number of shots.
 /// The register corresponds to the usage of a `DECLARE` instruction in Quil, and the name of that
@@ -16,7 +15,7 @@ use serde::{Deserialize, Serialize};
 /// # Usage
 ///
 /// Typically you will already know what type of data the `ExecutionResult` _should_ have, so you can
-/// use the [`mod@enum_as_inner`] methods (e.g. [`ExecutionResult::into_i8`]) in order to
+/// use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
 /// convert any variant type to its inner data.
 #[derive(Clone, Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
 #[serde(untagged)]

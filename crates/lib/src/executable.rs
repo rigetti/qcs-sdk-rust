@@ -378,7 +378,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
     ///
     /// # Errors
-    /// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
+    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
     ///
     /// 1. You are not authenticated for QCS
     /// 1. Your credentials don't have an active reservation for the QPU you requested
@@ -499,7 +499,7 @@ pub enum Error {
     /// [`Executable::retrieve_results`] can invalidate the handle.
     #[error("The job handle was not valid")]
     InvalidJobHandle,
-    /// Occurs when failing to construct a [`QcsClient`].
+    /// Occurs when failing to construct a [`Qcs`] client.
     #[error("The QCS client configuration failed to load")]
     QcsConfigLoadFailure(#[from] LoadError),
 }

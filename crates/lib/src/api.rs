@@ -53,7 +53,7 @@ pub enum RewriteArithmeticError {
     Rewrite(#[from] rewrite_arithmetic::Error),
 }
 
-/// The result of a call to [`rewrite_arithmetic`] which provides the
+/// The result of a call to [`rewrite_arithmetic()`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
 #[derive(Debug, Serialize)]
 pub struct RewriteArithmeticResult {
@@ -112,7 +112,7 @@ pub struct TranslationResult {
 ///
 /// # Errors
 ///
-/// Returns a [`translation::Error`] if translation fails.
+/// Returns a [`TranslationError`] if translation fails.
 pub async fn translate(
     native_quil: &str,
     shots: u16,
@@ -292,7 +292,7 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 ///
 /// # Errors
 ///
-/// May error if a [`gRPC`] client cannot be constructed, or a [`gRPC`]
+/// May error if a [`Qcs`] client cannot be constructed, or if the ``gRPC``
 /// call fails.
 pub async fn retrieve_results(
     job_id: &str,

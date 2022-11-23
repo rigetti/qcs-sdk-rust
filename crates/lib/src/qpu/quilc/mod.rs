@@ -170,7 +170,7 @@ impl NativeQuilRequest {
     }
 }
 
-/// Description of a device to compile for, part of [`NativeQuilRequest`]
+/// Description of a device to compile for.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 pub struct TargetDevice {

@@ -193,7 +193,7 @@ pub enum GrpcClientError {
     GrpcError(#[from] GrpcError),
 }
 
-/// Errors that may occur while trying to use a [`OpenAPI`] client
+/// Errors that may occur while trying to use an ``OpenAPI`` client
 #[derive(Debug, thiserror::Error)]
 pub enum OpenApiClientError<T> {
     /// Error due to request failure
