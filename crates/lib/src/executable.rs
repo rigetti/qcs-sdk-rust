@@ -24,7 +24,7 @@ use quil_rs::Program;
 ///
 /// ```rust
 /// use qcs_api_client_common::ClientConfiguration;
-/// use qcs::{Executable, RegisterData};
+/// use qcs::Executable;
 ///
 ///
 /// const PROGRAM: &str = r##"
@@ -290,7 +290,7 @@ impl Executable<'_, '_> {
     ///
     /// # Returns
     ///
-    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
+    /// An [`ExecutionResult`].
     ///
     /// # Errors
     ///
@@ -375,7 +375,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Returns
     ///
-    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
+    /// An [`ExecutionResult`].
     ///
     /// # Errors
     /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:

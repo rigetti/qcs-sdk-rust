@@ -39,7 +39,7 @@ pub enum ReadoutValue {
 /// for all memory indexes of a given shot.
 pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
-/// A mapping of readout fields to their [`ReadoutValues`].
+/// A mapping of readout fields to their [`ReadoutValue`]s.
 #[derive(Debug, Clone, PartialEq)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
