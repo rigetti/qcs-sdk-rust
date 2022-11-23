@@ -38,8 +38,8 @@ async fn test_bell_state() {
         .get_shot_wise_matrix("second")
         .expect("should have second register");
 
-    assert_eq!(first.shape(), [1, 1]);
-    assert_eq!(second.shape(), [1, 1]);
+    assert_eq!(first.shape(), [SHOTS.into(), 1]);
+    assert_eq!(second.shape(), [SHOTS.into(), 1]);
 
     for (first, second) in first.into_iter().zip(second) {
         assert_eq!(
