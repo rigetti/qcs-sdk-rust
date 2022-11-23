@@ -40,12 +40,13 @@ use quil_rs::Program;
 /// #[tokio::main]
 /// async fn main() {
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
-///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
-///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
-///     // In this case, we ran the program for 4 shots, so we know the length is 4.
-///     assert_eq!(data.len(), 4);
-///     for shot in data {
+///     // We get the data as a shot wise matrix so we can iterate over rows containing all the values in
+///     // in "ro" for each shot.
+///     let data = result.readout_data.get_shot_wise_matrix("ro").expect("should have data in ro");
+///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+///     assert_eq!(data.nrows(), 4);
+///     for shot in data.rows() {
 ///         // Each shot will contain all the memory, in order, for the vector (or "register") we
 ///         // requested the results of. In this case, "ro" (the default).
 ///         assert_eq!(shot.len(), 2);
@@ -143,20 +144,20 @@ impl<'executable> Executable<'executable, '_> {
     ///         .execute_on_qvm()
     ///         .await
     ///         .unwrap();
-    ///     let first = result
-    ///         .registers
-    ///         .remove("first")
-    ///         .expect("Did not receive first buffer")
-    ///         .into_f64()
-    ///         .expect("Received incorrect data type for first");
-    ///     let second = result
-    ///         .registers
-    ///         .remove("second")
-    ///         .expect("Did not receive second buffer")
-    ///         .into_f64()
-    ///         .expect("Received incorrect data type for second");
-    ///     assert_eq!(first[0][0], 3.141);
-    ///     assert_eq!(second[0][0], 1.234);
+    ///     let first_value = result
+    ///         .readout_data
+    ///         .get_value("first", 0, 0)
+    ///         .expect("should have value in first position of first register")
+    ///         .into_real()
+    ///         .expect("should be a floating point number");
+    ///     let second_value = result
+    ///         .readout_data
+    ///         .get_value("second", 0, 0)
+    ///         .expect("should have value in first position of second register")
+    ///         .into_real()
+    ///         .expect("should be a floating point number");
+    ///     assert_eq!(first_value, 3.141);
+    ///     assert_eq!(second_value, 1.234);
     /// }
     /// ```
     #[must_use]
@@ -198,9 +199,20 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let data = result.registers.remove("theta").expect("Could not read theta").into_f64().unwrap();
-    ///         assert_eq!(data[0][0], theta);
-    ///         assert_eq!(data[0][1], theta * 2.0);
+    ///         let first = result
+    ///             .readout_data
+    ///             .get_value("theta", 0, 0)
+    ///             .expect("first index, first shot of theta should have value")
+    ///             .into_real()
+    ///             .expect("value should be a float");
+    ///         let second = result
+    ///             .readout_data
+    ///             .get_value("theta", 1, 0)
+    ///             .expect("second index, first shot of theta should have value")
+    ///             .into_real()
+    ///             .expect("value should be a float");
+    ///         assert_eq!(first, theta);
+    ///         assert_eq!(second, theta * 2.0);
     ///     }
     /// }
     /// ```
