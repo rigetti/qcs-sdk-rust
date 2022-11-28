@@ -292,7 +292,7 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 ///
 /// # Errors
 ///
-/// May error if a [`Qcs`] client cannot be constructed, or if the ``gRPC``
+/// May error if a [`Qcs`] client cannot be constructed, or if the `gRPC`
 /// call fails.
 pub async fn retrieve_results(
     job_id: &str,
