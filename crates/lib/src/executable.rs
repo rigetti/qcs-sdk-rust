@@ -41,8 +41,8 @@ use quil_rs::Program;
 /// async fn main() {
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
-///     // We get the data as a shot wise matrix so we can iterate over rows containing all the values in
-///     // in "ro" for each shot.
+///     // We get the data as a matrix `M` whose elements `M[shot][index]` are the readout values
+///     // for the memory offset `index` during shot `shot`
 ///     let data = result.readout_data.get_shot_wise_matrix("ro").expect("should have data in ro");
 ///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
 ///     assert_eq!(data.nrows(), 4);

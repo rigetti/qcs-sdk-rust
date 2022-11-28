@@ -36,7 +36,7 @@ pub enum ReadoutValue {
 }
 
 /// A matrix where rows are the values of a memory index across all shots, and columns are values
-/// for all memory indexes of a given shot.
+/// for all memory indices of a given shot.
 pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
 /// A mapping of readout fields to their [`ReadoutValue`]s.
@@ -96,15 +96,15 @@ impl ReadoutMap {
         }
     }
 
-    /// Returns the matrix as a 2-dimensional array where the row is the memory index and the
-    /// column is the shot number.
+    /// Returns a [`RegisterMatrix`] `M` where `M[index]` contains the readout values for memory
+    /// offset `index` across all shots.
     #[must_use]
     pub fn get_index_wise_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
         self.0.get(register_name)
     }
 
-    /// Returns the matrix as a 2-dimensional array where the row is the shot number, and the
-    /// column is the memory index.
+    /// Returns a [`RegisterMatrix`] `M` where `M[shot]` contains the readout values for all memory
+    /// offset indices during shot `shot`.
     #[must_use]
     pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
         let register = self.0.get(register_name);
