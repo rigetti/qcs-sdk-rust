@@ -1,5 +1,5 @@
 //! This module provides methods for getting clients for the
-//! desired API (e.g. `gRPC` or ``OpenAPI``) and will properly
+//! desired API (e.g. `gRPC` or `OpenAPI`) and will properly
 //! initialize those clients (e.g. with authentication metadata).
 
 use qcs_api_client_common::ClientConfiguration;
