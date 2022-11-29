@@ -1,5 +1,6 @@
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::num::ParseIntError;
 use std::str::FromStr;
@@ -25,7 +26,7 @@ pub struct ExecutionData {
 }
 
 /// An enum representing every possible readout type
-#[derive(Clone, Copy, Debug, EnumAsInner, PartialEq)]
+#[derive(Clone, Copy, Debug, EnumAsInner, PartialEq, Serialize, Deserialize)]
 pub enum ReadoutValue {
     /// An integer readout value
     Integer(i32),
@@ -40,11 +41,17 @@ pub enum ReadoutValue {
 pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
 /// A mapping of readout fields to their [`ReadoutValue`]s.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
 impl ReadoutMap {
+    #[must_use]
+    /// Returns a [`ReadoutMap`] with the underlying [`RegisterMatrix`] data
+    pub fn new_from_hashmap(map: HashMap<String, RegisterMatrix>) -> Self {
+        Self(map)
+    }
+
     /// Returns a [`ReadoutValue`] for the given memory index and shot number, if any
     #[must_use]
     pub fn get_value(
