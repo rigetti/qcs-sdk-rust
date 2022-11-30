@@ -52,7 +52,10 @@
 //! using [`Executable`].
 
 pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
-pub use execution_data::{ExecutionData, ReadoutMap, ReadoutValue, RegisterMatrix};
+pub use execution_data::{
+    register_matrix_as_i32, ExecutionData, ReadoutMap, ReadoutValue, RegisterMatrix,
+    RegisterMatrixConversionError,
+};
 pub use register_data::RegisterData;
 
 pub mod api;

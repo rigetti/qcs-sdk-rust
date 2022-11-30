@@ -40,6 +40,60 @@ pub enum ReadoutValue {
 /// for all memory indices of a given shot.
 pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
 
+/// Errors that may occur when trying to interpret [`RegisterMatrix`] values as a single data type.
+#[derive(Debug, thiserror::Error)]
+pub enum RegisterMatrixConversionError {
+    /// The value at a given position was an unexpected format.
+    #[error("Could not convert register matrix data: {reason} at position ({axis_x}, {axis_y})")]
+    InvalidFormat {
+        reason: String,
+        axis_x: i32,
+        axis_y: i32,
+    },
+
+    /// The value at a given position was empty.
+    #[error("Empty register matrix value at position: ({axis_x}, {axis_y})")]
+    Empty { axis_x: i32, axis_y: i32 },
+}
+
+/// Given a [`RegisterMatrix`], assume that all data is the `i32` type.
+/// If any data is of the wrong type or missing, returns [`RegisterMatrixConversionError`].
+pub fn register_matrix_as_i32(
+    matrix: &RegisterMatrix,
+) -> Result<Array2<i32>, RegisterMatrixConversionError> {
+    let mut target = Array2::zeros(matrix.raw_dim());
+
+    for ((axis_x, axis_y), v) in matrix.indexed_iter().into_iter() {
+        let i = match v {
+            Some(ReadoutValue::Integer(i)) => i.clone(),
+            Some(ReadoutValue::Real(_)) => {
+                return Err(RegisterMatrixConversionError::InvalidFormat {
+                    reason: "value was F64".into(),
+                    axis_x: axis_x as i32,
+                    axis_y: axis_y as i32,
+                })
+            }
+            Some(ReadoutValue::Complex(_)) => {
+                return Err(RegisterMatrixConversionError::InvalidFormat {
+                    reason: "value was Complex32".into(),
+                    axis_x: axis_x as i32,
+                    axis_y: axis_y as i32,
+                })
+            }
+            None => {
+                return Err(RegisterMatrixConversionError::Empty {
+                    axis_x: axis_x as i32,
+                    axis_y: axis_y as i32,
+                })
+            }
+        };
+
+        target[(axis_x, axis_y)] = i;
+    }
+
+    Ok(target)
+}
+
 /// A mapping of readout fields to their [`ReadoutValue`]s.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
