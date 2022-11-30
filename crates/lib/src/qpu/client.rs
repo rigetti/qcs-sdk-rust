@@ -136,6 +136,7 @@ impl Qcs {
             .await?;
             gateways.extend(accessors.accessors.into_iter().filter(|acc| {
                 acc.live
+                    // `as_deref` needed to work around the `Option<Box<_>>` type.
                     && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
             }));
             next_page_token = accessors.next_page_token.clone();
@@ -144,7 +145,9 @@ impl Qcs {
             }
         }
         gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways.first().ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
+        let target = gateways
+            .first()
+            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
         parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
     }
 }
