@@ -144,7 +144,7 @@ impl Qcs {
             }
         }
         gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways.first().ok_or(GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
+        let target = gateways.first().ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
         parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
     }
 }
