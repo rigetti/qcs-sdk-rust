@@ -232,6 +232,11 @@ impl ReadoutMap {
     }
 }
 
+// This is a copy of [`quil_rs::instruction::MemoryReference`] that uses `usize` for the index
+// instead of `u64` for compatibility with the containers we use for [`ReadoutMap`].
+// It's possible `quil_rs` will use `usize` for it's `MemoryReference` in the future. If so, we
+// should use it to replace this.
+// See: https://github.com/rigetti/qcs-sdk-rust/issues/224
 struct MemoryReference {
     name: String,
     index: usize,
