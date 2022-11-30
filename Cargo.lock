@@ -1365,9 +1365,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.3.7"
+version = "0.3.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b28810a4421531e887f846e071bb78ea8c5b57c13894c0a40c4919f5f530f908"
+checksum = "de8ce34a5f6d100626d19f28219a2c791f11d7809a36521979c3817dfaac8f3a"
 dependencies = [
  "qcs-api-client-common",
  "reqwest",
