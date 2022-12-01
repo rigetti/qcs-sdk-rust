@@ -1,3 +1,9 @@
+## 0.9.1
+
+### Fixes
+
+- Fetch Gateway address with pagination (#225)
+
 ## 0.9.1-rc.0
 
 ### Fixes
