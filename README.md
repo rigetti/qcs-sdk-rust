@@ -49,7 +49,7 @@ To build the docs.rs-style docs, run `makers docs`. You can also do `makers serv
 
 ## Release
 
-To release the library crate or the bindings to Python, manually run the `release` or `release python` workflow in GitHub Actions, respectively.
+To release, manually run the `Prepare Release` workflow in GitHub Actions.
 
 Pre-releases for both the library crate and Python package happen automatically on merge to main.
 
