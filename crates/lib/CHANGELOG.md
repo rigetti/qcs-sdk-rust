@@ -1,3 +1,9 @@
+## 0.9.2-rc.0
+
+### Fixes
+
+- bump quil-rs to fix waveform issues (#228)
+
 ## 0.9.1
 
 ### Fixes
