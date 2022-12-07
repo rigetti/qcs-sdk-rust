@@ -24,7 +24,7 @@ qcs-api = "0.2.1"
 qcs-api-client-common = "0.2.7"
 qcs-api-client-openapi = "0.3.8"
 qcs-api-client-grpc = "0.2.7"
-quil-rs = "0.14"
+quil-rs = "0.15"
 reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
