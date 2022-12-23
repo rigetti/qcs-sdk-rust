@@ -223,6 +223,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ctor"
+version = "0.1.26"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6d2301688392eb071b0bf1a37be05c469d3cc4dbbd95df672fe28ab021e6a096"
+dependencies = [
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -444,6 +454,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ghost"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb19fe8de3ea0920d282f7b77dd4227aea6b8b999b42cdf0ca41b2472b14443a"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "h2"
 version = "0.3.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -636,6 +657,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if",
+]
+
+[[package]]
+name = "inventory"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e21e0a36a4dc4b469422ee17f715e8313f4a637675656d6a13637954278c6f55"
+dependencies = [
+ "ctor",
+ "ghost",
 ]
 
 [[package]]
@@ -1203,8 +1234,10 @@ checksum = "268be0c73583c183f2b14052337465768c07726936a260f480f0857cb95ba543"
 dependencies = [
  "cfg-if",
  "indoc",
+ "inventory",
  "libc",
  "memoffset",
+ "num-complex",
  "parking_lot",
  "pyo3-build-config",
  "pyo3-ffi",
@@ -1297,7 +1330,7 @@ dependencies = [
  "qcs-api-client-common",
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
- "quil-rs",
+ "quil-rs 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "regex",
  "reqwest",
  "rmp-serde",
@@ -1387,7 +1420,9 @@ dependencies = [
  "qcs",
  "qcs-api",
  "qcs-api-client-common",
- "quil-rs",
+ "quil-py",
+ "quil-rs 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rigetti-pyo3",
  "serde_json",
  "tokio",
 ]
@@ -1397,6 +1432,30 @@ name = "quick-error"
 version = "1.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
+
+[[package]]
+name = "quil-py"
+version = "0.1.0"
+dependencies = [
+ "pyo3",
+ "quil-rs 0.15.0",
+ "rigetti-pyo3",
+]
+
+[[package]]
+name = "quil-rs"
+version = "0.15.0"
+dependencies = [
+ "indexmap",
+ "lexical",
+ "nom",
+ "nom_locate",
+ "num-complex",
+ "petgraph",
+ "serde",
+ "strum",
+ "thiserror",
+]
 
 [[package]]
 name = "quil-rs"
@@ -1538,6 +1597,16 @@ dependencies = [
  "web-sys",
  "webpki-roots",
  "winreg",
+]
+
+[[package]]
+name = "rigetti-pyo3"
+version = "0.0.1"
+dependencies = [
+ "num-complex",
+ "paste",
+ "pyo3",
+ "time",
 ]
 
 [[package]]

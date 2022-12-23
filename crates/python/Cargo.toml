@@ -25,6 +25,8 @@ quil-rs = "0.15"
 tokio = "1.21"
 qcs-api = "0.2.1"
 serde_json = "1.0.86"
+rigetti-pyo3 = { path = "../../../rigetti-pyo3/" }
+quil-py = { path = "../../../quil-rs/quil-py" }
 
 [build-dependencies]
 pyo3-build-config = { version = "0.17" }

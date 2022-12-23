@@ -10,6 +10,9 @@ use pyo3::{
     prelude::*,
     types::PyDict,
 };
+use quil_py;
+
+use rigetti_pyo3::create_init_submodule;
 
 create_exception!(qcs, InvalidConfigError, PyRuntimeError);
 create_exception!(qcs, ExecutionError, PyRuntimeError);
@@ -152,8 +155,12 @@ fn get_quilc_version(py: Python<'_>) -> PyResult<&PyAny> {
     })
 }
 
+create_init_submodule! {
+    submodules: [ "quil": quil_py::init_quil_submodule ],
+}
+
 #[pymodule]
-fn qcs_sdk(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
+fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compile, m)?)?;
     m.add_function(wrap_pyfunction!(rewrite_arithmetic, m)?)?;
     m.add_function(wrap_pyfunction!(translate, m)?)?;
@@ -161,5 +168,6 @@ fn qcs_sdk(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(retrieve_results, m)?)?;
     m.add_function(wrap_pyfunction!(build_patch_values, m)?)?;
     m.add_function(wrap_pyfunction!(get_quilc_version, m)?)?;
+    init_submodule("qcs_sdk", py, m)?;
     Ok(())
 }
