@@ -19,7 +19,7 @@ futures = "0.3.24"
 indexmap = "1.9.1"
 lazy_static = "1.4.0"
 log = "0.4.17"
-num = "0.4.0"
+num = { version = "0.4.0", features = ["serde"] }
 qcs-api = "0.2.1"
 qcs-api-client-common = "0.2.7"
 qcs-api-client-openapi = "0.3.8"
