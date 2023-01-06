@@ -1,6 +1,7 @@
 //! This module contains the public-facing API for executing programs. [`Executable`] is the how
 //! users will interact with QCS, quilc, and QVM.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
@@ -66,7 +67,7 @@ use quil_rs::Program;
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
     shots: u16,
-    readout_memory_region_names: Option<Vec<&'executable str>>,
+    readout_memory_region_names: Option<Vec<Cow<'executable, str>>>,
     params: Parameters,
     compile_with_quilc: bool,
     compiler_options: CompilerOpts,
@@ -160,9 +161,12 @@ impl<'executable> Executable<'executable, '_> {
     /// }
     /// ```
     #[must_use]
-    pub fn read_from(mut self, register: &'executable str) -> Self {
+    pub fn read_from<S>(mut self, register: S) -> Self
+    where
+        S: Into<Cow<'executable, str>>,
+    {
         let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
-        readouts.push(register);
+        readouts.push(register.into());
         self.readout_memory_region_names = Some(readouts);
         self
     }
@@ -264,11 +268,11 @@ impl Executable<'_, '_> {
         self
     }
 
-    fn get_readouts(&self) -> &[&str] {
+    fn get_readouts(&self) -> &[Cow<'_, str>] {
         return self
             .readout_memory_region_names
             .as_ref()
-            .map_or(&["ro"], Vec::as_slice);
+            .map_or(&[Cow::Borrowed("ro")], Vec::as_slice);
     }
 
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
@@ -527,11 +531,11 @@ pub enum Service {
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
-            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
+            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{inner:?}")),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
-            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{:?}", v)),
-            ExecutionError::IsaError(v) => Self::Unexpected(format!("{:?}", v)),
-            ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::IsaError(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
@@ -548,7 +552,7 @@ impl From<qvm::Error> for Error {
             | qvm::Error::ShotsMustBePositive
             | qvm::Error::RegionSizeMismatch { .. }
             | qvm::Error::RegionNotFound { .. }
-            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{}", err)),
+            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{err}")),
         }
     }
 }

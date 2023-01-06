@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::str::FromStr;
+use std::{borrow::Cow, collections::HashMap};
 
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
@@ -58,7 +58,7 @@ impl Execution {
     pub(crate) async fn run(
         &mut self,
         shots: u16,
-        readouts: &[&str],
+        readouts: &[Cow<'_, str>],
         params: &Parameters,
         config: &ClientConfiguration,
     ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
@@ -108,7 +108,7 @@ impl Execution {
     async fn execute(
         &self,
         shots: u16,
-        readouts: &[&str],
+        readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
     ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
