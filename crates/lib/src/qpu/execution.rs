@@ -58,10 +58,10 @@ pub(crate) enum Error {
 impl From<quilc::Error> for Error {
     fn from(source: quilc::Error) -> Self {
         match source {
-            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{:?}", source))),
+            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{source:?}"))),
             quilc::Error::QuilcConnection(uri, details) => Self::Quilc {
                 uri,
-                details: format!("{:?}", details),
+                details: format!("{details:?}"),
             },
             quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
             quilc::Error::Parse(details) => Self::Compilation {
