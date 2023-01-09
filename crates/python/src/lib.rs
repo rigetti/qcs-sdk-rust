@@ -16,7 +16,14 @@ create_init_submodule! {
     classes: [
         execution_data::PyQpu,
         execution_data::PyQvm,
-        execution_data::PyReadoutMap
+        execution_data::PyReadoutMap,
+        executable::PyExecutable,
+        executable::PyJobHandle,
+        executable::PyService,
+        register_data::PyRegisterData
+    ],
+    errors: [
+        executable::QcsExecutionError
     ],
     funcs: [
         api::compile,

@@ -7,13 +7,38 @@ use rigetti_pyo3::{
 
 create_init_submodule! {
     classes: [PyQcsClient],
-    errors: [QcsLoadError],
+    errors: [
+        QcsGrpcClientError,
+        QcsGrpcEndpointError,
+        QcsGrpcError,
+        QcsLoadError
+    ],
 }
 
 wrap_error! {
     LoadError(qcs::qpu::client::LoadError);
 }
 py_wrap_error!(client, LoadError, QcsLoadError, PyRuntimeError);
+
+wrap_error! {
+    GrpcError(qcs::qpu::client::GrpcError);
+}
+py_wrap_error!(client, GrpcError, QcsGrpcError, PyRuntimeError);
+
+wrap_error! {
+    GrpcClientError(qcs::qpu::client::GrpcClientError);
+}
+py_wrap_error!(client, GrpcClientError, QcsGrpcClientError, PyRuntimeError);
+
+wrap_error! {
+    GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
+}
+py_wrap_error!(
+    client,
+    GrpcEndpointError,
+    QcsGrpcEndpointError,
+    PyRuntimeError
+);
 
 py_wrap_type! {
     PyQcsClient(Qcs) as "QcsClient";

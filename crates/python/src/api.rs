@@ -18,12 +18,15 @@ use qcs::{
     },
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_type, py_wrap_union_enum, ToPython,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum,
+    wrap_error, ToPython,
 };
 
 create_init_submodule! {
     classes: [
+        PyExecutionResult,
         PyExecutionResults,
+        PyRegister,
         PyRewriteArithmeticResult,
         PyTranslationResult
     ],
@@ -33,7 +36,8 @@ create_init_submodule! {
         TranslationError,
         CompilationError,
         RewriteArithmeticError,
-        DeviceIsaError
+        DeviceIsaError,
+        QcsSubmitError
     ],
     funcs: [
         compile,
@@ -84,6 +88,9 @@ create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
+
+wrap_error!(SubmitError(qcs::api::SubmitError));
+py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
 
 #[pyfunction(kwds = "**")]
 pub fn compile<'a>(
