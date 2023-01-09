@@ -61,7 +61,7 @@ impl Execution {
         readouts: &[Cow<'_, str>],
         params: &Parameters,
         config: &ClientConfiguration,
-    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
+    ) -> Result<HashMap<String, RegisterData>, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -110,7 +110,7 @@ impl Execution {
         shots: u16,
         readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
-    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
+    ) -> Result<HashMap<String, RegisterData>, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
@@ -129,11 +129,7 @@ impl Execution {
                 qvm_url: config.qvm_url().into(),
                 source,
             }),
-            Ok(Response::Success(response)) => Ok(response
-                .registers
-                .into_iter()
-                .map(|(key, value)| (key.into_boxed_str(), value))
-                .collect()),
+            Ok(Response::Success(response)) => Ok(response.registers),
             Ok(Response::Failure(response)) => Err(Error::Qvm {
                 message: response.status,
             }),

@@ -334,12 +334,13 @@ impl Executable<'_, '_> {
 
 impl<'execution> Executable<'_, 'execution> {
     /// Remove and return `self.qpu` if it's set and still valid. Otherwise, create a new one.
-    async fn qpu_for_id(
-        &mut self,
-        id: &'execution str,
-    ) -> Result<qpu::Execution<'execution>, Error> {
+    async fn qpu_for_id<S>(&mut self, id: S) -> Result<qpu::Execution<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let id = id.into();
         if let Some(qpu) = self.qpu.take() {
-            if qpu.quantum_processor_id == id && qpu.shots == self.shots {
+            if qpu.quantum_processor_id == id.as_ref() && qpu.shots == self.shots {
                 return Ok(qpu);
             }
         }
@@ -381,10 +382,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(
-        &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> ExecuteResultQPU {
+    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecuteResultQPU
+    where
+        S: Into<Cow<'execution, str>>,
+    {
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -397,16 +398,20 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu(
+    pub async fn submit_to_qpu<S>(
         &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> Result<JobHandle<'execution>, Error> {
+        quantum_processor_id: S,
+    ) -> Result<JobHandle<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let quantum_processor_id = quantum_processor_id.into();
         let JobHandle {
             job_id,
             readout_map,
             ..
         } = self
-            .qpu_for_id(quantum_processor_id)
+            .qpu_for_id(quantum_processor_id.clone())
             .await?
             .submit(&self.params)
             .await?;
@@ -562,20 +567,23 @@ impl From<qvm::Error> for Error {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JobHandle<'executable> {
     job_id: JobId,
-    quantum_processor_id: &'executable str,
+    quantum_processor_id: Cow<'executable, str>,
     readout_map: HashMap<String, String>,
 }
 
 impl<'a> JobHandle<'a> {
     #[must_use]
-    pub(crate) fn new(
+    pub(crate) fn new<S>(
         job_id: JobId,
-        quantum_processor_id: &'a str,
+        quantum_processor_id: S,
         readout_map: HashMap<String, String>,
-    ) -> Self {
+    ) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
         Self {
             job_id,
-            quantum_processor_id,
+            quantum_processor_id: quantum_processor_id.into(),
             readout_map,
         }
     }
