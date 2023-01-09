@@ -2,6 +2,7 @@ use pyo3::exceptions::PyRuntimeError;
 use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error};
 
 pub mod client;
+pub mod quilc;
 
 create_init_submodule! {
     errors: [QcsIsaError],

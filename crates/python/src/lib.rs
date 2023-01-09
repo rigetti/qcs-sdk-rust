@@ -4,6 +4,7 @@ use rigetti_pyo3::create_init_submodule;
 pub mod api;
 pub mod executable;
 pub mod execution_data;
+pub mod grpc;
 pub mod qpu;
 pub mod register_data;
 

@@ -1422,6 +1422,7 @@ dependencies = [
  "qcs",
  "qcs-api",
  "qcs-api-client-common",
+ "qcs-api-client-grpc",
  "quil-rs",
  "rigetti-pyo3",
  "serde_json",
