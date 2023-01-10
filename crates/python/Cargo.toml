@@ -24,7 +24,7 @@ pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
 quil-rs = "0.15"
 tokio = "1.21"
 qcs-api = "0.2.1"
-rigetti-pyo3 = { version = "0.0.1", features = ["extension-module", "complex"], path = "../../../rigetti-pyo3" } # git = "ssh://git@github.com/rigetti/rigetti-pyo3", branch = "support-fieldless-enums-data-structs" }
+rigetti-pyo3 = { version = "0.0.1", features = ["extension-module", "complex"], git = "ssh://git@github.com/rigetti/rigetti-pyo3", branch = "support-fieldless-enums-data-structs" }
 serde_json = "1.0.86"
 
 [build-dependencies]

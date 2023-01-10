@@ -1580,6 +1580,7 @@ dependencies = [
 [[package]]
 name = "rigetti-pyo3"
 version = "0.0.1"
+source = "git+ssh://git@github.com/rigetti/rigetti-pyo3?branch=support-fieldless-enums-data-structs#fec44462f47ce2ab63ecdac797842938ddd11903"
 dependencies = [
  "num-complex",
  "num-traits",
