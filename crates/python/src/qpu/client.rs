@@ -48,6 +48,7 @@ py_wrap_type! {
 impl PyQcsClient {
     // TODO: default arg
     #[new]
+    #[args("/", use_gateway = "None")]
     pub fn new(py: Python<'_>, use_gateway: Option<bool>) -> PyResult<Self> {
         future_into_py(py, async move {
             let client = Qcs::load()

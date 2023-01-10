@@ -21,6 +21,7 @@ py_wrap_type! {
 #[pymethods]
 impl PyCompilerOpts {
     #[new]
+    #[args("/", timeout = "DEFAULT_COMPILER_TIMEOUT")]
     pub fn new(timeout: Option<u8>) -> Self {
         Self::from(CompilerOpts::new().with_timeout(timeout))
     }

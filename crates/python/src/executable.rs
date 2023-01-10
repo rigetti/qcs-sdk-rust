@@ -43,6 +43,14 @@ pub struct PyParameter {
 #[pymethods]
 impl PyExecutable {
     #[new]
+    #[args(
+        "/",
+        registers = "Vec::new()",
+        parameters = "Vec::new()",
+        shots = "None",
+        compile_with_quilc = "None",
+        compiler_options = "None"
+    )]
     pub fn new(
         quil: String,
         registers: Vec<String>,
