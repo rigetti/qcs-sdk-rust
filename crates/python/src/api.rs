@@ -38,7 +38,7 @@ create_init_submodule! {
         CompilationError,
         RewriteArithmeticError,
         DeviceIsaError,
-        QcsApiError,
+        QcsListQuantumProcessorsError,
         QcsSubmitError
     ],
     funcs: [
@@ -91,10 +91,19 @@ create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
-create_exception!(qcs, QcsApiError, PyRuntimeError);
 
 wrap_error!(SubmitError(qcs::api::SubmitError));
 py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
+
+wrap_error!(ListQuantumProcessorNamesError(
+    qcs::api::ListQuantumProcessorNamesError
+));
+py_wrap_error!(
+    api,
+    ListQuantumProcessorNamesError,
+    QcsListQuantumProcessorsError,
+    PyRuntimeError
+);
 
 #[pyfunction(kwds = "**")]
 pub fn compile<'a>(
@@ -234,7 +243,7 @@ pub fn list_quantum_processors(py: Python<'_>) -> PyResult<&PyAny> {
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
         let names = list_quantum_processor_names(&client)
             .await
-            .map_err(|e| QcsApiError::new_err(e.to_string()))?;
+            .map_err(|e| QcsListQuantumProcessorsError::new_err(e.to_string()))?;
         Ok(names)
     })
 }
