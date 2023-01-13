@@ -333,7 +333,7 @@ pub enum ListQuantumProcessorNamesError {
 }
 
 /// Query the QCS API for the names of all available quantum processors.
-/// If undefined, the default `timeout` is 10 seconds.
+/// If `None`, the default `timeout` used is 10 seconds.
 pub async fn list_quantum_processor_names(
     client: &Qcs,
     timeout: Option<Duration>,
