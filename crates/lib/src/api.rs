@@ -1,7 +1,11 @@
 //! This module provides convenience functions to handle compilation,
 //! translation, parameter arithmetic rewriting, and results collection.
 
-use std::{collections::HashMap, str::FromStr};
+use std::{
+    collections::HashMap,
+    str::FromStr,
+    time::{Duration, SystemTime},
+};
 
 use num::complex::Complex32;
 use qcs_api_client_grpc::{
@@ -315,20 +319,55 @@ pub async fn retrieve_results(
         .map(ExecutionResults::from)
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Controller Job Execution Results".into()))
 }
-/// API Errors encountered when trying to list available quantum processors.
-pub type ListQuantumProcessorNamesError = OpenAPIError<ListQuantumProcessorsError>;
 
-/// Use the qcs api client to fetch all available quantum processors.
+/// API Errors encountered when trying to list available quantum processors.
+#[derive(Debug, thiserror::Error)]
+pub enum ListQuantumProcessorNamesError {
+    /// Failed an http call
+    #[error("Failed an http call: {0}")]
+    ApiError(#[from] OpenAPIError<ListQuantumProcessorsError>),
+
+    /// Pagination did not finish before timeout
+    #[error("API pagination did not finish before timeout: {0:?}")]
+    TimeoutError(Duration),
+}
+
+/// Query the QCS API for the names of all available quantum processors.
+/// If undefined, the default `timeout` is 10 seconds.
 pub async fn list_quantum_processor_names(
     client: &Qcs,
+    timeout: Option<Duration>,
 ) -> Result<Vec<String>, ListQuantumProcessorNamesError> {
-    let quantum_processor_names =
-        list_quantum_processors(&client.get_openapi_client(), Some(100), None)
-            .await?
+    let timeout = timeout.unwrap_or_else(|| Duration::from_secs(10));
+    let end_time = SystemTime::now() + timeout;
+
+    let mut quantum_processors = vec![];
+    let mut page_token = None;
+
+    loop {
+        if end_time > SystemTime::now() {
+            return Err(ListQuantumProcessorNamesError::TimeoutError(timeout));
+        }
+
+        let result = list_quantum_processors(
+            &client.get_openapi_client(),
+            Some(100),
+            page_token.as_deref(),
+        )
+        .await?;
+
+        let mut data = result
             .quantum_processors
             .into_iter()
             .map(|qpu| qpu.id)
             .collect::<Vec<_>>();
+        quantum_processors.append(&mut data);
 
-    Ok(quantum_processor_names)
+        page_token = result.next_page_token;
+        if page_token.is_none() {
+            break;
+        }
+    }
+
+    Ok(quantum_processors)
 }

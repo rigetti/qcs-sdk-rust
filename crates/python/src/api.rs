@@ -241,7 +241,7 @@ pub fn list_quantum_processors(py: Python<'_>) -> PyResult<&PyAny> {
         let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let names = list_quantum_processor_names(&client)
+        let names = list_quantum_processor_names(&client, None)
             .await
             .map_err(|e| QcsListQuantumProcessorsError::new_err(e.to_string()))?;
         Ok(names)
