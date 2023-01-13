@@ -10,6 +10,7 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
+use qcs_api_client_openapi::apis::quantum_processors_api::list_quantum_processors;
 use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
@@ -310,4 +311,43 @@ pub async fn retrieve_results(
         .result
         .map(ExecutionResults::from)
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Controller Job Execution Results".into()))
+}
+
+/// Use the qcs api client to fetch all available quantum processors.
+/// Will fail if more than 10 pages are requested without all names
+/// being found.
+pub async fn list_quantum_processor_names(
+    client: &Qcs,
+) -> Result<Vec<String>, Box<dyn std::error::Error + Send + Sync + 'static>> {
+    let mut quantum_processors = vec![];
+    let mut page_token = None;
+
+    // sanity check
+    let mut calls = 0;
+    loop {
+        if calls >= 10 {
+            return Err("Exceeded list_quantum_processesor pagination limit".into());
+        }
+        let result = list_quantum_processors(
+            &client.get_openapi_client(),
+            Some(100),
+            page_token.as_deref(),
+        )
+        .await?;
+
+        let mut page_data = result
+            .quantum_processors
+            .into_iter()
+            .map(|quantum_processor| quantum_processor.id)
+            .collect();
+        quantum_processors.append(&mut page_data);
+
+        page_token = result.next_page_token;
+        if page_token.is_none() {
+            break;
+        }
+        calls += 1;
+    }
+
+    return Ok(quantum_processors);
 }

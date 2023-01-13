@@ -32,7 +32,8 @@ create_init_submodule! {
         api::submit,
         api::retrieve_results,
         api::build_patch_values,
-        api::get_quilc_version
+        api::get_quilc_version,
+        api::list_quantum_processors
     ],
     submodules: [
         "api": api::init_submodule,

@@ -10,7 +10,8 @@ use pyo3::{
 };
 use qcs::{
     api::{
-        ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult, TranslationResult,
+        list_quantum_processor_names, ExecutionResult, ExecutionResults, Register,
+        RewriteArithmeticResult, TranslationResult,
     },
     qpu::{
         quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
@@ -37,6 +38,7 @@ create_init_submodule! {
         CompilationError,
         RewriteArithmeticError,
         DeviceIsaError,
+        QcsApiError,
         QcsSubmitError
     ],
     funcs: [
@@ -46,7 +48,8 @@ create_init_submodule! {
         submit,
         retrieve_results,
         build_patch_values,
-        get_quilc_version
+        get_quilc_version,
+        list_quantum_processors
     ],
 }
 
@@ -88,6 +91,7 @@ create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
+create_exception!(qcs, QcsApiError, PyRuntimeError);
 
 wrap_error!(SubmitError(qcs::api::SubmitError));
 py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
@@ -219,5 +223,18 @@ pub fn get_quilc_version(py: Python<'_>) -> PyResult<&PyAny> {
         let version = qcs::api::get_quilc_version(&client)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(version)
+    })
+}
+
+#[pyfunction]
+pub fn list_quantum_processors(py: Python<'_>) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        let client = Qcs::load()
+            .await
+            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let names = list_quantum_processor_names(&client)
+            .await
+            .map_err(|e| QcsApiError::new_err(e.to_string()))?;
+        Ok(names)
     })
 }

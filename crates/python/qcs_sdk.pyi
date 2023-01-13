@@ -164,3 +164,9 @@ async def get_quilc_version() -> str:
     Returns the version number of the running quilc server.
     """
     ...
+
+async def list_quantum_processors() -> List[str]:
+    """
+    Fetch all quantum processors available and return their IDs.
+    """
+    ...
