@@ -61,6 +61,29 @@ pub enum RegisterMatrixConversionError {
     MemoryReferenceParseError,
 }
 
+impl ReadoutData {
+    /// Convert [`ReadoutData`] from its inner representation as [`QVMMemory`] or
+    /// [`QPUReadout`] into a [`ReadoutMap`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`RegisterMatrixConversionError`] if the inner [`QPUReadout`] data for any of the
+    /// registers would result in a jagged matrix. [`QPUReadout`] data is captured per measure,
+    /// meaning a value is returned for every measure to a memory reference, not just once per shot.
+    /// This is often the case in programs with mid-circuit measurement or dynamic control flow,
+    /// where measurements to the same memory reference might occur multiple times in a shot, or be
+    /// skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
+    /// necessitate making assumptions about the data that could skew the data in undesirable ways.
+    /// Instead, it's recommended to manually build a matrix from [`QPUReadout`] that accurately
+    /// selects the correct value per-shot based on the program that was run.
+    pub fn to_readout_map(&self) -> Result<ReadoutMap, RegisterMatrixConversionError> {
+        match self {
+            ReadoutData::Qvm(data) => Ok(ReadoutMap::from_qvm_memory(data)),
+            ReadoutData::Qpu(data) => ReadoutMap::from_qpu_readout_data(data),
+        }
+    }
+}
+
 impl ReadoutMap {
     /// Returns a [`ReadoutMap`] with the underlying [`RegisterMatrix`] data
     #[must_use]
