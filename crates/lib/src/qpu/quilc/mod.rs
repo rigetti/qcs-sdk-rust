@@ -247,6 +247,7 @@ MEASURE 1 ro[1]
             .expect("Did not receive ro buffer")
             .into_i8()
             .unwrap()
+            .rows()
         {
             assert_eq!(shot.len(), 2);
             assert_eq!(shot[0], shot[1]);

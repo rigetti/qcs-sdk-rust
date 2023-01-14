@@ -1,4 +1,5 @@
 use enum_as_inner::EnumAsInner;
+use ndarray::Array2;
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 
@@ -21,12 +22,12 @@ use serde::{Deserialize, Serialize};
 #[serde(untagged)]
 pub enum RegisterData {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
-    I8(Vec<Vec<i8>>),
+    I8(Array2<i8>),
     /// Corresponds to the Quil `REAL` type.
-    F64(Vec<Vec<f64>>),
+    F64(Array2<f64>),
     /// Corresponds to the Quil `INTEGER` type.
-    I16(Vec<Vec<i16>>),
+    I16(Array2<i16>),
     /// Results containing complex numbers.
     #[serde(skip)]
-    Complex32(Vec<Vec<Complex32>>),
+    Complex32(Array2<Complex32>),
 }

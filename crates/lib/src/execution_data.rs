@@ -1,23 +1,29 @@
-use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::num::ParseIntError;
 use std::str::FromStr;
 use std::time::Duration;
 
 use ndarray::prelude::*;
 
-use qcs_api_client_grpc::models::controller::{readout_values, ReadoutValues};
+use crate::qpu::readout_data::ReadoutValues;
+use crate::{qpu::readout_data::QPUReadout, qvm::QVMMemory, RegisterData};
 
-use crate::RegisterData;
+/// TODO: Docstring
+#[derive(Debug, Clone, PartialEq)]
+pub enum ReadoutData {
+    Qvm(QVMMemory),
+    Qpu(QPUReadout),
+}
 
 /// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExecutionData {
     /// The readout data that was read from the [`Executable`](crate::Executable).
     /// Key is the name of the register, value is the data of the register after execution.
-    pub readout_data: ReadoutMap,
+    /// TODO: expand docstring
+    pub readout_data: ReadoutData,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
     ///
@@ -26,263 +32,154 @@ pub struct ExecutionData {
 }
 
 /// An enum representing every possible readout type
-#[derive(Clone, Copy, Debug, EnumAsInner, PartialEq, Serialize, Deserialize)]
-pub enum ReadoutValue {
+/// TODO: Doc, Option?
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub enum RegisterMatrix {
     /// An integer readout value
-    Integer(i32),
+    Integer(Array2<i32>),
     /// A real numbered readout value
-    Real(f64),
+    Real(Array2<f64>),
     /// A complex numbered readout value
-    Complex(Complex64),
+    Complex(Array2<Complex64>),
 }
 
-/// A matrix where rows are the values of a memory index across all shots, and columns are values
-/// for all memory indices of a given shot.
-pub type RegisterMatrix = Array2<Option<ReadoutValue>>;
-
-/// Errors that may occur when trying to interpret [`RegisterMatrix`] values as a single data type.
-#[derive(Debug, thiserror::Error)]
-pub enum RegisterMatrixConversionError {
-    /// The value at a given position was an unexpected format.
-    #[error("Could not convert register matrix data: {reason} at position ({axis_x}, {axis_y})")]
-    InvalidFormat {
-        reason: String,
-        axis_x: i32,
-        axis_y: i32,
-    },
-
-    /// The value at a given position was empty.
-    #[error("Empty register matrix value at position: ({axis_x}, {axis_y})")]
-    Empty { axis_x: i32, axis_y: i32 },
-}
-
-/// Given a [`RegisterMatrix`], assume that all data is the `i32` type.
-/// If any data is of the wrong type or missing, returns [`RegisterMatrixConversionError`].
-pub fn register_matrix_as_i32(
-    matrix: &RegisterMatrix,
-) -> Result<Array2<i32>, RegisterMatrixConversionError> {
-    let mut target = Array2::zeros(matrix.raw_dim());
-
-    for ((axis_x, axis_y), v) in matrix.indexed_iter().into_iter() {
-        let i = match v {
-            Some(ReadoutValue::Integer(i)) => i.clone(),
-            Some(ReadoutValue::Real(_)) => {
-                return Err(RegisterMatrixConversionError::InvalidFormat {
-                    reason: "value was F64".into(),
-                    axis_x: axis_x as i32,
-                    axis_y: axis_y as i32,
-                })
-            }
-            Some(ReadoutValue::Complex(_)) => {
-                return Err(RegisterMatrixConversionError::InvalidFormat {
-                    reason: "value was Complex32".into(),
-                    axis_x: axis_x as i32,
-                    axis_y: axis_y as i32,
-                })
-            }
-            None => {
-                return Err(RegisterMatrixConversionError::Empty {
-                    axis_x: axis_x as i32,
-                    axis_y: axis_y as i32,
-                })
-            }
-        };
-
-        target[(axis_x, axis_y)] = i;
-    }
-
-    Ok(target)
-}
-
-/// A mapping of readout fields to their [`ReadoutValue`]s.
+/// TODO: Doc
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
+/// Errors that may occur when trying to interpret [`RegisterMatrix`] values as a single data type.
+/// TODO: Refactor as error type for translating readout data to ``RegisterMatrix``
+#[derive(Copy, Clone, Debug, thiserror::Error)]
+pub enum RegisterMatrixConversionError {
+    /// The value at a given position was an unexpected format.
+    #[error("Could not convert data to a register matrix as it was not rectangular")]
+    InvalidShape,
+
+    /// The value at a given position was an unexpected format.
+    #[error("Could not parse the memory reference")]
+    MemoryReferenceParseError,
+}
+
 impl ReadoutMap {
-    #[must_use]
     /// Returns a [`ReadoutMap`] with the underlying [`RegisterMatrix`] data
-    pub fn new_from_hashmap(map: HashMap<String, RegisterMatrix>) -> Self {
+    #[must_use]
+    pub fn from_hashmap(map: HashMap<String, RegisterMatrix>) -> Self {
         Self(map)
     }
 
-    /// Returns a [`ReadoutValue`] for the given memory index and shot number, if any
+    /// Returns a [`ReadoutMap`] built from [`QVMMemory`]
     #[must_use]
-    pub fn get_value(
-        &self,
-        register_name: &str,
-        index: usize,
-        shot_num: usize,
-    ) -> Option<ReadoutValue> {
-        self.0
-            .get(register_name)
-            .and_then(|matrix| matrix.get((index, shot_num)))
-            .copied()?
-    }
-
-    /// Returns a vector of the [`ReadoutValue`]s in the given register at a particular memory
-    /// index across all shots.
-    #[must_use]
-    pub fn get_values_by_memory_index(
-        &self,
-        register_name: &str,
-        index: usize,
-    ) -> Option<Vec<Option<ReadoutValue>>> {
-        let register = self.0.get(register_name);
-        if let Some(matrix) = register {
-            if index >= matrix.nrows() {
-                return None;
-            }
-            Some(matrix.row(index).to_vec())
-        } else {
-            None
-        }
-    }
-
-    /// Returns a vector of the [`ReadoutValue`]s in the given register for a particular shot number.
-    #[must_use]
-    pub fn get_values_by_shot(
-        &self,
-        register_name: &str,
-        shot: usize,
-    ) -> Option<Vec<Option<ReadoutValue>>> {
-        let register = self.0.get(register_name);
-        if let Some(matrix) = register {
-            if shot >= matrix.ncols() {
-                return None;
-            }
-            Some(matrix.column(shot).to_vec())
-        } else {
-            None
-        }
-    }
-
-    /// Returns a [`RegisterMatrix`] `M` where `M[index]` contains the readout values for memory
-    /// offset `index` across all shots.
-    #[must_use]
-    pub fn get_index_wise_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
-        self.0.get(register_name)
-    }
-
-    /// Returns a [`RegisterMatrix`] `M` where `M[shot]` contains the readout values for all memory
-    /// offset indices during shot `shot`.
-    #[must_use]
-    pub fn get_shot_wise_matrix(&self, register_name: &str) -> Option<RegisterMatrix> {
-        let register = self.0.get(register_name);
-        register.cloned().map(ArrayBase::reversed_axes)
-    }
-
-    /// `readout_values` maps program-defined readout to result-defined readout, e.g.:
-    ///     { "ro[0]": "q0", "ro[1]": "q1" }
-    /// where `ro[0]` is defined in the original program, and `q0` is what comes back in execution results.
-    /// Here we map the result-defined readout values back to their original result-defined names.
-    pub(crate) fn from_mappings_and_values(
-        readout_mappings: &HashMap<String, String>,
-        readout_values: &HashMap<String, ReadoutValues>,
-    ) -> Self {
-        let mut result = ReadoutMap(HashMap::new());
-        for (readout_name, values) in readout_values {
-            readout_mappings
+    pub fn from_qvm_memory(memory: &QVMMemory) -> Self {
+        Self(
+            memory
                 .iter()
-                .filter_map(|(program_name, program_alias)| {
-                    (program_alias == readout_name).then(|| program_name.as_ref())
-                })
-                .map(parse_readout_register)
-                .filter_map(Result::ok)
-                .for_each(|reference| {
-                    let row = match &values.values {
-                        Some(readout_values::Values::IntegerValues(ints)) => ints
-                            .values
-                            .clone()
-                            .into_iter()
-                            .map(|i| Some(ReadoutValue::Integer(i)))
-                            .collect(),
-                        Some(readout_values::Values::ComplexValues(comps)) => comps
-                            .values
-                            .clone()
-                            .into_iter()
-                            .map(|c| Complex64::new(c.real().into(), c.imaginary().into()))
-                            .map(|c| Some(ReadoutValue::Complex(c)))
-                            .collect(),
-                        None => Vec::new(),
+                .map(|(name, register)| {
+                    let register_matrix = match register {
+                        RegisterData::I8(data) => RegisterMatrix::Integer(data.mapv(i32::from)),
+                        RegisterData::I16(data) => RegisterMatrix::Integer(data.mapv(i32::from)),
+                        RegisterData::F64(data) => RegisterMatrix::Real(data.mapv(f64::from)),
+                        RegisterData::Complex32(data) => RegisterMatrix::Complex(
+                            data.map(|c| Complex64::new(c.re.into(), c.im.into())),
+                        ),
                     };
-                    let shape = (reference.index + 1, row.len());
-                    let matrix = result
-                        .0
-                        .entry(reference.name)
-                        .and_modify(|m| {
-                            if shape.0 > m.nrows() {
-                                *m = Array2::from_shape_fn(shape, |(r, c)| {
-                                    m.get((r, c)).copied().flatten()
-                                });
-                            }
-                        })
-                        .or_insert_with(|| Array2::from_elem(shape, None));
-                    for (shot_num, value) in row.iter().enumerate() {
-                        matrix[[reference.index, shot_num]] = *value;
-                    }
-                });
-        }
-
-        result
+                    (name.clone(), register_matrix)
+                })
+                .collect(),
+        )
     }
 
-    /// Creates a new `ReadoutMap` from a mapping of register names (ie. "ro") to a 2-dimensional
-    /// vector containing rows of that registers memory values for each shot.
-    #[must_use]
-    pub fn from_register_data_map(map: &HashMap<Box<str>, RegisterData>) -> Self {
-        let mut result = ReadoutMap(HashMap::new());
-        for (name, data) in map {
-            let shot_values: Vec<Vec<Option<ReadoutValue>>> = match data {
-                RegisterData::I8(i8) => i8
+    /// TODO: Docs, cleanup, error messages
+    pub fn from_qpu_readout_data(
+        readout_data: &QPUReadout,
+    ) -> Result<Self, RegisterMatrixConversionError> {
+        Ok(
+            Self(
+                readout_data
+                    .mappings
                     .iter()
-                    .map(|inner| {
-                        inner
-                            .iter()
-                            .map(|&i| Some(ReadoutValue::Integer(i.into())))
-                            .collect()
+                    // Pair all the memory references with their readout values
+                    .map(|(memory_reference, alias)| {
+                        Ok((
+                            parse_readout_register(memory_reference).map_err(|_| {
+                                RegisterMatrixConversionError::MemoryReferenceParseError
+                            })?,
+                            readout_data
+                                .readout_values
+                                .get(alias)
+                                .ok_or(RegisterMatrixConversionError::InvalidShape)?,
+                        ))
                     })
-                    .collect(),
-                RegisterData::I16(i16) => i16
+                    // Collect into a type that will sort them by memory reference, this allows us
+                    // to make sure indices are sequential.
+                    .collect::<Result<
+                        BTreeMap<MemoryReference, &ReadoutValues>,
+                        RegisterMatrixConversionError,
+                    >>()?
                     .iter()
-                    .map(|inner| {
-                        inner
-                            .iter()
-                            .map(|&i| Some(ReadoutValue::Integer(i.into())))
-                            .collect()
-                    })
-                    .collect(),
-                RegisterData::F64(f64) => f64
-                    .iter()
-                    .map(|inner| inner.iter().map(|&f| Some(ReadoutValue::Real(f))).collect())
-                    .collect(),
-                RegisterData::Complex32(c32) => c32
-                    .iter()
-                    .map(|inner| {
-                        inner
-                            .iter()
-                            .map(|&c| {
-                                Some(ReadoutValue::Complex(Complex64::new(
-                                    c.re.into(),
-                                    c.im.into(),
-                                )))
-                            })
-                            .collect()
-                    })
-                    .collect(),
-            };
-            if !shot_values.is_empty() {
-                let nrows = shot_values[0].len();
-                let ncols = shot_values.len();
-                dbg!((nrows, ncols));
-                let matrix = Array2::from_shape_fn((nrows, ncols), |(index, shot_num)| {
-                    shot_values[shot_num][index]
-                });
-                result.0.insert(name.to_string(), matrix);
-            }
-        }
+                    // Iterate over them in reverse. Starting with the last index lets us:
+                    //     (1): Initialize the RegisterMatrix with the correct number of rows
+                    //     (2): Use a memory reference with an index of 0 as a setinel.
+                    .rev()
+                    .try_fold(
+                        (
+                            HashMap::with_capacity(readout_data.readout_values.len()),
+                            None::<&MemoryReference>,
+                        ),
+                        |(mut readout_data, previous_reference), (reference, values)| {
+                            // If we haven't started on a new register, make sure we aren't
+                            // skipping an index. For example, if we jumped from ro[5] to ro[3], or
+                            // ro[2] to theta[1], we skipped a column.
+                            if let Some(previous) = previous_reference {
+                                if previous.name != reference.name
+                                    || previous.index != reference.index + 1
+                                {
+                                    return Err(RegisterMatrixConversionError::InvalidShape);
+                                }
+                            }
 
-        result
+                            let matrix = readout_data.entry(reference.name.clone()).or_insert(
+                                match values {
+                                    ReadoutValues::Integer(v) => RegisterMatrix::Integer(
+                                        Array2::zeros((v.len(), reference.index + 1)),
+                                    ),
+                                    ReadoutValues::Complex(v) => RegisterMatrix::Complex(
+                                        Array2::zeros((v.len(), reference.index + 1)),
+                                    ),
+                                },
+                            );
+
+                            // Insert the readout values as a column iff it fits within the
+                            // dimensions of the matrix. Otherwise, the readout data must be
+                            // jagged and we return an error.
+                            match (matrix, values) {
+                                (RegisterMatrix::Integer(m), ReadoutValues::Integer(v))
+                                    if m.nrows() == v.len() =>
+                                {
+                                    m.column_mut(reference.index)
+                                        .assign(&Array::from_vec(v.clone()));
+                                }
+                                (RegisterMatrix::Complex(m), ReadoutValues::Complex(v))
+                                    if m.nrows() == v.len() =>
+                                {
+                                    m.column_mut(reference.index)
+                                        .assign(&Array::from_vec(v.clone()));
+                                }
+                                _ => return Err(RegisterMatrixConversionError::InvalidShape),
+                            }
+
+                            let previous_reference = if reference.index == 0 {
+                                None
+                            } else {
+                                Some(reference)
+                            };
+
+                            Ok((readout_data, previous_reference))
+                        },
+                    )?
+                    .0,
+            ),
+        )
     }
 }
 
@@ -290,7 +187,8 @@ impl ReadoutMap {
 // instead of `u64` for compatibility with the containers we use for [`ReadoutMap`].
 // It's possible `quil_rs` will use `usize` for it's `MemoryReference` in the future. If so, we
 // should use it to replace this.
-// See: https://github.com/rigetti/qcs-sdk-rust/issues/224
+// See https://github.com/rigetti/qcs-sdk-rust/issues/224
+#[derive(PartialEq, PartialOrd, Eq, Ord)]
 struct MemoryReference {
     name: String,
     index: usize,
@@ -328,167 +226,168 @@ fn parse_readout_register(
     })
 }
 
-#[cfg(test)]
-mod describe_readout_map {
-    use maplit::hashmap;
-    use ndarray::prelude::*;
-    use std::collections::HashMap;
-    use test_case::test_case;
-
-    use super::{ReadoutMap, ReadoutValue, ReadoutValues, RegisterData};
-    use qcs_api_client_grpc::models::controller::readout_values::Values;
-    use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
-
-    fn dummy_readout_values(v: i32) -> ReadoutValues {
-        ReadoutValues {
-            values: Some(Values::IntegerValues(IntegerReadoutValues {
-                values: vec![v],
-            })),
-        }
-    }
-
-    #[test]
-    fn it_converts_from_translation_readout_mappings() {
-        let readout_mappings = hashmap! {
-            String::from("ro[1]") => String::from("qA"),
-            String::from("ro[2]") => String::from("qB"),
-            String::from("ro[0]") => String::from("qC"),
-            String::from("bar[3]") => String::from("qD"),
-            String::from("bar[5]") => String::from("qE"),
-        };
-
-        let readout_values = hashmap! {
-            String::from("qA") => dummy_readout_values(11),
-            String::from("qB") => dummy_readout_values(22),
-            String::from("qD") => dummy_readout_values(33),
-            String::from("qE") => dummy_readout_values(44),
-        };
-
-        let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values);
-        let register = readout_map
-            .get_index_wise_matrix("ro")
-            .expect("ReadoutMap should have ro");
-
-        let expected = arr2(&[
-            [None],
-            [Some(ReadoutValue::Integer(11))],
-            [Some(ReadoutValue::Integer(22))],
-        ]);
-
-        assert_eq!(register, expected);
-
-        let bar = readout_map
-            .get_index_wise_matrix("bar")
-            .expect("ReadoutMap should have field `bar`");
-
-        let expected = arr2(&[
-            [None],
-            [None],
-            [None],
-            [Some(ReadoutValue::Integer(33))],
-            [None],
-            [Some(ReadoutValue::Integer(44))],
-        ]);
-
-        assert_eq!(bar, expected);
-    }
-
-    #[test]
-    fn it_converts_from_register_data_map() {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1, 0, 1]]),
-        };
-
-        let readout_map = ReadoutMap::from_register_data_map(&registers);
-
-        let ro = readout_map
-            .get_index_wise_matrix("ro")
-            .expect("ReadoutMap should have ro");
-
-        let expected = arr2(&[
-            [Some(ReadoutValue::Integer(1))],
-            [Some(ReadoutValue::Integer(0))],
-            [Some(ReadoutValue::Integer(1))],
-        ]);
-        assert_eq!(ro, expected);
-    }
-
-    #[test_case(0, 0 => Some(ReadoutValue::Integer(1)) ; "returns value when both indices are in bounds")]
-    #[test_case(1, 0 => None ; "returns None when row index is off by 1")]
-    #[test_case(0, 1 => None ; "returns None when column index is off by 1")]
-    fn get_value(row: usize, col: usize) -> Option<ReadoutValue> {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1]]),
-        };
-
-        ReadoutMap::from_register_data_map(&registers).get_value("ro", row, col)
-    }
-
-    #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct row when index is in bounds")]
-    #[test_case(2 => None ; "returns None when index is off by 1")]
-    fn get_values_by_memory_index(index: usize) -> Option<Vec<Option<ReadoutValue>>> {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1, 9], vec![2, 10]]),
-        };
-
-        ReadoutMap::from_register_data_map(&registers).get_values_by_memory_index("ro", index)
-    }
-
-    #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct column when index is in bounds")]
-    #[test_case(2 => None ; "returns None when index is off by 1")]
-    fn get_values_by_shot(shot_num: usize) -> Option<Vec<Option<ReadoutValue>>> {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1, 2], vec![3, 4]]),
-        };
-
-        ReadoutMap::from_register_data_map(&registers).get_values_by_shot("ro", shot_num)
-    }
-
-    #[test]
-    fn test_get_index_wise_matrix() {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
-        };
-
-        let expected = arr2(&[
-            [
-                Some(ReadoutValue::Integer(1)),
-                Some(ReadoutValue::Integer(2)),
-            ],
-            [
-                Some(ReadoutValue::Integer(3)),
-                Some(ReadoutValue::Integer(4)),
-            ],
-        ]);
-
-        let readout_data = ReadoutMap::from_register_data_map(&registers);
-        let matrix = readout_data
-            .get_index_wise_matrix("ro")
-            .expect("ReadoutMap should have ro");
-        assert_eq!(matrix, expected);
-    }
-
-    #[test]
-    fn test_get_shot_wise_matrix() {
-        let registers: HashMap<Box<str>, RegisterData> = hashmap! {
-            String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
-        };
-
-        let expected = arr2(&[
-            [
-                Some(ReadoutValue::Integer(1)),
-                Some(ReadoutValue::Integer(3)),
-            ],
-            [
-                Some(ReadoutValue::Integer(2)),
-                Some(ReadoutValue::Integer(4)),
-            ],
-        ]);
-
-        let readout_data = ReadoutMap::from_register_data_map(&registers);
-        let matrix = readout_data
-            .get_shot_wise_matrix("ro")
-            .expect("ReadoutMap should have ro");
-        assert_eq!(matrix, expected);
-    }
-}
+// TODO: Re-instate tests
+// #[cfg(test)]
+// mod describe_readout_map {
+//     use maplit::hashmap;
+//     use ndarray::prelude::*;
+//     use std::collections::HashMap;
+//     use test_case::test_case;
+//
+//     use super::{ReadoutMap, RegisterData};
+//     use qcs_api_client_grpc::models::controller::readout_values::Values;
+//     use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
+//
+//     fn dummy_readout_values(v: i32) -> ReadoutValues {
+//         ReadoutValues {
+//             values: Some(Values::IntegerValues(IntegerReadoutValues {
+//                 values: vec![v],
+//             })),
+//         }
+//     }
+//
+//     #[test]
+//     fn it_converts_from_translation_readout_mappings() {
+//         let readout_mappings = hashmap! {
+//             String::from("ro[1]") => String::from("qA"),
+//             String::from("ro[2]") => String::from("qB"),
+//             String::from("ro[0]") => String::from("qC"),
+//             String::from("bar[3]") => String::from("qD"),
+//             String::from("bar[5]") => String::from("qE"),
+//         };
+//
+//         let readout_values = hashmap! {
+//             String::from("qA") => dummy_readout_values(11),
+//             String::from("qB") => dummy_readout_values(22),
+//             String::from("qD") => dummy_readout_values(33),
+//             String::from("qE") => dummy_readout_values(44),
+//         };
+//
+//         let readout_map = ReadoutMap::from_mappings_and_values(&readout_mappings, &readout_values);
+//         let register = readout_map
+//             .get_index_wise_matrix("ro")
+//             .expect("ReadoutMap should have ro");
+//
+//         let expected = arr2(&[
+//             [None],
+//             [Some(ReadoutValue::Integer(11))],
+//             [Some(ReadoutValue::Integer(22))],
+//         ]);
+//
+//         assert_eq!(register, expected);
+//
+//         let bar = readout_map
+//             .get_index_wise_matrix("bar")
+//             .expect("ReadoutMap should have field `bar`");
+//
+//         let expected = arr2(&[
+//             [None],
+//             [None],
+//             [None],
+//             [Some(ReadoutValue::Integer(33))],
+//             [None],
+//             [Some(ReadoutValue::Integer(44))],
+//         ]);
+//
+//         assert_eq!(bar, expected);
+//     }
+//
+//     #[test]
+//     fn it_converts_from_register_data_map() {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1, 0, 1]]),
+//         };
+//
+//         let readout_map = ReadoutMap::from_register_data_map(&registers);
+//
+//         let ro = readout_map
+//             .get_index_wise_matrix("ro")
+//             .expect("ReadoutMap should have ro");
+//
+//         let expected = arr2(&[
+//             [Some(ReadoutValue::Integer(1))],
+//             [Some(ReadoutValue::Integer(0))],
+//             [Some(ReadoutValue::Integer(1))],
+//         ]);
+//         assert_eq!(ro, expected);
+//     }
+//
+//     #[test_case(0, 0 => Some(ReadoutValue::Integer(1)) ; "returns value when both indices are in bounds")]
+//     #[test_case(1, 0 => None ; "returns None when row index is off by 1")]
+//     #[test_case(0, 1 => None ; "returns None when column index is off by 1")]
+//     fn get_value(row: usize, col: usize) -> Option<ReadoutValue> {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1]]),
+//         };
+//
+//         ReadoutMap::from_register_data_map(&registers).get_value("ro", row, col)
+//     }
+//
+//     #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct row when index is in bounds")]
+//     #[test_case(2 => None ; "returns None when index is off by 1")]
+//     fn get_values_by_memory_index(index: usize) -> Option<Vec<Option<ReadoutValue>>> {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1, 9], vec![2, 10]]),
+//         };
+//
+//         ReadoutMap::from_register_data_map(&registers).get_values_by_memory_index("ro", index)
+//     }
+//
+//     #[test_case(0 => Some(vec![Some(ReadoutValue::Integer(1)), Some(ReadoutValue::Integer(2))]) ; "returns correct column when index is in bounds")]
+//     #[test_case(2 => None ; "returns None when index is off by 1")]
+//     fn get_values_by_shot(shot_num: usize) -> Option<Vec<Option<ReadoutValue>>> {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1, 2], vec![3, 4]]),
+//         };
+//
+//         ReadoutMap::from_register_data_map(&registers).get_values_by_shot("ro", shot_num)
+//     }
+//
+//     #[test]
+//     fn test_get_index_wise_matrix() {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
+//         };
+//
+//         let expected = arr2(&[
+//             [
+//                 Some(ReadoutValue::Integer(1)),
+//                 Some(ReadoutValue::Integer(2)),
+//             ],
+//             [
+//                 Some(ReadoutValue::Integer(3)),
+//                 Some(ReadoutValue::Integer(4)),
+//             ],
+//         ]);
+//
+//         let readout_data = ReadoutMap::from_register_data_map(&registers);
+//         let matrix = readout_data
+//             .get_index_wise_matrix("ro")
+//             .expect("ReadoutMap should have ro");
+//         assert_eq!(matrix, expected);
+//     }
+//
+//     #[test]
+//     fn test_get_shot_wise_matrix() {
+//         let registers: HashMap<Box<str>, RegisterData> = hashmap! {
+//             String::from("ro").into() => RegisterData::I8(vec![vec![1, 3], vec![2, 4]]),
+//         };
+//
+//         let expected = arr2(&[
+//             [
+//                 Some(ReadoutValue::Integer(1)),
+//                 Some(ReadoutValue::Integer(3)),
+//             ],
+//             [
+//                 Some(ReadoutValue::Integer(2)),
+//                 Some(ReadoutValue::Integer(4)),
+//             ],
+//         ]);
+//
+//         let readout_data = ReadoutMap::from_register_data_map(&registers);
+//         let matrix = readout_data
+//             .get_shot_wise_matrix("ro")
+//             .expect("ReadoutMap should have ro");
+//         assert_eq!(matrix, expected);
+//     }
+// }

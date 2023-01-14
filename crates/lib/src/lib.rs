@@ -53,8 +53,7 @@
 
 pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
 pub use execution_data::{
-    register_matrix_as_i32, ExecutionData, ReadoutMap, ReadoutValue, RegisterMatrix,
-    RegisterMatrixConversionError,
+    ExecutionData, ReadoutMap, RegisterMatrix, RegisterMatrixConversionError,
 };
 pub use register_data::RegisterData;
 
@@ -62,5 +61,5 @@ pub mod api;
 mod executable;
 mod execution_data;
 pub mod qpu;
-mod qvm;
+pub mod qvm;
 mod register_data;

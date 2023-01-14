@@ -11,12 +11,13 @@ use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
-use crate::execution_data::{MemoryReferenceParseError, ReadoutMap};
+use crate::execution_data::{MemoryReferenceParseError, ReadoutData};
 use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
 use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, CompilerOpts, TargetDevice};
+use super::readout_data::QPUReadout;
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -185,10 +186,10 @@ impl<'a> Execution<'a> {
             retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
 
         Ok(ExecutionData {
-            readout_data: ReadoutMap::from_mappings_and_values(
+            readout_data: ReadoutData::Qpu(QPUReadout::from_controller_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
-            ),
+            )),
             duration: response
                 .execution_duration_microseconds
                 .map(Duration::from_micros),

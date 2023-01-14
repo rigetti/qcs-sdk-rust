@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::str::FromStr;
 
 use qcs_api_client_common::ClientConfiguration;
@@ -9,9 +8,8 @@ use quil_rs::{
 };
 
 use crate::executable::Parameters;
-use crate::RegisterData;
 
-use super::{Request, Response};
+use super::{QVMMemory, Request, Response};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -61,7 +59,7 @@ impl Execution {
         readouts: &[&str],
         params: &Parameters,
         config: &ClientConfiguration,
-    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
+    ) -> Result<QVMMemory, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -110,7 +108,7 @@ impl Execution {
         shots: u16,
         readouts: &[&str],
         config: &ClientConfiguration,
-    ) -> Result<HashMap<Box<str>, RegisterData>, Error> {
+    ) -> Result<QVMMemory, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
@@ -132,7 +130,7 @@ impl Execution {
             Ok(Response::Success(response)) => Ok(response
                 .registers
                 .into_iter()
-                .map(|(key, value)| (key.into_boxed_str(), value))
+                .map(|(key, value)| (key, value))
                 .collect()),
             Ok(Response::Failure(response)) => Err(Error::Qvm {
                 message: response.status,
