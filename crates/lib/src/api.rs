@@ -320,8 +320,8 @@ pub async fn retrieve_results(
 /// API Errors encountered when trying to list available quantum processors.
 #[derive(Debug, thiserror::Error)]
 pub enum ListQuantumProcessorNamesError {
-    /// Failed an http call
-    #[error("Failed an http call: {0}")]
+    /// Failed the http call
+    #[error("Failed to list processors via API: {0}")]
     ApiError(#[from] OpenAPIError<ListQuantumProcessorsError>),
 
     /// Pagination did not finish before timeout
