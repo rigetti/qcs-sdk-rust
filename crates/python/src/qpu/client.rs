@@ -9,8 +9,7 @@ use qcs_api_client_common::{
     ClientConfiguration,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_error, py_wrap_struct, py_wrap_type, wrap_error, ToPython,
-    ToPythonError,
+    create_init_submodule, py_wrap_error, py_wrap_struct, py_wrap_type, wrap_error, ToPythonError,
 };
 
 create_init_submodule! {
@@ -115,6 +114,18 @@ py_wrap_type! {
     PyQcsClient(Qcs) as "QcsClient";
 }
 
+impl PyQcsClient {
+    pub(crate) async fn get_or_create_client(client: Option<Self>) -> PyResult<Qcs> {
+        Ok(match client {
+            Some(client) => client.0,
+            None => Qcs::load()
+                .await
+                .map_err(LoadError::from)
+                .map_err(LoadError::to_py_err)?,
+        })
+    }
+}
+
 #[pymethods]
 impl PyQcsClient {
     #[new]
@@ -163,14 +174,13 @@ impl PyQcsClient {
         Ok(Self(client))
     }
 
-    // TODO: default arg
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
     pub fn load(
         py: Python<'_>,
         profile_name: Option<String>,
         use_gateway: Option<bool>,
-    ) -> PyResult<Self> {
+    ) -> PyResult<&PyAny> {
         future_into_py(py, async move {
             let config = match profile_name {
                 Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
@@ -187,8 +197,11 @@ impl PyQcsClient {
                 Some(use_gateway) => client.with_use_gateway(use_gateway),
             };
 
-            Python::with_gil(|py| <_ as ToPython<Py<PyAny>>>::to_python(&Self(client), py))
-        })?
-        .extract()
+            Ok(Self(client))
+        })
+    }
+
+    fn info(&self) -> String {
+        format!("{:?}", self.0)
     }
 }

@@ -12,15 +12,14 @@ use qcs::{
     api::{
         ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult, TranslationResult,
     },
-    qpu::{
-        quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
-        Qcs,
-    },
+    qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
 };
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum,
     wrap_error, ToPython,
 };
+
+use crate::qpu::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -92,11 +91,12 @@ create_exception!(qcs, DeviceIsaError, PyValueError);
 wrap_error!(SubmitError(qcs::api::SubmitError));
 py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
 
-#[pyfunction(kwds = "**")]
+#[pyfunction(client = "None", kwds = "**")]
 pub fn compile<'a>(
     py: Python<'a>,
     quil: String,
     target_device: String,
+    client: Option<PyQcsClient>,
     kwds: Option<&PyDict>,
 ) -> PyResult<&'a PyAny> {
     let target_device: TargetDevice =
@@ -113,9 +113,7 @@ pub fn compile<'a>(
     }
 
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let options = CompilerOpts::default().with_timeout(compiler_timeout);
         let result = qcs::api::compile(&quil, target_device, &client, options)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
@@ -153,17 +151,16 @@ pub fn build_patch_values(
         .to_python(py)
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn translate(
     py: Python<'_>,
     native_quil: String,
     num_shots: u16,
     quantum_processor_id: String,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let result = qcs::api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
             .await
             .map_err(|e| TranslationError::new_err(e.to_string()))?;
@@ -171,19 +168,16 @@ pub fn translate(
     })
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn submit(
     py: Python<'_>,
     program: String,
     patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: String,
-    use_gateway: bool,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
-            .with_use_gateway(use_gateway);
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let job_id = qcs::api::submit(&program, patch_values, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -191,18 +185,15 @@ pub fn submit(
     })
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn retrieve_results(
     py: Python<'_>,
     job_id: String,
     quantum_processor_id: String,
-    use_gateway: bool,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
-            .with_use_gateway(use_gateway);
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let results = qcs::api::retrieve_results(&job_id, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -210,12 +201,10 @@ pub fn retrieve_results(
     })
 }
 
-#[pyfunction]
-pub fn get_quilc_version(py: Python<'_>) -> PyResult<&PyAny> {
+#[pyfunction(client = "None")]
+pub fn get_quilc_version(py: Python<'_>, client: Option<PyQcsClient>) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let version = qcs::api::get_quilc_version(&client)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(version)

@@ -20,7 +20,8 @@ create_init_submodule! {
         executable::PyExecutable,
         executable::PyJobHandle,
         executable::PyService,
-        register_data::PyRegisterData
+        register_data::PyRegisterData,
+        qpu::client::PyQcsClient
     ],
     errors: [
         executable::QcsExecutionError
