@@ -1330,8 +1330,9 @@ dependencies = [
  "maplit",
  "num",
  "qcs-api",
- "qcs-api-client-common",
- "qcs-api-client-grpc",
+ "qcs-api-client-common 0.3.0",
+ "qcs-api-client-grpc 0.2.7",
+ "qcs-api-client-grpc 0.3.0",
  "qcs-api-client-openapi",
  "quil-rs",
  "regex",
@@ -1381,6 +1382,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "qcs-api-client-common"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13b09ac85ca2a9839e81d72c2cd8c7a0995984e52d5f78c0d0d6ad00da075589"
+dependencies = [
+ "dirs",
+ "futures",
+ "jsonwebtoken",
+ "reqwest",
+ "serde",
+ "thiserror",
+ "tokio",
+ "toml 0.5.10",
+]
+
+[[package]]
 name = "qcs-api-client-grpc"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1391,7 +1408,26 @@ dependencies = [
  "pbjson-build",
  "prost",
  "prost-build",
- "qcs-api-client-common",
+ "qcs-api-client-common 0.2.7",
+ "serde",
+ "thiserror",
+ "tonic",
+ "tonic-build",
+ "tower",
+]
+
+[[package]]
+name = "qcs-api-client-grpc"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "623a691262ebdb46b72d1797682e2cc5fba1c859cacc17d58a2b59c9efe9ac77"
+dependencies = [
+ "http-body",
+ "pbjson",
+ "pbjson-build",
+ "prost",
+ "prost-build",
+ "qcs-api-client-common 0.3.0",
  "serde",
  "thiserror",
  "tonic",
@@ -1401,11 +1437,11 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.3.8"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de8ce34a5f6d100626d19f28219a2c791f11d7809a36521979c3817dfaac8f3a"
+checksum = "8a99306535343c8d28a013fe7489a9c52c7aeb4d64029f98444f44dadacc8334"
 dependencies = [
- "qcs-api-client-common",
+ "qcs-api-client-common 0.3.0",
  "reqwest",
  "serde",
  "serde_json",
@@ -1421,8 +1457,8 @@ dependencies = [
  "pyo3-build-config",
  "qcs",
  "qcs-api",
- "qcs-api-client-common",
- "qcs-api-client-grpc",
+ "qcs-api-client-common 0.3.0",
+ "qcs-api-client-grpc 0.3.0",
  "quil-rs",
  "rigetti-pyo3",
  "serde_json",
