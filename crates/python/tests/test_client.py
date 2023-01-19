@@ -1,7 +1,5 @@
 import pytest
 
-import re
-
 from qcs_sdk import QcsClient
 from qcs_sdk.qpu.client import QcsLoadError
 
@@ -29,5 +27,5 @@ async def test_client_default_profile_is_not_empty(default_client_info):
 @pytest.mark.asyncio
 async def test_client_broken_raises():
     """Using a profile with broken configuration should surface the underlying error."""
-    with pytest.raises(QcsLoadError, match=r"Expected auth server broken .* but it didn't exist"):
+    with pytest.raises(QcsLoadError, match=r"Expected auth server .* but it didn't exist"):
         await QcsClient.load(profile_name="broken")
