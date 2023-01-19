@@ -30,7 +30,6 @@ create_init_submodule! {
         PyTranslationResult
     ],
     errors: [
-        InvalidConfigError,
         ExecutionError,
         TranslationError,
         CompilationError,
@@ -81,7 +80,6 @@ py_wrap_type! {
     PyExecutionResult(ExecutionResult) as "ExecutionResult";
 }
 
-create_exception!(qcs, InvalidConfigError, PyRuntimeError);
 create_exception!(qcs, ExecutionError, PyRuntimeError);
 create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);

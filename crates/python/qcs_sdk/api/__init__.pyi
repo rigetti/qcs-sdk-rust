@@ -10,6 +10,42 @@ RecalculationTable = List[str]
 Memory = Dict[str, List[float]]
 PatchValues = Dict[str, List[float]]
 
+class ExecutionError(RuntimeError):
+    """Error encountered during program execution."""
+    ...
+
+
+class TranslationError(RuntimeError):
+    """Error encountered during program translation."""
+    ...
+
+
+class CompilationError(RuntimeError):
+    """Error encountered during program compilation."""
+    ...
+
+
+class RewriteArithmeticError(RuntimeError):
+    """Error encountered rewriting arithmetic for program."""
+    ...
+
+
+class DeviceIsaError(ValueError):
+    """Error while deserializing ISA."""
+    ...
+
+
+class JobHandle(TypedDict):
+    """
+    Represents a quantum program running on a QPU.
+    Can be passed to `retrieve_results` to retrieve the results of the job.
+    """
+
+    job_id: str
+
+    readout_map: Dict[str, str]
+
+
 class RewriteArithmeticResults(TypedDict):
     program: str
     """
@@ -189,6 +225,8 @@ async def get_quilc_version(
 ) -> str:
     """
     Returns the version number of the running quilc server.
-    client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Args:
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     """
     ...
