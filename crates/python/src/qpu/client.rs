@@ -64,7 +64,7 @@ fn get_pydict_str(py_dict: &PyDict, key: &str) -> Option<String> {
 }
 
 py_wrap_struct! {
-    PyQcsClientAuthServer(AuthServer) {
+    PyQcsClientAuthServer(AuthServer) as "QcsClientAuthServer" {
         py -> rs {
             py_dict: Py<PyDict> => AuthServer {
                 let py_dict = py_dict.as_ref(py);
@@ -90,7 +90,7 @@ py_wrap_struct! {
 }
 
 py_wrap_struct! {
-    PyQcsClientTokens(Tokens) {
+    PyQcsClientTokens(Tokens) as "QcsClientTokens" {
         py -> rs {
             py_dict: Py<PyDict> => Tokens {
                 let py_dict = py_dict.as_ref(py);

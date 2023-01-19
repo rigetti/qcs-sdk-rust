@@ -19,5 +19,6 @@ qcs-api/docs
 # macOS
 .DS_Store
 
-# Python crate test cache
+# Python artifacts
 __pycache__
+crates/python/qcs_sdk/*.so

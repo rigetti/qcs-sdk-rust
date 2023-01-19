@@ -4,6 +4,8 @@ The qcs_sdk module provides an interface to Rigetti Quantum Cloud Services. Allo
 from typing import Any, Dict, List, Optional, TypedDict
 from numbers import Number
 
+from ..qpu.client import QcsClient
+
 RecalculationTable = List[str]
 Memory = Dict[str, List[float]]
 PatchValues = Dict[str, List[float]]
@@ -69,13 +71,20 @@ class ExecutionResults(TypedDict):
     The time spent executing the program.
     """
 
-async def compile(quil: str, target_device: str, *, timeout: int = 30) -> str:
+async def compile(
+    quil: str,
+    target_device: str,
+    client: Optional[QcsClient] = None,
+    *,
+    timeout: int = 30,
+) -> str:
     """
     Uses quilc to convert a quil program to native Quil.
 
     Args:
         quil: A Quil program.
         target_device: A JSON encoded description of the Quantum Abstract Machine Architecture.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Keyword Args:
         timeout: The number of seconds to wait before timing out. If set to None, there is no timeout (default: 30).
@@ -85,7 +94,9 @@ async def compile(quil: str, target_device: str, *, timeout: int = 30) -> str:
     """
     ...
 
-def rewrite_arithmetic(native_quil: str) -> RewriteArithmeticResults:
+def rewrite_arithmetic(
+    native_quil: str,
+) -> RewriteArithmeticResults:
     """
     Rewrites parametric arithmetic such that all gate parameters are only memory references
     to a newly declared memory location (__SUBST).
@@ -99,7 +110,8 @@ def rewrite_arithmetic(native_quil: str) -> RewriteArithmeticResults:
     ...
 
 def build_patch_values(
-    recalculation_table: RecalculationTable, memory: Memory
+    recalculation_table: RecalculationTable,
+    memory: Memory,
 ) -> PatchValues:
     """
     Evaluate the expressions in recalculation_table using the numeric values
@@ -115,7 +127,10 @@ def build_patch_values(
     ...
 
 async def translate(
-    native_quil: str, num_shots: int, quantum_processor_id: str
+    native_quil: str,
+    num_shots: int,
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
 ) -> TranslationResult:
     """
     Translates a native Quil program into an executable.
@@ -124,6 +139,7 @@ async def translate(
         native_quil: A Quil program.
         num_shots: The number of shots to perform.
         quantum_processor_id: The ID of the quantum processor the executable will run on (e.g. "Aspen-M-2").
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Returns:
         An Awaitable that resolves to a dictionary with the compiled program, memory descriptors, and readout sources (see `TranslationResult`).
@@ -131,7 +147,10 @@ async def translate(
     ...
 
 async def submit(
-    program: str, patch_values: Dict[str, List[float]], quantum_processor_id: str
+    program: str,
+    patch_values: Dict[str, List[float]],
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -140,27 +159,36 @@ async def submit(
         program: An executable program (see `translate`).
         patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
         quantum_processor_id: The ID of the quantum processor to run the executable on.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Returns:
         An Awaitable that resolves to the ID of the submitted job.
     """
     ...
 
-async def retrieve_results(job_id: str, quantum_processor_id: str) -> ExecutionResults:
+async def retrieve_results(
+    job_id: str,
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
+) -> ExecutionResults:
     """
     Fetches results for the corresponding job ID.
 
     Args:
         job_id: The ID of the job to retrieve results for.
         quantum_processor_id: The ID of the quanutum processor the job ran on.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Returns:
         An Awaitable that resolves to a dictionary describing the results of the execution and its duration (see `ExecutionResults`).
     """
     ...
 
-async def get_quilc_version() -> str:
+async def get_quilc_version(
+    client: Optional[QcsClient] = None,
+) -> str:
     """
     Returns the version number of the running quilc server.
+    client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     """
     ...
