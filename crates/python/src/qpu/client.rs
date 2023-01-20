@@ -1,6 +1,6 @@
 use pyo3::{
-    conversion::IntoPy, exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyErr,
-    PyResult, Python,
+    conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods, types::PyDict,
+    Py, PyAny, PyErr, PyObject, PyResult, Python,
 };
 use pyo3_asyncio::tokio::future_into_py;
 use qcs::qpu::Qcs;
@@ -126,6 +126,12 @@ impl PyQcsClient {
     }
 }
 
+impl PartialEq for PyQcsClient {
+    fn eq(&self, other: &Self) -> bool {
+        format!("{:?}", self.0) == format!("{:?}", other.0)
+    }
+}
+
 #[pymethods]
 impl PyQcsClient {
     #[new]
@@ -201,7 +207,11 @@ impl PyQcsClient {
         })
     }
 
-    fn info(&self) -> String {
-        format!("{:?}", self.0)
+    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+        match op {
+            CompareOp::Eq => (self == other).into_py(py),
+            CompareOp::Ne => (self != other).into_py(py),
+            _ => py.NotImplemented(),
+        }
     }
 }
