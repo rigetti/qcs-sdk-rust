@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, TypedDict
 
 
 class QcsClient:
@@ -34,7 +34,7 @@ class QcsClient:
         ...
 
 
-class QcsClientAuthServer:
+class QcsClientAuthServer(TypedDict):
     """Authentication server configuration for the QCS API."""
 
     client_id: str
@@ -42,7 +42,7 @@ class QcsClientAuthServer:
 
 
 
-class QcsClientTokens:
+class QcsClientTokens(TypedDict):
     """Authentication tokens for the QCS API."""
 
     bearer_access_token: str
