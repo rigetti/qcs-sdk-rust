@@ -210,6 +210,9 @@ pub enum Register {
     /// A register of 32-bit integers
     I32(Vec<i32>),
     /// A register of 64-bit complex numbers
+    ///
+    /// This type is called `Complex64` because the entire complex number takes 64 bits,
+    /// while the inner type is called `Complex32` because both components are `f32`.
     Complex64(Vec<Complex32>),
     /// A register of 8-bit integers (bytes)
     I8(Vec<i8>),
