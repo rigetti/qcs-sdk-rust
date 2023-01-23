@@ -1,4 +1,4 @@
-use pyo3::{exceptions::PyRuntimeError, pymethods, Py, PyAny, PyResult, Python};
+use pyo3::{exceptions::PyRuntimeError, pymethods, PyResult, Python};
 use pyo3_asyncio::tokio::future_into_py;
 use qcs::qpu::Qcs;
 use rigetti_pyo3::{
@@ -46,7 +46,6 @@ py_wrap_type! {
 
 #[pymethods]
 impl PyQcsClient {
-    // TODO: default arg
     #[new]
     #[args("/", use_gateway = "None")]
     pub fn new(py: Python<'_>, use_gateway: Option<bool>) -> PyResult<Self> {
@@ -61,7 +60,7 @@ impl PyQcsClient {
                 Some(use_gateway) => client.with_use_gateway(use_gateway),
             };
 
-            Python::with_gil(|py| <_ as ToPython<Py<PyAny>>>::to_python(&Self(client), py))
+            Python::with_gil(|py| Self(client).to_python(py))
         })?
         .extract()
     }
