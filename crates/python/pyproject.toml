@@ -40,7 +40,7 @@ compatibility = "linux"
 sdist-include = ["README.md"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 maturin = "^0.13.2"
