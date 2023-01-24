@@ -33,7 +33,8 @@ def test_rewrite_arithmetic():
         "program": "DECLARE __SUBST REAL[1]\nRX(__SUBST[0]) 0\n",
         "recalculation_table": ["((2*theta[0])/6.283185307179586)"],
     }
-    assert rewritten_arithmetic == expected
+    assert rewritten_arithmetic.program == expected["program"]
+    assert rewritten_arithmetic.recalculation_table == expected["recalculation_table"]
 
 
 def test_build_patch_values():

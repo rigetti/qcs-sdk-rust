@@ -1,6 +1,7 @@
-use executable::QcsExecutionError;
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
+
+use executable::QcsExecutionError;
 
 pub mod api;
 pub mod executable;
