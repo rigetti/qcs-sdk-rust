@@ -3,7 +3,7 @@
 
 use std::{collections::HashMap, str::FromStr};
 
-use num::complex::Complex32;
+use num::Complex;
 use qcs_api_client_grpc::{
     models::controller::{readout_values, ControllerJobExecutionResult},
     services::controller::{
@@ -210,10 +210,7 @@ pub enum Register {
     /// A register of 32-bit integers
     I32(Vec<i32>),
     /// A register of 64-bit complex numbers
-    ///
-    /// This type is called `Complex64` because the entire complex number takes 64 bits,
-    /// while the inner type is called `Complex32` because both components are `f32`.
-    Complex64(Vec<Complex32>),
+    Complex64(Vec<Complex<f32>>),
     /// A register of 8-bit integers (bytes)
     I8(Vec<i8>),
 }
@@ -224,7 +221,7 @@ impl From<qpu::runner::Register> for Register {
             runner::Register::F64(f) => Register::F64(f),
             runner::Register::I16(i) => Register::I16(i),
             runner::Register::Complex32(c) => {
-                Register::Complex64(c.iter().map(|c| Complex32::new(c.re, c.im)).collect())
+                Register::Complex64(c.iter().map(|c| Complex::<f32>::new(c.re, c.im)).collect())
             }
             runner::Register::I8(i) => Register::I8(i),
         }
@@ -248,7 +245,9 @@ impl From<readout_values::Values> for ExecutionResult {
                 data: Register::Complex64(
                     c.values
                         .iter()
-                        .map(|c| Complex32::new(c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0)))
+                        .map(|c| {
+                            Complex::<f32>::new(c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0))
+                        })
                         .collect(),
                 ),
             },
