@@ -1,3 +1,9 @@
+## 0.5.0-rc.0
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
 ## 0.4.2
 
 ### Fixes
