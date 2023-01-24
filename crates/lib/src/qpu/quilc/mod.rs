@@ -194,7 +194,7 @@ mod tests {
     use super::*;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use regex::Regex;
-    use std::fs::File;
+    use std::{borrow::Cow, fs::File};
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
 
@@ -239,7 +239,12 @@ MEASURE 1 ro[1]
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))
             .unwrap()
-            .run(10, &["ro"], &HashMap::default(), &client.get_config())
+            .run(
+                10,
+                &[Cow::Borrowed("ro")],
+                &HashMap::default(),
+                &client.get_config(),
+            )
             .await
             .expect("Could not run program on QVM");
         for shot in results

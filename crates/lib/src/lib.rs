@@ -10,7 +10,6 @@
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,
     bad_style,
-    const_err,
     dead_code,
     deprecated_in_future,
     keyword_idents,

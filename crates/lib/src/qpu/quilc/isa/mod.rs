@@ -178,7 +178,7 @@ mod describe_compiler_isa {
         let compiler_isa =
             Compiler::try_from(qcs_isa).expect("Could not convert ISA to CompilerIsa");
         let serialized =
-            serde_json::to_value(&compiler_isa).expect("Unable to serialize CompilerIsa");
+            serde_json::to_value(compiler_isa).expect("Unable to serialize CompilerIsa");
 
         let result = json_is_equivalent(&serialized, &expected);
         result.expect("JSON was not equivalent");

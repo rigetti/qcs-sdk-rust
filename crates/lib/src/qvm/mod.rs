@@ -1,7 +1,7 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::collections::HashMap;
+use std::{borrow::Cow, collections::HashMap};
 
 use serde::{Deserialize, Serialize};
 
@@ -41,8 +41,8 @@ struct Request<'request> {
 }
 
 impl<'request> Request<'request> {
-    fn new(program: &str, shots: u16, readouts: &[&'request str]) -> Self {
-        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (*v, true)).collect();
+    fn new(program: &str, shots: u16, readouts: &'request [Cow<'request, str>]) -> Self {
+        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (v.as_ref(), true)).collect();
         Self {
             quil_instructions: program.to_string(),
             addresses,
@@ -60,6 +60,8 @@ enum RequestType {
 
 #[cfg(test)]
 mod describe_request {
+    use std::borrow::Cow;
+
     use super::Request;
 
     #[test]
@@ -71,7 +73,7 @@ mod describe_request {
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = Request::new("H 0", 10, &["ro"]);
+        let request = Request::new("H 0", 10, &[Cow::Borrowed("ro")]);
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
