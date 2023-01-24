@@ -18,3 +18,6 @@ qcs-api/docs
 
 # macOS
 .DS_Store
+
+# pytest artifacts
+**/__pycache__
