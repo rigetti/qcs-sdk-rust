@@ -5,7 +5,7 @@ use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
     prelude::*,
     pyfunction,
-    types::{PyComplex, PyDelta, PyDict, PyFloat, PyInt, PyList, PyString},
+    types::{PyComplex, PyDict, PyFloat, PyInt, PyList, PyString},
     Py, PyResult,
 };
 use qcs::{

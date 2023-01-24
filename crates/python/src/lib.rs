@@ -31,7 +31,7 @@ create_init_submodule! {
         api::retrieve_results,
         api::build_patch_values,
         api::get_quilc_version,
-        api::list_quantum_processors
+        api::py_list_quantum_processors
     ],
     submodules: [
         "api": api::init_submodule,
