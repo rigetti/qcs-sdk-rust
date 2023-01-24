@@ -11,7 +11,10 @@ use qcs_api_client_grpc::{
     },
 };
 use qcs_api_client_openapi::apis::{
-    quantum_processors_api::{list_quantum_processors, ListQuantumProcessorsError},
+    quantum_processors_api::{
+        list_quantum_processors as openapi_list_quantum_processors,
+        ListQuantumProcessorsError as GrpcListQuantumProcessorsError,
+    },
     Error as OpenAPIError,
 };
 use quil_rs::expression::Expression;
@@ -215,6 +218,9 @@ pub enum Register {
     /// A register of 32-bit integers
     I32(Vec<i32>),
     /// A register of 64-bit complex numbers
+    ///
+    /// This type is called `Complex64` because the entire complex number takes 64 bits,
+    /// while the inner type is called `Complex32` because both components are `f32`.
     Complex64(Vec<Complex32>),
     /// A register of 8-bit integers (bytes)
     I8(Vec<i8>),
@@ -319,10 +325,10 @@ pub async fn retrieve_results(
 
 /// API Errors encountered when trying to list available quantum processors.
 #[derive(Debug, thiserror::Error)]
-pub enum ListQuantumProcessorNamesError {
+pub enum ListQuantumProcessorsError {
     /// Failed the http call
     #[error("Failed to list processors via API: {0}")]
-    ApiError(#[from] OpenAPIError<ListQuantumProcessorsError>),
+    ApiError(#[from] OpenAPIError<GrpcListQuantumProcessorsError>),
 
     /// Pagination did not finish before timeout
     #[error("API pagination did not finish before timeout: {0:?}")]
@@ -331,10 +337,10 @@ pub enum ListQuantumProcessorNamesError {
 
 /// Query the QCS API for the names of all available quantum processors.
 /// If `None`, the default `timeout` used is 10 seconds.
-pub async fn list_quantum_processor_names(
+pub async fn list_quantum_processors(
     client: &Qcs,
     timeout: Option<Duration>,
-) -> Result<Vec<String>, ListQuantumProcessorNamesError> {
+) -> Result<Vec<String>, ListQuantumProcessorsError> {
     let timeout = timeout.unwrap_or_else(|| Duration::from_secs(10));
 
     tokio::time::timeout(timeout, async move {
@@ -342,7 +348,7 @@ pub async fn list_quantum_processor_names(
         let mut page_token = None;
 
         loop {
-            let result = list_quantum_processors(
+            let result = openapi_list_quantum_processors(
                 &client.get_openapi_client(),
                 Some(100),
                 page_token.as_deref(),

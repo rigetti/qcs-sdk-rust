@@ -8,6 +8,8 @@ pub mod grpc;
 pub mod qpu;
 pub mod register_data;
 
+use executable::QcsExecutionError;
+
 // pub use executable::{Error, Executable, ExecuteResultQPU, ExecuteResultQVM, JobHandle, Service};
 // pub use execution_data::{Qpu, Qvm, ReadoutMap};
 // pub use register_data::RegisterData;
@@ -20,10 +22,11 @@ create_init_submodule! {
         executable::PyExecutable,
         executable::PyJobHandle,
         executable::PyService,
-        register_data::PyRegisterData
+        register_data::PyRegisterData,
+        qpu::client::PyQcsClient
     ],
     errors: [
-        executable::QcsExecutionError
+        QcsExecutionError
     ],
     funcs: [
         api::compile,
