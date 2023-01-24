@@ -48,3 +48,9 @@ def test_build_patch_values():
 async def test_get_quilc_version():
     version = await qcs_sdk.get_quilc_version()
     assert re.match(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$", version)
+
+
+@pytest.mark.asyncio
+async def test_list_quantum_processors():
+    qpus = await qcs_sdk.list_quantum_processors()
+    assert isinstance(qpus, list)

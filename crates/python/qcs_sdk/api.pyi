@@ -166,6 +166,7 @@ async def compile(
     """
     ...
 
+
 def rewrite_arithmetic(
     native_quil: str,
 ) -> RewriteArithmeticResults:
@@ -184,6 +185,7 @@ def rewrite_arithmetic(
         - ``RewriteArithmeticError`` When the program arithmetic cannot be evaluated.
     """
     ...
+
 
 def build_patch_values(
     recalculation_table: RecalculationTable,
@@ -204,6 +206,7 @@ def build_patch_values(
         - ``TranslationError`` When the expressions in `recalculation_table` could not be evaluated.
     """
     ...
+
 
 async def translate(
     native_quil: str,
@@ -229,6 +232,7 @@ async def translate(
     """
     ...
 
+
 async def submit(
     program: str,
     patch_values: Dict[str, List[float]],
@@ -253,6 +257,7 @@ async def submit(
     """
     ...
 
+
 async def retrieve_results(
     job_id: str,
     quantum_processor_id: str,
@@ -275,6 +280,7 @@ async def retrieve_results(
     """
     ...
 
+
 async def get_quilc_version(
     client: Optional[QcsClient] = None,
 ) -> str:
@@ -287,5 +293,34 @@ async def get_quilc_version(
     Raises:
         - ``LoadError`` When there is an issue loading the QCS Client configuration.
         - ``CompilationError`` When there is an issue fetching the version from the quilc compiler.
+    """
+    ...
+
+
+async def get_quilc_version(
+    client: Optional[QcsClient] = None,
+) -> str:
+    """
+    Returns the version number of the running quilc server.
+
+    Args:
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    
+    Raises:
+        - ``LoadError`` When there is an issue loading the QCS Client configuration.
+        - ``CompilationError`` When there is an issue fetching the version from the quilc compiler.
+    """
+    ...
+
+async def list_quantum_processors(
+    client: Optional[QcsClient] = None,
+    timeout: Optional[float] = None,
+) -> List[str]:
+    """
+    Returns all available Quantum Processor IDs.
+
+    Args:
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+        timeout: Maximum duration to wait for API calls to complete, in seconds.
     """
     ...
