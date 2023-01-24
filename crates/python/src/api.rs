@@ -17,7 +17,7 @@ use qcs::{
 };
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum,
-    wrap_error, ToPython,
+    wrap_error, ToPython, ToPythonError,
 };
 
 use crate::qpu::client::PyQcsClient;
@@ -88,10 +88,19 @@ create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceIsaError, PyValueError);
-create_exception!(qcs, QcsListQuantumProcessorsError, PyRuntimeError);
 
 wrap_error!(SubmitError(qcs::api::SubmitError));
 py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
+
+wrap_error!(ListQuantumProcessorsError(
+    qcs::api::ListQuantumProcessorsError
+));
+py_wrap_error!(
+    api,
+    ListQuantumProcessorsError,
+    QcsListQuantumProcessorsError,
+    PyRuntimeError
+);
 
 #[pyfunction(client = "None", kwds = "**")]
 pub fn compile<'a>(
@@ -225,7 +234,8 @@ pub fn py_list_quantum_processors(
         let timeout = timeout.map(Duration::from_secs_f64);
         let names = list_quantum_processors(&client, timeout)
             .await
-            .map_err(|e| QcsListQuantumProcessorsError::new_err(e.to_string()))?;
+            .map_err(ListQuantumProcessorsError::from)
+            .map_err(ListQuantumProcessorsError::to_py_err)?;
         Ok(names)
     })
 }
