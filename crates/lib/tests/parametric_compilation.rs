@@ -35,10 +35,15 @@ async fn basic_substitution() {
         parametric_measurements.push(
             result
                 .readout_data
-                .get_value("ro", 0, 0)
+                .to_readout_map()
+                .expect("should convert to ReadoutMap")
+                .get_register_matrix("ro")
+                .expect("should have `ro`")
+                .as_integer()
+                .expect("`ro` should have integer values")
+                .get((0, 0))
                 .expect("ro register should have a value in the first index and shot")
-                .into_integer()
-                .expect("should be integer"),
+                .to_owned(),
         )
     }
 

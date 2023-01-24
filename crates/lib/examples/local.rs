@@ -18,7 +18,7 @@ async fn main() {
 
     let result = exe
         .with_parameter("theta", 0, PI)
-        .execute_on_qpu("Aspen-11")
+        .execute_on_qpu("Aspen-M-3")
         .await
         .expect("Program should execute successfully");
 

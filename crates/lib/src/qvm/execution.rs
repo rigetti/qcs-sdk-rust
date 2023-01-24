@@ -127,11 +127,7 @@ impl Execution {
                 qvm_url: config.qvm_url().into(),
                 source,
             }),
-            Ok(Response::Success(response)) => Ok(response
-                .registers
-                .into_iter()
-                .map(|(key, value)| (key, value))
-                .collect()),
+            Ok(Response::Success(response)) => Ok(response.registers),
             Ok(Response::Failure(response)) => Err(Error::Qvm {
                 message: response.status,
             }),

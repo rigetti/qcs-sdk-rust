@@ -1,5 +1,5 @@
-//! TODO: Docs
-//!
+//! This modules provides types and functions for initializing and working with
+//! QPU readout data.
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use quil_rs::instruction::MemoryReference;
@@ -9,16 +9,18 @@ use qcs_api_client_grpc::models::controller::{
     readout_values as controller_readout_values, ReadoutValues as ControllerReadoutValues,
 };
 
-/// TODO: Docs
+/// A row of readout values from the QPU.
 #[derive(Debug, Clone, EnumAsInner, PartialEq)]
 pub enum ReadoutValues {
-    /// A vector of all readout values across all shots for integer typed registers.
+    /// Integer readout values
     Integer(Vec<i32>),
-    /// A vector of all readout values across all shots for complex typed registers.
+    /// Complex readout values
     Complex(Vec<Complex64>),
+    /// Real numbered readout values
+    Real(Vec<f64>),
 }
 
-/// TODO: Docs
+/// This struct encapsulates the readout data returned from the QPU after executing a job.
 #[derive(Debug, Clone, PartialEq)]
 pub struct QPUReadout {
     /// Mappings of a memory region (ie. "ro[0]") to it's key name in `readout_values` (ie. "q0")
@@ -28,6 +30,7 @@ pub struct QPUReadout {
 }
 
 impl QPUReadout {
+    /// Creates a new [`QPUReadout`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,
         values: &HashMap<String, ControllerReadoutValues>,
@@ -64,7 +67,8 @@ impl QPUReadout {
         }
     }
 
-    /// TODO: Docs
+    /// Returns the [`ReadoutValues`] for a [`MemoryReference`], or None if a mapping to the
+    /// provided memory reference doesn't exist.
     #[must_use]
     pub fn get_values_for_memory_reference(
         &self,

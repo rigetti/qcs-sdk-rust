@@ -29,25 +29,26 @@ async fn main() {
         let theta = step * f64::from(i);
         let data = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-11")
+            .execute_on_qpu("Aspen-M-3")
             .await
             .expect("Executed program on QPU");
         total_execution_time += data
             .duration
-            .expect("Aspen-11 should always report duration");
+            .expect("Aspen-M-3 should always report duration");
 
         let first_ro_values = data
             .readout_data
-            .get_values_by_shot("ro", 0)
-            .expect("readout values should contain 'ro'");
+            .to_readout_map()
+            .expect("should be able to create a ReadoutMap")
+            .get_register_matrix("ro")
+            .expect("readout values should contain 'ro'")
+            .as_integer()
+            .expect("'ro' should be a register of integer values")
+            .row(0)
+            .to_owned();
 
         for value in first_ro_values.iter() {
-            parametric_measurements.push(
-                value
-                    .expect("ro should have values")
-                    .into_integer()
-                    .expect("values should be integers"),
-            )
+            parametric_measurements.push(*value)
         }
     }
 

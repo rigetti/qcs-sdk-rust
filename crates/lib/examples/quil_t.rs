@@ -19,17 +19,19 @@ async fn main() {
 
     let result = exe
         .compile_with_quilc(false)
-        .execute_on_qpu("Aspen-11")
+        .execute_on_qpu("Aspen-M-3")
         .await
         .expect("Program should execute successfully")
         .readout_data
-        .get_values_by_memory_index("ro", 0)
-        .expect("Readout data should include 'ro'");
+        .to_readout_map()
+        .expect("should be able to convert execution data to ReadoutMap")
+        .get_register_matrix("ro")
+        .expect("Readout data should include 'ro'")
+        .as_integer()
+        .expect("ro should be a register of integer values")
+        .to_owned();
 
-    for value in result.iter() {
-        value
-            .expect("values should exist")
-            .into_integer()
-            .expect("should be integers");
-    }
+    let serialized = serde_json::to_string(&result).unwrap();
+    println!("{serialized}");
+    dbg!(&result);
 }

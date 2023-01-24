@@ -30,21 +30,28 @@ async fn test_bell_state() {
 
     let first = data
         .readout_data
-        .get_shot_wise_matrix("first")
-        .expect("should have first register");
+        .to_readout_map()
+        .expect("should convert to readout map")
+        .get_register_matrix("first")
+        .expect("should have first register")
+        .as_integer()
+        .expect("first register should be integers")
+        .to_owned();
 
     let second = data
         .readout_data
-        .get_shot_wise_matrix("second")
-        .expect("should have second register");
+        .to_readout_map()
+        .expect("should convert to readout map")
+        .get_register_matrix("second")
+        .expect("should have second register")
+        .as_integer()
+        .expect("second register should be integers")
+        .to_owned();
 
     assert_eq!(first.shape(), [SHOTS.into(), 1]);
     assert_eq!(second.shape(), [SHOTS.into(), 1]);
 
     for (first, second) in first.into_iter().zip(second) {
-        assert_eq!(
-            first.expect("should have value"),
-            second.expect("should have value")
-        );
+        assert_eq!(first, second);
     }
 }
