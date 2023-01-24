@@ -1,3 +1,4 @@
+use executable::QcsExecutionError;
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
 
