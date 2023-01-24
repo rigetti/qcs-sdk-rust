@@ -10,13 +10,7 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
-use qcs_api_client_openapi::apis::{
-    quantum_processors_api::{
-        list_quantum_processors as openapi_list_quantum_processors,
-        ListQuantumProcessorsError as GrpcListQuantumProcessorsError,
-    },
-    Error as OpenAPIError,
-};
+use qcs_api_client_openapi::apis::{quantum_processors_api, Error as OpenAPIError};
 use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
@@ -327,7 +321,7 @@ pub async fn retrieve_results(
 pub enum ListQuantumProcessorsError {
     /// Failed the http call
     #[error("Failed to list processors via API: {0}")]
-    ApiError(#[from] OpenAPIError<GrpcListQuantumProcessorsError>),
+    ApiError(#[from] OpenAPIError<quantum_processors_api::ListQuantumProcessorsError>),
 
     /// Pagination did not finish before timeout
     #[error("API pagination did not finish before timeout: {0:?}")]
@@ -347,7 +341,7 @@ pub async fn list_quantum_processors(
         let mut page_token = None;
 
         loop {
-            let result = openapi_list_quantum_processors(
+            let result = quantum_processors_api::list_quantum_processors(
                 &client.get_openapi_client(),
                 Some(100),
                 page_token.as_deref(),
