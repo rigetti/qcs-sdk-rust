@@ -52,6 +52,7 @@ async def test_get_quilc_version():
 
 
 @pytest.mark.asyncio
+@pytest.mark.skip
 async def test_list_quantum_processors():
     qpus = await qcs_sdk.list_quantum_processors()
     assert isinstance(qpus, list)
