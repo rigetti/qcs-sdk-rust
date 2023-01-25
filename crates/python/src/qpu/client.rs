@@ -6,7 +6,7 @@ use qcs_api_client_common::{
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
-        conversion::IntoPy, exceptions::PyRuntimeError, prelude::*, pyclass::CompareOp, pymethods,
+        conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods,
         types::PyString, Py, PyAny, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
