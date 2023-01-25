@@ -6,6 +6,7 @@ from enum import Enum
 
 from typing import Dict, List, Optional
 from .qpu.quilc import CompilerOpts
+from ._execution_data import QVM, QPU
 
 class QcsExecutionError(RuntimeError):
     """Error encounteted when executing programs."""
@@ -22,7 +23,7 @@ class Executable:
         compiler_options: Optional[CompilerOpts]
     ) -> "Executable": ...
 
-    async def execute_on_qvm():
+    async def execute_on_qvm() -> QVM:
         """
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
@@ -33,7 +34,7 @@ class Executable:
 
     async def execute_on_qpu(
         quantum_processor_id: str
-    ):
+    ) -> QPU:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -44,7 +45,7 @@ class Executable:
     
     async def retrieve_results(
         job_handle: JobHandle
-    ):
+    ) -> QPU:
         """
         Wait for the results of a job to complete.
 
