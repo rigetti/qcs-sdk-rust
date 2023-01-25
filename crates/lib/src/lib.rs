@@ -10,7 +10,6 @@
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,
     bad_style,
-    const_err,
     dead_code,
     deprecated_in_future,
     keyword_idents,
@@ -53,7 +52,7 @@
 
 pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
 pub use execution_data::{
-    ExecutionData, ReadoutMap, RegisterMatrix, RegisterMatrixConversionError,
+    ExecutionData, ReadoutData, ReadoutMap, RegisterMatrix, RegisterMatrixConversionError,
 };
 pub use register_data::RegisterData;
 

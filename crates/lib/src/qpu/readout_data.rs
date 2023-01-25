@@ -14,22 +14,22 @@ use qcs_api_client_grpc::models::controller::{
 pub enum ReadoutValues {
     /// Integer readout values
     Integer(Vec<i32>),
-    /// Complex readout values
-    Complex(Vec<Complex64>),
     /// Real numbered readout values
     Real(Vec<f64>),
+    /// Complex readout values
+    Complex(Vec<Complex64>),
 }
 
 /// This struct encapsulates the readout data returned from the QPU after executing a job.
 #[derive(Debug, Clone, PartialEq)]
-pub struct QPUReadout {
+pub struct QpuReadout {
     /// Mappings of a memory region (ie. "ro[0]") to it's key name in `readout_values` (ie. "q0")
     pub mappings: HashMap<String, String>,
     /// Mapping of a readout values identifier (ie. "q0") to a set of [`ReadoutValues`]
     pub readout_values: HashMap<String, ReadoutValues>,
 }
 
-impl QPUReadout {
+impl QpuReadout {
     /// Creates a new [`QPUReadout`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,

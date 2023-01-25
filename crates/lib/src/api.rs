@@ -3,6 +3,7 @@
 
 use std::{collections::HashMap, str::FromStr};
 
+use num::Complex;
 use qcs_api_client_grpc::{
     models::controller::{readout_values, ControllerJobExecutionResult},
     services::controller::{
@@ -55,7 +56,7 @@ pub enum RewriteArithmeticError {
 
 /// The result of a call to [`rewrite_arithmetic()`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct RewriteArithmeticResult {
     /// The rewritten program
     pub program: String,
@@ -193,17 +194,13 @@ pub fn build_patch_values(
         .iter()
         .map(|expr| Expression::from_str(expr))
         .collect::<Result<_, _>>()
-        .map_err(|e| format!("Unable to interpret recalculation table: {:?}", e))?;
+        .map_err(|e| format!("Unable to interpret recalculation table: {e:?}"))?;
     rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
-/// A convenience type that describes a Complex-64 value whose real
-/// and imaginary parts of both f32.
-pub type Complex64 = [f32; 2];
-
 /// Data from an individual register. Each variant contains a vector with the expected data type
 /// where each value in the vector corresponds to a shot.
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 #[serde(untagged)] // Don't include the discriminant name in serialized output.
 pub enum Register {
     /// A register of 64-bit floating point numbers
@@ -213,7 +210,7 @@ pub enum Register {
     /// A register of 32-bit integers
     I32(Vec<i32>),
     /// A register of 64-bit complex numbers
-    Complex64(Vec<Complex64>),
+    Complex64(Vec<Complex<f32>>),
     /// A register of 8-bit integers (bytes)
     I8(Vec<i8>),
 }
@@ -224,7 +221,7 @@ impl From<qpu::runner::Register> for Register {
             runner::Register::F64(f) => Register::F64(f),
             runner::Register::I16(i) => Register::I16(i),
             runner::Register::Complex32(c) => {
-                Register::Complex64(c.iter().map(|c| [c.re, c.im]).collect())
+                Register::Complex64(c.iter().map(|c| Complex::<f32>::new(c.re, c.im)).collect())
             }
             runner::Register::I8(i) => Register::I8(i),
         }
@@ -232,7 +229,7 @@ impl From<qpu::runner::Register> for Register {
 }
 
 /// The execution readout data from a particular memory location.
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ExecutionResult {
     shape: Vec<usize>,
     data: Register,
@@ -248,7 +245,9 @@ impl From<readout_values::Values> for ExecutionResult {
                 data: Register::Complex64(
                     c.values
                         .iter()
-                        .map(|c| [c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0)])
+                        .map(|c| {
+                            Complex::<f32>::new(c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0))
+                        })
                         .collect(),
                 ),
             },
@@ -262,7 +261,7 @@ impl From<readout_values::Values> for ExecutionResult {
 }
 
 /// Execution readout data for all memory locations.
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct ExecutionResults {
     buffers: HashMap<String, ExecutionResult>,
     execution_duration_microseconds: Option<u64>,

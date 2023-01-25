@@ -9,7 +9,7 @@ use std::time::Duration;
 use ndarray::prelude::*;
 
 use crate::qpu::readout_data::ReadoutValues;
-use crate::{qpu::readout_data::QPUReadout, qvm::QVMMemory, RegisterData};
+use crate::{qpu::readout_data::QpuReadout, qvm::QVMMemory, RegisterData};
 
 /// Represents the two possible types of readout data returned from either then QVM or a real QPU.
 /// Each variant contains the original data returned from it's respective executor.
@@ -31,8 +31,10 @@ use crate::{qpu::readout_data::QPUReadout, qvm::QVMMemory, RegisterData};
 /// will get 2 values for
 #[derive(Debug, Clone, PartialEq, EnumAsInner)]
 pub enum ReadoutData {
+    /// Data returned from the QVM, stored as [`QVMMemory`]
     Qvm(QVMMemory),
-    Qpu(QPUReadout),
+    /// Readout data returned from the QPU, stored as [`QPUReadout`]
+    Qpu(QpuReadout),
 }
 
 /// The result of executing an [`Executable`](crate::Executable)
@@ -190,7 +192,7 @@ impl ReadoutMap {
 
     /// TODO: Docs, cleanup, error messages
     pub fn from_qpu_readout_data(
-        readout_data: &QPUReadout,
+        readout_data: &QpuReadout,
     ) -> Result<Self, RegisterMatrixConversionError> {
         Ok(
             Self(
@@ -342,7 +344,7 @@ mod describe_readout_map {
     use maplit::hashmap;
     use ndarray::prelude::*;
 
-    use crate::qpu::readout_data::QPUReadout;
+    use crate::qpu::readout_data::QpuReadout;
     use crate::qvm::QVMMemory;
 
     use super::{ReadoutMap, RegisterData};
@@ -370,7 +372,7 @@ mod describe_readout_map {
         };
 
         let qpu_readout =
-            QPUReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+            QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
         let readout_map = ReadoutMap::from_qpu_readout_data(&qpu_readout)
             .expect("Should be able to create ReadoutMap from rectangular QPU readout");
@@ -404,7 +406,7 @@ mod describe_readout_map {
         };
 
         let qpu_readout =
-            QPUReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+            QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
         ReadoutMap::from_qpu_readout_data(&qpu_readout)
             .expect_err("Should not be able to create ReadoutMap from QPU readout with missing indices for a register");
@@ -425,7 +427,7 @@ mod describe_readout_map {
         };
 
         let qpu_readout =
-            QPUReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+            QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
         ReadoutMap::from_qpu_readout_data(&qpu_readout)
             .expect_err("Should not be able to create ReadoutMap from QPU readout with jagged data for a register");

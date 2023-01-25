@@ -1,5 +1,6 @@
 //! Contains QPU-specific executable stuff.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::sync::Arc;
@@ -17,7 +18,7 @@ use crate::{ExecutionData, JobHandle};
 
 use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, CompilerOpts, TargetDevice};
-use super::readout_data::QPUReadout;
+use super::readout_data::QpuReadout;
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -29,7 +30,7 @@ use super::{get_isa, IsaError};
 #[derive(Debug, Clone)]
 pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
-    pub(crate) quantum_processor_id: &'a str,
+    pub(crate) quantum_processor_id: Cow<'a, str>,
     pub(crate) shots: u16,
     client: Arc<Qcs>,
 }
@@ -59,10 +60,10 @@ pub(crate) enum Error {
 impl From<quilc::Error> for Error {
     fn from(source: quilc::Error) -> Self {
         match source {
-            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{:?}", source))),
+            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{source:?}"))),
             quilc::Error::QuilcConnection(uri, details) => Self::Quilc {
                 uri,
-                details: format!("{:?}", details),
+                details: format!("{details:?}"),
             },
             quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
             quilc::Error::Parse(details) => Self::Compilation {
@@ -114,12 +115,12 @@ impl<'a> Execution<'a> {
     pub(crate) async fn new(
         quil: Arc<str>,
         shots: u16,
-        quantum_processor_id: &'a str,
+        quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
         compile_with_quilc: bool,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
-        let isa = get_isa(quantum_processor_id, &client).await?;
+        let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
         let program = if compile_with_quilc {
@@ -151,7 +152,7 @@ impl<'a> Execution<'a> {
     /// Run on a real QPU and wait for the results.
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'_>, Error> {
         let EncryptedTranslationResult { job, readout_map } = translate(
-            self.quantum_processor_id,
+            self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
             self.shots.into(),
             self.client.as_ref(),
@@ -163,7 +164,7 @@ impl<'a> Execution<'a> {
             .map_err(Error::Substitution)?;
 
         let job_id = submit(
-            self.quantum_processor_id,
+            self.quantum_processor_id.as_ref(),
             job,
             &patch_values,
             self.client.as_ref(),
@@ -172,7 +173,7 @@ impl<'a> Execution<'a> {
 
         Ok(JobHandle::new(
             job_id,
-            self.quantum_processor_id,
+            self.quantum_processor_id.clone(),
             readout_map,
         ))
     }
@@ -182,11 +183,15 @@ impl<'a> Execution<'a> {
         job_id: JobId,
         readout_mappings: HashMap<String, String>,
     ) -> Result<ExecutionData, Error> {
-        let response =
-            retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
+        let response = retrieve_results(
+            job_id,
+            self.quantum_processor_id.as_ref(),
+            self.client.as_ref(),
+        )
+        .await?;
 
         Ok(ExecutionData {
-            readout_data: ReadoutData::Qpu(QPUReadout::from_controller_mappings_and_values(
+            readout_data: ReadoutData::Qpu(QpuReadout::from_controller_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
             )),

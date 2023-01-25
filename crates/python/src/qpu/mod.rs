@@ -1,0 +1,20 @@
+use pyo3::exceptions::PyRuntimeError;
+use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error};
+
+pub mod client;
+pub mod quilc;
+pub mod readout_data;
+
+create_init_submodule! {
+    errors: [QcsIsaError],
+    submodules: [
+        "client": client::init_submodule,
+        "quilc": quilc::init_submodule
+    ],
+}
+
+wrap_error! {
+    IsaError(qcs::qpu::IsaError);
+}
+
+py_wrap_error!(qpu, IsaError, QcsIsaError, PyRuntimeError);

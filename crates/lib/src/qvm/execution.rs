@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::str::FromStr;
 
 use qcs_api_client_common::ClientConfiguration;
@@ -56,7 +57,7 @@ impl Execution {
     pub(crate) async fn run(
         &mut self,
         shots: u16,
-        readouts: &[&str],
+        readouts: &[Cow<'_, str>],
         params: &Parameters,
         config: &ClientConfiguration,
     ) -> Result<QVMMemory, Error> {
@@ -106,7 +107,7 @@ impl Execution {
     async fn execute(
         &self,
         shots: u16,
-        readouts: &[&str],
+        readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
     ) -> Result<QVMMemory, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
