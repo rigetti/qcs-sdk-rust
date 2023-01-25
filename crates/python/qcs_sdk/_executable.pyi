@@ -2,6 +2,7 @@
 Do not import this file, it has no exports.
 It is only here to represent the structure of the rust source code 1:1
 """
+from enum import Enum
 
 from typing import Dict, List, Optional
 from .qpu.quilc import CompilerOpts
@@ -26,7 +27,7 @@ class Executable:
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
         Raises:
-            - ``QcsExecutionError``: When the job failed to execute.
+            - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
 
@@ -37,7 +38,7 @@ class Executable:
         Compile the program and execute it on a QPU, waiting for results.
 
         Raises:
-            - ``QcsExecutionError``: When the job failed to execute.
+            - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
     
@@ -48,7 +49,7 @@ class Executable:
         Wait for the results of a job to complete.
 
         Raises:
-            - ``QcsExecutionError``: When there is a problem constructing job results.
+            - ``QcsExecutionError``: If there is a problem constructing job results.
         """
         ...
 
@@ -87,3 +88,9 @@ class ExeParameter:
     value: float
     """The value to set for the specified memory."""
 
+
+class Service(Enum):
+    Quilc = "Quilc",
+    Qvm = "Qvm",
+    Qcs = "Qcs",
+    Qpu = "Qpu",

@@ -1,9 +1,8 @@
 """
 The qcs_sdk module provides an interface to Rigetti Quantum Cloud Services. Allowing users to compile and run Quil programs on Rigetti quantum processors.
 """
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import  Dict, List, Optional
 from numbers import Number
-from enum import Enum
 
 from .qpu.client import QcsClient
 
@@ -36,7 +35,7 @@ class DeviceIsaError(ValueError):
     ...
 
 
-class RewriteArithmeticResults(TypedDict):
+class RewriteArithmeticResults:
     """
     The result of a call to [`rewrite_arithmetic`] which provides the information necessary to later patch-in memory values to a compiled program.
     """
@@ -51,7 +50,7 @@ class RewriteArithmeticResults(TypedDict):
     The recalculation table stores an ordered list of arithmetic expressions, which are to be used when updating the program memory before execution.
     """
 
-class TranslationResult(TypedDict):
+class TranslationResult:
     """
     The result of a call to [`translate`] which provides information about the translated program.
     """
@@ -67,7 +66,7 @@ class TranslationResult(TypedDict):
     """
 
 
-class ExecutionResult(TypedDict):
+class ExecutionResult:
     """Execution readout data from a particular memory location."""
 
     shape: List[int]
@@ -80,7 +79,7 @@ class ExecutionResult(TypedDict):
     """The type of the result data (as a `numpy` `dtype`)."""
 
 
-class ExecutionResults(TypedDict):
+class ExecutionResults:
     """Execution readout data for all memory locations."""
 
     buffers: Dict[str, ExecutionResult]
@@ -113,28 +112,33 @@ class Register:
 
     """
     
-    def is_i8() -> bool: ...
-    def is_i16() -> bool: ...
-    def is_i32() -> bool: ...
-    def is_f64() -> bool: ...
-    def is_complex64() -> bool: ...
+    def is_i8(self) -> bool: ...
+    def is_i16(self) -> bool: ...
+    def is_i32(self) -> bool: ...
+    def is_f64(self) -> bool: ...
+    def is_complex64(self) -> bool: ...
 
-    def as_i8() -> Optional[List[int]]: ...
-    def as_i16() -> Optional[List[int]]: ...
-    def as_i32() -> Optional[List[int]]: ...
-    def as_f64() -> Optional[List[float]]: ...
-    def as_complex64() -> Optional[List[complex]]: ...
+    def as_i8(self) -> Optional[List[int]]: ...
+    def as_i16(self) -> Optional[List[int]]: ...
+    def as_i32(self) -> Optional[List[int]]: ...
+    def as_f64(self) -> Optional[List[float]]: ...
+    def as_complex64(self) -> Optional[List[complex]]: ...
 
-    def to_i8() -> List[int]: ...
-    def to_i16() -> List[int]: ...
-    def to_i32() -> List[int]: ...
-    def to_f64() -> List[float]: ...
-    def to_complex64() -> List[complex]: ...
+    def to_i8(self) -> List[int]: ...
+    def to_i16(self) -> List[int]: ...
+    def to_i32(self) -> List[int]: ...
+    def to_f64(self) -> List[float]: ...
+    def to_complex64(self) -> List[complex]: ...
 
+    @staticmethod
     def from_i8(inner: List[int]) -> "Register": ...
+    @staticmethod
     def from_i16(inner: List[int]) -> "Register": ...
+    @staticmethod
     def from_i32(inner: List[int]) -> "Register": ...
+    @staticmethod
     def from_f64(inner: List[float]) -> "Register": ...
+    @staticmethod
     def from_complex64(inner: List[complex]) -> "Register": ...
 
 
@@ -160,9 +164,9 @@ async def compile(
         An Awaitable that resolves to the native Quil program.
 
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``DeviceIsaError`` When the `target_device` is misconfigured.
-        - ``CompilationError`` When the program could not compile.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``DeviceIsaError`` If the `target_device` is misconfigured.
+        - ``CompilationError`` If the program could not compile.
     """
     ...
 
@@ -181,8 +185,8 @@ def rewrite_arithmetic(
         A dictionary with the rewritten program and recalculation table (see `RewriteArithmeticResults`).
     
     Raises:
-        - ``TranslationError`` When the program could not be translated.
-        - ``RewriteArithmeticError`` When the program arithmetic cannot be evaluated.
+        - ``TranslationError`` If the program could not be translated.
+        - ``RewriteArithmeticError`` If the program arithmetic cannot be evaluated.
     """
     ...
 
@@ -203,7 +207,7 @@ def build_patch_values(
         A dictionary that maps each symbol to the value it should be patched with.
 
     Raises:
-        - ``TranslationError`` When the expressions in `recalculation_table` could not be evaluated.
+        - ``TranslationError`` If the expressions in `recalculation_table` could not be evaluated.
     """
     ...
 
@@ -227,8 +231,8 @@ async def translate(
         An Awaitable that resolves to a dictionary with the compiled program, memory descriptors, and readout sources (see `TranslationResult`).
     
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``TranslationError`` When the `native_quil` program could not be translated.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``TranslationError`` If the `native_quil` program could not be translated.
     """
     ...
 
@@ -252,8 +256,8 @@ async def submit(
         An Awaitable that resolves to the ID of the submitted job.
     
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``ExecutionError`` When there was a problem during program execution.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``ExecutionError`` If there was a problem during program execution.
     """
     ...
 
@@ -275,8 +279,8 @@ async def retrieve_results(
         An Awaitable that resolves to a dictionary describing the results of the execution and its duration (see `ExecutionResults`).
 
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``ExecutionError`` When there was a problem fetching execution results.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``ExecutionError`` If there was a problem fetching execution results.
     """
     ...
 
@@ -291,8 +295,8 @@ async def get_quilc_version(
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``CompilationError`` When there is an issue fetching the version from the quilc compiler.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``CompilationError`` If there is an issue fetching the version from the quilc compiler.
     """
     ...
 
@@ -307,8 +311,8 @@ async def get_quilc_version(
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     
     Raises:
-        - ``LoadError`` When there is an issue loading the QCS Client configuration.
-        - ``CompilationError`` When there is an issue fetching the version from the quilc compiler.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``CompilationError`` If there is an issue fetching the version from the quilc compiler.
     """
     ...
 
