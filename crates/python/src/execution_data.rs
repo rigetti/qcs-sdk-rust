@@ -1,5 +1,6 @@
 use std::{collections::HashMap, time::Duration};
 
+use numpy::{Complex64, PyArray2};
 use pyo3::{
     exceptions::PyValueError,
     pymethods,
@@ -65,6 +66,32 @@ py_wrap_type! {
 // TODO: Should be able to return inner matrix as ndarray
 py_wrap_type! {
     PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix";
+}
+
+impl PyRegisterMatrix {
+    pub fn as_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i32>> {
+        if let Some(matrix) = self.as_inner().as_integer() {
+            Ok(PyArray2::from_array(py, matrix))
+        } else {
+            Err(PyValueError::new_err("not a integer register"))
+        }
+    }
+
+    pub fn as_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
+        if let Some(matrix) = self.as_inner().as_real() {
+            Ok(PyArray2::from_array(py, matrix))
+        } else {
+            Err(PyValueError::new_err("not a real numbered register"))
+        }
+    }
+
+    pub fn as_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {
+        if let Some(matrix) = self.as_inner().as_complex() {
+            Ok(PyArray2::from_array(py, matrix))
+        } else {
+            Err(PyValueError::new_err("not a complex numbered register"))
+        }
+    }
 }
 
 #[pymethods]
