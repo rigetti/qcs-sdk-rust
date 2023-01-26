@@ -16,6 +16,7 @@ create_init_submodule! {
         execution_data::PyQvm,
         execution_data::PyReadoutMap,
         executable::PyExecutable,
+        executable::PyParameter,
         executable::PyJobHandle,
         executable::PyService,
         register_data::PyRegisterData,

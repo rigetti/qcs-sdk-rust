@@ -45,6 +45,14 @@ def test_build_patch_values():
     assert patch_values == expected
 
 
+def test_exe_parameters():
+    """Should be able to construct and pass exe parameters"""
+    exe_parameter = qcs_sdk.ExeParameter("a", 0, 0.25)
+    assert str(exe_parameter) == 'ExeParameter { name: "a", index: 0, value: 0.25 }'
+
+    qcs_sdk.Executable("quil", parameters=[exe_parameter])
+
+
 @pytest.mark.asyncio
 async def test_get_quilc_version():
     version = await qcs_sdk.get_quilc_version()

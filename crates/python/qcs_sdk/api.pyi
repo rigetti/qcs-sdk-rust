@@ -40,57 +40,76 @@ class RewriteArithmeticResults:
     The result of a call to [`rewrite_arithmetic`] which provides the information necessary to later patch-in memory values to a compiled program.
     """
 
-    program: str
-    """
-    The resulting program where gate parameter arithmetic has been replaced with memory references. Before execution, the program memory should be updated using the `recalculation_table`.
-    """
+    @property
+    def program(self) -> str:
+        """
+        The resulting program where gate parameter arithmetic has been replaced with memory references. Before execution, the program memory should be updated using the `recalculation_table`.
+        """
+        ...
 
-    recalculation_table: List[str]
-    """ 
-    The recalculation table stores an ordered list of arithmetic expressions, which are to be used when updating the program memory before execution.
-    """
+    @property
+    def recalculation_table(self) -> List[str]:
+        """ 
+        The recalculation table stores an ordered list of arithmetic expressions, which are to be used when updating the program memory before execution.
+        """
+        ...
+
 
 class TranslationResult:
     """
     The result of a call to [`translate`] which provides information about the translated program.
     """
 
-    program: str
-    """
-    The compiled program binary.
-    """
+    @property
+    def program(self) -> str:
+        """
+        The compiled program binary.
+        """
+        ...
 
-    ro_sources: Optional[dict]
-    """
-    A mapping from the program's memory references to the key used to index the results map.
-    """
+    @property
+    def ro_sources(self) -> Optional[dict]:
+        """
+        A mapping from the program's memory references to the key used to index the results map.
+        """
+        ...
 
 
 class ExecutionResult:
     """Execution readout data from a particular memory location."""
 
-    shape: List[int]
-    """The shape of the result data."""
+    @property
+    def shape(self) -> List[int]:
+        """The shape of the result data."""
+        ...
+    
+    @property
+    def data(self) -> List[Number | List[float]]:
+        """The result data. Complex numbers are represented as [real, imaginary]."""
+        ...
 
-    data: List[Number | List[float]]
-    """The result data. Complex numbers are represented as [real, imaginary]."""
-
-    dtype: str
-    """The type of the result data (as a `numpy` `dtype`)."""
+    @property
+    def dtype(self) -> str:
+        """The type of the result data (as a `numpy` `dtype`)."""
+        ...
 
 
 class ExecutionResults:
     """Execution readout data for all memory locations."""
 
-    buffers: Dict[str, ExecutionResult]
-    """
-    The readout results of execution, mapping a published filter node to its data.
+    @property
+    def buffers(self) -> Dict[str, ExecutionResult]:
+        """
+        The readout results of execution, mapping a published filter node to its data.
 
-    See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
-    """
-
-    execution_duration_microseconds: Optional[int]
-    """The time spent executing the program."""
+        See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
+        """
+        ...
+    
+    @property
+    def execution_duration_microseconds(self) -> Optional[int]:
+        """The time spent executing the program."""
+        ...
 
 
 class Register:

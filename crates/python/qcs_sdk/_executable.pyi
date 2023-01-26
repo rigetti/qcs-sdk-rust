@@ -14,16 +14,16 @@ class QcsExecutionError(RuntimeError):
 
 
 class Executable:
-    """"""
     def __new__(
-        registers: Optional[List[str]],
-        parameters: Optional[List[ExeParameter]],
-        shots: Optional[int],
-        compile_with_quilc: Optional[bool],
-        compiler_options: Optional[CompilerOpts]
+        cls,
+        registers: Optional[List[str]] = None,
+        parameters: Optional[List[ExeParameter]] = None,
+        shots: Optional[int] = None,
+        compile_with_quilc: Optional[bool] = None,
+        compiler_options: Optional[CompilerOpts] = None
     ) -> "Executable": ...
 
-    async def execute_on_qvm() -> QVM:
+    async def execute_on_qvm(self) -> QVM:
         """
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
@@ -32,9 +32,7 @@ class Executable:
         """
         ...
 
-    async def execute_on_qpu(
-        quantum_processor_id: str
-    ) -> QPU:
+    async def execute_on_qpu(self, quantum_processor_id: str) -> QPU:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -43,9 +41,7 @@ class Executable:
         """
         ...
     
-    async def retrieve_results(
-        job_handle: JobHandle
-    ) -> QPU:
+    async def retrieve_results(job_handle: JobHandle) -> QPU:
         """
         Wait for the results of a job to complete.
 
@@ -62,13 +58,19 @@ class JobHandle:
     Used to retrieve the results of a job.
     """
 
-    job_id: str
-    """Unique ID associated with a single job execution."""
+    @property
+    def job_id(self) -> str:
+        """
+        Unique ID associated with a single job execution.
+        """
+        ...
 
-    readout_map: Dict[str, str]
-    """
-    The readout map from source readout memory locations to the filter pipeline node which publishes the data.
-    """
+    @property
+    def readout_map(self) -> Dict[str, str]:
+        """
+        The readout map from source readout memory locations to the filter pipeline node which publishes the data.
+        """
+        ...
 
 
 class ExeParameter:
@@ -77,17 +79,27 @@ class ExeParameter:
 
     Note: The validity of parameters is not checked until execution.
     """
+    def __new__(
+        cls: type["ExeParameter"],
+        name: str,
+        index: int,
+        value: float,
+    ) -> "ExeParameter": ...
 
-    param_name: str
-    """
-    References the name of the parameter corresponding to a `DECLARE` statement in the Quil program.
-    """
+    @property
+    def name(self) -> str: ...
+    @name.setter
+    def name(self, value: str): ...
 
-    index: int
-    """The index into the memory vector that you're setting."""
+    @property
+    def index(self) -> int: ...
+    @index.setter
+    def index(self, value: int): ...
 
-    value: float
-    """The value to set for the specified memory."""
+    @property
+    def value(self) -> float: ...
+    @value.setter
+    def value(self, value: float): ...
 
 
 class Service(Enum):

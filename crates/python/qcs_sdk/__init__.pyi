@@ -12,6 +12,7 @@ from ._execution_data import (
 
 from ._executable import (
     Executable as Executable,
+    ExeParameter as ExeParameter,
     JobHandle as JobHandle,
     QcsExecutionError as QcsExecutionError,
     Service as Service,

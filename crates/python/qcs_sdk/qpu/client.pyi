@@ -1,4 +1,4 @@
-from typing import Optional, TypedDict
+from typing import Optional
 
 
 class QcsClient:
@@ -7,6 +7,7 @@ class QcsClient:
     """
 
     def __new__(
+        cls,
         tokens: Optional[QcsClientTokens] = None,
         api_url: Optional[str] = None,
         auth_server: Optional[QcsClientAuthServer] = None,
@@ -34,19 +35,32 @@ class QcsClient:
         ...
 
 
-class QcsClientAuthServer(TypedDict):
+class QcsClientAuthServer:
     """Authentication server configuration for the QCS API."""
 
-    client_id: str
-    issuer: str
+    @property
+    def client_id(self) -> str: ...
+    @client_id.setter
+    def client_id(self, value: str): ...
+
+    @property
+    def issuer(self) -> str: ...
+    @issuer.setter
+    def issuer(self, value: str): ...
 
 
-
-class QcsClientTokens(TypedDict):
+class QcsClientTokens:
     """Authentication tokens for the QCS API."""
 
-    bearer_access_token: str
-    refresh_token: str
+    @property
+    def bearer_access_token(self) -> Optional[str]: ...
+    @bearer_access_token.setter
+    def bearer_access_token(self, value: Optional[str]): ...
+
+    @property
+    def refresh_token(self) -> Optional[str]: ...
+    @refresh_token.setter
+    def refresh_token(self, value: Optional[str]): ...
 
 
 class QcsGrpcClientError(RuntimeError):
