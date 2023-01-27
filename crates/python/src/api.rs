@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use pyo3::{
     create_exception,
@@ -10,17 +10,17 @@ use pyo3::{
 };
 use qcs::{
     api::{
-        ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult, TranslationResult,
+        list_quantum_processors, ExecutionResult, ExecutionResults, Register,
+        RewriteArithmeticResult, TranslationResult,
     },
-    qpu::{
-        quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
-        Qcs,
-    },
+    qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
 };
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum,
-    wrap_error, ToPython,
+    wrap_error, ToPython, ToPythonError,
 };
+
+use crate::qpu::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -31,12 +31,12 @@ create_init_submodule! {
         PyTranslationResult
     ],
     errors: [
-        InvalidConfigError,
         ExecutionError,
         TranslationError,
         CompilationError,
         RewriteArithmeticError,
         DeviceIsaError,
+        QcsListQuantumProcessorsError,
         QcsSubmitError
     ],
     funcs: [
@@ -46,7 +46,8 @@ create_init_submodule! {
         submit,
         retrieve_results,
         build_patch_values,
-        get_quilc_version
+        get_quilc_version,
+        py_list_quantum_processors
     ],
 }
 
@@ -82,7 +83,6 @@ py_wrap_type! {
     PyExecutionResult(ExecutionResult) as "ExecutionResult";
 }
 
-create_exception!(qcs, InvalidConfigError, PyRuntimeError);
 create_exception!(qcs, ExecutionError, PyRuntimeError);
 create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
@@ -92,11 +92,22 @@ create_exception!(qcs, DeviceIsaError, PyValueError);
 wrap_error!(SubmitError(qcs::api::SubmitError));
 py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
 
-#[pyfunction(kwds = "**")]
+wrap_error!(ListQuantumProcessorsError(
+    qcs::api::ListQuantumProcessorsError
+));
+py_wrap_error!(
+    api,
+    ListQuantumProcessorsError,
+    QcsListQuantumProcessorsError,
+    PyRuntimeError
+);
+
+#[pyfunction(client = "None", kwds = "**")]
 pub fn compile<'a>(
     py: Python<'a>,
     quil: String,
     target_device: String,
+    client: Option<PyQcsClient>,
     kwds: Option<&PyDict>,
 ) -> PyResult<&'a PyAny> {
     let target_device: TargetDevice =
@@ -113,9 +124,7 @@ pub fn compile<'a>(
     }
 
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let options = CompilerOpts::default().with_timeout(compiler_timeout);
         let result = qcs::api::compile(&quil, target_device, &client, options)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
@@ -153,17 +162,16 @@ pub fn build_patch_values(
         .to_python(py)
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn translate(
     py: Python<'_>,
     native_quil: String,
     num_shots: u16,
     quantum_processor_id: String,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let result = qcs::api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
             .await
             .map_err(|e| TranslationError::new_err(e.to_string()))?;
@@ -171,19 +179,16 @@ pub fn translate(
     })
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn submit(
     py: Python<'_>,
     program: String,
     patch_values: HashMap<String, Vec<f64>>,
     quantum_processor_id: String,
-    use_gateway: bool,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
-            .with_use_gateway(use_gateway);
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let job_id = qcs::api::submit(&program, patch_values, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -191,18 +196,15 @@ pub fn submit(
     })
 }
 
-#[pyfunction]
+#[pyfunction(client = "None")]
 pub fn retrieve_results(
     py: Python<'_>,
     job_id: String,
     quantum_processor_id: String,
-    use_gateway: bool,
+    client: Option<PyQcsClient>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?
-            .with_use_gateway(use_gateway);
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let results = qcs::api::retrieve_results(&job_id, &quantum_processor_id, &client)
             .await
             .map_err(|e| ExecutionError::new_err(e.to_string()))?;
@@ -210,14 +212,30 @@ pub fn retrieve_results(
     })
 }
 
-#[pyfunction]
-pub fn get_quilc_version(py: Python<'_>) -> PyResult<&PyAny> {
+#[pyfunction(client = "None")]
+pub fn get_quilc_version(py: Python<'_>, client: Option<PyQcsClient>) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
-        let client = Qcs::load()
-            .await
-            .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
+        let client = PyQcsClient::get_or_create_client(client).await?;
         let version = qcs::api::get_quilc_version(&client)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(version)
+    })
+}
+
+#[pyfunction(client = "None", timeout = "None")]
+#[pyo3(name = "list_quantum_processors")]
+pub fn py_list_quantum_processors(
+    py: Python<'_>,
+    client: Option<PyQcsClient>,
+    timeout: Option<f64>,
+) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        let client = PyQcsClient::get_or_create_client(client).await?;
+        let timeout = timeout.map(Duration::from_secs_f64);
+        let names = list_quantum_processors(&client, timeout)
+            .await
+            .map_err(ListQuantumProcessorsError::from)
+            .map_err(ListQuantumProcessorsError::to_py_err)?;
+        Ok(names)
     })
 }

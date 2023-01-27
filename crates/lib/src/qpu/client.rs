@@ -36,7 +36,9 @@ pub struct Qcs {
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
     pub async fn load() -> Result<Self, LoadError> {
-        ClientConfiguration::load().await.map(Self::with_config)
+        ClientConfiguration::load_default()
+            .await
+            .map(Self::with_config)
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]

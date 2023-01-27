@@ -45,7 +45,24 @@ def test_build_patch_values():
     assert patch_values == expected
 
 
+def test_exe_parameters():
+    """Should be able to construct and pass exe parameters"""
+    exe_parameter = qcs_sdk.ExeParameter("a", 1, 2.5)
+    assert exe_parameter.name == "a"
+    assert exe_parameter.index == 1
+    assert exe_parameter.value == 2.5
+
+    qcs_sdk.Executable("quil", parameters=[exe_parameter])
+
+
 @pytest.mark.asyncio
 async def test_get_quilc_version():
     version = await qcs_sdk.get_quilc_version()
     assert re.match(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$", version)
+
+
+@pytest.mark.asyncio
+@pytest.mark.skip
+async def test_list_quantum_processors():
+    qpus = await qcs_sdk.list_quantum_processors()
+    assert isinstance(qpus, list)

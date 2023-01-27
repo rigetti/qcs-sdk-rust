@@ -1,13 +1,11 @@
 use std::sync::Arc;
 
-use pyo3::{
-    exceptions::PyRuntimeError, pyclass, pymethods, types::PyDict, FromPyObject, Py, PyAny,
-    PyResult, Python,
-};
+use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, JobHandle, Qpu, Qvm, Service};
 use rigetti_pyo3::{
-    impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type, wrap_error,
-    PyWrapper, ToPython, ToPythonError,
+    impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
+    pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
+    wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
 
@@ -35,9 +33,20 @@ impl_as_mut_for_wrapper!(PyExecutable);
 #[pyo3(name = "ExeParameter")]
 #[derive(FromPyObject)]
 pub struct PyParameter {
-    name: String,
-    index: usize,
-    value: f64,
+    #[pyo3(get, set)]
+    pub name: String,
+    #[pyo3(get, set)]
+    pub index: usize,
+    #[pyo3(get, set)]
+    pub value: f64,
+}
+
+#[pymethods]
+impl PyParameter {
+    #[new]
+    pub fn new(name: String, index: usize, value: f64) -> Self {
+        Self { name, index, value }
+    }
 }
 
 #[pymethods]
