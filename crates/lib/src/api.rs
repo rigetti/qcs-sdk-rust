@@ -27,7 +27,7 @@ use crate::qpu::{
 };
 
 /// TODO: make configurable at the client level.
-/// https://github.com/rigetti/qcs-sdk-rust/issues/239
+/// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Uses quilc to convert a Quil program to native Quil
