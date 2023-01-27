@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 /// Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`)
 ///
-/// This represents a "register" of typed memory across some number of shots.
+/// This represents a single vector (or "register") of typed memory across some number of shots.
 /// The register corresponds to the usage of a `DECLARE` instruction in Quil, and the name of that
 /// register should be provided with [`Executable::read_from`](`crate::Executable::read_from`).
 ///
@@ -14,8 +14,14 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Usage
 ///
-/// Typically you will already know what type of data the `ExecutionResult` _should_ have, so you can
-/// use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
+/// Typically, you will be interacting with this data through the [`crate::ReadoutData`] of an
+/// [`crate::ExecutionData`] returned after running a program. In those cases, you'll probably
+/// want to convert it to a readout map using [`crate::ReadoutData.to_readout_map()`]. This
+/// will give you each register in the form of a [`crate::RegisterMatrix`] which is similar
+/// but backed by an [`ndarray::Array2`] and more convenient for working with matrices.
+///
+/// If you are interacting with [`RegisterData`] directly, then you should already know what type of data it _should_
+/// have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
 /// convert any variant type to its inner data.
 #[derive(Clone, Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
 #[serde(untagged)]
