@@ -1,15 +1,10 @@
 use std::sync::Arc;
 
+use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, JobHandle, Qpu, Qvm, Service};
 use rigetti_pyo3::{
-    impl_as_mut_for_wrapper, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_simple_enum,
-    py_wrap_type,
-    pyo3::{
-        exceptions::PyRuntimeError,
-        pymethods,
-        types::{PyDict, PyFloat, PyInt, PyString},
-        Py, PyAny, PyResult, Python,
-    },
+    impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
+    pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
     wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
@@ -34,28 +29,23 @@ py_wrap_type! {
 
 impl_as_mut_for_wrapper!(PyExecutable);
 
-#[derive(Clone, Debug)]
-pub struct ExeParameter {
+#[pyclass]
+#[pyo3(name = "ExeParameter")]
+#[derive(FromPyObject)]
+pub struct PyParameter {
+    #[pyo3(get, set)]
     pub name: String,
+    #[pyo3(get, set)]
     pub index: usize,
+    #[pyo3(get, set)]
     pub value: f64,
 }
-
-py_wrap_data_struct! {
-    PyParameter(ExeParameter) as "ExeParameter" {
-        name: String => Py<PyString>,
-        index: usize => Py<PyInt>,
-        value: f64 => Py<PyFloat>
-    }
-}
-
-impl_repr!(PyParameter);
 
 #[pymethods]
 impl PyParameter {
     #[new]
     pub fn new(name: String, index: usize, value: f64) -> Self {
-        Self(ExeParameter { name, index, value })
+        Self { name, index, value }
     }
 }
 
@@ -85,8 +75,7 @@ impl PyExecutable {
         }
 
         for param in parameters {
-            let ExeParameter { name, index, value } = param.into();
-            exe.with_parameter(name, index, value);
+            exe.with_parameter(param.name, param.index, param.value);
         }
 
         if let Some(shots) = shots {
