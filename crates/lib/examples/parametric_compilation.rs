@@ -52,7 +52,7 @@ async fn main() {
         }
     }
 
-    println!("Total execution time: {:?}", total_execution_time);
+    println!("Total execution time: {total_execution_time:?}");
 
     for measurement in parametric_measurements {
         if measurement == 1 {

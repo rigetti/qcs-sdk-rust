@@ -122,7 +122,7 @@ mod mock_qcs {
                 warp::reply::json(&isa)
             });
 
-        let translate = warp::path(format!("{}:translateNativeQuilToEncryptedBinary", QPU_ID))
+        let translate = warp::path(format!("{QPU_ID}:translateNativeQuilToEncryptedBinary"))
             .and(warp::post())
             .and(warp::body::json())
             .map(|_request: TranslateNativeQuilToEncryptedBinaryRequest| {

@@ -42,9 +42,23 @@ use quil_rs::Program;
 /// async fn main() {
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
-///     // We get the data as a matrix `M` whose elements `M[shot][index]` are the readout values
-///     // for the memory offset `index` during shot `shot`
-///     let data = result.readout_data.get_shot_wise_matrix("ro").expect("should have data in ro");
+///
+///     // We first convert the readout data to a [`ReadoutMap`] to get a mapping of registers
+///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+///     // the memory offset `index` during shot `shot`.
+///     // There are some programs where readout data does not fit into a [`ReadoutMap`]. In
+///     // this case you should build the matrix you need from [`QPUReadout`] directly. See
+///     // the [`ReadoutMap`] documentation for more information on when this transformation
+///     // might fail.
+///     let data = result.readout_data
+///                         .to_readout_map()
+///                         .expect("should convert to readout map")
+///                         .get_register_matrix("ro")
+///                         .expect("should have data in ro")
+///                         .as_integer()
+///                         .expect("should be integer matrix")
+///                         .to_owned();
+///
 ///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
 ///     assert_eq!(data.nrows(), 4);
 ///     for shot in data.rows() {
@@ -147,16 +161,24 @@ impl<'executable> Executable<'executable, '_> {
     ///         .unwrap();
     ///     let first_value = result
     ///         .readout_data
-    ///         .get_value("first", 0, 0)
+    ///         .to_readout_map()
+    ///         .expect("qvm memory should fit readout map")
+    ///         .get_register_matrix("first")
+    ///         .expect("readout map should have 'first'")
+    ///         .as_real()
+    ///         .expect("should be real numbered register")
+    ///         .get((0, 0))
     ///         .expect("should have value in first position of first register")
-    ///         .into_real()
-    ///         .expect("should be a floating point number");
     ///     let second_value = result
     ///         .readout_data
-    ///         .get_value("second", 0, 0)
-    ///         .expect("should have value in first position of second register")
-    ///         .into_real()
-    ///         .expect("should be a floating point number");
+    ///         .to_readout_map()
+    ///         .expect("qvm memory should fit readout map")
+    ///         .get_register_matrix("second")
+    ///         .expect("readout map should have 'second'")
+    ///         .as_real()
+    ///         .expect("should be real numbered register")
+    ///         .get((0, 0))
+    ///         .expect("should have value in first position of first register")
     ///     assert_eq!(first_value, 3.141);
     ///     assert_eq!(second_value, 1.234);
     /// }
@@ -203,18 +225,22 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let first = result
-    ///             .readout_data
-    ///             .get_value("theta", 0, 0)
+    ///         let theta_register = readout_data
+    ///             .to_readout_map()
+    ///             .expect("should fit readout map")
+    ///             .get_register_matrix("theta")
+    ///             .expect("should have theta")
+    ///             .as_real()
+    ///             .expect("should be real valued register")
+    ///             .to_owned()
+    ///
+    ///         let first = theta_register
+    ///             .get((0, 0))
     ///             .expect("first index, first shot of theta should have value")
-    ///             .into_real()
-    ///             .expect("value should be a float");
-    ///         let second = result
-    ///             .readout_data
-    ///             .get_value("theta", 1, 0)
-    ///             .expect("second index, first shot of theta should have value")
-    ///             .into_real()
-    ///             .expect("value should be a float");
+    ///         let second = theta_tegister
+    ///             .get((0, 1))
+    ///             .expect("first shot, second_index of theta should have value")
+    ///         
     ///         assert_eq!(first, theta);
     ///         assert_eq!(second, theta * 2.0);
     ///     }

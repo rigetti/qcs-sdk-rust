@@ -22,5 +22,5 @@ async fn main() {
         .await
         .expect("Program should execute successfully");
 
-    println!("{:?}", result);
+    println!("{result:?}");
 }
