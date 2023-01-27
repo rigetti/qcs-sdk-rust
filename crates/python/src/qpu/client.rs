@@ -6,8 +6,8 @@ use qcs_api_client_common::{
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
-        conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods,
-        types::PyString, Py, PyAny, PyObject, PyResult, Python,
+        conversion::IntoPy, exceptions::PyRuntimeError, pyclass, pyclass::CompareOp, pymethods,
+        types::PyString, FromPyObject, Py, PyAny, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
 };
@@ -62,26 +62,23 @@ py_wrap_error!(
 );
 
 /// The fields on qcs_api_client_common::client::AuthServer are not public.
-#[derive(Clone)]
-pub struct QcsClientAuthServer {
+#[pyclass]
+#[pyo3(name = "QcsClientAuthServer")]
+#[derive(FromPyObject)]
+pub struct PyQcsClientAuthServer {
+    #[pyo3(get, set)]
     pub client_id: Option<String>,
+    #[pyo3(get, set)]
     pub issuer: Option<String>,
-}
-
-py_wrap_data_struct! {
-    PyQcsClientAuthServer(QcsClientAuthServer) as "QcsClientAuthServer" {
-        client_id: Option<String> => Option<Py<PyString>>,
-        issuer: Option<String> => Option<Py<PyString>>
-    }
 }
 
 impl From<PyQcsClientAuthServer> for AuthServer {
     fn from(value: PyQcsClientAuthServer) -> Self {
         let mut auth_server = AuthServer::default();
-        if let Some(client_id) = value.0.client_id {
+        if let Some(client_id) = value.client_id {
             auth_server = auth_server.set_client_id(client_id);
         }
-        if let Some(issuer) = value.0.issuer {
+        if let Some(issuer) = value.issuer {
             auth_server = auth_server.set_issuer(issuer);
         }
         auth_server
@@ -93,7 +90,7 @@ impl PyQcsClientAuthServer {
     #[new]
     #[args(client_id = "None", issuer = "None")]
     pub fn new(client_id: Option<String>, issuer: Option<String>) -> Self {
-        Self(QcsClientAuthServer { client_id, issuer })
+        Self { client_id, issuer }
     }
 }
 

@@ -46,6 +46,8 @@ class RewriteArithmeticResults:
         The resulting program where gate parameter arithmetic has been replaced with memory references. Before execution, the program memory should be updated using the `recalculation_table`.
         """
         ...
+    @program.setter
+    def program(self, value: str): ...
 
     @property
     def recalculation_table(self) -> List[str]:
@@ -53,6 +55,8 @@ class RewriteArithmeticResults:
         The recalculation table stores an ordered list of arithmetic expressions, which are to be used when updating the program memory before execution.
         """
         ...
+    @recalculation_table.setter
+    def recalculation_table(self, value: List[str]): ...
 
 
 class TranslationResult:
@@ -66,6 +70,8 @@ class TranslationResult:
         The compiled program binary.
         """
         ...
+    @program.setter
+    def program(self, value: str): ...
 
     @property
     def ro_sources(self) -> Optional[dict]:
@@ -73,6 +79,8 @@ class TranslationResult:
         A mapping from the program's memory references to the key used to index the results map.
         """
         ...
+    @ro_sources.setter
+    def ro_sources(self, value: Optional[dict]): ...
 
 
 class ExecutionResult:
@@ -82,16 +90,22 @@ class ExecutionResult:
     def shape(self) -> List[int]:
         """The shape of the result data."""
         ...
+    @shape.setter
+    def shape(self, value: List[int]): ...
     
     @property
     def data(self) -> List[Number | List[float]]:
         """The result data. Complex numbers are represented as [real, imaginary]."""
         ...
+    @data.setter
+    def data(self, value: List[Number | List[float]]): ...
 
     @property
     def dtype(self) -> str:
         """The type of the result data (as a `numpy` `dtype`)."""
         ...
+    @dtype.setter
+    def dtype(self, value: str): ...
 
 
 class ExecutionResults:
@@ -105,11 +119,15 @@ class ExecutionResults:
         See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
         """
         ...
+    @buffers.setter
+    def buffers(self, value: Dict[str, ExecutionResult]): ...
     
     @property
     def execution_duration_microseconds(self) -> Optional[int]:
         """The time spent executing the program."""
         ...
+    @execution_duration_microseconds.setter
+    def execution_duration_microseconds(self, value: Optional[int]): ...
 
 
 class Register:
