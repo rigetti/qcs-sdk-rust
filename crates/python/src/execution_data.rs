@@ -4,14 +4,14 @@ use numpy::{Complex64, PyArray2};
 use pyo3::{
     exceptions::PyValueError,
     pymethods,
-    types::{PyDelta, PyDict},
+    types::{PyDelta, PyDict, PyType},
     Py, PyResult, Python,
 };
 use qcs::{ExecutionData, ReadoutData, ReadoutMap, RegisterMatrix};
 use qcs_api_client_grpc::models::controller::{readout_values::Values, ReadoutValues};
 use rigetti_pyo3::{
-    py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper,
-    ToPython, ToPythonError,
+    py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyTryFrom,
+    PyWrapper, ToPython, ToPythonError,
 };
 
 use crate::register_data::PyRegisterData;
@@ -36,7 +36,7 @@ py_wrap_error!(
 
 #[pymethods]
 impl PyReadoutData {
-    pub fn to_readout_map(&self, py: Python) -> PyResult<PyReadoutMap> {
+    fn to_readout_map(&self, py: Python) -> PyResult<PyReadoutMap> {
         self.as_inner()
             .to_readout_map()
             .map_err(RegisterMatrixConversionError)
@@ -52,6 +52,21 @@ py_wrap_data_struct! {
     }
 }
 
+#[pymethods]
+impl PyExecutionData {
+    #[new]
+    fn __new__(
+        py: Python<'_>,
+        readout_data: PyReadoutData,
+        duration: Option<u64>,
+    ) -> PyResult<Self> {
+        Ok(Self(ExecutionData {
+            readout_data: ReadoutData::py_try_from(py, &readout_data)?,
+            duration: duration.map(Duration::from_micros),
+        }))
+    }
+}
+
 // From gRPC
 py_wrap_data_struct! {
     PyReadoutValues(ReadoutValues) as "ReadoutValues" {
@@ -63,13 +78,26 @@ py_wrap_type! {
     PyReadoutMap(ReadoutMap) as "ReadoutMap";
 }
 
-// TODO: Should be able to return inner matrix as ndarray
+// py_wrap_union_enum! {
+//     PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix" {
+//         integer: Integer => PyArray2<i32>,
+//         real: Real => PyArray2<f64>,
+//         complex: Complex => PyArray2<Complex64>
+//     }
+// }
+//
 py_wrap_type! {
-    PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix";
+    PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix"
 }
 
+#[pymethods]
 impl PyRegisterMatrix {
-    pub fn as_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i32>> {
+    #[classmethod]
+    fn from_integer(_cls: &PyType, matrix: &PyArray2<i64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Integer(matrix.to_owned_array()))
+    }
+
+    fn as_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i64>> {
         if let Some(matrix) = self.as_inner().as_integer() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
@@ -77,7 +105,16 @@ impl PyRegisterMatrix {
         }
     }
 
-    pub fn as_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
+    fn is_integer(&self) -> bool {
+        matches!(self.as_inner(), RegisterMatrix::Integer(_))
+    }
+
+    #[classmethod]
+    fn from_real(_cls: &PyType, matrix: &PyArray2<f64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Real(matrix.to_owned_array()))
+    }
+
+    fn as_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
         if let Some(matrix) = self.as_inner().as_real() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
@@ -85,12 +122,25 @@ impl PyRegisterMatrix {
         }
     }
 
-    pub fn as_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {
+    fn is_real(&self) -> bool {
+        matches!(self.as_inner(), RegisterMatrix::Real(_))
+    }
+
+    #[classmethod]
+    fn from_complex(_cls: &PyType, matrix: &PyArray2<Complex64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Complex(matrix.to_owned_array()))
+    }
+
+    fn as_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {
         if let Some(matrix) = self.as_inner().as_complex() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
             Err(PyValueError::new_err("not a complex numbered register"))
         }
+    }
+
+    fn is_complex(&self) -> bool {
+        matches!(self.as_inner(), RegisterMatrix::Complex(_))
     }
 }
 

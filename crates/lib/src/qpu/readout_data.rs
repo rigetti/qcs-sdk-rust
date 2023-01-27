@@ -13,7 +13,7 @@ use qcs_api_client_grpc::models::controller::{
 #[derive(Debug, Clone, EnumAsInner, PartialEq)]
 pub enum ReadoutValues {
     /// Integer readout values
-    Integer(Vec<i32>),
+    Integer(Vec<i64>),
     /// Real numbered readout values
     Real(Vec<f64>),
     /// Complex readout values
@@ -44,7 +44,9 @@ impl QpuReadout {
                         key.clone(),
                         match &readout_values.values {
                             Some(controller_readout_values::Values::IntegerValues(v)) => {
-                                ReadoutValues::Integer(v.values.clone())
+                                ReadoutValues::Integer(
+                                    v.values.iter().copied().map(i64::from).collect(),
+                                )
                             }
                             Some(controller_readout_values::Values::ComplexValues(v)) => {
                                 ReadoutValues::Complex(

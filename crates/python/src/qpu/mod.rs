@@ -6,6 +6,7 @@ pub mod quilc;
 pub mod readout_data;
 
 create_init_submodule! {
+    classes: [readout_data::PyReadoutValues, readout_data::PyQpuReadout],
     errors: [QcsIsaError],
     submodules: [
         "client": client::init_submodule,

@@ -33,6 +33,9 @@ authors = [
 	"Marquess Valdez <mvaldez@rigetti.com>",
 	"Randall Fulton <rfulton@rigetti.com>",
 ]
+[tool.poetry.group.dev.dependencies]
+numpy = "^1.24.1"
+
 
 [tool.maturin]
 bindings = "pyo3"

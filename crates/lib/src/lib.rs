@@ -14,7 +14,7 @@
     deprecated_in_future,
     keyword_idents,
     improper_ctypes,
-    clippy::let_underscore_drop,
+    let_underscore_drop,
     macro_use_extern_crate,
     meta_variable_misuse,
     missing_abi,

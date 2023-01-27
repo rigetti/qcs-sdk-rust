@@ -50,10 +50,10 @@ pub struct ExecutionData {
 }
 
 /// An enum representing every possible register type as a 2 dimensional matrix.
-#[derive(Clone, Debug, EnumAsInner, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, EnumAsInner, PartialEq, Serialize, Deserialize)]
 pub enum RegisterMatrix {
     /// Integer register
-    Integer(Array2<i32>),
+    Integer(Array2<i64>),
     /// Real numbered register
     Real(Array2<f64>),
     /// Complex numbered register
@@ -62,7 +62,7 @@ pub enum RegisterMatrix {
 
 /// A mapping of a register name (ie. "ro") to a [`RegisterMatrix`] containing the values for the
 /// register.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
 pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
 
@@ -137,7 +137,7 @@ impl ReadoutMap {
                         RegisterData::I8(data) => RegisterMatrix::Integer(
                             Array::from_shape_vec(
                                 (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter().flatten().copied().map(i32::from).collect(),
+                                data.iter().flatten().copied().map(i64::from).collect(),
                             )
                             .map_err(|_| {
                                 RegisterMatrixConversionError::InvalidShape {
@@ -148,7 +148,7 @@ impl ReadoutMap {
                         RegisterData::I16(data) => RegisterMatrix::Integer(
                             Array::from_shape_vec(
                                 (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter().flatten().copied().map(i32::from).collect(),
+                                data.iter().flatten().copied().map(i64::from).collect(),
                             )
                             .map_err(|_| {
                                 RegisterMatrixConversionError::InvalidShape {
