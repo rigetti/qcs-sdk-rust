@@ -26,6 +26,10 @@ use crate::qpu::{
     IsaError,
 };
 
+/// TODO: make configurable at the client level.
+/// https://github.com/rigetti/qcs-sdk-rust/issues/239
+static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
+
 /// Uses quilc to convert a Quil program to native Quil
 pub fn compile(
     quil: &str,
@@ -334,7 +338,7 @@ pub async fn list_quantum_processors(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<Vec<String>, ListQuantumProcessorsError> {
-    let timeout = timeout.unwrap_or_else(|| Duration::from_secs(10));
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
 
     tokio::time::timeout(timeout, async move {
         let mut quantum_processors = vec![];
