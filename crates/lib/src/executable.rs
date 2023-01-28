@@ -169,6 +169,7 @@ impl<'executable> Executable<'executable, '_> {
     ///         .expect("should be real numbered register")
     ///         .get((0, 0))
     ///         .expect("should have value in first position of first register")
+    ///         .clone();
     ///     let second_value = result
     ///         .readout_data
     ///         .to_readout_map()
@@ -179,6 +180,7 @@ impl<'executable> Executable<'executable, '_> {
     ///         .expect("should be real numbered register")
     ///         .get((0, 0))
     ///         .expect("should have value in first position of first register")
+    ///         .clone();
     ///     assert_eq!(first_value, 3.141);
     ///     assert_eq!(second_value, 1.234);
     /// }
@@ -225,21 +227,24 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let theta_register = readout_data
+    ///         let theta_register = result
+    ///             .readout_data
     ///             .to_readout_map()
     ///             .expect("should fit readout map")
     ///             .get_register_matrix("theta")
     ///             .expect("should have theta")
     ///             .as_real()
     ///             .expect("should be real valued register")
-    ///             .to_owned()
+    ///             .to_owned();
     ///
     ///         let first = theta_register
     ///             .get((0, 0))
     ///             .expect("first index, first shot of theta should have value")
-    ///         let second = theta_tegister
+    ///             .clone();
+    ///         let second = theta_register
     ///             .get((0, 1))
     ///             .expect("first shot, second_index of theta should have value")
+    ///             .clone();
     ///         
     ///         assert_eq!(first, theta);
     ///         assert_eq!(second, theta * 2.0);
