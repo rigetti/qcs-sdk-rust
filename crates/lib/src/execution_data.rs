@@ -203,6 +203,12 @@ impl ReadoutMap {
         ))
     }
 
+    /// Attempts to build a [`ReadoutMap`] from [`QpuReadout`].
+    ///
+    /// # Errors
+    ///
+    /// This fails if the underlying [`QpuReadout`] data is jagged. See [`ReadoutData`] for more
+    /// detailed explanations of why and when this occurs.
     pub fn from_qpu_readout_data(
         readout_data: &QpuReadout,
     ) -> Result<Self, RegisterMatrixConversionError> {
