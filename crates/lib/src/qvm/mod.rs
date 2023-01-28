@@ -12,6 +12,7 @@ use crate::RegisterData;
 mod execution;
 
 /// A map of register names (ie. "ro") to a [`RegisterData`] containing their values.
+#[allow(clippy::module_name_repetitions)]
 pub type QvmMemory = HashMap<String, RegisterData>;
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
