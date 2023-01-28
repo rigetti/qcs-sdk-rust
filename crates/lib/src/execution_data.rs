@@ -414,7 +414,7 @@ mod describe_readout_map {
             .as_integer()
             .expect("Shout be a register of integer values");
 
-        let expected_bar = arr2(&[[0, 2], [1, 3]]);
+        let expected_bar = arr2(&[[2, 0], [3, 1]]);
 
         assert_eq!(bar, expected_bar);
     }
