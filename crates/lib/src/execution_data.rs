@@ -11,7 +11,7 @@ use ndarray::prelude::*;
 use crate::qpu::readout_data::ReadoutValues;
 use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 
-/// Represents the two possible types of readout data returned from either then QVM or a real QPU.
+/// Represents the two possible types of readout data returned from either the QVM or a real QPU.
 /// Each variant contains the original data returned from it's respective executor.
 ///
 /// # Usage
