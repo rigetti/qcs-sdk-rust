@@ -31,10 +31,10 @@ use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 /// overwrite the previous value. The QVM returns memory at the end of every shot. This means
 /// we get the last value in every memory reference for each shot, which is exactly the
 /// representation we want for a [`RegisterMatrix`]. For this reason, `to_readout_map()` should
-/// always succeed for [`ReadoutData::QVM`]
+/// always succeed for [`ReadoutData::Qvm`]
 ///
 /// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-/// (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
+/// (ie. "ro\[0\]") is more like a stream than a value in memory. Every `MEASURE` to a memory
 /// reference emits a new value to said stream. This means that the number of values per memory
 /// reference can vary per shot. For this reason, it's not always clear what the final value in
 /// each shot was for a particular reference. When this is the case, `to_readout_map()` will return
@@ -44,9 +44,9 @@ use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner)]
 pub enum ReadoutData {
-    /// Data returned from the QVM, stored as [`QVMMemory`]
+    /// Data returned from the QVM, stored as [`QvmMemory`]
     Qvm(QvmMemory),
-    /// Readout data returned from the QPU, stored as [`QPUReadout`]
+    /// Readout data returned from the QPU, stored as [`QpuReadout`]
     Qpu(QpuReadout),
 }
 
@@ -104,20 +104,20 @@ pub enum RegisterMatrixConversionError {
 }
 
 impl ReadoutData {
-    /// Convert [`ReadoutData`] from its inner representation as [`QVMMemory`] or
-    /// [`QPUReadout`] into a [`ReadoutMap`]. The [`RegisterMatrix`] for each register will be
+    /// Convert [`ReadoutData`] from its inner representation as [`QvmMemory`] or
+    /// [`QpuReadout`] into a [`ReadoutMap`]. The [`RegisterMatrix`] for each register will be
     /// constructed such that each row contains all the values in the register for a single shot.
     ///
     /// # Errors
     ///
     /// Returns a [`RegisterMatrixConversionError`] if the inner execution data for any of the
-    /// registers would result in a jagged matrix. [`QPUReadout`] data is captured per measure,
+    /// registers would result in a jagged matrix. [`QpuReadout`] data is captured per measure,
     /// meaning a value is returned for every measure to a memory reference, not just once per shot.
     /// This is often the case in programs that use mid-circuit measurement or dynamic control flow,
     /// where measurements to the same memory reference might occur multiple times in a shot, or be
     /// skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
     /// necessitate making assumptions about the data that could skew the data in undesirable ways.
-    /// Instead, it's recommended to manually build a matrix from [`QPUReadout`] that accurately
+    /// Instead, it's recommended to manually build a matrix from [`QpuReadout`] that accurately
     /// selects the last value per-shot based on the program that was run.
     pub fn to_readout_map(&self) -> Result<ReadoutMap, RegisterMatrixConversionError> {
         match self {
@@ -140,7 +140,7 @@ impl ReadoutMap {
         Self(map)
     }
 
-    /// Returns a [`ReadoutMap`] built from [`QVMMemory`]
+    /// Returns a [`ReadoutMap`] built from [`QvmMemory`]
     pub fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
         Ok(Self(
             memory
@@ -380,12 +380,16 @@ mod describe_readout_map {
             String::from("ro[1]") => String::from("qB"),
             String::from("ro[2]") => String::from("qC"),
             String::from("ro[0]") => String::from("qA"),
+            String::from("bar[0]") => String::from("qE"),
+            String::from("bar[1]") => String::from("qD")
         };
 
         let readout_values = hashmap! {
             String::from("qA") => dummy_readout_values(vec![1, 2]),
             String::from("qB") => dummy_readout_values(vec![3, 4]),
             String::from("qC") => dummy_readout_values(vec![5, 6]),
+            String::from("qD") => dummy_readout_values(vec![0, 1]),
+            String::from("qE") => dummy_readout_values(vec![2, 3]),
         };
 
         let qpu_readout =
@@ -394,15 +398,25 @@ mod describe_readout_map {
         let readout_map = ReadoutMap::from_qpu_readout_data(&qpu_readout)
             .expect("Should be able to create ReadoutMap from rectangular QPU readout");
 
-        let register = readout_map
+        let ro = readout_map
             .get_register_matrix("ro")
             .expect("ReadoutMap should have ro")
             .as_integer()
             .expect("Should be a register of integer values");
 
-        let expected = arr2(&[[1, 3, 5], [2, 4, 6]]);
+        let expected_ro = arr2(&[[1, 3, 5], [2, 4, 6]]);
 
-        assert_eq!(register, expected);
+        assert_eq!(ro, expected_ro);
+
+        let bar = readout_map
+            .get_register_matrix("bar")
+            .expect("ReadoutMap should have bar")
+            .as_integer()
+            .expect("Shout be a register of integer values");
+
+        let expected_bar = arr2(&[[0, 2], [1, 3]]);
+
+        assert_eq!(bar, expected_bar);
     }
 
     #[test]
@@ -457,7 +471,7 @@ mod describe_readout_map {
         };
 
         let readout_map = ReadoutMap::from_qvm_memory(&qvm_memory)
-            .expect("Should be able to create ReadoutMap from QVMMemory");
+            .expect("Should be able to create ReadoutMap from QvmMemory");
 
         let ro = readout_map
             .get_register_matrix("ro")
