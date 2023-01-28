@@ -349,7 +349,7 @@ impl Executable<'_, '_> {
         if let Some(config) = &self.config {
             Ok(config.clone())
         } else {
-            let config = ClientConfiguration::load().await?;
+            let config = ClientConfiguration::load_default().await?;
             self.config = Some(config.clone());
             Ok(config)
         }

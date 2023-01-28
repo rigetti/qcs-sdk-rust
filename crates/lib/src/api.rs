@@ -1,7 +1,7 @@
 //! This module provides convenience functions to handle compilation,
 //! translation, parameter arithmetic rewriting, and results collection.
 
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr, time::Duration};
 
 use num::Complex;
 use qcs_api_client_grpc::{
@@ -10,9 +10,11 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
+use qcs_api_client_openapi::apis::{quantum_processors_api, Error as OpenAPIError};
 use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
+use tokio::time::error::Elapsed;
 
 use crate::qpu::{
     self,
@@ -23,6 +25,10 @@ use crate::qpu::{
     translation::{self, EncryptedTranslationResult},
     IsaError,
 };
+
+/// TODO: make configurable at the client level.
+/// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
+static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Uses quilc to convert a Quil program to native Quil
 pub fn compile(
@@ -312,4 +318,54 @@ pub async fn retrieve_results(
         .result
         .map(ExecutionResults::from)
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Controller Job Execution Results".into()))
+}
+
+/// API Errors encountered when trying to list available quantum processors.
+#[derive(Debug, thiserror::Error)]
+pub enum ListQuantumProcessorsError {
+    /// Failed the http call
+    #[error("Failed to list processors via API: {0}")]
+    ApiError(#[from] OpenAPIError<quantum_processors_api::ListQuantumProcessorsError>),
+
+    /// Pagination did not finish before timeout
+    #[error("API pagination did not finish before timeout: {0:?}")]
+    TimeoutError(#[from] Elapsed),
+}
+
+/// Query the QCS API for the names of all available quantum processors.
+/// If `None`, the default `timeout` used is 10 seconds.
+pub async fn list_quantum_processors(
+    client: &Qcs,
+    timeout: Option<Duration>,
+) -> Result<Vec<String>, ListQuantumProcessorsError> {
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
+
+    tokio::time::timeout(timeout, async move {
+        let mut quantum_processors = vec![];
+        let mut page_token = None;
+
+        loop {
+            let result = quantum_processors_api::list_quantum_processors(
+                &client.get_openapi_client(),
+                Some(100),
+                page_token.as_deref(),
+            )
+            .await?;
+
+            let mut data = result
+                .quantum_processors
+                .into_iter()
+                .map(|qpu| qpu.id)
+                .collect::<Vec<_>>();
+            quantum_processors.append(&mut data);
+
+            page_token = result.next_page_token;
+            if page_token.is_none() {
+                break;
+            }
+        }
+
+        Ok(quantum_processors)
+    })
+    .await?
 }

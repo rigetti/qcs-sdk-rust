@@ -1,6 +1,8 @@
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
 
+use executable::QcsExecutionError;
+
 pub mod api;
 pub mod executable;
 pub mod execution_data;
@@ -15,12 +17,14 @@ create_init_submodule! {
         execution_data::PyReadoutMap,
         execution_data::PyRegisterMatrix,
         executable::PyExecutable,
+        executable::PyParameter,
         executable::PyJobHandle,
         executable::PyService,
-        register_data::PyRegisterData
+        register_data::PyRegisterData,
+        qpu::client::PyQcsClient
     ],
     errors: [
-        executable::QcsExecutionError
+        QcsExecutionError
     ],
     funcs: [
         api::compile,
@@ -29,7 +33,8 @@ create_init_submodule! {
         api::submit,
         api::retrieve_results,
         api::build_patch_values,
-        api::get_quilc_version
+        api::get_quilc_version,
+        api::py_list_quantum_processors
     ],
     submodules: [
         "api": api::init_submodule,

@@ -1367,7 +1367,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.10.0-rc.0"
+version = "0.10.0-rc.1"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1419,9 +1419,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.2.7"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a067d003dbf106c4a3ec821ac99bf41e508bddbba760e66e4124ea41619209b5"
+checksum = "13b09ac85ca2a9839e81d72c2cd8c7a0995984e52d5f78c0d0d6ad00da075589"
 dependencies = [
  "dirs",
  "futures",
@@ -1435,9 +1435,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.2.7"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a77d9d4329f3d8a051417f96a69326965dadb21b10de83cd8c94018d4917b2c8"
+checksum = "623a691262ebdb46b72d1797682e2cc5fba1c859cacc17d58a2b59c9efe9ac77"
 dependencies = [
  "http-body",
  "pbjson",
@@ -1454,9 +1454,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.3.8"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "de8ce34a5f6d100626d19f28219a2c791f11d7809a36521979c3817dfaac8f3a"
+checksum = "8a99306535343c8d28a013fe7489a9c52c7aeb4d64029f98444f44dadacc8334"
 dependencies = [
  "qcs-api-client-common",
  "reqwest",
@@ -1467,7 +1467,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.5.0-rc.0"
+version = "0.5.0-rc.1"
 dependencies = [
  "numpy",
  "pyo3",
@@ -1633,9 +1633,9 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.1.0-rc.0"
+version = "0.1.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "298f878d681dbe7bea9652f48816534c16f165c259b2b19d1dc5a4f00f929ad6"
+checksum = "17d3d8822e4d3ab36de8cff3b8d9990a9d2ccc9c9da3536de9347e29353b2455"
 dependencies = [
  "num-complex",
  "num-traits",
