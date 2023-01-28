@@ -30,7 +30,7 @@ use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 /// as one might expect it to. It is zero-initalized, and subsequent writes to the same region
 /// overwrite the previous value. The QVM returns memory at the end of every shot. This means
 /// we get the last value in every memory reference for each shot, which is exactly the
-/// representation we want for a [`RegisterMatrix`] For this reason, `to_readout_map()` should
+/// representation we want for a [`RegisterMatrix`]. For this reason, `to_readout_map()` should
 /// always succeed for [`ReadoutData::QVM`]
 ///
 /// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
@@ -203,7 +203,6 @@ impl ReadoutMap {
         ))
     }
 
-    /// TODO: Docs, cleanup, error messages
     pub fn from_qpu_readout_data(
         readout_data: &QpuReadout,
     ) -> Result<Self, RegisterMatrixConversionError> {
