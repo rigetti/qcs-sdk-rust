@@ -10,7 +10,7 @@ use quil_rs::{
 
 use crate::executable::Parameters;
 
-use super::{QVMMemory, Request, Response};
+use super::{QvmMemory, Request, Response};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -60,7 +60,7 @@ impl Execution {
         readouts: &[Cow<'_, str>],
         params: &Parameters,
         config: &ClientConfiguration,
-    ) -> Result<QVMMemory, Error> {
+    ) -> Result<QvmMemory, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -109,7 +109,7 @@ impl Execution {
         shots: u16,
         readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
-    ) -> Result<QVMMemory, Error> {
+    ) -> Result<QvmMemory, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();

@@ -12,7 +12,7 @@ use crate::RegisterData;
 mod execution;
 
 /// A map of register names (ie. "ro") to a [`RegisterData`] containing their values.
-pub type QVMMemory = HashMap<String, RegisterData>;
+pub type QvmMemory = HashMap<String, RegisterData>;
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(untagged)]

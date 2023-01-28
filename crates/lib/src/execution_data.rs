@@ -9,7 +9,7 @@ use std::time::Duration;
 use ndarray::prelude::*;
 
 use crate::qpu::readout_data::ReadoutValues;
-use crate::{qpu::readout_data::QpuReadout, qvm::QVMMemory, RegisterData};
+use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 
 /// Represents the two possible types of readout data returned from either then QVM or a real QPU.
 /// Each variant contains the original data returned from it's respective executor.
@@ -17,22 +17,35 @@ use crate::{qpu::readout_data::QpuReadout, qvm::QVMMemory, RegisterData};
 /// # Usage
 ///
 /// Your usage of [`ReadoutData`] will depend on the types of programs you are running and where.
-/// The `to_readout_map()` method will attempt to build a [`ReadoutMap`] out of data, where each
-/// register name is mapped to a 2-dimensional rectangular matrix of values. [`QVMMemory`]
-/// generally fits nicely into rectangular matrices, however the shape of [`QPUReadout`] data is
-/// heavily dependent on the structure of the program data.
+/// The `to_readout_map()` method will attempt to build a [`ReadoutMap`] out of the data, where each
+/// register name is mapped to a 2-dimensional rectangular [`RegisterMatrix`] where each row
+/// represents the final values in each register index for a particular shot. This is often the
+/// desired form of the data and it is _probably_ what you want. This transformation isn't always
+/// possible, in which case `to_readout_map()` will return an error.
 ///
-/// The QVM takes a snapshot of memory at the end of every shot, this means we always get a single
-/// value for every index of memory in all registers.
+/// To understand why this transformation can fail, we need to understand a bit about how readout data is
+/// returned from the QVM and from a real QPU:
 ///
-/// The QPU on the other hand emits a value per evaluated `MEASURE` in the program. This
-/// means that the number of values per memory region can vary per shot. For example, programs that
-/// use mid-circuit measurement, and record to the same memory reference twice times in a run,
-/// will get 2 values for
+/// The QVM treats each `DECLARE` statement as initialzing some amount of memory. This memory works
+/// as one might expect it to. It is zero-initalized, and subsequent writes to the same region
+/// overwrite the previous value. The QVM returns memory at the end of every shot. This means
+/// we get the last value in every memory reference for each shot, which is exactly the
+/// representation we want for a [`RegisterMatrix`] For this reason, `to_readout_map()` should
+/// always succeed for [`ReadoutData::QVM`]
+///
+/// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
+/// (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
+/// reference emits a new value to said stream. This means that the number of values per memory
+/// reference can vary per shot. For this reason, it's not always clear what the final value in
+/// each shot was for a particular reference. When this is the case, `to_readout_map()` will return
+/// an error as it's impossible to build a correct [`RegisterMatrix`]  from the data without
+/// knowing the intent of the program that was run. Instead, it's recommended to build the
+/// [`RegisterMatrix`] you need from the inner [`QpuReadout`] data using the knowledge of your
+/// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner)]
 pub enum ReadoutData {
     /// Data returned from the QVM, stored as [`QVMMemory`]
-    Qvm(QVMMemory),
+    Qvm(QvmMemory),
     /// Readout data returned from the QPU, stored as [`QPUReadout`]
     Qpu(QpuReadout),
 }
@@ -105,7 +118,7 @@ impl ReadoutData {
     /// skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
     /// necessitate making assumptions about the data that could skew the data in undesirable ways.
     /// Instead, it's recommended to manually build a matrix from [`QPUReadout`] that accurately
-    /// selects the correct value per-shot based on the program that was run.
+    /// selects the last value per-shot based on the program that was run.
     pub fn to_readout_map(&self) -> Result<ReadoutMap, RegisterMatrixConversionError> {
         match self {
             ReadoutData::Qvm(data) => ReadoutMap::from_qvm_memory(data),
@@ -128,7 +141,7 @@ impl ReadoutMap {
     }
 
     /// Returns a [`ReadoutMap`] built from [`QVMMemory`]
-    pub fn from_qvm_memory(memory: &QVMMemory) -> Result<Self, RegisterMatrixConversionError> {
+    pub fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
         Ok(Self(
             memory
                 .iter()
@@ -316,7 +329,6 @@ pub enum MemoryReferenceParseError {
     InvalidIndex(#[from] ParseIntError),
 }
 
-// Note: MemoryReference may have a from_string in the fututre
 fn parse_readout_register(
     register_name: &str,
 ) -> Result<MemoryReference, MemoryReferenceParseError> {
@@ -345,7 +357,7 @@ mod describe_readout_map {
     use ndarray::prelude::*;
 
     use crate::qpu::readout_data::QpuReadout;
-    use crate::qvm::QVMMemory;
+    use crate::qvm::QvmMemory;
 
     use super::{ReadoutMap, RegisterData};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
@@ -435,7 +447,7 @@ mod describe_readout_map {
 
     #[test]
     fn it_converts_from_qvm_memory() {
-        let qvm_memory: QVMMemory = hashmap! {
+        let qvm_memory: QvmMemory = hashmap! {
             String::from("ro") => RegisterData::I8(vec![vec![1, 0, 1]]),
         };
 

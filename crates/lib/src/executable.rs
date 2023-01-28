@@ -654,101 +654,100 @@ mod describe_get_config {
     }
 }
 
-// TODO: When were these tests broken?
-// #[cfg(test)]
-// #[cfg(feature = "manual-tests")]
-// mod describe_qpu_for_id {
-//     use std::sync::Arc;
-//
-//     use crate::{configuration::Configuration, qpu, Executable};
-//
-//     #[tokio::test]
-//     async fn it_refreshes_auth_token() {
-//         let mut exe = Executable::from_quil("");
-//         // Default config has no auth, so it should try to refresh
-//         exe.config = Some(Arc::new(Configuration::default()));
-//         let result = exe.qpu_for_id("blah").await;
-//         let err = if let Err(err) = result {
-//             err
-//         } else {
-//             panic!("Expected an error!");
-//         };
-//         let result_string = format!("{:?}", err);
-//         assert!(result_string.contains("refresh_token"));
-//     }
-//
-//     #[tokio::test]
-//     async fn it_loads_cached_version() {
-//         let mut exe = Executable::from_quil("");
-//         let shots = 17;
-//         exe.shots = shots;
-//         exe.qpu = Some(
-//             qpu::Execution::new(
-//                 "".into(),
-//                 shots,
-//                 "Aspen-11",
-//                 exe.get_config().await.unwrap_or_default(),
-//                 exe.compile_with_quilc,
-//             )
-//             .await
-//             .unwrap(),
-//         );
-//         // Load config with no credentials to prevent creating a new Execution if it tries
-//         exe.config = Some(Arc::new(Configuration::default()));
-//
-//         assert!(exe.qpu_for_id("Aspen-11").await.is_ok());
-//     }
-//
-//     #[tokio::test]
-//     async fn it_creates_new_after_shot_change() {
-//         let original_shots = 23;
-//         let mut exe = Executable::from_quil("").with_shots(original_shots);
-//         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
-//
-//         assert_eq!(qpu.shots, original_shots);
-//
-//         // Cache so we can verify cache is not used.
-//         exe.qpu = Some(qpu);
-//         let new_shots = 32;
-//         exe = exe.with_shots(new_shots);
-//         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
-//
-//         assert_eq!(qpu.shots, new_shots);
-//     }
-//
-//     #[tokio::test]
-//     async fn it_creates_new_for_new_qpu_id() {
-//         let mut exe = Executable::from_quil("");
-//         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
-//
-//         assert_eq!(qpu.quantum_processor_id, "Aspen-9");
-//
-//         // Cache so we can verify cache is not used.
-//         exe.qpu = Some(qpu);
-//         // Load config with no credentials to prevent creating the new Execution (which would fail anyway)
-//         exe.config = Some(Arc::new(Configuration::default()));
-//         let result = exe.qpu_for_id("Aspen-8").await;
-//
-//         assert!(matches!(result, Err(_)));
-//         assert!(matches!(exe.qpu, None));
-//     }
-// }
-//
-// #[cfg(test)]
-// #[cfg(feature = "manual-tests")]
-// mod describe_get_config {
-//     use std::sync::Arc;
-//
-//     use crate::{configuration::Configuration, Executable};
-//
-//     #[tokio::test]
-//     async fn it_returns_cached_values() {
-//         let mut exe = Executable::from_quil("");
-//         let mut config = Configuration::default();
-//         config.quilc_url = String::from("test");
-//         let config = Arc::new(config);
-//         exe.config = Some(config.clone());
-//         let gotten = exe.get_config().await.unwrap_or_default();
-//         assert_eq!(gotten.quilc_url, config.quilc_url);
-//     }
-// }
+#[cfg(test)]
+#[cfg(feature = "manual-tests")]
+mod describe_qpu_for_id {
+    use std::sync::Arc;
+
+    use crate::{configuration::Configuration, qpu, Executable};
+
+    #[tokio::test]
+    async fn it_refreshes_auth_token() {
+        let mut exe = Executable::from_quil("");
+        // Default config has no auth, so it should try to refresh
+        exe.config = Some(Arc::new(Configuration::default()));
+        let result = exe.qpu_for_id("blah").await;
+        let err = if let Err(err) = result {
+            err
+        } else {
+            panic!("Expected an error!");
+        };
+        let result_string = format!("{:?}", err);
+        assert!(result_string.contains("refresh_token"));
+    }
+
+    #[tokio::test]
+    async fn it_loads_cached_version() {
+        let mut exe = Executable::from_quil("");
+        let shots = 17;
+        exe.shots = shots;
+        exe.qpu = Some(
+            qpu::Execution::new(
+                "".into(),
+                shots,
+                "Aspen-11",
+                exe.get_config().await.unwrap_or_default(),
+                exe.compile_with_quilc,
+            )
+            .await
+            .unwrap(),
+        );
+        // Load config with no credentials to prevent creating a new Execution if it tries
+        exe.config = Some(Arc::new(Configuration::default()));
+
+        assert!(exe.qpu_for_id("Aspen-11").await.is_ok());
+    }
+
+    #[tokio::test]
+    async fn it_creates_new_after_shot_change() {
+        let original_shots = 23;
+        let mut exe = Executable::from_quil("").with_shots(original_shots);
+        let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
+
+        assert_eq!(qpu.shots, original_shots);
+
+        // Cache so we can verify cache is not used.
+        exe.qpu = Some(qpu);
+        let new_shots = 32;
+        exe = exe.with_shots(new_shots);
+        let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
+
+        assert_eq!(qpu.shots, new_shots);
+    }
+
+    #[tokio::test]
+    async fn it_creates_new_for_new_qpu_id() {
+        let mut exe = Executable::from_quil("");
+        let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
+
+        assert_eq!(qpu.quantum_processor_id, "Aspen-9");
+
+        // Cache so we can verify cache is not used.
+        exe.qpu = Some(qpu);
+        // Load config with no credentials to prevent creating the new Execution (which would fail anyway)
+        exe.config = Some(Arc::new(Configuration::default()));
+        let result = exe.qpu_for_id("Aspen-8").await;
+
+        assert!(matches!(result, Err(_)));
+        assert!(matches!(exe.qpu, None));
+    }
+}
+
+#[cfg(test)]
+#[cfg(feature = "manual-tests")]
+mod describe_get_config {
+    use std::sync::Arc;
+
+    use crate::{configuration::Configuration, Executable};
+
+    #[tokio::test]
+    async fn it_returns_cached_values() {
+        let mut exe = Executable::from_quil("");
+        let mut config = Configuration::default();
+        config.quilc_url = String::from("test");
+        let config = Arc::new(config);
+        exe.config = Some(config.clone());
+        let gotten = exe.get_config().await.unwrap_or_default();
+        assert_eq!(gotten.quilc_url, config.quilc_url);
+    }
+}
