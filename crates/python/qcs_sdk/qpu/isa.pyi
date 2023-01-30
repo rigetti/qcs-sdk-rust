@@ -305,7 +305,7 @@ async def get_isa(quantum_processor_id: str, client: QcsClient = ...) -> Instruc
     Fetch the `InstructionSetArchitecture` (ISA) for a given `quantum_processor_id` from the QCS API.
 
     Raises:
-        - `QcsLoadError` is there is an issue with the QCS API client configuration.
+        - `QcsLoadError` if there is an issue with the QCS API client configuration.
         - `QcsIsaError` if there is an issue fetching the ISA from the QCS API.
     """
     ...
