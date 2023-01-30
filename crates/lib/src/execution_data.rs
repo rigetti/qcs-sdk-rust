@@ -286,6 +286,12 @@ impl ReadoutMap {
                                     m.column_mut(reference.index)
                                         .assign(&Array::from_vec(v.clone()));
                                 }
+                                (RegisterMatrix::Real(m), ReadoutValues::Real(v))
+                                    if m.nrows() == v.len() =>
+                                {
+                                    m.column_mut(reference.index)
+                                        .assign(&Array::from_vec(v.clone()));
+                                }
                                 (RegisterMatrix::Complex(m), ReadoutValues::Complex(v))
                                     if m.nrows() == v.len() =>
                                 {
