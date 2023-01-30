@@ -4,6 +4,10 @@ from .qpu.client import (
     QcsClient as QcsClient
 )
 
+from .qpu.isa import (
+    get_isa as get_isa
+)
+
 from ._execution_data import (
     QPU as QPU,
     QVM as QVM,
