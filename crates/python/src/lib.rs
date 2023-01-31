@@ -34,7 +34,7 @@ create_init_submodule! {
         api::build_patch_values,
         api::get_quilc_version,
         api::py_list_quantum_processors,
-        qpu::isa::py_get_isa
+        qpu::isa::py_get_instruction_set_architecture
     ],
     submodules: [
         "api": api::init_submodule,

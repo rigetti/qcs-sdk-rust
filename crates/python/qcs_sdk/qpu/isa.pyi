@@ -300,7 +300,7 @@ class InstructionSetArchitecture:
         ...
 
 
-async def get_isa(quantum_processor_id: str, client: QcsClient = ...) -> InstructionSetArchitecture:
+async def get_instruction_set_architecture(quantum_processor_id: str, client: QcsClient = ...) -> InstructionSetArchitecture:
     """
     Fetch the `InstructionSetArchitecture` (ISA) for a given `quantum_processor_id` from the QCS API.
 

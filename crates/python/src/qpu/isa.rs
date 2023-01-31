@@ -34,7 +34,7 @@ create_init_submodule! {
         QcsIsaError
     ],
     funcs: [
-        py_get_isa
+        py_get_instruction_set_architecture
     ],
 }
 
@@ -166,8 +166,8 @@ impl PyInstructionSetArchitecture {
 }
 
 #[pyfunction(client = "None")]
-#[pyo3(name = "get_isa")]
-pub(crate) fn py_get_isa(
+#[pyo3(name = "get_instruction_set_architecture")]
+pub(crate) fn py_get_instruction_set_architecture(
     py: Python<'_>,
     quantum_processor_id: String,
     client: Option<PyQcsClient>,

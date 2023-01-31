@@ -3,7 +3,7 @@ import pytest
 from os import path
 import json
 
-from qcs_sdk import get_isa
+from qcs_sdk import get_instruction_set_architecture
 from qcs_sdk.qpu.isa import InstructionSetArchitecture, Family
 
 
@@ -45,6 +45,6 @@ def test_isa_from_aspen_m_3_json(aspen_m_3_json: str):
 @pytest.mark.asyncio
 @pytest.mark.skip
 async def test_get_isa_aspen_m_3():
-    isa = await get_isa("Aspen-M-3")
+    isa = await get_instruction_set_architecture("Aspen-M-3")
 
     assert isa.architecture.family == Family.Aspen

@@ -5,7 +5,7 @@ from .qpu.client import (
 )
 
 from .qpu.isa import (
-    get_isa as get_isa
+    get_instruction_set_architecture as get_instruction_set_architecture
 )
 
 from ._execution_data import (
