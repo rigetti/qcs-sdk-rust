@@ -52,7 +52,7 @@
 
 pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
 pub use execution_data::{
-    ExecutionData, ReadoutData, ReadoutMap, RegisterMatrix, RegisterMatrixConversionError,
+    ExecutionData, RegisterMap, RegisterMatrix, RegisterMatrixConversionError, ResultData,
 };
 pub use register_data::RegisterData;
 

@@ -11,7 +11,7 @@ use ndarray::prelude::*;
 use crate::qpu::readout_data::ReadoutValues;
 use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 
-/// Represents the two possible types of readout data returned from either the QVM or a real QPU.
+/// Represents the two possible types of data returned from either the QVM or a real QPU.
 /// Each variant contains the original data returned from its respective executor.
 ///
 /// # Usage
@@ -43,7 +43,7 @@ use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 /// [`RegisterMatrix`] you need from the inner [`QpuReadout`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner)]
-pub enum ReadoutData {
+pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmMemory`]
     Qvm(QvmMemory),
     /// Readout data returned from the QPU, stored as [`QpuReadout`]
@@ -53,8 +53,8 @@ pub enum ReadoutData {
 /// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq)]
 pub struct ExecutionData {
-    /// The [`ReadoutData`] that was read from the [`Executable`](crate::Executable).
-    pub readout_data: ReadoutData,
+    /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
+    pub result_data: ResultData,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
     ///
@@ -77,7 +77,7 @@ pub enum RegisterMatrix {
 /// register.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
-pub struct ReadoutMap(HashMap<String, RegisterMatrix>);
+pub struct RegisterMap(HashMap<String, RegisterMatrix>);
 
 /// Errors that may occur when trying to build a [`RegisterMatrix`] from execution data
 #[allow(missing_docs)]
@@ -103,10 +103,10 @@ pub enum RegisterMatrixConversionError {
     MemoryReferenceParseError(MemoryReferenceParseError),
 }
 
-impl ReadoutData {
-    /// Convert [`ReadoutData`] from its inner representation as [`QvmMemory`] or
-    /// [`QpuReadout`] into a [`ReadoutMap`]. The [`RegisterMatrix`] for each register will be
-    /// constructed such that each row contains all the values in the register for a single shot.
+impl ResultData {
+    /// Convert [`ResultData`] from its inner representation as [`QvmMemory`] or
+    /// [`QpuReadout`] into a [`RegisterMap`]. The [`RegisterMatrix`] for each register will be
+    /// constructed such that each row contains all the final values in the register for a single shot.
     ///
     /// # Errors
     ///
@@ -119,28 +119,28 @@ impl ReadoutData {
     /// necessitate making assumptions about the data that could skew the data in undesirable ways.
     /// Instead, it's recommended to manually build a matrix from [`QpuReadout`] that accurately
     /// selects the last value per-shot based on the program that was run.
-    pub fn to_readout_map(&self) -> Result<ReadoutMap, RegisterMatrixConversionError> {
+    pub fn to_register_map(&self) -> Result<RegisterMap, RegisterMatrixConversionError> {
         match self {
-            ReadoutData::Qvm(data) => ReadoutMap::from_qvm_memory(data),
-            ReadoutData::Qpu(data) => ReadoutMap::from_qpu_readout_data(data),
+            ResultData::Qvm(data) => RegisterMap::from_qvm_memory(data),
+            ResultData::Qpu(data) => RegisterMap::from_qpu_readout_data(data),
         }
     }
 }
 
-impl ReadoutMap {
+impl RegisterMap {
     /// Returns the [`RegisterMatrix`] for the given register, if it exists.
     #[must_use]
     pub fn get_register_matrix(&self, register_name: &str) -> Option<&RegisterMatrix> {
         self.0.get(register_name)
     }
 
-    /// Returns a [`ReadoutMap`] with the underlying [`RegisterMatrix`] data
+    /// Returns a [`RegisterMap`] with the underlying [`RegisterMatrix`] data
     #[must_use]
     pub fn from_hashmap(map: HashMap<String, RegisterMatrix>) -> Self {
         Self(map)
     }
 
-    /// Returns a [`ReadoutMap`] built from [`QvmMemory`]
+    /// Returns a [`RegisterMap`] built from [`QvmMemory`]
     fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
         Ok(Self(
             memory
@@ -203,11 +203,11 @@ impl ReadoutMap {
         ))
     }
 
-    /// Attempts to build a [`ReadoutMap`] from [`QpuReadout`].
+    /// Attempts to build a [`RegisterMap`] from [`QpuReadout`].
     ///
     /// # Errors
     ///
-    /// This fails if the underlying [`QpuReadout`] data is jagged. See [`ReadoutData`] for more
+    /// This fails if the underlying [`QpuReadout`] data is jagged. See [`RegisterMap`] for more
     /// detailed explanations of why and when this occurs.
     fn from_qpu_readout_data(
         readout_data: &QpuReadout,
@@ -366,7 +366,7 @@ mod describe_readout_map {
     use crate::qpu::readout_data::QpuReadout;
     use crate::qvm::QvmMemory;
 
-    use super::{ReadoutMap, RegisterData};
+    use super::{RegisterData, RegisterMap};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
     use qcs_api_client_grpc::models::controller::{IntegerReadoutValues, ReadoutValues};
 
@@ -397,7 +397,7 @@ mod describe_readout_map {
         let qpu_readout =
             QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
-        let readout_map = ReadoutMap::from_qpu_readout_data(&qpu_readout)
+        let readout_map = RegisterMap::from_qpu_readout_data(&qpu_readout)
             .expect("Should be able to create ReadoutMap from rectangular QPU readout");
 
         let ro = readout_map
@@ -441,7 +441,7 @@ mod describe_readout_map {
         let qpu_readout =
             QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
-        ReadoutMap::from_qpu_readout_data(&qpu_readout)
+        RegisterMap::from_qpu_readout_data(&qpu_readout)
             .expect_err("Should not be able to create ReadoutMap from QPU readout with missing indices for a register");
     }
 
@@ -462,7 +462,7 @@ mod describe_readout_map {
         let qpu_readout =
             QpuReadout::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
-        ReadoutMap::from_qpu_readout_data(&qpu_readout)
+        RegisterMap::from_qpu_readout_data(&qpu_readout)
             .expect_err("Should not be able to create ReadoutMap from QPU readout with jagged data for a register");
     }
 
@@ -472,7 +472,7 @@ mod describe_readout_map {
             String::from("ro") => RegisterData::I8(vec![vec![1, 0, 1]]),
         };
 
-        let readout_map = ReadoutMap::from_qvm_memory(&qvm_memory)
+        let readout_map = RegisterMap::from_qvm_memory(&qvm_memory)
             .expect("Should be able to create ReadoutMap from QvmMemory");
 
         let ro = readout_map

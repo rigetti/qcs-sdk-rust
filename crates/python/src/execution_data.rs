@@ -7,7 +7,7 @@ use pyo3::{
     types::{PyDelta, PyDict, PyType},
     Py, PyResult, Python,
 };
-use qcs::{ExecutionData, ReadoutData, ReadoutMap, RegisterMatrix};
+use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use qcs_api_client_grpc::models::controller::{readout_values::Values, ReadoutValues};
 use rigetti_pyo3::{
     py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyTryFrom,
@@ -18,7 +18,7 @@ use crate::register_data::PyRegisterData;
 use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::readout_data::PyQpuReadout};
 
 py_wrap_union_enum! {
-    PyReadoutData(ReadoutData) as "ReadoutData" {
+    PyReadoutData(ResultData) as "ReadoutData" {
         qpu: Qpu => PyQpuReadout,
         qvm: Qvm => HashMap<String, PyRegisterData> => Py<PyDict>
     }
@@ -38,7 +38,7 @@ py_wrap_error!(
 impl PyReadoutData {
     fn to_readout_map(&self, py: Python) -> PyResult<PyReadoutMap> {
         self.as_inner()
-            .to_readout_map()
+            .to_register_map()
             .map_err(RegisterMatrixConversionError)
             .map_err(ToPythonError::to_py_err)?
             .to_python(py)
@@ -47,7 +47,7 @@ impl PyReadoutData {
 
 py_wrap_data_struct! {
     PyExecutionData(ExecutionData) as "ExecutionData" {
-        readout_data: ReadoutData => PyReadoutData,
+        result_data: ResultData => PyReadoutData,
         duration: Option<Duration> => Option<Py<PyDelta>>
     }
 }
@@ -61,7 +61,7 @@ impl PyExecutionData {
         duration: Option<u64>,
     ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
-            readout_data: ReadoutData::py_try_from(py, &readout_data)?,
+            result_data: ResultData::py_try_from(py, &readout_data)?,
             duration: duration.map(Duration::from_micros),
         }))
     }
@@ -75,7 +75,7 @@ py_wrap_data_struct! {
 }
 
 py_wrap_type! {
-    PyReadoutMap(ReadoutMap) as "ReadoutMap";
+    PyReadoutMap(RegisterMap) as "ReadoutMap";
 }
 
 // py_wrap_union_enum! {

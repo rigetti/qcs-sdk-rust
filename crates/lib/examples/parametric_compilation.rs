@@ -37,8 +37,8 @@ async fn main() {
             .expect("Aspen-M-3 should always report duration");
 
         let first_ro_values = data
-            .readout_data
-            .to_readout_map()
+            .result_data
+            .to_register_map()
             .expect("should be able to create a ReadoutMap")
             .get_register_matrix("ro")
             .expect("readout values should contain 'ro'")

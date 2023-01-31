@@ -12,7 +12,7 @@ use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
-use crate::execution_data::{MemoryReferenceParseError, ReadoutData};
+use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
@@ -191,7 +191,7 @@ impl<'a> Execution<'a> {
         .await?;
 
         Ok(ExecutionData {
-            readout_data: ReadoutData::Qpu(QpuReadout::from_controller_mappings_and_values(
+            result_data: ResultData::Qpu(QpuReadout::from_controller_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
             )),

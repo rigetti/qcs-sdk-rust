@@ -30,8 +30,8 @@ async fn successful_bell_state() {
         .expect("Failed to run program that should be successful");
     assert_eq!(
         result
-            .readout_data
-            .to_readout_map()
+            .result_data
+            .to_register_map()
             .expect("should convert to ReadoutMap")
             .get_register_matrix("ro")
             .expect("should have values for `ro`")

@@ -22,8 +22,8 @@ async fn main() {
         .execute_on_qpu("Aspen-M-3")
         .await
         .expect("Program should execute successfully")
-        .readout_data
-        .to_readout_map()
+        .result_data
+        .to_register_map()
         .expect("should be able to convert execution data to ReadoutMap")
         .get_register_matrix("ro")
         .expect("Readout data should include 'ro'")

@@ -29,8 +29,8 @@ async fn test_bell_state() {
         .expect("Could not run on QVM");
 
     let first = data
-        .readout_data
-        .to_readout_map()
+        .result_data
+        .to_register_map()
         .expect("should convert to readout map")
         .get_register_matrix("first")
         .expect("should have first register")
@@ -39,8 +39,8 @@ async fn test_bell_state() {
         .to_owned();
 
     let second = data
-        .readout_data
-        .to_readout_map()
+        .result_data
+        .to_register_map()
         .expect("should convert to readout map")
         .get_register_matrix("second")
         .expect("should have second register")

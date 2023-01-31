@@ -34,8 +34,8 @@ async fn basic_substitution() {
             .expect("Executed on QPU");
         parametric_measurements.push(
             result
-                .readout_data
-                .to_readout_map()
+                .result_data
+                .to_register_map()
                 .expect("should convert to ReadoutMap")
                 .get_register_matrix("ro")
                 .expect("should have `ro`")

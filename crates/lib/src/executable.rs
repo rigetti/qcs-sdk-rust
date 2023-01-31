@@ -9,7 +9,7 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
 
-use crate::execution_data::{self, ReadoutData};
+use crate::execution_data::{self, ResultData};
 use crate::qpu::client::Qcs;
 use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
@@ -43,15 +43,15 @@ use quil_rs::Program;
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
-///     // We first convert the readout data to a [`ReadoutMap`] to get a mapping of registers
+///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
 ///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
 ///     // the memory offset `index` during shot `shot`.
-///     // There are some programs where readout data does not fit into a [`ReadoutMap`]. In
-///     // this case you should build the matrix you need from [`QPUReadout`] directly. See
-///     // the [`ReadoutMap`] documentation for more information on when this transformation
+///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`]. In
+///     // which case you should build the matrix you need from [`QPUReadout`] directly. See
+///     // the [`RegisterMap`] documentation for more information on when this transformation
 ///     // might fail.
-///     let data = result.readout_data
-///                         .to_readout_map()
+///     let data = result.result_data
+///                         .to_register_map()
 ///                         .expect("should convert to readout map")
 ///                         .get_register_matrix("ro")
 ///                         .expect("should have data in ro")
@@ -160,8 +160,8 @@ impl<'executable> Executable<'executable, '_> {
     ///         .await
     ///         .unwrap();
     ///     let first_value = result
-    ///         .readout_data
-    ///         .to_readout_map()
+    ///         .result_data
+    ///         .to_register_map()
     ///         .expect("qvm memory should fit readout map")
     ///         .get_register_matrix("first")
     ///         .expect("readout map should have 'first'")
@@ -171,8 +171,8 @@ impl<'executable> Executable<'executable, '_> {
     ///         .expect("should have value in first position of first register")
     ///         .clone();
     ///     let second_value = result
-    ///         .readout_data
-    ///         .to_readout_map()
+    ///         .result_data
+    ///         .to_register_map()
     ///         .expect("qvm memory should fit readout map")
     ///         .get_register_matrix("second")
     ///         .expect("readout map should have 'second'")
@@ -228,8 +228,8 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
     ///         let theta_register = result
-    ///             .readout_data
-    ///             .to_readout_map()
+    ///             .result_data
+    ///             .to_register_map()
     ///             .expect("should fit readout map")
     ///             .get_register_matrix("theta")
     ///             .expect("should have theta")
@@ -345,7 +345,7 @@ impl Executable<'_, '_> {
         result
             .map_err(Error::from)
             .map(|registers| execution_data::ExecutionData {
-                readout_data: ReadoutData::Qvm(registers),
+                result_data: ResultData::Qvm(registers),
                 duration: None,
             })
     }
