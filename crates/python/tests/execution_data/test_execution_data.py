@@ -1,12 +1,12 @@
 from qcs_sdk.qpu import ReadoutValues, QPUReadout
-from qcs_sdk import ReadoutData, RegisterData, RegisterMatrix
+from qcs_sdk import ResultData, RegisterData, RegisterMatrix
 import numpy as np
 from numpy.testing import assert_array_equal
 import pytest
 
 
-class TestReadoutData:
-    def test_to_readout_map_from_qpu_readout(self):
+class TestResultData:
+    def test_to_register_map_from_qpu_readout(self):
         mappings = {
             "ro[0]": "qA",
             "ro[1]": "qB",
@@ -17,14 +17,14 @@ class TestReadoutData:
             "qB": ReadoutValues.from_integer([1, 2]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ReadoutData.from_qpu(QPUReadout(mappings, values))
-        readout_map = readout_data.to_readout_map()
+        readout_data = ResultData.from_qpu(QPUReadout(mappings, values))
+        readout_map = readout_data.to_register_map()
         ro = readout_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)
 
-    def test_to_readout_map_from_jagged_qpu_readout(self):
+    def test_to_register_map_from_jagged_qpu_readout(self):
         mappings = {
             "ro[0]": "qA",
             "ro[1]": "qB",
@@ -35,15 +35,15 @@ class TestReadoutData:
             "qB": ReadoutValues.from_integer([1]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ReadoutData.from_qpu(QPUReadout(mappings, values))
+        readout_data = ResultData.from_qpu(QPUReadout(mappings, values))
 
         with pytest.raises(ValueError):
-            readout_data.to_readout_map()
+            readout_data.to_register_map()
 
-    def test_to_readout_map_from_qvm_memory(self):
+    def test_to_register_map_from_qvm_memory(self):
         qvm_memory_map = {"ro": RegisterData.from_i16([[0, 1, 2], [1, 2, 3]])}
-        readout_data = ReadoutData.from_qvm(qvm_memory_map)
-        readout_map = readout_data.to_readout_map()
+        readout_data = ResultData.from_qvm(qvm_memory_map)
+        readout_map = readout_data.to_register_map()
         ro = readout_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 

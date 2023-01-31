@@ -18,7 +18,7 @@ use crate::register_data::PyRegisterData;
 use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::readout_data::PyQpuReadout};
 
 py_wrap_union_enum! {
-    PyReadoutData(ResultData) as "ReadoutData" {
+    PyResultData(ResultData) as "ResultData" {
         qpu: Qpu => PyQpuReadout,
         qvm: Qvm => HashMap<String, PyRegisterData> => Py<PyDict>
     }
@@ -35,8 +35,8 @@ py_wrap_error!(
 );
 
 #[pymethods]
-impl PyReadoutData {
-    fn to_readout_map(&self, py: Python) -> PyResult<PyReadoutMap> {
+impl PyResultData {
+    fn to_register_map(&self, py: Python) -> PyResult<PyRegisterMap> {
         self.as_inner()
             .to_register_map()
             .map_err(RegisterMatrixConversionError)
@@ -47,7 +47,7 @@ impl PyReadoutData {
 
 py_wrap_data_struct! {
     PyExecutionData(ExecutionData) as "ExecutionData" {
-        result_data: ResultData => PyReadoutData,
+        result_data: ResultData => PyResultData,
         duration: Option<Duration> => Option<Py<PyDelta>>
     }
 }
@@ -57,7 +57,7 @@ impl PyExecutionData {
     #[new]
     fn __new__(
         py: Python<'_>,
-        readout_data: PyReadoutData,
+        readout_data: PyResultData,
         duration: Option<u64>,
     ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
@@ -75,7 +75,7 @@ py_wrap_data_struct! {
 }
 
 py_wrap_type! {
-    PyReadoutMap(RegisterMap) as "ReadoutMap";
+    PyRegisterMap(RegisterMap) as "RegisterMap";
 }
 
 // py_wrap_union_enum! {
@@ -145,7 +145,7 @@ impl PyRegisterMatrix {
 }
 
 #[pymethods]
-impl PyReadoutMap {
+impl PyRegisterMap {
     pub fn get_register_matrix(&self, register_name: String) -> Option<PyRegisterMatrix> {
         self.as_inner()
             .get_register_matrix(&register_name)

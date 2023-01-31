@@ -13,8 +13,8 @@ pub mod register_data;
 create_init_submodule! {
     classes: [
         execution_data::PyExecutionData,
-        execution_data::PyReadoutData,
-        execution_data::PyReadoutMap,
+        execution_data::PyResultData,
+        execution_data::PyRegisterMap,
         execution_data::PyRegisterMatrix,
         executable::PyExecutable,
         executable::PyParameter,
