@@ -1,7 +1,7 @@
 # This is the metadata Maturin uploads to PyPI on publish
 [project]
 name = "qcs-sdk-python"
-version = "0.4.2"
+version = "0.5.0-rc.1"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -24,7 +24,7 @@ classifiers = [
 # We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
 [tool.poetry]
 name = "qcs-sdk-python"
-version = "0.4.2"
+version = "0.5.0-rc.1"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 authors = [
@@ -40,7 +40,7 @@ compatibility = "linux"
 sdist-include = ["README.md"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 maturin = "^0.13.2"
