@@ -31,7 +31,5 @@ async fn main() {
         .expect("ro should be a register of integer values")
         .to_owned();
 
-    let serialized = serde_json::to_string(&result).unwrap();
-    println!("{serialized}");
-    dbg!(&result);
+    println!("{result:?}");
 }

@@ -12,7 +12,7 @@ use crate::qpu::readout_data::ReadoutValues;
 use crate::{qpu::readout_data::QpuReadout, qvm::QvmMemory, RegisterData};
 
 /// Represents the two possible types of readout data returned from either the QVM or a real QPU.
-/// Each variant contains the original data returned from it's respective executor.
+/// Each variant contains the original data returned from its respective executor.
 ///
 /// # Usage
 ///
@@ -141,7 +141,7 @@ impl ReadoutMap {
     }
 
     /// Returns a [`ReadoutMap`] built from [`QvmMemory`]
-    pub fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
+    fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
         Ok(Self(
             memory
                 .iter()
@@ -209,7 +209,7 @@ impl ReadoutMap {
     ///
     /// This fails if the underlying [`QpuReadout`] data is jagged. See [`ReadoutData`] for more
     /// detailed explanations of why and when this occurs.
-    pub fn from_qpu_readout_data(
+    fn from_qpu_readout_data(
         readout_data: &QpuReadout,
     ) -> Result<Self, RegisterMatrixConversionError> {
         Ok(
@@ -237,7 +237,7 @@ impl ReadoutMap {
                         BTreeMap<MemoryReference, &ReadoutValues>,
                         RegisterMatrixConversionError,
                     >>()?
-                    .iter()
+                    .into_iter()
                     // Iterate over them in reverse. Starting with the last index lets us:
                     //     (1): Initialize the RegisterMatrix with the correct number of rows
                     //     (2): Use a memory reference with an index of 0 as a setinel.
@@ -245,19 +245,19 @@ impl ReadoutMap {
                     .try_fold(
                         (
                             HashMap::with_capacity(readout_data.readout_values.len()),
-                            None::<&MemoryReference>,
+                            None::<MemoryReference>,
                         ),
                         |(mut readout_data, previous_reference), (reference, values)| {
                             // If we haven't started on a new register, make sure we aren't
                             // skipping an index. For example, if we jumped from ro[5] to ro[3], or
-                            // ro[2] to theta[1], we skipped a column.
+                            // ro[2] to theta[0], we skipped a column.
                             if let Some(previous) = previous_reference {
                                 if previous.name != reference.name
-                                    || previous.index != reference.index + 1
+                                    || previous.index - 1 != reference.index
                                 {
                                     return Err(RegisterMatrixConversionError::MissingRow {
-                                        register: reference.name.clone(),
-                                        index: previous.index + 1,
+                                        register: reference.name,
+                                        index: previous.index - 1,
                                     });
                                 }
                             }
@@ -300,16 +300,12 @@ impl ReadoutMap {
                                 }
                                 _ => {
                                     return Err(RegisterMatrixConversionError::InvalidShape {
-                                        register: reference.name.clone(),
+                                        register: reference.name,
                                     })
                                 }
                             }
 
-                            let previous_reference = if reference.index == 0 {
-                                None
-                            } else {
-                                Some(reference)
-                            };
+                            let previous_reference = (reference.index != 0).then_some(reference);
 
                             Ok((readout_data, previous_reference))
                         },

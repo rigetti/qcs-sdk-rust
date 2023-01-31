@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 /// register should be provided with [`Executable::read_from`](`crate::Executable::read_from`).
 ///
 /// There is a variant of this enum for each type of data that a register could hold. The register
-/// is represented as a 2-dimensional, array `M` where the value `M[shot_number][memory_index]`
+/// is represented as a 2-dimensional array `M` where the value `M[shot_number][memory_index]`
 /// represents the value at `memory_index` for `shot_number`.
 ///
 /// # Usage
