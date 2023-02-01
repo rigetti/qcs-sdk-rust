@@ -248,6 +248,7 @@ MEASURE 1 ro[1]
             .await
             .expect("Could not run program on QVM");
         for shot in results
+            .memory
             .remove("ro")
             .expect("Did not receive ro buffer")
             .into_i8()

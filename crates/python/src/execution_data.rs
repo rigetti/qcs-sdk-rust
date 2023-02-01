@@ -1,10 +1,10 @@
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
 use pyo3::{
     exceptions::PyValueError,
     pymethods,
-    types::{PyDelta, PyDict, PyType},
+    types::{PyDelta, PyType},
     Py, PyResult, Python,
 };
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
@@ -14,13 +14,13 @@ use rigetti_pyo3::{
     PyWrapper, ToPython, ToPythonError,
 };
 
-use crate::register_data::PyRegisterData;
+use crate::qvm::PyQvmResultData;
 use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::result_data::PyQpuResultData};
 
 py_wrap_union_enum! {
     PyResultData(ResultData) as "ResultData" {
         qpu: Qpu => PyQpuResultData,
-        qvm: Qvm => HashMap<String, PyRegisterData> => Py<PyDict>
+        qvm: Qvm => PyQvmResultData
     }
 }
 

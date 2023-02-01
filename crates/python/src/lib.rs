@@ -8,6 +8,7 @@ pub mod executable;
 pub mod execution_data;
 pub mod grpc;
 pub mod qpu;
+pub mod qvm;
 pub mod register_data;
 
 create_init_submodule! {

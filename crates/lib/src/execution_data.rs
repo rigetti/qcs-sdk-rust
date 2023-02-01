@@ -10,7 +10,7 @@ use ndarray::prelude::*;
 
 use crate::{
     qpu::result_data::{QpuResultData, ReadoutValues},
-    qvm::QvmMemory,
+    qvm::QvmResultData,
     RegisterData,
 };
 
@@ -47,8 +47,8 @@ use crate::{
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner)]
 pub enum ResultData {
-    /// Data returned from the QVM, stored as [`QvmMemory`]
-    Qvm(QvmMemory),
+    /// Data returned from the QVM, stored as [`QvmResultData`]
+    Qvm(QvmResultData),
     /// Readout data returned from the QPU, stored as [`QpuResultData`]
     Qpu(QpuResultData),
 }
@@ -107,7 +107,7 @@ pub enum RegisterMatrixConversionError {
 }
 
 impl ResultData {
-    /// Convert [`ResultData`] from its inner representation as [`QvmMemory`] or
+    /// Convert [`ResultData`] from its inner representation as [`QvmResultData`] or
     /// [`QpuResultData`] into a [`RegisterMap`]. The [`RegisterMatrix`] for each register will be
     /// constructed such that each row contains all the final values in the register for a single shot.
     ///
@@ -124,7 +124,7 @@ impl ResultData {
     /// selects the last value per-shot based on the program that was run.
     pub fn to_register_map(&self) -> Result<RegisterMap, RegisterMatrixConversionError> {
         match self {
-            ResultData::Qvm(data) => RegisterMap::from_qvm_memory(data),
+            ResultData::Qvm(data) => RegisterMap::from_qvm_result_data(data),
             ResultData::Qpu(data) => RegisterMap::from_qpu_result_data(data),
         }
     }
@@ -143,10 +143,13 @@ impl RegisterMap {
         Self(map)
     }
 
-    /// Returns a [`RegisterMap`] built from [`QvmMemory`]
-    fn from_qvm_memory(memory: &QvmMemory) -> Result<Self, RegisterMatrixConversionError> {
+    /// Returns a [`RegisterMap`] built from [`QvmResultData`]
+    fn from_qvm_result_data(
+        result_data: &QvmResultData,
+    ) -> Result<Self, RegisterMatrixConversionError> {
         Ok(Self(
-            memory
+            result_data
+                .memory
                 .iter()
                 .map(|(name, register)| {
                     let register_matrix = match register {
@@ -367,7 +370,7 @@ mod describe_register_map {
     use ndarray::prelude::*;
 
     use crate::qpu::result_data::QpuResultData;
-    use crate::qvm::QvmMemory;
+    use crate::qvm::QvmResultData;
 
     use super::{RegisterData, RegisterMap};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
@@ -401,7 +404,7 @@ mod describe_register_map {
             QpuResultData::from_controller_mappings_and_values(&readout_mappings, &readout_values);
 
         let register_map = RegisterMap::from_qpu_result_data(&qpu_result_data)
-            .expect("Should be able to create ReadoutMap from rectangular QPU readout");
+            .expect("Should be able to create RegisterMap from rectangular QPU readout");
 
         let ro = register_map
             .get_register_matrix("ro")
@@ -471,16 +474,16 @@ mod describe_register_map {
 
     #[test]
     fn it_converts_from_qvm_memory() {
-        let qvm_memory: QvmMemory = hashmap! {
+        let qvm_result_data = QvmResultData::from_qvm_response(hashmap! {
             String::from("ro") => RegisterData::I8(vec![vec![1, 0, 1]]),
-        };
+        });
 
-        let register_map = RegisterMap::from_qvm_memory(&qvm_memory)
-            .expect("Should be able to create ReadoutMap from QvmMemory");
+        let register_map = RegisterMap::from_qvm_result_data(&qvm_result_data)
+            .expect("Should be able to create RegisterMap from QvmResultData");
 
         let ro = register_map
             .get_register_matrix("ro")
-            .expect("ReadoutMap should have ro")
+            .expect("RegisterMap should have ro")
             .as_integer()
             .expect("Should be a register of integers");
 
