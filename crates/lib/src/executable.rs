@@ -240,11 +240,11 @@ impl<'executable> Executable<'executable, '_> {
     ///         let first = theta_register
     ///             .get((0, 0))
     ///             .expect("first index, first shot of theta should have value")
-    ///             .clone();
+    ///             .to_owned();
     ///         let second = theta_register
     ///             .get((0, 1))
     ///             .expect("first shot, second_index of theta should have value")
-    ///             .clone();
+    ///             .to_owned();
     ///         
     ///         assert_eq!(first, theta);
     ///         assert_eq!(second, theta * 2.0);
