@@ -39,7 +39,7 @@ async fn main() {
         let first_ro_values = data
             .result_data
             .to_register_map()
-            .expect("should be able to create a ReadoutMap")
+            .expect("should be able to create a RegisterMap")
             .get_register_matrix("ro")
             .expect("readout values should contain 'ro'")
             .as_integer()

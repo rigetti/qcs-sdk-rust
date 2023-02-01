@@ -24,9 +24,9 @@ async fn main() {
         .expect("Program should execute successfully")
         .result_data
         .to_register_map()
-        .expect("should be able to convert execution data to ReadoutMap")
+        .expect("should be able to convert execution data to RegisterMap")
         .get_register_matrix("ro")
-        .expect("Readout data should include 'ro'")
+        .expect("Register data should include 'ro'")
         .as_integer()
         .expect("ro should be a register of integer values")
         .to_owned();

@@ -18,7 +18,7 @@ use crate::{ExecutionData, JobHandle};
 
 use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, CompilerOpts, TargetDevice};
-use super::readout_data::QpuReadout;
+use super::result_data::QpuResultData;
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -191,7 +191,7 @@ impl<'a> Execution<'a> {
         .await?;
 
         Ok(ExecutionData {
-            result_data: ResultData::Qpu(QpuReadout::from_controller_mappings_and_values(
+            result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
             )),

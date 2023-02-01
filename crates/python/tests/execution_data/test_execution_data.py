@@ -18,8 +18,8 @@ class TestResultData:
             "qC": ReadoutValues.from_integer([2, 3]),
         }
         readout_data = ResultData.from_qpu(QPUReadout(mappings, values))
-        readout_map = readout_data.to_register_map()
-        ro = readout_map.get_register_matrix("ro").as_integer()
+        register_map = readout_data.to_register_map()
+        ro = register_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)
@@ -43,8 +43,8 @@ class TestResultData:
     def test_to_register_map_from_qvm_memory(self):
         qvm_memory_map = {"ro": RegisterData.from_i16([[0, 1, 2], [1, 2, 3]])}
         readout_data = ResultData.from_qvm(qvm_memory_map)
-        readout_map = readout_data.to_register_map()
-        ro = readout_map.get_register_matrix("ro").as_integer()
+        register_map = readout_data.to_register_map()
+        ro = register_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)

@@ -15,11 +15,11 @@ use rigetti_pyo3::{
 };
 
 use crate::register_data::PyRegisterData;
-use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::readout_data::PyQpuReadout};
+use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::result_data::PyQpuResultData};
 
 py_wrap_union_enum! {
     PyResultData(ResultData) as "ResultData" {
-        qpu: Qpu => PyQpuReadout,
+        qpu: Qpu => PyQpuResultData,
         qvm: Qvm => HashMap<String, PyRegisterData> => Py<PyDict>
     }
 }

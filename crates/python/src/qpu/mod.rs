@@ -3,10 +3,10 @@ use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error};
 
 pub mod client;
 pub mod quilc;
-pub mod readout_data;
+pub mod result_data;
 
 create_init_submodule! {
-    classes: [readout_data::PyReadoutValues, readout_data::PyQpuReadout],
+    classes: [result_data::PyReadoutValues, result_data::PyQpuResultData],
     errors: [QcsIsaError],
     submodules: [
         "client": client::init_submodule,

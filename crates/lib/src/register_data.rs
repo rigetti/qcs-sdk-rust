@@ -14,9 +14,9 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Usage
 ///
-/// Typically, you will be interacting with this data through the [`crate::ReadoutData`] of an
+/// Typically, you will be interacting with this data through the [`crate::ResultData`] of an
 /// [`crate::ExecutionData`] returned after running a program. In those cases, you'll probably
-/// want to convert it to a readout map using [`crate::ReadoutData.to_readout_map()`]. This
+/// want to convert it to a readout map using [`crate::ResultData.to_register_map()`]. This
 /// will give you each register in the form of a [`crate::RegisterMatrix`] which is similar
 /// but backed by an [`ndarray::Array2`] and more convenient for working with matrices.
 ///

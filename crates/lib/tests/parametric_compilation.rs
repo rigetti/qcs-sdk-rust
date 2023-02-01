@@ -36,7 +36,7 @@ async fn basic_substitution() {
             result
                 .result_data
                 .to_register_map()
-                .expect("should convert to ReadoutMap")
+                .expect("should convert to RegisterMap")
                 .get_register_matrix("ro")
                 .expect("should have `ro`")
                 .as_integer()

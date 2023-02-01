@@ -1,5 +1,5 @@
 //! This modules provides types and functions for initializing and working with
-//! QPU readout data.
+//! data returned from the QPU
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use quil_rs::instruction::MemoryReference;
@@ -20,16 +20,17 @@ pub enum ReadoutValues {
     Complex(Vec<Complex64>),
 }
 
-/// This struct encapsulates the readout data returned from the QPU after executing a job.
+/// This struct encapsulates data returned from the QPU after executing a job.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
-pub struct QpuReadout {
-    /// Mappings of a memory region (ie. "ro\[0\]") to it's key name in `readout_values` (ie. "q0")
+pub struct QpuResultData {
+    /// Mappings of a memory region (ie. "ro\[0\]") to its key name in `readout_values` (ie. "q0")
     pub mappings: HashMap<String, String>,
     /// Mapping of a readout values identifier (ie. "q0") to a set of [`ReadoutValues`]
     pub readout_values: HashMap<String, ReadoutValues>,
 }
 
-impl QpuReadout {
+impl QpuResultData {
     /// Creates a new [`QPUReadout`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,
@@ -69,7 +70,7 @@ impl QpuReadout {
         }
     }
 
-    /// Returns the [`ReadoutValues`] for a [`MemoryReference`], or None if a mapping to the
+    /// Returns the [`ReadoutValues`] for a [`MemoryReference`], or `None` if a mapping to the
     /// provided memory reference doesn't exist.
     #[must_use]
     pub fn get_values_for_memory_reference(
