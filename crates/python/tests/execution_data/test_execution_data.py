@@ -1,4 +1,4 @@
-from qcs_sdk.qpu import ReadoutValues, QPUReadout
+from qcs_sdk.qpu import ReadoutValues, QpuResultData
 from qcs_sdk import ResultData, RegisterData, RegisterMatrix
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -17,7 +17,7 @@ class TestResultData:
             "qB": ReadoutValues.from_integer([1, 2]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ResultData.from_qpu(QPUReadout(mappings, values))
+        readout_data = ResultData.from_qpu(QpuResultData(mappings, values))
         register_map = readout_data.to_register_map()
         ro = register_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
@@ -35,7 +35,7 @@ class TestResultData:
             "qB": ReadoutValues.from_integer([1]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ResultData.from_qpu(QPUReadout(mappings, values))
+        readout_data = ResultData.from_qpu(QpuResultData(mappings, values))
 
         with pytest.raises(ValueError):
             readout_data.to_register_map()

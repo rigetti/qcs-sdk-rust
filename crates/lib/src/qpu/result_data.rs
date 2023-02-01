@@ -31,7 +31,7 @@ pub struct QpuResultData {
 }
 
 impl QpuResultData {
-    /// Creates a new [`QPUReadout`] using data returned from controller service.
+    /// Creates a new [`QpuResultData`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,
         values: &HashMap<String, ControllerReadoutValues>,

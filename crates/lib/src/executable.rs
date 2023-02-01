@@ -47,7 +47,7 @@ use quil_rs::Program;
 ///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
 ///     // the memory offset `index` during shot `shot`.
 ///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`]. In
-///     // which case you should build the matrix you need from [`QPUReadout`] directly. See
+///     // which case you should build the matrix you need from [`QpuResultData`] directly. See
 ///     // the [`RegisterMap`] documentation for more information on when this transformation
 ///     // might fail.
 ///     let data = result.result_data
