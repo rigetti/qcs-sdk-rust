@@ -39,7 +39,8 @@ create_init_submodule! {
     ],
     submodules: [
         "api": api::init_submodule,
-        "qpu": qpu::init_submodule
+        "qpu": qpu::init_submodule,
+        "qvm": qvm::init_submodule
     ],
 }
 
