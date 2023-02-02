@@ -10,7 +10,7 @@ use rigetti_pyo3::{
         types::{PyFloat, PyInt, PyList, PyString},
         Py, Python,
     },
-    wrap_error, ToPython, ToPythonError,
+    wrap_error, ToPythonError,
 };
 
 use qcs::qpu::get_isa;
@@ -51,22 +51,10 @@ py_wrap_error!(api, IsaError, QcsIsaError, PyRuntimeError);
 
 py_wrap_simple_enum! {
     PyFamily(Family) as "Family" {
-        None,
-        Full,
-        Aspen,
-        Ankaa
-    }
-}
-
-// TODO: are there macros for these or should `py_wrap_simple_enum` be updated to have them?
-impl ToPython<PyFamily> for Family {
-    fn to_python(&self, _py: pyo3::Python) -> pyo3::PyResult<PyFamily> {
-        Ok(PyFamily::from(self))
-    }
-}
-impl rigetti_pyo3::PyTryFrom<PyFamily> for Family {
-    fn py_try_from(_py: pyo3::Python, item: &PyFamily) -> pyo3::PyResult<Self> {
-        Ok(item.as_ref().clone())
+        None as NONE,
+        Full as Full,
+        Aspen as Aspen,
+        Ankaa as Ankaa
     }
 }
 
@@ -130,13 +118,6 @@ py_wrap_data_struct! {
         benchmarks: Vec<Operation> => Vec<PyOperation>,
         instructions: Vec<Operation> => Vec<PyOperation>,
         name: String => Py<PyString>
-    }
-}
-
-#[pymethods]
-impl PyOperation {
-    fn test(&self) -> String {
-        format!("What a great test!")
     }
 }
 

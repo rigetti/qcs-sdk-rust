@@ -1552,9 +1552,9 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.1.0-rc.1"
+version = "0.1.0-rc.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17d3d8822e4d3ab36de8cff3b8d9990a9d2ccc9c9da3536de9347e29353b2455"
+checksum = "747db1eb6c058767a5528363b21e2a32eef3fa504238c7b643cac68d98b260c8"
 dependencies = [
  "num-complex",
  "num-traits",

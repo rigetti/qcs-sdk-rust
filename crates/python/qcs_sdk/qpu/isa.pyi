@@ -20,6 +20,7 @@ class Family(Enum):
     Value "Full"  implies that each node is connected to every other (fully-connected architecture).
     """
 
+    NONE = "NONE",
     Full = "Full",
     Aspen = "Aspen",
     Ankaa = "Ankaa",
