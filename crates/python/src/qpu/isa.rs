@@ -80,12 +80,12 @@ py_wrap_data_struct! {
 
 py_wrap_data_struct! {
     PyCharacteristic(Characteristic) as "Characteristic" {
-        error: Option<f32> => Option<Py<PyFloat>>,
+        error: Option<f64> => Option<Py<PyFloat>>,
         name: String => Py<PyString>,
         node_ids: Option<Vec<i32>> => Option<Py<PyList>>,
-        parameter_values: Option<Vec<f32>> => Option<Py<PyList>>,
+        parameter_values: Option<Vec<f64>> => Option<Py<PyList>>,
         timestamp: String => Py<PyString>,
-        value: f32 => Py<PyFloat>
+        value: f64 => Py<PyFloat>
     }
 }
 
