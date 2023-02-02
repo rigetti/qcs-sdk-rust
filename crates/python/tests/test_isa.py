@@ -38,8 +38,7 @@ def test_isa_from_aspen_m_3_json(aspen_m_3_json: str):
     node_ids = {node.node_id for node in isa.architecture.nodes}
     assert len(node_ids) == 80
 
-    # TODO: example ISA has values that round when being converted to f32
-    # assert json.loads(isa.json()) == clean_nones(json.loads(aspen_m_3_json))
+    assert json.loads(isa.json()) == ignore_nones(json.loads(aspen_m_3_json))
 
 
 @pytest.mark.asyncio
