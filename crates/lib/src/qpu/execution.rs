@@ -126,7 +126,7 @@ impl<'a> Execution<'a> {
             trace!("Converting to Native Quil");
             let client = client.clone();
             spawn_blocking(move || {
-                quilc::compile_program(&quil, target_device, None, &client, compiler_options)
+                quilc::compile_program(&quil, target_device, &client, compiler_options)
             })
             .await
             .map_err(|source| {

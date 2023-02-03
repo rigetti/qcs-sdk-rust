@@ -34,11 +34,10 @@ static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 pub fn compile(
     quil: &str,
     target: TargetDevice,
-    protoquil: Option<bool>,
     client: &Qcs,
     options: CompilerOpts,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-    quilc::compile_program(quil, target, protoquil, client, options)
+    quilc::compile_program(quil, target, client, options)
         .map_err(Into::into)
         .map(|p| p.to_string(true))
 }

@@ -37,13 +37,12 @@ pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
 pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
-    protoquil: Option<bool>,
     client: &Qcs,
     options: CompilerOpts,
 ) -> Result<Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let params = QuilcParams::new(quil, isa, protoquil);
+    let params = QuilcParams::new(quil, isa, options.protoquil);
     let request =
         rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
@@ -59,6 +58,9 @@ pub(crate) fn compile_program(
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
     timeout: Option<u8>,
+
+    /// If the compiler should produce "protoquil" as output.
+    protoquil: Option<bool>,
 }
 
 /// Functions for building a [`CompilerOpts`] instance
@@ -67,13 +69,23 @@ impl CompilerOpts {
     /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
     #[must_use]
     pub fn new() -> Self {
-        Self { timeout: None }
+        Self {
+            timeout: None,
+            protoquil: None,
+        }
     }
 
     /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
     #[must_use]
     pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
         self.timeout = seconds;
+        *self
+    }
+
+    /// Set if the compiler should produce "protoquil" as output.
+    #[must_use]
+    pub fn with_protoquil(&mut self, protoquil: Option<bool>) -> Self {
+        self.protoquil = protoquil;
         *self
     }
 }
@@ -84,6 +96,7 @@ impl Default for CompilerOpts {
     fn default() -> Self {
         Self {
             timeout: Some(DEFAULT_COMPILER_TIMEOUT),
+            protoquil: None,
         }
     }
 }

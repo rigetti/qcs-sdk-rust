@@ -102,22 +102,15 @@ py_wrap_error!(
     PyRuntimeError
 );
 
-/// Get the keyword `key` value from `kwds` if it is of type `Option<T>`,
-/// otherwise return `default`.
-///
-/// Note that values present at `key` that cannot be extracted
-/// into `Option<T>` will be discarded in favor of `default`.
-fn kwd_or_default<'a, T: FromPyObject<'a>>(
-    kwds: Option<&'a PyDict>,
-    key: &str,
-    default: Option<T>,
-) -> Option<T> {
+/// Get the keyword `key` value from `kwds` if it is of type `Option<T>`, else `None`.
+/// Note that values present at `key` that cannot be extracted into `Option<T>` are discarded.
+fn get_kwd<'a, T: FromPyObject<'a>>(kwds: Option<&'a PyDict>, key: &str) -> Option<T> {
     if let Some(kwds) = kwds {
         kwds.get_item(key)
             .map(|value| value.extract().ok())
-            .unwrap_or(default)
+            .unwrap_or_default()
     } else {
-        default
+        None
     }
 }
 
@@ -132,13 +125,15 @@ pub fn compile<'a>(
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
 
-    let compiler_timeout = kwd_or_default(kwds, "timeout", Some(DEFAULT_COMPILER_TIMEOUT));
-    let protoquil: Option<bool> = kwd_or_default(kwds, "protoquil", None);
+    let compiler_timeout = get_kwd(kwds, "timeout").or(Some(DEFAULT_COMPILER_TIMEOUT));
+    let protoquil: Option<bool> = get_kwd(kwds, "protoquil");
 
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
-        let options = CompilerOpts::default().with_timeout(compiler_timeout);
-        let result = qcs::api::compile(&quil, target_device, protoquil, &client, options)
+        let options = CompilerOpts::default()
+            .with_timeout(compiler_timeout)
+            .with_protoquil(protoquil);
+        let result = qcs::api::compile(&quil, target_device, &client, options)
             .map_err(|e| CompilationError::new_err(e.to_string()))?;
         Ok(result)
     })
