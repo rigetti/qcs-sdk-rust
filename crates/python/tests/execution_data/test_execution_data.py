@@ -7,7 +7,7 @@ import pytest
 
 
 class TestResultData:
-    def test_to_register_map_from_qpu_readout(self):
+    def test_to_register_map_from_qpu_result_data(self):
         mappings = {
             "ro[0]": "qA",
             "ro[1]": "qB",
@@ -18,14 +18,14 @@ class TestResultData:
             "qB": ReadoutValues.from_integer([1, 2]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ResultData.from_qpu(QPUResultData(mappings, values))
-        register_map = readout_data.to_register_map()
+        result_data = ResultData.from_qpu(QPUResultData(mappings, values))
+        register_map = result_data.to_register_map()
         ro = register_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)
 
-    def test_to_register_map_from_jagged_qpu_readout(self):
+    def test_to_register_map_from_jagged_qpu_result_data(self):
         mappings = {
             "ro[0]": "qA",
             "ro[1]": "qB",
@@ -36,16 +36,16 @@ class TestResultData:
             "qB": ReadoutValues.from_integer([1]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        readout_data = ResultData.from_qpu(QPUResultData(mappings, values))
+        result_data = ResultData.from_qpu(QPUResultData(mappings, values))
 
         with pytest.raises(ValueError):
-            readout_data.to_register_map()
+            result_data.to_register_map()
 
-    def test_to_register_map_from_qvm_memory(self):
+    def test_to_register_map_from_qvm_result_data(self):
         qvm_memory_map = {"ro": RegisterData.from_i16([[0, 1, 2], [1, 2, 3]])}
         qvm_result_data = QVMResultData.from_memory_map(qvm_memory_map)
-        readout_data = ResultData.from_qvm(qvm_result_data)
-        register_map = readout_data.to_register_map()
+        result_data = ResultData.from_qvm(qvm_result_data)
+        register_map = result_data.to_register_map()
         ro = register_map.get_register_matrix("ro").as_integer()
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 

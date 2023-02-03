@@ -55,13 +55,9 @@ py_wrap_data_struct! {
 #[pymethods]
 impl PyExecutionData {
     #[new]
-    fn __new__(
-        py: Python<'_>,
-        readout_data: PyResultData,
-        duration: Option<u64>,
-    ) -> PyResult<Self> {
+    fn __new__(py: Python<'_>, result_data: PyResultData, duration: Option<u64>) -> PyResult<Self> {
         Ok(Self(ExecutionData {
-            result_data: ResultData::py_try_from(py, &readout_data)?,
+            result_data: ResultData::py_try_from(py, &result_data)?,
             duration: duration.map(Duration::from_micros),
         }))
     }

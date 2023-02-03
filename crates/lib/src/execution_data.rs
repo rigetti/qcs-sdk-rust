@@ -266,9 +266,9 @@ impl RegisterMap {
             // correct number of rows
             register_map.into_iter().rev().try_fold(
                 HashMap::with_capacity(qpu_result_data.readout_values.len()),
-                |mut readout_data, (reference, values)| {
+                |mut register_map, (reference, values)| {
                     let matrix =
-                        readout_data
+                        register_map
                             .entry(reference.name.clone())
                             .or_insert(match values {
                                 ReadoutValues::Integer(v) => RegisterMatrix::Integer(
@@ -311,7 +311,7 @@ impl RegisterMap {
                             })
                         }
                     }
-                    Ok(readout_data)
+                    Ok(register_map)
                 },
             )?,
         ))
@@ -469,7 +469,7 @@ mod describe_register_map {
     }
 
     #[test]
-    fn it_converts_from_qvm_memory() {
+    fn it_converts_from_qvm_result_data() {
         let qvm_result_data = QvmResultData::from_qvm_response(hashmap! {
             String::from("ro") => RegisterData::I8(vec![vec![1, 0, 1]]),
         });
