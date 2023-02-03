@@ -162,7 +162,7 @@ impl FrbSim1q {
                     node_ids.len() == 1 && node_ids[0] == qubit
                 })
             })
-            .map(|characteristic| characteristic.value.into())
+            .map(|characteristic| characteristic.value)
             .ok_or(Error::MissingBenchmarkForQubit(qubit))
     }
 }
@@ -308,7 +308,7 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
         .iter()
         .find(|characteristic| &characteristic.name == "fRO")
         .map_or(MEASURE_DEFAULT_FIDELITY, |characteristic| {
-            characteristic.value.into()
+            characteristic.value
         });
 
     vec![
