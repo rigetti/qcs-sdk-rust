@@ -1,3 +1,13 @@
+## 0.5.0-rc.2
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- implement get_instruction_set_architecture (#240)
+
 ## 0.5.0-rc.1
 
 ### Breaking Changes

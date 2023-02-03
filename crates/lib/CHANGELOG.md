@@ -1,3 +1,9 @@
+## 0.10.0-rc.2
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
 ## 0.10.0-rc.1
 
 ### Breaking Changes
