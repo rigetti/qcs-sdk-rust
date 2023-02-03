@@ -290,9 +290,7 @@ fn basic_gates(
     let fidelity = characteristics
         .iter()
         .find(|characteristic| &characteristic.name == characteristic_name)
-        .map_or(*default_fidelity, |characteristic| {
-            characteristic.value.into()
-        });
+        .map_or(*default_fidelity, |characteristic| characteristic.value);
 
     Operator::Gate {
         operator: op_name,

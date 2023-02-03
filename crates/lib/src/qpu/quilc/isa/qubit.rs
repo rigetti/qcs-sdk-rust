@@ -162,7 +162,7 @@ impl FrbSim1q {
                     node_ids.len() == 1 && node_ids[0] == qubit
                 })
             })
-            .map(|characteristic| characteristic.value.into())
+            .map(|characteristic| characteristic.value)
             .ok_or(Error::MissingBenchmarkForQubit(qubit))
     }
 }
@@ -239,28 +239,28 @@ mod describe_rx_gates {
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
-                fidelity: 0.996_832_609_176_635_7,
+                fidelity: 0.996_832_6,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(PI)],
             },
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
-                fidelity: 0.996_832_609_176_635_7,
+                fidelity: 0.996_832_6,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(-PI)],
             },
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
-                fidelity: 0.996_832_609_176_635_7,
+                fidelity: 0.996_832_6,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(FRAC_PI_2)],
             },
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
-                fidelity: 0.996_832_609_176_635_7,
+                fidelity: 0.996_832_6,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(-FRAC_PI_2)],
             },
@@ -308,7 +308,7 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
         .iter()
         .find(|characteristic| &characteristic.name == "fRO")
         .map_or(MEASURE_DEFAULT_FIDELITY, |characteristic| {
-            characteristic.value.into()
+            characteristic.value
         });
 
     vec![
@@ -353,14 +353,14 @@ mod describe_measure {
             Operator::Measure {
                 operator: "MEASURE".to_string(),
                 duration: 2000.0,
-                fidelity: 0.981_000_006_198_883_1,
+                fidelity: 0.981,
                 qubit: operator::Qubit::Int(0),
                 target: Some("_".to_string()),
             },
             Operator::Measure {
                 operator: "MEASURE".to_string(),
                 duration: 2000.0,
-                fidelity: 0.981_000_006_198_883_1,
+                fidelity: 0.981,
                 qubit: operator::Qubit::Int(0),
                 target: None,
             },

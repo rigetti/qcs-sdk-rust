@@ -27,7 +27,7 @@ pub(crate) use execution::{Error as ExecutionError, Execution};
 /// 1. Problem communicating with QCS
 /// 2. Unauthenticated
 /// 3. Expired token
-pub(crate) async fn get_isa(
+pub async fn get_isa(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<InstructionSetArchitecture, IsaError> {
