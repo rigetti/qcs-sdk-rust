@@ -15,7 +15,7 @@ mod qubit;
 
 /// Restructuring of an [`InstructionSetArchitecture`] for sending to quilc
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Compiler {
+pub(crate) struct Compiler {
     #[serde(rename = "1Q")]
     qubits: HashMap<String, Qubit>,
     #[serde(rename = "2Q")]
@@ -172,13 +172,13 @@ mod describe_compiler_isa {
             .expect("Could not read Aspen 8 output data");
         let qcs_isa: InstructionSetArchitecture =
             serde_json::from_str(&input).expect("Could not deserialize Aspen-8 input");
-        let expected: serde_json::Value =
+        let expected: Value =
             serde_json::from_str(&expected_json).expect("Could not deserialize Aspen-8 output");
 
         let compiler_isa =
             Compiler::try_from(qcs_isa).expect("Could not convert ISA to CompilerIsa");
         let serialized =
-            serde_json::to_value(&compiler_isa).expect("Unable to serialize CompilerIsa");
+            serde_json::to_value(compiler_isa).expect("Unable to serialize CompilerIsa");
 
         let result = json_is_equivalent(&serialized, &expected);
         result.expect("JSON was not equivalent");

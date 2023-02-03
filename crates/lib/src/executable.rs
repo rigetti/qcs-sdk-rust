@@ -1,6 +1,7 @@
 //! This module contains the public-facing API for executing programs. [`Executable`] is the how
 //! users will interact with QCS, quilc, and QVM.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
@@ -10,6 +11,7 @@ use qcs_api_client_common::ClientConfiguration;
 
 use crate::execution_data;
 use crate::qpu::client::Qcs;
+use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
@@ -61,13 +63,14 @@ use quil_rs::Program;
 /// You should be able to largely ignore these, just keep in mind that any borrowed data passed to
 /// the methods most likely needs to live as long as this struct. Check individual methods for
 /// specifics. If only using `'static` strings then everything should just work.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
     shots: u16,
-    readout_memory_region_names: Option<Vec<&'executable str>>,
+    readout_memory_region_names: Option<Vec<Cow<'executable, str>>>,
     params: Parameters,
     compile_with_quilc: bool,
+    compiler_options: CompilerOpts,
     config: Option<ClientConfiguration>,
     client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -99,6 +102,7 @@ impl<'executable> Executable<'executable, '_> {
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
+            compiler_options: CompilerOpts::default(),
             config: None,
             client: None,
             qpu: None,
@@ -157,9 +161,12 @@ impl<'executable> Executable<'executable, '_> {
     /// }
     /// ```
     #[must_use]
-    pub fn read_from(mut self, register: &'executable str) -> Self {
+    pub fn read_from<S>(mut self, register: S) -> Self
+    where
+        S: Into<Cow<'executable, str>>,
+    {
         let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
-        readouts.push(register);
+        readouts.push(register.into());
         self.readout_memory_region_names = Some(readouts);
         self
     }
@@ -188,7 +195,7 @@ impl<'executable> Executable<'executable, '_> {
     ///     let mut exe = Executable::from_quil(PROGRAM)
     ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
-    ///     
+    ///
     ///     for theta in 0..2 {
     ///         let theta = theta as f64;
     ///         let mut result = exe
@@ -233,8 +240,10 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
-type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
+/// The [`Result`] from executing on the QVM.
+pub type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
+/// The [`Result`] from executing on a QPU.
+pub type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -252,11 +261,18 @@ impl Executable<'_, '_> {
         self
     }
 
-    fn get_readouts(&self) -> &[&str] {
+    /// If set, the value will override the default compiler options
+    #[must_use]
+    pub fn compiler_options(mut self, options: CompilerOpts) -> Self {
+        self.compiler_options = options;
+        self
+    }
+
+    fn get_readouts(&self) -> &[Cow<'_, str>] {
         return self
             .readout_memory_region_names
             .as_ref()
-            .map_or(&["ro"], Vec::as_slice);
+            .map_or(&[Cow::Borrowed("ro")], Vec::as_slice);
     }
 
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).
@@ -297,7 +313,7 @@ impl Executable<'_, '_> {
         if let Some(config) = &self.config {
             Ok(config.clone())
         } else {
-            let config = ClientConfiguration::load().await?;
+            let config = ClientConfiguration::load_default().await?;
             self.config = Some(config.clone());
             Ok(config)
         }
@@ -318,12 +334,13 @@ impl Executable<'_, '_> {
 
 impl<'execution> Executable<'_, 'execution> {
     /// Remove and return `self.qpu` if it's set and still valid. Otherwise, create a new one.
-    async fn qpu_for_id(
-        &mut self,
-        id: &'execution str,
-    ) -> Result<qpu::Execution<'execution>, Error> {
+    async fn qpu_for_id<S>(&mut self, id: S) -> Result<qpu::Execution<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let id = id.into();
         if let Some(qpu) = self.qpu.take() {
-            if qpu.quantum_processor_id == id && qpu.shots == self.shots {
+            if qpu.quantum_processor_id == id.as_ref() && qpu.shots == self.shots {
                 return Ok(qpu);
             }
         }
@@ -333,6 +350,7 @@ impl<'execution> Executable<'_, 'execution> {
             id,
             self.get_client().await?,
             self.compile_with_quilc,
+            self.compiler_options,
         )
         .await
         .map_err(Error::from)
@@ -364,10 +382,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu(
-        &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> ExecuteResultQPU {
+    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecuteResultQPU
+    where
+        S: Into<Cow<'execution, str>>,
+    {
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -380,16 +398,20 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu(
+    pub async fn submit_to_qpu<S>(
         &mut self,
-        quantum_processor_id: &'execution str,
-    ) -> Result<JobHandle<'execution>, Error> {
+        quantum_processor_id: S,
+    ) -> Result<JobHandle<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let quantum_processor_id = quantum_processor_id.into();
         let JobHandle {
             job_id,
             readout_map,
             ..
         } = self
-            .qpu_for_id(quantum_processor_id)
+            .qpu_for_id(quantum_processor_id.clone())
             .await?
             .submit(&self.params)
             .await?;
@@ -514,11 +536,11 @@ pub enum Service {
 impl From<ExecutionError> for Error {
     fn from(err: ExecutionError) -> Self {
         match err {
-            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{:?}", inner)),
+            ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{inner:?}")),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
-            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{:?}", v)),
-            ExecutionError::IsaError(v) => Self::Unexpected(format!("{:?}", v)),
-            ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{:?}", v)),
+            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::IsaError(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
@@ -535,7 +557,7 @@ impl From<qvm::Error> for Error {
             | qvm::Error::ShotsMustBePositive
             | qvm::Error::RegionSizeMismatch { .. }
             | qvm::Error::RegionNotFound { .. }
-            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{}", err)),
+            | qvm::Error::Qvm { .. } => Self::Compilation(format!("{err}")),
         }
     }
 }
@@ -545,20 +567,23 @@ impl From<qvm::Error> for Error {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JobHandle<'executable> {
     job_id: JobId,
-    quantum_processor_id: &'executable str,
+    quantum_processor_id: Cow<'executable, str>,
     readout_map: HashMap<String, String>,
 }
 
 impl<'a> JobHandle<'a> {
     #[must_use]
-    pub(crate) fn new(
+    pub(crate) fn new<S>(
         job_id: JobId,
-        quantum_processor_id: &'a str,
+        quantum_processor_id: S,
         readout_map: HashMap<String, String>,
-    ) -> Self {
+    ) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
         Self {
             job_id,
-            quantum_processor_id,
+            quantum_processor_id: quantum_processor_id.into(),
             readout_map,
         }
     }
@@ -586,7 +611,7 @@ mod describe_get_config {
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
         let mut exe = Executable::from_quil("").with_config(ClientConfiguration::default());
-        let foo_len = |exe: &mut Executable| exe.params.get("foo").unwrap().len();
+        let foo_len = |exe: &mut Executable<'_, '_>| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
         assert_eq!(foo_len(&mut exe), 1);
