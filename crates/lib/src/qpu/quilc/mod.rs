@@ -225,7 +225,6 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            None,
             &Qcs::load().await.unwrap_or_default(),
             CompilerOpts::default(),
         )
@@ -248,7 +247,6 @@ MEASURE 1 ro[1]
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            None,
             &client,
             CompilerOpts::default(),
         )
