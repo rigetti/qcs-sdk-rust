@@ -102,6 +102,11 @@ py_wrap_error!(
     PyRuntimeError
 );
 
+/// Get the keyword `key` value from `kwds` if it is of type `Option<T>`,
+/// otherwise return `default`.
+///
+/// Note that values present at `key` that cannot be extracted
+/// into `Option<T>` will be discarded in favor of `default`.
 fn kwd_or_default<'a, T: FromPyObject<'a>>(
     kwds: Option<&'a PyDict>,
     key: &str,
