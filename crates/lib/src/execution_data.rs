@@ -219,7 +219,7 @@ impl RegisterMap {
     fn from_qpu_result_data(
         qpu_result_data: &QpuResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
-        let readout_map = qpu_result_data
+        let register_map = qpu_result_data
                     .mappings
                     .iter()
                     // Pair all the memory references with their readout values
@@ -245,7 +245,7 @@ impl RegisterMap {
 
         // Return an error if any group of memory references don't form a continuous sequence, indicating
         // that a row is missing
-        for (reference_a, reference_b) in readout_map.keys().tuple_windows() {
+        for (reference_a, reference_b) in register_map.keys().tuple_windows() {
             if reference_a.name == reference_b.name {
                 if reference_a.index + 1 != reference_b.index {
                     return Err(RegisterMatrixConversionError::MissingRow {
@@ -264,7 +264,7 @@ impl RegisterMap {
         Ok(Self(
             // Iterate over them in reverse so we  can initialize each RegisterMatrix with the
             // correct number of rows
-            readout_map.into_iter().rev().try_fold(
+            register_map.into_iter().rev().try_fold(
                 HashMap::with_capacity(qpu_result_data.readout_values.len()),
                 |mut readout_data, (reference, values)| {
                     let matrix =
