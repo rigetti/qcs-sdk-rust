@@ -6,6 +6,7 @@ use std::num::ParseIntError;
 use std::str::FromStr;
 use std::time::Duration;
 
+use itertools::Itertools;
 use ndarray::prelude::*;
 
 use crate::{
@@ -218,9 +219,7 @@ impl RegisterMap {
     fn from_qpu_result_data(
         qpu_result_data: &QpuResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
-        Ok(
-            Self(
-                qpu_result_data
+        let readout_map = qpu_result_data
                     .mappings
                     .iter()
                     // Pair all the memory references with their readout values
@@ -242,83 +241,78 @@ impl RegisterMap {
                     .collect::<Result<
                         BTreeMap<MemoryReference, &ReadoutValues>,
                         RegisterMatrixConversionError,
-                    >>()?
-                    .into_iter()
-                    // Iterate over them in reverse. Starting with the last index lets us:
-                    //     (1): Initialize the RegisterMatrix with the correct number of rows
-                    //     (2): Use a memory reference with an index of 0 as a setinel.
-                    .rev()
-                    .try_fold(
-                        (
-                            HashMap::with_capacity(qpu_result_data.readout_values.len()),
-                            None::<MemoryReference>,
-                        ),
-                        |(mut readout_data, previous_reference), (reference, values)| {
-                            // If we haven't started on a new register, make sure we aren't
-                            // skipping an index. For example, if we jumped from ro[5] to ro[3], or
-                            // ro[2] to theta[0], we skipped a column.
-                            if let Some(previous) = previous_reference {
-                                if previous.name != reference.name
-                                    || previous.index - 1 != reference.index
-                                {
-                                    return Err(RegisterMatrixConversionError::MissingRow {
-                                        register: reference.name,
-                                        index: previous.index - 1,
-                                    });
-                                }
-                            }
+                    >>()?;
 
-                            let matrix = readout_data.entry(reference.name.clone()).or_insert(
-                                match values {
-                                    ReadoutValues::Integer(v) => RegisterMatrix::Integer(
-                                        Array2::zeros((v.len(), reference.index + 1)),
-                                    ),
-                                    ReadoutValues::Complex(v) => RegisterMatrix::Complex(
-                                        Array2::zeros((v.len(), reference.index + 1)),
-                                    ),
-                                    ReadoutValues::Real(v) => RegisterMatrix::Real(Array2::zeros(
-                                        (v.len(), reference.index + 1),
-                                    )),
-                                },
-                            );
+        // Return an error if any group of memory references don't form a continuous sequence, indicating
+        // that a row is missing.
+        for (reference_a, reference_b) in readout_map.keys().tuple_windows() {
+            if reference_a.name == reference_b.name && reference_a.index + 1 != reference_b.index {
+                return Err(RegisterMatrixConversionError::MissingRow {
+                    register: reference_a.name.clone(),
+                    index: reference_a.index + 1,
+                });
+            } else if reference_b.index != 0 {
+                return Err(RegisterMatrixConversionError::MissingRow {
+                    register: reference_b.name.clone(),
+                    index: 0,
+                });
+            }
+        }
 
-                            // Insert the readout values as a column iff it fits within the
-                            // dimensions of the matrix. Otherwise, the readout data must be
-                            // jagged and we return an error.
-                            match (matrix, values) {
-                                (RegisterMatrix::Integer(m), ReadoutValues::Integer(v))
-                                    if m.nrows() == v.len() =>
-                                {
-                                    m.column_mut(reference.index)
-                                        .assign(&Array::from_vec(v.clone()));
-                                }
-                                (RegisterMatrix::Real(m), ReadoutValues::Real(v))
-                                    if m.nrows() == v.len() =>
-                                {
-                                    m.column_mut(reference.index)
-                                        .assign(&Array::from_vec(v.clone()));
-                                }
-                                (RegisterMatrix::Complex(m), ReadoutValues::Complex(v))
-                                    if m.nrows() == v.len() =>
-                                {
-                                    m.column_mut(reference.index)
-                                        .assign(&Array::from_vec(v.clone()));
-                                }
-                                _ => {
-                                    return Err(RegisterMatrixConversionError::InvalidShape {
-                                        register: reference.name,
-                                    })
-                                }
-                            }
+        Ok(Self(
+            // Iterate over them in reverse so we  can initialize each RegisterMatrix with the
+            // correct number of rows
+            readout_map.into_iter().rev().try_fold(
+                HashMap::with_capacity(qpu_result_data.readout_values.len()),
+                |mut readout_data, (reference, values)| {
+                    let matrix =
+                        readout_data
+                            .entry(reference.name.clone())
+                            .or_insert(match values {
+                                ReadoutValues::Integer(v) => RegisterMatrix::Integer(
+                                    Array2::zeros((v.len(), reference.index + 1)),
+                                ),
+                                ReadoutValues::Complex(v) => RegisterMatrix::Complex(
+                                    Array2::zeros((v.len(), reference.index + 1)),
+                                ),
+                                ReadoutValues::Real(v) => RegisterMatrix::Real(Array2::zeros((
+                                    v.len(),
+                                    reference.index + 1,
+                                ))),
+                            });
 
-                            let previous_reference = (reference.index != 0).then_some(reference);
-
-                            Ok((readout_data, previous_reference))
-                        },
-                    )?
-                    .0,
-            ),
-        )
+                    // Insert the readout values as a column iff it fits within the
+                    // dimensions of the matrix. Otherwise, the readout data must be
+                    // jagged and we return an error.
+                    match (matrix, values) {
+                        (RegisterMatrix::Integer(m), ReadoutValues::Integer(v))
+                            if m.nrows() == v.len() =>
+                        {
+                            m.column_mut(reference.index)
+                                .assign(&Array::from_vec(v.clone()));
+                        }
+                        (RegisterMatrix::Real(m), ReadoutValues::Real(v))
+                            if m.nrows() == v.len() =>
+                        {
+                            m.column_mut(reference.index)
+                                .assign(&Array::from_vec(v.clone()));
+                        }
+                        (RegisterMatrix::Complex(m), ReadoutValues::Complex(v))
+                            if m.nrows() == v.len() =>
+                        {
+                            m.column_mut(reference.index)
+                                .assign(&Array::from_vec(v.clone()));
+                        }
+                        _ => {
+                            return Err(RegisterMatrixConversionError::InvalidShape {
+                                register: reference.name,
+                            })
+                        }
+                    }
+                    Ok(readout_data)
+                },
+            )?,
+        ))
     }
 }
 

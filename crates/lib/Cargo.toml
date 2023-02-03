@@ -37,6 +37,7 @@ toml = "0.5.9"
 uuid = { version = "1.2.1", features = ["v4"] }
 tonic = { version = "0.8.2", features = ["tls", "tls-roots"] }
 zmq = { version = "0.9.2", features = ["vendored"] }
+itertools = "0.10.5"
 
 [dev-dependencies]
 erased-serde = "0.3.23"
