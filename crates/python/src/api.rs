@@ -102,6 +102,20 @@ py_wrap_error!(
     PyRuntimeError
 );
 
+fn kwd_or_default<'a, T: FromPyObject<'a>>(
+    kwds: Option<&'a PyDict>,
+    key: &str,
+    default: Option<T>,
+) -> Option<T> {
+    if let Some(kwds) = kwds {
+        kwds.get_item(key)
+            .map(|value| value.extract().ok())
+            .unwrap_or(default)
+    } else {
+        default
+    }
+}
+
 #[pyfunction(client = "None", kwds = "**")]
 pub fn compile<'a>(
     py: Python<'a>,
@@ -113,19 +127,8 @@ pub fn compile<'a>(
     let target_device: TargetDevice =
         serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
 
-    let mut compiler_timeout = Some(DEFAULT_COMPILER_TIMEOUT);
-    let mut protoquil = None;
-    if let Some(kwargs) = kwds {
-        if let Some(timeout_arg) = kwargs.get_item("timeout") {
-            let timeout: Result<Option<u8>, _> = timeout_arg.extract();
-            if let Ok(option) = timeout {
-                compiler_timeout = option
-            }
-        }
-        if let Some(protoquil_arg) = kwargs.get_item("protoquil") {
-            protoquil = protoquil_arg.extract().ok();
-        }
-    }
+    let compiler_timeout = kwd_or_default(kwds, "timeout", Some(DEFAULT_COMPILER_TIMEOUT));
+    let protoquil: Option<bool> = kwd_or_default(kwds, "protoquil", None);
 
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
