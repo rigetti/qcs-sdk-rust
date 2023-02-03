@@ -244,13 +244,15 @@ impl RegisterMap {
                     >>()?;
 
         // Return an error if any group of memory references don't form a continuous sequence, indicating
-        // that a row is missing.
+        // that a row is missing
         for (reference_a, reference_b) in readout_map.keys().tuple_windows() {
-            if reference_a.name == reference_b.name && reference_a.index + 1 != reference_b.index {
-                return Err(RegisterMatrixConversionError::MissingRow {
-                    register: reference_a.name.clone(),
-                    index: reference_a.index + 1,
-                });
+            if reference_a.name == reference_b.name {
+                if reference_a.index + 1 != reference_b.index {
+                    return Err(RegisterMatrixConversionError::MissingRow {
+                        register: reference_a.name.clone(),
+                        index: reference_a.index + 1,
+                    });
+                }
             } else if reference_b.index != 0 {
                 return Err(RegisterMatrixConversionError::MissingRow {
                     register: reference_b.name.clone(),
@@ -321,7 +323,7 @@ impl RegisterMap {
 // It's possible `quil_rs` will use `usize` for its `MemoryReference` in the future. If so, we
 // should use it to replace this.
 // See https://github.com/rigetti/qcs-sdk-rust/issues/224
-#[derive(PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
 struct MemoryReference {
     name: String,
     index: usize,

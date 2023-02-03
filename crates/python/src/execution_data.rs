@@ -78,14 +78,6 @@ py_wrap_type! {
     PyRegisterMap(RegisterMap) as "RegisterMap";
 }
 
-// py_wrap_union_enum! {
-//     PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix" {
-//         integer: Integer => PyArray2<i32>,
-//         real: Real => PyArray2<f64>,
-//         complex: Complex => PyArray2<Complex64>
-//     }
-// }
-//
 py_wrap_type! {
     PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix"
 }
