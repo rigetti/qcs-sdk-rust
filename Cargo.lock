@@ -1308,9 +1308,8 @@ dependencies = [
  "maplit",
  "num",
  "qcs-api",
- "qcs-api-client-common 0.4.2",
- "qcs-api-client-grpc 0.3.0",
- "qcs-api-client-grpc 0.4.2",
+ "qcs-api-client-common",
+ "qcs-api-client-grpc",
  "qcs-api-client-openapi",
  "quil-rs",
  "regex",
@@ -1345,22 +1344,6 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13b09ac85ca2a9839e81d72c2cd8c7a0995984e52d5f78c0d0d6ad00da075589"
-dependencies = [
- "dirs",
- "futures",
- "jsonwebtoken",
- "reqwest",
- "serde",
- "thiserror",
- "tokio",
- "toml 0.5.11",
-]
-
-[[package]]
-name = "qcs-api-client-common"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d90f4d6309d205a9be54079876738df7bf926c6486cb5afbefd9ad1b1ae4536"
@@ -1377,25 +1360,6 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "623a691262ebdb46b72d1797682e2cc5fba1c859cacc17d58a2b59c9efe9ac77"
-dependencies = [
- "http-body",
- "pbjson",
- "pbjson-build",
- "prost",
- "prost-build",
- "qcs-api-client-common 0.3.0",
- "serde",
- "thiserror",
- "tonic",
- "tonic-build",
- "tower",
-]
-
-[[package]]
-name = "qcs-api-client-grpc"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "daea74d6222e1d4afa2c15b300ae4e47889326e009cf79245fb3bcba00fbadd8"
@@ -1405,7 +1369,7 @@ dependencies = [
  "pbjson-build",
  "prost",
  "prost-build",
- "qcs-api-client-common 0.4.2",
+ "qcs-api-client-common",
  "serde",
  "thiserror",
  "tonic",
@@ -1419,7 +1383,7 @@ version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a83ac57ae6d8fee0c3d99e4aa3cfc2b887c2fa18108d55ed1a66af29cadbe75"
 dependencies = [
- "qcs-api-client-common 0.4.2",
+ "qcs-api-client-common",
  "reqwest",
  "serde",
  "serde_json",
@@ -1435,8 +1399,8 @@ dependencies = [
  "pyo3-build-config",
  "qcs",
  "qcs-api",
- "qcs-api-client-common 0.4.2",
- "qcs-api-client-grpc 0.4.2",
+ "qcs-api-client-common",
+ "qcs-api-client-grpc",
  "qcs-api-client-openapi",
  "quil-rs",
  "rigetti-pyo3",
