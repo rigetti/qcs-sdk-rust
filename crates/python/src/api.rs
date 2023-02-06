@@ -103,13 +103,12 @@ py_wrap_error!(
 );
 
 /// Get the keyword `key` value from `kwds` if it is of type `Option<T>`, else `None`.
-/// Note that values present at `key` that cannot be extracted into `Option<T>` are discarded.
+/// Note that values present at `key` that cannot be extracted into `Option<T>` are treated as `None`.
 fn get_kwd<'a, T: FromPyObject<'a>>(kwds: Option<&'a PyDict>, key: &str) -> Option<T> {
-    if let Some(kwds) = kwds {
-        kwds.get_item(key).and_then(|value| value.extract().ok())
-    } else {
-        None
-    }
+    kwds
+        .and_then(|kwds| kwds.get_item(key))
+        .map(|value| value.extract())
+        .transpose()
 }
 
 #[pyfunction(client = "None", kwds = "**")]
