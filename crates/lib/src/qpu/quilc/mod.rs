@@ -42,7 +42,7 @@ pub(crate) fn compile_program(
 ) -> Result<Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let params = QuilcParams::new(quil, isa, options.protoquil);
+    let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
     let request =
         rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
@@ -59,7 +59,8 @@ pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
     timeout: Option<u8>,
 
-    /// If the compiler should produce "protoquil" as output.
+    /// If the compiler should produce "protoquil" as output. If `None`, the default
+    /// behavior configured in the compiler service is used.
     protoquil: Option<bool>,
 }
 
@@ -159,11 +160,15 @@ struct QuilcParams {
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: TargetDevice, protoquil: Option<bool>) -> Self {
+    fn new(quil: &str, isa: TargetDevice) -> Self {
         Self {
-            protoquil,
+            protoquil: None,
             args: [NativeQuilRequest::new(quil, isa)],
         }
+    }
+
+    fn with_protoquil(self, protoquil: Option<bool>) -> Self {
+        Self { protoquil, ..self }
     }
 }
 
