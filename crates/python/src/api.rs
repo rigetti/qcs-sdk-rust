@@ -106,9 +106,7 @@ py_wrap_error!(
 /// Note that values present at `key` that cannot be extracted into `Option<T>` are discarded.
 fn get_kwd<'a, T: FromPyObject<'a>>(kwds: Option<&'a PyDict>, key: &str) -> Option<T> {
     if let Some(kwds) = kwds {
-        kwds.get_item(key)
-            .map(|value| value.extract().ok())
-            .unwrap_or_default()
+        kwds.get_item(key).and_then(|value| value.extract().ok())
     } else {
         None
     }
