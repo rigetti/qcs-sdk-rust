@@ -83,7 +83,8 @@ impl CompilerOpts {
         *self
     }
 
-    /// Set if the compiler should produce "protoquil" as output.
+    /// Set to control whether the compiler should produce "protoquil" as output.
+    /// If `None`, the default behavior configured in the compiler service is used.
     #[must_use]
     pub fn with_protoquil(&mut self, protoquil: Option<bool>) -> Self {
         self.protoquil = protoquil;
