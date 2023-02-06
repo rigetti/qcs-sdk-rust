@@ -18,3 +18,7 @@ qcs-api/docs
 
 # macOS
 .DS_Store
+
+# Python artifacts
+**/__pycache__
+crates/python/qcs_sdk/*.so

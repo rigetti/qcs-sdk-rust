@@ -1,3 +1,63 @@
+## 0.10.0-rc.1
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+## 0.10.0-rc.0
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+## 0.9.2
+
+### Fixes
+
+- bump quil-rs to fix waveform issues (#228)
+
+## 0.9.2-rc.0
+
+### Fixes
+
+- bump quil-rs to fix waveform issues (#228)
+
+## 0.9.1
+
+### Fixes
+
+- Fetch Gateway address with pagination (#225)
+
+## 0.9.1-rc.0
+
+### Fixes
+
+- Fetch Gateway address with pagination (#225)
+
+## 0.9.0
+
+### Breaking Changes
+
+- compiler timeout is now configurable
+
+## 0.9.0-rc.0
+
+### Breaking Changes
+
+- compiler timeout is now configurable
+
+## 0.8.4
+
+### Features
+
+- add method for getting the version of the running quilc server (#206)
+
+## 0.8.4-rc.0
+
+### Features
+
+- add method for getting the version of the running quilc server (#206)
+
 ## 0.8.3
 
 ### Fixes

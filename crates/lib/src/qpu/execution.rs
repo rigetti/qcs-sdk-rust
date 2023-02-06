@@ -1,5 +1,6 @@
 //! Contains QPU-specific executable stuff.
 
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::sync::Arc;
@@ -16,7 +17,7 @@ use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
 use crate::JobHandle;
 
 use super::client::{GrpcClientError, Qcs};
-use super::quilc::{self, TargetDevice};
+use super::quilc::{self, CompilerOpts, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
@@ -25,10 +26,10 @@ use super::{get_isa, IsaError};
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
 /// same number of shots.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
-    pub(crate) quantum_processor_id: &'a str,
+    pub(crate) quantum_processor_id: Cow<'a, str>,
     pub(crate) shots: u16,
     client: Arc<Qcs>,
 }
@@ -58,10 +59,10 @@ pub(crate) enum Error {
 impl From<quilc::Error> for Error {
     fn from(source: quilc::Error) -> Self {
         match source {
-            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{:?}", source))),
+            quilc::Error::Isa(source) => Self::Unexpected(Unexpected::Isa(format!("{source:?}"))),
             quilc::Error::QuilcConnection(uri, details) => Self::Quilc {
                 uri,
-                details: format!("{:?}", details),
+                details: format!("{details:?}"),
             },
             quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
             quilc::Error::Parse(details) => Self::Compilation {
@@ -92,8 +93,11 @@ impl<'a> Execution<'a> {
     /// * `quil`: The raw Quil program to eventually be run on a QPU.
     /// * `shots`: The number of times to run this program with each call to [`Execution::run`].
     /// * `quantum_processor_id`: The QPU this Quil will be run on and should be compiled for.
-    /// * `config`: A [`Configuration`] instance provided by the user which contains connection info
+    /// * `client`: A [`qcs::qpu::client::Qcs`] instance provided by the user which contains connection info
     ///     for QCS and the `quilc` compiler.
+    /// * `compile_with_quilc`: A boolean that if set, will compile the given `quil` using `quilc`
+    /// * `compiler_options`: A [`qcs::qpu::quilc::CompilerOpts`] instance with configuration
+    ///     options for quilc. Has no effect if `compile_with_quilc` is false
     ///
     /// returns: Result<Execution, Report>
     ///
@@ -110,25 +114,27 @@ impl<'a> Execution<'a> {
     pub(crate) async fn new(
         quil: Arc<str>,
         shots: u16,
-        quantum_processor_id: &'a str,
+        quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
         compile_with_quilc: bool,
+        compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
-        let isa = get_isa(quantum_processor_id, &client).await?;
+        let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
         let program = if compile_with_quilc {
             trace!("Converting to Native Quil");
             let client = client.clone();
-            // TODO Support protoquil optional
-            spawn_blocking(move || quilc::compile_program(&quil, target_device, None, &client))
-                .await
-                .map_err(|source| {
-                    Error::Unexpected(Unexpected::TaskError {
-                        task_name: "quilc",
-                        source,
-                    })
-                })??
+            spawn_blocking(move || {
+                quilc::compile_program(&quil, target_device, &client, compiler_options)
+            })
+            .await
+            .map_err(|source| {
+                Error::Unexpected(Unexpected::TaskError {
+                    task_name: "quilc",
+                    source,
+                })
+            })??
         } else {
             trace!("Skipping conversion to Native Quil");
             quil.parse().map_err(Error::Quil)?
@@ -143,9 +149,9 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
+    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'_>, Error> {
         let EncryptedTranslationResult { job, readout_map } = translate(
-            self.quantum_processor_id,
+            self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
             self.shots.into(),
             self.client.as_ref(),
@@ -157,7 +163,7 @@ impl<'a> Execution<'a> {
             .map_err(Error::Substitution)?;
 
         let job_id = submit(
-            self.quantum_processor_id,
+            self.quantum_processor_id.as_ref(),
             job,
             &patch_values,
             self.client.as_ref(),
@@ -166,7 +172,7 @@ impl<'a> Execution<'a> {
 
         Ok(JobHandle::new(
             job_id,
-            self.quantum_processor_id,
+            self.quantum_processor_id.clone(),
             readout_map,
         ))
     }
@@ -176,8 +182,12 @@ impl<'a> Execution<'a> {
         job_id: JobId,
         readout_mappings: HashMap<String, String>,
     ) -> Result<Qpu, Error> {
-        let response =
-            retrieve_results(job_id, self.quantum_processor_id, self.client.as_ref()).await?;
+        let response = retrieve_results(
+            job_id,
+            self.quantum_processor_id.as_ref(),
+            self.client.as_ref(),
+        )
+        .await?;
 
         Ok(Qpu {
             readout_data: ReadoutMap::from_mappings_and_values(

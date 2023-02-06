@@ -14,6 +14,9 @@ use super::{rpcq, Qcs};
 
 mod isa;
 
+/// Number of seconds to wait before timing out.
+pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
+
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
 /// # Arguments
@@ -21,6 +24,7 @@ mod isa;
 /// * `program`: The Quil program to compile.
 /// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
 ///     [`super::get_isa`].
+/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to [`DEFAULT_COMPILER_TIMEOUT`].
 ///
 /// returns: `eyre::Result<quil_rs::Program>`
 ///
@@ -33,20 +37,80 @@ mod isa;
 pub(crate) fn compile_program(
     quil: &str,
     isa: TargetDevice,
-    protoquil: Option<bool>,
     client: &Qcs,
-) -> Result<quil_rs::Program, Error> {
+    options: CompilerOpts,
+) -> Result<Program, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let params = QuilcParams::new(quil, isa, protoquil);
-    let request = rpcq::RPCRequest::new("quil_to_native_quil", &params);
+    let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
+    let request =
+        rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilcResponse>(&request) {
-        Ok(response) => response
-            .quil
-            .parse::<quil_rs::Program>()
-            .map_err(Error::Parse),
+    match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
+        Ok(response) => response.quil.parse::<Program>().map_err(Error::Parse),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+/// A set of options that determine the behavior of compiling programs with quilc
+#[derive(Clone, Copy, Debug)]
+pub struct CompilerOpts {
+    /// The number of seconds to wait before timing out. If `None`, there is no timeout.
+    timeout: Option<u8>,
+
+    /// If the compiler should produce "protoquil" as output. If `None`, the default
+    /// behavior configured in the compiler service is used.
+    protoquil: Option<bool>,
+}
+
+/// Functions for building a [`CompilerOpts`] instance
+impl CompilerOpts {
+    /// Creates a new instance of [`CompilerOpts`] with zero values for each option.
+    /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+    #[must_use]
+    pub fn new() -> Self {
+        Self {
+            timeout: None,
+            protoquil: None,
+        }
+    }
+
+    /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
+    #[must_use]
+    pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
+        self.timeout = seconds;
+        *self
+    }
+
+    /// Set if the compiler should produce "protoquil" as output.
+    #[must_use]
+    pub fn with_protoquil(&mut self, protoquil: Option<bool>) -> Self {
+        self.protoquil = protoquil;
+        *self
+    }
+}
+
+impl Default for CompilerOpts {
+    /// Default compiler options
+    /// * `timeout`: See [`DEFAULT_COMPILER_TIMEOUT`]
+    fn default() -> Self {
+        Self {
+            timeout: Some(DEFAULT_COMPILER_TIMEOUT),
+            protoquil: None,
+        }
+    }
+}
+
+pub(crate) fn get_version_info(client: &Qcs) -> Result<String, Error> {
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let binding: HashMap<String, String> = HashMap::new();
+    let request = rpcq::RPCRequest::new("get_version_info", &binding);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, QuilcVersionResponse>(&request) {
+        Ok(response) => Ok(response.quilc),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
 }
@@ -78,8 +142,13 @@ impl Error {
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-struct QuilcResponse {
-    pub quil: String,
+struct QuilcCompileProgramResponse {
+    quil: String,
+}
+
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+struct QuilcVersionResponse {
+    quilc: String,
 }
 
 /// The top level params that get passed to quilc
@@ -91,11 +160,15 @@ struct QuilcParams {
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: TargetDevice, protoquil: Option<bool>) -> Self {
+    fn new(quil: &str, isa: TargetDevice) -> Self {
         Self {
-            protoquil,
+            protoquil: None,
             args: [NativeQuilRequest::new(quil, isa)],
         }
+    }
+
+    fn with_protoquil(self, protoquil: Option<bool>) -> Self {
+        Self { protoquil, ..self }
     }
 }
 
@@ -139,7 +212,8 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 mod tests {
     use super::*;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
-    use std::fs::File;
+    use regex::Regex;
+    use std::{borrow::Cow, fs::File};
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
 
@@ -147,7 +221,7 @@ mod tests {
         serde_json::from_reader(File::open("tests/aspen_9_isa.json").unwrap()).unwrap()
     }
 
-    pub fn qvm_isa() -> InstructionSetArchitecture {
+    pub(crate) fn qvm_isa() -> InstructionSetArchitecture {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
@@ -156,8 +230,8 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            None,
             &Qcs::load().await.unwrap_or_default(),
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
@@ -178,13 +252,18 @@ MEASURE 1 ro[1]
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            None,
             &client,
+            CompilerOpts::default(),
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.to_string(true))
             .unwrap()
-            .run(10, &["ro"], &HashMap::default(), &client.get_config())
+            .run(
+                10,
+                &[Cow::Borrowed("ro")],
+                &HashMap::default(),
+                &client.get_config(),
+            )
             .await
             .expect("Could not run program on QVM");
         for shot in results
@@ -196,5 +275,13 @@ MEASURE 1 ro[1]
             assert_eq!(shot.len(), 2);
             assert_eq!(shot[0], shot[1]);
         }
+    }
+
+    #[tokio::test]
+    async fn get_version_info_from_quilc() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let version = get_version_info(&client).expect("Should get version info from quilc");
+        let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
+        assert!(semver_re.is_match(&version));
     }
 }

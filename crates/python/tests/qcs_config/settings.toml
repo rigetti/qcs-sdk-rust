@@ -1,0 +1,24 @@
+default_profile_name = "default"
+
+[auth_servers]
+
+  [auth_servers.default]
+    client_id = "0oa3ykoirzDKpkfzk357"
+    issuer = "https://auth.qcs.rigetti.com/oauth2/aus8jcovzG0gW2TUG355"
+
+[profiles]
+
+  [profiles.default]
+    api_url = "https://api.qcs.rigetti.com"
+    auth_server_name = "default"
+    credentials_name = "default"
+
+  [profiles.empty]
+    api_url = "https://api.qcs.rigetti.com"
+    auth_server_name = "default"
+    credentials_name = "does-not-exist"
+
+  [profiles.broken]
+    api_url = "https://api.qcs.rigetti.com"
+    auth_server_name = "does-not-exist"
+    credentials_name = "default"

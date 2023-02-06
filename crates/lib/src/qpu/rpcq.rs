@@ -11,6 +11,8 @@ use zmq::{Context, Socket, SocketType};
 
 use crate::qpu::rpcq::Error::AuthSetup;
 
+pub(crate) const DEFAULT_CLIENT_TIMEOUT: u8 = 30;
+
 /// A minimal RPCQ client that does just enough to talk to `quilc` and QPU endpoints
 pub(crate) struct Client {
     socket: Socket,
@@ -27,7 +29,7 @@ impl Client {
     }
 
     /// Construct a new [`Client`] with authentication.
-    fn new_with_credentials(endpoint: &str, credentials: &Credentials) -> Result<Self, Error> {
+    fn new_with_credentials(endpoint: &str, credentials: &Credentials<'_>) -> Result<Self, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
@@ -51,7 +53,7 @@ impl Client {
     /// * `request`: An [`RPCRequest`] containing some params.
     pub(crate) fn run_request<Request: Serialize, Response: DeserializeOwned>(
         &self,
-        request: &RPCRequest<Request>,
+        request: &RPCRequest<'_, Request>,
     ) -> Result<Response, Error> {
         self.send(request)?;
         self.receive::<Response>(&request.id)
@@ -64,7 +66,7 @@ impl Client {
     /// * `request`: An [`RPCRequest`] containing some params.
     pub(crate) fn send<Request: Serialize>(
         &self,
-        request: &RPCRequest<Request>,
+        request: &RPCRequest<'_, Request>,
     ) -> Result<(), Error> {
         let mut data = vec![];
         request
@@ -157,7 +159,7 @@ where
     params: &'params T,
     id: String,
     jsonrpc: &'static str,
-    client_timeout: u8,
+    client_timeout: Option<u8>,
     client_key: Option<String>,
 }
 
@@ -170,24 +172,36 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
     /// * `params`: The parameters to send. This must implement [`serde::Serialize`].
     ///
     /// returns: `RPCRequest<T>` where `T` is the type you passed in as `params`.
-    pub fn new(method: &'static str, params: &'params T) -> Self {
+    pub(crate) fn new(method: &'static str, params: &'params T) -> Self {
         Self {
             method,
             params,
             id: Uuid::new_v4().to_string(),
             jsonrpc: "2.0",
-            client_timeout: 10,
+            client_timeout: Some(DEFAULT_CLIENT_TIMEOUT),
             client_key: None,
         }
+    }
+
+    /// Sets the client timeout for the [`RPCRequest`].
+    ///
+    /// # Arguments
+    ///
+    /// * `seconds`: The number of seconds to wait before timing out, or None for no timeout
+    ///
+    /// returns: `RPCRequest<T>` with the updated timeout.
+    pub(crate) fn with_timeout(mut self, seconds: Option<u8>) -> Self {
+        self.client_timeout = seconds;
+        self
     }
 }
 
 /// Credentials for connecting to RPCQ Server
 #[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 struct Credentials<'a> {
-    pub client_secret_key: &'a str,
-    pub client_public_key: &'a str,
-    pub server_public_key: &'a str,
+    client_secret_key: &'a str,
+    client_public_key: &'a str,
+    server_public_key: &'a str,
 }
 
 #[derive(Deserialize, Debug)]

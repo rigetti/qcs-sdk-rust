@@ -35,9 +35,9 @@ impl Edge {
         }
     }
 
-    pub(crate) fn add_operation<'op_name>(
+    pub(crate) fn add_operation(
         &mut self,
-        op_name: &'op_name str,
+        op_name: &str,
         characteristics: &[Characteristic],
     ) -> Result<(), Error> {
         let operator = match GATE_PARAMS.get_key_value(op_name) {
