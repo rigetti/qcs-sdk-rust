@@ -106,8 +106,7 @@ py_wrap_error!(
 /// Returns an error if a value is present but cannot be extracted into `T`.
 fn get_kwd<'a, T: FromPyObject<'a>>(kwds: Option<&'a PyDict>, key: &str) -> PyResult<Option<T>> {
     kwds.and_then(|kwds| kwds.get_item(key))
-        .map(<Option<T>>::extract)
-        .unwrap_or(Ok(None))
+        .map_or(Ok(None), PyAny::extract::<Option<T>>)
 }
 
 #[pyfunction(client = "None", kwds = "**")]
