@@ -10,14 +10,15 @@ use pyo3::{
 };
 use qcs::{
     api::{
-        list_quantum_processors, ExecutionResult, ExecutionResults, Register,
-        RewriteArithmeticResult, TranslationResult,
+        get_quilt_calibrations, list_quantum_processors, ExecutionResult, ExecutionResults,
+        Register, RewriteArithmeticResult, TranslationResult,
     },
     qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
 };
+use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum,
-    wrap_error, ToPython, ToPythonError,
+    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type,
+    py_wrap_union_enum, wrap_error, ToPython, ToPythonError,
 };
 
 use crate::qpu::client::PyQcsClient;
@@ -37,7 +38,8 @@ create_init_submodule! {
         RewriteArithmeticError,
         DeviceIsaError,
         QcsListQuantumProcessorsError,
-        QcsSubmitError
+        QcsSubmitError,
+        QcsGetQuiltCalibrationsError
     ],
     funcs: [
         compile,
@@ -47,7 +49,8 @@ create_init_submodule! {
         retrieve_results,
         build_patch_values,
         get_quilc_version,
-        py_list_quantum_processors
+        py_list_quantum_processors,
+        py_get_quilt_calibrations
     ],
 }
 
@@ -64,6 +67,14 @@ py_wrap_data_struct! {
         ro_sources: Option<HashMap<String, String>> => Option<Py<PyDict>>
     }
 }
+
+py_wrap_data_struct! {
+    PyQuiltCalibrations(GetQuiltCalibrationsResponse) as "QuiltCalibrations" {
+        quilt: String => Py<PyString>,
+        settings_timestamp: Option<String> => Option<Py<PyString>>
+    }
+}
+impl_repr!(PyQuiltCalibrations);
 
 py_wrap_type! {
     PyExecutionResults(ExecutionResults) as "ExecutionResults";
@@ -99,6 +110,16 @@ py_wrap_error!(
     api,
     ListQuantumProcessorsError,
     QcsListQuantumProcessorsError,
+    PyRuntimeError
+);
+
+wrap_error!(GetQuiltCalibrationsError(
+    qcs::api::GetQuiltCalibrationsError
+));
+py_wrap_error!(
+    api,
+    GetQuiltCalibrationsError,
+    QcsGetQuiltCalibrationsError,
     PyRuntimeError
 );
 
@@ -237,5 +258,25 @@ pub fn py_list_quantum_processors(
             .map_err(ListQuantumProcessorsError::from)
             .map_err(ListQuantumProcessorsError::to_py_err)?;
         Ok(names)
+    })
+}
+
+#[pyfunction(client = "None", timeout = "None")]
+#[pyo3(name = "get_quilt_calibrations")]
+pub fn py_get_quilt_calibrations(
+    py: Python<'_>,
+    quantum_processor_id: String,
+    client: Option<PyQcsClient>,
+    timeout: Option<f64>,
+) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        let client = PyQcsClient::get_or_create_client(client).await?;
+        let timeout = timeout.map(Duration::from_secs_f64);
+        let result = get_quilt_calibrations(&quantum_processor_id, &client, timeout)
+            .await
+            .map(PyQuiltCalibrations::from)
+            .map_err(GetQuiltCalibrationsError::from)
+            .map_err(GetQuiltCalibrationsError::to_py_err)?;
+        Ok(result)
     })
 }
