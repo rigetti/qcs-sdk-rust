@@ -1,3 +1,13 @@
+## 0.10.0-rc.4
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export get_quilt_calibrations (#247)
+
 ## 0.10.0-rc.3
 
 ### Breaking Changes

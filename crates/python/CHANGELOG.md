@@ -1,3 +1,14 @@
+## 0.5.0-rc.4
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export get_quilt_calibrations (#247)
+- implement get_instruction_set_architecture (#240)
+
 ## 0.5.0-rc.3
 
 ### Breaking Changes
