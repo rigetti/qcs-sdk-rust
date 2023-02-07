@@ -35,6 +35,11 @@ class DeviceIsaError(ValueError):
     ...
 
 
+class QcsGetQuiltCalibrationsError(RuntimeError):
+    """Error while fetching Quil-T calibrations."""
+    ...
+
+
 class RewriteArithmeticResults:
     """
     The result of a call to [`rewrite_arithmetic`] which provides the information necessary to later patch-in memory values to a compiled program.
@@ -177,6 +182,24 @@ class Register:
     def from_f64(inner: List[float]) -> "Register": ...
     @staticmethod
     def from_complex64(inner: List[complex]) -> "Register": ...
+
+
+class QuiltCalibrations:
+    """Result of `get_quilt_calibrations`."""
+
+    @property
+    def quilt(self) -> str:
+        """Calibrations suitable for use in a Quil-T program."""
+        ...
+    @quilt.setter
+    def quilt(self, value: str): ...
+
+    @property
+    def settings_timestamp(self) -> Optional[str]:
+        """ISO8601 timestamp of the settings used to generate these calibrations."""
+        ...
+    @settings_timestamp.setter
+    def settings_timestamp(self, value: Optional[str]): ...
 
 
 async def compile(
@@ -337,22 +360,6 @@ async def get_quilc_version(
     """
     ...
 
-
-async def get_quilc_version(
-    client: Optional[QcsClient] = None,
-) -> str:
-    """
-    Returns the version number of the running quilc server.
-
-    Args:
-        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
-    Raises:
-        - ``LoadError`` If there is an issue loading the QCS Client configuration.
-        - ``CompilationError`` If there is an issue fetching the version from the quilc compiler.
-    """
-    ...
-
 async def list_quantum_processors(
     client: Optional[QcsClient] = None,
     timeout: Optional[float] = None,
@@ -365,3 +372,10 @@ async def list_quantum_processors(
         timeout: Maximum duration to wait for API calls to complete, in seconds.
     """
     ...
+
+async def get_quilt_calibrations(
+    client: Optional[QcsClient] = None,
+    timeout: Optional[float] = None,
+) -> List[str]:
+
+)

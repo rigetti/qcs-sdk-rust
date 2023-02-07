@@ -10,7 +10,10 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
-use qcs_api_client_openapi::apis::{quantum_processors_api, Error as OpenAPIError};
+use qcs_api_client_openapi::{
+    apis::{quantum_processors_api, translation_api, Error as OpenAPIError},
+    models::GetQuiltCalibrationsResponse,
+};
 use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
@@ -366,6 +369,37 @@ pub async fn list_quantum_processors(
         }
 
         Ok(quantum_processors)
+    })
+    .await?
+}
+
+/// API Errors encountered when trying to get Quil-T calibrations.
+#[derive(Debug, thiserror::Error)]
+pub enum GetQuiltCalibrationsError {
+    /// Failed the http call
+    #[error("Failed to get Quil-T calibrations via API: {0}")]
+    ApiError(#[from] OpenAPIError<translation_api::GetQuiltCalibrationsError>),
+
+    /// API call did not finish before timeout
+    #[error("API call did not finish before timeout: {0:?}")]
+    TimeoutError(#[from] Elapsed),
+}
+
+/// Query the QCS API for Quil-T calibrations.
+/// If `None`, the default `timeout` used is 10 seconds.
+pub async fn get_quilt_calibrations(
+    quantum_processor_id: &str,
+    client: &Qcs,
+    timeout: Option<Duration>,
+) -> Result<GetQuiltCalibrationsResponse, GetQuiltCalibrationsError> {
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
+
+    tokio::time::timeout(timeout, async move {
+        Ok(translation_api::get_quilt_calibrations(
+            &client.get_openapi_client(),
+            quantum_processor_id,
+        )
+        .await?)
     })
     .await?
 }
