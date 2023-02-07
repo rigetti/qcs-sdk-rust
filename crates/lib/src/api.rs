@@ -331,7 +331,7 @@ pub enum ListQuantumProcessorsError {
     ApiError(#[from] OpenAPIError<quantum_processors_api::ListQuantumProcessorsError>),
 
     /// Pagination did not finish before timeout
-    #[error("API pagination did not finish before timeout: {0:?}")]
+    #[error("API pagination did not finish before timeout.")]
     TimeoutError(#[from] Elapsed),
 }
 
@@ -381,7 +381,7 @@ pub enum GetQuiltCalibrationsError {
     ApiError(#[from] OpenAPIError<translation_api::GetQuiltCalibrationsError>),
 
     /// API call did not finish before timeout
-    #[error("API call did not finish before timeout: {0:?}")]
+    #[error("API call did not finish before timeout.")]
     TimeoutError(#[from] Elapsed),
 }
 
