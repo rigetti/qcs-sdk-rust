@@ -58,6 +58,7 @@ impl Qcs {
     }
 
     /// Return a copy of all settings parsed and resolved from configuration sources.
+    #[must_use]
     pub fn get_config(&self) -> ClientConfiguration {
         self.config.clone()
     }
