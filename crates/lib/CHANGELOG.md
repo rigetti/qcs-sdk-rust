@@ -1,3 +1,15 @@
+## 0.10.0-rc.6
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
 ## 0.10.0-rc.5
 
 ### Breaking Changes
