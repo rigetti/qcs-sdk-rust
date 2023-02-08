@@ -57,7 +57,8 @@ impl Qcs {
         self
     }
 
-    pub(crate) fn get_config(&self) -> ClientConfiguration {
+    /// Return a copy of all settings parsed and resolved from configuration sources.
+    pub fn get_config(&self) -> ClientConfiguration {
         self.config.clone()
     }
 
