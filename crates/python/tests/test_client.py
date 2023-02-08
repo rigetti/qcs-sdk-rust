@@ -1,4 +1,5 @@
 import pytest
+from urllib.parse import urlparse
 
 from qcs_sdk import QcsClient
 from qcs_sdk.qpu.client import QcsLoadError, QcsClientAuthServer, QcsClientTokens
@@ -6,6 +7,14 @@ from qcs_sdk.qpu.client import QcsLoadError, QcsClientAuthServer, QcsClientToken
 @pytest.fixture
 def default_client():
     return QcsClient()
+
+@pytest.mark.asyncio
+async def test_client_has_url_from_env(default_client: QcsClient):
+    """The default client is configured with valid urls."""
+    assert urlparse(default_client.api_url).geturl() != ""
+    assert urlparse(default_client.grpc_api_url).geturl() != ""
+    assert urlparse(default_client.quilc_url).geturl() != ""
+    assert urlparse(default_client.qvm_url).geturl() != ""
 
 
 @pytest.mark.asyncio

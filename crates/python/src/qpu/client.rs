@@ -210,6 +210,26 @@ impl PyQcsClient {
         })
     }
 
+    #[getter]
+    pub fn api_url(&self) -> String {
+        self.as_ref().get_config().api_url().to_string()
+    }
+
+    #[getter]
+    pub fn grpc_api_url(&self) -> String {
+        self.as_ref().get_config().grpc_api_url().to_string()
+    }
+
+    #[getter]
+    pub fn quilc_url(&self) -> String {
+        self.as_ref().get_config().quilc_url().to_string()
+    }
+
+    #[getter]
+    pub fn qvm_url(&self) -> String {
+        self.as_ref().get_config().qvm_url().to_string()
+    }
+
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
         match op {
             CompareOp::Eq => (self == other).into_py(py),
