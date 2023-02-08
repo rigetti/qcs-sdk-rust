@@ -212,22 +212,22 @@ impl PyQcsClient {
 
     #[getter]
     pub fn api_url(&self) -> String {
-        self.0.get_config().api_url().to_string()
+        self.as_inner().get_config().api_url().to_string()
     }
 
     #[getter]
     pub fn grpc_api_url(&self) -> String {
-        self.0.get_config().grpc_api_url().to_string()
+        self.as_inner().get_config().grpc_api_url().to_string()
     }
 
     #[getter]
     pub fn quilc_url(&self) -> String {
-        self.0.get_config().quilc_url().to_string()
+        self.as_inner().get_config().quilc_url().to_string()
     }
 
     #[getter]
     pub fn qvm_url(&self) -> String {
-        self.0.get_config().qvm_url().to_string()
+        self.as_inner().get_config().qvm_url().to_string()
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
