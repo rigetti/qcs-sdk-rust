@@ -1,6 +1,9 @@
 from .api import *
 
 from .qpu.client import QcsClient as QcsClient
+from .qpu.isa import (
+    get_instruction_set_architecture as get_instruction_set_architecture,
+)
 from .qpu.result_data import (
     ReadoutValues as ReadoutValues,
     QPUResultData as QPUResultData,

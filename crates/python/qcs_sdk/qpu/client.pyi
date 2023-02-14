@@ -23,7 +23,7 @@ class QcsClient:
         ...
     
     @staticmethod
-    def load(
+    async def load(
         profile_name: Optional[str] = None,
         use_gateway: Optional[bool] = None,
     ) -> "QcsClient":
@@ -32,6 +32,26 @@ class QcsClient:
 
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
         """
+        ...
+
+    @property
+    def api_url(self) -> str:
+        """URL to access the QCS API."""
+        ...
+
+    @property
+    def grpc_api_url(self) -> str:
+        """URL to access the gRPC API."""
+        ...
+
+    @property
+    def quilc_url(self) -> str:
+        """URL to access the `quilc` compiler."""
+        ...
+
+    @property
+    def qvm_url(self) -> str:
+        """URL to access the QVM."""
         ...
 
 
