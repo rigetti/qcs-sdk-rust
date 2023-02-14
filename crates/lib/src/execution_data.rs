@@ -35,7 +35,7 @@ use crate::{
 /// overwrite the previous value. The QVM returns memory at the end of every shot. This means
 /// we get the last value in every memory reference for each shot, which is exactly the
 /// representation we want for a [`RegisterMatrix`]. For this reason, `to_register_map()` should
-/// always succeed for [`ResultData::Qvm`]
+/// always succeed for [`ResultData::Qvm`].
 ///
 /// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
 /// (ie. "ro\[0\]") is more like a stream than a value in memory. Every `MEASURE` to a memory
@@ -245,6 +245,16 @@ impl RegisterMap {
 
         // Return an error if any group of memory references don't form a continuous sequence, indicating
         // that a row is missing
+        let reference_windows = register_map.keys().tuple_windows();
+        // Ensure the first window starts with a zero index
+        if let Some((reference_a, _)) = reference_windows.peekable().peek() {
+            if reference_a.index != 0 {
+                return Err(RegisterMatrixConversionError::MissingRow {
+                    register: reference_a.name.clone(),
+                    index: 0,
+                });
+            }
+        }
         for (reference_a, reference_b) in register_map.keys().tuple_windows() {
             if reference_a.name == reference_b.name {
                 if reference_a.index + 1 != reference_b.index {

@@ -1,12 +1,7 @@
 use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
-use pyo3::{
-    exceptions::PyValueError,
-    pymethods,
-    types::{PyDelta, PyType},
-    Py, PyResult, Python,
-};
+use pyo3::{exceptions::PyValueError, pymethods, types::PyDelta, Py, PyResult, Python};
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use qcs_api_client_grpc::models::controller::{readout_values::Values, ReadoutValues};
 use rigetti_pyo3::{
@@ -80,8 +75,8 @@ py_wrap_type! {
 
 #[pymethods]
 impl PyRegisterMatrix {
-    #[classmethod]
-    fn from_integer(_cls: &PyType, matrix: &PyArray2<i64>) -> PyRegisterMatrix {
+    #[staticmethod]
+    fn from_integer(matrix: &PyArray2<i64>) -> PyRegisterMatrix {
         Self(RegisterMatrix::Integer(matrix.to_owned_array()))
     }
 
@@ -105,8 +100,8 @@ impl PyRegisterMatrix {
         matches!(self.as_inner(), RegisterMatrix::Integer(_))
     }
 
-    #[classmethod]
-    fn from_real(_cls: &PyType, matrix: &PyArray2<f64>) -> PyRegisterMatrix {
+    #[staticmethod]
+    fn from_real(matrix: &PyArray2<f64>) -> PyRegisterMatrix {
         Self(RegisterMatrix::Real(matrix.to_owned_array()))
     }
 
@@ -130,8 +125,8 @@ impl PyRegisterMatrix {
         matches!(self.as_inner(), RegisterMatrix::Real(_))
     }
 
-    #[classmethod]
-    fn from_complex(_cls: &PyType, matrix: &PyArray2<Complex64>) -> PyRegisterMatrix {
+    #[staticmethod]
+    fn from_complex(matrix: &PyArray2<Complex64>) -> PyRegisterMatrix {
         Self(RegisterMatrix::Complex(matrix.to_owned_array()))
     }
 
