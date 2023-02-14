@@ -2,13 +2,14 @@ from typing import Dict, List, Optional
 
 class ReadoutValues:
     """
-    A row of readout values from the QPU. It will be a list of variants that correspond to the memory type that was used
-    for the corresponding register.
+    A row of readout values from the QPU. Each row contains all the values emitted
+    to a memory reference across all shots. There is a variant for each possible type
+    the list of readout values could be.
 
     Variants:
         - ``integer``: Corresponds to the Quil `BIT`, `OCTET`, or `INTEGER` types.
         - ``real``: Corresponds to the Quil `REAL` type.
-        - ``complex``: Corresponds to the Quil `REAL` type.
+        - ``complex``: Corresponds to readout values containing complex numbers
 
     Methods (each per variant):
         - ``is_*``: if the underlying values are that type.

@@ -9,7 +9,8 @@ use qcs_api_client_grpc::models::controller::{
     readout_values as controller_readout_values, ReadoutValues as ControllerReadoutValues,
 };
 
-/// A row of readout values from the QPU.
+/// A row of readout values from the QPU. Each row contains all the values emitted to a
+/// memory reference across all shots.
 #[derive(Debug, Clone, EnumAsInner, PartialEq)]
 pub enum ReadoutValues {
     /// Integer readout values
