@@ -1,7 +1,6 @@
 [flake8]
 max-line-length = 120
 # E203, E302 ignored for black compatibility
-# F403 to ignore "unused" warnings in pyi files
 extend-ignore = E203, E302
 
 per-file-ignores = 
