@@ -3,9 +3,9 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.3.0"
-qcs-api-client-grpc = "0.3.0"
-qcs-api-client-openapi = "0.4.0"
+qcs-api-client-common = "0.4.2"
+qcs-api-client-grpc = "0.4.2"
+qcs-api-client-openapi = "0.5.2"
 quil-rs = "0.15"
 serde_json = "1.0.86"
 tokio = "1.24.2"
@@ -20,4 +20,4 @@ numpy = "0.17"
 pyo3 = { version = "0.17", features = ["extension-module"] }
 pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
 pyo3-build-config = { version = "0.17" }
-rigetti-pyo3 = { version = "0.1.0-rc.1", features = ["extension-module", "complex"] }
+rigetti-pyo3 = { version = "0.1.0-rc.4", features = ["extension-module", "complex"] }
