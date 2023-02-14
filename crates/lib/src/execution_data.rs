@@ -154,55 +154,36 @@ impl RegisterMap {
                 .iter()
                 .map(|(name, register)| {
                     let register_matrix = match register {
-                        RegisterData::I8(data) => RegisterMatrix::Integer(
-                            Array::from_shape_vec(
-                                (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter().flatten().copied().map(i64::from).collect(),
-                            )
-                            .map_err(|_| {
-                                RegisterMatrixConversionError::InvalidShape {
-                                    register: name.to_string(),
-                                }
-                            })?,
-                        ),
-                        RegisterData::I16(data) => RegisterMatrix::Integer(
-                            Array::from_shape_vec(
-                                (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter().flatten().copied().map(i64::from).collect(),
-                            )
-                            .map_err(|_| {
-                                RegisterMatrixConversionError::InvalidShape {
-                                    register: name.to_string(),
-                                }
-                            })?,
-                        ),
-                        RegisterData::F64(data) => RegisterMatrix::Real(
-                            Array::from_shape_vec(
-                                (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter().flatten().copied().collect(),
-                            )
-                            .map_err(|_| {
-                                RegisterMatrixConversionError::InvalidShape {
-                                    register: name.to_string(),
-                                }
-                            })?,
-                        ),
-                        RegisterData::Complex32(data) => RegisterMatrix::Complex(
-                            Array::from_shape_vec(
-                                (data.len(), data.first().map_or(0, Vec::len)),
-                                data.iter()
-                                    .flatten()
-                                    .copied()
-                                    .map(|c| Complex64::new(c.re.into(), c.im.into()))
-                                    .collect(),
-                            )
-                            .map_err(|_| {
-                                RegisterMatrixConversionError::InvalidShape {
-                                    register: name.to_string(),
-                                }
-                            })?,
-                        ),
-                    };
+                        RegisterData::I8(data) => Array::from_shape_vec(
+                            (data.len(), data.first().map_or(0, Vec::len)),
+                            data.iter().flatten().copied().map(i64::from).collect(),
+                        )
+                        .map(RegisterMatrix::Integer),
+                        RegisterData::I16(data) => Array::from_shape_vec(
+                            (data.len(), data.first().map_or(0, Vec::len)),
+                            data.iter().flatten().copied().map(i64::from).collect(),
+                        )
+                        .map(RegisterMatrix::Integer),
+                        RegisterData::F64(data) => Array::from_shape_vec(
+                            (data.len(), data.first().map_or(0, Vec::len)),
+                            data.iter().flatten().copied().collect(),
+                        )
+                        .map(RegisterMatrix::Real),
+                        RegisterData::Complex32(data) => Array::from_shape_vec(
+                            (data.len(), data.first().map_or(0, Vec::len)),
+                            data.iter()
+                                .flatten()
+                                .copied()
+                                .map(|c| Complex64::new(c.re.into(), c.im.into()))
+                                .collect(),
+                        )
+                        .map(RegisterMatrix::Complex),
+                    }
+                    .map_err(|_| {
+                        RegisterMatrixConversionError::InvalidShape {
+                            register: name.to_string(),
+                        }
+                    })?;
                     Ok((name.clone(), register_matrix))
                 })
                 .collect::<Result<HashMap<String, RegisterMatrix>, RegisterMatrixConversionError>>(
