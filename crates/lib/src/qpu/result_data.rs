@@ -24,7 +24,7 @@ pub enum ReadoutValues {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct QpuResultData {
-    /// Mappings of a memory region (ie. "ro\[0\]") to its key name in `readout_values` (ie. "q0")
+    /// Mappings of a memory region (ie. "ro\[0\]") to it's key name in `readout_values` (ie. "q0")
     pub mappings: HashMap<String, String>,
     /// Mapping of a readout values identifier (ie. "q0") to a set of [`ReadoutValues`]
     pub readout_values: HashMap<String, ReadoutValues>,

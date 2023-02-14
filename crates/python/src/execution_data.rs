@@ -85,11 +85,19 @@ impl PyRegisterMatrix {
         Self(RegisterMatrix::Integer(matrix.to_owned_array()))
     }
 
-    fn as_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i64>> {
+    fn to_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i64>> {
         if let Some(matrix) = self.as_inner().as_integer() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
             Err(PyValueError::new_err("not a integer register"))
+        }
+    }
+
+    fn as_integer<'a>(&self, py: Python<'a>) -> Option<&'a PyArray2<i64>> {
+        if let Some(matrix) = self.as_inner().as_integer() {
+            Some(PyArray2::from_array(py, matrix))
+        } else {
+            None
         }
     }
 
@@ -102,11 +110,19 @@ impl PyRegisterMatrix {
         Self(RegisterMatrix::Real(matrix.to_owned_array()))
     }
 
-    fn as_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
+    fn to_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
         if let Some(matrix) = self.as_inner().as_real() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
             Err(PyValueError::new_err("not a real numbered register"))
+        }
+    }
+
+    fn as_real<'a>(&self, py: Python<'a>) -> Option<&'a PyArray2<f64>> {
+        if let Some(matrix) = self.as_inner().as_real() {
+            Some(PyArray2::from_array(py, matrix))
+        } else {
+            None
         }
     }
 
@@ -119,11 +135,19 @@ impl PyRegisterMatrix {
         Self(RegisterMatrix::Complex(matrix.to_owned_array()))
     }
 
-    fn as_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {
+    fn to_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {
         if let Some(matrix) = self.as_inner().as_complex() {
             Ok(PyArray2::from_array(py, matrix))
         } else {
             Err(PyValueError::new_err("not a complex numbered register"))
+        }
+    }
+
+    fn as_complex<'a>(&self, py: Python<'a>) -> Option<&'a PyArray2<Complex64>> {
+        if let Some(matrix) = self.as_inner().as_complex() {
+            Some(PyArray2::from_array(py, matrix))
+        } else {
+            None
         }
     }
 

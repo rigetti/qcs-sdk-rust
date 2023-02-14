@@ -1,13 +1,19 @@
 from .api import *
 
-from .qpu.client import (
-    QcsClient as QcsClient
+from .qpu.client import QcsClient as QcsClient
+from .qpu.result_data import (
+    ReadoutValues as ReadoutValues,
+    QPUResultData as QPUResultData,
 )
 
+from .qvm.result_data import QVMResultData as QVMResultData
+
 from ._execution_data import (
-    QPU as QPU,
-    QVM as QVM,
-    ReadoutMap as ReadoutMap,
+    ResultData as ResultData,
+    ExecutionData as ExecutionData,
+    RegisterMatrix as RegisterMatrix,
+    RegisterMap as RegisterMap,
+    RegisterMatrixConversionError as RegisterMatrixConversionError,
 )
 
 from ._executable import (

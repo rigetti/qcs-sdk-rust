@@ -10,7 +10,8 @@ create_init_submodule! {
     errors: [QcsIsaError],
     submodules: [
         "client": client::init_submodule,
-        "quilc": quilc::init_submodule
+        "quilc": quilc::init_submodule,
+        "result_data": result_data::init_submodule
     ],
 }
 

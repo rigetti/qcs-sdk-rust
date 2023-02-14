@@ -25,7 +25,8 @@ create_init_submodule! {
         qpu::client::PyQcsClient
     ],
     errors: [
-        QcsExecutionError
+        QcsExecutionError,
+        execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
         api::compile,

@@ -1,0 +1,53 @@
+from typing import Dict, List, Optional
+
+class ReadoutValues:
+    """
+    A row of readout values from the QPU. It will be a list of variants that correspond to the memory type that was used
+    for the corresponding register.
+
+    Variants:
+        - ``integer``: Corresponds to the Quil `BIT`, `OCTET`, or `INTEGER` types.
+        - ``real``: Corresponds to the Quil `REAL` type.
+        - ``complex``: Corresponds to the Quil `REAL` type.
+
+    Methods (each per variant):
+        - ``is_*``: if the underlying values are that type.
+        - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+        - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
+        - ``from_*``: wrap underlying values as this enum type.
+
+    """
+
+    def is_integer(self) -> bool: ...
+    def is_real(self) -> bool: ...
+    def is_complex(self) -> bool: ...
+    def as_integer(self) -> Optional[List[int]]: ...
+    def as_real(self) -> Optional[List[float]]: ...
+    def as_f64(self) -> Optional[List[complex]]: ...
+    def to_integer(self) -> Optional[List[int]]: ...
+    def to_real(self) -> Optional[List[float]]: ...
+    def to_complex(self) -> Optional[List[complex]]: ...
+    @staticmethod
+    def from_integer(inner: List[List[int]]) -> "ReadoutValues": ...
+    @staticmethod
+    def from_real(inner: List[List[float]]) -> "ReadoutValues": ...
+    @staticmethod
+    def from_complex(inner: List[List[complex]]) -> "ReadoutValues": ...
+
+class QPUResultData:
+    """
+    Encapsulates data returned from the QPU after executing a job.
+    """
+
+    def __init__(
+        self, mappings: Dict[str, str], readout_values: Dict[str, ReadoutValues]
+    ): ...
+    def get_mappings(self) -> Dict[str, str]: ...
+    """
+    Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
+    """
+
+    def get_readout_values(self) -> Dict[str, ReadoutValues]: ...
+    """
+    Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
+    """
