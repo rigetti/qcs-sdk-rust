@@ -1,5 +1,5 @@
 use pyo3::prelude::*;
-use quil_py;
+use quil;
 use rigetti_pyo3::create_init_submodule;
 
 use executable::QcsExecutionError;
@@ -39,7 +39,7 @@ create_init_submodule! {
     submodules: [
         "api": api::init_submodule,
         "qpu": qpu::init_submodule,
-        "quil": quil_py::init_quil_submodule
+        "quil": quil::init_quil_submodule
     ],
 }
 
