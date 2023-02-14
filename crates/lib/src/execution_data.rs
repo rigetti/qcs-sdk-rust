@@ -42,7 +42,7 @@ use crate::{
 /// reference emits a new value to said stream. This means that the number of values per memory
 /// reference can vary per shot. For this reason, it's not always clear what the final value in
 /// each shot was for a particular reference. When this is the case, `to_register_map()` will return
-/// an error as it's impossible to build a correct [`RegisterMatrix`]  from the data without
+/// an error as it's impossible to build a correct [`RegisterMatrix`] from the data without
 /// knowing the intent of the program that was run. Instead, it's recommended to build the
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
@@ -272,9 +272,9 @@ impl RegisterMap {
         }
 
         Ok(Self(
-            // Iterate over them in reverse so we  can initialize each RegisterMatrix with the
+            // Iterate over them in reverse so we can initialize each RegisterMatrix with the
             // correct number of rows
-            register_map.into_iter().rev().try_fold(
+            register_map.into_iter().try_rfold(
                 HashMap::with_capacity(qpu_result_data.readout_values.len()),
                 |mut register_map, (reference, values)| {
                     let matrix =
