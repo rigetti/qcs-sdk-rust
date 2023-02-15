@@ -31,7 +31,7 @@ use crate::{
 /// returned from the QVM and from a real QPU:
 ///
 /// The QVM treats each `DECLARE` statement as initialzing some amount of memory. This memory works
-/// as one might expect it to. It is zero-initalized, and subsequent writes to the same region
+/// as one might expect it to. It is zero-initialized on each shot, and subsequent writes to the same region
 /// overwrite the previous value. The QVM returns memory at the end of every shot. This means
 /// we get the last value in every memory reference for each shot, which is exactly the
 /// representation we want for a [`RegisterMatrix`]. For this reason, `to_register_map()` should
