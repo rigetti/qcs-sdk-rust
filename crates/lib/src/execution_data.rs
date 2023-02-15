@@ -461,7 +461,7 @@ mod describe_register_map {
 
     #[test]
     fn it_converts_from_qvm_result_data() {
-        let qvm_result_data = QvmResultData::from_qvm_response(hashmap! {
+        let qvm_result_data = QvmResultData::from_memory_map(hashmap! {
             String::from("ro") => RegisterData::I8(vec![vec![1, 0, 1]]),
         });
 

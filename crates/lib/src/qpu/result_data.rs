@@ -25,13 +25,24 @@ pub enum ReadoutValues {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct QpuResultData {
-    /// Mappings of a memory region (ie. "ro\[0\]") to it's key name in `readout_values` (ie. "q0")
-    pub mappings: HashMap<String, String>,
-    /// Mapping of a readout values identifier (ie. "q0") to a set of [`ReadoutValues`]
-    pub readout_values: HashMap<String, ReadoutValues>,
+    pub(crate) mappings: HashMap<String, String>,
+    pub(crate) readout_values: HashMap<String, ReadoutValues>,
 }
 
 impl QpuResultData {
+    /// Builds a new [`QpuResultData`] from mappings of memory references to readout identifiers
+    /// and readout identifiers to [`ReadoutValues`]
+    #[must_use]
+    pub fn from_mappings_and_values(
+        mappings: HashMap<String, String>,
+        readout_values: HashMap<String, ReadoutValues>,
+    ) -> Self {
+        Self {
+            mappings,
+            readout_values,
+        }
+    }
+
     /// Creates a new [`QpuResultData`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,
@@ -81,5 +92,17 @@ impl QpuResultData {
         self.mappings
             .get(&reference.to_string())
             .and_then(|key| self.readout_values.get(key))
+    }
+
+    /// Get mappings of a memory region (ie. "ro\[0\]") to it's key name in `readout_values` (ie. "q0")
+    #[must_use]
+    pub fn mappings(&self) -> &HashMap<String, String> {
+        &self.mappings
+    }
+
+    /// Get mapping of a readout values identifier (ie. "q0") to a set of [`ReadoutValues`]
+    #[must_use]
+    pub fn readout_values(&self) -> &HashMap<String, ReadoutValues> {
+        &self.readout_values
     }
 }

@@ -129,7 +129,7 @@ impl Execution {
                 source,
             }),
             Ok(Response::Success(response)) => {
-                Ok(QvmResultData::from_qvm_response(response.registers))
+                Ok(QvmResultData::from_memory_map(response.registers))
             }
             Ok(Response::Failure(response)) => Err(Error::Qvm {
                 message: response.status,

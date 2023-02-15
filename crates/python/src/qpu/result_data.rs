@@ -2,11 +2,13 @@ use std::collections::HashMap;
 
 use pyo3::{
     pymethods,
-    types::{PyComplex, PyDict, PyFloat, PyInt},
+    types::{PyComplex, PyFloat, PyInt},
     Py, PyResult, Python,
 };
 use qcs::qpu::result_data::{QpuResultData, ReadoutValues};
-use rigetti_pyo3::{create_init_submodule, py_wrap_data_struct, py_wrap_union_enum, PyTryFrom};
+use rigetti_pyo3::{
+    create_init_submodule, py_wrap_type, py_wrap_union_enum, PyTryFrom, PyWrapper, ToPython,
+};
 
 py_wrap_union_enum! {
     PyReadoutValues(ReadoutValues) as "ReadoutValues" {
@@ -16,11 +18,8 @@ py_wrap_union_enum! {
     }
 }
 
-py_wrap_data_struct! {
-    PyQpuResultData(QpuResultData) as "QPUResultData" {
-        mappings: HashMap<String, String> => Py<PyDict>,
-        readout_values: HashMap<String, ReadoutValues> => HashMap<String, PyReadoutValues> => Py<PyDict>
-    }
+py_wrap_type! {
+    PyQpuResultData(QpuResultData) as "QPUResultData"
 }
 
 #[pymethods]
@@ -31,10 +30,20 @@ impl PyQpuResultData {
         mappings: HashMap<String, String>,
         readout_values: HashMap<String, PyReadoutValues>,
     ) -> PyResult<Self> {
-        Ok(Self(QpuResultData {
-            mappings: HashMap::<String, String>::py_try_from(py, &mappings)?,
-            readout_values: HashMap::<String, ReadoutValues>::py_try_from(py, &readout_values)?,
-        }))
+        Ok(Self(QpuResultData::from_mappings_and_values(
+            HashMap::<String, String>::py_try_from(py, &mappings)?,
+            HashMap::<String, ReadoutValues>::py_try_from(py, &readout_values)?,
+        )))
+    }
+
+    #[getter]
+    fn mappings(&self, py: Python<'_>) -> PyResult<HashMap<String, String>> {
+        self.as_inner().mappings().to_python(py)
+    }
+
+    #[getter]
+    fn readout_values(&self, py: Python<'_>) -> PyResult<HashMap<String, PyReadoutValues>> {
+        self.as_inner().readout_values().to_python(py)
     }
 }
 

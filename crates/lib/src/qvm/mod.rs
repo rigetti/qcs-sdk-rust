@@ -15,15 +15,20 @@ mod execution;
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 pub struct QvmResultData {
-    /// A map of register names (ie. "ro") to a [`RegisterData`] containing their values.
-    pub memory: HashMap<String, RegisterData>,
+    pub(crate) memory: HashMap<String, RegisterData>,
 }
 
 impl QvmResultData {
-    pub(crate) fn from_qvm_response(register_data_map: HashMap<String, RegisterData>) -> Self {
-        Self {
-            memory: register_data_map,
-        }
+    #[must_use]
+    /// Build a [`QvmResultData`] from a mapping of register names to a [`RegisterData`]
+    pub fn from_memory_map(memory: HashMap<String, RegisterData>) -> Self {
+        Self { memory }
+    }
+
+    /// Get a map of register names (ie. "ro") to a [`RegisterData`] containing their values.
+    #[must_use]
+    pub fn memory(&self) -> &HashMap<String, RegisterData> {
+        &self.memory
     }
 }
 

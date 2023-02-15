@@ -23,9 +23,3 @@ class QVMResultData:
     """
     Get the mapping of register names (ie. "ro") to a ``RegisterData`` matrix containing the register values.
     """
-
-    @memory.setter
-    def memory(self, memory_map: Dict[str, RegisterData]): ...
-    """
-    Set the mapping of register names (ie. "ro") to a ``RegisterData`` matrix containing the register values.
-    """

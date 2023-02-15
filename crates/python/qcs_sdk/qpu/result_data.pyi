@@ -43,12 +43,14 @@ class QPUResultData:
     def __init__(
         self, mappings: Dict[str, str], readout_values: Dict[str, ReadoutValues]
     ): ...
-    def get_mappings(self) -> Dict[str, str]: ...
+    @property
+    def mappings(self) -> Dict[str, str]: ...
     """
     Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
     """
 
-    def get_readout_values(self) -> Dict[str, ReadoutValues]: ...
+    @property
+    def readout_values(self) -> Dict[str, ReadoutValues]: ...
     """
     Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
     """
