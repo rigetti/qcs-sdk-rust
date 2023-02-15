@@ -29,7 +29,7 @@ impl PyQpuResultData {
         readout_values: HashMap<String, PyReadoutValues>,
     ) -> PyResult<Self> {
         Ok(Self(QpuResultData::from_mappings_and_values(
-            HashMap::<String, String>::py_try_from(py, &mappings)?,
+            mappings,
             HashMap::<String, ReadoutValues>::py_try_from(py, &readout_values)?,
         )))
     }
