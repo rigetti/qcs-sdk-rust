@@ -255,7 +255,10 @@ impl From<readout_values::Values> for ExecutionResult {
                     c.values
                         .iter()
                         .map(|c| {
-                            Complex::<f32>::new(c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0))
+                            Complex::<f32>::new(
+                                c.real.unwrap_or_default(),
+                                c.imaginary.unwrap_or_default(),
+                            )
                         })
                         .collect(),
                 ),

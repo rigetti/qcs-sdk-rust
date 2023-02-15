@@ -209,7 +209,7 @@ impl RegisterMap {
                             parse_readout_register(memory_reference).map_err(|e| {
                                 RegisterMatrixConversionError::MemoryReferenceParseError(e)
                             })?,
-                            qpu_result_data.readout_values.get(alias).ok_or(
+                            qpu_result_data.readout_values.get(alias).ok_or_else(||
                                 RegisterMatrixConversionError::UnmappedAlias {
                                     memory_reference: memory_reference.to_string(),
                                     alias: alias.to_string(),
@@ -226,9 +226,9 @@ impl RegisterMap {
 
         // Return an error if any group of memory references don't form a continuous sequence, indicating
         // that a row is missing
-        let reference_windows = register_map.keys().tuple_windows();
+        let mut reference_windows = register_map.keys().tuple_windows().peekable();
         // Ensure the first window starts with a zero index
-        if let Some((reference_a, _)) = reference_windows.peekable().peek() {
+        if let Some((reference_a, _)) = reference_windows.peek() {
             if reference_a.index != 0 {
                 return Err(RegisterMatrixConversionError::MissingRow {
                     register: reference_a.name.clone(),
