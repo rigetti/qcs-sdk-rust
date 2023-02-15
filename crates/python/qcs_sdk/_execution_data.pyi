@@ -9,8 +9,8 @@ from typing import Optional
 import numpy as np
 from numpy.typing import NDArray
 
-from crates.python.qcs_sdk.qpu.result_data import QPUResultData
-from crates.python.qcs_sdk.qvm.result_data import QVMResultData
+from .qpu import QPUResultData
+from .qvm import QVMResultData
 
 class RegisterMatrixConversionError(ValueError):
     """Error that may occur when building a ``RegisterMatrix`` from execution data."""
