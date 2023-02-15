@@ -1,8 +1,10 @@
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
+use quil_rs::program::SyntaxError;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
-use std::num::ParseIntError;
+use std::convert::TryFrom;
+use std::num::TryFromIntError;
 use std::str::FromStr;
 use std::time::Duration;
 
@@ -10,7 +12,7 @@ use itertools::Itertools;
 use ndarray::prelude::*;
 
 use crate::{
-    qpu::result_data::{QpuResultData, ReadoutValues},
+    qpu::{QpuResultData, ReadoutValues},
     qvm::QvmResultData,
     RegisterData,
 };
@@ -322,32 +324,20 @@ struct MemoryReference {
 
 #[derive(Debug, thiserror::Error)]
 pub enum MemoryReferenceParseError {
-    #[error("Could not parse memory reference: {reason}")]
-    InvalidFormat { reason: String },
+    #[error("{0}")]
+    InvalidFormat(#[from] SyntaxError<quil_rs::instruction::MemoryReference>),
 
-    #[error("Could not parse index from reference name: {0}")]
-    InvalidIndex(#[from] ParseIntError),
+    #[error("Could not convert index from u64 to a usize: {0}")]
+    OversizedIndex(#[from] TryFromIntError),
 }
 
 fn parse_readout_register(
     register_name: &str,
 ) -> Result<MemoryReference, MemoryReferenceParseError> {
-    let open_brace =
-        register_name
-            .find('[')
-            .ok_or_else(|| MemoryReferenceParseError::InvalidFormat {
-                reason: "Opening brace not found".into(),
-            })?;
-    let close_brace =
-        register_name
-            .find(']')
-            .ok_or_else(|| MemoryReferenceParseError::InvalidFormat {
-                reason: "Closing brace not found".into(),
-            })?;
-
+    let reference = quil_rs::instruction::MemoryReference::from_str(register_name)?;
     Ok(MemoryReference {
-        name: String::from(&register_name[..open_brace]),
-        index: usize::from_str(&register_name[open_brace + 1..close_brace])?,
+        name: reference.name,
+        index: usize::try_from(reference.index)?,
     })
 }
 
@@ -356,7 +346,7 @@ mod describe_register_map {
     use maplit::hashmap;
     use ndarray::prelude::*;
 
-    use crate::qpu::result_data::QpuResultData;
+    use crate::qpu::QpuResultData;
     use crate::qvm::QvmResultData;
 
     use super::{RegisterData, RegisterMap};
