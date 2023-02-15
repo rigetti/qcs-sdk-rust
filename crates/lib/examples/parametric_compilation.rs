@@ -47,7 +47,7 @@ async fn main() {
             .row(0)
             .to_owned();
 
-        for value in first_ro_values.iter() {
+        for value in &first_ro_values {
             parametric_measurements.push(*value)
         }
     }
