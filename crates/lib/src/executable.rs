@@ -46,7 +46,7 @@ use quil_rs::Program;
 ///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
 ///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
 ///     // the memory offset `index` during shot `shot`.
-///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`]. In
+///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
 ///     // which case you should build the matrix you need from [`QpuResultData`] directly. See
 ///     // the [`RegisterMap`] documentation for more information on when this transformation
 ///     // might fail.
