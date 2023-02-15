@@ -1,9 +1,10 @@
 """
 The qcs_sdk module provides an interface to Rigetti Quantum Cloud Services. Allowing users to compile and run Quil programs on Rigetti quantum processors.
 """
-from typing import  Dict, List, Optional
 from numbers import Number
+from typing import Dict, List, Optional
 
+from .qpu.isa import InstructionSetArchitecture
 from .qpu.client import QcsClient
 
 RecalculationTable = List[str]
@@ -12,33 +13,33 @@ PatchValues = Dict[str, List[float]]
 
 class ExecutionError(RuntimeError):
     """Error encountered during program execution submission or when retrieving results."""
-    ...
 
+    ...
 
 class TranslationError(RuntimeError):
     """Error encountered during program translation."""
-    ...
 
+    ...
 
 class CompilationError(RuntimeError):
     """Error encountered during program compilation."""
-    ...
 
+    ...
 
 class RewriteArithmeticError(RuntimeError):
     """Error encountered rewriting arithmetic for program."""
-    ...
 
+    ...
 
 class DeviceIsaError(ValueError):
     """Error while building Instruction Set Architecture."""
-    ...
 
+    ...
 
 class QcsGetQuiltCalibrationsError(RuntimeError):
     """Error while fetching Quil-T calibrations."""
-    ...
 
+    ...
 
 class RewriteArithmeticResults:
     """
@@ -53,16 +54,14 @@ class RewriteArithmeticResults:
         ...
     @program.setter
     def program(self, value: str): ...
-
     @property
     def recalculation_table(self) -> List[str]:
-        """ 
+        """
         The recalculation table stores an ordered list of arithmetic expressions, which are to be used when updating the program memory before execution.
         """
         ...
     @recalculation_table.setter
     def recalculation_table(self, value: List[str]): ...
-
 
 class TranslationResult:
     """
@@ -77,7 +76,6 @@ class TranslationResult:
         ...
     @program.setter
     def program(self, value: str): ...
-
     @property
     def ro_sources(self) -> Optional[dict]:
         """
@@ -86,7 +84,6 @@ class TranslationResult:
         ...
     @ro_sources.setter
     def ro_sources(self, value: Optional[dict]): ...
-
 
 class ExecutionResult:
     """Execution readout data from a particular memory location."""
@@ -97,21 +94,18 @@ class ExecutionResult:
         ...
     @shape.setter
     def shape(self, value: List[int]): ...
-    
     @property
     def data(self) -> List[Number | List[float]]:
         """The result data. Complex numbers are represented as [real, imaginary]."""
         ...
     @data.setter
     def data(self, value: List[Number | List[float]]): ...
-
     @property
     def dtype(self) -> str:
         """The type of the result data (as a `numpy` `dtype`)."""
         ...
     @dtype.setter
     def dtype(self, value: str): ...
-
 
 class ExecutionResults:
     """Execution readout data for all memory locations."""
@@ -126,14 +120,12 @@ class ExecutionResults:
         ...
     @buffers.setter
     def buffers(self, value: Dict[str, ExecutionResult]): ...
-    
     @property
     def execution_duration_microseconds(self) -> Optional[int]:
         """The time spent executing the program."""
         ...
     @execution_duration_microseconds.setter
     def execution_duration_microseconds(self, value: Optional[int]): ...
-
 
 class Register:
     """
@@ -153,25 +145,22 @@ class Register:
         - ``from_*``: wrap underlying values as this enum type.
 
     """
-    
+
     def is_i8(self) -> bool: ...
     def is_i16(self) -> bool: ...
     def is_i32(self) -> bool: ...
     def is_f64(self) -> bool: ...
     def is_complex64(self) -> bool: ...
-
     def as_i8(self) -> Optional[List[int]]: ...
     def as_i16(self) -> Optional[List[int]]: ...
     def as_i32(self) -> Optional[List[int]]: ...
     def as_f64(self) -> Optional[List[float]]: ...
     def as_complex64(self) -> Optional[List[complex]]: ...
-
     def to_i8(self) -> List[int]: ...
     def to_i16(self) -> List[int]: ...
     def to_i32(self) -> List[int]: ...
     def to_f64(self) -> List[float]: ...
     def to_complex64(self) -> List[complex]: ...
-
     @staticmethod
     def from_i8(inner: List[int]) -> "Register": ...
     @staticmethod
@@ -183,7 +172,6 @@ class Register:
     @staticmethod
     def from_complex64(inner: List[complex]) -> "Register": ...
 
-
 class QuiltCalibrations:
     """Result of `get_quilt_calibrations`."""
 
@@ -193,14 +181,12 @@ class QuiltCalibrations:
         ...
     @quilt.setter
     def quilt(self, value: str): ...
-
     @property
     def settings_timestamp(self) -> Optional[str]:
         """ISO8601 timestamp of the settings used to generate these calibrations."""
         ...
     @settings_timestamp.setter
     def settings_timestamp(self, value: Optional[str]): ...
-
 
 async def compile(
     quil: str,
@@ -230,7 +216,6 @@ async def compile(
     """
     ...
 
-
 def rewrite_arithmetic(
     native_quil: str,
 ) -> RewriteArithmeticResults:
@@ -243,13 +228,12 @@ def rewrite_arithmetic(
 
     Returns:
         A dictionary with the rewritten program and recalculation table (see `RewriteArithmeticResults`).
-    
+
     Raises:
         - ``TranslationError`` If the program could not be translated.
         - ``RewriteArithmeticError`` If the program arithmetic cannot be evaluated.
     """
     ...
-
 
 def build_patch_values(
     recalculation_table: RecalculationTable,
@@ -271,7 +255,6 @@ def build_patch_values(
     """
     ...
 
-
 async def translate(
     native_quil: str,
     num_shots: int,
@@ -289,13 +272,12 @@ async def translate(
 
     Returns:
         An Awaitable that resolves to a dictionary with the compiled program, memory descriptors, and readout sources (see `TranslationResult`).
-    
+
     Raises:
         - ``LoadError`` If there is an issue loading the QCS Client configuration.
         - ``TranslationError`` If the `native_quil` program could not be translated.
     """
     ...
-
 
 async def submit(
     program: str,
@@ -314,13 +296,12 @@ async def submit(
 
     Returns:
         An Awaitable that resolves to the ID of the submitted job.
-    
+
     Raises:
         - ``LoadError`` If there is an issue loading the QCS Client configuration.
         - ``ExecutionError`` If there was a problem during program execution.
     """
     ...
-
 
 async def retrieve_results(
     job_id: str,
@@ -344,7 +325,6 @@ async def retrieve_results(
     """
     ...
 
-
 async def get_quilc_version(
     client: Optional[QcsClient] = None,
 ) -> str:
@@ -353,7 +333,7 @@ async def get_quilc_version(
 
     Args:
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
+
     Raises:
         - ``LoadError`` If there is an issue loading the QCS Client configuration.
         - ``CompilationError`` If there is an issue fetching the version from the quilc compiler.
@@ -387,5 +367,20 @@ async def get_quilt_calibrations(
     Raises:
         - ``LoadError`` If there is an issue loading the QCS Client configuration.
         - ``QcsGetQuiltCalibrationsError`` If there was a problem fetching Quil-T calibrations.
+    """
+    ...
+
+async def get_instruction_set_architecture(
+    quantum_processor_id: str, client: Optional[QcsClient]
+) -> InstructionSetArchitecture:
+    """
+    Retrieve the InstructionSetArchitecture (ISA) for the given Quantum Processor ID.
+
+    Args:
+        quantum_processor_id: The ID of the quantum processor
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Raises:
+        - ``IsaError`` if there was a problem fetching the ISA.
     """
     ...

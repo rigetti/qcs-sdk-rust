@@ -1,19 +1,20 @@
 use pyo3::exceptions::PyRuntimeError;
 use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error};
 
+pub use result_data::{PyQpuResultData, PyReadoutValues};
+
 pub mod client;
 pub mod isa;
 pub mod quilc;
-pub mod result_data;
+mod result_data;
 
 create_init_submodule! {
-    classes: [result_data::PyReadoutValues, result_data::PyQpuResultData],
+    classes: [PyQpuResultData, PyReadoutValues],
     errors: [QcsIsaError],
     submodules: [
         "client": client::init_submodule,
         "isa": isa::init_submodule,
-        "quilc": quilc::init_submodule,
-        "result_data": result_data::init_submodule
+        "quilc": quilc::init_submodule
     ],
 }
 

@@ -20,7 +20,10 @@ class TestResultData:
         }
         result_data = ResultData.from_qpu(QPUResultData(mappings, values))
         register_map = result_data.to_register_map()
-        ro = register_map.get_register_matrix("ro").as_integer()
+        ro = register_map.get_register_matrix("ro")
+        assert ro is not None, "'ro' should exist in the register map"
+        ro = ro.as_integer()
+        assert ro is not None, "'ro' should be an integer register matrix"
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)
@@ -46,7 +49,10 @@ class TestResultData:
         qvm_result_data = QVMResultData.from_memory_map(qvm_memory_map)
         result_data = ResultData.from_qvm(qvm_result_data)
         register_map = result_data.to_register_map()
-        ro = register_map.get_register_matrix("ro").as_integer()
+        ro = register_map.get_register_matrix("ro")
+        assert ro is not None, "'ro' should exist in the register map"
+        ro = ro.as_integer()
+        assert ro is not None, "'ro' should be an integer register matrix"
         expected = np.array([[0, 1, 2], [1, 2, 3]])
 
         assert_array_equal(ro, expected)
@@ -56,14 +62,20 @@ class TestRegisterMatrix:
     def test_integer(self):
         m = np.array([[0, 1, 2], [1, 2, 3]])
         register_matrix = RegisterMatrix.from_integer(m)
-        assert_array_equal(register_matrix.as_integer(), m)
         assert register_matrix.is_integer()
+        register_matrix = register_matrix.as_integer()
+        assert (
+            register_matrix is not None
+        ), "register_matrix should be an integer matrix"
+        assert_array_equal(register_matrix, m)
 
     def test_real(self):
         m = np.array([[0.0, 1.1, 2.2], [1.1, 2.2, 3.3]])
         register_matrix = RegisterMatrix.from_real(m)
-        assert_array_equal(register_matrix.as_real(), m)
         assert register_matrix.is_real()
+        register_matrix = register_matrix.as_real()
+        assert register_matrix is not None, "register_matrix should be a real matrix"
+        assert_array_equal(register_matrix, m)
 
     def test_complex(self):
         m = np.array(
@@ -73,5 +85,7 @@ class TestRegisterMatrix:
             ]
         )
         register_matrix = RegisterMatrix.from_complex(m)
-        assert_array_equal(register_matrix.as_complex(), m)
         assert register_matrix.is_complex()
+        register_matrix = register_matrix.as_complex()
+        assert register_matrix is not None, "register_matrix should be a complex matrix"
+        assert_array_equal(register_matrix, m)

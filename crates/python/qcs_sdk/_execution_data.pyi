@@ -4,7 +4,7 @@ It is only here to represent the structure of the rust source code 1:1
 """
 
 import datetime
-from typing import List, Optional
+from typing import Optional
 
 import numpy as np
 from numpy.typing import NDArray

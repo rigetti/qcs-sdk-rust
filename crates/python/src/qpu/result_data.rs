@@ -6,9 +6,7 @@ use pyo3::{
     Py, PyResult, Python,
 };
 use qcs::qpu::result_data::{QpuResultData, ReadoutValues};
-use rigetti_pyo3::{
-    create_init_submodule, py_wrap_type, py_wrap_union_enum, PyTryFrom, PyWrapper, ToPython,
-};
+use rigetti_pyo3::{py_wrap_type, py_wrap_union_enum, PyTryFrom, PyWrapper, ToPython};
 
 py_wrap_union_enum! {
     PyReadoutValues(ReadoutValues) as "ReadoutValues" {
@@ -45,8 +43,4 @@ impl PyQpuResultData {
     fn readout_values(&self, py: Python<'_>) -> PyResult<HashMap<String, PyReadoutValues>> {
         self.as_inner().readout_values().to_python(py)
     }
-}
-
-create_init_submodule! {
-    classes: [PyReadoutValues, PyQpuResultData],
 }

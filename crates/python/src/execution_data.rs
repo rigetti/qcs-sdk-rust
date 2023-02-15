@@ -10,7 +10,7 @@ use rigetti_pyo3::{
 };
 
 use crate::qvm::PyQvmResultData;
-use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::result_data::PyQpuResultData};
+use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::PyQpuResultData};
 
 py_wrap_union_enum! {
     PyResultData(ResultData) as "ResultData" {
