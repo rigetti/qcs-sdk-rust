@@ -5,7 +5,7 @@ use pyo3::{
     types::{PyComplex, PyFloat, PyInt},
     Py, PyResult, Python,
 };
-use qcs::qpu::result_data::{QpuResultData, ReadoutValues};
+use qcs::qpu::{QpuResultData, ReadoutValues};
 use rigetti_pyo3::{py_wrap_type, py_wrap_union_enum, PyTryFrom, PyWrapper, ToPython};
 
 py_wrap_union_enum! {
