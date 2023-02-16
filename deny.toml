@@ -36,6 +36,7 @@ allow = [
     "ISC",
     "MIT",
     "OpenSSL",
+    "BSD-2-Clause",
     "BSD-3-Clause",
     "Unicode-DFS-2016",
 ]
