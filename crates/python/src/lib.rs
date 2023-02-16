@@ -8,13 +8,15 @@ pub mod executable;
 pub mod execution_data;
 pub mod grpc;
 pub mod qpu;
+pub mod qvm;
 pub mod register_data;
 
 create_init_submodule! {
     classes: [
-        execution_data::PyQpu,
-        execution_data::PyQvm,
-        execution_data::PyReadoutMap,
+        execution_data::PyExecutionData,
+        execution_data::PyResultData,
+        execution_data::PyRegisterMap,
+        execution_data::PyRegisterMatrix,
         executable::PyExecutable,
         executable::PyParameter,
         executable::PyJobHandle,
@@ -23,7 +25,8 @@ create_init_submodule! {
         qpu::client::PyQcsClient
     ],
     errors: [
-        QcsExecutionError
+        QcsExecutionError,
+        execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
         api::compile,
@@ -38,7 +41,8 @@ create_init_submodule! {
     ],
     submodules: [
         "api": api::init_submodule,
-        "qpu": qpu::init_submodule
+        "qpu": qpu::init_submodule,
+        "qvm": qvm::init_submodule
     ],
 }
 

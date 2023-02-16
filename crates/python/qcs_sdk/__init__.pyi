@@ -1,17 +1,16 @@
 from .api import *
 
-from .qpu.client import (
-    QcsClient as QcsClient
-)
-
+from .qpu.client import QcsClient as QcsClient
 from .qpu.isa import (
-    get_instruction_set_architecture as get_instruction_set_architecture
+    get_instruction_set_architecture as get_instruction_set_architecture,
 )
 
 from ._execution_data import (
-    QPU as QPU,
-    QVM as QVM,
-    ReadoutMap as ReadoutMap,
+    ResultData as ResultData,
+    ExecutionData as ExecutionData,
+    RegisterMatrix as RegisterMatrix,
+    RegisterMap as RegisterMap,
+    RegisterMatrixConversionError as RegisterMatrixConversionError,
 )
 
 from ._executable import (

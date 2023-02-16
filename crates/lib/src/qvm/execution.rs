@@ -1,5 +1,5 @@
+use std::borrow::Cow;
 use std::str::FromStr;
-use std::{borrow::Cow, collections::HashMap};
 
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
@@ -9,9 +9,8 @@ use quil_rs::{
 };
 
 use crate::executable::Parameters;
-use crate::RegisterData;
 
-use super::{Request, Response};
+use super::{QvmResultData, Request, Response};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -61,7 +60,7 @@ impl Execution {
         readouts: &[Cow<'_, str>],
         params: &Parameters,
         config: &ClientConfiguration,
-    ) -> Result<HashMap<String, RegisterData>, Error> {
+    ) -> Result<QvmResultData, Error> {
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -110,7 +109,7 @@ impl Execution {
         shots: u16,
         readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
-    ) -> Result<HashMap<String, RegisterData>, Error> {
+    ) -> Result<QvmResultData, Error> {
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
@@ -129,7 +128,9 @@ impl Execution {
                 qvm_url: config.qvm_url().into(),
                 source,
             }),
-            Ok(Response::Success(response)) => Ok(response.registers),
+            Ok(Response::Success(response)) => {
+                Ok(QvmResultData::from_memory_map(response.registers))
+            }
             Ok(Response::Failure(response)) => Err(Error::Qvm {
                 message: response.status,
             }),

@@ -9,7 +9,7 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
 
-use crate::execution_data;
+use crate::execution_data::{self, ResultData};
 use crate::qpu::client::Qcs;
 use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
@@ -25,7 +25,7 @@ use quil_rs::Program;
 ///
 /// ```rust
 /// use qcs_api_client_common::ClientConfiguration;
-/// use qcs::{Executable, RegisterData};
+/// use qcs::Executable;
 ///
 ///
 /// const PROGRAM: &str = r##"
@@ -41,12 +41,27 @@ use quil_rs::Program;
 /// #[tokio::main]
 /// async fn main() {
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
-///     // We know it's i8 because we declared the memory as `BIT` in Quil.
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
-///     let data = result.registers.remove("ro").expect("Did not receive ro data").into_i8().unwrap();
-///     // In this case, we ran the program for 4 shots, so we know the length is 4.
-///     assert_eq!(data.len(), 4);
-///     for shot in data {
+///
+///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
+///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+///     // the memory offset `index` during shot `shot`.
+///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
+///     // which case you should build the matrix you need from [`QpuResultData`] directly. See
+///     // the [`RegisterMap`] documentation for more information on when this transformation
+///     // might fail.
+///     let data = result.result_data
+///                         .to_register_map()
+///                         .expect("should convert to readout map")
+///                         .get_register_matrix("ro")
+///                         .expect("should have data in ro")
+///                         .as_integer()
+///                         .expect("should be integer matrix")
+///                         .to_owned();
+///
+///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+///     assert_eq!(data.nrows(), 4);
+///     for shot in data.rows() {
 ///         // Each shot will contain all the memory, in order, for the vector (or "register") we
 ///         // requested the results of. In this case, "ro" (the default).
 ///         assert_eq!(shot.len(), 2);
@@ -144,20 +159,30 @@ impl<'executable> Executable<'executable, '_> {
     ///         .execute_on_qvm()
     ///         .await
     ///         .unwrap();
-    ///     let first = result
-    ///         .registers
-    ///         .remove("first")
-    ///         .expect("Did not receive first buffer")
-    ///         .into_f64()
-    ///         .expect("Received incorrect data type for first");
-    ///     let second = result
-    ///         .registers
-    ///         .remove("second")
-    ///         .expect("Did not receive second buffer")
-    ///         .into_f64()
-    ///         .expect("Received incorrect data type for second");
-    ///     assert_eq!(first[0][0], 3.141);
-    ///     assert_eq!(second[0][0], 1.234);
+    ///     let first_value = result
+    ///         .result_data
+    ///         .to_register_map()
+    ///         .expect("qvm memory should fit readout map")
+    ///         .get_register_matrix("first")
+    ///         .expect("readout map should have 'first'")
+    ///         .as_real()
+    ///         .expect("should be real numbered register")
+    ///         .get((0, 0))
+    ///         .expect("should have value in first position of first register")
+    ///         .clone();
+    ///     let second_value = result
+    ///         .result_data
+    ///         .to_register_map()
+    ///         .expect("qvm memory should fit readout map")
+    ///         .get_register_matrix("second")
+    ///         .expect("readout map should have 'second'")
+    ///         .as_real()
+    ///         .expect("should be real numbered register")
+    ///         .get((0, 0))
+    ///         .expect("should have value in first position of first register")
+    ///         .clone();
+    ///     assert_eq!(first_value, 3.141);
+    ///     assert_eq!(second_value, 1.234);
     /// }
     /// ```
     #[must_use]
@@ -202,9 +227,27 @@ impl<'executable> Executable<'executable, '_> {
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
     ///             .execute_on_qvm().await.unwrap();
-    ///         let data = result.registers.remove("theta").expect("Could not read theta").into_f64().unwrap();
-    ///         assert_eq!(data[0][0], theta);
-    ///         assert_eq!(data[0][1], theta * 2.0);
+    ///         let theta_register = result
+    ///             .result_data
+    ///             .to_register_map()
+    ///             .expect("should fit readout map")
+    ///             .get_register_matrix("theta")
+    ///             .expect("should have theta")
+    ///             .as_real()
+    ///             .expect("should be real valued register")
+    ///             .to_owned();
+    ///
+    ///         let first = theta_register
+    ///             .get((0, 0))
+    ///             .expect("first index, first shot of theta should have value")
+    ///             .to_owned();
+    ///         let second = theta_register
+    ///             .get((0, 1))
+    ///             .expect("first shot, second_index of theta should have value")
+    ///             .to_owned();
+    ///         
+    ///         assert_eq!(first, theta);
+    ///         assert_eq!(second, theta * 2.0);
     ///     }
     /// }
     /// ```
@@ -240,10 +283,8 @@ impl<'executable> Executable<'executable, '_> {
     }
 }
 
-/// The [`Result`] from executing on the QVM.
-pub type ExecuteResultQVM = Result<execution_data::Qvm, Error>;
-/// The [`Result`] from executing on a QPU.
-pub type ExecuteResultQPU = Result<execution_data::Qpu, Error>;
+/// The [`Result`] from executing on a QPU or QVM.
+pub type ExecutionResult = Result<execution_data::ExecutionData, Error>;
 
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
@@ -284,12 +325,12 @@ impl Executable<'_, '_> {
     ///
     /// # Returns
     ///
-    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
+    /// An [`ExecutionResult`].
     ///
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm(&mut self) -> ExecuteResultQVM {
+    pub async fn execute_on_qvm(&mut self) -> ExecutionResult {
         let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
@@ -303,8 +344,8 @@ impl Executable<'_, '_> {
         self.qvm = Some(qvm);
         result
             .map_err(Error::from)
-            .map(|registers| execution_data::Qvm {
-                registers,
+            .map(|registers| execution_data::ExecutionData {
+                result_data: ResultData::Qvm(registers),
                 duration: None,
             })
     }
@@ -370,10 +411,10 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Returns
     ///
-    /// A `HashMap<String, ExecutionResult>` where the key is the name of the register that was read from (e.g. "ro").
+    /// An [`ExecutionResult`].
     ///
     /// # Errors
-    /// All errors are human readable by way of [`mod@eyre`]. Some common errors are:
+    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
     ///
     /// 1. You are not authenticated for QCS
     /// 1. Your credentials don't have an active reservation for the QPU you requested
@@ -382,7 +423,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecuteResultQPU
+    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
@@ -429,10 +470,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(
-        &mut self,
-        job_handle: JobHandle<'execution>,
-    ) -> ExecuteResultQPU {
+    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
         let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
         qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
             .await
@@ -501,7 +539,7 @@ pub enum Error {
     /// [`Executable::retrieve_results`] can invalidate the handle.
     #[error("The job handle was not valid")]
     InvalidJobHandle,
-    /// Occurs when failing to construct a [`QcsClient`].
+    /// Occurs when failing to construct a [`Qcs`] client.
     #[error("The QCS client configuration failed to load")]
     QcsConfigLoadFailure(#[from] LoadError),
 }

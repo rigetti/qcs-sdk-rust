@@ -1,9 +1,13 @@
 # Cargo / rustc artifacts
 /target
 
+# Python artifacts
+__pycache__/
+
 # Local config
 .env
 venv/
+.venv
 
 # JetBrains
 .idea

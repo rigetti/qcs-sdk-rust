@@ -12,6 +12,7 @@ use qcs_api_client_openapi::{
 pub mod client;
 mod execution;
 pub mod quilc;
+mod result_data;
 pub(crate) mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
@@ -19,6 +20,8 @@ pub(crate) mod translation;
 
 pub use client::Qcs;
 pub(crate) use execution::{Error as ExecutionError, Execution};
+#[allow(clippy::module_name_repetitions)]
+pub use result_data::{QpuResultData, ReadoutValues};
 
 /// Query QCS for the ISA of the provided `quantum_processor_id`.
 ///

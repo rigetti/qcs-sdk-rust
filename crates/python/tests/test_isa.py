@@ -7,24 +7,19 @@ from qcs_sdk import get_instruction_set_architecture
 from qcs_sdk.qpu.isa import InstructionSetArchitecture, Family
 
 
-
 def ignore_nones(value):
     """Recursively ignore `None` values, useful for comparing json serializations."""
     if isinstance(value, list):
         return [ignore_nones(x) for x in value if x is not None]
     elif isinstance(value, dict):
-        return {
-            key: ignore_nones(val)
-            for key, val in value.items()
-            if val is not None
-        }
+        return {key: ignore_nones(val) for key, val in value.items() if val is not None}
     else:
         return value
 
 
 @pytest.fixture
 def aspen_m_3_json() -> str:
-    filepath = path.join(path.dirname(__file__), "fixtures/aspen-m-3.json" )
+    filepath = path.join(path.dirname(__file__), "fixtures/aspen-m-3.json")
     with open(filepath) as f:
         contents = f.read()
     return contents

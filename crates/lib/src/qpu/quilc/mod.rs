@@ -190,7 +190,7 @@ impl NativeQuilRequest {
     }
 }
 
-/// Description of a device to compile for, part of [`NativeQuilRequest`]
+/// Description of a device to compile for.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 pub struct TargetDevice {
@@ -268,6 +268,7 @@ MEASURE 1 ro[1]
             .await
             .expect("Could not run program on QVM");
         for shot in results
+            .memory
             .remove("ro")
             .expect("Did not receive ro buffer")
             .into_i8()
