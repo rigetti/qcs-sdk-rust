@@ -6,24 +6,29 @@ import re
 import qcs_sdk
 
 
-@pytest.mark.asyncio
-async def test_compile(native_bitflip_program: str, device_2q: str):
-    await qcs_sdk.compile(native_bitflip_program, device_2q)
+def test_compile(native_bitflip_program: str, device_2q: str):
+    qcs_sdk.compile(native_bitflip_program, device_2q)
 
 
-@pytest.mark.asyncio
 @pytest.mark.skip
-async def test_translate(native_bitflip_program: str, device_2q: str):
-    await qcs_sdk.translate(native_bitflip_program, 1, "Aspen-11")
+def test_translate(native_bitflip_program: str, device_2q: str):
+    qcs_sdk.translate(native_bitflip_program, 1, "Aspen-M-3")
+
+def test_translate_exe(bell_program: str):
+    shots = 1234
+    executable = qcs_sdk.Executable(bell_program, shots=shots)
+    response = executable.execute_on_qvm()
+    data = response.result_data.to_qvm().memory.get("ro").to_i8()
+
+    assert data == [[1, 1] for _ in range(shots)]
 
 
-@pytest.mark.asyncio
 @pytest.mark.skip
-async def test_execute(bell_program: str, device_2q):
-    compiled_program = await qcs_sdk.compile(bell_program, device_2q)
-    translation_result = await qcs_sdk.translate(compiled_program, 1, "Aspen-11")
-    job_id = await qcs_sdk.submit(translation_result["program"], {}, "Aspen-11")
-    await qcs_sdk.retrieve_results(job_id, "Aspen-M-3")
+def test_execute(bell_program: str, device_2q):
+    compiled_program = qcs_sdk.compile(bell_program, device_2q)
+    translation_result = qcs_sdk.translate(compiled_program, 1, "Aspen-M-3")
+    job_id = qcs_sdk.submit(translation_result["program"], {}, "Aspen-M-3")
+    qcs_sdk.retrieve_results(job_id, "Aspen-M-3")
 
 
 def test_rewrite_arithmetic():
@@ -55,14 +60,12 @@ def test_exe_parameters():
     qcs_sdk.Executable("quil", parameters=[exe_parameter])
 
 
-@pytest.mark.asyncio
-async def test_get_quilc_version():
-    version = await qcs_sdk.get_quilc_version()
+def test_get_quilc_version():
+    version = qcs_sdk.get_quilc_version()
     assert re.match(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$", version)
 
 
-@pytest.mark.asyncio
 @pytest.mark.skip
-async def test_list_quantum_processors():
-    qpus = await qcs_sdk.list_quantum_processors()
+def test_list_quantum_processors():
+    qpus = qcs_sdk.list_quantum_processors()
     assert isinstance(qpus, list)

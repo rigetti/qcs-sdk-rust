@@ -4,12 +4,12 @@ use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
-    pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
+    pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyResult, Python},
     wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
 
-use crate::qpu::quilc::PyCompilerOpts;
+use crate::{execution_data::PyExecutionData, qpu::quilc::PyCompilerOpts};
 
 wrap_error!(ExecutionError(Error));
 
@@ -93,53 +93,45 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm<'py>(&self, py: Python<'py>) -> PyResult<&'py PyAny> {
+    pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
+        crate::utils::py_sync!(async move {
             arc.lock()
                 .await
                 .execute_on_qvm()
                 .await
                 .map(ExecutionData::from)
-                .map(|qvm| Python::with_gil(|py| qvm.to_python(py)))
+                .map(PyExecutionData::from)
                 .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
+                .map_err(ExecutionError::to_py_err)
         })
     }
 
-    pub fn execute_on_qpu<'py>(
-        &self,
-        py: Python<'py>,
-        quantum_processor_id: String,
-    ) -> PyResult<&'py PyAny> {
+    pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
+        crate::utils::py_sync!(async move {
             arc.lock()
                 .await
                 .execute_on_qpu(quantum_processor_id)
                 .await
                 .map(ExecutionData::from)
-                .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
+                .map(PyExecutionData::from)
                 .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
+                .map_err(ExecutionError::to_py_err)
         })
     }
 
-    pub fn retrieve_results<'py>(
-        &mut self,
-        py: Python<'py>,
-        job_handle: PyJobHandle,
-    ) -> PyResult<&'py PyAny> {
+    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
+        crate::utils::py_sync!(async move {
             arc.lock()
                 .await
                 .retrieve_results(job_handle.into_inner())
                 .await
                 .map(ExecutionData::from)
-                .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
+                .map(PyExecutionData::from)
                 .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
+                .map_err(ExecutionError::to_py_err)
         })
     }
 }

@@ -36,9 +36,8 @@ def test_isa_from_aspen_m_3_json(aspen_m_3_json: str):
     assert json.loads(isa.json()) == ignore_nones(json.loads(aspen_m_3_json))
 
 
-@pytest.mark.asyncio
 @pytest.mark.skip
-async def test_get_isa_aspen_m_3():
-    isa = await get_instruction_set_architecture("Aspen-M-3")
+def test_get_isa_aspen_m_3():
+    isa = get_instruction_set_architecture("Aspen-M-3")
 
     assert isa.architecture.family == Family.Aspen

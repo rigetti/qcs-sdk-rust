@@ -12,7 +12,7 @@ MEASURE 0 ro[0]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
     let job_handle = exe
-        .submit_to_qpu("Aspen-11")
+        .submit_to_qpu("Aspen-M-3")
         .await
         .expect("Program should be sucessfully submitted for execution");
     // Do some other stuff

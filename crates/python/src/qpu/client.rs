@@ -1,4 +1,3 @@
-use pyo3_asyncio::tokio::future_into_py;
 use qcs_api_client_common::{
     configuration::{AuthServer, BuildError, ClientConfigurationBuilder, Tokens},
     ClientConfiguration,
@@ -7,7 +6,7 @@ use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
         conversion::IntoPy, exceptions::PyRuntimeError, pyclass, pyclass::CompareOp, pymethods,
-        types::PyString, FromPyObject, Py, PyAny, PyObject, PyResult, Python,
+        types::PyString, FromPyObject, Py, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
 };
@@ -185,12 +184,8 @@ impl PyQcsClient {
 
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
-    pub fn load(
-        py: Python<'_>,
-        profile_name: Option<String>,
-        use_gateway: Option<bool>,
-    ) -> PyResult<&PyAny> {
-        future_into_py(py, async move {
+    pub fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        crate::utils::py_sync!(async move {
             let config = match profile_name {
                 Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
                 None => ClientConfiguration::load_default().await,

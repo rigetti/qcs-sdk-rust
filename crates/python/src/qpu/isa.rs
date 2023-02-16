@@ -8,7 +8,7 @@ use rigetti_pyo3::{
         exceptions::{PyRuntimeError, PyValueError},
         prelude::*,
         types::{PyFloat, PyInt, PyList, PyString},
-        Py, Python,
+        Py,
     },
     wrap_error, ToPythonError,
 };
@@ -149,11 +149,10 @@ impl PyInstructionSetArchitecture {
 #[pyfunction(client = "None")]
 #[pyo3(name = "get_instruction_set_architecture")]
 pub(crate) fn py_get_instruction_set_architecture(
-    py: Python<'_>,
     quantum_processor_id: String,
     client: Option<PyQcsClient>,
-) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+) -> PyResult<PyInstructionSetArchitecture> {
+    crate::utils::py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
 
         get_isa(&quantum_processor_id, &client)
