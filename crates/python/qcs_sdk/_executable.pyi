@@ -94,7 +94,7 @@ class ExeParameter:
     def value(self, value: float): ...
 
 class Service(Enum):
-    Quilc = ("Quilc",)
-    Qvm = ("Qvm",)
-    Qcs = ("Qcs",)
-    Qpu = ("Qpu",)
+    Quilc = "Quilc"
+    Qvm = "Qvm"
+    Qcs = "Qcs"
+    Qpu = "Qpu"
