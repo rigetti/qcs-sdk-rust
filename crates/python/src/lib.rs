@@ -31,13 +31,13 @@ create_init_submodule! {
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
-        api::compile,
+        api::py_compile,
         api::rewrite_arithmetic,
-        api::translate,
-        api::submit,
-        api::retrieve_results,
+        api::py_translate,
+        api::py_submit,
+        api::py_retrieve_results,
         api::build_patch_values,
-        api::get_quilc_version,
+        api::py_get_quilc_version,
         api::py_list_quantum_processors,
         qpu::isa::py_get_instruction_set_architecture
     ],

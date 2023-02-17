@@ -6,14 +6,14 @@ use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
         conversion::IntoPy, exceptions::PyRuntimeError, pyclass, pyclass::CompareOp, pymethods,
-        types::PyString, FromPyObject, Py, PyObject, PyResult, Python,
+        types::PyString, FromPyObject, Py, PyAny, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
 };
 
 use qcs::qpu::Qcs;
 
-use crate::py_sync::py_sync;
+use crate::py_sync::{py_async, py_sync};
 
 create_init_submodule! {
     classes: [
@@ -128,6 +128,25 @@ impl PyQcsClient {
                 .map_err(LoadError::to_py_err)?,
         })
     }
+
+    async fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        let config = match profile_name {
+            Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
+            None => ClientConfiguration::load_default().await,
+        };
+
+        let client = config
+            .map(Qcs::with_config)
+            .map_err(LoadError)
+            .map_err(ToPythonError::to_py_err)?;
+
+        let client = match use_gateway {
+            None => client,
+            Some(use_gateway) => client.with_use_gateway(use_gateway),
+        };
+
+        Ok(Self(client))
+    }
 }
 
 impl PartialEq for PyQcsClient {
@@ -186,25 +205,20 @@ impl PyQcsClient {
 
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
-    pub fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
-        py_sync!(async move {
-            let config = match profile_name {
-                Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
-                None => ClientConfiguration::load_default().await,
-            };
+    #[pyo3(name = "load")]
+    pub fn py_load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        py_sync!(Self::load(profile_name, use_gateway))
+    }
 
-            let client = config
-                .map(Qcs::with_config)
-                .map_err(LoadError)
-                .map_err(ToPythonError::to_py_err)?;
-
-            let client = match use_gateway {
-                None => client,
-                Some(use_gateway) => client.with_use_gateway(use_gateway),
-            };
-
-            Ok(Self(client))
-        })
+    #[staticmethod]
+    #[args("/", profile_name = "None", use_gateway = "None")]
+    #[pyo3(name = "load_async")]
+    pub fn py_load_async(
+        py: Python<'_>,
+        profile_name: Option<String>,
+        use_gateway: Option<bool>,
+    ) -> PyResult<&PyAny> {
+        py_async!(py, Self::load(profile_name, use_gateway))
     }
 
     #[getter]

@@ -1471,6 +1471,7 @@ name = "qcs-sdk-python"
 version = "0.5.0-rc.7"
 dependencies = [
  "numpy",
+ "paste",
  "pyo3",
  "pyo3-asyncio",
  "pyo3-build-config",
