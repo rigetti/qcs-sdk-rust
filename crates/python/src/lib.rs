@@ -64,9 +64,7 @@ pub(crate) mod utils {
     ///
     /// #[pyo3(name="say_hello")]
     /// pub fn py_say_hello(name: String) -> PyResult<String> {
-    ///     py_sync!(async move {
-    ///         say_hello(name)
-    ///     })
+    ///     py_sync!(say_hello(name))
     /// }
     /// ```
     ///
