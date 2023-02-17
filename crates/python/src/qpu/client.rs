@@ -13,6 +13,8 @@ use rigetti_pyo3::{
 
 use qcs::qpu::Qcs;
 
+use crate::py_sync::py_sync;
+
 create_init_submodule! {
     classes: [
         PyQcsClient,
@@ -185,7 +187,7 @@ impl PyQcsClient {
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
     pub fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
-        crate::utils::py_sync!(async move {
+        py_sync!(async move {
             let config = match profile_name {
                 Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
                 None => ClientConfiguration::load_default().await,

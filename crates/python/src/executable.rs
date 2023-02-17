@@ -9,7 +9,7 @@ use rigetti_pyo3::{
 };
 use tokio::sync::Mutex;
 
-use crate::{execution_data::PyExecutionData, qpu::quilc::PyCompilerOpts};
+use crate::{execution_data::PyExecutionData, py_sync::py_sync, qpu::quilc::PyCompilerOpts};
 
 wrap_error!(ExecutionError(Error));
 
@@ -95,7 +95,7 @@ impl PyExecutable {
 
     pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        crate::utils::py_sync!(async move {
+        py_sync!(async move {
             arc.lock()
                 .await
                 .execute_on_qvm()
@@ -109,7 +109,7 @@ impl PyExecutable {
 
     pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        crate::utils::py_sync!(async move {
+        py_sync!(async move {
             arc.lock()
                 .await
                 .execute_on_qpu(quantum_processor_id)
@@ -123,7 +123,7 @@ impl PyExecutable {
 
     pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
         let arc = self.as_inner().clone();
-        crate::utils::py_sync!(async move {
+        py_sync!(async move {
             arc.lock()
                 .await
                 .retrieve_results(job_handle.into_inner())

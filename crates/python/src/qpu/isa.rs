@@ -15,7 +15,7 @@ use rigetti_pyo3::{
 
 use qcs::qpu::get_isa;
 
-use crate::qpu::client::PyQcsClient;
+use crate::{py_sync::py_sync, qpu::client::PyQcsClient};
 
 create_init_submodule! {
     classes: [
@@ -152,7 +152,7 @@ pub(crate) fn py_get_instruction_set_architecture(
     quantum_processor_id: String,
     client: Option<PyQcsClient>,
 ) -> PyResult<PyInstructionSetArchitecture> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
 
         get_isa(&quantum_processor_id, &client)

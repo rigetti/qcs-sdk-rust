@@ -21,7 +21,7 @@ use rigetti_pyo3::{
     py_wrap_union_enum, wrap_error, ToPython, ToPythonError,
 };
 
-use crate::qpu::client::PyQcsClient;
+use crate::{py_sync::py_sync, qpu::client::PyQcsClient};
 
 create_init_submodule! {
     classes: [
@@ -143,7 +143,7 @@ pub fn compile(
     let compiler_timeout = get_kwd(kwds, "timeout")?.or(Some(DEFAULT_COMPILER_TIMEOUT));
     let protoquil: Option<bool> = get_kwd(kwds, "protoquil")?;
 
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let options = CompilerOpts::default()
             .with_timeout(compiler_timeout)
@@ -190,7 +190,7 @@ pub fn translate(
     quantum_processor_id: String,
     client: Option<PyQcsClient>,
 ) -> PyResult<PyTranslationResult> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
             .await
@@ -206,7 +206,7 @@ pub fn submit(
     quantum_processor_id: String,
     client: Option<PyQcsClient>,
 ) -> PyResult<String> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::api::submit(&program, patch_values, &quantum_processor_id, &client)
             .await
@@ -220,7 +220,7 @@ pub fn retrieve_results(
     quantum_processor_id: String,
     client: Option<PyQcsClient>,
 ) -> PyResult<PyExecutionResults> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::api::retrieve_results(&job_id, &quantum_processor_id, &client)
             .await
@@ -231,7 +231,7 @@ pub fn retrieve_results(
 
 #[pyfunction(client = "None")]
 pub fn get_quilc_version(client: Option<PyQcsClient>) -> PyResult<String> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::api::get_quilc_version(&client).map_err(|e| CompilationError::new_err(e.to_string()))
     })
@@ -243,7 +243,7 @@ pub fn py_list_quantum_processors(
     client: Option<PyQcsClient>,
     timeout: Option<f64>,
 ) -> PyResult<Vec<String>> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let timeout = timeout.map(Duration::from_secs_f64);
         list_quantum_processors(&client, timeout)
@@ -260,7 +260,7 @@ pub fn py_get_quilt_calibrations(
     client: Option<PyQcsClient>,
     timeout: Option<f64>,
 ) -> PyResult<PyQuiltCalibrations> {
-    crate::utils::py_sync!(async move {
+    py_sync!(async move {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let timeout = timeout.map(Duration::from_secs_f64);
         get_quilt_calibrations(&quantum_processor_id, &client, timeout)
