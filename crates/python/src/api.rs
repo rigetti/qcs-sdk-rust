@@ -229,37 +229,6 @@ py_function_dual! {
     }
 }
 
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "translate")]
-// pub fn py_translate(
-//     native_quil: String,
-//     num_shots: u16,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<PyTranslationResult> {
-//     py_sync!(translate(
-//         native_quil,
-//         num_shots,
-//         quantum_processor_id,
-//         client
-//     ))
-// }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "translate_async")]
-// pub fn py_translate_async(
-//     py: Python<'_>,
-//     native_quil: String,
-//     num_shots: u16,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<&PyAny> {
-//     py_async!(
-//         py,
-//         translate(native_quil, num_shots, quantum_processor_id, client)
-//     )
-// }
-
 py_function_dual! {
     #[args(client = "None")]
     async fn submit(
@@ -274,32 +243,6 @@ py_function_dual! {
             .map_err(|e| ExecutionError::new_err(e.to_string()))
     }
 }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "submit")]
-// pub fn py_submit(
-//     program: String,
-//     patch_values: HashMap<String, Vec<f64>>,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<String> {
-//     py_sync!(submit(program, patch_values, quantum_processor_id, client))
-// }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "submit_async")]
-// pub fn py_submit_async(
-//     py: Python<'_>,
-//     program: String,
-//     patch_values: HashMap<String, Vec<f64>>,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<&PyAny> {
-//     py_async!(
-//         py,
-//         submit(program, patch_values, quantum_processor_id, client)
-//     )
-// }
 
 py_function_dual! {
     #[args(client = "None")]
@@ -316,27 +259,6 @@ py_function_dual! {
     }
 }
 
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "retrieve_results")]
-// pub fn py_retrieve_results(
-//     job_id: String,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<PyExecutionResults> {
-//     py_sync!(retrieve_results(job_id, quantum_processor_id, client))
-// }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "retrieve_results_async")]
-// pub fn py_retrieve_results_async(
-//     py: Python<'_>,
-//     job_id: String,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-// ) -> PyResult<&PyAny> {
-//     py_async!(py, retrieve_results(job_id, quantum_processor_id, client))
-// }
-
 py_function_dual! {
     #[args(client = "None")]
     async fn get_quilc_version(client: Option<PyQcsClient>) -> PyResult<String> {
@@ -344,18 +266,6 @@ py_function_dual! {
         qcs::api::get_quilc_version(&client).map_err(|e| CompilationError::new_err(e.to_string()))
     }
 }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "get_quilc_version")]
-// pub fn py_get_quilc_version(client: Option<PyQcsClient>) -> PyResult<String> {
-//     py_sync!(get_quilc_version(client))
-// }
-
-// #[pyfunction(client = "None")]
-// #[pyo3(name = "get_quilc_version_async")]
-// pub fn py_get_quilc_version_async(py: Python<'_>, client: Option<PyQcsClient>) -> PyResult<&PyAny> {
-//     py_async!(py, get_quilc_version(client))
-// }
 
 py_function_dual! {
     #[args(client = "None", timeout = "None")]
@@ -371,25 +281,6 @@ py_function_dual! {
             .map_err(ListQuantumProcessorsError::to_py_err)
     }
 }
-
-// #[pyfunction(client = "None", timeout = "None")]
-// #[pyo3(name = "list_quantum_processors")]
-// pub fn py_list_quantum_processors(
-//     client: Option<PyQcsClient>,
-//     timeout: Option<f64>,
-// ) -> PyResult<Vec<String>> {
-//     py_sync!(list_quantum_processors(client, timeout))
-// }
-
-// #[pyfunction(client = "None", timeout = "None")]
-// #[pyo3(name = "list_quantum_processors_async")]
-// pub fn py_list_quantum_processors_async(
-//     py: Python<'_>,
-//     client: Option<PyQcsClient>,
-//     timeout: Option<f64>,
-// ) -> PyResult<&PyAny> {
-//     py_async!(py, list_quantum_processors(client, timeout))
-// }
 
 py_function_dual! {
     #[args(client = "None", timeout = "None")]
@@ -407,31 +298,3 @@ py_function_dual! {
             .map_err(GetQuiltCalibrationsError::to_py_err)
     }
 }
-
-// #[pyfunction(client = "None", timeout = "None")]
-// #[pyo3(name = "get_quilt_calibrations")]
-// pub fn py_get_quilt_calibrations(
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-//     timeout: Option<f64>,
-// ) -> PyResult<PyQuiltCalibrations> {
-//     py_sync!(get_quilt_calibrations(
-//         quantum_processor_id,
-//         client,
-//         timeout
-//     ))
-// }
-
-// #[pyfunction(client = "None", timeout = "None")]
-// #[pyo3(name = "get_quilt_calibrations_async")]
-// pub fn py_get_quilt_calibrations_async(
-//     py: Python<'_>,
-//     quantum_processor_id: String,
-//     client: Option<PyQcsClient>,
-//     timeout: Option<f64>,
-// ) -> PyResult<&PyAny> {
-//     py_async!(
-//         py,
-//         get_quilt_calibrations(quantum_processor_id, client, timeout)
-//     )
-// }
