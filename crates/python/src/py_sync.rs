@@ -32,7 +32,7 @@ macro_rules! py_sync {
 /// `pyo3_asyncio::tokio::local_future_into_py`
 macro_rules! py_async {
     ($py: ident, $body: expr) => {
-        pyo3_asyncio::tokio::local_future_into_py($py, $body)
+        pyo3_asyncio::tokio::future_into_py($py, $body)
     };
 }
 
@@ -55,7 +55,7 @@ macro_rules! py_async {
 ///     ]
 /// }
 ///
-/// py_function_dual! {
+/// py_function_sync_async! {
 ///     #[args(timeout = "None")]
 ///     async fn do_thing(timeout: Option<u64>) -> PyResult<String> {
 ///         // ... sleep for timeout ...
@@ -70,29 +70,29 @@ macro_rules! py_async {
 /// assert do_stuff() == "done"
 /// assert await do_stuff() == "done"
 /// ```
-macro_rules! py_function_dual {
+macro_rules! py_function_sync_async {
     (
-        #[args$((
+        $(#[pyfunction$((
             $($k: ident = $v: literal),* $(,)?
-        ))?]
+        ))?])?
         async fn $name: ident($($arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
     ) => {
-        async fn $name($($arg: $kind,)*) -> $ret {
+        async fn $name($($arg: $kind,)*) $(-> $ret)? {
             $body
         }
 
         ::paste::paste! {
-        #[::pyo3::pyfunction$((
+        #[::pyo3::pyfunction$($((
             $($k = $v),*
-        ))?]
+        ))?)?]
         #[pyo3(name = $name "")]
-        pub fn [< py_ $name >]($($arg: $kind),*) -> $ret {
+        pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
             py_sync!($name($($arg),*))
         }
 
-        #[::pyo3::pyfunction$((
+        #[::pyo3::pyfunction$($((
             $($k = $v),*
-        ))?]
+        ))?)?]
         #[pyo3(name = $name "_async")]
         pub fn [< py_ $name _async >](py: Python<'_> $(, $arg: $kind)*) -> PyResult<&PyAny> {
             py_async!(py, $name($($arg),*))
@@ -102,5 +102,5 @@ macro_rules! py_function_dual {
 }
 
 pub(crate) use py_async;
-pub(crate) use py_function_dual;
+pub(crate) use py_function_sync_async;
 pub(crate) use py_sync;

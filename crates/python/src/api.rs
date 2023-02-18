@@ -22,7 +22,7 @@ use rigetti_pyo3::{
 };
 
 use crate::{
-    py_sync::{py_async, py_function_dual, py_sync},
+    py_sync::{py_async, py_function_sync_async, py_sync},
     qpu::client::PyQcsClient,
 };
 
@@ -213,8 +213,8 @@ pub fn build_patch_values(
         .to_python(py)
 }
 
-py_function_dual! {
-    #[args(client = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
     async fn translate(
         native_quil: String,
         num_shots: u16,
@@ -229,8 +229,8 @@ py_function_dual! {
     }
 }
 
-py_function_dual! {
-    #[args(client = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
@@ -244,8 +244,8 @@ py_function_dual! {
     }
 }
 
-py_function_dual! {
-    #[args(client = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
     async fn retrieve_results(
         job_id: String,
         quantum_processor_id: String,
@@ -259,16 +259,16 @@ py_function_dual! {
     }
 }
 
-py_function_dual! {
-    #[args(client = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
     async fn get_quilc_version(client: Option<PyQcsClient>) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::api::get_quilc_version(&client).map_err(|e| CompilationError::new_err(e.to_string()))
     }
 }
 
-py_function_dual! {
-    #[args(client = "None", timeout = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None", timeout = "None")]
     async fn list_quantum_processors(
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
@@ -282,8 +282,8 @@ py_function_dual! {
     }
 }
 
-py_function_dual! {
-    #[args(client = "None", timeout = "None")]
+py_function_sync_async! {
+    #[pyfunction(client = "None", timeout = "None")]
     async fn get_quilt_calibrations(
         quantum_processor_id: String,
         client: Option<PyQcsClient>,

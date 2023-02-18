@@ -56,12 +56,12 @@ impl PyParameter {
 /// Invoke a PyExecutable's inner Executable::method with given arguments,
 /// then mapped to `Future<Output = Result<PyExecutionData, ExecutionError>>`
 macro_rules! py_executable_data {
-    ($self: ident, $method: ident $(, $arg: expr)*) => {{
+    ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
         let arc = $self.as_inner().clone();
         async move {
             arc.lock()
                 .await
-                .$method($($arg ,)*)
+                .$method($($arg),*)
                 .await
                 .map(ExecutionData::from)
                 .map(PyExecutionData::from)
@@ -115,27 +115,23 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    #[pyo3(name = "execute_on_qvm")]
-    pub fn py_execute_on_qvm(&self) -> PyResult<PyExecutionData> {
+    pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(self, execute_on_qvm))
     }
 
-    #[pyo3(name = "execute_on_qvm_async")]
-    pub fn py_execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
+    pub fn execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
         py_async!(py, py_executable_data!(self, execute_on_qvm))
     }
 
-    #[pyo3(name = "execute_on_qpu")]
-    pub fn py_execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
+    pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(
             self,
             execute_on_qpu,
-            quantum_processor_id
+            quantum_processor_id,
         ))
     }
 
-    #[pyo3(name = "execute_on_qpu_async")]
-    pub fn py_execute_on_qpu_async<'py>(
+    pub fn execute_on_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
@@ -146,17 +142,15 @@ impl PyExecutable {
         )
     }
 
-    #[pyo3(name = "retrieve_results")]
-    pub fn py_retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
+    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(
             self,
             retrieve_results,
-            job_handle.into()
+            job_handle.into(),
         ))
     }
 
-    #[pyo3(name = "retrieve_results_async")]
-    pub fn py_retrieve_results_async<'py>(
+    pub fn retrieve_results_async<'py>(
         &'py mut self,
         py: Python<'py>,
         job_handle: PyJobHandle,
