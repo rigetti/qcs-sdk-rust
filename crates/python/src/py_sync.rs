@@ -72,9 +72,7 @@ macro_rules! py_async {
 /// ```
 macro_rules! py_function_sync_async {
     (
-        $(#[pyfunction$((
-            $($k: ident = $v: literal),* $(,)?
-        ))?])?
+        $(#[$meta: meta])+
         async fn $name: ident($($arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
     ) => {
         async fn $name($($arg: $kind,)*) $(-> $ret)? {
@@ -82,17 +80,13 @@ macro_rules! py_function_sync_async {
         }
 
         ::paste::paste! {
-        #[::pyo3::pyfunction$($((
-            $($k = $v),*
-        ))?)?]
+        $(#[$meta])+
         #[pyo3(name = $name "")]
         pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
             py_sync!($name($($arg),*))
         }
 
-        #[::pyo3::pyfunction$($((
-            $($k = $v),*
-        ))?)?]
+        $(#[$meta])+
         #[pyo3(name = $name "_async")]
         pub fn [< py_ $name _async >](py: Python<'_> $(, $arg: $kind)*) -> PyResult<&PyAny> {
             py_async!(py, $name($($arg),*))
