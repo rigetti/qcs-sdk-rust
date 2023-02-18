@@ -73,9 +73,9 @@ macro_rules! py_async {
 macro_rules! py_function_dual {
     (
         #[args$((
-            $($k: ident = $v: literal),* $(,)*
+            $($k: ident = $v: literal),* $(,)?
         ))?]
-        async fn $name: ident($($arg: ident : $kind: ty),* $(,)*) -> $ret: ty $body: block
+        async fn $name: ident($($arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
     ) => {
         async fn $name($($arg: $kind,)*) -> $ret {
             $body
@@ -86,16 +86,16 @@ macro_rules! py_function_dual {
             $($k = $v),*
         ))?]
         #[pyo3(name = $name "")]
-        pub fn [< py_ $name >]($($arg: $kind,)*) -> $ret {
-            py_sync!($name($($arg, )*))
+        pub fn [< py_ $name >]($($arg: $kind),*) -> $ret {
+            py_sync!($name($($arg),*))
         }
 
         #[::pyo3::pyfunction$((
             $($k = $v),*
         ))?]
         #[pyo3(name = $name "_async")]
-        pub fn [< py_ $name _async >](py: Python<'_>, $($arg: $kind,)*) -> PyResult<&PyAny> {
-            py_async!(py, $name($($arg, )*))
+        pub fn [< py_ $name _async >](py: Python<'_> $(, $arg: $kind)*) -> PyResult<&PyAny> {
+            py_async!(py, $name($($arg),*))
         }
         }
     };
