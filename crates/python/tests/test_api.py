@@ -14,12 +14,17 @@ def test_compile(native_bitflip_program: str, device_2q: str):
 def test_translate(native_bitflip_program: str, device_2q: str):
     qcs_sdk.translate(native_bitflip_program, 1, "Aspen-M-3")
 
-def test_translate_exe(bell_program: str):
+@pytest.mark.asyncio
+async def test_translate_exe(bell_program: str):
     shots = 1234
     executable = qcs_sdk.Executable(bell_program, shots=shots)
+
     response = executable.execute_on_qvm()
     data = response.result_data.to_qvm().memory.get("ro").to_i8()
+    assert data == [[1, 1] for _ in range(shots)]
 
+    response = await executable.execute_on_qvm_async()
+    data = response.result_data.to_qvm().memory.get("ro").to_i8()
     assert data == [[1, 1] for _ in range(shots)]
 
 
