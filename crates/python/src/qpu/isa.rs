@@ -148,7 +148,6 @@ impl PyInstructionSetArchitecture {
 }
 
 py_function_sync_async! {
-    /// This is a test of the comment system.
     #[pyfunction(client = "None")]
     async fn get_instruction_set_architecture(
         quantum_processor_id: String,
