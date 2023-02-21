@@ -492,6 +492,7 @@ async def list_quantum_processors_async(
     ...
 
 def get_quilt_calibrations(
+    quantum_processor_id: str,
     client: Optional[QcsClient] = None,
     timeout: Optional[float] = None,
 ) -> QuiltCalibrations:
@@ -499,6 +500,7 @@ def get_quilt_calibrations(
     Retrieve the calibration data used for client-side Quil-T generation.
 
     Args:
+        quantum_processor_id: The ID of the quanutum processor the job ran on.
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
         timeout: Maximum duration to wait for API calls to complete, in seconds.
 
@@ -509,6 +511,7 @@ def get_quilt_calibrations(
     ...
 
 async def get_quilt_calibrations_async(
+    quantum_processor_id: str,
     client: Optional[QcsClient] = None,
     timeout: Optional[float] = None,
 ) -> QuiltCalibrations:
@@ -518,6 +521,7 @@ async def get_quilt_calibrations_async(
     Retrieve the calibration data used for client-side Quil-T generation.
 
     Args:
+        quantum_processor_id: The ID of the quanutum processor the job ran on.
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
         timeout: Maximum duration to wait for API calls to complete, in seconds.
 

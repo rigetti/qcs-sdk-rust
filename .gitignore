@@ -25,4 +25,5 @@ qcs-api/docs
 
 # Python artifacts
 **/__pycache__
+crates/python/.hypothesis
 crates/python/qcs_sdk/*.so
