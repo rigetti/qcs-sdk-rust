@@ -237,7 +237,7 @@ async def compile_async(
         timeout: The number of seconds to wait before timing out. If set to None, there is no timeout (default: 30).
 
     Returns:
-        An Awaitable that resolves to the native Quil program.
+        An ``Awaitable`` that resolves to the native Quil program.
 
     Raises:
         - ``LoadError`` If there is an issue loading the QCS Client configuration.
@@ -419,7 +419,7 @@ async def retrieve_results_async(
 
     Args:
         job_id: The ID of the job to retrieve results for.
-        quantum_processor_id: The ID of the quanutum processor the job ran on.
+        quantum_processor_id: The ID of the quantum processor the job ran on.
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Returns:
@@ -500,7 +500,7 @@ def get_quilt_calibrations(
     Retrieve the calibration data used for client-side Quil-T generation.
 
     Args:
-        quantum_processor_id: The ID of the quanutum processor the job ran on.
+        quantum_processor_id: The ID of the quantum processor the job ran on.
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
         timeout: Maximum duration to wait for API calls to complete, in seconds.
 
@@ -521,7 +521,7 @@ async def get_quilt_calibrations_async(
     Retrieve the calibration data used for client-side Quil-T generation.
 
     Args:
-        quantum_processor_id: The ID of the quanutum processor the job ran on.
+        quantum_processor_id: The ID of the quantum processor the job ran on.
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
         timeout: Maximum duration to wait for API calls to complete, in seconds.
 
