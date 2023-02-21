@@ -22,7 +22,7 @@ class Executable:
         compile_with_quilc: Optional[bool] = None,
         compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
-    async def execute_on_qvm(self) -> ExecutionData:
+    def execute_on_qvm(self) -> ExecutionData:
         """
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
@@ -30,7 +30,17 @@ class Executable:
             - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
-    async def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
+    async def execute_on_qvm_async(self) -> ExecutionData:
+        """
+        Async version of ``execute_on_qvm``.
+
+        Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
+
+        Raises:
+            - ``QcsExecutionError``: If the job fails to execute.
+        """
+        ...
+    def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -38,8 +48,28 @@ class Executable:
             - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
-    async def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
+    async def execute_on_qpu_async(self, quantum_processor_id: str) -> ExecutionData:
         """
+        Async version of ``execute_on_qvm``.
+
+        Compile the program and execute it on a QPU, waiting for results.
+
+        Raises:
+            - ``QcsExecutionError``: If the job fails to execute.
+        """
+        ...
+    def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
+        """
+        Wait for the results of a job to complete.
+
+        Raises:
+            - ``QcsExecutionError``: If there is a problem constructing job results.
+        """
+        ...
+    async def retrieve_results_async(self, job_handle: JobHandle) -> ExecutionData:
+        """
+        Async version of ``retrieve_results``.
+
         Wait for the results of a job to complete.
 
         Raises:

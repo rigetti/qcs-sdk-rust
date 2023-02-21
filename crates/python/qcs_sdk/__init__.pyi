@@ -3,6 +3,7 @@ from .api import *
 from .qpu.client import QcsClient as QcsClient
 from .qpu.isa import (
     get_instruction_set_architecture as get_instruction_set_architecture,
+    get_instruction_set_architecture_async as get_instruction_set_architecture_async,
 )
 
 from ._execution_data import (

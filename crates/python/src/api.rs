@@ -46,15 +46,21 @@ create_init_submodule! {
     ],
     funcs: [
         py_compile,
+        py_compile_async,
         rewrite_arithmetic,
         py_translate,
+        py_translate_async,
         py_submit,
+        py_submit_async,
         py_retrieve_results,
+        py_retrieve_results_async,
         build_patch_values,
         py_get_quilc_version,
+        py_get_quilc_version_async,
         py_list_quantum_processors,
         py_list_quantum_processors_async,
-        py_get_quilt_calibrations
+        py_get_quilt_calibrations,
+        py_get_quilt_calibrations_async
     ],
 }
 

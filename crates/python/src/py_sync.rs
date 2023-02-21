@@ -29,7 +29,7 @@ macro_rules! py_sync {
 }
 
 /// Convert a rust future into a Python awaitable using
-/// `pyo3_asyncio::tokio::local_future_into_py`
+/// `pyo3_asyncio::tokio::future_into_py`
 macro_rules! py_async {
     ($py: ident, $body: expr) => {
         pyo3_asyncio::tokio::future_into_py($py, $body)
@@ -83,13 +83,13 @@ macro_rules! py_function_sync_async {
         $(#[$meta])+
         #[pyo3(name = $name "")]
         pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
-            py_sync!($name($($arg),*))
+            $crate::py_sync::py_sync!($name($($arg),*))
         }
 
         $(#[$meta])+
         #[pyo3(name = $name "_async")]
         pub fn [< py_ $name _async >](py: Python<'_> $(, $arg: $kind)*) -> PyResult<&PyAny> {
-            py_async!(py, $name($($arg),*))
+            $crate::py_sync::py_async!(py, $name($($arg),*))
         }
         }
     };

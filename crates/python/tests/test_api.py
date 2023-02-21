@@ -65,12 +65,18 @@ def test_exe_parameters():
     qcs_sdk.Executable("quil", parameters=[exe_parameter])
 
 
-def test_get_quilc_version():
+@pytest.mark.asyncio
+async def test_get_quilc_version():
     version = qcs_sdk.get_quilc_version()
     assert re.match(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$", version)
 
+    assert version == await qcs_sdk.get_quilc_version_async()
+
 
 @pytest.mark.skip
-def test_list_quantum_processors():
+@pytest.mark.asyncio
+async def test_list_quantum_processors():
     qpus = qcs_sdk.list_quantum_processors()
     assert isinstance(qpus, list)
+
+    assert qpus == await qcs_sdk.list_quantum_processors_async()

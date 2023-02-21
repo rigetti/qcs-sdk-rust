@@ -300,10 +300,35 @@ class InstructionSetArchitecture:
         """Serialize the `InstructionSetArchitecture` to a json string, optionally pretty-printed."""
         ...
 
-
-async def get_instruction_set_architecture(quantum_processor_id: str, client: QcsClient = ...) -> InstructionSetArchitecture:
+def get_instruction_set_architecture(
+    quantum_processor_id: str,
+    client: QcsClient = ...,
+) -> InstructionSetArchitecture:
     """
     Fetch the `InstructionSetArchitecture` (ISA) for a given `quantum_processor_id` from the QCS API.
+
+    Args:
+        quantum_processor_id: The ID of the quantum processor
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Raises:
+        - `QcsLoadError` if there is an issue with the QCS API client configuration.
+        - `QcsIsaError` if there is an issue fetching the ISA from the QCS API.
+    """
+    ...
+
+async def get_instruction_set_architecture_async(
+    quantum_processor_id: str,
+    client: QcsClient = ...,
+) -> InstructionSetArchitecture:
+    """
+    Async verion of ``get_instruction_set_architecture``
+
+    Fetch the `InstructionSetArchitecture` (ISA) for a given `quantum_processor_id` from the QCS API.
+
+    Args:
+        quantum_processor_id: The ID of the quantum processor
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Raises:
         - `QcsLoadError` if there is an issue with the QCS API client configuration.

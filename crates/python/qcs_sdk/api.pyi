@@ -188,7 +188,7 @@ class QuiltCalibrations:
     @settings_timestamp.setter
     def settings_timestamp(self, value: Optional[str]): ...
 
-async def compile(
+def compile(
     quil: str,
     target_device: str,
     client: Optional[QcsClient] = None,
@@ -196,6 +196,36 @@ async def compile(
     timeout: int = 30,
 ) -> str:
     """
+    Uses quilc to convert a quil program to native Quil.
+
+    Args:
+        quil: A Quil program.
+        target_device: A JSON encoded description of the Quantum Abstract Machine Architecture.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Keyword Args:
+        timeout: The number of seconds to wait before timing out. If set to None, there is no timeout (default: 30).
+
+    Returns:
+        An Awaitable that resolves to the native Quil program.
+
+    Raises:
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``DeviceIsaError`` If the `target_device` is misconfigured.
+        - ``CompilationError`` If the program could not compile.
+    """
+    ...
+
+async def compile_async(
+    quil: str,
+    target_device: str,
+    client: Optional[QcsClient] = None,
+    *,
+    timeout: int = 30,
+) -> str:
+    """
+    Async version of ``compile``.
+
     Uses quilc to convert a quil program to native Quil.
 
     Args:
@@ -255,7 +285,7 @@ def build_patch_values(
     """
     ...
 
-async def translate(
+def translate(
     native_quil: str,
     num_shots: int,
     quantum_processor_id: str,
@@ -279,7 +309,33 @@ async def translate(
     """
     ...
 
-async def submit(
+async def translate_async(
+    native_quil: str,
+    num_shots: int,
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
+) -> TranslationResult:
+    """
+    Async version of ``translate``
+
+    Translates a native Quil program into an executable.
+
+    Args:
+        native_quil: A Quil program.
+        num_shots: The number of shots to perform.
+        quantum_processor_id: The ID of the quantum processor the executable will run on (e.g. "Aspen-M-2").
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Returns:
+        An Awaitable that resolves to a dictionary with the compiled program, memory descriptors, and readout sources (see `TranslationResult`).
+
+    Raises:
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``TranslationError`` If the `native_quil` program could not be translated.
+    """
+    ...
+
+def submit(
     program: str,
     patch_values: Dict[str, List[float]],
     quantum_processor_id: str,
@@ -303,7 +359,33 @@ async def submit(
     """
     ...
 
-async def retrieve_results(
+async def submit_async(
+    program: str,
+    patch_values: Dict[str, List[float]],
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
+) -> str:
+    """
+    Async version of ``submit``.
+
+    Submits an executable `program` to be run on the specified QPU.
+
+    Args:
+        program: An executable program (see `translate`).
+        patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
+        quantum_processor_id: The ID of the quantum processor to run the executable on.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Returns:
+        An Awaitable that resolves to the ID of the submitted job.
+
+    Raises:
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``ExecutionError`` If there was a problem during program execution.
+    """
+    ...
+
+def retrieve_results(
     job_id: str,
     quantum_processor_id: str,
     client: Optional[QcsClient] = None,
@@ -325,7 +407,31 @@ async def retrieve_results(
     """
     ...
 
-async def get_quilc_version(
+async def retrieve_results_async(
+    job_id: str,
+    quantum_processor_id: str,
+    client: Optional[QcsClient] = None,
+) -> ExecutionResults:
+    """
+    Async version of ``retrieve_results``
+
+    Fetches results for the corresponding job ID.
+
+    Args:
+        job_id: The ID of the job to retrieve results for.
+        quantum_processor_id: The ID of the quanutum processor the job ran on.
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Returns:
+        An Awaitable that resolves to a dictionary describing the results of the execution and its duration (see `ExecutionResults`).
+
+    Raises:
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``ExecutionError`` If there was a problem fetching execution results.
+    """
+    ...
+
+def get_quilc_version(
     client: Optional[QcsClient] = None,
 ) -> str:
     """
@@ -340,7 +446,24 @@ async def get_quilc_version(
     """
     ...
 
-async def list_quantum_processors(
+async def get_quilc_version_async(
+    client: Optional[QcsClient] = None,
+) -> str:
+    """
+    Async version of ``get_quilc_version``
+
+    Returns the version number of the running quilc server.
+
+    Args:
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Raises:
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``CompilationError`` If there is an issue fetching the version from the quilc compiler.
+    """
+    ...
+
+def list_quantum_processors(
     client: Optional[QcsClient] = None,
     timeout: Optional[float] = None,
 ) -> List[str]:
@@ -353,7 +476,22 @@ async def list_quantum_processors(
     """
     ...
 
-async def get_quilt_calibrations(
+async def list_quantum_processors_async(
+    client: Optional[QcsClient] = None,
+    timeout: Optional[float] = None,
+) -> List[str]:
+    """
+    Async version of ``list_quantum_processors``
+
+    Returns all available Quantum Processor IDs.
+
+    Args:
+        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+        timeout: Maximum duration to wait for API calls to complete, in seconds.
+    """
+    ...
+
+def get_quilt_calibrations(
     client: Optional[QcsClient] = None,
     timeout: Optional[float] = None,
 ) -> QuiltCalibrations:
@@ -370,17 +508,21 @@ async def get_quilt_calibrations(
     """
     ...
 
-async def get_instruction_set_architecture(
-    quantum_processor_id: str, client: Optional[QcsClient]
-) -> InstructionSetArchitecture:
+async def get_quilt_calibrations_async(
+    client: Optional[QcsClient] = None,
+    timeout: Optional[float] = None,
+) -> QuiltCalibrations:
     """
-    Retrieve the InstructionSetArchitecture (ISA) for the given Quantum Processor ID.
+    Async version of `get_quilt_calibrations``
+
+    Retrieve the calibration data used for client-side Quil-T generation.
 
     Args:
-        quantum_processor_id: The ID of the quantum processor
         client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+        timeout: Maximum duration to wait for API calls to complete, in seconds.
 
     Raises:
-        - ``IsaError`` if there was a problem fetching the ISA.
+        - ``LoadError`` If there is an issue loading the QCS Client configuration.
+        - ``QcsGetQuiltCalibrationsError`` If there was a problem fetching Quil-T calibrations.
     """
     ...

@@ -32,14 +32,21 @@ create_init_submodule! {
     ],
     funcs: [
         api::py_compile,
+        api::py_compile_async,
         api::rewrite_arithmetic,
         api::py_translate,
+        api::py_translate_async,
         api::py_submit,
+        api::py_submit_async,
         api::py_retrieve_results,
+        api::py_retrieve_results_async,
         api::build_patch_values,
         api::py_get_quilc_version,
+        api::py_get_quilc_version_async,
         api::py_list_quantum_processors,
-        qpu::isa::py_get_instruction_set_architecture
+        api::py_list_quantum_processors_async,
+        qpu::isa::py_get_instruction_set_architecture,
+        qpu::isa::py_get_instruction_set_architecture_async
     ],
     submodules: [
         "api": api::init_submodule,

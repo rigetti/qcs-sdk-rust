@@ -16,11 +16,14 @@ def test_client_has_url_from_env(default_client: QcsClient):
     assert urlparse(default_client.qvm_url).geturl() != ""
 
 
-def test_client_empty_profile_is_default(default_client: QcsClient):
+@pytest.mark.asyncio
+async def test_client_empty_profile_is_default(default_client: QcsClient):
     """The profile "empty" is configured to be similar to a default client."""
     client = QcsClient.load(profile_name="empty")
 
     assert client == default_client
+
+    assert client == await QcsClient.load_async(profile_name="empty")
 
 
 def test_client_default_profile_is_not_empty(default_client: QcsClient):

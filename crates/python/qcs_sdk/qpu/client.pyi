@@ -21,11 +21,24 @@ class QcsClient:
         """
         ...
     @staticmethod
-    async def load(
+    def load(
         profile_name: Optional[str] = None,
         use_gateway: Optional[bool] = None,
     ) -> "QcsClient":
         """
+        Load a QcsClient configuration using an environment-based configuration.
+
+        See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
+        """
+        ...
+    @staticmethod
+    async def load_async(
+        profile_name: Optional[str] = None,
+        use_gateway: Optional[bool] = None,
+    ) -> "QcsClient":
+        """
+        Async version of ``QcsClient.load()``
+
         Load a QcsClient configuration using an environment-based configuration.
 
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
