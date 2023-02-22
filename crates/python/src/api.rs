@@ -39,10 +39,10 @@ create_init_submodule! {
         TranslationError,
         CompilationError,
         RewriteArithmeticError,
-        DeviceIsaError,
-        QcsListQuantumProcessorsError,
-        QcsSubmitError,
-        QcsGetQuiltCalibrationsError
+        DeviceISAError,
+        QCSListQuantumProcessorsError,
+        QCSSubmitError,
+        QCSGetQuiltCalibrationsError
     ],
     funcs: [
         py_compile,
@@ -108,10 +108,10 @@ create_exception!(qcs, ExecutionError, PyRuntimeError);
 create_exception!(qcs, TranslationError, PyRuntimeError);
 create_exception!(qcs, CompilationError, PyRuntimeError);
 create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
-create_exception!(qcs, DeviceIsaError, PyValueError);
+create_exception!(qcs, DeviceISAError, PyValueError);
 
 wrap_error!(SubmitError(qcs::api::SubmitError));
-py_wrap_error!(api, SubmitError, QcsSubmitError, PyRuntimeError);
+py_wrap_error!(api, SubmitError, QCSSubmitError, PyRuntimeError);
 
 wrap_error!(ListQuantumProcessorsError(
     qcs::api::ListQuantumProcessorsError
@@ -119,7 +119,7 @@ wrap_error!(ListQuantumProcessorsError(
 py_wrap_error!(
     api,
     ListQuantumProcessorsError,
-    QcsListQuantumProcessorsError,
+    QCSListQuantumProcessorsError,
     PyRuntimeError
 );
 
@@ -129,7 +129,7 @@ wrap_error!(GetQuiltCalibrationsError(
 py_wrap_error!(
     api,
     GetQuiltCalibrationsError,
-    QcsGetQuiltCalibrationsError,
+    QCSGetQuiltCalibrationsError,
     PyRuntimeError
 );
 
@@ -157,7 +157,7 @@ async fn compile(
     options: CompilerOpts,
 ) -> PyResult<String> {
     let target_device: TargetDevice =
-        serde_json::from_str(&target_device).map_err(|e| DeviceIsaError::new_err(e.to_string()))?;
+        serde_json::from_str(&target_device).map_err(|e| DeviceISAError::new_err(e.to_string()))?;
 
     let client = PyQcsClient::get_or_create_client(client).await?;
     qcs::api::compile(&quil, target_device, &client, options)

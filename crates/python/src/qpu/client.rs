@@ -22,27 +22,28 @@ create_init_submodule! {
         PyQcsClientTokens
     ],
     errors: [
-        QcsGrpcClientError,
-        QcsGrpcEndpointError,
-        QcsGrpcError,
-        QcsLoadError
+        QCSGRPCClientError,
+        QCSGRPCEndpointError,
+        QCSGRPCError,
+        QCSLoadError,
+        QCSConfigurationBuildError
     ],
 }
 
 wrap_error! {
     LoadError(qcs::qpu::client::LoadError);
 }
-py_wrap_error!(client, LoadError, QcsLoadError, PyRuntimeError);
+py_wrap_error!(client, LoadError, QCSLoadError, PyRuntimeError);
 
 wrap_error! {
     GrpcError(qcs::qpu::client::GrpcError);
 }
-py_wrap_error!(client, GrpcError, QcsGrpcError, PyRuntimeError);
+py_wrap_error!(client, GrpcError, QCSGRPCError, PyRuntimeError);
 
 wrap_error! {
     GrpcClientError(qcs::qpu::client::GrpcClientError);
 }
-py_wrap_error!(client, GrpcClientError, QcsGrpcClientError, PyRuntimeError);
+py_wrap_error!(client, GrpcClientError, QCSGRPCClientError, PyRuntimeError);
 
 wrap_error! {
     GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
@@ -50,7 +51,7 @@ wrap_error! {
 py_wrap_error!(
     client,
     GrpcEndpointError,
-    QcsGrpcEndpointError,
+    QCSGRPCEndpointError,
     PyRuntimeError
 );
 
@@ -58,13 +59,13 @@ wrap_error!(ConfigurationBuildError(BuildError));
 py_wrap_error!(
     qcs,
     ConfigurationBuildError,
-    QcsConfigurationBuildError,
+    QCSConfigurationBuildError,
     PyRuntimeError
 );
 
 /// The fields on qcs_api_client_common::client::AuthServer are not public.
 #[pyclass]
-#[pyo3(name = "QcsClientAuthServer")]
+#[pyo3(name = "QCSClientAuthServer")]
 #[derive(FromPyObject)]
 pub struct PyQcsClientAuthServer {
     #[pyo3(get, set)]
@@ -96,7 +97,7 @@ impl PyQcsClientAuthServer {
 }
 
 py_wrap_data_struct! {
-    PyQcsClientTokens(Tokens) as "QcsClientTokens" {
+    PyQcsClientTokens(Tokens) as "QCSClientTokens" {
         bearer_access_token: Option<String> => Option<Py<PyString>>,
         refresh_token: Option<String> => Option<Py<PyString>>
     }
@@ -115,7 +116,7 @@ impl PyQcsClientTokens {
 }
 
 py_wrap_type! {
-    PyQcsClient(Qcs) as "QcsClient";
+    PyQcsClient(Qcs) as "QCSClient";
 }
 
 impl PyQcsClient {

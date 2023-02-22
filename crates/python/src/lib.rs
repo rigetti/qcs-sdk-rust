@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
 
-use executable::QcsExecutionError;
+use executable::QCSExecutionError;
 
 pub mod api;
 pub mod executable;
@@ -27,7 +27,7 @@ create_init_submodule! {
         qpu::client::PyQcsClient
     ],
     errors: [
-        QcsExecutionError,
+        QCSExecutionError,
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [

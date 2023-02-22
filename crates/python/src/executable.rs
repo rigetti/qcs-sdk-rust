@@ -20,7 +20,7 @@ wrap_error!(ExecutionError(Error));
 py_wrap_error!(
     executable,
     ExecutionError,
-    QcsExecutionError,
+    QCSExecutionError,
     PyRuntimeError
 );
 

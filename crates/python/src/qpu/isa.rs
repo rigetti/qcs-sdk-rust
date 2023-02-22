@@ -30,8 +30,8 @@ create_init_submodule! {
         PyInstructionSetArchitecture
     ],
     errors: [
-        QcsIsaSerializationError,
-        QcsIsaError
+        QCSISASerializationError,
+        QCSISAError
     ],
     funcs: [
         py_get_instruction_set_architecture,
@@ -43,12 +43,12 @@ wrap_error!(IsaSerializationError(serde_json::Error));
 py_wrap_error!(
     api,
     IsaSerializationError,
-    QcsIsaSerializationError,
+    QCSISASerializationError,
     PyValueError
 );
 
 wrap_error!(IsaError(qcs::qpu::IsaError));
-py_wrap_error!(api, IsaError, QcsIsaError, PyRuntimeError);
+py_wrap_error!(api, IsaError, QCSISAError, PyRuntimeError);
 
 py_wrap_simple_enum! {
     PyFamily(Family) as "Family" {
