@@ -20,11 +20,11 @@
 /// ```
 macro_rules! py_sync {
     ($body: expr) => {{
-        let runtime = pyo3_asyncio::tokio::get_runtime();
+        let runtime = ::pyo3_asyncio::tokio::get_runtime();
         let handle = runtime.spawn($body);
         runtime
             .block_on(handle)
-            .map_err(|err| PyRuntimeError::new_err(err.to_string()))?
+            .map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?
     }};
 }
 
@@ -32,7 +32,7 @@ macro_rules! py_sync {
 /// `pyo3_asyncio::tokio::future_into_py`
 macro_rules! py_async {
     ($py: ident, $body: expr) => {
-        pyo3_asyncio::tokio::future_into_py($py, $body)
+        ::pyo3_asyncio::tokio::future_into_py($py, $body)
     };
 }
 
@@ -88,7 +88,7 @@ macro_rules! py_function_sync_async {
 
         $(#[$meta])+
         #[pyo3(name = $name "_async")]
-        pub fn [< py_ $name _async >](py: Python<'_> $(, $arg: $kind)*) -> PyResult<&PyAny> {
+        pub fn [< py_ $name _async >](py: ::pyo3::Python<'_> $(, $arg: $kind)*) -> ::pyo3::PyResult<&::pyo3::PyAny> {
             $crate::py_sync::py_async!(py, $name($($arg),*))
         }
         }
