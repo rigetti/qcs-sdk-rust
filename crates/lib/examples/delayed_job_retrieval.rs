@@ -14,7 +14,7 @@ async fn main() {
     let job_handle = exe
         .submit_to_qpu("Aspen-M-3")
         .await
-        .expect("Program should be sucessfully submitted for execution");
+        .expect("Program should be successfully submitted for execution");
     // Do some other stuff
     let _data = exe
         .retrieve_results(job_handle)

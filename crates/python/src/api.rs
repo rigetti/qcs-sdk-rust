@@ -32,7 +32,8 @@ create_init_submodule! {
         PyExecutionResults,
         PyRegister,
         PyRewriteArithmeticResult,
-        PyTranslationResult
+        PyTranslationResult,
+        PyQuiltCalibrations
     ],
     errors: [
         ExecutionError,
@@ -48,13 +49,13 @@ create_init_submodule! {
         py_compile,
         py_compile_async,
         rewrite_arithmetic,
+        build_patch_values,
         py_translate,
         py_translate_async,
         py_submit,
         py_submit_async,
         py_retrieve_results,
         py_retrieve_results_async,
-        build_patch_values,
         py_get_quilc_version,
         py_get_quilc_version_async,
         py_list_quantum_processors,

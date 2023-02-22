@@ -22,9 +22,9 @@ create_init_submodule! {
         PyQcsClientTokens
     ],
     errors: [
-        QCSGRPCClientError,
-        QCSGRPCEndpointError,
-        QCSGRPCError,
+        QCSGrpcClientError,
+        QCSGrpcEndpointError,
+        QCSGrpcError,
         QCSLoadError,
         QCSConfigurationBuildError
     ],
@@ -38,12 +38,12 @@ py_wrap_error!(client, LoadError, QCSLoadError, PyRuntimeError);
 wrap_error! {
     GrpcError(qcs::qpu::client::GrpcError);
 }
-py_wrap_error!(client, GrpcError, QCSGRPCError, PyRuntimeError);
+py_wrap_error!(client, GrpcError, QCSGrpcError, PyRuntimeError);
 
 wrap_error! {
     GrpcClientError(qcs::qpu::client::GrpcClientError);
 }
-py_wrap_error!(client, GrpcClientError, QCSGRPCClientError, PyRuntimeError);
+py_wrap_error!(client, GrpcClientError, QCSGrpcClientError, PyRuntimeError);
 
 wrap_error! {
     GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
@@ -51,7 +51,7 @@ wrap_error! {
 py_wrap_error!(
     client,
     GrpcEndpointError,
-    QCSGRPCEndpointError,
+    QCSGrpcEndpointError,
     PyRuntimeError
 );
 

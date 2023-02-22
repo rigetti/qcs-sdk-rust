@@ -8,7 +8,7 @@ from typing import Dict, List, Optional
 from .qpu.quilc import CompilerOpts
 from ._execution_data import ExecutionData
 
-class QcsExecutionError(RuntimeError):
+class QCSExecutionError(RuntimeError):
     """Error encounteted when executing programs."""
 
     ...
@@ -27,7 +27,7 @@ class Executable:
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
         Raises:
-            - ``QcsExecutionError``: If the job fails to execute.
+            - ``QCSExecutionError``: If the job fails to execute.
         """
         ...
     async def execute_on_qvm_async(self) -> ExecutionData:
@@ -37,7 +37,7 @@ class Executable:
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
         Raises:
-            - ``QcsExecutionError``: If the job fails to execute.
+            - ``QCSExecutionError``: If the job fails to execute.
         """
         ...
     def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
@@ -45,7 +45,7 @@ class Executable:
         Compile the program and execute it on a QPU, waiting for results.
 
         Raises:
-            - ``QcsExecutionError``: If the job fails to execute.
+            - ``QCSExecutionError``: If the job fails to execute.
         """
         ...
     async def execute_on_qpu_async(self, quantum_processor_id: str) -> ExecutionData:
@@ -55,7 +55,7 @@ class Executable:
         Compile the program and execute it on a QPU, waiting for results.
 
         Raises:
-            - ``QcsExecutionError``: If the job fails to execute.
+            - ``QCSExecutionError``: If the job fails to execute.
         """
         ...
     def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
@@ -63,7 +63,7 @@ class Executable:
         Wait for the results of a job to complete.
 
         Raises:
-            - ``QcsExecutionError``: If there is a problem constructing job results.
+            - ``QCSExecutionError``: If there is a problem constructing job results.
         """
         ...
     async def retrieve_results_async(self, job_handle: JobHandle) -> ExecutionData:
@@ -73,7 +73,7 @@ class Executable:
         Wait for the results of a job to complete.
 
         Raises:
-            - ``QcsExecutionError``: If there is a problem constructing job results.
+            - ``QCSExecutionError``: If there is a problem constructing job results.
         """
         ...
 
@@ -125,6 +125,6 @@ class ExeParameter:
 
 class Service(Enum):
     Quilc = "Quilc"
-    Qvm = "Qvm"
-    Qcs = "Qcs"
-    Qpu = "Qpu"
+    QVM = "QVM"
+    QCS = "QCS"
+    QPU = "QPU"

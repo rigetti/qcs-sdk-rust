@@ -1,14 +1,14 @@
 from enum import Enum
 from typing import List, Optional
 
-from .client import QcsClient
+from .client import QCSClient
 
-class QcsIsaSerializationError(ValueError):
+class QCSISASerializationError(ValueError):
     """Raised when an ``InstructionSetArchitecture`` is not able to be serialized from a given json string."""
     ...
 
 
-class QcsIsaError(RuntimeError):
+class QCSISAError(RuntimeError):
     """Raised when there is a problem fetching ``InstructionSetArchitecture`` from the QCS API."""
     ...
 
@@ -302,24 +302,24 @@ class InstructionSetArchitecture:
 
 def get_instruction_set_architecture(
     quantum_processor_id: str,
-    client: QcsClient = ...,
+    client: QCSClient = ...,
 ) -> InstructionSetArchitecture:
     """
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
 
     Args:
         quantum_processor_id: The ID of the quantum processor
-        client: The ``QcsClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+        client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Raises:
-        - ``QcsLoadError`` if there is an issue with the QCS API client configuration.
-        - ``QcsIsaError`` if there is an issue fetching the ISA from the QCS API.
+        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
+        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
     """
     ...
 
 async def get_instruction_set_architecture_async(
     quantum_processor_id: str,
-    client: QcsClient = ...,
+    client: QCSClient = ...,
 ) -> InstructionSetArchitecture:
     """
     Async verion of ``get_instruction_set_architecture``
@@ -328,10 +328,10 @@ async def get_instruction_set_architecture_async(
 
     Args:
         quantum_processor_id: The ID of the quantum processor
-        client: The QcsClient to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+        client: The ``QCSClient`` to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Raises:
-        - ``QcsLoadError`` if there is an issue with the QCS API client configuration.
-        - ``QcsIsaError`` if there is an issue fetching the ISA from the QCS API.
+        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
+        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
     """
     ...

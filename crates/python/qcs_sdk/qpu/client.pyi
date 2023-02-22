@@ -1,32 +1,32 @@
 from typing import Optional
 
-class QcsClient:
+class QCSClient:
     """
     Configuration for connecting and authenticating to QCS API resources.
     """
 
     def __new__(
         cls,
-        tokens: Optional[QcsClientTokens] = None,
+        tokens: Optional[QCSClientTokens] = None,
         api_url: Optional[str] = None,
-        auth_server: Optional[QcsClientAuthServer] = None,
+        auth_server: Optional[QCSClientAuthServer] = None,
         grpc_api_url: Optional[str] = None,
         quilc_url: Optional[str] = None,
         qvm_url: Optional[str] = None,
-    ) -> "QcsClient":
+    ) -> "QCSClient":
         """
         Construct a client from scratch.
 
-        Use ``QcsClient.load`` to construct an environment-based profile.
+        Use ``QCSClient.load`` to construct an environment-based profile.
         """
         ...
     @staticmethod
     def load(
         profile_name: Optional[str] = None,
         use_gateway: Optional[bool] = None,
-    ) -> "QcsClient":
+    ) -> "QCSClient":
         """
-        Load a QcsClient configuration using an environment-based configuration.
+        Create a ``QCSClient`` configuration using an environment-based configuration.
 
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
         """
@@ -35,11 +35,11 @@ class QcsClient:
     async def load_async(
         profile_name: Optional[str] = None,
         use_gateway: Optional[bool] = None,
-    ) -> "QcsClient":
+    ) -> "QCSClient":
         """
-        Async version of ``QcsClient.load()``
+        Async version of ``QCSClient.load()``
 
-        Load a QcsClient configuration using an environment-based configuration.
+        Create a ``QCSClient`` configuration using an environment-based configuration.
 
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
         """
@@ -61,7 +61,7 @@ class QcsClient:
         """URL to access the QVM."""
         ...
 
-class QcsClientAuthServer:
+class QCSClientAuthServer:
     """Authentication server configuration for the QCS API."""
 
     def __init__(self, client_id: str, issuer: str): ...
@@ -74,7 +74,7 @@ class QcsClientAuthServer:
     @issuer.setter
     def issuer(self, value: str): ...
 
-class QcsClientTokens:
+class QCSClientTokens:
     """Authentication tokens for the QCS API."""
 
     def __init__(self, bearer_access_token: str, refresh_token: str): ...
@@ -87,14 +87,17 @@ class QcsClientTokens:
     @refresh_token.setter
     def refresh_token(self, value: Optional[str]): ...
 
-class QcsGrpcClientError(RuntimeError):
+class QCSGrpcClientError(RuntimeError):
     """Error encountered while loading a QCS gRPC API client."""
 
-class QcsGrpcEndpointError(RuntimeError):
+class QCSGrpcEndpointError(RuntimeError):
     """Error when trying to resolve the QCS gRPC API endpoint."""
 
-class QcsGrpcError(RuntimeError):
+class QCSGrpcError(RuntimeError):
     """Error during QCS gRPC API requests."""
 
-class QcsLoadError(RuntimeError):
+class QCSLoadError(RuntimeError):
     """Error encountered while loading the QCS API client configuration."""
+
+class QCSConfigurationBuildError(RuntimeError):
+    """Error encountered while building the QCS API client configuration."""

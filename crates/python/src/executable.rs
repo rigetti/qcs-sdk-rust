@@ -164,10 +164,10 @@ impl PyExecutable {
 
 py_wrap_simple_enum! {
     PyService(Service) as "Service" {
-        Quilc,
-        Qvm,
-        Qcs,
-        Qpu
+        Quilc as Quilc,
+        Qvm as QVM,
+        Qcs as QCS,
+        Qpu as QPU
     }
 }
 
