@@ -690,7 +690,7 @@ mod describe_qpu_for_id {
             qpu::Execution::new(
                 "".into(),
                 shots,
-                "Aspen-11",
+                "Aspen-M-3",
                 exe.get_config().await.unwrap_or_default(),
                 exe.compile_with_quilc,
             )
@@ -700,7 +700,7 @@ mod describe_qpu_for_id {
         // Load config with no credentials to prevent creating a new Execution if it tries
         exe.config = Some(Arc::new(Configuration::default()));
 
-        assert!(exe.qpu_for_id("Aspen-11").await.is_ok());
+        assert!(exe.qpu_for_id("Aspen-M-3").await.is_ok());
     }
 
     #[tokio::test]

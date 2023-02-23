@@ -8,14 +8,14 @@ use rigetti_pyo3::{
         exceptions::{PyRuntimeError, PyValueError},
         prelude::*,
         types::{PyFloat, PyInt, PyList, PyString},
-        Py, Python,
+        Py,
     },
     wrap_error, ToPythonError,
 };
 
 use qcs::qpu::get_isa;
 
-use crate::qpu::client::PyQcsClient;
+use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
 
 create_init_submodule! {
     classes: [
@@ -30,11 +30,12 @@ create_init_submodule! {
         PyInstructionSetArchitecture
     ],
     errors: [
-        QcsIsaSerializationError,
-        QcsIsaError
+        QCSISASerializationError,
+        QCSISAError
     ],
     funcs: [
-        py_get_instruction_set_architecture
+        py_get_instruction_set_architecture,
+        py_get_instruction_set_architecture_async
     ],
 }
 
@@ -42,12 +43,12 @@ wrap_error!(IsaSerializationError(serde_json::Error));
 py_wrap_error!(
     api,
     IsaSerializationError,
-    QcsIsaSerializationError,
+    QCSISASerializationError,
     PyValueError
 );
 
 wrap_error!(IsaError(qcs::qpu::IsaError));
-py_wrap_error!(api, IsaError, QcsIsaError, PyRuntimeError);
+py_wrap_error!(api, IsaError, QCSISAError, PyRuntimeError);
 
 py_wrap_simple_enum! {
     PyFamily(Family) as "Family" {
@@ -146,14 +147,12 @@ impl PyInstructionSetArchitecture {
     }
 }
 
-#[pyfunction(client = "None")]
-#[pyo3(name = "get_instruction_set_architecture")]
-pub(crate) fn py_get_instruction_set_architecture(
-    py: Python<'_>,
-    quantum_processor_id: String,
-    client: Option<PyQcsClient>,
-) -> PyResult<&PyAny> {
-    pyo3_asyncio::tokio::future_into_py(py, async move {
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
+    async fn get_instruction_set_architecture(
+        quantum_processor_id: String,
+        client: Option<PyQcsClient>,
+    ) -> PyResult<PyInstructionSetArchitecture> {
         let client = PyQcsClient::get_or_create_client(client).await?;
 
         get_isa(&quantum_processor_id, &client)
@@ -161,5 +160,5 @@ pub(crate) fn py_get_instruction_set_architecture(
             .map(PyInstructionSetArchitecture::from)
             .map_err(IsaError::from)
             .map_err(IsaError::to_py_err)
-    })
+    }
 }

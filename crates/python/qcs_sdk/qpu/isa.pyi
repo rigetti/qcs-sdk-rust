@@ -1,21 +1,21 @@
 from enum import Enum
 from typing import List, Optional
 
-from .client import QcsClient
+from .client import QCSClient
 
-class QcsIsaSerializationError(ValueError):
-    """Raised when an `InstructionSetArchitecture` is not able to be serialized from a given json string."""
+class QCSISASerializationError(ValueError):
+    """Raised when an ``InstructionSetArchitecture`` is not able to be serialized from a given json string."""
     ...
 
 
-class QcsIsaError(RuntimeError):
-    """Raised when there is a problem fetching `InstructionSetArchitecture` from the QCS API."""
+class QCSISAError(RuntimeError):
+    """Raised when there is a problem fetching ``InstructionSetArchitecture`` from the QCS API."""
     ...
 
 
 class Family(Enum):
     """
-    The architecture family identifier of an `InstructionSetArchitecture`.
+    The architecture family identifier of an ``InstructionSetArchitecture``.
 
     Value "Full"  implies that each node is connected to every other (fully-connected architecture).
     """
@@ -30,9 +30,9 @@ class Node:
     """
     A logical node in the quantum processor's architecture.
 
-    The existence of a node in the ISA `Architecture` does not necessarily mean that a given 1Q
+    The existence of a node in the ISA ``Architecture`` does not necessarily mean that a given 1Q
     operation will be available on the node. This information is conveyed by the presence of the
-    specific `node_id` in instances of `Instruction`.
+    specific `node_id` in instances of ``Instruction``.
     """
 
     @property
@@ -50,9 +50,9 @@ class Edge:
     """
     A degree-two logical connection in the quantum processor's architecture.
 
-    The existence of an edge in the ISA `Architecture` does not necessarily mean that a given 2Q
+    The existence of an edge in the ISA ``Architecture`` does not necessarily mean that a given 2Q
     operation will be available on the edge. This information is conveyed by the presence of the
-    two `node_id` values in instances of `Instruction`.
+    two `node_id` values in instances of ``Instruction``.
 
     Note that edges are undirected in this model. Thus edge :math:`(a, b)` is equivalent to edge
     :math:`(b, a)`.
@@ -223,8 +223,8 @@ class Architecture:
     7 qubits wide and 12 tall. This architecture may also be presented in "landscape"
     orientation, which is a simple 90-degree clockwise rotation of the vertical orientation. 
 
-    Note that the operations that are actually available are defined entirely by `Operation`
-    instances. The presence of a node or edge in the `Architecture` model provides no guarantee
+    Note that the operations that are actually available are defined entirely by ``Operation``
+    instances. The presence of a node or edge in the ``Architecture`` model provides no guarantee
     that any 1Q or 2Q operation will be available to users writing QUIL programs.
     """
 
@@ -293,20 +293,45 @@ class InstructionSetArchitecture:
 
     @staticmethod
     def from_raw(value: str) -> "InstructionSetArchitecture":
-        """Deserialize an `InstructionSetArchitecture` from a json representation."""
+        """Deserialize an ``InstructionSetArchitecture`` from a json representation."""
         ...
     
     def json(self, pretty: bool = False) -> str:
-        """Serialize the `InstructionSetArchitecture` to a json string, optionally pretty-printed."""
+        """Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed."""
         ...
 
-
-async def get_instruction_set_architecture(quantum_processor_id: str, client: QcsClient = ...) -> InstructionSetArchitecture:
+def get_instruction_set_architecture(
+    quantum_processor_id: str,
+    client: QCSClient = ...,
+) -> InstructionSetArchitecture:
     """
-    Fetch the `InstructionSetArchitecture` (ISA) for a given `quantum_processor_id` from the QCS API.
+    Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
+
+    Args:
+        quantum_processor_id: The ID of the quantum processor
+        client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
     Raises:
-        - `QcsLoadError` if there is an issue with the QCS API client configuration.
-        - `QcsIsaError` if there is an issue fetching the ISA from the QCS API.
+        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
+        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
+    """
+    ...
+
+async def get_instruction_set_architecture_async(
+    quantum_processor_id: str,
+    client: QCSClient = ...,
+) -> InstructionSetArchitecture:
+    """
+    Async verion of ``get_instruction_set_architecture``
+
+    Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
+
+    Args:
+        quantum_processor_id: The ID of the quantum processor
+        client: The ``QCSClient`` to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+
+    Raises:
+        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
+        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
     """
     ...

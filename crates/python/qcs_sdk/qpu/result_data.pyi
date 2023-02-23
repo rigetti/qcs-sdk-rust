@@ -1,3 +1,7 @@
+"""
+Do not import this file, it has no exports.
+It is only here to represent the structure of the rust source code 1:1
+"""
 from typing import Dict, List, Optional
 
 class ReadoutValues:

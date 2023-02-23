@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use quil;
 use rigetti_pyo3::create_init_submodule;
 
-use executable::QcsExecutionError;
+use executable::QCSExecutionError;
 
 pub mod api;
 pub mod executable;
@@ -11,6 +11,8 @@ pub mod grpc;
 pub mod qpu;
 pub mod qvm;
 pub mod register_data;
+
+pub(crate) mod py_sync;
 
 create_init_submodule! {
     classes: [
@@ -26,19 +28,26 @@ create_init_submodule! {
         qpu::client::PyQcsClient
     ],
     errors: [
-        QcsExecutionError,
+        QCSExecutionError,
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
-        api::compile,
+        api::py_compile,
+        api::py_compile_async,
         api::rewrite_arithmetic,
-        api::translate,
-        api::submit,
-        api::retrieve_results,
+        api::py_translate,
+        api::py_translate_async,
+        api::py_submit,
+        api::py_submit_async,
+        api::py_retrieve_results,
+        api::py_retrieve_results_async,
         api::build_patch_values,
-        api::get_quilc_version,
+        api::py_get_quilc_version,
+        api::py_get_quilc_version_async,
         api::py_list_quantum_processors,
-        qpu::isa::py_get_instruction_set_architecture
+        api::py_list_quantum_processors_async,
+        qpu::isa::py_get_instruction_set_architecture,
+        qpu::isa::py_get_instruction_set_architecture_async
     ],
     submodules: [
         "api": api::init_submodule,
