@@ -66,9 +66,9 @@ macro_rules! py_async {
 ///
 /// becomes in python:
 /// ```py
-/// from things import do_stuff, do_stuff_async
-/// assert do_stuff() == "done"
-/// assert await do_stuff() == "done"
+/// from things import do_thing, do_thing_async
+/// assert do_thing() == "done"
+/// assert await do_thing_async() == "done"
 /// ```
 macro_rules! py_function_sync_async {
     (
