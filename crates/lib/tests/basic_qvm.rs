@@ -19,7 +19,7 @@ MEASURE 1 second
 async fn test_bell_state() {
     const SHOTS: u16 = 10;
 
-    let mut data = Executable::from_quil(PROGRAM)
+    let data = Executable::from_quil(PROGRAM)
         .with_config(ClientConfiguration::default())
         .with_shots(SHOTS)
         .read_from("first")
@@ -28,22 +28,30 @@ async fn test_bell_state() {
         .await
         .expect("Could not run on QVM");
 
-    let first: Vec<Vec<i8>> = data
-        .registers
-        .remove("first")
-        .expect("Missing first buffer")
-        .into_i8()
-        .expect("Produced wrong data type");
-    let second: Vec<Vec<i8>> = data
-        .registers
-        .remove("second")
-        .expect("Missing second buffer")
-        .into_i8()
-        .expect("Produced wrong data type");
+    let first = data
+        .result_data
+        .to_register_map()
+        .expect("should convert to readout map")
+        .get_register_matrix("first")
+        .expect("should have first register")
+        .as_integer()
+        .expect("first register should be integers")
+        .to_owned();
+
+    let second = data
+        .result_data
+        .to_register_map()
+        .expect("should convert to readout map")
+        .get_register_matrix("second")
+        .expect("should have second register")
+        .as_integer()
+        .expect("second register should be integers")
+        .to_owned();
+
+    assert_eq!(first.shape(), [SHOTS.into(), 1]);
+    assert_eq!(second.shape(), [SHOTS.into(), 1]);
 
     for (first, second) in first.into_iter().zip(second) {
-        assert_eq!(first.len(), 1);
-        assert_eq!(second.len(), 1);
-        assert_eq!(first[0], second[0]);
+        assert_eq!(first, second);
     }
 }

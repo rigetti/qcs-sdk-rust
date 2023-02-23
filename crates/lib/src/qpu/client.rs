@@ -1,5 +1,5 @@
 //! This module provides methods for getting clients for the
-//! desired API (e.g. ``gRPC`` or ``OpenAPI``) and will properly
+//! desired API (e.g. `gRPC` or `OpenAPI`) and will properly
 //! initialize those clients (e.g. with authentication metadata).
 
 use qcs_api_client_common::ClientConfiguration;
@@ -57,7 +57,9 @@ impl Qcs {
         self
     }
 
-    pub(crate) fn get_config(&self) -> ClientConfiguration {
+    /// Return a copy of all settings parsed and resolved from configuration sources.
+    #[must_use]
+    pub fn get_config(&self) -> ClientConfiguration {
         self.config.clone()
     }
 
@@ -154,7 +156,7 @@ impl Qcs {
     }
 }
 
-/// Errors that may occur while trying to resolve a ``gRPC`` endpoint
+/// Errors that may occur while trying to resolve a `gRPC` endpoint
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcEndpointError {
     /// Error due to a malformed URI
@@ -174,7 +176,7 @@ pub enum GrpcEndpointError {
     NoEndpoint(String),
 }
 
-/// Errors that may occur while trying to use a ``gRPC`` client
+/// Errors that may occur while trying to use a `gRPC` client
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcClientError {
     /// Error due to failure to resolve the endpoint
@@ -189,12 +191,12 @@ pub enum GrpcClientError {
     #[error("Response body had missing data: {0}")]
     ResponseEmpty(String),
 
-    /// Error due to ``gRPC`` error
+    /// Error due to `gRPC` error
     #[error("gRPC error: {0}")]
     GrpcError(#[from] GrpcError),
 }
 
-/// Errors that may occur while trying to use a [`OpenAPI`] client
+/// Errors that may occur while trying to use an `OpenAPI` client
 #[derive(Debug, thiserror::Error)]
 pub enum OpenApiClientError<T> {
     /// Error due to request failure

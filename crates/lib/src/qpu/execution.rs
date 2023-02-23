@@ -12,15 +12,16 @@ use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
-use crate::execution_data::{MemoryReferenceParseError, Qpu, ReadoutMap};
+use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
-use crate::JobHandle;
+use crate::{ExecutionData, JobHandle};
 
 use super::client::{GrpcClientError, Qcs};
 use super::quilc::{self, CompilerOpts, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
+use super::QpuResultData;
 use super::{get_isa, IsaError};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
@@ -181,7 +182,7 @@ impl<'a> Execution<'a> {
         &self,
         job_id: JobId,
         readout_mappings: HashMap<String, String>,
-    ) -> Result<Qpu, Error> {
+    ) -> Result<ExecutionData, Error> {
         let response = retrieve_results(
             job_id,
             self.quantum_processor_id.as_ref(),
@@ -189,11 +190,11 @@ impl<'a> Execution<'a> {
         )
         .await?;
 
-        Ok(Qpu {
-            readout_data: ReadoutMap::from_mappings_and_values(
+        Ok(ExecutionData {
+            result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
                 &readout_mappings,
                 &response.readout_values,
-            ),
+            )),
             duration: response
                 .execution_duration_microseconds
                 .map(Duration::from_micros),

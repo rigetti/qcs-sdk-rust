@@ -3,11 +3,10 @@
 
 use std::time::Duration;
 
+use ndarray::arr2;
+
 use qcs::Executable;
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
-use qcs_api_client_grpc::models::controller::{
-    readout_values::Values, IntegerReadoutValues, ReadoutValues,
-};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -19,7 +18,7 @@ MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "#;
 
-const QPU_ID: &str = "Aspen-9";
+const QPU_ID: &str = "Aspen-M-3";
 
 #[tokio::test]
 async fn successful_bell_state() {
@@ -31,22 +30,14 @@ async fn successful_bell_state() {
         .expect("Failed to run program that should be successful");
     assert_eq!(
         result
-            .readout_data
-            .get_readout_values_for_field("ro")
+            .result_data
+            .to_register_map()
+            .expect("should convert to RegisterMap")
+            .get_register_matrix("ro")
             .expect("should have values for `ro`")
-            .unwrap(),
-        vec![
-            Some(ReadoutValues {
-                values: Some(Values::IntegerValues(IntegerReadoutValues {
-                    values: vec![0, 0],
-                })),
-            }),
-            Some(ReadoutValues {
-                values: Some(Values::IntegerValues(IntegerReadoutValues {
-                    values: vec![1, 1],
-                })),
-            }),
-        ],
+            .as_integer()
+            .expect("`ro` should have integer values"),
+        arr2(&[[0, 1], [0, 1],]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 }
@@ -131,7 +122,7 @@ mod mock_qcs {
                 warp::reply::json(&isa)
             });
 
-        let translate = warp::path(format!("{}:translateNativeQuilToEncryptedBinary", QPU_ID))
+        let translate = warp::path(format!("{QPU_ID}:translateNativeQuilToEncryptedBinary"))
             .and(warp::post())
             .and(warp::body::json())
             .map(|_request: TranslateNativeQuilToEncryptedBinaryRequest| {

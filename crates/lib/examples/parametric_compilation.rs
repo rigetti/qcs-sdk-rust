@@ -5,7 +5,6 @@ use std::f64::consts::PI;
 use std::time::Duration;
 
 use qcs::Executable;
-use qcs_api_client_grpc::models::controller::{readout_values::Values, IntegerReadoutValues};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT
@@ -30,32 +29,30 @@ async fn main() {
         let theta = step * f64::from(i);
         let data = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-11")
+            .execute_on_qpu("Aspen-M-3")
             .await
             .expect("Executed program on QPU");
         total_execution_time += data
             .duration
-            .expect("Aspen-11 should always report duration");
+            .expect("Aspen-M-3 should always report duration");
 
-        let ro_readout_data = data
-            .readout_data
-            .get_readout_values_for_field("ro")
+        let first_ro_values = data
+            .result_data
+            .to_register_map()
+            .expect("should be able to create a RegisterMap")
+            .get_register_matrix("ro")
             .expect("readout values should contain 'ro'")
-            .expect("'ro' should contain readout values");
-        let first_ro_data = ro_readout_data
-            .first()
-            .expect("'ro' should contain at least one readout value")
-            .clone();
-        let first_ro_values = first_ro_data
-            .expect("first readout value should ")
-            .values
-            .expect("'ro' should have readout values");
-        if let Values::IntegerValues(IntegerReadoutValues { mut values }) = first_ro_values {
-            parametric_measurements.append(&mut values)
+            .as_integer()
+            .expect("'ro' should be a register of integer values")
+            .row(0)
+            .to_owned();
+
+        for value in &first_ro_values {
+            parametric_measurements.push(*value)
         }
     }
 
-    println!("Total execution time: {:?}", total_execution_time);
+    println!("Total execution time: {total_execution_time:?}");
 
     for measurement in parametric_measurements {
         if measurement == 1 {

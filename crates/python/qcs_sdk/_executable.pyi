@@ -6,12 +6,12 @@ from enum import Enum
 
 from typing import Dict, List, Optional
 from .qpu.quilc import CompilerOpts
-from ._execution_data import QVM, QPU
+from ._execution_data import ExecutionData
 
 class QcsExecutionError(RuntimeError):
     """Error encounteted when executing programs."""
-    ...
 
+    ...
 
 class Executable:
     def __new__(
@@ -20,10 +20,9 @@ class Executable:
         parameters: Optional[List[ExeParameter]] = None,
         shots: Optional[int] = None,
         compile_with_quilc: Optional[bool] = None,
-        compiler_options: Optional[CompilerOpts] = None
+        compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
-
-    async def execute_on_qvm(self) -> QVM:
+    async def execute_on_qvm(self) -> ExecutionData:
         """
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
@@ -31,8 +30,7 @@ class Executable:
             - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
-
-    async def execute_on_qpu(self, quantum_processor_id: str) -> QPU:
+    async def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -40,8 +38,7 @@ class Executable:
             - ``QcsExecutionError``: If the job fails to execute.
         """
         ...
-    
-    async def retrieve_results(job_handle: JobHandle) -> QPU:
+    async def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
         """
         Wait for the results of a job to complete.
 
@@ -50,11 +47,10 @@ class Executable:
         """
         ...
 
-
 class JobHandle:
     """
     The result of submitting a job to a QPU.
-    
+
     Used to retrieve the results of a job.
     """
 
@@ -64,7 +60,6 @@ class JobHandle:
         Unique ID associated with a single job execution.
         """
         ...
-
     @property
     def readout_map(self) -> Dict[str, str]:
         """
@@ -72,38 +67,34 @@ class JobHandle:
         """
         ...
 
-
 class ExeParameter:
     """
     Program execution parameters.
 
     Note: The validity of parameters is not checked until execution.
     """
+
     def __new__(
         cls: type["ExeParameter"],
         name: str,
         index: int,
         value: float,
     ) -> "ExeParameter": ...
-
     @property
     def name(self) -> str: ...
     @name.setter
     def name(self, value: str): ...
-
     @property
     def index(self) -> int: ...
     @index.setter
     def index(self, value: int): ...
-
     @property
     def value(self) -> float: ...
     @value.setter
     def value(self, value: float): ...
 
-
 class Service(Enum):
-    Quilc = "Quilc",
-    Qvm = "Qvm",
-    Qcs = "Qcs",
-    Qpu = "Qpu",
+    Quilc = "Quilc"
+    Qvm = "Qvm"
+    Qcs = "Qcs"
+    Qpu = "Qpu"

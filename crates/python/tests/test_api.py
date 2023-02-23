@@ -23,7 +23,7 @@ async def test_execute(bell_program: str, device_2q):
     compiled_program = await qcs_sdk.compile(bell_program, device_2q)
     translation_result = await qcs_sdk.translate(compiled_program, 1, "Aspen-11")
     job_id = await qcs_sdk.submit(translation_result["program"], {}, "Aspen-11")
-    await qcs_sdk.retrieve_results(job_id, "Aspen-11")
+    await qcs_sdk.retrieve_results(job_id, "Aspen-M-3")
 
 
 def test_rewrite_arithmetic():

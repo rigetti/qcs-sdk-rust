@@ -1,7 +1,6 @@
 #![deny(clippy::all)]
 #![deny(clippy::pedantic)]
 #![deny(clippy::cargo)]
-#![deny(clippy::let_underscore_drop)]
 #![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
 #![allow(clippy::missing_errors_doc)]
 #![forbid(unsafe_code)]
@@ -21,6 +20,7 @@
     missing_copy_implementations,
     missing_debug_implementations,
     missing_docs,
+    let_underscore_drop,
     no_mangle_generic_items,
     non_shorthand_field_patterns,
     noop_method_call,
@@ -50,13 +50,15 @@
 //! crate allows you to run Quil programs against real QPUs or a QVM
 //! using [`Executable`].
 
-pub use executable::{Error, Executable, ExecuteResultQPU, ExecuteResultQVM, JobHandle, Service};
-pub use execution_data::{Qpu, Qvm, ReadoutMap};
+pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
+pub use execution_data::{
+    ExecutionData, RegisterMap, RegisterMatrix, RegisterMatrixConversionError, ResultData,
+};
 pub use register_data::RegisterData;
 
 pub mod api;
 mod executable;
 mod execution_data;
 pub mod qpu;
-mod qvm;
+pub mod qvm;
 mod register_data;

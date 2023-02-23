@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use pyo3::{pyclass, FromPyObject};
-use qcs::{Error, Executable, JobHandle, Qpu, Qvm, Service};
+use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
@@ -100,7 +100,7 @@ impl PyExecutable {
                 .await
                 .execute_on_qvm()
                 .await
-                .map(Qvm::from)
+                .map(ExecutionData::from)
                 .map(|qvm| Python::with_gil(|py| qvm.to_python(py)))
                 .map_err(ExecutionError::from)
                 .map_err(ExecutionError::to_py_err)?
@@ -118,7 +118,7 @@ impl PyExecutable {
                 .await
                 .execute_on_qpu(quantum_processor_id)
                 .await
-                .map(Qpu::from)
+                .map(ExecutionData::from)
                 .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
                 .map_err(ExecutionError::from)
                 .map_err(ExecutionError::to_py_err)?
@@ -136,7 +136,7 @@ impl PyExecutable {
                 .await
                 .retrieve_results(job_handle.into_inner())
                 .await
-                .map(Qpu::from)
+                .map(ExecutionData::from)
                 .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
                 .map_err(ExecutionError::from)
                 .map_err(ExecutionError::to_py_err)?

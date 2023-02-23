@@ -11,6 +11,27 @@ use crate::RegisterData;
 
 mod execution;
 
+/// Encapsulates data returned after running a program on the QVM
+#[allow(clippy::module_name_repetitions)]
+#[derive(Debug, Deserialize, Clone, PartialEq)]
+pub struct QvmResultData {
+    pub(crate) memory: HashMap<String, RegisterData>,
+}
+
+impl QvmResultData {
+    #[must_use]
+    /// Build a [`QvmResultData`] from a mapping of register names to a [`RegisterData`]
+    pub fn from_memory_map(memory: HashMap<String, RegisterData>) -> Self {
+        Self { memory }
+    }
+
+    /// Get a map of register names (ie. "ro") to a [`RegisterData`] containing their values.
+    #[must_use]
+    pub fn memory(&self) -> &HashMap<String, RegisterData> {
+        &self.memory
+    }
+}
+
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(untagged)]
 pub(super) enum Response {

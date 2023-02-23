@@ -1,3 +1,61 @@
+## 0.10.0-rc.7
+
+### Breaking Changes
+
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+## 0.10.0-rc.6
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+## 0.10.0-rc.5
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+## 0.10.0-rc.4
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export get_quilt_calibrations (#247)
+
+## 0.10.0-rc.3
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
+## 0.10.0-rc.2
+
+### Breaking Changes
+
+- implement Python wrappers for the full Rust API (#230)
+
 ## 0.10.0-rc.1
 
 ### Breaking Changes

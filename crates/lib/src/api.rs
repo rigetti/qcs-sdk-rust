@@ -10,7 +10,10 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
-use qcs_api_client_openapi::apis::{quantum_processors_api, Error as OpenAPIError};
+use qcs_api_client_openapi::{
+    apis::{quantum_processors_api, translation_api, Error as OpenAPIError},
+    models::GetQuiltCalibrationsResponse,
+};
 use quil_rs::expression::Expression;
 use quil_rs::{program::ProgramError, Program};
 use serde::Serialize;
@@ -60,7 +63,7 @@ pub enum RewriteArithmeticError {
     Rewrite(#[from] rewrite_arithmetic::Error),
 }
 
-/// The result of a call to [`rewrite_arithmetic`] which provides the
+/// The result of a call to [`rewrite_arithmetic()`] which provides the
 /// information necessary to later patch-in memory values to a compiled program.
 #[derive(Clone, Debug, Serialize)]
 pub struct RewriteArithmeticResult {
@@ -119,7 +122,7 @@ pub struct TranslationResult {
 ///
 /// # Errors
 ///
-/// Returns a [`translation::Error`] if translation fails.
+/// Returns a [`TranslationError`] if translation fails.
 pub async fn translate(
     native_quil: &str,
     shots: u16,
@@ -252,7 +255,10 @@ impl From<readout_values::Values> for ExecutionResult {
                     c.values
                         .iter()
                         .map(|c| {
-                            Complex::<f32>::new(c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0))
+                            Complex::<f32>::new(
+                                c.real.unwrap_or_default(),
+                                c.imaginary.unwrap_or_default(),
+                            )
                         })
                         .collect(),
                 ),
@@ -297,7 +303,7 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 ///
 /// # Errors
 ///
-/// May error if a [`gRPC`] client cannot be constructed, or a [`gRPC`]
+/// May error if a [`Qcs`] client cannot be constructed, or if the `gRPC`
 /// call fails.
 pub async fn retrieve_results(
     job_id: &str,
@@ -328,7 +334,7 @@ pub enum ListQuantumProcessorsError {
     ApiError(#[from] OpenAPIError<quantum_processors_api::ListQuantumProcessorsError>),
 
     /// Pagination did not finish before timeout
-    #[error("API pagination did not finish before timeout: {0:?}")]
+    #[error("API pagination did not finish before timeout.")]
     TimeoutError(#[from] Elapsed),
 }
 
@@ -366,6 +372,37 @@ pub async fn list_quantum_processors(
         }
 
         Ok(quantum_processors)
+    })
+    .await?
+}
+
+/// API Errors encountered when trying to get Quil-T calibrations.
+#[derive(Debug, thiserror::Error)]
+pub enum GetQuiltCalibrationsError {
+    /// Failed the http call
+    #[error("Failed to get Quil-T calibrations via API: {0}")]
+    ApiError(#[from] OpenAPIError<translation_api::GetQuiltCalibrationsError>),
+
+    /// API call did not finish before timeout
+    #[error("API call did not finish before timeout.")]
+    TimeoutError(#[from] Elapsed),
+}
+
+/// Query the QCS API for Quil-T calibrations.
+/// If `None`, the default `timeout` used is 10 seconds.
+pub async fn get_quilt_calibrations(
+    quantum_processor_id: &str,
+    client: &Qcs,
+    timeout: Option<Duration>,
+) -> Result<GetQuiltCalibrationsResponse, GetQuiltCalibrationsError> {
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
+
+    tokio::time::timeout(timeout, async move {
+        Ok(translation_api::get_quilt_calibrations(
+            &client.get_openapi_client(),
+            quantum_processor_id,
+        )
+        .await?)
     })
     .await?
 }
