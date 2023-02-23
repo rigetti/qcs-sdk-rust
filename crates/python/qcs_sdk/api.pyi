@@ -201,7 +201,7 @@ def compile(
     target_device: str,
     client: Optional[QCSClient] = None,
     *,
-    timeout: int = 30,
+    timeout: float = 30,
 ) -> str:
     """
     Uses quilc to convert a quil program to native Quil.
@@ -229,7 +229,7 @@ async def compile_async(
     target_device: str,
     client: Optional[QCSClient] = None,
     *,
-    timeout: int = 30,
+    timeout: float = 30,
 ) -> str:
     """
     Async version of ``compile``.

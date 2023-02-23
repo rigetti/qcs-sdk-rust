@@ -15,7 +15,7 @@ use super::{rpcq, Qcs};
 mod isa;
 
 /// Number of seconds to wait before timing out.
-pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
+pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
@@ -57,7 +57,7 @@ pub(crate) fn compile_program(
 #[derive(Clone, Copy, Debug)]
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
-    timeout: Option<u8>,
+    timeout: Option<f64>,
 
     /// If the compiler should produce "protoquil" as output. If `None`, the default
     /// behavior configured in the compiler service is used.
@@ -78,7 +78,7 @@ impl CompilerOpts {
 
     /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
     #[must_use]
-    pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
+    pub fn with_timeout(&mut self, seconds: Option<f64>) -> Self {
         self.timeout = seconds;
         *self
     }
