@@ -1,4 +1,3 @@
-use pyo3_asyncio::tokio::future_into_py;
 use qcs_api_client_common::{
     configuration::{AuthServer, BuildError, ClientConfigurationBuilder, Tokens},
     ClientConfiguration,
@@ -14,6 +13,8 @@ use rigetti_pyo3::{
 
 use qcs::qpu::Qcs;
 
+use crate::py_sync::{py_async, py_sync};
+
 create_init_submodule! {
     classes: [
         PyQcsClient,
@@ -21,27 +22,28 @@ create_init_submodule! {
         PyQcsClientTokens
     ],
     errors: [
-        QcsGrpcClientError,
-        QcsGrpcEndpointError,
-        QcsGrpcError,
-        QcsLoadError
+        QCSGrpcClientError,
+        QCSGrpcEndpointError,
+        QCSGrpcError,
+        QCSLoadError,
+        QCSConfigurationBuildError
     ],
 }
 
 wrap_error! {
     LoadError(qcs::qpu::client::LoadError);
 }
-py_wrap_error!(client, LoadError, QcsLoadError, PyRuntimeError);
+py_wrap_error!(client, LoadError, QCSLoadError, PyRuntimeError);
 
 wrap_error! {
     GrpcError(qcs::qpu::client::GrpcError);
 }
-py_wrap_error!(client, GrpcError, QcsGrpcError, PyRuntimeError);
+py_wrap_error!(client, GrpcError, QCSGrpcError, PyRuntimeError);
 
 wrap_error! {
     GrpcClientError(qcs::qpu::client::GrpcClientError);
 }
-py_wrap_error!(client, GrpcClientError, QcsGrpcClientError, PyRuntimeError);
+py_wrap_error!(client, GrpcClientError, QCSGrpcClientError, PyRuntimeError);
 
 wrap_error! {
     GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
@@ -49,7 +51,7 @@ wrap_error! {
 py_wrap_error!(
     client,
     GrpcEndpointError,
-    QcsGrpcEndpointError,
+    QCSGrpcEndpointError,
     PyRuntimeError
 );
 
@@ -57,13 +59,13 @@ wrap_error!(ConfigurationBuildError(BuildError));
 py_wrap_error!(
     qcs,
     ConfigurationBuildError,
-    QcsConfigurationBuildError,
+    QCSConfigurationBuildError,
     PyRuntimeError
 );
 
 /// The fields on qcs_api_client_common::client::AuthServer are not public.
 #[pyclass]
-#[pyo3(name = "QcsClientAuthServer")]
+#[pyo3(name = "QCSClientAuthServer")]
 #[derive(FromPyObject)]
 pub struct PyQcsClientAuthServer {
     #[pyo3(get, set)]
@@ -95,7 +97,7 @@ impl PyQcsClientAuthServer {
 }
 
 py_wrap_data_struct! {
-    PyQcsClientTokens(Tokens) as "QcsClientTokens" {
+    PyQcsClientTokens(Tokens) as "QCSClientTokens" {
         bearer_access_token: Option<String> => Option<Py<PyString>>,
         refresh_token: Option<String> => Option<Py<PyString>>
     }
@@ -114,7 +116,7 @@ impl PyQcsClientTokens {
 }
 
 py_wrap_type! {
-    PyQcsClient(Qcs) as "QcsClient";
+    PyQcsClient(Qcs) as "QCSClient";
 }
 
 impl PyQcsClient {
@@ -126,6 +128,25 @@ impl PyQcsClient {
                 .map_err(LoadError::from)
                 .map_err(LoadError::to_py_err)?,
         })
+    }
+
+    async fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        let config = match profile_name {
+            Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
+            None => ClientConfiguration::load_default().await,
+        };
+
+        let client = config
+            .map(Qcs::with_config)
+            .map_err(LoadError)
+            .map_err(ToPythonError::to_py_err)?;
+
+        let client = match use_gateway {
+            None => client,
+            Some(use_gateway) => client.with_use_gateway(use_gateway),
+        };
+
+        Ok(Self(client))
     }
 }
 
@@ -185,29 +206,20 @@ impl PyQcsClient {
 
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
-    pub fn load(
+    #[pyo3(name = "load")]
+    pub fn py_load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        py_sync!(Self::load(profile_name, use_gateway))
+    }
+
+    #[staticmethod]
+    #[args("/", profile_name = "None", use_gateway = "None")]
+    #[pyo3(name = "load_async")]
+    pub fn py_load_async(
         py: Python<'_>,
         profile_name: Option<String>,
         use_gateway: Option<bool>,
     ) -> PyResult<&PyAny> {
-        future_into_py(py, async move {
-            let config = match profile_name {
-                Some(profile_name) => ClientConfiguration::load_profile(profile_name).await,
-                None => ClientConfiguration::load_default().await,
-            };
-
-            let client = config
-                .map(Qcs::with_config)
-                .map_err(LoadError)
-                .map_err(ToPythonError::to_py_err)?;
-
-            let client = match use_gateway {
-                None => client,
-                Some(use_gateway) => client.with_use_gateway(use_gateway),
-            };
-
-            Ok(Self(client))
-        })
+        py_async!(py, Self::load(profile_name, use_gateway))
     }
 
     #[getter]

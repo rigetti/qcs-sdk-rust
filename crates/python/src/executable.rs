@@ -9,14 +9,18 @@ use rigetti_pyo3::{
 };
 use tokio::sync::Mutex;
 
-use crate::qpu::quilc::PyCompilerOpts;
+use crate::{
+    execution_data::PyExecutionData,
+    py_sync::{py_async, py_sync},
+    qpu::quilc::PyCompilerOpts,
+};
 
 wrap_error!(ExecutionError(Error));
 
 py_wrap_error!(
     executable,
     ExecutionError,
-    QcsExecutionError,
+    QCSExecutionError,
     PyRuntimeError
 );
 
@@ -47,6 +51,24 @@ impl PyParameter {
     pub fn new(name: String, index: usize, value: f64) -> Self {
         Self { name, index, value }
     }
+}
+
+/// Invoke a PyExecutable's inner Executable::method with given arguments,
+/// then mapped to `Future<Output = Result<PyExecutionData, ExecutionError>>`
+macro_rules! py_executable_data {
+    ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
+        let arc = $self.as_inner().clone();
+        async move {
+            arc.lock()
+                .await
+                .$method($($arg),*)
+                .await
+                .map(ExecutionData::from)
+                .map(PyExecutionData::from)
+                .map_err(ExecutionError::from)
+                .map_err(ExecutionError::to_py_err)
+        }
+    }};
 }
 
 #[pymethods]
@@ -93,63 +115,59 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm<'py>(&self, py: Python<'py>) -> PyResult<&'py PyAny> {
-        let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
-            arc.lock()
-                .await
-                .execute_on_qvm()
-                .await
-                .map(ExecutionData::from)
-                .map(|qvm| Python::with_gil(|py| qvm.to_python(py)))
-                .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
-        })
+    pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
+        py_sync!(py_executable_data!(self, execute_on_qvm))
     }
 
-    pub fn execute_on_qpu<'py>(
-        &self,
+    pub fn execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
+        py_async!(py, py_executable_data!(self, execute_on_qvm))
+    }
+
+    pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
+        py_sync!(py_executable_data!(
+            self,
+            execute_on_qpu,
+            quantum_processor_id,
+        ))
+    }
+
+    pub fn execute_on_qpu_async<'py>(
+        &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
-    ) -> PyResult<&'py PyAny> {
-        let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
-            arc.lock()
-                .await
-                .execute_on_qpu(quantum_processor_id)
-                .await
-                .map(ExecutionData::from)
-                .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
-                .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
-        })
+    ) -> PyResult<&PyAny> {
+        py_async!(
+            py,
+            py_executable_data!(self, execute_on_qpu, quantum_processor_id)
+        )
     }
 
-    pub fn retrieve_results<'py>(
-        &mut self,
+    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
+        py_sync!(py_executable_data!(
+            self,
+            retrieve_results,
+            job_handle.into(),
+        ))
+    }
+
+    pub fn retrieve_results_async<'py>(
+        &'py mut self,
         py: Python<'py>,
         job_handle: PyJobHandle,
-    ) -> PyResult<&'py PyAny> {
-        let arc = self.as_inner().clone();
-        pyo3_asyncio::tokio::local_future_into_py(py, async move {
-            arc.lock()
-                .await
-                .retrieve_results(job_handle.into_inner())
-                .await
-                .map(ExecutionData::from)
-                .map(|qpu| Python::with_gil(|py| qpu.to_python(py)))
-                .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)?
-        })
+    ) -> PyResult<&PyAny> {
+        py_async!(
+            py,
+            py_executable_data!(self, retrieve_results, job_handle.into())
+        )
     }
 }
 
 py_wrap_simple_enum! {
     PyService(Service) as "Service" {
-        Quilc,
-        Qvm,
-        Qcs,
-        Qpu
+        Quilc as Quilc,
+        Qvm as QVM,
+        Qcs as QCS,
+        Qpu as QPU
     }
 }
 

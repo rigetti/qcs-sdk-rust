@@ -1,6 +1,7 @@
 from typing import Optional
 
 DEFAULT_COMPILER_TIMEOUT: int
+"""Number of seconds to wait before timing out."""
 
 class QuilcError(RuntimeError): ...
 
