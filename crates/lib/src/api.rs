@@ -1,7 +1,7 @@
 //! This module provides convenience functions to handle compilation,
 //! translation, parameter arithmetic rewriting, and results collection.
 
-use std::{collections::HashMap, str::FromStr, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 use num::Complex;
 use qcs_api_client_grpc::{
@@ -14,17 +14,14 @@ use qcs_api_client_openapi::{
     apis::{quantum_processors_api, translation_api, Error as OpenAPIError},
     models::GetQuiltCalibrationsResponse,
 };
-use quil_rs::expression::Expression;
-use quil_rs::{program::ProgramError, Program};
+
 use serde::Serialize;
 use tokio::time::error::Elapsed;
 
 use crate::qpu::{
     self,
     client::{GrpcClientError, Qcs},
-    quilc,
-    rewrite_arithmetic::{self, Substitutions},
-    runner,
+    quilc, runner,
     translation::{self, EncryptedTranslationResult},
     IsaError,
 };
@@ -32,50 +29,6 @@ use crate::qpu::{
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
-
-/// Collection of errors that can result from rewriting arithmetic.
-#[derive(thiserror::Error, Debug)]
-pub enum RewriteArithmeticError {
-    /// The Quil program could not be parsed.
-    #[error("Could not parse program: {0}")]
-    Program(#[from] ProgramError<Program>),
-    /// Parameteric arithmetic in the Quil program could not be rewritten.
-    #[error("Could not rewrite arithmetic: {0}")]
-    Rewrite(#[from] rewrite_arithmetic::Error),
-}
-
-/// The result of a call to [`rewrite_arithmetic()`] which provides the
-/// information necessary to later patch-in memory values to a compiled program.
-#[derive(Clone, Debug, Serialize)]
-pub struct RewriteArithmeticResult {
-    /// The rewritten program
-    pub program: String,
-    /// The expressions used to fill-in the `__SUBST` memory location. The
-    /// expression index in this vec is the same as that in `__SUBST`.
-    pub recalculation_table: Vec<String>,
-}
-
-/// Rewrite parametric arithmetic such that all gate parameters are only memory
-/// references to newly declared memory location (`__SUBST`).
-///
-/// A "recalculation" table is provided which can be used to populate the memory
-/// when needed (see `build_patch_values`).
-///
-/// # Errors
-///
-/// May return an error if the program fails to parse, or the parameter arithmetic
-/// cannot be rewritten.
-pub fn rewrite_arithmetic(
-    native_quil: Program,
-) -> Result<RewriteArithmeticResult, rewrite_arithmetic::Error> {
-    let (program, subs) = qpu::rewrite_arithmetic::rewrite_arithmetic(native_quil)?;
-    let recalculation_table = subs.into_iter().map(|expr| expr.to_string()).collect();
-
-    Ok(RewriteArithmeticResult {
-        program: program.to_string(true),
-        recalculation_table,
-    })
-}
 
 /// Errors that can happen during translation
 #[derive(Debug, thiserror::Error)]
@@ -169,23 +122,6 @@ pub enum SubmitError {
     /// Job could not be deserialized
     #[error("Failed to deserialize job: {0}")]
     DeserializeError(#[from] serde_json::Error),
-}
-
-/// Evaluate the expressions in `recalculation_table` using the numeric values
-/// provided in `memory`.
-///
-/// # Errors
-#[allow(clippy::implicit_hasher)]
-pub fn build_patch_values(
-    recalculation_table: &[String],
-    memory: &HashMap<Box<str>, Vec<f64>>,
-) -> Result<HashMap<Box<str>, Vec<f64>>, String> {
-    let substitutions: Substitutions = recalculation_table
-        .iter()
-        .map(|expr| Expression::from_str(expr))
-        .collect::<Result<_, _>>()
-        .map_err(|e| format!("Unable to interpret recalculation table: {e:?}"))?;
-    rewrite_arithmetic::get_substitutions(&substitutions, memory)
 }
 
 /// Data from an individual register. Each variant contains a vector with the expected data type

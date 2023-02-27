@@ -3,18 +3,15 @@ use std::{collections::HashMap, time::Duration};
 use pyo3::{
     create_exception,
     exceptions::{PyRuntimeError, PyValueError},
-    prelude::*,
     pyfunction,
-    types::{PyComplex, PyDict, PyFloat, PyInt, PyList, PyString},
+    types::{PyComplex, PyDict, PyFloat, PyInt, PyString},
     Py, PyResult,
 };
-use qcs::api::{
-    self, ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult, TranslationResult,
-};
+use qcs::api::{self, ExecutionResult, ExecutionResults, Register, TranslationResult};
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
     create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type,
-    py_wrap_union_enum, wrap_error, ToPython, ToPythonError,
+    py_wrap_union_enum, wrap_error, ToPythonError,
 };
 
 use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
@@ -24,7 +21,6 @@ create_init_submodule! {
         PyExecutionResult,
         PyExecutionResults,
         PyRegister,
-        PyRewriteArithmeticResult,
         PyTranslationResult,
         PyQuiltCalibrations
     ],
@@ -39,8 +35,6 @@ create_init_submodule! {
         QCSGetQuiltCalibrationsError
     ],
     funcs: [
-        rewrite_arithmetic,
-        build_patch_values,
         py_translate,
         py_translate_async,
         py_submit,
@@ -52,13 +46,6 @@ create_init_submodule! {
         py_get_quilt_calibrations,
         py_get_quilt_calibrations_async
     ],
-}
-
-py_wrap_data_struct! {
-    PyRewriteArithmeticResult(RewriteArithmeticResult) as "RewriteArithmeticResult" {
-        program: String => Py<PyString>,
-        recalculation_table: Vec<String> => Py<PyList>
-    }
 }
 
 py_wrap_data_struct! {
@@ -122,36 +109,6 @@ py_wrap_error!(
     QCSGetQuiltCalibrationsError,
     PyRuntimeError
 );
-
-#[pyfunction]
-pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticResult> {
-    let native_program = native_quil
-        .parse::<quil_rs::Program>()
-        .map_err(|e| TranslationError::new_err(e.to_string()))?;
-    let result = qcs::api::rewrite_arithmetic(native_program)
-        .map_err(|e| RewriteArithmeticError::new_err(e.to_string()))?;
-    let pyed = result.into();
-    Ok(pyed)
-}
-
-#[pyfunction]
-pub fn build_patch_values(
-    py: Python<'_>,
-    recalculation_table: Vec<String>,
-    memory: HashMap<String, Vec<f64>>,
-) -> PyResult<Py<PyDict>> {
-    let memory = memory
-        .into_iter()
-        .map(|(k, v)| (k.into_boxed_str(), v))
-        .collect();
-    let patch_values = qcs::api::build_patch_values(&recalculation_table, &memory)
-        .map_err(TranslationError::new_err)?;
-    patch_values
-        .into_iter()
-        .map(|(k, v)| (k.to_string(), v))
-        .collect::<HashMap<_, _>>()
-        .to_python(py)
-}
 
 py_function_sync_async! {
     #[pyfunction(client = "None")]

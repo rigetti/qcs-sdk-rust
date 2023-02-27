@@ -13,7 +13,7 @@ pub mod client;
 mod execution;
 pub mod quilc;
 mod result_data;
-pub(crate) mod rewrite_arithmetic;
+pub mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
 pub(crate) mod translation;

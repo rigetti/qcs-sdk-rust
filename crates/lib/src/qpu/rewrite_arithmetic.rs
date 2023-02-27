@@ -1,3 +1,4 @@
+//! Rewriting arithmetic
 use std::{collections::HashMap, convert::TryFrom};
 
 use indexmap::set::IndexSet;
@@ -46,7 +47,7 @@ use crate::executable::Parameters;
 /// where `__SUBST[0]` will be recalculated for each parameter set that is run and passed as a
 /// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
-pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
+pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
     let mut substitutions = Substitutions::new();
     let Program {
         calibrations,
@@ -115,7 +116,7 @@ pub(crate) fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitut
 /// Because QPUs do not evaluate expressions themselves. This function creates the values for
 /// `__SUBST` by calculating the original expressions given the user-provided params (in this
 /// case just `theta`).
-pub(crate) fn get_substitutions(
+pub fn get_substitutions(
     substitutions: &Substitutions,
     params: &Parameters,
 ) -> Result<Parameters, String> {
@@ -153,10 +154,20 @@ pub(crate) fn get_substitutions(
 /// All of the errors that can occur in this module.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// A DEFRAME is missing for the given frame.
     #[error("No DEFFRAME for {0}")]
     MissingDefFrame(String),
+
+    /// The SAMPLE-RATE value is invalid for the given frame.
     #[error("Unable to use SAMPLE-RATE {sample_rate} for frame {frame}")]
-    InvalidSampleRate { sample_rate: String, frame: String },
+    InvalidSampleRate {
+        /// The invalid SAMPLE-RATE value.
+        sample_rate: String,
+        /// The given frame name.
+        frame: String,
+    },
+
+    /// A SAMPLE-RATE is missing for the given frame.
     #[error("SAMPLE-RATE is required for frame {0}")]
     MissingSampleRate(String),
 }
