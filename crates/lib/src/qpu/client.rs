@@ -2,6 +2,8 @@
 //! desired API (e.g. `gRPC` or `OpenAPI`) and will properly
 //! initialize those clients (e.g. with authentication metadata).
 
+use std::time::Duration;
+
 use qcs_api_client_common::ClientConfiguration;
 use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
@@ -24,6 +26,10 @@ use tonic::Status;
 pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
+
+/// TODO: make configurable at the client level.
+/// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
+pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// A client providing helper functionality for accessing QCS APIs
 #[derive(Debug, Clone, Default)]

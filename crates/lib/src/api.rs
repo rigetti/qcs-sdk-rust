@@ -10,9 +10,8 @@ use qcs_api_client_grpc::{
         get_controller_job_results_request::Target, GetControllerJobResultsRequest,
     },
 };
-use qcs_api_client_openapi::{
-    apis::{quantum_processors_api, translation_api, Error as OpenAPIError},
-    models::GetQuiltCalibrationsResponse,
+use qcs_api_client_openapi::apis::{
+    quantum_processors_api, translation_api, Error as OpenAPIError,
 };
 
 use serde::Serialize;
@@ -20,13 +19,9 @@ use tokio::time::error::Elapsed;
 
 use crate::qpu::{
     self,
-    client::{GrpcClientError, Qcs},
+    client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT},
     runner,
 };
-
-/// TODO: make configurable at the client level.
-/// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
-static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// Data from an individual register. Each variant contains a vector with the expected data type
 /// where each value in the vector corresponds to a shot.
@@ -207,23 +202,4 @@ pub enum GetQuiltCalibrationsError {
     /// API call did not finish before timeout
     #[error("API call did not finish before timeout.")]
     TimeoutError(#[from] Elapsed),
-}
-
-/// Query the QCS API for Quil-T calibrations.
-/// If `None`, the default `timeout` used is 10 seconds.
-pub async fn get_quilt_calibrations(
-    quantum_processor_id: &str,
-    client: &Qcs,
-    timeout: Option<Duration>,
-) -> Result<GetQuiltCalibrationsResponse, GetQuiltCalibrationsError> {
-    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
-
-    tokio::time::timeout(timeout, async move {
-        Ok(translation_api::get_quilt_calibrations(
-            &client.get_openapi_client(),
-            quantum_processor_id,
-        )
-        .await?)
-    })
-    .await?
 }

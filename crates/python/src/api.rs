@@ -20,22 +20,18 @@ create_init_submodule! {
     classes: [
         PyExecutionResult,
         PyExecutionResults,
-        PyRegister,
-        PyQuiltCalibrations
+        PyRegister
     ],
     errors: [
         ExecutionError,
         DeviceISAError,
-        QCSListQuantumProcessorsError,
-        QCSGetQuiltCalibrationsError
+        QCSListQuantumProcessorsError
     ],
     funcs: [
         py_retrieve_results,
         py_retrieve_results_async,
         py_list_quantum_processors,
-        py_list_quantum_processors_async,
-        py_get_quilt_calibrations,
-        py_get_quilt_calibrations_async
+        py_list_quantum_processors_async
     ],
 }
 
@@ -115,22 +111,5 @@ py_function_sync_async! {
             .await
             .map_err(ListQuantumProcessorsError::from)
             .map_err(ListQuantumProcessorsError::to_py_err)
-    }
-}
-
-py_function_sync_async! {
-    #[pyfunction(client = "None", timeout = "None")]
-    async fn get_quilt_calibrations(
-        quantum_processor_id: String,
-        client: Option<PyQcsClient>,
-        timeout: Option<f64>,
-    ) -> PyResult<PyQuiltCalibrations> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let timeout = timeout.map(Duration::from_secs_f64);
-        api::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
-            .await
-            .map(PyQuiltCalibrations::from)
-            .map_err(GetQuiltCalibrationsError::from)
-            .map_err(GetQuiltCalibrationsError::to_py_err)
     }
 }
