@@ -31,8 +31,6 @@ create_init_submodule! {
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
-        api::py_translate,
-        api::py_translate_async,
         api::py_submit,
         api::py_submit_async,
         api::py_retrieve_results,

@@ -16,7 +16,7 @@ mod result_data;
 pub mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub(crate) mod runner;
-pub(crate) mod translation;
+pub mod translation;
 
 pub use client::Qcs;
 pub(crate) use execution::{Error as ExecutionError, Execution};

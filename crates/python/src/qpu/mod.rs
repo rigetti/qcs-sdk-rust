@@ -7,6 +7,7 @@ pub mod isa;
 pub mod quilc;
 mod result_data;
 pub mod rewrite_arithmetic;
+pub mod translation;
 
 use isa::QCSISAError;
 
@@ -17,6 +18,7 @@ create_init_submodule! {
         "client": client::init_submodule,
         "isa": isa::init_submodule,
         "quilc": quilc::init_submodule,
-        "rewrite_arithmetic": rewrite_arithmetic::init_submodule
+        "rewrite_arithmetic": rewrite_arithmetic::init_submodule,
+        "translation": translation::init_submodule
     ],
 }

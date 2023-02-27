@@ -4,10 +4,10 @@ use pyo3::{
     create_exception,
     exceptions::{PyRuntimeError, PyValueError},
     pyfunction,
-    types::{PyComplex, PyDict, PyFloat, PyInt, PyString},
+    types::{PyComplex, PyFloat, PyInt, PyString},
     Py, PyResult,
 };
-use qcs::api::{self, ExecutionResult, ExecutionResults, Register, TranslationResult};
+use qcs::api::{self, ExecutionResult, ExecutionResults, Register};
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
     create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type,
@@ -21,22 +21,16 @@ create_init_submodule! {
         PyExecutionResult,
         PyExecutionResults,
         PyRegister,
-        PyTranslationResult,
         PyQuiltCalibrations
     ],
     errors: [
         ExecutionError,
-        TranslationError,
-        CompilationError,
-        RewriteArithmeticError,
         DeviceISAError,
         QCSListQuantumProcessorsError,
         QCSSubmitError,
         QCSGetQuiltCalibrationsError
     ],
     funcs: [
-        py_translate,
-        py_translate_async,
         py_submit,
         py_submit_async,
         py_retrieve_results,
@@ -46,13 +40,6 @@ create_init_submodule! {
         py_get_quilt_calibrations,
         py_get_quilt_calibrations_async
     ],
-}
-
-py_wrap_data_struct! {
-    PyTranslationResult(TranslationResult) as "TranslationResult" {
-        program: String => Py<PyString>,
-        ro_sources: Option<HashMap<String, String>> => Option<Py<PyDict>>
-    }
 }
 
 py_wrap_data_struct! {
@@ -82,9 +69,6 @@ py_wrap_type! {
 }
 
 create_exception!(qcs, ExecutionError, PyRuntimeError);
-create_exception!(qcs, TranslationError, PyRuntimeError);
-create_exception!(qcs, CompilationError, PyRuntimeError);
-create_exception!(qcs, RewriteArithmeticError, PyRuntimeError);
 create_exception!(qcs, DeviceISAError, PyValueError);
 
 wrap_error!(SubmitError(qcs::api::SubmitError));
@@ -109,22 +93,6 @@ py_wrap_error!(
     QCSGetQuiltCalibrationsError,
     PyRuntimeError
 );
-
-py_function_sync_async! {
-    #[pyfunction(client = "None")]
-    async fn translate(
-        native_quil: String,
-        num_shots: u16,
-        quantum_processor_id: String,
-        client: Option<PyQcsClient>,
-    ) -> PyResult<PyTranslationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        qcs::api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
-            .await
-            .map(PyTranslationResult::from)
-            .map_err(|e| TranslationError::new_err(e.to_string()))
-    }
-}
 
 py_function_sync_async! {
     #[pyfunction(client = "None")]

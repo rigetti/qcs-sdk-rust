@@ -21,58 +21,12 @@ use tokio::time::error::Elapsed;
 use crate::qpu::{
     self,
     client::{GrpcClientError, Qcs},
-    quilc, runner,
-    translation::{self, EncryptedTranslationResult},
-    IsaError,
+    quilc, runner, IsaError,
 };
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
-
-/// Errors that can happen during translation
-#[derive(Debug, thiserror::Error)]
-pub enum TranslationError {
-    /// The program could not be translated
-    #[error("Could not translate quil: {0}")]
-    Translate(#[from] GrpcClientError),
-    /// The result of translation could not be deserialized
-    #[error("Could not serialize translation result: {0}")]
-    Serialize(#[from] serde_json::Error),
-}
-
-/// The result of a call to [`translate`] which provides information about the
-/// translated program.
-#[derive(Clone, Debug, PartialEq, Eq, Default, Serialize)]
-pub struct TranslationResult {
-    /// The translated program.
-    pub program: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    /// The memory locations used for readout.
-    pub ro_sources: Option<HashMap<String, String>>,
-}
-
-/// Translates a native Quil program into an executable
-///
-/// # Errors
-///
-/// Returns a [`TranslationError`] if translation fails.
-pub async fn translate(
-    native_quil: &str,
-    shots: u16,
-    quantum_processor_id: &str,
-    client: &Qcs,
-) -> Result<TranslationResult, TranslationError> {
-    let EncryptedTranslationResult { job, readout_map } =
-        translation::translate(quantum_processor_id, native_quil, shots.into(), client).await?;
-
-    let program = serde_json::to_string(&job)?;
-
-    Ok(TranslationResult {
-        ro_sources: Some(readout_map),
-        program,
-    })
-}
 
 /// Submits an executable `program` to be run on the specified QPU
 ///
