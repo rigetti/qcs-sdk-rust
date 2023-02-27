@@ -33,8 +33,6 @@ create_init_submodule! {
     funcs: [
         api::py_retrieve_results,
         api::py_retrieve_results_async,
-        api::py_list_quantum_processors,
-        api::py_list_quantum_processors_async,
         qpu::isa::py_get_instruction_set_architecture,
         qpu::isa::py_get_instruction_set_architecture_async
     ],
