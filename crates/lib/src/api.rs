@@ -21,62 +21,12 @@ use tokio::time::error::Elapsed;
 use crate::qpu::{
     self,
     client::{GrpcClientError, Qcs},
-    quilc, runner, IsaError,
+    runner,
 };
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
-
-/// Submits an executable `program` to be run on the specified QPU
-///
-/// # Errors
-///
-/// May return an error if
-/// * an engagement is not available
-/// * an RPCQ client cannot be built
-/// * the program cannot be submitted
-#[allow(clippy::implicit_hasher)]
-pub async fn submit(
-    program: &str,
-    patch_values: HashMap<String, Vec<f64>>,
-    quantum_processor_id: &str,
-    client: &Qcs,
-) -> Result<String, SubmitError> {
-    // Is there a better way to map these patch_values keys? This
-    // negates the whole purpose of [`submit`] using `Box<str>`,
-    // instead of `String` directly, which normally would decrease
-    // copies _and_ require less space, since str can't be extended.
-    let patch_values = patch_values
-        .into_iter()
-        .map(|(k, v)| (k.into_boxed_str(), v))
-        .collect();
-
-    let job = serde_json::from_str(program)?;
-    let job_id = runner::submit(quantum_processor_id, job, &patch_values, client).await?;
-
-    Ok(job_id.0)
-}
-
-/// Errors that may occur when submitting a program for execution
-#[derive(Debug, thiserror::Error)]
-pub enum SubmitError {
-    /// Failed to fetch the desired ISA
-    #[error("Failed to fetch ISA: {0}")]
-    IsaError(#[from] IsaError),
-
-    /// Failed a gRPC API call
-    #[error("Failed a gRPC call: {0}")]
-    GrpcError(#[from] GrpcClientError),
-
-    /// Quilc compilation failed
-    #[error("Failed quilc compilation: {0}")]
-    QuilcError(#[from] quilc::Error),
-
-    /// Job could not be deserialized
-    #[error("Failed to deserialize job: {0}")]
-    DeserializeError(#[from] serde_json::Error),
-}
 
 /// Data from an individual register. Each variant contains a vector with the expected data type
 /// where each value in the vector corresponds to a shot.

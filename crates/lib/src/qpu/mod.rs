@@ -15,7 +15,7 @@ pub mod quilc;
 mod result_data;
 pub mod rewrite_arithmetic;
 pub(crate) mod rpcq;
-pub(crate) mod runner;
+pub mod runner;
 pub mod translation;
 
 pub use client::Qcs;

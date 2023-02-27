@@ -42,7 +42,6 @@ py_wrap_error!(
 
 /// The result of a call to [`translate`] which provides information about the
 /// translated program.
-// #[derive(Clone, Debug, PartialEq, Eq, Default, Serialize)]
 #[pyclass]
 #[pyo3(name = "TranslationResult")]
 pub struct PyTranslationResult {

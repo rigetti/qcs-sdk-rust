@@ -1,3 +1,4 @@
+//! runner
 use std::convert::{TryFrom, TryInto};
 use std::fmt::{Display, Formatter};
 
@@ -43,10 +44,16 @@ pub(crate) fn params_into_job_execution_configuration(
 
 /// The QCS Job ID. Useful for debugging or retrieving results later.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub(crate) struct JobId(pub(crate) String);
+pub struct JobId(pub(crate) String);
+
+impl ToString for JobId {
+    fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}
 
 /// Execute compiled program on a QPU.
-pub(crate) async fn submit(
+pub async fn submit(
     quantum_processor_id: &str,
     program: EncryptedControllerJob,
     patch_values: &Parameters,

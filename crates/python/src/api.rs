@@ -1,4 +1,4 @@
-use std::{collections::HashMap, time::Duration};
+use std::time::Duration;
 
 use pyo3::{
     create_exception,
@@ -27,12 +27,9 @@ create_init_submodule! {
         ExecutionError,
         DeviceISAError,
         QCSListQuantumProcessorsError,
-        QCSSubmitError,
         QCSGetQuiltCalibrationsError
     ],
     funcs: [
-        py_submit,
-        py_submit_async,
         py_retrieve_results,
         py_retrieve_results_async,
         py_list_quantum_processors,
@@ -71,9 +68,6 @@ py_wrap_type! {
 create_exception!(qcs, ExecutionError, PyRuntimeError);
 create_exception!(qcs, DeviceISAError, PyValueError);
 
-wrap_error!(SubmitError(qcs::api::SubmitError));
-py_wrap_error!(api, SubmitError, QCSSubmitError, PyRuntimeError);
-
 wrap_error!(ListQuantumProcessorsError(
     qcs::api::ListQuantumProcessorsError
 ));
@@ -93,21 +87,6 @@ py_wrap_error!(
     QCSGetQuiltCalibrationsError,
     PyRuntimeError
 );
-
-py_function_sync_async! {
-    #[pyfunction(client = "None")]
-    async fn submit(
-        program: String,
-        patch_values: HashMap<String, Vec<f64>>,
-        quantum_processor_id: String,
-        client: Option<PyQcsClient>,
-    ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        qcs::api::submit(&program, patch_values, &quantum_processor_id, &client)
-            .await
-            .map_err(|e| ExecutionError::new_err(e.to_string()))
-    }
-}
 
 py_function_sync_async! {
     #[pyfunction(client = "None")]
