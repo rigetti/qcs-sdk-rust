@@ -22,7 +22,7 @@ use tokio::time::error::Elapsed;
 use crate::qpu::{
     self,
     client::{GrpcClientError, Qcs},
-    quilc::{self, CompilerOpts, TargetDevice},
+    quilc,
     rewrite_arithmetic::{self, Substitutions},
     runner,
     translation::{self, EncryptedTranslationResult},
@@ -32,25 +32,6 @@ use crate::qpu::{
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
-
-/// Uses quilc to convert a Quil program to native Quil
-pub fn compile(
-    quil: &str,
-    target: TargetDevice,
-    client: &Qcs,
-    options: CompilerOpts,
-) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-    quilc::compile_program(quil, target, client, options)
-        .map_err(Into::into)
-        .map(|p| p.to_string(true))
-}
-
-/// Gets the quilc version
-pub fn get_quilc_version(
-    client: &Qcs,
-) -> Result<String, Box<dyn std::error::Error + Send + Sync + 'static>> {
-    quilc::get_version_info(client).map_err(Into::into)
-}
 
 /// Collection of errors that can result from rewriting arithmetic.
 #[derive(thiserror::Error, Debug)]

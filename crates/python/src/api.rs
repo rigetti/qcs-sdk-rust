@@ -8,12 +8,8 @@ use pyo3::{
     types::{PyComplex, PyDict, PyFloat, PyInt, PyList, PyString},
     Py, PyResult,
 };
-use qcs::{
-    api::{
-        self, ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult,
-        TranslationResult,
-    },
-    qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT},
+use qcs::api::{
+    self, ExecutionResult, ExecutionResults, Register, RewriteArithmeticResult, TranslationResult,
 };
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
@@ -21,10 +17,7 @@ use rigetti_pyo3::{
     py_wrap_union_enum, wrap_error, ToPython, ToPythonError,
 };
 
-use crate::{
-    py_sync::{py_async, py_function_sync_async, py_sync},
-    qpu::client::PyQcsClient,
-};
+use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
 
 create_init_submodule! {
     classes: [
@@ -46,8 +39,6 @@ create_init_submodule! {
         QCSGetQuiltCalibrationsError
     ],
     funcs: [
-        py_compile,
-        py_compile_async,
         rewrite_arithmetic,
         build_patch_values,
         py_translate,
@@ -56,8 +47,6 @@ create_init_submodule! {
         py_submit_async,
         py_retrieve_results,
         py_retrieve_results_async,
-        py_get_quilc_version,
-        py_get_quilc_version_async,
         py_list_quantum_processors,
         py_list_quantum_processors_async,
         py_get_quilt_calibrations,
@@ -134,62 +123,6 @@ py_wrap_error!(
     PyRuntimeError
 );
 
-/// Get the keyword `key` value from `kwds` if it is of type `Option<T>` and it is present, else `None`.
-/// Returns an error if a value is present but cannot be extracted into `T`.
-fn get_kwd<'a, T: FromPyObject<'a>>(kwds: Option<&'a PyDict>, key: &str) -> PyResult<Option<T>> {
-    kwds.and_then(|kwds| kwds.get_item(key))
-        .map_or(Ok(None), PyAny::extract::<Option<T>>)
-}
-
-/// Because `PyDict` does not implement `Send`, we must build `CompilerOpts`
-/// before having python wrappers invoke the private `compile` function.
-fn get_compiler_opts(kwds: Option<&PyDict>) -> PyResult<CompilerOpts> {
-    let compiler_timeout = get_kwd(kwds, "timeout")?.or(Some(DEFAULT_COMPILER_TIMEOUT));
-    let protoquil: Option<bool> = get_kwd(kwds, "protoquil")?;
-    Ok(CompilerOpts::default()
-        .with_timeout(compiler_timeout)
-        .with_protoquil(protoquil))
-}
-
-async fn compile(
-    quil: String,
-    target_device: String,
-    client: Option<PyQcsClient>,
-    options: CompilerOpts,
-) -> PyResult<String> {
-    let target_device: TargetDevice =
-        serde_json::from_str(&target_device).map_err(|e| DeviceISAError::new_err(e.to_string()))?;
-
-    let client = PyQcsClient::get_or_create_client(client).await?;
-    qcs::api::compile(&quil, target_device, &client, options)
-        .map_err(|e| CompilationError::new_err(e.to_string()))
-}
-
-#[pyfunction(client = "None", kwds = "**")]
-#[pyo3(name = "compile")]
-pub fn py_compile(
-    quil: String,
-    target_device: String,
-    client: Option<PyQcsClient>,
-    kwds: Option<&PyDict>,
-) -> PyResult<String> {
-    let options = get_compiler_opts(kwds)?;
-    py_sync!(compile(quil, target_device, client, options))
-}
-
-#[pyfunction(client = "None", kwds = "**")]
-#[pyo3(name = "compile_async")]
-pub fn py_compile_async<'py>(
-    py: Python<'py>,
-    quil: String,
-    target_device: String,
-    client: Option<PyQcsClient>,
-    kwds: Option<&'py PyDict>,
-) -> PyResult<&'py PyAny> {
-    let options = get_compiler_opts(kwds)?;
-    py_async!(py, compile(quil, target_device, client, options))
-}
-
 #[pyfunction]
 pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticResult> {
     let native_program = native_quil
@@ -263,14 +196,6 @@ py_function_sync_async! {
             .await
             .map(PyExecutionResults::from)
             .map_err(|e| ExecutionError::new_err(e.to_string()))
-    }
-}
-
-py_function_sync_async! {
-    #[pyfunction(client = "None")]
-    async fn get_quilc_version(client: Option<PyQcsClient>) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        qcs::api::get_quilc_version(&client).map_err(|e| CompilationError::new_err(e.to_string()))
     }
 }
 

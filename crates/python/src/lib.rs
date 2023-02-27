@@ -31,8 +31,6 @@ create_init_submodule! {
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
-        api::py_compile,
-        api::py_compile_async,
         api::rewrite_arithmetic,
         api::py_translate,
         api::py_translate_async,
@@ -41,8 +39,6 @@ create_init_submodule! {
         api::py_retrieve_results,
         api::py_retrieve_results_async,
         api::build_patch_values,
-        api::py_get_quilc_version,
-        api::py_get_quilc_version_async,
         api::py_list_quantum_processors,
         api::py_list_quantum_processors_async,
         qpu::isa::py_get_instruction_set_architecture,

@@ -34,7 +34,7 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 /// recoverable at runtime. This function can fail generally if the provided ISA cannot be converted
 /// into a form that `quilc` recognizes, if `quilc` cannot be contacted, or if the program cannot
 /// be converted by `quilc`.
-pub(crate) fn compile_program(
+pub fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
@@ -103,7 +103,8 @@ impl Default for CompilerOpts {
     }
 }
 
-pub(crate) fn get_version_info(client: &Qcs) -> Result<String, Error> {
+/// Fetch the version information from the running Quilc compiler.
+pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let binding: HashMap<String, String> = HashMap::new();
