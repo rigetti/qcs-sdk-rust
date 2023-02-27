@@ -26,6 +26,7 @@ pyo3-asyncio.workspace = true
 quil-rs.workspace = true
 serde_json.workspace = true
 tokio.workspace = true
+thiserror.workspace = true
 numpy.workspace = true
 rigetti-pyo3.workspace = true
 paste = "1.0.11"

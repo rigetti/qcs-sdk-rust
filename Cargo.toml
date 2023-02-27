@@ -8,6 +8,7 @@ qcs-api-client-grpc = "0.4.2"
 qcs-api-client-openapi = "0.5.2"
 quil-rs = "0.15"
 serde_json = "1.0.86"
+thiserror = "1.0.37"
 tokio = "1.24.2"
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a 
