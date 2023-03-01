@@ -1,12 +1,4 @@
 //! runner
-use std::convert::{TryFrom, TryInto};
-use std::fmt::{Display, Formatter};
-
-use enum_as_inner::EnumAsInner;
-use num::complex::Complex32;
-use serde::{Deserialize, Serialize};
-use serde_bytes::ByteBuf;
-
 use qcs_api_client_grpc::{
     models::controller::{
         data_value::Value, ControllerJobExecutionResult, DataValue, EncryptedControllerJob,
@@ -46,6 +38,12 @@ pub(crate) fn params_into_job_execution_configuration(
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct JobId(pub(crate) String);
 
+impl From<String> for JobId {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
+
 impl ToString for JobId {
     fn to_string(&self) -> String {
         self.0.clone()
@@ -82,7 +80,8 @@ pub async fn submit(
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution ID".into()))
 }
 
-pub(crate) async fn retrieve_results(
+/// Fetch results from QPU job execution.
+pub async fn retrieve_results(
     job_id: JobId,
     quantum_processor_id: &str,
     client: &Qcs,
@@ -104,153 +103,4 @@ pub(crate) async fn retrieve_results(
         .into_inner()
         .result
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
-}
-
-/// Errors that can occur when decoding the results from the QPU
-#[derive(Debug, thiserror::Error)]
-pub(crate) enum DecodeError {
-    #[error("Only 1-dimensional buffer shapes are currently supported")]
-    InvalidShape,
-    #[error("Expected buffer length {expected}, got {actual}")]
-    BufferLength { expected: usize, actual: usize },
-}
-
-impl Buffer {
-    fn check_shape(&self) -> Result<(), DecodeError> {
-        if self.shape.len() == 1 {
-            Ok(())
-        } else {
-            Err(DecodeError::InvalidShape)
-        }
-    }
-
-    fn assert_len(&self, expected: usize) -> Result<(), DecodeError> {
-        let actual = self.data.len();
-        if expected == actual {
-            Ok(())
-        } else {
-            Err(DecodeError::BufferLength { expected, actual })
-        }
-    }
-}
-
-/// The raw form of the data which comes back from an execution.
-///
-/// Generally this should not be used directly, but converted into an appropriate
-/// 2-D array.
-#[derive(Deserialize, Serialize, Debug, PartialEq, Clone, Eq)]
-struct Buffer {
-    shape: Vec<usize>,
-    data: ByteBuf,
-    dtype: DataType,
-}
-
-#[derive(Deserialize, Serialize, Debug, Copy, Clone, PartialEq, Eq)]
-#[serde(rename_all = "lowercase")]
-enum DataType {
-    Float64,
-    Int16,
-    Complex64,
-    Int8,
-}
-
-impl Display for DataType {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Float64 => write!(f, "float64"),
-            Self::Int16 => write!(f, "int16"),
-            Self::Complex64 => write!(f, "complex64"),
-            Self::Int8 => write!(f, "int8"),
-        }
-    }
-}
-
-/// Data from an individual register. Each variant contains a vector with the expected data type
-/// where each value in the vector corresponds to a shot.
-#[derive(Debug, PartialEq, EnumAsInner)]
-pub(crate) enum Register {
-    /// Corresponds to the NumPy `float64` type, contains a vector of `f64`.
-    F64(Vec<f64>),
-    /// Corresponds to the NumPy `int16` type, contains a vector of `i16`.
-    I16(Vec<i16>),
-    /// Corresponds to the NumPy `complex64` type, contains a vector of [`num::complex::Complex32`].
-    Complex32(Vec<Complex32>),
-    /// Corresponds to the NumPy `int8` type, contains a vector of `i8`.
-    I8(Vec<i8>),
-}
-
-#[allow(clippy::cast_possible_wrap)]
-impl TryFrom<Buffer> for Register {
-    type Error = DecodeError;
-
-    fn try_from(buffer: Buffer) -> Result<Register, Self::Error> {
-        const NUM_BYTES_IN_F64: usize = 8;
-        const NUM_BYTES_IN_I16: usize = 2;
-        const NUM_BYTES_IN_F32: usize = 4;
-        const NUM_BYTES_IN_COMPLEX32: usize = NUM_BYTES_IN_F32 * 2;
-
-        buffer.check_shape()?;
-
-        let shots = buffer.shape[0];
-        let expected_len: usize = match &buffer.dtype {
-            DataType::Float64 => shots * NUM_BYTES_IN_F64,
-            DataType::Int16 => shots * NUM_BYTES_IN_I16,
-            DataType::Complex64 => shots * NUM_BYTES_IN_COMPLEX32,
-            DataType::Int8 => shots,
-        };
-        buffer.assert_len(expected_len)?;
-
-        Ok(match &buffer.dtype {
-            DataType::Float64 => Self::F64(
-                buffer
-                    .data
-                    .chunks_exact(NUM_BYTES_IN_F64)
-                    .map(|data| {
-                        f64::from_le_bytes(
-                            data.try_into()
-                                .expect("Length of all the pieces was pre-checked up above!"),
-                        )
-                    })
-                    .collect(),
-            ),
-            DataType::Int16 => Self::I16(
-                buffer
-                    .data
-                    .chunks_exact(NUM_BYTES_IN_I16)
-                    .map(|data| {
-                        i16::from_le_bytes(
-                            data.try_into()
-                                .expect("Length of all the pieces was pre-checked up above!"),
-                        )
-                    })
-                    .collect(),
-            ),
-            DataType::Complex64 => Self::Complex32(
-                buffer
-                    .data
-                    .chunks_exact(NUM_BYTES_IN_COMPLEX32)
-                    .map(|data: &[u8]| {
-                        let [real, imaginary]: [f32; 2] =
-                            data.chunks_exact(NUM_BYTES_IN_F32)
-                                .map(|data| {
-                                    f32::from_le_bytes(data.try_into().expect(
-                                        "Length of all the pieces was pre-checked up above!",
-                                    ))
-                                })
-                                .collect::<Vec<f32>>()
-                                .try_into()
-                                .expect("Length of all the pieces was pre-checked up above!");
-                        Complex32::new(real, imaginary)
-                    })
-                    .collect(),
-            ),
-            DataType::Int8 => Self::I8(
-                buffer
-                    .data
-                    .into_iter()
-                    .map(|unsigned: u8| unsigned as i8)
-                    .collect(),
-            ),
-        })
-    }
 }

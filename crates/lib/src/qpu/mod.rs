@@ -16,7 +16,7 @@ use tokio::time::error::Elapsed;
 pub mod client;
 mod execution;
 pub mod quilc;
-mod result_data;
+pub mod result_data;
 pub mod rewrite_arithmetic;
 pub(crate) mod rpcq;
 pub mod runner;

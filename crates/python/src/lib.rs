@@ -3,7 +3,6 @@ use rigetti_pyo3::create_init_submodule;
 
 use executable::QCSExecutionError;
 
-pub mod api;
 pub mod executable;
 pub mod execution_data;
 pub mod grpc;
@@ -31,13 +30,10 @@ create_init_submodule! {
         execution_data::PyRegisterMatrixConversionError
     ],
     funcs: [
-        api::py_retrieve_results,
-        api::py_retrieve_results_async,
         qpu::isa::py_get_instruction_set_architecture,
         qpu::isa::py_get_instruction_set_architecture_async
     ],
     submodules: [
-        "api": api::init_submodule,
         "qpu": qpu::init_submodule,
         "qvm": qvm::init_submodule
     ],
