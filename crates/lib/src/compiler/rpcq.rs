@@ -1,15 +1,12 @@
-use log::{trace, warn};
 use std::collections::HashMap;
-use std::convert::TryFrom;
 
-use qcs_api_client_openapi::models::EngagementWithCredentials;
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zmq::{Context, Socket, SocketType};
 
-use crate::qpu::rpcq::Error::AuthSetup;
+use super::rpcq::Error::AuthSetup;
 
 pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 
@@ -100,30 +97,6 @@ impl Client {
     /// Retrieve the raw bytes of a response
     pub(crate) fn receive_raw(&self) -> Result<Vec<u8>, Error> {
         self.socket.recv_bytes(0).map_err(Error::Communication)
-    }
-}
-
-impl TryFrom<&EngagementWithCredentials> for Client {
-    type Error = Error;
-
-    fn try_from(engagement: &EngagementWithCredentials) -> Result<Self, Error> {
-        let EngagementWithCredentials {
-            address,
-            credentials,
-            ..
-        } = engagement;
-        if credentials.server_public.is_empty() {
-            warn!("Connecting to QPU on {} with no credentials.", address);
-            Client::new(address)
-        } else {
-            let credentials = Credentials {
-                client_secret_key: &credentials.client_secret,
-                client_public_key: &credentials.client_public,
-                server_public_key: &credentials.server_public,
-            };
-            trace!("Connecting to QPU at {} with credentials", &address);
-            Client::new_with_credentials(address, &credentials)
-        }
     }
 }
 

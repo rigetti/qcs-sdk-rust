@@ -9,9 +9,9 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
 
+use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
 use crate::qpu::client::Qcs;
-use crate::qpu::quilc::CompilerOpts;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;

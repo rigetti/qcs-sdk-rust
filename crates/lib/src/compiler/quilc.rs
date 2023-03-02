@@ -1,5 +1,4 @@
-//! This module provides the functions and types necessary to compile a program
-//! using quilc.
+//! This module provides the functions and types necessary to compile a program.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -7,12 +6,12 @@ use std::convert::TryFrom;
 use quil_rs::program::{Program, ProgramError};
 use serde::{Deserialize, Serialize};
 
-use isa::Compiler;
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
-use super::{rpcq, Qcs};
+use super::isa::{self, Compiler};
+use super::rpcq;
 
-mod isa;
+use crate::qpu::client::Qcs;
 
 /// Number of seconds to wait before timing out.
 pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;

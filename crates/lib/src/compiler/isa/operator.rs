@@ -63,9 +63,7 @@ where
 mod describe_operator {
     use serde_json::json;
 
-    use crate::qpu::quilc::isa::operator::{
-        Argument, Operator, Parameter, Qubit, PERFECT_DURATION, PERFECT_FIDELITY,
-    };
+    use super::{Argument, Operator, Parameter, Qubit, PERFECT_DURATION, PERFECT_FIDELITY};
 
     /// This test copies some JSON data from the pyQuil ISA integration test to
     /// validate that [`Operator::Gate`] is serialized correctly.
@@ -202,7 +200,7 @@ pub(crate) enum Parameter {
 
 #[cfg(test)]
 mod describe_parameters {
-    use crate::qpu::quilc::isa::operator::Parameter;
+    use super::Parameter;
 
     #[test]
     fn it_serializes_underscore_as_list_of_strings() {
@@ -232,7 +230,7 @@ pub(crate) enum Argument {
 mod describe_arguments {
     use serde_json::json;
 
-    use crate::qpu::quilc::isa::operator::Argument;
+    use super::Argument;
 
     #[test]
     fn it_serializes_underscores_as_list_of_strings() {

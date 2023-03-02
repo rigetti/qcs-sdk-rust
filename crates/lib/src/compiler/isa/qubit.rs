@@ -99,7 +99,7 @@ impl From<&Node> for Qubit {
 
 #[cfg(test)]
 mod describe_qubit {
-    use crate::qpu::quilc::isa::qubit::Qubit;
+    use super::Qubit;
 
     #[test]
     fn it_skips_serializing_dead_if_false() {
@@ -200,7 +200,7 @@ mod describe_rx_gates {
 
     use qcs_api_client_openapi::models::Characteristic;
 
-    use crate::qpu::quilc::isa::{
+    use super::super::{
         operator::{Argument, Operator, Parameter},
         qubit::{rx_gates, FrbSim1q},
     };
@@ -333,9 +333,7 @@ fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
 mod describe_measure {
     use qcs_api_client_openapi::models::Characteristic;
 
-    use crate::qpu::quilc::isa::operator::{self, Operator};
-
-    use super::measure;
+    use super::{super::operator, measure, Operator};
 
     /// This test copies data from pyQuil's integration test for ISA conversion.
     #[test]
