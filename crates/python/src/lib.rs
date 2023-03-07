@@ -3,6 +3,7 @@ use rigetti_pyo3::create_init_submodule;
 
 use executable::QCSExecutionError;
 
+pub mod compiler;
 pub mod executable;
 pub mod execution_data;
 pub mod grpc;

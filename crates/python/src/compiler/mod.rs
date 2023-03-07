@@ -1,12 +1,12 @@
 use pyo3::{exceptions::PyRuntimeError, pyfunction, pymethods, PyResult};
-use qcs::qpu::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT};
+use qcs::compiler::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT};
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_error, py_wrap_struct, py_wrap_type, wrap_error, ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
 
-use super::client::PyQcsClient;
+use crate::qpu::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -43,7 +43,7 @@ impl PyCompilerOpts {
     }
 }
 
-wrap_error!(Error(qcs::qpu::quilc::Error));
+wrap_error!(Error(qcs::compiler::quilc::Error));
 py_wrap_error!(quilc, Error, QuilcError, PyRuntimeError);
 
 py_wrap_struct! {
@@ -60,7 +60,7 @@ py_function_sync_async! {
     ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let options = options.unwrap_or_default();
-        qcs::qpu::quilc::compile_program(&quil, target.into(), &client, options.into())
+        qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(Error::from)
             .map_err(Error::to_py_err)
             .map(|p| p.to_string(true))
@@ -73,7 +73,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
     ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await?;
-        qcs::qpu::quilc::get_version_info(&client)
+        qcs::compiler::quilc::get_version_info(&client)
             .map_err(Error::from)
             .map_err(Error::to_py_err)
     }

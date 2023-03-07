@@ -6,11 +6,9 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zmq::{Context, Socket, SocketType};
 
-use super::rpcq::Error::AuthSetup;
-
 pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 
-/// A minimal RPCQ client that does just enough to talk to `quilc` and QPU endpoints
+/// A minimal RPCQ client that does just enough to talk to `quilc`
 pub(crate) struct Client {
     socket: Socket,
 }
@@ -21,24 +19,6 @@ impl Client {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
-        socket.connect(endpoint).map_err(Error::Communication)?;
-        Ok(Self { socket })
-    }
-
-    /// Construct a new [`Client`] with authentication.
-    fn new_with_credentials(endpoint: &str, credentials: &Credentials<'_>) -> Result<Self, Error> {
-        let socket = Context::new()
-            .socket(SocketType::DEALER)
-            .map_err(Error::SocketCreation)?;
-        socket
-            .set_curve_publickey(credentials.client_public_key.as_bytes())
-            .map_err(AuthSetup)?;
-        socket
-            .set_curve_secretkey(credentials.client_secret_key.as_bytes())
-            .map_err(AuthSetup)?;
-        socket
-            .set_curve_serverkey(credentials.server_public_key.as_bytes())
-            .map_err(AuthSetup)?;
         socket.connect(endpoint).map_err(Error::Communication)?;
         Ok(Self { socket })
     }
@@ -167,14 +147,6 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
         self.client_timeout = seconds;
         self
     }
-}
-
-/// Credentials for connecting to RPCQ Server
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-struct Credentials<'a> {
-    client_secret_key: &'a str,
-    client_public_key: &'a str,
-    server_public_key: &'a str,
 }
 
 #[derive(Deserialize, Debug)]
