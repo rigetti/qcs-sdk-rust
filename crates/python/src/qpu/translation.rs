@@ -14,24 +14,60 @@ use super::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
-        PyTranslationResult,
-        PyQuiltCalibrations
+        PyQuiltCalibrations,
+        PyTranslationResult
     ],
     errors: [
-        PyTranslationError,
-        PyGetQuiltCalibrationsError
+        GetQuiltCalibrationsError,
+        TranslationError
     ],
     funcs: [
-        py_translate,
-        py_translate_async,
         py_get_quilt_calibrations,
-        py_get_quilt_calibrations_async
+        py_get_quilt_calibrations_async,
+        py_translate,
+        py_translate_async
     ],
+}
+
+py_wrap_data_struct! {
+    PyQuiltCalibrations(GetQuiltCalibrationsResponse) as "QuiltCalibrations" {
+        quilt: String => Py<PyString>,
+        settings_timestamp: Option<String> => Option<Py<PyString>>
+    }
+}
+
+wrap_error!(RustGetQuiltCalibrationsError(
+    qcs::qpu::translation::GetQuiltCalibrationsError
+));
+py_wrap_error!(
+    translation,
+    RustGetQuiltCalibrationsError,
+    GetQuiltCalibrationsError,
+    PyRuntimeError
+);
+
+py_function_sync_async! {
+    /// Query the QCS API for Quil-T calibrations.
+    /// If `None`, the default `timeout` used is 10 seconds.
+    #[pyfunction(client = "None", timeout = "None")]
+    async fn get_quilt_calibrations(
+        quantum_processor_id: String,
+        client: Option<PyQcsClient>,
+        timeout: Option<f64>,
+    ) -> PyResult<PyQuiltCalibrations> {
+        let client = PyQcsClient::get_or_create_client(client).await?;
+        let timeout = timeout.map(Duration::from_secs_f64);
+        qcs::qpu::translation::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
+            .await
+            .map(PyQuiltCalibrations::from)
+            .map_err(RustGetQuiltCalibrationsError::from)
+            .map_err(RustGetQuiltCalibrationsError::to_py_err)
+    }
 }
 
 /// Errors that can happen during translation
 #[derive(Debug, thiserror::Error)]
-pub enum TranslationError {
+pub enum RustTranslationError {
     /// The program could not be translated
     #[error("Could not translate quil: {0}")]
     Translate(#[from] GrpcClientError),
@@ -42,8 +78,8 @@ pub enum TranslationError {
 
 py_wrap_error!(
     translation,
+    RustTranslationError,
     TranslationError,
-    PyTranslationError,
     PyRuntimeError
 );
 
@@ -53,9 +89,11 @@ py_wrap_error!(
 #[pyo3(name = "TranslationResult")]
 pub struct PyTranslationResult {
     /// The translated program.
+    #[pyo3(get)]
     pub program: String,
 
     /// The memory locations used for readout.
+    #[pyo3(get)]
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
@@ -76,52 +114,16 @@ py_function_sync_async! {
         let result =
             qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client)
                 .await
-                .map_err(TranslationError::from)
-                .map_err(TranslationError::to_py_err)?;
+                .map_err(RustTranslationError::from)
+                .map_err(RustTranslationError::to_py_err)?;
 
         let program = serde_json::to_string(&result.job)
-            .map_err(TranslationError::from)
-            .map_err(TranslationError::to_py_err)?;
+            .map_err(RustTranslationError::from)
+            .map_err(RustTranslationError::to_py_err)?;
 
         Ok(PyTranslationResult {
             program,
             ro_sources: Some(result.readout_map),
         })
-    }
-}
-
-py_wrap_data_struct! {
-    PyQuiltCalibrations(GetQuiltCalibrationsResponse) as "QuiltCalibrations" {
-        quilt: String => Py<PyString>,
-        settings_timestamp: Option<String> => Option<Py<PyString>>
-    }
-}
-
-wrap_error!(GetQuiltCalibrationsError(
-    qcs::qpu::translation::GetQuiltCalibrationsError
-));
-py_wrap_error!(
-    translation,
-    GetQuiltCalibrationsError,
-    PyGetQuiltCalibrationsError,
-    PyRuntimeError
-);
-
-py_function_sync_async! {
-    /// Query the QCS API for Quil-T calibrations.
-    /// If `None`, the default `timeout` used is 10 seconds.
-    #[pyfunction(client = "None", timeout = "None")]
-    async fn get_quilt_calibrations(
-        quantum_processor_id: String,
-        client: Option<PyQcsClient>,
-        timeout: Option<f64>,
-    ) -> PyResult<PyQuiltCalibrations> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let timeout = timeout.map(Duration::from_secs_f64);
-        qcs::qpu::translation::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
-            .await
-            .map(PyQuiltCalibrations::from)
-            .map_err(GetQuiltCalibrationsError::from)
-            .map_err(GetQuiltCalibrationsError::to_py_err)
     }
 }

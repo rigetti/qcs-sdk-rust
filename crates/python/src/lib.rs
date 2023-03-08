@@ -30,11 +30,12 @@ create_init_submodule! {
         QCSExecutionError,
         execution_data::PyRegisterMatrixConversionError
     ],
-    funcs: [
-        qpu::isa::py_get_instruction_set_architecture,
-        qpu::isa::py_get_instruction_set_architecture_async
-    ],
+    // funcs: [
+    //     qpu::isa::py_get_instruction_set_architecture,
+    //     qpu::isa::py_get_instruction_set_architecture_async
+    // ],
     submodules: [
+        "compiler": compiler::init_submodule,
         "qpu": qpu::init_submodule,
         "qvm": qvm::init_submodule
     ],

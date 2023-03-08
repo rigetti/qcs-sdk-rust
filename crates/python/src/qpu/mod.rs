@@ -5,40 +5,43 @@ use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error, ToPythonErr
 
 pub use result_data::{PyQpuResultData, PyReadoutValues};
 
+pub mod api;
 pub mod client;
 pub mod isa;
 mod result_data;
 pub mod rewrite_arithmetic;
-pub mod runner;
 pub mod translation;
-
-use isa::QCSISAError;
 
 use crate::py_sync::py_function_sync_async;
 
 create_init_submodule! {
-    classes: [PyQpuResultData, PyReadoutValues],
-    errors: [QCSISAError],
+    classes: [
+        PyQpuResultData,
+        PyReadoutValues
+    ],
+    errors: [
+        ListQuantumProcessorsError
+    ],
     funcs: [
         py_list_quantum_processors,
         py_list_quantum_processors_async
     ],
     submodules: [
+        "api": api::init_submodule,
         "client": client::init_submodule,
         "isa": isa::init_submodule,
         "rewrite_arithmetic": rewrite_arithmetic::init_submodule,
-        "runner": runner::init_submodule,
         "translation": translation::init_submodule
     ],
 }
 
-wrap_error!(ListQuantumProcessorsError(
+wrap_error!(RustListQuantumProcessorsError(
     qcs::qpu::ListQuantumProcessorsError
 ));
 py_wrap_error!(
     api,
+    RustListQuantumProcessorsError,
     ListQuantumProcessorsError,
-    QCSListQuantumProcessorsError,
     PyRuntimeError
 );
 
@@ -52,7 +55,7 @@ py_function_sync_async! {
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::list_quantum_processors(&client, timeout)
             .await
-            .map_err(ListQuantumProcessorsError::from)
-            .map_err(ListQuantumProcessorsError::to_py_err)
+            .map_err(RustListQuantumProcessorsError::from)
+            .map_err(RustListQuantumProcessorsError::to_py_err)
     }
 }

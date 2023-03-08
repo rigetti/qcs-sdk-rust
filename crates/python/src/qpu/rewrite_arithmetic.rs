@@ -10,16 +10,18 @@ create_init_submodule! {
         PyRewriteArithmeticResult
     ],
     errors: [
-        PyRewriteArithmeticError
+        BuildPatchValuesError,
+        RewriteArithmeticError
     ],
     funcs: [
+        build_patch_values,
         rewrite_arithmetic
     ],
 }
 
 /// Collection of errors that can result from rewriting arithmetic.
 #[derive(Debug, thiserror::Error)]
-pub enum RewriteArithmeticError {
+pub enum RustRewriteArithmeticError {
     /// The Quil program could not be parsed.
     #[error("Could not parse program: {0}")]
     Program(#[from] quil_rs::program::ProgramError<quil_rs::Program>),
@@ -31,8 +33,8 @@ pub enum RewriteArithmeticError {
 
 py_wrap_error!(
     rewrite_arithmetic,
+    RustRewriteArithmeticError,
     RewriteArithmeticError,
-    PyRewriteArithmeticError,
     PyRuntimeError
 );
 
@@ -65,12 +67,12 @@ pub struct PyRewriteArithmeticResult {
 pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticResult> {
     let native_program = native_quil
         .parse::<quil_rs::Program>()
-        .map_err(RewriteArithmeticError::from)
-        .map_err(RewriteArithmeticError::to_py_err)?;
+        .map_err(RustRewriteArithmeticError::from)
+        .map_err(RustRewriteArithmeticError::to_py_err)?;
 
     let (program, index_set) = qcs::qpu::rewrite_arithmetic::rewrite_arithmetic(native_program)
-        .map_err(RewriteArithmeticError::from)
-        .map_err(RewriteArithmeticError::to_py_err)?;
+        .map_err(RustRewriteArithmeticError::from)
+        .map_err(RustRewriteArithmeticError::to_py_err)?;
 
     let program = program.to_string(true);
     let recalculation_table = index_set.into_iter().map(|e| e.to_string()).collect();
@@ -83,7 +85,7 @@ pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticRe
 
 /// Collection of errors that can result from building patch values.
 #[derive(Debug, thiserror::Error)]
-pub enum BuildPatchValuesError {
+pub enum RustBuildPatchValuesError {
     /// Failed to interpret the recalculation table.
     #[error("Unable to interpret recalculation table: {0:?}")]
     Substitutions(#[from] quil_rs::program::ProgramError<quil_rs::expression::Expression>),
@@ -95,8 +97,8 @@ pub enum BuildPatchValuesError {
 
 py_wrap_error!(
     rewrite_arithmetic,
+    RustBuildPatchValuesError,
     BuildPatchValuesError,
-    PyBuildPatchValuesError,
     PyRuntimeError
 );
 
@@ -118,11 +120,11 @@ pub fn build_patch_values(
         .iter()
         .map(|expr| Expression::from_str(expr))
         .collect::<Result<_, _>>()
-        .map_err(BuildPatchValuesError::from)
-        .map_err(BuildPatchValuesError::to_py_err)?;
+        .map_err(RustBuildPatchValuesError::from)
+        .map_err(RustBuildPatchValuesError::to_py_err)?;
     let patch_values = qcs::qpu::rewrite_arithmetic::get_substitutions(&substitutions, &memory)
-        .map_err(BuildPatchValuesError::PatchValues)
-        .map_err(BuildPatchValuesError::to_py_err)?
+        .map_err(RustBuildPatchValuesError::PatchValues)
+        .map_err(RustBuildPatchValuesError::to_py_err)?
         .into_iter()
         .map(|(k, v)| (k.to_string(), v))
         .collect();

@@ -10,7 +10,7 @@ use rigetti_pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
-    compiler::PyCompilerOpts,
+    compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
 };

@@ -30,8 +30,8 @@ create_init_submodule! {
         PyInstructionSetArchitecture
     ],
     errors: [
-        QCSISASerializationError,
-        QCSISAError
+        SerializaISAError,
+        GetISAError
     ],
     funcs: [
         py_get_instruction_set_architecture,
@@ -39,16 +39,11 @@ create_init_submodule! {
     ],
 }
 
-wrap_error!(IsaSerializationError(serde_json::Error));
-py_wrap_error!(
-    api,
-    IsaSerializationError,
-    QCSISASerializationError,
-    PyValueError
-);
+wrap_error!(RustSerializeIsaError(serde_json::Error));
+py_wrap_error!(isa, RustSerializeIsaError, SerializaISAError, PyValueError);
 
-wrap_error!(IsaError(qcs::qpu::IsaError));
-py_wrap_error!(api, IsaError, QCSISAError, PyRuntimeError);
+wrap_error!(RustGetIsaError(qcs::qpu::GetIsaError));
+py_wrap_error!(isa, RustGetIsaError, GetISAError, PyRuntimeError);
 
 py_wrap_simple_enum! {
     PyFamily(Family) as "Family" {
@@ -127,8 +122,8 @@ impl PyInstructionSetArchitecture {
     #[staticmethod]
     pub fn from_raw(json: String) -> PyResult<Self> {
         let isa = serde_json::from_str(&json)
-            .map_err(IsaSerializationError::from)
-            .map_err(IsaSerializationError::to_py_err)?;
+            .map_err(RustSerializeIsaError::from)
+            .map_err(RustSerializeIsaError::to_py_err)?;
         Ok(Self(isa))
     }
 
@@ -141,8 +136,8 @@ impl PyInstructionSetArchitecture {
                 serde_json::to_string(&self.0)
             }
         }
-        .map_err(IsaSerializationError::from)
-        .map_err(IsaSerializationError::to_py_err)?;
+        .map_err(RustSerializeIsaError::from)
+        .map_err(RustSerializeIsaError::to_py_err)?;
         Ok(data)
     }
 }
@@ -158,7 +153,7 @@ py_function_sync_async! {
         get_isa(&quantum_processor_id, &client)
             .await
             .map(PyInstructionSetArchitecture::from)
-            .map_err(IsaError::from)
-            .map_err(IsaError::to_py_err)
+            .map_err(RustGetIsaError::from)
+            .map_err(RustGetIsaError::to_py_err)
     }
 }

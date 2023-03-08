@@ -5,7 +5,7 @@ It is only here to represent the structure of the rust source code 1:1
 from enum import Enum
 
 from typing import Dict, List, Optional
-from .qpu.quilc import CompilerOpts
+from .compiler.quilc import CompilerOpts
 from ._execution_data import ExecutionData
 
 class QCSExecutionError(RuntimeError):

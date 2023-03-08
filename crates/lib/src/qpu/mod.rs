@@ -13,11 +13,11 @@ use qcs_api_client_openapi::{
 };
 use tokio::time::error::Elapsed;
 
+pub mod api;
 pub mod client;
 mod execution;
 pub mod result_data;
 pub mod rewrite_arithmetic;
-pub mod runner;
 pub mod translation;
 
 pub use client::Qcs;
@@ -35,14 +35,14 @@ pub use result_data::{QpuResultData, ReadoutValues};
 pub async fn get_isa(
     quantum_processor_id: &str,
     client: &Qcs,
-) -> Result<InstructionSetArchitecture, IsaError> {
+) -> Result<InstructionSetArchitecture, GetIsaError> {
     get_instruction_set_architecture(&client.get_openapi_client(), quantum_processor_id)
         .await
         .map_err(client::OpenApiClientError::RequestFailed)
 }
 
 /// Error raised due to failure to get an ISA
-pub type IsaError = client::OpenApiClientError<GetInstructionSetArchitectureError>;
+pub type GetIsaError = client::OpenApiClientError<GetInstructionSetArchitectureError>;
 
 /// API Errors encountered when trying to list available quantum processors.
 #[derive(Debug, thiserror::Error)]

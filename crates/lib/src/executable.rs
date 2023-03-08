@@ -11,9 +11,9 @@ use qcs_api_client_common::ClientConfiguration;
 
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
+use crate::qpu::api::JobId;
 use crate::qpu::client::Qcs;
 use crate::qpu::rewrite_arithmetic;
-use crate::qpu::runner::JobId;
 use crate::qpu::ExecutionError;
 use crate::{qpu, qvm};
 use quil_rs::program::ProgramError;

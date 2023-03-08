@@ -26,7 +26,7 @@ create_init_submodule! {
         ExecutionResults
     ],
     errors: [
-        SubmitError,
+        SubmissionError,
         RetrieveResultsError
     ],
     funcs: [
@@ -39,7 +39,7 @@ create_init_submodule! {
 
 /// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
-enum _SubmitError {
+enum RustSubmissionError {
     /// Failed a gRPC API call
     #[error("Failed a gRPC call: {0}")]
     GrpcError(#[from] GrpcClientError),
@@ -49,7 +49,7 @@ enum _SubmitError {
     DeserializeError(#[from] serde_json::Error),
 }
 
-py_wrap_error!(runner, _SubmitError, SubmitError, PyRuntimeError);
+py_wrap_error!(runner, RustSubmissionError, SubmissionError, PyRuntimeError);
 
 py_function_sync_async! {
     /// Submits an executable `program` to be run on the specified QPU
@@ -80,21 +80,21 @@ py_function_sync_async! {
             .collect();
 
         let job = serde_json::from_str(&program)
-            .map_err(_SubmitError::from)
-            .map_err(_SubmitError::to_py_err)?;
+            .map_err(RustSubmissionError::from)
+            .map_err(RustSubmissionError::to_py_err)?;
 
-        let job_id = qcs::qpu::runner::submit(&quantum_processor_id, job, &patch_values, &client).await
-            .map_err(_SubmitError::from)
-            .map_err(_SubmitError::to_py_err)?;
+        let job_id = qcs::qpu::api::submit(&quantum_processor_id, job, &patch_values, &client).await
+            .map_err(RustSubmissionError::from)
+            .map_err(RustSubmissionError::to_py_err)?;
 
         Ok(job_id.to_string())
     }
 }
 
-wrap_error!(_RetrieveResultsError(GrpcClientError));
+wrap_error!(RustRetrieveResultsError(GrpcClientError));
 py_wrap_error!(
     runner,
-    _RetrieveResultsError,
+    RustRetrieveResultsError,
     RetrieveResultsError,
     PyRuntimeError
 );
@@ -187,10 +187,10 @@ py_function_sync_async! {
     ) -> PyResult<ExecutionResults> {
         let client = PyQcsClient::get_or_create_client(client).await?;
 
-        let results = qcs::qpu::runner::retrieve_results(job_id.into(), &quantum_processor_id, &client)
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), &quantum_processor_id, &client)
             .await
-            .map_err(_RetrieveResultsError::from)
-            .map_err(_RetrieveResultsError::to_py_err)?;
+            .map_err(RustRetrieveResultsError::from)
+            .map_err(RustRetrieveResultsError::to_py_err)?;
 
         Ok(results.into())
     }
