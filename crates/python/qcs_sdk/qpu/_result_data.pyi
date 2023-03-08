@@ -54,13 +54,15 @@ class QPUResultData:
     ): ...
 
     @property
-    def mappings(self) -> Dict[str, str]: ...
-    """
-    Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
-    """
+    def mappings(self) -> Dict[str, str]:
+        """
+        Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
+        """
+        ...
 
     @property
-    def readout_values(self) -> Dict[str, ReadoutValues]: ...
-    """
-    Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
-    """
+    def readout_values(self) -> Dict[str, ReadoutValues]:
+        """
+        Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
+        """
+        ...

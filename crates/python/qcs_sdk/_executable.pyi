@@ -2,18 +2,24 @@
 Do not import this file, it has no exports.
 It is only here to represent the structure of the rust source code 1:1
 """
-from enum import Enum
 
+from enum import Enum
 from typing import Dict, List, Optional
+
 from .compiler.quilc import CompilerOpts
 from ._execution_data import ExecutionData
 
-class QCSExecutionError(RuntimeError):
-    """Error encounteted when executing programs."""
 
+class ExecutionError(RuntimeError):
+    """Error encountered when executing a program."""
     ...
 
+
 class Executable:
+    """
+    The builder interface for executing Quil programs on QVMs and QPUs.
+    """
+
     def __new__(
         cls,
         registers: Optional[List[str]] = None,
@@ -22,58 +28,55 @@ class Executable:
         compile_with_quilc: Optional[bool] = None,
         compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
+
     def execute_on_qvm(self) -> ExecutionData:
         """
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
 
-        Raises:
-            - ``QCSExecutionError``: If the job fails to execute.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
+
     async def execute_on_qvm_async(self) -> ExecutionData:
         """
-        Async version of ``execute_on_qvm``.
-
         Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
+        (async analog of ``Executable.execute_on_qvm``)
 
-        Raises:
-            - ``QCSExecutionError``: If the job fails to execute.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
+
     def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
-        Raises:
-            - ``QCSExecutionError``: If the job fails to execute.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
+
     async def execute_on_qpu_async(self, quantum_processor_id: str) -> ExecutionData:
         """
-        Async version of ``execute_on_qvm``.
-
         Compile the program and execute it on a QPU, waiting for results.
+        (async analog of ``Executable.execute_on_qpu``)
 
-        Raises:
-            - ``QCSExecutionError``: If the job fails to execute.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
+
     def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
         """
         Wait for the results of a job to complete.
 
-        Raises:
-            - ``QCSExecutionError``: If there is a problem constructing job results.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
+
     async def retrieve_results_async(self, job_handle: JobHandle) -> ExecutionData:
         """
-        Async version of ``retrieve_results``.
-
         Wait for the results of a job to complete.
+        (async analog of ``Executable.retrieve_results``)
 
-        Raises:
-            - ``QCSExecutionError``: If there is a problem constructing job results.
+        :raises ExecutionError: If the job fails to execute.
         """
         ...
 
@@ -90,6 +93,7 @@ class JobHandle:
         Unique ID associated with a single job execution.
         """
         ...
+
     @property
     def readout_map(self) -> Dict[str, str]:
         """
@@ -110,18 +114,22 @@ class ExeParameter:
         index: int,
         value: float,
     ) -> "ExeParameter": ...
+
     @property
     def name(self) -> str: ...
     @name.setter
     def name(self, value: str): ...
+
     @property
     def index(self) -> int: ...
     @index.setter
     def index(self, value: int): ...
+
     @property
     def value(self) -> float: ...
     @value.setter
     def value(self, value: float): ...
+
 
 class Service(Enum):
     Quilc = "Quilc"

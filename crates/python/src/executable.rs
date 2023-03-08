@@ -15,12 +15,11 @@ use crate::{
     py_sync::{py_async, py_sync},
 };
 
-wrap_error!(ExecutionError(Error));
-
+wrap_error!(RustExecutionError(Error));
 py_wrap_error!(
     executable,
+    RustExecutionError,
     ExecutionError,
-    QCSExecutionError,
     PyRuntimeError
 );
 
@@ -65,8 +64,8 @@ macro_rules! py_executable_data {
                 .await
                 .map(ExecutionData::from)
                 .map(PyExecutionData::from)
-                .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)
+                .map_err(RustExecutionError::from)
+                .map_err(RustExecutionError::to_py_err)
         }
     }};
 }
