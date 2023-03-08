@@ -22,8 +22,6 @@ create_init_submodule! {
         PyQcsClientTokens
     ],
     errors: [
-        // ClientGrpcError,
-        // GrpcEndpointError,
         LoadClientError,
         BuildClientError
     ],
@@ -39,17 +37,6 @@ py_wrap_error!(
     BuildClientError,
     PyRuntimeError
 );
-
-// wrap_error!(RustClientGrpcError(client::GrpcError));
-// py_wrap_error!(client, RustClientGrpcError, ClientGrpcError, PyRuntimeError);
-
-// wrap_error!(RustGrpcEndpointError(client::GrpcEndpointError));
-// py_wrap_error!(
-//     client,
-//     RustGrpcEndpointError,
-//     GrpcEndpointError,
-//     PyRuntimeError
-// );
 
 /// The fields on qcs_api_client_common::client::AuthServer are not public.
 #[pyclass]
