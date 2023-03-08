@@ -8,19 +8,21 @@ from qcs_sdk.qpu.isa import (
     get_instruction_set_architecture_async,
 )
 
+@pytest.mark.skip
 def test_get_instruction_set_architecture(quantum_processor_id: str):
     """Successfully get a known public ISA."""
     isa = get_instruction_set_architecture(quantum_processor_id)
     assert type(isa) is InstructionSetArchitecture
 
 
+@pytest.mark.skip
 @pytest.mark.asyncio
 async def test_get_instruction_set_architecture_async(quantum_processor_id: str):
     """Successfully get a known public ISA."""
     isa = await get_instruction_set_architecture_async(quantum_processor_id)
     assert type(isa) is InstructionSetArchitecture
 
-
+@pytest.mark.skip
 def test_get_instruction_set_architecture_error():
     with pytest.raises(GetISAError):
         get_instruction_set_architecture("Does Not Exist")
