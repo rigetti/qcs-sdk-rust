@@ -3,9 +3,12 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.4.2"
-qcs-api-client-grpc = "0.4.2"
-qcs-api-client-openapi = "0.5.2"
+# qcs-api-client-common = "0.4.2"
+qcs-api-client-common = { path = "../qcs-api-client-rust/qcs-api-client-common" }
+# qcs-api-client-grpc = "0.4.2"
+qcs-api-client-grpc= { path = "../qcs-api-client-rust/qcs-api-client-grpc" }
+# qcs-api-client-openapi = "0.5.2"
+qcs-api-client-openapi = { path = "../qcs-api-client-rust/qcs-api-client-openapi/public" }
 quil-rs = "0.15"
 serde_json = "1.0.86"
 thiserror = "1.0.37"
