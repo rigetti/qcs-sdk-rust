@@ -110,7 +110,7 @@ py_wrap_union_enum! {
     #[derive(Debug)]
     PyRegister(Register) as "Register" {
         i32: I32 => Vec<Py<PyInt>>,
-        complex: Complex32 => Vec<Py<PyComplex>>
+        complex32: Complex32 => Vec<Py<PyComplex>>
     }
 }
 

@@ -2,7 +2,7 @@ import pytest
 from urllib.parse import urlparse
 
 from qcs_sdk import QCSClient
-from qcs_sdk.qpu.client import QCSLoadError, QCSClientAuthServer, QCSClientTokens
+from qcs_sdk.qpu.client import LoadClientError, QCSClientAuthServer, QCSClientTokens
 
 @pytest.fixture
 def default_client():
@@ -35,7 +35,7 @@ def test_client_default_profile_is_not_empty(default_client: QCSClient):
 
 def test_client_broken_raises():
     """Using a profile with broken configuration should surface the underlying error."""
-    with pytest.raises(QCSLoadError, match=r"Expected auth server .* but it didn't exist"):
+    with pytest.raises(LoadClientError, match=r"Expected auth server .* but it didn't exist"):
         QCSClient.load(profile_name="broken")
 
 

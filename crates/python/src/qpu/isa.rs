@@ -30,7 +30,7 @@ create_init_submodule! {
         PyInstructionSetArchitecture
     ],
     errors: [
-        SerializaISAError,
+        SerializeISAError,
         GetISAError
     ],
     funcs: [
@@ -40,7 +40,7 @@ create_init_submodule! {
 }
 
 wrap_error!(RustSerializeIsaError(serde_json::Error));
-py_wrap_error!(isa, RustSerializeIsaError, SerializaISAError, PyValueError);
+py_wrap_error!(isa, RustSerializeIsaError, SerializeISAError, PyValueError);
 
 wrap_error!(RustGetIsaError(qcs::qpu::GetIsaError));
 py_wrap_error!(isa, RustGetIsaError, GetISAError, PyRuntimeError);
