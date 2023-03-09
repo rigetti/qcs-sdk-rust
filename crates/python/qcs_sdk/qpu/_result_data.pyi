@@ -2,8 +2,9 @@
 Do not import this file, it has no exports.
 It is only here to represent the structure of the rust source code 1:1
 """
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, final
 
+@final
 class ReadoutValues:
     """
     A row of readout values from the QPU. Each row contains all the values emitted
@@ -29,7 +30,7 @@ class ReadoutValues:
 
     def as_integer(self) -> Optional[List[int]]: ...
     def as_real(self) -> Optional[List[float]]: ...
-    def as_f64(self) -> Optional[List[complex]]: ...
+    def as_complex(self) -> Optional[List[complex]]: ...
 
     def to_integer(self) -> List[int]: ...
     def to_real(self) -> List[float]: ...
@@ -42,6 +43,8 @@ class ReadoutValues:
     @staticmethod
     def from_complex(inner: List[complex]) -> "ReadoutValues": ...
 
+
+@final
 class QPUResultData:
     """
     Encapsulates data returned from the QPU after executing a job.

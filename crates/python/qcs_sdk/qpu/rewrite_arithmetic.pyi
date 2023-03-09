@@ -1,5 +1,5 @@
 
-from typing import Dict, List
+from typing import Dict, List, final
 
 
 class RewriteArithmeticError(RuntimeError):
@@ -22,6 +22,7 @@ class BuildPatchValuesError(RuntimeError):
     ...
 
 
+@final
 class RewriteArithmeticResult:
     """
     Result of a ``rewrite_arithmetic call``.

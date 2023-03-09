@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, final
 
 from .client import QCSClient
 
@@ -13,6 +13,7 @@ class RetrieveResultsError(RuntimeError):
     ...
 
 
+@final
 class Register:
     """
     Data vectors within a single ``ExecutionResult``.
@@ -44,6 +45,7 @@ class Register:
     def from_complex32(inner: List[complex]) -> "Register": ...
 
 
+@final
 class ExecutionResult:
     """Execution readout data from a particular memory location."""
 
@@ -63,6 +65,7 @@ class ExecutionResult:
         ...
 
 
+@final
 class ExecutionResults:
     """Execution readout data for all memory locations."""
 
@@ -138,7 +141,7 @@ def retrieve_results(
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
-    :returns ExecutionResults:
+    :returns: results from execution.
 
     :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     :raises SubmissionError: If there was a problem during program execution.
@@ -159,7 +162,7 @@ async def retrieve_results_async(
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
-    :returns ExecutionResults:
+    :returns: results from execution.
 
     :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     :raises SubmissionError: If there was a problem during program execution.

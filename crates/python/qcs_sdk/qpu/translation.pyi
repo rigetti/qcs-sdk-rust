@@ -1,7 +1,19 @@
-from typing import Optional
+from typing import Dict, Optional, final
 
 from .client import QCSClient
 
+
+class GetQuiltCalibrationsError(RuntimeError):
+    """An error occured while fetching Quil-T calibrations."""
+    ...
+
+
+class TranslationError(RuntimeError):
+    """An error occured while translating a program."""
+    ...
+
+
+@final
 class QuiltCalibrations:
     """Result of `get_quilt_calibrations`."""
 
@@ -20,6 +32,7 @@ class QuiltCalibrations:
     def settings_timestamp(self, value: Optional[str]): ...
 
 
+@final
 class TranslationResult:
     """
     The result of a call to [`translate`] which provides information about the translated program.
@@ -31,7 +44,7 @@ class TranslationResult:
         ...
 
     @property
-    def ro_sources(self) -> Optional[dict]:
+    def ro_sources(self) -> Optional[Dict[str, str]]:
         """A mapping from the program's memory references to the key used to index the results map."""
         ...
 

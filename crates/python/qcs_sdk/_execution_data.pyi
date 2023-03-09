@@ -4,7 +4,7 @@ It is only here to represent the structure of the rust source code 1:1
 """
 
 import datetime
-from typing import Optional
+from typing import Optional, final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -17,6 +17,7 @@ class RegisterMatrixConversionError(ValueError):
     ...
 
 
+@final
 class RegisterMatrix:
     """
     Values in a 2-dimensional ``ndarray`` representing the final shot value in each memory reference across all shots.
@@ -56,6 +57,7 @@ class RegisterMatrix:
     def from_complex(inner: NDArray[np.complex128]) -> "RegisterMatrix": ...
 
 
+@final
 class RegisterMap:
     """A map of register names (ie. "ro") to a ``RegisterMatrix`` containing the values of the register."""
 
@@ -64,6 +66,7 @@ class RegisterMap:
         ...
 
 
+@final
 class ResultData:
     """
     Represents the two possible types of data returned from either the QVM or a real QPU.
@@ -146,6 +149,7 @@ class ResultData:
     def from_qpu(inner: QPUResultData) -> "ResultData": ...
 
 
+@final
 class ExecutionData:
     @property
     def result_data(self) -> ResultData: ...

@@ -1,7 +1,9 @@
-from typing import Dict
+from typing import Dict, final
 
 from .._register_data import RegisterData
 
+
+@final
 class QVMResultData:
     """
     Encapsulates data returned from the QVM after executing a program.

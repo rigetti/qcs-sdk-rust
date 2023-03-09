@@ -1,29 +1,17 @@
 import pytest
 
-from qcs_sdk.compiler.quilc import (
-    TargetDevice,
-    compile_program,
-    compile_program_async,
-)
 from qcs_sdk.qpu.rewrite_arithmetic import (
     rewrite_arithmetic,
     build_patch_values,
 )
 from qcs_sdk.qpu.translation import (
     translate,
-    translate_async,
 )
 
 from qcs_sdk.qpu.api import (
-    SubmissionError,
-    RetrieveResultsError,
     Register,
-    ExecutionResult,
-    ExecutionResults,
     retrieve_results,
-    retrieve_results_async,
     submit,
-    submit_async,
 )
 
 def test_register():
@@ -45,26 +33,21 @@ def test_register():
     assert register.as_i32() == data
 
 
+# TODO: This needs to be able to run when the environment has active auth credentials
 @pytest.mark.skip
-class TestSubmitRetrieve:
+def test_submit_retrieve(
+    quantum_processor_id: str,
+):
     """
     Test the full program submission and retrieval.
     """
 
-    # TODO: test submit / retrieve
-    # def test_submit_retrieve(
-    #     bell_program: str,
-    #     target_device: TargetDevice,
-    #     quantum_processor_id: str,
-    # ):
-    #     # TODO
-    #     pass
+    program = "DECLARE theta REAL; RZ(theta) 0"
+    memory = { "theta": [0.5] }
 
-    # @pytest.mark.asyncio
-    # async def test_submit_retrieve_async(
-    #     bell_program: str,
-    #     target_device: TargetDevice,
-    #     quantum_processor_id: str,
-    # ):
-    #     # TODO
-    #     pass
+    translated = translate(program, 1, quantum_processor_id)
+    rewritten = rewrite_arithmetic(translated.program)
+    patch_values = build_patch_values(rewritten.recalculation_table, memory)
+
+    job_id = submit(rewritten.program, patch_values, quantum_processor_id)
+    results = retrieve_results(job_id)

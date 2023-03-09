@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, final
 
 from ..qpu.isa import InstructionSetArchitecture
 from ..qpu.client import QCSClient
@@ -18,18 +18,9 @@ class QuilcError(RuntimeError):
     ...
 
 
+@final
 class CompilerOpts:
     """A set of options that determine the behavior of compiling programs with quilc."""
-
-    @property
-    def timeout(self) -> Optional[float]:
-        """The number of seconds to wait before timing out. If `None`, there is no timeout."""
-        ...
-
-    @property
-    def protoquil(self) -> Optional[bool]:
-        """If the compiler should produce protoquil as output. If `None`, defer to server settings."""
-        ...
 
     def __new__(
         cls,
@@ -42,6 +33,7 @@ class CompilerOpts:
     def default() -> "CompilerOpts": ...
 
 
+@final
 class TargetDevice:
     """
     Architectural description of device to compile for.

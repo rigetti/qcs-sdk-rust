@@ -4,7 +4,7 @@ It is only here to represent the structure of the rust source code 1:1
 """
 
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, final
 
 from .compiler.quilc import CompilerOpts
 from ._execution_data import ExecutionData
@@ -15,6 +15,7 @@ class ExecutionError(RuntimeError):
     ...
 
 
+@final
 class Executable:
     """
     The builder interface for executing Quil programs on QVMs and QPUs.
@@ -80,6 +81,7 @@ class Executable:
         """
         ...
 
+@final
 class JobHandle:
     """
     The result of submitting a job to a QPU.
@@ -101,6 +103,7 @@ class JobHandle:
         """
         ...
 
+@final
 class ExeParameter:
     """
     Program execution parameters.
@@ -131,6 +134,7 @@ class ExeParameter:
     def value(self, value: float): ...
 
 
+@final
 class Service(Enum):
     Quilc = "Quilc"
     QVM = "QVM"

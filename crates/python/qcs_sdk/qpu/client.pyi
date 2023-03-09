@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, final
 
 class LoadClientError(RuntimeError):
     """Error encountered while loading the QCS API client configuration from the environment configuration."""
@@ -10,6 +10,7 @@ class BuildClientError(RuntimeError):
     ...
 
 
+@final
 class QCSClient:
     """
     Configuration for connecting and authenticating to QCS APIs and resources.
@@ -86,6 +87,7 @@ class QCSClient:
         """URL to access the QVM."""
         ...
 
+@final
 class QCSClientAuthServer:
     """Authentication server configuration for the QCS API."""
 
@@ -112,6 +114,7 @@ class QCSClientAuthServer:
     def issuer(self, value: str): ...
 
 
+@final
 class QCSClientTokens:
     """Authentication tokens for the QCS API."""
 

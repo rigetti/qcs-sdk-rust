@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, final
 
 from .client import QCSClient
 
@@ -13,6 +13,7 @@ class GetISAError(RuntimeError):
     ...
 
 
+@final
 class Family(Enum):
     """
     The architecture family identifier of an ``InstructionSetArchitecture``.
@@ -26,6 +27,7 @@ class Family(Enum):
     Ankaa = "Ankaa",
 
 
+@final
 class Node:
     """
     A logical node in the quantum processor's architecture.
@@ -46,6 +48,7 @@ class Node:
     def node_id(self, value: int): ...
 
 
+@final
 class Edge:
     """
     A degree-two logical connection in the quantum processor's architecture.
@@ -69,6 +72,7 @@ class Edge:
     def node_ids(self, value: List[int]): ...
 
 
+@final
 class Parameter:
     """A parameter to an operation."""
 
@@ -80,6 +84,7 @@ class Parameter:
     def name(self, value: str): ...
 
 
+@final
 class Characteristic:
     """A measured characteristic of an operation."""
 
@@ -135,6 +140,7 @@ class Characteristic:
     def parameter_values(self, value: Optional[List[float]]): ...
 
 
+@final
 class OperationSite:
     """A site for an operation, with its site-dependent characteristics."""
 
@@ -156,6 +162,7 @@ class OperationSite:
     def characteristics(self, value: List[Characteristic]): ...
 
 
+@final
 class Operation:
     """An operation, with its sites and site-independent characteristics."""
 
@@ -198,6 +205,7 @@ class Operation:
     def characteristics(self, value: List[Characteristic]): ...
 
 
+@final
 class Architecture:
     """
     Represents the logical underlying architecture of a quantum processor.
@@ -251,6 +259,7 @@ class Architecture:
 
 
 
+@final
 class InstructionSetArchitecture:
     """
     The native instruction set architecture (ISA) of a quantum processor, annotated with characteristics.

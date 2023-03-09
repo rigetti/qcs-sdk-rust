@@ -171,7 +171,7 @@ py_wrap_simple_enum! {
 }
 
 py_wrap_type! {
-    PyJobHandle(JobHandle<'static>);
+    PyJobHandle(JobHandle<'static>) as "JobHandle";
 }
 
 #[pymethods]
