@@ -21,6 +21,14 @@ args = ["down"]
 command = "poetry"
 args = ["run", "pytest", "tests"]
 
+[tasks.test-session]
+command = "poetry"
+args = ["run", "pytest", "tests", "--with-qcs-session"]
+
+[tasks.test-execution]
+command = "poetry"
+args = ["run", "pytest", "tests", "--with-qcs-session", "--with-qcs-execution"]
+
 [tasks.pytest-flow]
 dependencies = [
     "pre-test-docker-up",

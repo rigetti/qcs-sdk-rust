@@ -70,10 +70,28 @@ macro_rules! py_executable_data {
     }};
 }
 
+/// Invoke `submit_to_qpu` on an executable.
+macro_rules! py_submit_job {
+    ($self: ident, $quantum_processor_id: expr) => {{
+        let arc = $self.as_inner().clone();
+        async move {
+            arc.lock()
+                .await
+                .submit_to_qpu($quantum_processor_id)
+                .await
+                .map(JobHandle::from)
+                .map(PyJobHandle::from)
+                .map_err(RustExecutionError::from)
+                .map_err(RustExecutionError::to_py_err)
+        }
+    }};
+}
+
 #[pymethods]
 impl PyExecutable {
     #[new]
     #[args(
+        quil,
         "/",
         registers = "Vec::new()",
         parameters = "Vec::new()",
@@ -139,6 +157,18 @@ impl PyExecutable {
             py,
             py_executable_data!(self, execute_on_qpu, quantum_processor_id)
         )
+    }
+
+    pub fn submit_to_qpu(&self, quantum_processor_id: String) -> PyResult<PyJobHandle> {
+        py_sync!(py_submit_job!(self, quantum_processor_id))
+    }
+
+    pub fn submit_to_qpu_async<'py>(
+        &'py self,
+        py: Python<'py>,
+        quantum_processor_id: String,
+    ) -> PyResult<&PyAny> {
+        py_async!(py, py_submit_job!(self, quantum_processor_id))
     }
 
     pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {

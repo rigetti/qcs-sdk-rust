@@ -23,6 +23,8 @@ class Executable:
 
     def __new__(
         cls,
+        quil: str,
+        /,
         registers: Optional[List[str]] = None,
         parameters: Optional[List[ExeParameter]] = None,
         shots: Optional[int] = None,
@@ -58,6 +60,23 @@ class Executable:
     async def execute_on_qpu_async(self, quantum_processor_id: str) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
+        (async analog of ``Executable.execute_on_qpu``)
+
+        :raises ExecutionError: If the job fails to execute.
+        """
+        ...
+
+    def submit_to_qpu(self, quantum_processor_id: str) -> JobHandle:
+        """
+        Compile the program and execute it on a QPU, without waiting for results.
+
+        :raises ExecutionError: If the job fails to execute.
+        """
+        ...
+
+    async def submit_to_qpu_async(self, quantum_processor_id: str) -> JobHandle:
+        """
+        Compile the program and execute it on a QPU, without waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
 
         :raises ExecutionError: If the job fails to execute.

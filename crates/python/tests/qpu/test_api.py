@@ -33,8 +33,7 @@ def test_register():
     assert register.as_i32() == data
 
 
-# TODO: This needs to be able to run when the environment has active auth credentials
-@pytest.mark.skip
+@pytest.mark.qcs_execution
 def test_submit_retrieve(
     quantum_processor_id: str,
 ):
