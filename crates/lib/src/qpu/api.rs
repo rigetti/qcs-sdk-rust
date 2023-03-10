@@ -1,4 +1,6 @@
-//! runner
+//! This module provides bindings to for submitting jobs to and retrieving them from
+//! Rigetti QPUs using the QCS API.
+
 use qcs_api_client_grpc::{
     models::controller::{
         data_value::Value, ControllerJobExecutionResult, DataValue, EncryptedControllerJob,

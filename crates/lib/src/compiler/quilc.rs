@@ -1,4 +1,4 @@
-//! This module provides the functions and types necessary to compile a program.
+//! This module provides bindings for compiling programs with the Quilc compiler.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;

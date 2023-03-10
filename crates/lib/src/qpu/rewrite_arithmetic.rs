@@ -1,4 +1,6 @@
-//! Rewriting arithmetic
+//! This module provides functions to rewrite arithmetic in programs where
+//! it is required to do so for Rigetti QPUs to understand that program.
+
 use std::{collections::HashMap, convert::TryFrom};
 
 use indexmap::set::IndexSet;

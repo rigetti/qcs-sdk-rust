@@ -1,4 +1,6 @@
-//! Translation
+//! This module provides bindings to translate programs or fetching Quil-T calibrations
+//! from the QCS API.
+
 use std::{collections::HashMap, time::Duration};
 
 use qcs_api_client_grpc::{
