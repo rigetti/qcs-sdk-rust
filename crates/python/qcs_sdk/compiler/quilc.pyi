@@ -53,6 +53,19 @@ class TargetDevice:
         """
         ...
 
+    @staticmethod
+    def from_json(
+        value: str,
+    ) -> "TargetDevice":
+        """
+        Create a ``TargetDevice`` based on its JSON representation.
+
+        :param value: The JSON representation of a ``TargetDevice`` that describes the target device.
+
+        :raises ValueError: If the JSON is malformed.
+        """
+        ...
+
 
 def compile_program(
     quil: str,
