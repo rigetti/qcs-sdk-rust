@@ -1,3 +1,4 @@
+use pyo3::exceptions::PyValueError;
 use pyo3::{exceptions::PyRuntimeError, pyfunction, pymethods, PyResult};
 use qcs::compiler::quilc::{CompilerOpts, TargetDevice, DEFAULT_COMPILER_TIMEOUT};
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
@@ -63,6 +64,15 @@ impl PyTargetDevice {
             .try_into()
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)?;
+
+        Ok(Self(target))
+    }
+
+    #[staticmethod]
+    pub fn from_json(value: String) -> PyResult<Self> {
+        let target: TargetDevice = serde_json::from_str(&value)
+            .map_err(|err| err.to_string())
+            .map_err(PyValueError::new_err)?;
 
         Ok(Self(target))
     }

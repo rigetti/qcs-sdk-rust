@@ -55,8 +55,8 @@ class ExecutionResult:
         ...
 
     @property
-    def data(self) -> List[Register]:
-        """The result data. Complex numbers are represented as [real, imaginary]."""
+    def data(self) -> Register:
+        """The result data for all shots by the particular memory location."""
         ...
 
     @property
