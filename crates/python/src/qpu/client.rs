@@ -11,7 +11,7 @@ use rigetti_pyo3::{
     wrap_error, ToPythonError,
 };
 
-use qcs::qpu::Qcs;
+use qcs::qpu::{client, Qcs};
 
 use crate::py_sync::{py_async, py_sync};
 
@@ -22,44 +22,19 @@ create_init_submodule! {
         PyQcsClientTokens
     ],
     errors: [
-        QCSGrpcClientError,
-        QCSGrpcEndpointError,
-        QCSGrpcError,
-        QCSLoadError,
-        QCSConfigurationBuildError
+        LoadClientError,
+        BuildClientError
     ],
 }
 
-wrap_error! {
-    LoadError(qcs::qpu::client::LoadError);
-}
-py_wrap_error!(client, LoadError, QCSLoadError, PyRuntimeError);
+wrap_error!(RustLoadClientError(client::LoadError));
+py_wrap_error!(client, RustLoadClientError, LoadClientError, PyRuntimeError);
 
-wrap_error! {
-    GrpcError(qcs::qpu::client::GrpcError);
-}
-py_wrap_error!(client, GrpcError, QCSGrpcError, PyRuntimeError);
-
-wrap_error! {
-    GrpcClientError(qcs::qpu::client::GrpcClientError);
-}
-py_wrap_error!(client, GrpcClientError, QCSGrpcClientError, PyRuntimeError);
-
-wrap_error! {
-    GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
-}
+wrap_error!(RustBuildClientError(BuildError));
 py_wrap_error!(
     client,
-    GrpcEndpointError,
-    QCSGrpcEndpointError,
-    PyRuntimeError
-);
-
-wrap_error!(ConfigurationBuildError(BuildError));
-py_wrap_error!(
-    qcs,
-    ConfigurationBuildError,
-    QCSConfigurationBuildError,
+    RustBuildClientError,
+    BuildClientError,
     PyRuntimeError
 );
 
@@ -125,8 +100,8 @@ impl PyQcsClient {
             Some(client) => client.into(),
             None => Qcs::load()
                 .await
-                .map_err(LoadError::from)
-                .map_err(LoadError::to_py_err)?,
+                .map_err(RustLoadClientError::from)
+                .map_err(RustLoadClientError::to_py_err)?,
         })
     }
 
@@ -138,8 +113,8 @@ impl PyQcsClient {
 
         let client = config
             .map(Qcs::with_config)
-            .map_err(LoadError)
-            .map_err(ToPythonError::to_py_err)?;
+            .map_err(RustLoadClientError)
+            .map_err(RustLoadClientError::to_py_err)?;
 
         let client = match use_gateway {
             None => client,
@@ -198,8 +173,8 @@ impl PyQcsClient {
         let client = builder
             .build()
             .map(Qcs::with_config)
-            .map_err(ConfigurationBuildError::from)
-            .map_err(ConfigurationBuildError::to_py_err)?;
+            .map_err(RustBuildClientError::from)
+            .map_err(RustBuildClientError::to_py_err)?;
 
         Ok(Self(client))
     }

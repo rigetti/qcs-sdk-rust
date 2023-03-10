@@ -10,17 +10,16 @@ use rigetti_pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
+    compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
-    qpu::quilc::PyCompilerOpts,
 };
 
-wrap_error!(ExecutionError(Error));
-
+wrap_error!(RustExecutionError(Error));
 py_wrap_error!(
     executable,
+    RustExecutionError,
     ExecutionError,
-    QCSExecutionError,
     PyRuntimeError
 );
 
@@ -65,8 +64,25 @@ macro_rules! py_executable_data {
                 .await
                 .map(ExecutionData::from)
                 .map(PyExecutionData::from)
-                .map_err(ExecutionError::from)
-                .map_err(ExecutionError::to_py_err)
+                .map_err(RustExecutionError::from)
+                .map_err(RustExecutionError::to_py_err)
+        }
+    }};
+}
+
+/// Invoke `submit_to_qpu` on an executable.
+macro_rules! py_submit_job {
+    ($self: ident, $quantum_processor_id: expr) => {{
+        let arc = $self.as_inner().clone();
+        async move {
+            arc.lock()
+                .await
+                .submit_to_qpu($quantum_processor_id)
+                .await
+                .map(JobHandle::from)
+                .map(PyJobHandle::from)
+                .map_err(RustExecutionError::from)
+                .map_err(RustExecutionError::to_py_err)
         }
     }};
 }
@@ -75,6 +91,7 @@ macro_rules! py_executable_data {
 impl PyExecutable {
     #[new]
     #[args(
+        quil,
         "/",
         registers = "Vec::new()",
         parameters = "Vec::new()",
@@ -142,6 +159,18 @@ impl PyExecutable {
         )
     }
 
+    pub fn submit_to_qpu(&self, quantum_processor_id: String) -> PyResult<PyJobHandle> {
+        py_sync!(py_submit_job!(self, quantum_processor_id))
+    }
+
+    pub fn submit_to_qpu_async<'py>(
+        &'py self,
+        py: Python<'py>,
+        quantum_processor_id: String,
+    ) -> PyResult<&PyAny> {
+        py_async!(py, py_submit_job!(self, quantum_processor_id))
+    }
+
     pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(
             self,
@@ -172,7 +201,7 @@ py_wrap_simple_enum! {
 }
 
 py_wrap_type! {
-    PyJobHandle(JobHandle<'static>);
+    PyJobHandle(JobHandle<'static>) as "JobHandle";
 }
 
 #[pymethods]

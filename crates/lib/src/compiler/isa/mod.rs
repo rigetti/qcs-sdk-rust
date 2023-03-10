@@ -5,9 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use edge::{convert_edges, Edge, Id};
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
-use qubit::Qubit;
-
-use crate::qpu::quilc::isa::qubit::FrbSim1q;
+use qubit::{FrbSim1q, Qubit};
 
 mod edge;
 mod operator;

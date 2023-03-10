@@ -2,8 +2,9 @@
 Do not import this file, it has no exports.
 It is only here to represent the structure of the rust source code 1:1
 """
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, final
 
+@final
 class ReadoutValues:
     """
     A row of readout values from the QPU. Each row contains all the values emitted
@@ -26,12 +27,15 @@ class ReadoutValues:
     def is_integer(self) -> bool: ...
     def is_real(self) -> bool: ...
     def is_complex(self) -> bool: ...
+
     def as_integer(self) -> Optional[List[int]]: ...
     def as_real(self) -> Optional[List[float]]: ...
-    def as_f64(self) -> Optional[List[complex]]: ...
+    def as_complex(self) -> Optional[List[complex]]: ...
+
     def to_integer(self) -> List[int]: ...
     def to_real(self) -> List[float]: ...
     def to_complex(self) -> List[complex]: ...
+
     @staticmethod
     def from_integer(inner: List[int]) -> "ReadoutValues": ...
     @staticmethod
@@ -39,22 +43,29 @@ class ReadoutValues:
     @staticmethod
     def from_complex(inner: List[complex]) -> "ReadoutValues": ...
 
+
+@final
 class QPUResultData:
     """
     Encapsulates data returned from the QPU after executing a job.
     """
 
-    def __init__(
-        self, mappings: Dict[str, str], readout_values: Dict[str, ReadoutValues]
+    def __new__(
+        cls,
+        mappings: Dict[str, str],
+        readout_values: Dict[str, ReadoutValues]
     ): ...
-    @property
-    def mappings(self) -> Dict[str, str]: ...
-    """
-    Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
-    """
 
     @property
-    def readout_values(self) -> Dict[str, ReadoutValues]: ...
-    """
-    Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
-    """
+    def mappings(self) -> Dict[str, str]:
+        """
+        Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
+        """
+        ...
+
+    @property
+    def readout_values(self) -> Dict[str, ReadoutValues]:
+        """
+        Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
+        """
+        ...

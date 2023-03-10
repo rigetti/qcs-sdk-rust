@@ -13,16 +13,16 @@ use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
-use crate::qpu::{rewrite_arithmetic, runner::JobId, translation::translate};
+use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
+use super::api::{retrieve_results, submit, JobId};
 use super::client::{GrpcClientError, Qcs};
-use super::quilc::{self, CompilerOpts, TargetDevice};
 use super::rewrite_arithmetic::RewrittenProgram;
-use super::runner::{retrieve_results, submit};
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
-use super::{get_isa, IsaError};
+use super::{get_isa, GetIsaError};
+use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -46,7 +46,7 @@ pub(crate) enum Error {
     #[error("Problem using QCS API: {0}")]
     QcsClient(#[from] GrpcClientError),
     #[error("Problem fetching ISA: {0}")]
-    IsaError(#[from] IsaError),
+    IsaError(#[from] GetIsaError),
     #[error("Problem parsing memory readout: {0}")]
     ReadoutParse(#[from] MemoryReferenceParseError),
     #[error("Problem when compiling program: {details}")]

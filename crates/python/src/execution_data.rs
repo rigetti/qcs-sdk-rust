@@ -19,22 +19,22 @@ py_wrap_union_enum! {
     }
 }
 
-wrap_error!(RegisterMatrixConversionError(
+wrap_error!(RustRegisterMatrixConversionError(
     qcs::RegisterMatrixConversionError
 ));
 py_wrap_error!(
     execution_data,
+    RustRegisterMatrixConversionError,
     RegisterMatrixConversionError,
-    PyRegisterMatrixConversionError,
     PyValueError
 );
 
 #[pymethods]
 impl PyResultData {
-    fn to_register_map(&self, py: Python) -> PyResult<PyRegisterMap> {
+    pub fn to_register_map(&self, py: Python) -> PyResult<PyRegisterMap> {
         self.as_inner()
             .to_register_map()
-            .map_err(RegisterMatrixConversionError)
+            .map_err(RustRegisterMatrixConversionError)
             .map_err(ToPythonError::to_py_err)?
             .to_python(py)
     }
