@@ -1,3 +1,23 @@
+## 0.5.0-rc.10
+
+### Breaking Changes
+
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+- implement get_instruction_set_architecture (#240)
+
+### Fixes
+
+- add missing types and fix others needed from pyquil (#257)
+
 ## 0.5.0-rc.9
 
 ### Breaking Changes
