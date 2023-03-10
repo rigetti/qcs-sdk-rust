@@ -35,7 +35,7 @@ class QuiltCalibrations:
 @final
 class TranslationResult:
     """
-    The result of a call to [`translate`] which provides information about the translated program.
+    The result of a call to `translate` which provides information about the translated program.
     """
 
     @property
