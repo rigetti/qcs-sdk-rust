@@ -41,6 +41,7 @@ sdist-include = ["README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
+quil = { path = "../../../quil-rs/quil-py" }
 
 [tool.poetry.dev-dependencies]
 numpy = "^1.24.1"

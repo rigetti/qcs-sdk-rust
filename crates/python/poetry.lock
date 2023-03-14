@@ -287,6 +287,20 @@ pytest = ">=6.1.0"
 testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (>=0.931)", "pytest-trio (>=0.7.0)"]
 
 [[package]]
+name = "quil"
+version = "0.1.0"
+description = ""
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = []
+develop = false
+
+[package.source]
+type = "directory"
+url = "../../../quil-rs/quil-py"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -313,4 +327,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "226706998c75145ffb0124fc12c73c08935e14c1872e1b0bd37f08c1c3e69cb5"
+content-hash = "ad9227c8eabd7269e23f9da80957c69e76c2b0e42b9974ccdac7faa7af43b607"
