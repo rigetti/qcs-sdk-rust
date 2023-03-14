@@ -1,19 +1,14 @@
-use log::{trace, warn};
 use std::collections::HashMap;
-use std::convert::TryFrom;
 
-use qcs_api_client_openapi::models::EngagementWithCredentials;
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zmq::{Context, Socket, SocketType};
 
-use crate::qpu::rpcq::Error::AuthSetup;
+pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 
-pub(crate) const DEFAULT_CLIENT_TIMEOUT: u8 = 30;
-
-/// A minimal RPCQ client that does just enough to talk to `quilc` and QPU endpoints
+/// A minimal RPCQ client that does just enough to talk to `quilc`
 pub(crate) struct Client {
     socket: Socket,
 }
@@ -24,24 +19,6 @@ impl Client {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
-        socket.connect(endpoint).map_err(Error::Communication)?;
-        Ok(Self { socket })
-    }
-
-    /// Construct a new [`Client`] with authentication.
-    fn new_with_credentials(endpoint: &str, credentials: &Credentials<'_>) -> Result<Self, Error> {
-        let socket = Context::new()
-            .socket(SocketType::DEALER)
-            .map_err(Error::SocketCreation)?;
-        socket
-            .set_curve_publickey(credentials.client_public_key.as_bytes())
-            .map_err(AuthSetup)?;
-        socket
-            .set_curve_secretkey(credentials.client_secret_key.as_bytes())
-            .map_err(AuthSetup)?;
-        socket
-            .set_curve_serverkey(credentials.server_public_key.as_bytes())
-            .map_err(AuthSetup)?;
         socket.connect(endpoint).map_err(Error::Communication)?;
         Ok(Self { socket })
     }
@@ -103,30 +80,6 @@ impl Client {
     }
 }
 
-impl TryFrom<&EngagementWithCredentials> for Client {
-    type Error = Error;
-
-    fn try_from(engagement: &EngagementWithCredentials) -> Result<Self, Error> {
-        let EngagementWithCredentials {
-            address,
-            credentials,
-            ..
-        } = engagement;
-        if credentials.server_public.is_empty() {
-            warn!("Connecting to QPU on {} with no credentials.", address);
-            Client::new(address)
-        } else {
-            let credentials = Credentials {
-                client_secret_key: &credentials.client_secret,
-                client_public_key: &credentials.client_public,
-                server_public_key: &credentials.server_public,
-            };
-            trace!("Connecting to QPU at {} with credentials", &address);
-            Client::new_with_credentials(address, &credentials)
-        }
-    }
-}
-
 /// All of the possible errors for this module
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -159,7 +112,7 @@ where
     params: &'params T,
     id: String,
     jsonrpc: &'static str,
-    client_timeout: Option<u8>,
+    client_timeout: Option<f64>,
     client_key: Option<String>,
 }
 
@@ -190,18 +143,10 @@ impl<'params, T: Serialize> RPCRequest<'params, T> {
     /// * `seconds`: The number of seconds to wait before timing out, or None for no timeout
     ///
     /// returns: `RPCRequest<T>` with the updated timeout.
-    pub(crate) fn with_timeout(mut self, seconds: Option<u8>) -> Self {
+    pub(crate) fn with_timeout(mut self, seconds: Option<f64>) -> Self {
         self.client_timeout = seconds;
         self
     }
-}
-
-/// Credentials for connecting to RPCQ Server
-#[derive(Debug, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-struct Credentials<'a> {
-    client_secret_key: &'a str,
-    client_public_key: &'a str,
-    server_public_key: &'a str,
 }
 
 #[derive(Deserialize, Debug)]

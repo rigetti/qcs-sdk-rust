@@ -3,9 +3,10 @@ Do not import this file, it has no exports.
 It is only here to represent the structure of the rust source code 1:1
 """
 
-from typing import List, Optional
+from typing import List, Optional, final
 
 
+@final
 class RegisterData:
     """
     Values present in a register that are one of a set of variants.

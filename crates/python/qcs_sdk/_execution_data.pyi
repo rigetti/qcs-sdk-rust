@@ -4,7 +4,7 @@ It is only here to represent the structure of the rust source code 1:1
 """
 
 import datetime
-from typing import Optional
+from typing import Optional, final
 
 import numpy as np
 from numpy.typing import NDArray
@@ -14,9 +14,10 @@ from .qvm import QVMResultData
 
 class RegisterMatrixConversionError(ValueError):
     """Error that may occur when building a ``RegisterMatrix`` from execution data."""
-
     ...
 
+
+@final
 class RegisterMatrix:
     """
     Values in a 2-dimensional ``ndarray`` representing the final shot value in each memory reference across all shots.
@@ -38,13 +39,16 @@ class RegisterMatrix:
     def is_integer(self) -> bool: ...
     def is_real(self) -> bool: ...
     def is_complex(self) -> bool: ...
+
     def as_integer(self) -> Optional[NDArray[np.int64]]: ...
     def as_real(self) -> Optional[NDArray[np.float64]]: ...
     # In numpy `complex128` is a complex number made up of two `f64`s.
     def as_complex(self) -> Optional[NDArray[np.complex128]]: ...
+
     def to_integer(self) -> NDArray[np.int64]: ...
     def to_real(self) -> NDArray[np.float64]: ...
     def to_complex(self) -> NDArray[np.complex128]: ...
+
     @staticmethod
     def from_integer(inner: NDArray[np.int64]) -> "RegisterMatrix": ...
     @staticmethod
@@ -52,12 +56,17 @@ class RegisterMatrix:
     @staticmethod
     def from_complex(inner: NDArray[np.complex128]) -> "RegisterMatrix": ...
 
+
+@final
 class RegisterMap:
     """A map of register names (ie. "ro") to a ``RegisterMatrix`` containing the values of the register."""
 
-    def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]: ...
-    """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
+    def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]:
+        """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
+        ...
 
+
+@final
 class ResultData:
     """
     Represents the two possible types of data returned from either the QVM or a real QPU.
@@ -102,45 +111,51 @@ class ResultData:
         - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
         - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
         - ``from_*``: wrap underlying values as this enum type.
-
     """
 
-    def to_register_map(self) -> RegisterMap: ...
-    """
-    Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
-    ``QPUResultData`` into a ``RegisterMap``. The ``RegisterMatrix`` for each register will be
-    constructed such that each row contains all the final values in the register for a single shot.
+    def to_register_map(self) -> RegisterMap:
+        """
+        Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
+        ``QPUResultData`` into a ``RegisterMap``. The ``RegisterMatrix`` for each register will be
+        constructed such that each row contains all the final values in the register for a single shot.
 
-    Errors
-    ------
+        Errors
+        ------
 
-    Raises a ``RegisterMatrixConversionError`` if the inner execution data for any of the
-    registers would result in a jagged matrix. ``QPUResultData`` data is captured per measure,
-    meaning a value is returned for every measure to a memory reference, not just once per shot.
-    This is often the case in programs that use mid-circuit measurement or dynamic control flow,
-    where measurements to the same memory reference might occur multiple times in a shot, or be
-    skipped conditionally. In these cases, building a rectangular ``RegisterMatrix`` would
-    necessitate making assumptions about the data that could skew the data in undesirable ways.
-    Instead, it's recommended to manually build a matrix from ``QPUResultData`` that accurately
-    selects the last value per-shot based on the program that was run.
-    """
+        Raises a ``RegisterMatrixConversionError`` if the inner execution data for any of the
+        registers would result in a jagged matrix. ``QPUResultData`` data is captured per measure,
+        meaning a value is returned for every measure to a memory reference, not just once per shot.
+        This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+        where measurements to the same memory reference might occur multiple times in a shot, or be
+        skipped conditionally. In these cases, building a rectangular ``RegisterMatrix`` would
+        necessitate making assumptions about the data that could skew the data in undesirable ways.
+        Instead, it's recommended to manually build a matrix from ``QPUResultData`` that accurately
+        selects the last value per-shot based on the program that was run.
+        """
+        ...
 
     def is_qvm(self) -> bool: ...
     def is_qpu(self) -> bool: ...
+
     def as_qvm(self) -> Optional[QVMResultData]: ...
     def as_qpu(self) -> Optional[QPUResultData]: ...
+
     def to_qvm(self) -> QVMResultData: ...
     def to_qpu(self) -> QPUResultData: ...
+
     @staticmethod
     def from_qvm(inner: QVMResultData) -> "ResultData": ...
     @staticmethod
     def from_qpu(inner: QPUResultData) -> "ResultData": ...
 
+
+@final
 class ExecutionData:
     @property
     def result_data(self) -> ResultData: ...
     @result_data.setter
     def result_data(self, result_data: ResultData): ...
+
     @property
     def duration(self) -> Optional[datetime.timedelta]: ...
     @duration.setter

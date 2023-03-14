@@ -56,7 +56,7 @@ pub use execution_data::{
 };
 pub use register_data::RegisterData;
 
-pub mod api;
+pub mod compiler;
 mod executable;
 mod execution_data;
 pub mod qpu;

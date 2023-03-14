@@ -1,183 +1,74 @@
 import os
+from typing import List
 
 import pytest
+from _pytest.config import Config
+from _pytest.config.argparsing import Parser
+from _pytest.nodes import Item
+
+from qcs_sdk.qpu.isa import InstructionSetArchitecture
 
 
-TEST_CONFIG_DIR = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), "./qcs_config"
-)
-TEST_QCS_SETTINGS_PATH = os.path.join(TEST_CONFIG_DIR, "settings.toml")
-TEST_QCS_SECRETS_PATH = os.path.join(TEST_CONFIG_DIR, "secrets.toml")
-os.environ["QCS_SETTINGS_FILE_PATH"] = TEST_QCS_SETTINGS_PATH
-os.environ["QCS_SECRETS_FILE_PATH"] = TEST_QCS_SECRETS_PATH
+TEST_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
+TEST_CONFIG_DIR = os.path.join(TEST_ROOT_DIR, "./_qcs_config")
+TEST_FIXTURE_DIR = os.path.join(TEST_ROOT_DIR, "./_fixtures")
+
+
+def pytest_addoption(parser: Parser):
+    parser.addoption("--with-qcs-session", action="store_true", default=False, help="Run tests that require proper user config authentication.")
+    parser.addoption("--with-qcs-execution", action="store_true", default=False, help="Run tests that require qpu execution.")
+
+
+def pytest_configure(config: Config):
+    config.addinivalue_line("markers", "qcs_session: mark test as requiring authentication + authorization.")
+    config.addinivalue_line("markers", "not_qcs_session: mark test as requiring no authentication + authorization.")
+    config.addinivalue_line("markers", "qcs_execution: mark test as requiring qpu execution.")
+
+
+def pytest_collection_modifyitems(config: Config, items: List[Item]):
+    with_qcs_session = config.getoption("--with-qcs-session")
+    with_qcs_execution = config.getoption("--with-qcs-execution")
+
+    if not with_qcs_session:
+        os.environ["QCS_SETTINGS_FILE_PATH"] = os.path.join(TEST_CONFIG_DIR, "settings.toml")
+        os.environ["QCS_SECRETS_FILE_PATH"] = os.path.join(TEST_CONFIG_DIR, "secrets.toml")
+
+    skip_not_sess = pytest.mark.skip(reason="requires --with-qcs-session pytest option to be false.")
+    skip_sess = pytest.mark.skip(reason="requires --with-qcs-session pytest option to be true.")
+    skip_exec = pytest.mark.skip(reason="requires --with-qcs-execution pytest option to be true.")
+
+    for item in items:
+        if not with_qcs_session:
+            if "qcs_session" in item.keywords:
+                item.add_marker(skip_sess)
+        else:
+            if "not_qcs_session" in item.keywords:
+                item.add_marker(skip_not_sess)
+
+        if not with_qcs_execution:
+            if "qcs_execution" in item.keywords:
+                item.add_marker(skip_exec)
+
+
+def _read_fixture(relpath: str) -> str:
+    with open(os.path.join(TEST_FIXTURE_DIR, relpath)) as f:
+        contents = f.read()
+    return contents
+
+
+@pytest.fixture
+def quantum_processor_id() -> str:
+    return "Aspen-M-3"
+
+
+@pytest.fixture
+def aspen_m_3_isa() -> InstructionSetArchitecture:
+    return InstructionSetArchitecture.from_raw(_read_fixture("./aspen-m-3.json"))
 
 
 @pytest.fixture
 def device_2q() -> str:
-    import json
-
-    return json.dumps(
-        {
-            "isa": {
-                "1Q": {
-                    "0": {
-                        "id": 0,
-                        "gates": [
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 1.0,
-                                "parameters": [0.0],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9909074679565163,
-                                "parameters": [3.141592653589793],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9909074679565163,
-                                "parameters": [-3.141592653589793],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9909074679565163,
-                                "parameters": [1.5707963267948966],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9909074679565163,
-                                "parameters": [-1.5707963267948966],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RZ",
-                                "duration": 0.01,
-                                "fidelity": 1.0,
-                                "parameters": ["_"],
-                                "arguments": [0],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "MEASURE",
-                                "duration": 2000.0,
-                                "fidelity": 0.977,
-                                "qubit": 0,
-                                "target": "_",
-                                "operator_type": "measure",
-                            },
-                            {
-                                "operator": "MEASURE",
-                                "duration": 2000.0,
-                                "fidelity": 0.977,
-                                "qubit": 0,
-                                "target": None,
-                                "operator_type": "measure",
-                            },
-                        ],
-                    },
-                    "1": {
-                        "id": 1,
-                        "gates": [
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 1.0,
-                                "parameters": [0.0],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9967034552975036,
-                                "parameters": [3.141592653589793],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9967034552975036,
-                                "parameters": [-3.141592653589793],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9967034552975036,
-                                "parameters": [1.5707963267948966],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RX",
-                                "duration": 50.0,
-                                "fidelity": 0.9967034552975036,
-                                "parameters": [-1.5707963267948966],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "RZ",
-                                "duration": 0.01,
-                                "fidelity": 1.0,
-                                "parameters": ["_"],
-                                "arguments": [1],
-                                "operator_type": "gate",
-                            },
-                            {
-                                "operator": "MEASURE",
-                                "duration": 2000.0,
-                                "fidelity": 0.9450000000000001,
-                                "qubit": 1,
-                                "target": "_",
-                                "operator_type": "measure",
-                            },
-                            {
-                                "operator": "MEASURE",
-                                "duration": 2000.0,
-                                "fidelity": 0.9450000000000001,
-                                "qubit": 1,
-                                "target": None,
-                                "operator_type": "measure",
-                            },
-                        ],
-                    },
-                },
-                "2Q": {
-                    "0-1": {
-                        "ids": [0, 1],
-                        "gates": [
-                            {
-                                "operator": "CZ",
-                                "duration": 200.0,
-                                "fidelity": 0.95,
-                                "parameters": [],
-                                "arguments": ["_", "_"],
-                                "operator_type": "gate",
-                            },
-                        ],
-                    },
-                },
-            },
-            "specs": {},
-        }
-    )
+    return _read_fixture("./device-2q.json")
 
 
 @pytest.fixture

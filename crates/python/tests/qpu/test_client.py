@@ -2,7 +2,7 @@ import pytest
 from urllib.parse import urlparse
 
 from qcs_sdk import QCSClient
-from qcs_sdk.qpu.client import QCSLoadError, QCSClientAuthServer, QCSClientTokens
+from qcs_sdk.qpu.client import LoadClientError, QCSClientAuthServer, QCSClientTokens
 
 @pytest.fixture
 def default_client():
@@ -16,6 +16,7 @@ def test_client_has_url_from_env(default_client: QCSClient):
     assert urlparse(default_client.qvm_url).geturl() != ""
 
 
+@pytest.mark.not_qcs_session
 @pytest.mark.asyncio
 async def test_client_empty_profile_is_default(default_client: QCSClient):
     """The profile "empty" is configured to be similar to a default client."""
@@ -26,6 +27,7 @@ async def test_client_empty_profile_is_default(default_client: QCSClient):
     assert client == await QCSClient.load_async(profile_name="empty")
 
 
+@pytest.mark.not_qcs_session
 def test_client_default_profile_is_not_empty(default_client: QCSClient):
     """The "default" profile is configured to have a token, unlike the default client."""
     client = QCSClient.load()
@@ -33,9 +35,10 @@ def test_client_default_profile_is_not_empty(default_client: QCSClient):
     assert client != default_client
 
 
+@pytest.mark.not_qcs_session
 def test_client_broken_raises():
     """Using a profile with broken configuration should surface the underlying error."""
-    with pytest.raises(QCSLoadError, match=r"Expected auth server .* but it didn't exist"):
+    with pytest.raises(LoadClientError, match=r"Expected auth server .* but it didn't exist"):
         QCSClient.load(profile_name="broken")
 
 

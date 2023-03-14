@@ -1,18 +1,19 @@
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, final
 
 from .client import QCSClient
 
-class QCSISASerializationError(ValueError):
-    """Raised when an ``InstructionSetArchitecture`` is not able to be serialized from a given json string."""
+class SerializeISAError(ValueError):
+    """If an ``InstructionSetArchitecture`` could not be serialized or deserialized correctly."""
     ...
 
 
-class QCSISAError(RuntimeError):
-    """Raised when there is a problem fetching ``InstructionSetArchitecture`` from the QCS API."""
+class GetISAError(RuntimeError):
+    """If there was an issue fetching ``InstructionSetArchitecture`` from the QCS API."""
     ...
 
 
+@final
 class Family(Enum):
     """
     The architecture family identifier of an ``InstructionSetArchitecture``.
@@ -26,6 +27,7 @@ class Family(Enum):
     Ankaa = "Ankaa",
 
 
+@final
 class Node:
     """
     A logical node in the quantum processor's architecture.
@@ -46,6 +48,7 @@ class Node:
     def node_id(self, value: int): ...
 
 
+@final
 class Edge:
     """
     A degree-two logical connection in the quantum processor's architecture.
@@ -69,6 +72,7 @@ class Edge:
     def node_ids(self, value: List[int]): ...
 
 
+@final
 class Parameter:
     """A parameter to an operation."""
 
@@ -80,6 +84,7 @@ class Parameter:
     def name(self, value: str): ...
 
 
+@final
 class Characteristic:
     """A measured characteristic of an operation."""
 
@@ -135,6 +140,7 @@ class Characteristic:
     def parameter_values(self, value: Optional[List[float]]): ...
 
 
+@final
 class OperationSite:
     """A site for an operation, with its site-dependent characteristics."""
 
@@ -156,6 +162,7 @@ class OperationSite:
     def characteristics(self, value: List[Characteristic]): ...
 
 
+@final
 class Operation:
     """An operation, with its sites and site-independent characteristics."""
 
@@ -198,6 +205,7 @@ class Operation:
     def characteristics(self, value: List[Characteristic]): ...
 
 
+@final
 class Architecture:
     """
     Represents the logical underlying architecture of a quantum processor.
@@ -251,6 +259,7 @@ class Architecture:
 
 
 
+@final
 class InstructionSetArchitecture:
     """
     The native instruction set architecture (ISA) of a quantum processor, annotated with characteristics.
@@ -293,45 +302,54 @@ class InstructionSetArchitecture:
 
     @staticmethod
     def from_raw(value: str) -> "InstructionSetArchitecture":
-        """Deserialize an ``InstructionSetArchitecture`` from a json representation."""
+        """
+        Deserialize an ``InstructionSetArchitecture`` from a json representation.
+
+        :param value: The json-serialized ``InstructionSetArchitecture`` to deserialize.
+        
+        :raises SerializeISAError: If the input string was not deserialized correctly.
+        """
         ...
     
     def json(self, pretty: bool = False) -> str:
-        """Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed."""
+        """
+        Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed.
+
+        :param pretty: If the json output should be pretty-printed with newlines and indents.
+
+        :raises SerializeISAError: If the input string was not serialized correctly.
+        """
         ...
+
 
 def get_instruction_set_architecture(
     quantum_processor_id: str,
-    client: QCSClient = ...,
+    client: Optional[QCSClient] = ...,
 ) -> InstructionSetArchitecture:
     """
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
 
-    Args:
-        quantum_processor_id: The ID of the quantum processor
-        client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param quantum_processor_id: The ID of the quantum processor
+    :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
-    Raises:
-        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
-        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
+    :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     """
     ...
+
 
 async def get_instruction_set_architecture_async(
     quantum_processor_id: str,
     client: QCSClient = ...,
 ) -> InstructionSetArchitecture:
     """
-    Async verion of ``get_instruction_set_architecture``
-
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
+    (async analog of ``get_instruction_set_architecture``)
 
-    Args:
-        quantum_processor_id: The ID of the quantum processor
-        client: The ``QCSClient`` to use. Loads one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param quantum_processor_id: The ID of the quantum processor
+    :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
 
-    Raises:
-        - ``QCSLoadError`` if there is an issue with the QCS API client configuration.
-        - ``QCSISAError`` if there is an issue fetching the ISA from the QCS API.
+    :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     """
     ...

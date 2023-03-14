@@ -1,5 +1,4 @@
-//! This module provides the functions and types necessary to compile a program
-//! using quilc.
+//! This module provides bindings for compiling programs with the Quilc compiler.
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
@@ -7,15 +6,15 @@ use std::convert::TryFrom;
 use quil_rs::program::{Program, ProgramError};
 use serde::{Deserialize, Serialize};
 
-use isa::Compiler;
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
-use super::{rpcq, Qcs};
+use super::isa::{self, Compiler};
+use super::rpcq;
 
-mod isa;
+use crate::qpu::client::Qcs;
 
 /// Number of seconds to wait before timing out.
-pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
+pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
@@ -34,7 +33,7 @@ pub const DEFAULT_COMPILER_TIMEOUT: u8 = 30;
 /// recoverable at runtime. This function can fail generally if the provided ISA cannot be converted
 /// into a form that `quilc` recognizes, if `quilc` cannot be contacted, or if the program cannot
 /// be converted by `quilc`.
-pub(crate) fn compile_program(
+pub fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
@@ -57,7 +56,7 @@ pub(crate) fn compile_program(
 #[derive(Clone, Copy, Debug)]
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
-    timeout: Option<u8>,
+    timeout: Option<f64>,
 
     /// If the compiler should produce "protoquil" as output. If `None`, the default
     /// behavior configured in the compiler service is used.
@@ -78,7 +77,7 @@ impl CompilerOpts {
 
     /// Set the number of seconds to wait before timing out. If set to None, the timeout is disabled.
     #[must_use]
-    pub fn with_timeout(&mut self, seconds: Option<u8>) -> Self {
+    pub fn with_timeout(&mut self, seconds: Option<f64>) -> Self {
         self.timeout = seconds;
         *self
     }
@@ -103,7 +102,8 @@ impl Default for CompilerOpts {
     }
 }
 
-pub(crate) fn get_version_info(client: &Qcs) -> Result<String, Error> {
+/// Fetch the version information from the running Quilc compiler.
+pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let binding: HashMap<String, String> = HashMap::new();

@@ -1367,7 +1367,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.10.0-rc.8"
+version = "0.10.0-rc.11"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1468,7 +1468,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.5.0-rc.8"
+version = "0.5.0-rc.11"
 dependencies = [
  "numpy",
  "paste",
@@ -1484,6 +1484,7 @@ dependencies = [
  "quil-rs 0.15.0",
  "rigetti-pyo3",
  "serde_json",
+ "thiserror",
  "tokio",
 ]
 
@@ -1493,7 +1494,7 @@ version = "0.1.0"
 dependencies = [
  "pyo3",
  "pyo3-build-config",
- "quil-rs 0.16.0-rc.0",
+ "quil-rs 0.16.0-rc.1",
  "rigetti-pyo3",
 ]
 
@@ -1516,7 +1517,7 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.16.0-rc.0"
+version = "0.16.0-rc.1"
 dependencies = [
  "indexmap",
  "lexical",

@@ -71,7 +71,7 @@ pub enum Error {
 
 #[cfg(test)]
 mod describe_edge {
-    use crate::qpu::quilc::isa::edge::{Edge, Id};
+    use super::{Edge, Id};
 
     #[test]
     fn it_skips_serializing_dead_if_false() {
@@ -150,7 +150,7 @@ impl Display for Id {
 mod describe_edge_id {
     use std::convert::TryFrom;
 
-    use crate::qpu::quilc::isa::edge::Id;
+    use super::Id;
 
     #[test]
     fn it_serializes_as_an_int_list() {
@@ -211,7 +211,7 @@ pub(crate) fn convert_edges(edges: &[models::Edge]) -> Result<HashMap<Id, Edge>,
 mod describe_convert_edges {
     use qcs_api_client_openapi::models;
 
-    use crate::qpu::quilc::isa::edge::{convert_edges, Id};
+    use super::{convert_edges, Id};
 
     #[test]
     fn it_converts_valid_edges() {
