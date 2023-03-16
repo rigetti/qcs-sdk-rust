@@ -13,7 +13,7 @@ use super::operator::{
 /// Represents a single Qubit on a QPU and its capabilities. Needed by quilc for optimization.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Qubit {
-    id: i32,
+    id: i64,
     #[serde(skip_serializing_if = "is_false")]
     #[serde(default)]
     dead: bool,
@@ -27,7 +27,7 @@ fn is_false(val: &bool) -> bool {
 }
 
 impl Qubit {
-    pub(crate) fn from_nodes(nodes: &[Node]) -> HashMap<i32, Qubit> {
+    pub(crate) fn from_nodes(nodes: &[Node]) -> HashMap<i64, Qubit> {
         nodes
             .iter()
             .map(|node| (node.node_id, Qubit::from(node)))
@@ -82,7 +82,7 @@ pub enum Error {
     #[error("Benchmark `randomized_benchmark_simultaneous_1q` must have a single call site")]
     InvalidBenchmark,
     #[error("Benchmark missing for qubit {0}")]
-    MissingBenchmarkForQubit(i32),
+    MissingBenchmarkForQubit(i64),
     #[error("Unknown operator {0}")]
     UnknownOperator(String),
 }
@@ -154,7 +154,7 @@ impl TryFrom<Vec<Operation>> for FrbSim1q {
 }
 
 impl FrbSim1q {
-    fn fidelity_for_qubit(&self, qubit: i32) -> Result<f64, Error> {
+    fn fidelity_for_qubit(&self, qubit: i64) -> Result<f64, Error> {
         self.0
             .iter()
             .find(|characteristic| {
@@ -169,7 +169,7 @@ impl FrbSim1q {
 
 const DEFAULT_DURATION_RX: f64 = 50.0;
 
-fn rx_gates(node_id: i32, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
+fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
     let fidelity = frb_sim_1q.fidelity_for_qubit(node_id)?;
 
     let mut gates = Vec::with_capacity(5);
@@ -269,7 +269,7 @@ mod describe_rx_gates {
     }
 }
 
-fn rz_gates(node_id: i32) -> Vec<Operator> {
+fn rz_gates(node_id: i64) -> Vec<Operator> {
     vec![Operator::Gate {
         operator: "RZ".to_string(),
         parameters: vec![Parameter::String("_".to_owned())],
@@ -303,7 +303,7 @@ const MEASURE_DEFAULT_DURATION: f64 = 2000.0;
 const MEASURE_DEFAULT_FIDELITY: f64 = 0.90;
 
 /// Process a "MEASURE" operation.
-fn measure(node_id: i32, characteristics: &[Characteristic]) -> Vec<Operator> {
+fn measure(node_id: i64, characteristics: &[Characteristic]) -> Vec<Operator> {
     let fidelity = characteristics
         .iter()
         .find(|characteristic| &characteristic.name == "fRO")

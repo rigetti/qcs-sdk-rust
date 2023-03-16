@@ -1,6 +1,6 @@
 use serde::{Deserialize, Deserializer, Serialize};
 
-pub(crate) fn wildcard(node_id: Option<i32>) -> Operator {
+pub(crate) fn wildcard(node_id: Option<i64>) -> Operator {
     let arg = node_id.map_or_else(|| Argument::String("_".to_owned()), Argument::Int);
     Operator::Gate {
         operator: "_".to_string(),
@@ -39,7 +39,7 @@ pub(crate) enum Operator {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub(crate) enum Qubit {
-    Int(i32),
+    Int(i64),
     String(String),
 }
 
@@ -222,7 +222,7 @@ mod describe_parameters {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub(crate) enum Argument {
-    Int(i32),
+    Int(i64),
     String(String),
 }
 

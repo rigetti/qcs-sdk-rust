@@ -1458,6 +1458,8 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-common"
 version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b2f8560d8462749ccf01772ad8fc92999ecdf3bebe37b45ca7dc4838a834ae7"
 dependencies = [
  "async-trait",
  "dirs",
@@ -1473,6 +1475,8 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-grpc"
 version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db289d73aa9a5bafb7f3c3029e52923da2005024e307750a8c30ef3a4a20a96a"
 dependencies = [
  "http",
  "http-body",
@@ -1491,6 +1495,8 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-openapi"
 version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b44d3d778ba2ac173c19b15ee136f527cda67ed2ae3be642752937cee0851f02"
 dependencies = [
  "qcs-api-client-common",
  "reqwest",
