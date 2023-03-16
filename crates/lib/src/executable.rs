@@ -245,7 +245,7 @@ impl<'executable> Executable<'executable, '_> {
     ///             .get((0, 1))
     ///             .expect("first shot, second_index of theta should have value")
     ///             .to_owned();
-    ///         
+    ///
     ///         assert_eq!(first, theta);
     ///         assert_eq!(second, theta * 2.0);
     ///     }
@@ -657,6 +657,17 @@ mod describe_get_config {
         exe.with_parameter("foo", 10, 10.0);
         assert_eq!(foo_len(&mut exe), 11);
     }
+
+    #[tokio::test]
+    #[cfg(feature = "manual-tests")]
+    async fn it_returns_cached_values() {
+        let mut exe = Executable::from_quil("");
+        let config = ClientConfiguration::builder().set_quilc_url(String::from("test")).build().unwrap();
+        let config = config;
+        exe.config = Some(config.clone());
+        let gotten = exe.get_config().await.unwrap_or_default();
+        assert_eq!(gotten.quilc_url(), config.quilc_url());
+    }
 }
 
 #[cfg(test)]
@@ -664,20 +675,20 @@ mod describe_get_config {
 mod describe_qpu_for_id {
     use std::sync::Arc;
 
-    use crate::{configuration::Configuration, qpu, Executable};
+    use qcs_api_client_common::ClientConfiguration;
+
+    use crate::{qpu::{self, Qcs, quilc::CompilerOpts}, Executable};
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {
         let mut exe = Executable::from_quil("");
         // Default config has no auth, so it should try to refresh
-        exe.config = Some(Arc::new(Configuration::default()));
+        exe.config = Some(ClientConfiguration::default());
         let result = exe.qpu_for_id("blah").await;
-        let err = if let Err(err) = result {
-            err
-        } else {
+        let Err(err) = result else {
             panic!("Expected an error!");
         };
-        let result_string = format!("{:?}", err);
+        let result_string = format!("{err:?}");
         assert!(result_string.contains("refresh_token"));
     }
 
@@ -690,15 +701,16 @@ mod describe_qpu_for_id {
             qpu::Execution::new(
                 "".into(),
                 shots,
-                "Aspen-M-3",
-                exe.get_config().await.unwrap_or_default(),
+                "Aspen-M-3".into(),
+                Arc::new(Qcs::with_config(exe.get_config().await.unwrap_or_default())),
                 exe.compile_with_quilc,
+                CompilerOpts::default(),
             )
             .await
             .unwrap(),
         );
         // Load config with no credentials to prevent creating a new Execution if it tries
-        exe.config = Some(Arc::new(Configuration::default()));
+        exe.config = Some(ClientConfiguration::default());
 
         assert!(exe.qpu_for_id("Aspen-M-3").await.is_ok());
     }
@@ -730,29 +742,10 @@ mod describe_qpu_for_id {
         // Cache so we can verify cache is not used.
         exe.qpu = Some(qpu);
         // Load config with no credentials to prevent creating the new Execution (which would fail anyway)
-        exe.config = Some(Arc::new(Configuration::default()));
+        exe.config = Some(ClientConfiguration::default());
         let result = exe.qpu_for_id("Aspen-8").await;
 
         assert!(matches!(result, Err(_)));
         assert!(matches!(exe.qpu, None));
-    }
-}
-
-#[cfg(test)]
-#[cfg(feature = "manual-tests")]
-mod describe_get_config {
-    use std::sync::Arc;
-
-    use crate::{configuration::Configuration, Executable};
-
-    #[tokio::test]
-    async fn it_returns_cached_values() {
-        let mut exe = Executable::from_quil("");
-        let mut config = Configuration::default();
-        config.quilc_url = String::from("test");
-        let config = Arc::new(config);
-        exe.config = Some(config.clone());
-        let gotten = exe.get_config().await.unwrap_or_default();
-        assert_eq!(gotten.quilc_url, config.quilc_url);
     }
 }
