@@ -13,7 +13,7 @@ tokio = "1.24.2"
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
-# crates version of ndarray in sync.
+# crates' versions of ndarray in sync.
 # Similarly, pyo3 packages (`numpy`, `rigetti-pyo3`, `pyo3*`) track versions together
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
