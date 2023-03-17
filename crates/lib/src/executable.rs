@@ -663,7 +663,6 @@ mod describe_get_config {
     async fn it_returns_cached_values() {
         let mut exe = Executable::from_quil("");
         let config = ClientConfiguration::builder().set_quilc_url(String::from("test")).build().unwrap();
-        let config = config;
         exe.config = Some(config.clone());
         let gotten = exe.get_config().await.unwrap_or_default();
         assert_eq!(gotten.quilc_url(), config.quilc_url());
@@ -677,7 +676,8 @@ mod describe_qpu_for_id {
 
     use qcs_api_client_common::ClientConfiguration;
 
-    use crate::{qpu::{self, Qcs, quilc::CompilerOpts}, Executable};
+    use crate::{qpu::{self, Qcs}, Executable};
+    use crate::compiler::quilc::CompilerOpts;
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {
