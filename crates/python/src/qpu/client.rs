@@ -1,5 +1,5 @@
 use qcs_api_client_common::{
-    configuration::{AuthServer, BuildError, ClientConfigurationBuilder, RefreshError, Tokens},
+    configuration::{AuthServer, BuildError, ClientConfigurationBuilder, Tokens},
     ClientConfiguration,
 };
 use rigetti_pyo3::{
@@ -38,21 +38,6 @@ py_wrap_error!(
     BuildClientError,
     PyRuntimeError
 );
-
-wrap_error! {
-    GrpcError(qcs::qpu::client::GrpcError<RefreshError>);
-}
-py_wrap_error!(client, GrpcError, QCSGrpcError, PyRuntimeError);
-
-wrap_error! {
-    GrpcClientError(qcs::qpu::client::GrpcClientError);
-}
-py_wrap_error!(client, GrpcClientError, QCSGrpcClientError, PyRuntimeError);
-
-wrap_error! {
-    GrpcEndpointError(qcs::qpu::client::GrpcEndpointError);
-}
-py_wrap_error!(client, GrpcEndpointError, QCSGrpcEndpointError, PyRuntimeError);
 
 /// The fields on qcs_api_client_common::client::AuthServer are not public.
 #[pyclass]
