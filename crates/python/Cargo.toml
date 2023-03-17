@@ -17,7 +17,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 qcs = { path = "../lib" }
-quil-py = { path = "../../../quil-rs/quil-py" }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true

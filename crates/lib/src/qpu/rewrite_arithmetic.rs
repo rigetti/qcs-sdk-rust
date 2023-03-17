@@ -6,7 +6,7 @@ use std::{collections::HashMap, convert::TryFrom};
 use indexmap::set::IndexSet;
 use num::complex::Complex64;
 use quil_rs::{
-    expression::{Expression, InfixOperator},
+    expression::{Expression, InfixExpression, InfixOperator},
     instruction::{
         AttributeValue, FrameIdentifier, Gate, Instruction, MemoryReference, ScalarType,
         SetFrequency, SetPhase, SetScale, ShiftFrequency, ShiftPhase, Vector,
@@ -236,15 +236,15 @@ fn process_gate(mut gate: Gate, substitutions: &mut Substitutions) -> Instructio
 }
 
 fn divide_2_pi(expression: Expression) -> Expression {
-    Expression::Infix {
+    Expression::Infix(InfixExpression {
         left: Box::new(expression),
         operator: InfixOperator::Slash,
-        right: Box::new(Expression::Infix {
+        right: Box::new(Expression::Infix(InfixExpression {
             left: Box::new(Expression::Number(Complex64::from(2.0))),
             operator: InfixOperator::Star,
             right: Box::new(Expression::PiConstant),
-        }),
-    }
+        })),
+    })
     .into_simplified()
 }
 
@@ -256,11 +256,11 @@ fn process_set_scale(mut set_scale: SetScale, substitutions: &mut Substitutions)
 
     let SetScale { frame, scale } = set_scale;
 
-    let expression = Expression::Infix {
+    let expression = Expression::Infix(InfixExpression {
         left: Box::new(scale),
         operator: InfixOperator::Slash,
         right: Box::new(Expression::Number(Complex64::from(8.0))),
-    }
+    })
     .into_simplified();
 
     Instruction::SetScale(SetScale {
@@ -296,17 +296,17 @@ fn process_frequency_expression(
         }
     };
     if let Some(AttributeValue::Expression(center_frequency)) = attributes.get("CENTER-FREQUENCY") {
-        expression = Expression::Infix {
+        expression = Expression::Infix(InfixExpression {
             left: Box::new(expression),
             operator: InfixOperator::Minus,
             right: Box::new(center_frequency.clone()),
-        }
+        });
     }
-    expression = Expression::Infix {
+    expression = Expression::Infix(InfixExpression {
         left: Box::new(expression),
         operator: InfixOperator::Slash,
         right: Box::new(sample_rate.clone()),
-    };
+    });
     Ok(substitution(expression, substitutions))
 }
 

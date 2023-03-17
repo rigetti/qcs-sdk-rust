@@ -130,7 +130,7 @@ pub enum Error {
     QuilcCompilation(String),
     /// An error when trying to parse the compiled program.
     #[error("Problem when trying to parse the compiled program: {0}")]
-    Parse(ProgramError<Program>),
+    Parse(ProgramError),
 }
 
 impl Error {

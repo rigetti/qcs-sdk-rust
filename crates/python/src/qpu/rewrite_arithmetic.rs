@@ -24,7 +24,7 @@ create_init_submodule! {
 pub enum RustRewriteArithmeticError {
     /// The Quil program could not be parsed.
     #[error("Could not parse program: {0}")]
-    Program(#[from] quil_rs::program::ProgramError<quil_rs::Program>),
+    Program(#[from] quil_rs::program::ProgramError),
 
     /// Parameteric arithmetic in the Quil program could not be rewritten.
     #[error("Could not rewrite arithmetic: {0}")]
@@ -88,7 +88,7 @@ pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticRe
 pub enum RustBuildPatchValuesError {
     /// Failed to interpret the recalculation table.
     #[error("Unable to interpret recalculation table: {0:?}")]
-    Substitutions(#[from] quil_rs::program::ProgramError<quil_rs::expression::Expression>),
+    Substitutions(#[from] quil_rs::program::ParseProgramError<quil_rs::expression::Expression>),
 
     /// Failed to build patch values.
     #[error("Failed to build patch values: {0}")]

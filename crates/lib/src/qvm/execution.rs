@@ -142,7 +142,7 @@ impl Execution {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("Error parsing Quil program: {0}")]
-    Parsing(#[from] ProgramError<Program>),
+    Parsing(#[from] ProgramError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]

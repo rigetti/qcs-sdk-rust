@@ -17,7 +17,6 @@ use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
 use crate::{qpu, qvm};
 use quil_rs::program::ProgramError;
-use quil_rs::Program;
 
 /// The builder interface for executing Quil programs on QVMs and QPUs.
 ///
@@ -513,7 +512,7 @@ pub enum Error {
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
     #[error("There was a problem with the Quil program: {0}")]
-    Quil(#[from] ProgramError<Program>),
+    Quil(#[from] ProgramError),
     /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),

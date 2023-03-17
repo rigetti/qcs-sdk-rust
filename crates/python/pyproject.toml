@@ -36,6 +36,7 @@ authors = [
 ]
 
 [tool.maturin]
+features = ["pyo3/extension-module"]
 bindings = "pyo3"
 compatibility = "linux"
 sdist-include = ["README.md"]

@@ -8,7 +8,6 @@ use std::time::Duration;
 
 use log::trace;
 use quil_rs::program::ProgramError;
-use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
 
 use crate::executable::Parameters;
@@ -38,7 +37,7 @@ pub(crate) struct Execution<'a> {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("problem processing the provided Quil: {0}")]
-    Quil(#[from] ProgramError<Program>),
+    Quil(#[from] ProgramError),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
