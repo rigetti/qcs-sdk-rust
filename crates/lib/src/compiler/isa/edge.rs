@@ -110,20 +110,20 @@ mod describe_edge {
 ///
 /// This struct enforces those things to make looking up of Edges easier when converting ISAs.
 #[derive(Deserialize, Debug, Copy, Clone, Eq, PartialEq, Hash)]
-pub struct Id([i32; 2]);
+pub struct Id([i64; 2]);
 
 impl Id {
-    pub fn new(mut node_ids: [i32; 2]) -> Self {
+    pub fn new(mut node_ids: [i64; 2]) -> Self {
         node_ids.sort_unstable();
         Self(node_ids)
     }
 }
 
-impl TryFrom<&Vec<i32>> for Id {
+impl TryFrom<&Vec<i64>> for Id {
     type Error = Error;
 
-    fn try_from(node_ids: &Vec<i32>) -> Result<Self, Error> {
-        let node_ids: [i32; 2] = node_ids
+    fn try_from(node_ids: &Vec<i64>) -> Result<Self, Error> {
+        let node_ids: [i64; 2] = node_ids
             .as_slice()
             .try_into()
             .map_err(|_| Error::EdgeSize(node_ids.len()))?;

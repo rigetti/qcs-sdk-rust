@@ -31,6 +31,7 @@ wrap_error!(RustLoadClientError(client::LoadError));
 py_wrap_error!(client, RustLoadClientError, LoadClientError, PyRuntimeError);
 
 wrap_error!(RustBuildClientError(BuildError));
+
 py_wrap_error!(
     client,
     RustBuildClientError,

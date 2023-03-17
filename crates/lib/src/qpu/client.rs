@@ -4,7 +4,7 @@
 
 use std::time::Duration;
 
-use qcs_api_client_common::ClientConfiguration;
+use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
     services::{
@@ -72,7 +72,8 @@ impl Qcs {
     pub(crate) async fn get_controller_client(
         &self,
         quantum_processor_id: &str,
-    ) -> Result<ControllerClient<RefreshService<Channel>>, GrpcEndpointError> {
+    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
+    {
         self.get_controller_endpoint(quantum_processor_id)
             .await
             .map(get_channel)
@@ -86,14 +87,20 @@ impl Qcs {
 
     pub(crate) fn get_translation_client(
         &self,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
         parse_uri(translation_grpc_endpoint)
             .map(get_channel)
             .map(|channel| wrap_channel_with(channel, self.get_config()))
@@ -167,7 +174,7 @@ impl Qcs {
 pub enum GrpcEndpointError {
     /// Error due to a malformed URI
     #[error("Malformed URI for endpoint: {0}")]
-    BadUri(#[from] GrpcError),
+    BadUri(#[from] GrpcError<RefreshError>),
 
     /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
@@ -199,7 +206,7 @@ pub enum GrpcClientError {
 
     /// Error due to `gRPC` error
     #[error("gRPC error: {0}")]
-    GrpcError(#[from] GrpcError),
+    GrpcError(#[from] GrpcError<RefreshError>),
 }
 
 /// Errors that may occur while trying to use an `OpenAPI` client
