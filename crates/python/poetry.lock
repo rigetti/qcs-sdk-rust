@@ -289,17 +289,19 @@ testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy 
 [[package]]
 name = "quil"
 version = "0.1.0"
-description = ""
+description = "A Python package for building and parsing Quil programs."
 category = "main"
 optional = false
-python-versions = ">=3.8"
+python-versions = "^3.8"
 files = []
 develop = false
 
 [package.source]
-type = "directory"
-url = "../../../quil-rs/quil-py"
-
+type = "git"
+url = "https://github.com/rigetti/quil-rs"
+reference = "1455-python-support-for-program-and-beyond"
+resolved_reference = "ccb803e40e51cc33b977df88d154221edee045aa"
+subdirectory = "quil-py"
 [[package]]
 name = "tomli"
 version = "2.0.1"
@@ -327,4 +329,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ad9227c8eabd7269e23f9da80957c69e76c2b0e42b9974ccdac7faa7af43b607"
+content-hash = "874d527aab8d1bc96d36e0aae383fa83b76dbb734973e7421fa34d5cc6363242"
