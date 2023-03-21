@@ -11,7 +11,7 @@ use qcs_api_client_common::ClientConfiguration;
 
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::JobId;
+use crate::qpu::api::{JobId, JobTarget};
 use crate::qpu::client::Qcs;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
@@ -427,8 +427,10 @@ impl<'execution> Executable<'_, 'execution> {
     where
         S: Into<Cow<'execution, str>>,
     {
-        let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
-        self.retrieve_results(job_handle).await
+        let quantum_processor_id: Cow<'execution, str> = quantum_processor_id.into();
+        let job_handle = self.submit_to_qpu(quantum_processor_id.clone()).await?;
+        self.retrieve_results(quantum_processor_id, &job_handle)
+            .await
     }
 
     /// Compile and submit the program to a QPU, but do not wait for execution to complete.
@@ -439,30 +441,40 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu<S>(
-        &mut self,
-        quantum_processor_id: S,
-    ) -> Result<JobHandle<'execution>, Error>
+    pub async fn submit_to_qpu<S>(&mut self, quantum_processor_id: S) -> Result<JobHandle, Error>
     where
         S: Into<Cow<'execution, str>>,
     {
-        let quantum_processor_id = quantum_processor_id.into();
-        let JobHandle {
-            job_id,
-            readout_map,
-            ..
-        } = self
-            .qpu_for_id(quantum_processor_id.clone())
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
             .await?
             .submit(&self.params)
             .await?;
+        Ok(job_handle)
+    }
 
-        // The unpacking/re-packing here is to avoid lifetime issues.
-        Ok(JobHandle {
-            job_id,
-            quantum_processor_id,
-            readout_map,
-        })
+    /// Compile and submit the program to a QCS endpoint, but do not wait for execution to complete.
+    ///
+    /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
+    /// results.
+    ///
+    /// # Errors
+    ///
+    /// See [`Executable::execute_on_qpu`].
+    pub async fn submit_to_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+    ) -> Result<JobHandle, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
+            .await?
+            .submit_to_endpoint_id(&self.params, endpoint_id.into())
+            .await?;
+        Ok(job_handle)
     }
 
     /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
@@ -470,11 +482,16 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
-        let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
-        qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
-            .await
-            .map_err(Error::from)
+    pub async fn retrieve_results<S>(
+        &mut self,
+        quantum_processor_id: S,
+        job_handle: &JobHandle,
+    ) -> ExecutionResult
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let qpu = self.qpu_for_id(quantum_processor_id).await?;
+        qpu.retrieve_results(job_handle).await.map_err(Error::from)
     }
 }
 
@@ -603,33 +620,36 @@ impl From<qvm::Error> for Error {
 /// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
 /// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JobHandle<'executable> {
+pub struct JobHandle {
     job_id: JobId,
-    quantum_processor_id: Cow<'executable, str>,
+    job_target: JobTarget,
     readout_map: HashMap<String, String>,
 }
 
-impl<'a> JobHandle<'a> {
+impl JobHandle {
     #[must_use]
-    pub(crate) fn new<S>(
+    pub(crate) fn new(
         job_id: JobId,
-        quantum_processor_id: S,
+        job_target: JobTarget,
         readout_map: HashMap<String, String>,
-    ) -> Self
-    where
-        S: Into<Cow<'a, str>>,
-    {
+    ) -> Self {
         Self {
             job_id,
-            quantum_processor_id: quantum_processor_id.into(),
+            job_target,
             readout_map,
         }
     }
 
     /// The string representation of the QCS Job ID. Useful for debugging.
     #[must_use]
-    pub fn job_id(&self) -> &str {
-        self.job_id.0.as_str()
+    pub fn job_id(&self) -> JobId {
+        self.job_id.clone()
+    }
+
+    /// The string representation of the QCS Job ID. Useful for debugging.
+    #[must_use]
+    pub fn job_target(&self) -> &JobTarget {
+        &self.job_target
     }
 
     /// The readout map from source readout memory locations to the
@@ -662,7 +682,10 @@ mod describe_get_config {
     #[cfg(feature = "manual-tests")]
     async fn it_returns_cached_values() {
         let mut exe = Executable::from_quil("");
-        let config = ClientConfiguration::builder().set_quilc_url(String::from("test")).build().unwrap();
+        let config = ClientConfiguration::builder()
+            .set_quilc_url(String::from("test"))
+            .build()
+            .unwrap();
         exe.config = Some(config.clone());
         let gotten = exe.get_config().await.unwrap_or_default();
         assert_eq!(gotten.quilc_url(), config.quilc_url());
@@ -676,8 +699,11 @@ mod describe_qpu_for_id {
 
     use qcs_api_client_common::ClientConfiguration;
 
-    use crate::{qpu::{self, Qcs}, Executable};
     use crate::compiler::quilc::CompilerOpts;
+    use crate::{
+        qpu::{self, Qcs},
+        Executable,
+    };
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {

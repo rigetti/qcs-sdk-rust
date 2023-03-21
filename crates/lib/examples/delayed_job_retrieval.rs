@@ -11,13 +11,14 @@ MEASURE 0 ro[0]
 #[tokio::main]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
+    let quantum_processor_id = "Aspen-M-3";
     let job_handle = exe
-        .submit_to_qpu("Aspen-M-3")
+        .submit_to_qpu(quantum_processor_id)
         .await
         .expect("Program should be successfully submitted for execution");
     // Do some other stuff
     let _data = exe
-        .retrieve_results(job_handle)
+        .retrieve_results(quantum_processor_id, &job_handle)
         .await
         .expect("Results should be successfully retrieved");
 }

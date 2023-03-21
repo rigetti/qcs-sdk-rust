@@ -171,22 +171,33 @@ impl PyExecutable {
         py_async!(py, py_submit_job!(self, quantum_processor_id))
     }
 
-    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
+    pub fn retrieve_results(
+        &mut self,
+        quantum_processor_id: String,
+        job_handle: PyJobHandle,
+    ) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(
             self,
             retrieve_results,
-            job_handle.into(),
+            quantum_processor_id,
+            &job_handle.into(),
         ))
     }
 
     pub fn retrieve_results_async<'py>(
         &'py mut self,
         py: Python<'py>,
+        quantum_processor_id: String,
         job_handle: PyJobHandle,
     ) -> PyResult<&PyAny> {
         py_async!(
             py,
-            py_executable_data!(self, retrieve_results, job_handle.into())
+            py_executable_data!(
+                self,
+                retrieve_results,
+                quantum_processor_id,
+                &job_handle.into()
+            )
         )
     }
 }
@@ -201,14 +212,14 @@ py_wrap_simple_enum! {
 }
 
 py_wrap_type! {
-    PyJobHandle(JobHandle<'static>) as "JobHandle";
+    PyJobHandle(JobHandle) as "JobHandle";
 }
 
 #[pymethods]
 impl PyJobHandle {
     #[getter]
-    pub fn job_id(&self) -> &str {
-        self.as_inner().job_id()
+    pub fn job_id(&self) -> String {
+        self.as_inner().job_id().to_string()
     }
 
     #[getter]
