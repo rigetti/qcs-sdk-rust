@@ -145,7 +145,7 @@ impl Qcs {
         let grpc_address = endpoint.addresses.grpc;
 
         grpc_address
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(endpoint_id.into()))
+            .ok_or_else(|| GrpcEndpointError::EndpointNotFound(endpoint_id.into()))
             .map(|v| parse_uri(&v).map_err(GrpcEndpointError::BadUri))?
     }
 
@@ -159,7 +159,7 @@ impl Qcs {
         let addresses = default_endpoint.addresses.as_ref();
         let grpc_address = addresses.grpc.as_ref();
         grpc_address
-            .ok_or_else(|| GrpcEndpointError::NoQpuEndpoint(quantum_processor_id.into()))
+            .ok_or_else(|| GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.into()))
             .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
     }
 
@@ -189,9 +189,9 @@ impl Qcs {
             }
         }
         gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways
-            .first()
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
+        let target = gateways.first().ok_or_else(|| {
+            GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.to_string())
+        })?;
         parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
     }
 }
