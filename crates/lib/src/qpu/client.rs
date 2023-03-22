@@ -136,7 +136,7 @@ impl Qcs {
             .await
     }
 
-    /// Get address for direction connection to Controller, when explicitly targeting a endpoint by ID.
+    /// Get address for direct connection to Controller, explicitly targeting an endpoint by ID.
     async fn get_controller_endpoint_by_id(
         &self,
         endpoint_id: &str,
@@ -217,11 +217,11 @@ pub enum GrpcEndpointError {
 
     /// Error due to missing gRPC endpoint for quantum processor
     #[error("Missing gRPC endpoint for quantum processor: {0}")]
-    NoQpuEndpoint(String),
+    QpuEndpointNotFound(String),
 
     /// Error due to missing gRPC endpoint for endpoint ID
     #[error("Missing gRPC endpoint for endpoint ID: {0}")]
-    NoEndpoint(String),
+    EndpointNotFound(String),
 }
 
 /// Errors that may occur while trying to use a `gRPC` client
