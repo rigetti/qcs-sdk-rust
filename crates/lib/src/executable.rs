@@ -423,14 +423,52 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
+    pub async fn execute_on_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+    ) -> ExecutionResult
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let job_handle = self
+            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id)
+            .await?;
+        self.retrieve_results(job_handle).await
+    }
+
+    /// Compile the program and execute it on a QCS endpoint, waiting for results.
+    ///
+    /// # Arguments
+    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    ///     This parameter affects the lifetime of the [`Executable`].
+    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    ///
+    /// # Warning
+    ///
+    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
+    /// to avoid blocking shutdown of the runtime.
+    ///
+    /// # Returns
+    ///
+    /// An [`ExecutionResult`].
+    ///
+    /// # Errors
+    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
+    ///
+    /// 1. You are not authenticated for QCS
+    /// 1. Your credentials don't have an active reservation for the QPU you requested
+    /// 1. [quilc] was not running.
+    /// 1. The `quil` that this [`Executable`] was constructed with was invalid.
+    /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
+    ///
+    /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
-        let quantum_processor_id: Cow<'execution, str> = quantum_processor_id.into();
-        let job_handle = self.submit_to_qpu(quantum_processor_id.clone()).await?;
-        self.retrieve_results(quantum_processor_id, &job_handle)
-            .await
+        let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
+        self.retrieve_results(job_handle).await
     }
 
     /// Compile and submit the program to a QPU, but do not wait for execution to complete.
@@ -441,7 +479,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu<S>(&mut self, quantum_processor_id: S) -> Result<JobHandle, Error>
+    pub async fn submit_to_qpu<S>(
+        &mut self,
+        quantum_processor_id: S,
+    ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
     {
@@ -465,7 +506,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         endpoint_id: S,
-    ) -> Result<JobHandle, Error>
+    ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
     {
@@ -482,14 +523,8 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results<S>(
-        &mut self,
-        quantum_processor_id: S,
-        job_handle: &JobHandle,
-    ) -> ExecutionResult
-    where
-        S: Into<Cow<'execution, str>>,
-    {
+    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
+        let quantum_processor_id = job_handle.quantum_processor_id.to_string();
         let qpu = self.qpu_for_id(quantum_processor_id).await?;
         qpu.retrieve_results(job_handle).await.map_err(Error::from)
     }
@@ -620,22 +655,28 @@ impl From<qvm::Error> for Error {
 /// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
 /// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JobHandle {
+pub struct JobHandle<'executable> {
     job_id: JobId,
-    job_target: JobTarget,
+    quantum_processor_id: Cow<'executable, str>,
+    endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
 }
 
-impl JobHandle {
+impl<'a> JobHandle<'a> {
     #[must_use]
-    pub(crate) fn new(
+    pub(crate) fn new<S>(
         job_id: JobId,
-        job_target: JobTarget,
+        quantum_processor_id: S,
+        endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
-    ) -> Self {
+    ) -> Self
+    where
+        S: Into<Cow<'a, str>>,
+    {
         Self {
             job_id,
-            job_target,
+            quantum_processor_id: quantum_processor_id.into(),
+            endpoint_id: endpoint_id.map(|v| v.into()),
             readout_map,
         }
     }
@@ -648,8 +689,11 @@ impl JobHandle {
 
     /// The string representation of the QCS Job ID. Useful for debugging.
     #[must_use]
-    pub fn job_target(&self) -> &JobTarget {
-        &self.job_target
+    pub fn job_target(&self) -> JobTarget {
+        self.endpoint_id.as_ref().map_or_else(
+            || JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string()),
+            |endpoint_id| JobTarget::EndpointId(endpoint_id.to_string()),
+        )
     }
 
     /// The readout map from source readout memory locations to the

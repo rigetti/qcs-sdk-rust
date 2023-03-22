@@ -149,18 +149,21 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle, Error> {
+    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'a>, Error> {
         let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
         self.submit_to_target(params, job_target).await
     }
 
     /// Run on specific QCS endpoint and wait for the results.
-    pub(crate) async fn submit_to_endpoint_id(
+    pub(crate) async fn submit_to_endpoint_id<S>(
         &mut self,
         params: &Parameters,
-        endpoint_id: Cow<'_, str>,
-    ) -> Result<JobHandle, Error> where {
-        let job_target = JobTarget::EndpointId(endpoint_id.to_string());
+        endpoint_id: S,
+    ) -> Result<JobHandle<'a>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
         self.submit_to_target(params, job_target).await
     }
 
@@ -168,7 +171,7 @@ impl<'a> Execution<'a> {
         &mut self,
         params: &Parameters,
         job_target: JobTarget,
-    ) -> Result<JobHandle, Error> {
+    ) -> Result<JobHandle<'a>, Error> {
         let EncryptedTranslationResult { job, readout_map } = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
@@ -183,16 +186,26 @@ impl<'a> Execution<'a> {
 
         let job_id = submit(&job_target, job, &patch_values, self.client.as_ref()).await?;
 
-        Ok(JobHandle::new(job_id, job_target, readout_map))
+        let endpoint_id = match job_target {
+            JobTarget::EndpointId(endpoint_id) => Some(endpoint_id),
+            JobTarget::QuantumProcessorId(_) => None,
+        };
+
+        Ok(JobHandle::new(
+            job_id,
+            self.quantum_processor_id.to_string(),
+            endpoint_id,
+            readout_map,
+        ))
     }
 
     pub(crate) async fn retrieve_results(
         &self,
-        job_handle: &JobHandle,
+        job_handle: JobHandle<'a>,
     ) -> Result<ExecutionData, Error> {
         let response = retrieve_results(
             job_handle.job_id(),
-            job_handle.job_target(),
+            &job_handle.job_target(),
             self.client.as_ref(),
         )
         .await?;
