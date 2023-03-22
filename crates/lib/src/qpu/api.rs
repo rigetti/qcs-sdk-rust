@@ -1,6 +1,8 @@
 //! This module provides bindings to for submitting jobs to and retrieving them from
 //! Rigetti QPUs using the QCS API.
 
+use std::fmt;
+
 use qcs_api_client_grpc::{
     models::controller::{
         data_value::Value, ControllerJobExecutionResult, DataValue, EncryptedControllerJob,
@@ -68,15 +70,15 @@ impl From<&JobTarget> for get_controller_job_results_request::Target {
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct JobId(pub(crate) String);
 
-impl From<String> for JobId {
-    fn from(value: String) -> Self {
-        Self(value)
+impl fmt::Display for JobId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        <String as fmt::Display>::fmt(&self.0, f)
     }
 }
 
-impl ToString for JobId {
-    fn to_string(&self) -> String {
-        self.0.clone()
+impl From<String> for JobId {
+    fn from(value: String) -> Self {
+        Self(value)
     }
 }
 
@@ -87,6 +89,9 @@ pub async fn submit(
     patch_values: &Parameters,
     client: &Qcs,
 ) -> Result<JobId, GrpcClientError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("submitting job to {}", quantum_processor_id);
+
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
@@ -123,6 +128,13 @@ pub async fn retrieve_results(
     job_target: &JobTarget,
     client: &Qcs,
 ) -> Result<ControllerJobExecutionResult, GrpcClientError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        "retrieving job results for {} on {}",
+        job_id,
+        quantum_processor_id
+    );
+
     let request = GetControllerJobResultsRequest {
         job_execution_id: Some(job_id.0),
         target: Some(job_target.into()),

@@ -33,12 +33,19 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 /// recoverable at runtime. This function can fail generally if the provided ISA cannot be converted
 /// into a form that `quilc` recognizes, if `quilc` cannot be contacted, or if the program cannot
 /// be converted by `quilc`.
+#[cfg_attr(
+    feature = "tracing",
+    tracing::instrument(skip(client), level = "trace")
+)]
 pub fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
     options: CompilerOpts,
 ) -> Result<Program, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(%quil, compiler_options=?options, "compiling quil program with quilc",);
+
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
@@ -104,6 +111,9 @@ impl Default for CompilerOpts {
 
 /// Fetch the version information from the running Quilc compiler.
 pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("requesting quilc version information");
+
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let binding: HashMap<String, String> = HashMap::new();

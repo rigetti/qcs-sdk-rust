@@ -50,6 +50,9 @@ use crate::executable::Parameters;
 /// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
 pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("rewriting arithmetic");
+
     let mut substitutions = Substitutions::new();
     let Program {
         calibrations,

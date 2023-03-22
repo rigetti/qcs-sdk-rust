@@ -5,10 +5,10 @@ use std::convert::TryFrom;
 use std::sync::Arc;
 use std::time::Duration;
 
-use log::trace;
 use quil_rs::program::ProgramError;
 use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
+use tracing::trace;
 
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
@@ -119,6 +119,16 @@ impl<'a> Execution<'a> {
         compile_with_quilc: bool,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            %quil,
+            num_shots=%shots,
+            %quantum_processor_id,
+            %compile_with_quilc,
+            ?compiler_options,
+            "creating new QPU Execution",
+        );
+
         let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
@@ -162,6 +172,9 @@ impl<'a> Execution<'a> {
 
     /// Run on a real QPU and wait for the results.
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'a>, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
+
         let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
         self.submit_to_target(params, job_target).await
     }
@@ -209,6 +222,14 @@ impl<'a> Execution<'a> {
         &self,
         job_handle: JobHandle<'a>,
     ) -> Result<ExecutionData, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            %job_id,
+            num_shots = %self.shots,
+            quantum_processor_id=%self.quantum_processor_id,
+            "retrieving execution results for job",
+        );
+
         let response = retrieve_results(
             job_handle.job_id(),
             &job_handle.job_target(),

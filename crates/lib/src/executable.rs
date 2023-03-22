@@ -190,8 +190,11 @@ impl<'executable> Executable<'executable, '_> {
     where
         S: Into<Cow<'executable, str>>,
     {
+        let register = register.into();
+        #[cfg(feature = "tracing")]
+        tracing::trace!("reading from register {:?}", register);
         let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
-        readouts.push(register.into());
+        readouts.push(register);
         self.readout_memory_region_names = Some(readouts);
         self
     }
@@ -260,6 +263,10 @@ impl<'executable> Executable<'executable, '_> {
         value: f64,
     ) -> &mut Self {
         let param_name = param_name.into();
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!("setting parameter {}[{}] to {}", param_name, index, value);
+
         let mut values = self
             .params
             .remove(&param_name)
@@ -331,6 +338,13 @@ impl Executable<'_, '_> {
     ///
     /// See [`Error`].
     pub async fn execute_on_qvm(&mut self) -> ExecutionResult {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            quil = %self.quil,
+            num_shots = %self.shots,
+            "running Executable on QVM",
+        );
+
         let config = self.get_config().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
@@ -467,6 +481,16 @@ impl<'execution> Executable<'_, 'execution> {
     where
         S: Into<Cow<'execution, str>>,
     {
+        let quantum_processor_id = quantum_processor_id.into();
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            quil = %self.quil,
+            num_shots = %self.shots,
+            %quantum_processor_id,
+            "running Executable on QPU",
+        );
+
         let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
         self.retrieve_results(job_handle).await
     }
@@ -486,6 +510,16 @@ impl<'execution> Executable<'_, 'execution> {
     where
         S: Into<Cow<'execution, str>>,
     {
+        let quantum_processor_id = quantum_processor_id.into();
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            quil = %self.quil,
+            num_shots = %self.shots,
+            %quantum_processor_id,
+            "submitting Executable to QPU",
+        );
+
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
