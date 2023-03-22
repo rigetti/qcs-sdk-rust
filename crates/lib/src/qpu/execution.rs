@@ -8,6 +8,8 @@ use std::time::Duration;
 use quil_rs::program::ProgramError;
 use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
+
+#[cfg(feature = "tracing")]
 use tracing::trace;
 
 use crate::executable::Parameters;
@@ -132,6 +134,7 @@ impl<'a> Execution<'a> {
         let target_device = TargetDevice::try_from(isa)?;
 
         let program = if compile_with_quilc {
+            #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
             let client = client.clone();
             spawn_blocking(move || {
@@ -145,6 +148,7 @@ impl<'a> Execution<'a> {
                 })
             })??
         } else {
+            #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
             quil.parse().map_err(Error::Quil)?
         };
