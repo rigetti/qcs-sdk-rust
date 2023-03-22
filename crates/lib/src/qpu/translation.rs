@@ -41,7 +41,6 @@ pub async fn translate(
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
-        program=%quil_program,
         %num_shots,
         "translating program for {}",
         quantum_processor_id,

@@ -121,7 +121,6 @@ impl<'a> Execution<'a> {
     ) -> Result<Execution<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
-            %quil,
             num_shots=%shots,
             %quantum_processor_id,
             %compile_with_quilc,

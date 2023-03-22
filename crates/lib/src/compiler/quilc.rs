@@ -44,7 +44,7 @@ pub fn compile_program(
     options: CompilerOpts,
 ) -> Result<Program, Error> {
     #[cfg(feature = "tracing")]
-    tracing::debug!(%quil, compiler_options=?options, "compiling quil program with quilc",);
+    tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
 
     let config = client.get_config();
     let endpoint = config.quilc_url();

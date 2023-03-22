@@ -340,7 +340,6 @@ impl Executable<'_, '_> {
     pub async fn execute_on_qvm(&mut self) -> ExecutionResult {
         #[cfg(feature = "tracing")]
         tracing::debug!(
-            quil = %self.quil,
             num_shots = %self.shots,
             "running Executable on QVM",
         );
@@ -485,7 +484,6 @@ impl<'execution> Executable<'_, 'execution> {
 
         #[cfg(feature = "tracing")]
         tracing::debug!(
-            quil = %self.quil,
             num_shots = %self.shots,
             %quantum_processor_id,
             "running Executable on QPU",
@@ -514,7 +512,6 @@ impl<'execution> Executable<'_, 'execution> {
 
         #[cfg(feature = "tracing")]
         tracing::debug!(
-            quil = %self.quil,
             num_shots = %self.shots,
             %quantum_processor_id,
             "submitting Executable to QPU",
