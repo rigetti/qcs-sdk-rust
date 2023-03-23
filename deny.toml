@@ -92,8 +92,9 @@ wildcards = "deny"
 highlight = "all"
 skip-tree = [
     { name = "toml", version = "*", depth = 20 },
-    { name = "warp", version = "*", depth = 20 },       # Only used for development
-    { name = "hermit-abi", version = "*", depth = 20 }, # Only used for development
+    { name = "warp", version = "*", depth = 20 },              # Only used for development
+    { name = "hermit-abi", version = "*", depth = 20 },        # Only used for development
+    { name = "hyper-rustls", version = "<=0.23", depth = 20 }, # `hyper-proxy` relies on an older version than `reqwest`
 ]
 
 # This section is considered when running `cargo deny check sources`.
