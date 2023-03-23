@@ -1,3 +1,27 @@
+## 0.10.0-rc.15
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
 ## 0.10.0-rc.14
 
 ### Breaking Changes
