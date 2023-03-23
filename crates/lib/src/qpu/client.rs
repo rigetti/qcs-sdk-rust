@@ -87,11 +87,10 @@ impl Qcs {
         endpoint_id: &str,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
     {
-        self.get_controller_endpoint_by_id(endpoint_id)
-            .await
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(ControllerClient::new)
+        let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
+        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
+        let service = wrap_channel_with(channel, self.get_config());
+        Ok(ControllerClient::new(service))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
@@ -145,7 +144,7 @@ impl Qcs {
 
         grpc_address
             .ok_or_else(|| GrpcEndpointError::EndpointNotFound(endpoint_id.into()))
-            .map(|v| parse_uri(&v).map_err(GrpcEndpointError::BadUri))?
+            .map(|v| parse_uri(&v).map_err(GrpcEndpointError::GrpcError))?
     }
 
     /// Get address for direction connection to Controller.
