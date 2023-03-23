@@ -76,11 +76,10 @@ impl Qcs {
         quantum_processor_id: &str,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
     {
-        self.get_controller_endpoint(quantum_processor_id)
-            .await
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(ControllerClient::new)
+        let uri = self.get_controller_endpoint(quantum_processor_id).await?;
+        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
+        let service = wrap_channel_with(channel, self.get_config());
+        Ok(ControllerClient::new(service))
     }
 
     pub(crate) async fn get_controller_client_with_endpoint_id(
@@ -115,10 +114,10 @@ impl Qcs {
         TranslationClient<RefreshService<Channel, ClientConfiguration>>,
         GrpcError<RefreshError>,
     > {
-        parse_uri(translation_grpc_endpoint)
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(TranslationClient::new)
+        let uri = parse_uri(translation_grpc_endpoint)?;
+        let channel = get_channel(uri)?;
+        let service = wrap_channel_with(channel, self.get_config());
+        Ok(TranslationClient::new(service))
     }
 
     async fn get_controller_endpoint(
@@ -160,7 +159,7 @@ impl Qcs {
         let grpc_address = addresses.grpc.as_ref();
         grpc_address
             .ok_or_else(|| GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.into()))
-            .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
+            .map(|v| parse_uri(v).map_err(GrpcEndpointError::GrpcError))?
     }
 
     /// Get address for Gateway assigned to the provided `quantum_processor_id`, if one exists.
@@ -192,16 +191,16 @@ impl Qcs {
         let target = gateways.first().ok_or_else(|| {
             GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.to_string())
         })?;
-        parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
+        parse_uri(&target.url).map_err(GrpcEndpointError::GrpcError)
     }
 }
 
 /// Errors that may occur while trying to resolve a `gRPC` endpoint
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcEndpointError {
-    /// Error due to a malformed URI
-    #[error("Malformed URI for endpoint: {0}")]
-    BadUri(#[from] GrpcError<RefreshError>),
+    /// Error due to a bad gRPC configuration
+    #[error("Error configuring gRPC request: {0}")]
+    GrpcError(#[from] GrpcError<RefreshError>),
 
     /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
