@@ -148,6 +148,18 @@ impl<'a> Execution<'a> {
         })
     }
 
+    /// Translate the execution's quil program for it's given quantum processor.
+    pub(crate) async fn translate(&mut self) -> Result<EncryptedTranslationResult, Error> {
+        let encrpyted_translation_result = translate(
+            self.quantum_processor_id.as_ref(),
+            &self.program.to_string().0,
+            self.shots.into(),
+            self.client.as_ref(),
+        )
+        .await?;
+        Ok(encrpyted_translation_result)
+    }
+
     /// Run on a real QPU and wait for the results.
     pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'a>, Error> {
         let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
@@ -172,13 +184,7 @@ impl<'a> Execution<'a> {
         params: &Parameters,
         job_target: JobTarget,
     ) -> Result<JobHandle<'a>, Error> {
-        let EncryptedTranslationResult { job, readout_map } = translate(
-            self.quantum_processor_id.as_ref(),
-            &self.program.to_string().0,
-            self.shots.into(),
-            self.client.as_ref(),
-        )
-        .await?;
+        let EncryptedTranslationResult { job, readout_map } = self.translate().await?;
 
         let patch_values = self
             .get_substitutions(params)

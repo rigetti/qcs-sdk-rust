@@ -687,7 +687,7 @@ impl<'a> JobHandle<'a> {
         self.job_id.clone()
     }
 
-    /// The string representation of the QCS Job ID. Useful for debugging.
+    /// The execution target of the QCS Job, either the quantum processor or an expicit endpoint.
     #[must_use]
     pub fn job_target(&self) -> JobTarget {
         self.endpoint_id.as_ref().map_or_else(
