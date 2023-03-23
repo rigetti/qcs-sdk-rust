@@ -11,9 +11,20 @@ readme = "./README.md"
 
 [features]
 manual-tests = []
-otel-tracing = [
+tracing = [
+    "deps:tracing",
+    "qcs-api-client-common/tracing",
+    "qcs-api-client-grpc/tracing",
+    "qcs-api-client-openapi/tracing"
+]
+tracing-config = [
     "tracing",
     "qcs-api-client-common/tracing-config",
+    "qcs-api-client-grpc/tracing-config",
+    "qcs-api-client-openapi/tracing-config"
+]
+otel-tracing = [
+    "tracing-config",
     "qcs-api-client-grpc/otel-tracing",
     "qcs-api-client-openapi/otel-tracing",
 ]
