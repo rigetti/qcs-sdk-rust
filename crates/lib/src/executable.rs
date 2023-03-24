@@ -676,7 +676,7 @@ impl<'a> JobHandle<'a> {
         Self {
             job_id,
             quantum_processor_id: quantum_processor_id.into(),
-            endpoint_id: endpoint_id.map(|v| v.into()),
+            endpoint_id: endpoint_id.map(Into::into),
             readout_map,
         }
     }
