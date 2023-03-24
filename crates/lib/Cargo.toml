@@ -28,7 +28,7 @@ qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
 reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
-serde = { version = "1.0.145", features = ["derive"] }
+serde = { version = "1.0.158", features = ["derive"] }
 serde_bytes = "0.11.7"
 serde_json.workspace = true
 thiserror.workspace = true
