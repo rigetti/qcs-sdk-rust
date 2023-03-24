@@ -14,7 +14,9 @@ use qcs_api_client_grpc::{
 };
 use qcs_api_client_openapi::apis::{
     configuration::Configuration as OpenApiConfiguration,
-    endpoints_api::{get_default_endpoint, GetDefaultEndpointError},
+    endpoints_api::{
+        get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
+    },
     quantum_processors_api::{
         list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
     },
@@ -80,6 +82,17 @@ impl Qcs {
         Ok(ControllerClient::new(service))
     }
 
+    pub(crate) async fn get_controller_client_with_endpoint_id(
+        &self,
+        endpoint_id: &str,
+    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
+    {
+        let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
+        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
+        let service = wrap_channel_with(channel, self.get_config());
+        Ok(ControllerClient::new(service))
+    }
+
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
         OpenApiConfiguration::with_qcs_config(self.get_config())
     }
@@ -121,6 +134,19 @@ impl Qcs {
             .await
     }
 
+    /// Get address for direct connection to Controller, explicitly targeting an endpoint by ID.
+    async fn get_controller_endpoint_by_id(
+        &self,
+        endpoint_id: &str,
+    ) -> Result<Uri, GrpcEndpointError> {
+        let endpoint = get_endpoint(&self.get_openapi_client(), endpoint_id).await?;
+        let grpc_address = endpoint.addresses.grpc;
+
+        grpc_address
+            .ok_or_else(|| GrpcEndpointError::EndpointNotFound(endpoint_id.into()))
+            .map(|v| parse_uri(&v).map_err(GrpcEndpointError::GrpcError))?
+    }
+
     /// Get address for direction connection to Controller.
     async fn get_controller_default_endpoint(
         &self,
@@ -131,7 +157,7 @@ impl Qcs {
         let addresses = default_endpoint.addresses.as_ref();
         let grpc_address = addresses.grpc.as_ref();
         grpc_address
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))
+            .ok_or_else(|| GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.into()))
             .map(|v| parse_uri(v).map_err(GrpcEndpointError::GrpcError))?
     }
 
@@ -161,9 +187,9 @@ impl Qcs {
             }
         }
         gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways
-            .first()
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
+        let target = gateways.first().ok_or_else(|| {
+            GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.to_string())
+        })?;
         parse_uri(&target.url).map_err(GrpcEndpointError::GrpcError)
     }
 }
@@ -177,15 +203,23 @@ pub enum GrpcEndpointError {
 
     /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
-    RequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
+    QpuEndpointRequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
+
+    /// Error due to failure to get endpoint for quantum processor
+    #[error("Failed to get endpoint for the given ID: {0}")]
+    EndpointRequestFailed(#[from] OpenApiError<GetEndpointError>),
 
     /// Error due to failure to get accessors for quantum processor
     #[error("Failed to get accessors for quantum processor: {0}")]
     AccessorRequestFailed(#[from] OpenApiError<ListQuantumProcessorAccessorsError>),
 
     /// Error due to missing gRPC endpoint for quantum processor
-    #[error("Missing gRPC endpoint for quantum processor {0}")]
-    NoEndpoint(String),
+    #[error("Missing gRPC endpoint for quantum processor: {0}")]
+    QpuEndpointNotFound(String),
+
+    /// Error due to missing gRPC endpoint for endpoint ID
+    #[error("Missing gRPC endpoint for endpoint ID: {0}")]
+    EndpointNotFound(String),
 }
 
 /// Errors that may occur while trying to use a `gRPC` client

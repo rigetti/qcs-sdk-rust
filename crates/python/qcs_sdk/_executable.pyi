@@ -49,35 +49,47 @@ class Executable:
         """
         ...
 
-    def execute_on_qpu(self, quantum_processor_id: str) -> ExecutionData:
+    def execute_on_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
+
+        :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
+        the default endpoint for the given quantum_processor_id is used.
 
         :raises ExecutionError: If the job fails to execute.
         """
         ...
 
-    async def execute_on_qpu_async(self, quantum_processor_id: str) -> ExecutionData:
+    async def execute_on_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
 
+        :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
+        the default endpoint for the given quantum_processor_id is used.
+
         :raises ExecutionError: If the job fails to execute.
         """
         ...
 
-    def submit_to_qpu(self, quantum_processor_id: str) -> JobHandle:
+    def submit_to_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
 
+        :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
+        the default endpoint for the given quantum_processor_id is used.
+
         :raises ExecutionError: If the job fails to execute.
         """
         ...
 
-    async def submit_to_qpu_async(self, quantum_processor_id: str) -> JobHandle:
+    async def submit_to_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
+
+        :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
+        the default endpoint for the given quantum_processor_id is used.
 
         :raises ExecutionError: If the job fails to execute.
         """

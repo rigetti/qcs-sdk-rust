@@ -11,7 +11,7 @@ use qcs_api_client_common::ClientConfiguration;
 
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::JobId;
+use crate::qpu::api::{JobId, JobTarget};
 use crate::qpu::client::Qcs;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
@@ -423,6 +423,46 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
+    pub async fn execute_on_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+    ) -> ExecutionResult
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let job_handle = self
+            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id)
+            .await?;
+        self.retrieve_results(job_handle).await
+    }
+
+    /// Compile the program and execute it on a QCS endpoint, waiting for results.
+    ///
+    /// # Arguments
+    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    ///     This parameter affects the lifetime of the [`Executable`].
+    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    ///
+    /// # Warning
+    ///
+    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
+    /// to avoid blocking shutdown of the runtime.
+    ///
+    /// # Returns
+    ///
+    /// An [`ExecutionResult`].
+    ///
+    /// # Errors
+    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
+    ///
+    /// 1. You are not authenticated for QCS
+    /// 1. Your credentials don't have an active reservation for the QPU you requested
+    /// 1. [quilc] was not running.
+    /// 1. The `quil` that this [`Executable`] was constructed with was invalid.
+    /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
+    ///
+    /// [quilc]: https://github.com/quil-lang/quilc
     pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
@@ -446,23 +486,36 @@ impl<'execution> Executable<'_, 'execution> {
     where
         S: Into<Cow<'execution, str>>,
     {
-        let quantum_processor_id = quantum_processor_id.into();
-        let JobHandle {
-            job_id,
-            readout_map,
-            ..
-        } = self
-            .qpu_for_id(quantum_processor_id.clone())
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
             .await?
             .submit(&self.params)
             .await?;
+        Ok(job_handle)
+    }
 
-        // The unpacking/re-packing here is to avoid lifetime issues.
-        Ok(JobHandle {
-            job_id,
-            quantum_processor_id,
-            readout_map,
-        })
+    /// Compile and submit the program to a QCS endpoint, but do not wait for execution to complete.
+    ///
+    /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
+    /// results.
+    ///
+    /// # Errors
+    ///
+    /// See [`Executable::execute_on_qpu`].
+    pub async fn submit_to_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+    ) -> Result<JobHandle<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
+            .await?
+            .submit_to_endpoint_id(&self.params, endpoint_id.into())
+            .await?;
+        Ok(job_handle)
     }
 
     /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
@@ -471,10 +524,9 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// See [`Executable::execute_on_qpu`].
     pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
-        let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
-        qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
-            .await
-            .map_err(Error::from)
+        let quantum_processor_id = job_handle.quantum_processor_id.to_string();
+        let qpu = self.qpu_for_id(quantum_processor_id).await?;
+        qpu.retrieve_results(job_handle).await.map_err(Error::from)
     }
 }
 
@@ -606,6 +658,7 @@ impl From<qvm::Error> for Error {
 pub struct JobHandle<'executable> {
     job_id: JobId,
     quantum_processor_id: Cow<'executable, str>,
+    endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
 }
 
@@ -614,6 +667,7 @@ impl<'a> JobHandle<'a> {
     pub(crate) fn new<S>(
         job_id: JobId,
         quantum_processor_id: S,
+        endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
     ) -> Self
     where
@@ -622,14 +676,24 @@ impl<'a> JobHandle<'a> {
         Self {
             job_id,
             quantum_processor_id: quantum_processor_id.into(),
+            endpoint_id: endpoint_id.map(Into::into),
             readout_map,
         }
     }
 
     /// The string representation of the QCS Job ID. Useful for debugging.
     #[must_use]
-    pub fn job_id(&self) -> &str {
-        self.job_id.0.as_str()
+    pub fn job_id(&self) -> JobId {
+        self.job_id.clone()
+    }
+
+    /// The execution target of the QCS Job, either the quantum processor or an expicit endpoint.
+    #[must_use]
+    pub fn job_target(&self) -> JobTarget {
+        self.endpoint_id.as_ref().map_or_else(
+            || JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string()),
+            |endpoint_id| JobTarget::EndpointId(endpoint_id.to_string()),
+        )
     }
 
     /// The readout map from source readout memory locations to the
@@ -662,7 +726,10 @@ mod describe_get_config {
     #[cfg(feature = "manual-tests")]
     async fn it_returns_cached_values() {
         let mut exe = Executable::from_quil("");
-        let config = ClientConfiguration::builder().set_quilc_url(String::from("test")).build().unwrap();
+        let config = ClientConfiguration::builder()
+            .set_quilc_url(String::from("test"))
+            .build()
+            .unwrap();
         exe.config = Some(config.clone());
         let gotten = exe.get_config().await.unwrap_or_default();
         assert_eq!(gotten.quilc_url(), config.quilc_url());
@@ -676,8 +743,11 @@ mod describe_qpu_for_id {
 
     use qcs_api_client_common::ClientConfiguration;
 
-    use crate::{qpu::{self, Qcs}, Executable};
     use crate::compiler::quilc::CompilerOpts;
+    use crate::{
+        qpu::{self, Qcs},
+        Executable,
+    };
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {

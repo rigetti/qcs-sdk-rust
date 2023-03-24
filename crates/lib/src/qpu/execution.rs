@@ -1,7 +1,6 @@
 //! Contains QPU-specific executable stuff.
 
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::sync::Arc;
 use std::time::Duration;
@@ -16,7 +15,7 @@ use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
-use super::api::{retrieve_results, submit, JobId};
+use super::api::{retrieve_results, submit, JobTarget};
 use super::client::{GrpcClientError, Qcs};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
@@ -149,50 +148,77 @@ impl<'a> Execution<'a> {
         })
     }
 
-    /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'_>, Error> {
-        let EncryptedTranslationResult { job, readout_map } = translate(
+    /// Translate the execution's quil program for it's given quantum processor.
+    pub(crate) async fn translate(&mut self) -> Result<EncryptedTranslationResult, Error> {
+        let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
             self.shots.into(),
             self.client.as_ref(),
         )
         .await?;
+        Ok(encrpyted_translation_result)
+    }
+
+    /// Run on a real QPU and wait for the results.
+    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'a>, Error> {
+        let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
+        self.submit_to_target(params, job_target).await
+    }
+
+    /// Run on specific QCS endpoint and wait for the results.
+    pub(crate) async fn submit_to_endpoint_id<S>(
+        &mut self,
+        params: &Parameters,
+        endpoint_id: S,
+    ) -> Result<JobHandle<'a>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
+        self.submit_to_target(params, job_target).await
+    }
+
+    async fn submit_to_target(
+        &mut self,
+        params: &Parameters,
+        job_target: JobTarget,
+    ) -> Result<JobHandle<'a>, Error> {
+        let EncryptedTranslationResult { job, readout_map } = self.translate().await?;
 
         let patch_values = self
             .get_substitutions(params)
             .map_err(Error::Substitution)?;
 
-        let job_id = submit(
-            self.quantum_processor_id.as_ref(),
-            job,
-            &patch_values,
-            self.client.as_ref(),
-        )
-        .await?;
+        let job_id = submit(&job_target, job, &patch_values, self.client.as_ref()).await?;
+
+        let endpoint_id = match job_target {
+            JobTarget::EndpointId(endpoint_id) => Some(endpoint_id),
+            JobTarget::QuantumProcessorId(_) => None,
+        };
 
         Ok(JobHandle::new(
             job_id,
-            self.quantum_processor_id.clone(),
+            self.quantum_processor_id.to_string(),
+            endpoint_id,
             readout_map,
         ))
     }
 
     pub(crate) async fn retrieve_results(
         &self,
-        job_id: JobId,
-        readout_mappings: HashMap<String, String>,
+        job_handle: JobHandle<'a>,
     ) -> Result<ExecutionData, Error> {
         let response = retrieve_results(
-            job_id,
-            self.quantum_processor_id.as_ref(),
+            job_handle.job_id(),
+            &job_handle.job_target(),
             self.client.as_ref(),
         )
         .await?;
 
         Ok(ExecutionData {
             result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
-                &readout_mappings,
+                job_handle.readout_map(),
                 &response.readout_values,
             )),
             duration: response

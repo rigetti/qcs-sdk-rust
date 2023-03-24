@@ -70,14 +70,15 @@ macro_rules! py_executable_data {
     }};
 }
 
-/// Invoke `submit_to_qpu` on an executable.
-macro_rules! py_submit_job {
-    ($self: ident, $quantum_processor_id: expr) => {{
+/// Invoke a PyExecutable's inner Executable::method with given arguments,
+/// then mapped to `Future<Output = Result<PyJobHandle, ExecutionError>>`
+macro_rules! py_job_handle {
+    ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
         let arc = $self.as_inner().clone();
         async move {
             arc.lock()
                 .await
-                .submit_to_qpu($quantum_processor_id)
+                .$method($($arg),*)
                 .await
                 .map(JobHandle::from)
                 .map(PyJobHandle::from)
@@ -140,42 +141,99 @@ impl PyExecutable {
         py_async!(py, py_executable_data!(self, execute_on_qvm))
     }
 
-    pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(
-            self,
-            execute_on_qpu,
-            quantum_processor_id,
-        ))
+    #[args(endpoint_id = "None")]
+    pub fn execute_on_qpu(
+        &self,
+        quantum_processor_id: String,
+        endpoint_id: Option<String>,
+    ) -> PyResult<PyExecutionData> {
+        match endpoint_id {
+            Some(endpoint_id) => py_sync!(py_executable_data!(
+                self,
+                execute_on_qpu_with_endpoint,
+                quantum_processor_id,
+                endpoint_id
+            )),
+            None => py_sync!(py_executable_data!(
+                self,
+                execute_on_qpu,
+                quantum_processor_id
+            )),
+        }
     }
 
+    #[args(endpoint_id = "None")]
     pub fn execute_on_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
+        endpoint_id: Option<String>,
     ) -> PyResult<&PyAny> {
-        py_async!(
-            py,
-            py_executable_data!(self, execute_on_qpu, quantum_processor_id)
-        )
+        match endpoint_id {
+            Some(endpoint_id) => py_async!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id
+                )
+            ),
+            None => py_async!(
+                py,
+                py_executable_data!(self, execute_on_qpu, quantum_processor_id)
+            ),
+        }
     }
 
-    pub fn submit_to_qpu(&self, quantum_processor_id: String) -> PyResult<PyJobHandle> {
-        py_sync!(py_submit_job!(self, quantum_processor_id))
+    #[args(endpoint_id = "None")]
+    pub fn submit_to_qpu(
+        &self,
+        quantum_processor_id: String,
+        endpoint_id: Option<String>,
+    ) -> PyResult<PyJobHandle> {
+        match endpoint_id {
+            Some(endpoint_id) => py_sync!(py_job_handle!(
+                self,
+                submit_to_qpu_with_endpoint,
+                quantum_processor_id,
+                endpoint_id
+            )),
+            None => py_sync!(py_job_handle!(self, submit_to_qpu, quantum_processor_id)),
+        }
     }
 
+    #[args(endpoint_id = "None")]
     pub fn submit_to_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
+        endpoint_id: Option<String>,
     ) -> PyResult<&PyAny> {
-        py_async!(py, py_submit_job!(self, quantum_processor_id))
+        match endpoint_id {
+            Some(endpoint_id) => {
+                py_async!(
+                    py,
+                    py_job_handle!(
+                        self,
+                        submit_to_qpu_with_endpoint,
+                        quantum_processor_id,
+                        endpoint_id
+                    )
+                )
+            }
+            None => py_async!(
+                py,
+                py_job_handle!(self, submit_to_qpu, quantum_processor_id)
+            ),
+        }
     }
 
     pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
         py_sync!(py_executable_data!(
             self,
             retrieve_results,
-            job_handle.into(),
+            job_handle.into()
         ))
     }
 
@@ -207,8 +265,8 @@ py_wrap_type! {
 #[pymethods]
 impl PyJobHandle {
     #[getter]
-    pub fn job_id(&self) -> &str {
-        self.as_inner().job_id()
+    pub fn job_id(&self) -> String {
+        self.as_inner().job_id().to_string()
     }
 
     #[getter]
