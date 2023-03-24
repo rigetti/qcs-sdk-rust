@@ -26,7 +26,7 @@ qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
-reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
+reqwest = { version = "0.11.15", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_bytes = "0.11.7"
