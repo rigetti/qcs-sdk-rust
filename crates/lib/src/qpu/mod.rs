@@ -36,6 +36,12 @@ pub async fn get_isa(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<InstructionSetArchitecture, GetIsaError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        "getting instruction set architecture for {}",
+        quantum_processor_id
+    );
+
     get_instruction_set_architecture(&client.get_openapi_client(), quantum_processor_id)
         .await
         .map_err(client::OpenApiClientError::RequestFailed)
@@ -62,6 +68,9 @@ pub async fn list_quantum_processors(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<Vec<String>, ListQuantumProcessorsError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("listing quantum processors");
+
     let timeout = timeout.unwrap_or(client::DEFAULT_HTTP_API_TIMEOUT);
 
     tokio::time::timeout(timeout, async move {

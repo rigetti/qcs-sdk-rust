@@ -39,6 +39,13 @@ pub async fn translate(
     num_shots: u32,
     client: &Qcs,
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %num_shots,
+        "translating program for {}",
+        quantum_processor_id,
+    );
+
     let request = TranslateQuilToEncryptedControllerJobRequest {
         quantum_processor_id: Some(quantum_processor_id.to_owned()),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),
@@ -81,6 +88,9 @@ pub async fn get_quilt_calibrations(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<GetQuiltCalibrationsResponse, GetQuiltCalibrationsError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("getting Quil-T calibrations for {}", quantum_processor_id);
+
     let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
 
     tokio::time::timeout(timeout, async move {

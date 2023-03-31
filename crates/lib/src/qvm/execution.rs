@@ -61,6 +61,14 @@ impl Execution {
         params: &Parameters,
         config: &ClientConfiguration,
     ) -> Result<QvmResultData, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            %shots,
+            ?readouts,
+            ?params,
+            "running program on QVM"
+        );
+
         if shots == 0 {
             return Err(Error::ShotsMustBePositive);
         }
@@ -110,6 +118,13 @@ impl Execution {
         readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
     ) -> Result<QvmResultData, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            %shots,
+            ?readouts,
+            "executing program on QVM"
+        );
+
         let request = Request::new(&self.program.to_string(true), shots, readouts);
 
         let client = reqwest::Client::new();
