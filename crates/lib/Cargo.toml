@@ -12,7 +12,7 @@ readme = "./README.md"
 [features]
 manual-tests = []
 tracing = [
-    "deps:tracing",
+    "dep:tracing",
     "qcs-api-client-common/tracing",
     "qcs-api-client-grpc/tracing",
     "qcs-api-client-openapi/tracing"
