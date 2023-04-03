@@ -126,6 +126,93 @@ pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
     }
 }
 
+/// Request to conjugate a Pauli element by a Clifford element.
+#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub struct ConjugatePauliByCliffordRequest {
+    /// Qubit indices onto which the factors of the Pauli term are applied.
+    pub pauli_indices: Vec<u64>,
+
+    /// Ordered factors of the Pauli term.
+    pub pauli_symbols: Vec<String>,
+
+    /// Clifford element.
+    pub clifford: String,
+}
+
+/// Conjugate Pauli by Clifford response.
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub struct ConjugatePauliByCliffordResponse {
+    /// Encoded global phase factor on the emitted Pauli.
+    pub phase_factor: i64,
+
+    /// Description of the encoded Pauli.
+    pub pauli: String,
+}
+
+/// Conjugate a Pauli element by a Clifford element.
+pub fn conjugate_pauli_by_clifford(
+    client: &Qcs,
+    request: &ConjugatePauliByCliffordRequest,
+) -> Result<ConjugatePauliByCliffordResponse, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
+
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", request);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
+        Ok(response) => Ok(response),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+/// Request to generate a randomized benchmarking sequence.
+#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub struct GenerateRandomizedBenchmarkingSequenceRequest {
+    /// Depth of the benchmarking sequence.
+    pub depth: u64,
+
+    /// Number of qubits involved in the benchmarking sequence.
+    pub num_qubits: u64,
+
+    /// List of Quil programs, each describing a Clifford.
+    pub gateset: Vec<String>,
+
+    /// PRNG seed. Set this to guarantee repeatable results.
+    pub seed: Option<u64>,
+
+    /// Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.
+    pub interleaver: Option<String>,
+}
+
+/// Randomly generated benchmarking sequence response.
+#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+pub struct GenerateRandomizedBenchmarkingSequenceResponse {
+    /// List of Cliffords, each expressed as a list of generator indices.
+    pub sequence: Vec<Vec<i64>>,
+}
+
+/// Conjugate a Pauli element by a Clifford element.
+pub fn generate_randomized_benchmarking_sequence(
+    client: &Qcs,
+    request: &GenerateRandomizedBenchmarkingSequenceRequest,
+) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
+
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let request = rpcq::RPCRequest::new("generate_rb_sequence", request);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
+        Ok(response) => Ok(response),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
 /// All of the errors that can occur within this module.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
