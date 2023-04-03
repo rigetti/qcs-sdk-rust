@@ -48,6 +48,14 @@ pub enum JobTarget {
     EndpointId(String),
 }
 
+impl fmt::Display for JobTarget {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::EndpointId(id) | Self::QuantumProcessorId(id) => write!(f, "{id}"),
+        }
+    }
+}
+
 impl From<&JobTarget> for execute_controller_job_request::Target {
     fn from(value: &JobTarget) -> Self {
         match value {
@@ -90,7 +98,7 @@ pub async fn submit(
     client: &Qcs,
 ) -> Result<JobId, GrpcClientError> {
     #[cfg(feature = "tracing")]
-    tracing::debug!("submitting job to {}", quantum_processor_id);
+    tracing::debug!("submitting job to {}", job_target);
 
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
@@ -129,11 +137,7 @@ pub async fn retrieve_results(
     client: &Qcs,
 ) -> Result<ControllerJobExecutionResult, GrpcClientError> {
     #[cfg(feature = "tracing")]
-    tracing::debug!(
-        "retrieving job results for {} on {}",
-        job_id,
-        quantum_processor_id
-    );
+    tracing::debug!("retrieving job results for {} on {}", job_id, job_target,);
 
     let request = GetControllerJobResultsRequest {
         job_execution_id: Some(job_id.0),
