@@ -227,7 +227,7 @@ impl<'a> Execution<'a> {
     ) -> Result<ExecutionData, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
-            %job_id,
+            job_id=%job_handle.job_id(),
             num_shots = %self.shots,
             quantum_processor_id=%self.quantum_processor_id,
             "retrieving execution results for job",
