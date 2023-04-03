@@ -383,4 +383,48 @@ MEASURE 1 ro[1]
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }
+
+    #[tokio::test]
+    async fn test_conjugate_pauli_by_clifford() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let request = ConjugatePauliByCliffordRequest {
+            pauli_indices: vec![0, 1, 2],
+            pauli_symbols: vec!["x", "y", "z"].into_iter().map(String::from).collect(),
+            clifford: "cliff".into(),
+        };
+        let response = conjugate_pauli_by_clifford(&client, &request)
+            .expect("Should conjugate pauli by clifford");
+
+        assert_eq!(
+            response,
+            ConjugatePauliByCliffordResponse {
+                phase_factor: 42,
+                pauli: "pauli".into(),
+            }
+        );
+    }
+
+    #[tokio::test]
+    async fn test_generate_randomized_benchmark_sequence() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let request = GenerateRandomizedBenchmarkingSequenceRequest {
+            depth: 42,
+            num_qubits: 3,
+            gateset: vec!["some", "gate", "set"]
+                .into_iter()
+                .map(String::from)
+                .collect(),
+            seed: Some(314),
+            interleaver: Some("some-interleaver".into()),
+        };
+        let response = generate_randomized_benchmarking_sequence(&client, &request)
+            .expect("Should generate randomized benchmark sequence");
+
+        assert_eq!(
+            response,
+            GenerateRandomizedBenchmarkingSequenceResponse {
+                sequence: vec![vec![3, 1, 4], vec![1, 6, 1]],
+            }
+        )
+    }
 }
