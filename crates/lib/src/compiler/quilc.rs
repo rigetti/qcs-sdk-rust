@@ -167,14 +167,14 @@ pub struct ConjugatePauliByCliffordResponse {
 /// Conjugate a Pauli element by a Clifford element.
 pub fn conjugate_pauli_by_clifford(
     client: &Qcs,
-    request: ConjugatePauliByCliffordRequest,
+    request: &ConjugatePauliByCliffordRequest,
 ) -> Result<ConjugatePauliByCliffordResponse, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
 
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
+    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", request);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
@@ -220,14 +220,14 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
 /// Conjugate a Pauli element by a Clifford element.
 pub fn generate_randomized_benchmarking_sequence(
     client: &Qcs,
-    request: GenerateRandomizedBenchmarkingSequenceRequest,
+    request: &GenerateRandomizedBenchmarkingSequenceRequest,
 ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
 
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
+    let request = rpcq::RPCRequest::new("generate_rb_sequence", request);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
@@ -419,7 +419,7 @@ MEASURE 1 ro[1]
                 clifford: "H 0".into(),
             }],
         };
-        let response = conjugate_pauli_by_clifford(&client, request)
+        let response = conjugate_pauli_by_clifford(&client, &request)
             .expect("Should conjugate pauli by clifford");
 
         assert_eq!(
@@ -443,7 +443,7 @@ MEASURE 1 ro[1]
                 interleaver: Some("Y 0".into()),
             }],
         };
-        let response = generate_randomized_benchmarking_sequence(&client, request)
+        let response = generate_randomized_benchmarking_sequence(&client, &request)
             .expect("Should generate randomized benchmark sequence");
 
         assert_eq!(
