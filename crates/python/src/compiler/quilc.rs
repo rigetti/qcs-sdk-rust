@@ -23,6 +23,7 @@ create_init_submodule! {
     classes: [
         PyCompilerOpts,
         PyTargetDevice,
+        PyPauliTerm,
         PyConjugateByCliffordRequest,
         PyConjugatePauliByCliffordResponse,
         PyRandomizedBenchmarkingRequest,
