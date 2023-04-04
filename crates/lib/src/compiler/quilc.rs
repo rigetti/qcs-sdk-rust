@@ -137,12 +137,13 @@ pub struct PauliTerm {
     pub symbols: Vec<String>,
 }
 
-/// Request to conjugate a Pauli element by a Clifford element.
+/// Request to conjugate a Pauli Term by a Clifford element.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
 pub struct ConjugateByCliffordRequest {
-    /// Pauli term
+    /// Pauli Term to conjugate.
     pub pauli: PauliTerm,
+
     /// Clifford element.
     pub clifford: String,
 }
@@ -170,7 +171,10 @@ pub struct ConjugatePauliByCliffordResponse {
     pub pauli: String,
 }
 
-/// Conjugate a Pauli element by a Clifford element.
+/// Given a circuit that consists only of elements of the Clifford group,
+/// return its action on a PauliTerm.
+/// In particular, for Clifford C, and Pauli P, this returns the PauliTerm
+/// representing CPC^{\dagger}.
 pub fn conjugate_pauli_by_clifford(
     client: &Qcs,
     request: ConjugateByCliffordRequest,
@@ -230,7 +234,18 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     pub sequence: Vec<Vec<i64>>,
 }
 
-/// Conjugate a Pauli element by a Clifford element.
+/// Construct a randomized benchmarking experiment on the given qubits, decomposing into
+/// gateset. If interleaver is not provided, the returned sequence will have the form
+///
+///     C_1 C_2 ... C_(depth-1) C_inv ,
+///
+/// where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
+/// and C_inv is selected so that the entire sequence composes to the identity.  If an
+/// interleaver G (which must be a Clifford, and which will be decomposed into the native
+/// gateset) is provided, then the sequence instead takes the form
+///
+///     C_1 G C_2 G ... C_(depth-1) G C_inv .
+///
 pub fn generate_randomized_benchmarking_sequence(
     client: &Qcs,
     request: RandomizedBenchmarkingRequest,
