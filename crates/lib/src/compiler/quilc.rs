@@ -127,7 +127,7 @@ pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
 }
 
 /// Request to conjugate a Pauli element by a Clifford element.
-#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct ConjugatePauliByCliffordRequest {
     /// Qubit indices onto which the factors of the Pauli term are applied.
     pub pauli_indices: Vec<u64>,
@@ -140,10 +140,10 @@ pub struct ConjugatePauliByCliffordRequest {
 }
 
 /// Conjugate Pauli by Clifford response.
-#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct ConjugatePauliByCliffordResponse {
     /// Encoded global phase factor on the emitted Pauli.
-    pub phase_factor: i64,
+    pub phase_factor: f64,
 
     /// Description of the encoded Pauli.
     pub pauli: String,
@@ -169,7 +169,7 @@ pub fn conjugate_pauli_by_clifford(
 }
 
 /// Request to generate a randomized benchmarking sequence.
-#[derive(Clone, Serialize, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct GenerateRandomizedBenchmarkingSequenceRequest {
     /// Depth of the benchmarking sequence.
     pub depth: u64,
@@ -188,7 +188,7 @@ pub struct GenerateRandomizedBenchmarkingSequenceRequest {
 }
 
 /// Randomly generated benchmarking sequence response.
-#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     /// List of Cliffords, each expressed as a list of generator indices.
     pub sequence: Vec<Vec<i64>>,
@@ -388,9 +388,9 @@ MEASURE 1 ro[1]
     async fn test_conjugate_pauli_by_clifford() {
         let client = Qcs::load().await.unwrap_or_default();
         let request = ConjugatePauliByCliffordRequest {
-            pauli_indices: vec![0, 1, 2],
-            pauli_symbols: vec!["x", "y", "z"].into_iter().map(String::from).collect(),
-            clifford: "cliff".into(),
+            pauli_indices: vec![0],
+            pauli_symbols: vec!["X".into()],
+            clifford: "H 0".into(),
         };
         let response = conjugate_pauli_by_clifford(&client, &request)
             .expect("Should conjugate pauli by clifford");
@@ -398,8 +398,8 @@ MEASURE 1 ro[1]
         assert_eq!(
             response,
             ConjugatePauliByCliffordResponse {
-                phase_factor: 42,
-                pauli: "pauli".into(),
+                phase_factor: 0.34,
+                pauli: "I".into(),
             }
         );
     }
