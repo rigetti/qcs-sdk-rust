@@ -437,7 +437,7 @@ MEASURE 1 ro[1]
         let request = GenerateRandomizedBenchmarkingSequenceRequest {
             args: [RandomizedBenchmarkingRequest {
                 depth: 2,
-                qubits: 2,
+                qubits: 1,
                 gateset: vec!["X 0", "H 0"].into_iter().map(String::from).collect(),
                 seed: Some(314),
                 interleaver: Some("Y 0".into()),
@@ -449,7 +449,7 @@ MEASURE 1 ro[1]
         assert_eq!(
             response,
             GenerateRandomizedBenchmarkingSequenceResponse {
-                sequence: vec![vec![3, 1, 4], vec![1, 6, 1]],
+                sequence: vec![vec![1, 0], vec![0, 1, 0, 1], vec![1, 0]],
             }
         )
     }
