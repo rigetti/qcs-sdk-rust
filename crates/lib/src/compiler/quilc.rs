@@ -149,9 +149,15 @@ pub struct ConjugateByCliffordRequest {
 
 /// The "outer" request shape for a `conjugate_pauli_by_clifford` request.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
-pub struct ConjugatePauliByCliffordRequest {
+struct ConjugatePauliByCliffordRequest {
     #[serde(rename = "*args")]
     args: [ConjugateByCliffordRequest; 1],
+}
+
+impl From<ConjugateByCliffordRequest> for ConjugatePauliByCliffordRequest {
+    fn from(value: ConjugateByCliffordRequest) -> Self {
+        Self { args: [value] }
+    }
 }
 
 /// Conjugate Pauli by Clifford response.
@@ -167,14 +173,15 @@ pub struct ConjugatePauliByCliffordResponse {
 /// Conjugate a Pauli element by a Clifford element.
 pub fn conjugate_pauli_by_clifford(
     client: &Qcs,
-    request: &ConjugatePauliByCliffordRequest,
+    request: ConjugateByCliffordRequest,
 ) -> Result<ConjugatePauliByCliffordResponse, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
 
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", request);
+    let request: ConjugatePauliByCliffordRequest = request.into();
+    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
@@ -205,9 +212,15 @@ pub struct RandomizedBenchmarkingRequest {
 
 /// The "outer" request shape for a `generate_rb_sequence` request.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
-pub struct GenerateRandomizedBenchmarkingSequenceRequest {
+struct GenerateRandomizedBenchmarkingSequenceRequest {
     #[serde(rename = "*args")]
     args: [RandomizedBenchmarkingRequest; 1],
+}
+
+impl From<RandomizedBenchmarkingRequest> for GenerateRandomizedBenchmarkingSequenceRequest {
+    fn from(value: RandomizedBenchmarkingRequest) -> Self {
+        Self { args: [value] }
+    }
 }
 
 /// Randomly generated benchmarking sequence response.
@@ -220,14 +233,15 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
 /// Conjugate a Pauli element by a Clifford element.
 pub fn generate_randomized_benchmarking_sequence(
     client: &Qcs,
-    request: &GenerateRandomizedBenchmarkingSequenceRequest,
+    request: RandomizedBenchmarkingRequest,
 ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
 
     let config = client.get_config();
     let endpoint = config.quilc_url();
-    let request = rpcq::RPCRequest::new("generate_rb_sequence", request);
+    let request: GenerateRandomizedBenchmarkingSequenceRequest = request.into();
+    let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
     match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
@@ -410,16 +424,14 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
         let client = Qcs::load().await.unwrap_or_default();
-        let request = ConjugatePauliByCliffordRequest {
-            args: [ConjugateByCliffordRequest {
-                pauli: PauliTerm {
-                    indices: vec![0],
-                    symbols: vec!["X".into()],
-                },
-                clifford: "H 0".into(),
-            }],
+        let request = ConjugateByCliffordRequest {
+            pauli: PauliTerm {
+                indices: vec![0],
+                symbols: vec!["X".into()],
+            },
+            clifford: "H 0".into(),
         };
-        let response = conjugate_pauli_by_clifford(&client, &request)
+        let response = conjugate_pauli_by_clifford(&client, request)
             .expect("Should conjugate pauli by clifford");
 
         assert_eq!(
@@ -434,16 +446,14 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn test_generate_randomized_benchmark_sequence() {
         let client = Qcs::load().await.unwrap_or_default();
-        let request = GenerateRandomizedBenchmarkingSequenceRequest {
-            args: [RandomizedBenchmarkingRequest {
-                depth: 2,
-                qubits: 1,
-                gateset: vec!["X 0", "H 0"].into_iter().map(String::from).collect(),
-                seed: Some(314),
-                interleaver: Some("Y 0".into()),
-            }],
+        let request = RandomizedBenchmarkingRequest {
+            depth: 2,
+            qubits: 1,
+            gateset: vec!["X 0", "H 0"].into_iter().map(String::from).collect(),
+            seed: Some(314),
+            interleaver: Some("Y 0".into()),
         };
-        let response = generate_randomized_benchmarking_sequence(&client, &request)
+        let response = generate_randomized_benchmarking_sequence(&client, request)
             .expect("Should generate randomized benchmark sequence");
 
         assert_eq!(
