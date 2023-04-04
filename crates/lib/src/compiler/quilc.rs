@@ -172,8 +172,8 @@ pub struct ConjugatePauliByCliffordResponse {
 }
 
 /// Given a circuit that consists only of elements of the Clifford group,
-/// return its action on a PauliTerm.
-/// In particular, for Clifford C, and Pauli P, this returns the PauliTerm
+/// return its action on a `PauliTerm`.
+/// In particular, for Clifford C, and Pauli P, this returns the Pauli Term
 /// representing CPC^{\dagger}.
 pub fn conjugate_pauli_by_clifford(
     client: &Qcs,
@@ -240,7 +240,7 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
 ///     C_1 C_2 ... C_(depth-1) C_inv ,
 ///
 /// where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
-/// and C_inv is selected so that the entire sequence composes to the identity.  If an
+/// and ``C_inv`` is selected so that the entire sequence composes to the identity.  If an
 /// interleaver G (which must be a Clifford, and which will be decomposed into the native
 /// gateset) is provided, then the sequence instead takes the form
 ///
