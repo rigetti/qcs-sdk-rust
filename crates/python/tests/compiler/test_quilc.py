@@ -5,11 +5,20 @@ from qcs_sdk.compiler.quilc import (
     DEFAULT_COMPILER_TIMEOUT,
     CompilerOpts,
     TargetDevice,
+    PauliTerm,
+    GenerateRandomizedBenchmarkingSequenceResponse,
+    RandomizedBenchmarkingRequest,
+    ConjugateByCliffordRequest,
+    ConjugatePauliByCliffordResponse,
     QuilcError,
     compile_program,
     compile_program_async,
     get_version_info,
     get_version_info_async,
+    conjugate_pauli_by_clifford,
+    conjugate_pauli_by_clifford_async,
+    generate_randomized_benchmarking_sequence,
+    generate_randomized_benchmarking_sequence_async,
 )
 
 @pytest.fixture
@@ -68,3 +77,57 @@ async def test_get_version_info_async():
     """A valid version should be returned."""
     version = await get_version_info_async()
     assert version
+
+
+def test_conjugate_pauli_by_clifford():
+    """Pauli should be conjugated by clifford."""
+    request = ConjugateByCliffordRequest(
+        pauli=PauliTerm(indices=[0], symbols=["X"]),
+        clifford="H 0"
+    )
+    response = conjugate_pauli_by_clifford(request)
+    assert type(response) == ConjugatePauliByCliffordResponse
+    assert response.pauli == "Z"
+    assert response.phase == 0
+
+
+@pytest.mark.asyncio
+async def test_conjugate_pauli_by_clifford_async():
+    """Pauli should be conjugated by clifford."""
+    request = ConjugateByCliffordRequest(
+        pauli=PauliTerm(indices=[0], symbols=["X"]),
+        clifford="H 0"
+    )
+    response = await conjugate_pauli_by_clifford_async(request)
+    assert type(response) == ConjugatePauliByCliffordResponse
+    assert response.pauli == "Z"
+    assert response.phase == 0
+
+
+def test_generate_randomized_benchmark_sequence():
+    """Random benchmark should run predictably."""
+    request = RandomizedBenchmarkingRequest(
+        depth=2,
+        qubits=1,
+        gateset=["X 0", "H 0"],
+        seed=314,
+        interleaver="Y 0",
+    )
+    response = generate_randomized_benchmarking_sequence(request)
+    assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
+    assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]
+
+
+@pytest.mark.asyncio
+async def test_generate_randomized_benchmark_sequence_async():
+    """Random benchmark should run predictably."""
+    request = RandomizedBenchmarkingRequest(
+        depth=2,
+        qubits=1,
+        gateset=["X 0", "H 0"],
+        seed=314,
+        interleaver="Y 0",
+    )
+    response = await generate_randomized_benchmarking_sequence_async(request)
+    assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
+    assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]

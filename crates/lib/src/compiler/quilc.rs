@@ -126,6 +126,142 @@ pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
     }
 }
 
+/// Pauli Term
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+#[serde(tag = "_type")]
+pub struct PauliTerm {
+    /// Qubit indices onto which the factors of the Pauli term are applied.
+    pub indices: Vec<u64>,
+
+    /// Ordered factors of the Pauli term.
+    pub symbols: Vec<String>,
+}
+
+/// Request to conjugate a Pauli Term by a Clifford element.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+#[serde(tag = "_type")]
+pub struct ConjugateByCliffordRequest {
+    /// Pauli Term to conjugate.
+    pub pauli: PauliTerm,
+
+    /// Clifford element.
+    pub clifford: String,
+}
+
+/// The "outer" request shape for a `conjugate_pauli_by_clifford` request.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+struct ConjugatePauliByCliffordRequest {
+    #[serde(rename = "*args")]
+    args: [ConjugateByCliffordRequest; 1],
+}
+
+impl From<ConjugateByCliffordRequest> for ConjugatePauliByCliffordRequest {
+    fn from(value: ConjugateByCliffordRequest) -> Self {
+        Self { args: [value] }
+    }
+}
+
+/// Conjugate Pauli by Clifford response.
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+pub struct ConjugatePauliByCliffordResponse {
+    /// Encoded global phase factor on the emitted Pauli.
+    pub phase: i64,
+
+    /// Description of the encoded Pauli.
+    pub pauli: String,
+}
+
+/// Given a circuit that consists only of elements of the Clifford group,
+/// return its action on a `PauliTerm`.
+/// In particular, for Clifford ``C``, and Pauli ``P``, this returns the Pauli Term
+/// representing ``CPC^{\dagger}``.
+pub fn conjugate_pauli_by_clifford(
+    client: &Qcs,
+    request: ConjugateByCliffordRequest,
+) -> Result<ConjugatePauliByCliffordResponse, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
+
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let request: ConjugatePauliByCliffordRequest = request.into();
+    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
+        Ok(response) => Ok(response),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
+/// Request to generate a randomized benchmarking sequence.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+#[serde(tag = "_type")]
+pub struct RandomizedBenchmarkingRequest {
+    /// Depth of the benchmarking sequence.
+    pub depth: u64,
+
+    /// Number of qubits involved in the benchmarking sequence.
+    pub qubits: u64,
+
+    /// List of Quil programs, each describing a Clifford.
+    pub gateset: Vec<String>,
+
+    /// PRNG seed. Set this to guarantee repeatable results.
+    pub seed: Option<u64>,
+
+    /// Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.
+    pub interleaver: Option<String>,
+}
+
+/// The "outer" request shape for a `generate_rb_sequence` request.
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+struct GenerateRandomizedBenchmarkingSequenceRequest {
+    #[serde(rename = "*args")]
+    args: [RandomizedBenchmarkingRequest; 1],
+}
+
+impl From<RandomizedBenchmarkingRequest> for GenerateRandomizedBenchmarkingSequenceRequest {
+    fn from(value: RandomizedBenchmarkingRequest) -> Self {
+        Self { args: [value] }
+    }
+}
+
+/// Randomly generated benchmarking sequence response.
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+pub struct GenerateRandomizedBenchmarkingSequenceResponse {
+    /// List of Cliffords, each expressed as a list of generator indices.
+    pub sequence: Vec<Vec<i64>>,
+}
+
+/// Construct a randomized benchmarking experiment on the given qubits, decomposing into
+/// gateset. If interleaver is not provided, the returned sequence will have the form
+/// ```C_1 C_2 ... C_(depth-1) C_inv ,```
+///
+/// where each C is a Clifford element drawn from gateset, ``C_{< depth}`` are randomly selected,
+/// and ``C_inv`` is selected so that the entire sequence composes to the identity.  If an
+/// interleaver ``G`` (which must be a Clifford, and which will be decomposed into the native
+/// gateset) is provided, then the sequence instead takes the form
+/// ```C_1 G C_2 G ... C_(depth-1) G C_inv .```
+pub fn generate_randomized_benchmarking_sequence(
+    client: &Qcs,
+    request: RandomizedBenchmarkingRequest,
+) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
+
+    let config = client.get_config();
+    let endpoint = config.quilc_url();
+    let request: GenerateRandomizedBenchmarkingSequenceRequest = request.into();
+    let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
+    let rpcq_client = rpcq::Client::new(endpoint)
+        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
+        Ok(response) => Ok(response),
+        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
+    }
+}
+
 /// All of the errors that can occur within this module.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -295,5 +431,48 @@ MEASURE 1 ro[1]
         let version = get_version_info(&client).expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
+    }
+
+    #[tokio::test]
+    async fn test_conjugate_pauli_by_clifford() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let request = ConjugateByCliffordRequest {
+            pauli: PauliTerm {
+                indices: vec![0],
+                symbols: vec!["X".into()],
+            },
+            clifford: "H 0".into(),
+        };
+        let response = conjugate_pauli_by_clifford(&client, request)
+            .expect("Should conjugate pauli by clifford");
+
+        assert_eq!(
+            response,
+            ConjugatePauliByCliffordResponse {
+                phase: 0,
+                pauli: "Z".into(),
+            }
+        );
+    }
+
+    #[tokio::test]
+    async fn test_generate_randomized_benchmark_sequence() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let request = RandomizedBenchmarkingRequest {
+            depth: 2,
+            qubits: 1,
+            gateset: vec!["X 0", "H 0"].into_iter().map(String::from).collect(),
+            seed: Some(314),
+            interleaver: Some("Y 0".into()),
+        };
+        let response = generate_randomized_benchmarking_sequence(&client, request)
+            .expect("Should generate randomized benchmark sequence");
+
+        assert_eq!(
+            response,
+            GenerateRandomizedBenchmarkingSequenceResponse {
+                sequence: vec![vec![1, 0], vec![0, 1, 0, 1], vec![1, 0]],
+            }
+        )
     }
 }
