@@ -77,20 +77,60 @@ fn build_patch_values(
     Ok(patch_values)
 }
 
+#[pyclass]
+struct V1Options {}
+
+#[pyclass]
+struct V2Options {}
+
+#[derive(Debug, Clone)]
+#[pyclass]
+enum TranslationBackend {
+    V1,
+    V2,
+}
+
+#[derive(Debug, Clone)]
+#[pyclass]
+struct TranslationOptions {
+    backend: Option<TranslationBackend>,
+}
+
+impl From<TranslationOptions> for api::TranslationOptions {
+    fn from(value: TranslationOptions) -> Self {
+        let backend = value.backend.map(|backend| match backend {
+            TranslationBackend::V1 => {
+                api::TranslationBackend::V1(api::V1TranslationBackendOptions {})
+            }
+            TranslationBackend::V2 => {
+                api::TranslationBackend::V2(api::V2TranslationBackendOptions {})
+            }
+        });
+    }
+}
+
 #[pyfunction]
 fn translate(
     py: Python<'_>,
     native_quil: String,
     num_shots: u16,
     quantum_processor_id: String,
+    translation_options: Option<TranslationOptions>,
 ) -> PyResult<&PyAny> {
     pyo3_asyncio::tokio::future_into_py(py, async move {
         let client = Qcs::load()
             .await
             .map_err(|e| InvalidConfigError::new_err(e.to_string()))?;
-        let result = api::translate(&native_quil, num_shots, &quantum_processor_id, &client)
-            .await
-            .map_err(|e| TranslationError::new_err(e.to_string()))?;
+        let translation_options = translation_options.into();
+        let result = api::translate(
+            &native_quil,
+            num_shots,
+            &quantum_processor_id,
+            &client,
+            translation_options,
+        )
+        .await
+        .map_err(|e| TranslationError::new_err(e.to_string()))?;
         let result = Python::with_gil(|py| {
             pythonize(py, &result).map_err(|e| TranslationError::new_err(e.to_string()))
         })?;

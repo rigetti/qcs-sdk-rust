@@ -31,6 +31,7 @@ pub(crate) struct Execution<'a> {
     pub(crate) quantum_processor_id: &'a str,
     pub(crate) shots: u16,
     client: Arc<Qcs>,
+    translation_options: Option<crate::api::TranslationOptions>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -117,6 +118,7 @@ impl<'a> Execution<'a> {
         client: Arc<Qcs>,
         compile_with_quilc: bool,
         compiler_options: CompilerOpts,
+        translation_options: Option<crate::api::TranslationOptions>,
     ) -> Result<Execution<'a>, Error> {
         let isa = get_isa(quantum_processor_id, &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
@@ -144,6 +146,7 @@ impl<'a> Execution<'a> {
             quantum_processor_id,
             client,
             shots,
+            translation_options,
         })
     }
 
@@ -153,6 +156,7 @@ impl<'a> Execution<'a> {
             self.quantum_processor_id,
             &self.program.to_string().0,
             self.shots.into(),
+            None,
             self.client.as_ref(),
         )
         .await?;

@@ -21,9 +21,12 @@ lazy_static = "1.4.0"
 log = "0.4.17"
 num = "0.4.0"
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.2.7"
-qcs-api-client-openapi = "0.3.7"
-qcs-api-client-grpc = "0.2.7"
+qcs-api-client-common = { git = "ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust", branch = "55-update_proto_definitions" }
+# qcs-api-client-common = "0.2.7"
+qcs-api-client-openapi = { git = "ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust", branch = "55-update_proto_definitions" }
+# qcs-api-client-openapi = "0.3.7"
+# qcs-api-client-grpc = "0.2.7"
+qcs-api-client-grpc = { git = "ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust", branch = "55-update_proto_definitions" }
 quil-rs = "0.14"
 reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
@@ -42,7 +45,8 @@ erased-serde = "0.3.23"
 float-cmp = "0.9.0"
 hex = "0.4.3"
 maplit = "1.0.2"
-qcs-api-client-grpc = { version = "0.2.7", features = ["server"] }
+qcs-api-client-grpc = { git = "ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust", branch = "55-update_proto_definitions" , features = ["server"]}
+# qcs-api-client-grpc = { version = "0.2.7", features = ["server"] }
 simple_logger = { version = "2.3.0", default-features = false }
 tempfile = "3.3.0"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }

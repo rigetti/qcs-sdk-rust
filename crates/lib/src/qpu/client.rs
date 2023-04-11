@@ -2,9 +2,9 @@
 //! desired API (e.g. ``gRPC`` or ``OpenAPI``) and will properly
 //! initialize those clients (e.g. with authentication metadata).
 
-use qcs_api_client_common::ClientConfiguration;
+use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
 use qcs_api_client_grpc::{
-    channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
+    channel::{get_channel, parse_uri, wrap_channel_with, ChannelError, RefreshService},
     services::{
         controller::controller_client::ControllerClient,
         translation::translation_client::TranslationClient,
@@ -36,7 +36,9 @@ pub struct Qcs {
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
     pub async fn load() -> Result<Self, LoadError> {
-        ClientConfiguration::load().await.map(Self::with_config)
+        ClientConfiguration::load_default()
+            .await
+            .map(Self::with_config)
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
@@ -62,12 +64,11 @@ impl Qcs {
     pub(crate) async fn get_controller_client(
         &self,
         quantum_processor_id: &str,
-    ) -> Result<ControllerClient<RefreshService<Channel>>, GrpcEndpointError> {
-        self.get_controller_endpoint(quantum_processor_id)
-            .await
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(ControllerClient::new)
+    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
+    {
+        let endpoint = self.get_controller_endpoint(quantum_processor_id).await?;
+        let channel = wrap_channel_with(get_channel(endpoint)?, self.get_config());
+        Ok(ControllerClient::new(channel))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
@@ -76,18 +77,23 @@ impl Qcs {
 
     pub(crate) fn get_translation_client(
         &self,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
-        parse_uri(translation_grpc_endpoint)
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(TranslationClient::new)
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
+        let uri = parse_uri(translation_grpc_endpoint)?;
+        let channel = wrap_channel_with(get_channel(uri)?, self.get_config());
+        Ok(TranslationClient::new(channel))
     }
 
     async fn get_controller_endpoint(
@@ -158,7 +164,7 @@ impl Qcs {
 pub enum GrpcEndpointError {
     /// Error due to a malformed URI
     #[error("Malformed URI for endpoint: {0}")]
-    BadUri(#[from] GrpcError),
+    BadUri(#[from] GrpcError<RefreshError>),
 
     /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
@@ -171,6 +177,10 @@ pub enum GrpcEndpointError {
     /// Error due to missing gRPC endpoint for quantum processor
     #[error("Missing gRPC endpoint for quantum processor {0}")]
     NoEndpoint(String),
+
+    /// Error due to failure to get a communication channel for the endpoint
+    #[error("Failed to get a communication channel for the endpoint: {0}")]
+    GetChannelFailed(#[from] ChannelError),
 }
 
 /// Errors that may occur while trying to use a ``gRPC`` client
@@ -190,7 +200,7 @@ pub enum GrpcClientError {
 
     /// Error due to ``gRPC`` error
     #[error("gRPC error: {0}")]
-    GrpcError(#[from] GrpcError),
+    GrpcError(#[from] GrpcError<RefreshError>),
 }
 
 /// Errors that may occur while trying to use a [`OpenAPI`] client

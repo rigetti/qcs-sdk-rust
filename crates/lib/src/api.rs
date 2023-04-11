@@ -108,6 +108,30 @@ pub struct TranslationResult {
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
+/// Options to use when translating with the V1 translation backend
+#[derive(Debug, Clone, Copy)]
+pub struct V1TranslationBackendOptions {}
+
+/// Options to use when translating with the V2 translation backend
+#[derive(Debug, Clone, Copy)]
+pub struct V2TranslationBackendOptions {}
+
+/// The backend to use for translation
+#[derive(Debug, Clone, Copy)]
+pub enum TranslationBackend {
+    /// V1 is the "legacy" translation backend
+    V1(V1TranslationBackendOptions),
+    /// V2 is the next-gen backend supporting control-flow
+    V2(V2TranslationBackendOptions),
+}
+
+/// The options to use in translation
+#[derive(Debug, Clone, Copy)]
+pub struct TranslationOptions {
+    /// The backend options to use in translation
+    backend: Option<TranslationBackend>,
+}
+
 /// Translates a native Quil program into an executable
 ///
 /// # Errors
@@ -118,9 +142,16 @@ pub async fn translate(
     shots: u16,
     quantum_processor_id: &str,
     client: &Qcs,
+    translation_options: Option<TranslationOptions>,
 ) -> Result<TranslationResult, TranslationError> {
-    let EncryptedTranslationResult { job, readout_map } =
-        translation::translate(quantum_processor_id, native_quil, shots.into(), client).await?;
+    let EncryptedTranslationResult { job, readout_map } = translation::translate(
+        quantum_processor_id,
+        native_quil,
+        shots.into(),
+        translation_options,
+        client,
+    )
+    .await?;
 
     let program = serde_json::to_string(&job)?;
 
@@ -245,12 +276,7 @@ impl From<readout_values::Values> for ExecutionResult {
             readout_values::Values::ComplexValues(c) => Self {
                 shape: vec![c.values.len(), 1],
                 dtype: "complex".into(),
-                data: Register::Complex64(
-                    c.values
-                        .iter()
-                        .map(|c| [c.real.unwrap_or(0.0), c.imaginary.unwrap_or(0.0)])
-                        .collect(),
-                ),
+                data: Register::Complex64(c.values.iter().map(|c| [c.real, c.imaginary]).collect()),
             },
             readout_values::Values::IntegerValues(i) => Self {
                 shape: vec![i.values.len(), 1],
@@ -283,7 +309,7 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 
         Self {
             buffers,
-            execution_duration_microseconds: result.execution_duration_microseconds,
+            execution_duration_microseconds: Some(result.execution_duration_microseconds),
         }
     }
 }
@@ -300,7 +326,7 @@ pub async fn retrieve_results(
     client: &Qcs,
 ) -> Result<ExecutionResults, GrpcClientError> {
     let request = GetControllerJobResultsRequest {
-        job_execution_id: Some(job_id.into()),
+        job_execution_id: job_id.into(),
         target: Some(Target::QuantumProcessorId(quantum_processor_id.into())),
     };
 

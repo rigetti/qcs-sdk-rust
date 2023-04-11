@@ -19,6 +19,7 @@ pub(crate) async fn translate(
     quantum_processor_id: &str,
     quil_program: &str,
     num_shots: u32,
+    translation_options: Option<crate::api::TranslationOptions>,
     client: &Qcs,
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
     let request = TranslateQuilToEncryptedControllerJobRequest {

@@ -70,6 +70,7 @@ pub struct Executable<'executable, 'execution> {
     params: Parameters,
     compile_with_quilc: bool,
     compiler_options: CompilerOpts,
+    translation_options: Option<crate::api::TranslationOptions>,
     config: Option<ClientConfiguration>,
     client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
@@ -102,6 +103,7 @@ impl<'executable> Executable<'executable, '_> {
             params: Parameters::new(),
             compile_with_quilc: true,
             compiler_options: CompilerOpts::default(),
+            translation_options: None,
             config: None,
             client: None,
             qpu: None,
@@ -309,7 +311,7 @@ impl Executable<'_, '_> {
         if let Some(config) = &self.config {
             Ok(config.clone())
         } else {
-            let config = ClientConfiguration::load().await?;
+            let config = ClientConfiguration::load_default().await?;
             self.config = Some(config.clone());
             Ok(config)
         }
@@ -346,6 +348,7 @@ impl<'execution> Executable<'_, 'execution> {
             self.get_client().await?,
             self.compile_with_quilc,
             self.compiler_options,
+            self.translation_options,
         )
         .await
         .map_err(Error::from)
