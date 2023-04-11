@@ -1,7 +1,9 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
-use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult};
+use pyo3::{
+    exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, types::PyString, Py, PyResult,
+};
 use qcs::qpu::client::GrpcClientError;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
@@ -15,7 +17,9 @@ use super::client::PyQcsClient;
 create_init_submodule! {
     classes: [
         PyQuiltCalibrations,
-        PyTranslationResult
+        PyTranslationResult,
+        TranslationOptions,
+        TranslationBackend
     ],
     errors: [
         GetQuiltCalibrationsError,
@@ -97,12 +101,6 @@ pub struct PyTranslationResult {
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
-#[pyclass]
-struct V1Options {}
-
-#[pyclass]
-struct V2Options {}
-
 #[derive(Debug, Clone)]
 #[pyclass]
 enum TranslationBackend {
@@ -114,6 +112,16 @@ enum TranslationBackend {
 #[pyclass]
 pub struct TranslationOptions {
     backend: Option<TranslationBackend>,
+}
+
+#[pymethods]
+impl TranslationOptions {
+    #[new]
+    fn py_new(backend: TranslationBackend) -> PyResult<Self> {
+        Ok(Self {
+            backend: Some(backend),
+        })
+    }
 }
 
 impl From<TranslationOptions> for qcs::qpu::translation::TranslationOptions {
