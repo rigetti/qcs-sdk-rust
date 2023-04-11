@@ -20,7 +20,7 @@ use crate::{ExecutionData, JobHandle};
 use super::api::{retrieve_results, submit, JobTarget};
 use super::client::{GrpcClientError, Qcs};
 use super::rewrite_arithmetic::RewrittenProgram;
-use super::translation::EncryptedTranslationResult;
+use super::translation::{EncryptedTranslationResult, TranslationOptions};
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
 use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
@@ -34,6 +34,7 @@ pub(crate) struct Execution<'a> {
     pub(crate) quantum_processor_id: Cow<'a, str>,
     pub(crate) shots: u16,
     client: Arc<Qcs>,
+    translation_options: Option<TranslationOptions>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -120,6 +121,7 @@ impl<'a> Execution<'a> {
         client: Arc<Qcs>,
         compile_with_quilc: bool,
         compiler_options: CompilerOpts,
+        translation_options: Option<TranslationOptions>,
     ) -> Result<Execution<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
@@ -158,6 +160,7 @@ impl<'a> Execution<'a> {
             quantum_processor_id,
             client,
             shots,
+            translation_options,
         })
     }
 
@@ -167,6 +170,7 @@ impl<'a> Execution<'a> {
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
             self.shots.into(),
+            self.translation_options,
             self.client.as_ref(),
         )
         .await?;
@@ -245,9 +249,9 @@ impl<'a> Execution<'a> {
                 job_handle.readout_map(),
                 &response.readout_values,
             )),
-            duration: response
-                .execution_duration_microseconds
-                .map(Duration::from_micros),
+            duration: Some(Duration::from_micros(
+                response.execution_duration_microseconds,
+            )),
         })
     }
 

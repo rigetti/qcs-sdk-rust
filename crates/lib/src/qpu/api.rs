@@ -140,7 +140,7 @@ pub async fn retrieve_results(
     tracing::debug!("retrieving job results for {} on {}", job_id, job_target,);
 
     let request = GetControllerJobResultsRequest {
-        job_execution_id: Some(job_id.0),
+        job_execution_id: job_id.0.to_string(),
         target: Some(job_target.into()),
     };
 

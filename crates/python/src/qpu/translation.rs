@@ -97,6 +97,39 @@ pub struct PyTranslationResult {
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
+#[pyclass]
+struct V1Options {}
+
+#[pyclass]
+struct V2Options {}
+
+#[derive(Debug, Clone)]
+#[pyclass]
+enum TranslationBackend {
+    V1,
+    V2,
+}
+
+#[derive(Debug, Clone)]
+#[pyclass]
+pub struct TranslationOptions {
+    backend: Option<TranslationBackend>,
+}
+
+impl From<TranslationOptions> for qcs::qpu::translation::TranslationOptions {
+    fn from(value: TranslationOptions) -> Self {
+        let backend = value.backend.map(|backend| match backend {
+            TranslationBackend::V1 => qcs::qpu::translation::TranslationBackend::V1(
+                qcs::qpu::translation::V1TranslationBackendOptions {},
+            ),
+            TranslationBackend::V2 => qcs::qpu::translation::TranslationBackend::V2(
+                qcs::qpu::translation::V2TranslationBackendOptions {},
+            ),
+        });
+        Self { backend }
+    }
+}
+
 py_function_sync_async! {
     #[pyfunction(client = "None")]
     /// Translates a native Quil program into an executable
@@ -109,10 +142,12 @@ py_function_sync_async! {
         num_shots: u32,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
+        translation_options: Option<TranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
         let client = PyQcsClient::get_or_create_client(client).await?;
+        let translation_options = translation_options.map(Into::into);
         let result =
-            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client)
+            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, translation_options, &client)
                 .await
                 .map_err(RustTranslationError::from)
                 .map_err(RustTranslationError::to_py_err)?;

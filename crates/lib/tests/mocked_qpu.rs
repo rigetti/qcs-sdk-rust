@@ -192,7 +192,7 @@ mod translation {
             Ok(Response::new(
                 TranslateQuilToEncryptedControllerJobResponse {
                     job: Some(EncryptedControllerJob {
-                        job: None,
+                        job: vec![],
                         encryption: None,
                     }),
                     metadata: Some(QuilTranslationMetadata {
@@ -281,9 +281,9 @@ mod qpu {
                             },
                         ),
                     ]),
-                    status: Some(0),
+                    status: 0,
                     status_message: Some("success".to_string()),
-                    execution_duration_microseconds: Some(8675),
+                    execution_duration_microseconds: 8675,
                 }),
             }))
         }

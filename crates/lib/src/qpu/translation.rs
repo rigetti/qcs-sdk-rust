@@ -7,7 +7,9 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        TranslateQuilToEncryptedControllerJobRequest,
+        translation_options::TranslationBackend as RdmTranslationBackend,
+        BackendV1Options as RdmBackendV1Options, BackendV2Options as RdmBackendV2Options,
+        TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as RdmTranslationOptions,
     },
 };
 use qcs_api_client_openapi::{
@@ -17,6 +19,59 @@ use qcs_api_client_openapi::{
 use tokio::time::error::Elapsed;
 
 use super::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
+
+/// Options to use when translating with the V1 translation backend
+#[derive(Debug, Clone, Copy)]
+pub struct V1TranslationBackendOptions {}
+
+impl From<V1TranslationBackendOptions> for RdmBackendV1Options {
+    fn from(_options: V1TranslationBackendOptions) -> Self {
+        RdmBackendV1Options {}
+    }
+}
+
+/// Options to use when translating with the V2 translation backend
+#[derive(Debug, Clone, Copy)]
+pub struct V2TranslationBackendOptions {}
+
+impl From<V2TranslationBackendOptions> for RdmBackendV2Options {
+    fn from(_options: V2TranslationBackendOptions) -> Self {
+        RdmBackendV2Options {}
+    }
+}
+
+/// The backend to use for translation
+#[derive(Debug, Clone, Copy)]
+pub enum TranslationBackend {
+    /// V1 is the "legacy" translation backend
+    V1(V1TranslationBackendOptions),
+    /// V2 is the next-gen backend supporting control-flow
+    V2(V2TranslationBackendOptions),
+}
+
+impl From<TranslationBackend> for RdmTranslationBackend {
+    fn from(backend: TranslationBackend) -> Self {
+        match backend {
+            TranslationBackend::V1(options) => RdmTranslationBackend::V1(options.into()),
+            TranslationBackend::V2(options) => RdmTranslationBackend::V2(options.into()),
+        }
+    }
+}
+
+/// The options to use in translation
+#[derive(Debug, Clone, Copy)]
+pub struct TranslationOptions {
+    /// The backend options to use in translation
+    pub backend: Option<TranslationBackend>,
+}
+
+impl From<TranslationOptions> for RdmTranslationOptions {
+    fn from(options: TranslationOptions) -> Self {
+        RdmTranslationOptions {
+            translation_backend: options.backend.map(Into::into),
+        }
+    }
+}
 
 /// An encrypted and translated program, along with `readout_map`
 /// to map job `readout_data` back to program-declared variables.
@@ -37,6 +92,7 @@ pub async fn translate(
     quantum_processor_id: &str,
     quil_program: &str,
     num_shots: u32,
+    translation_options: Option<TranslationOptions>,
     client: &Qcs,
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
     #[cfg(feature = "tracing")]
@@ -47,9 +103,10 @@ pub async fn translate(
     );
 
     let request = TranslateQuilToEncryptedControllerJobRequest {
-        quantum_processor_id: Some(quantum_processor_id.to_owned()),
+        quantum_processor_id: quantum_processor_id.to_owned(),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),
-        quil_program: Some(quil_program.to_owned()),
+        quil_program: quil_program.to_owned(),
+        options: translation_options.map(Into::into),
     };
 
     let response = client

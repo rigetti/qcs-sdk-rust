@@ -61,7 +61,8 @@ erased-serde = "0.3.23"
 float-cmp = "0.9.0"
 hex = "0.4.3"
 maplit = "1.0.2"
-qcs-api-client-grpc = { workspace = true, features = ["server"] }
+# qcs-api-client-grpc = { workspace = true, features = ["server"] }
+qcs-api-client-grpc = { git = "ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust", branch = "55-update_proto_definitions" , features = ["server"]}
 simple_logger = { version = "2.3.0", default-features = false }
 tempfile = "3.3.0"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }

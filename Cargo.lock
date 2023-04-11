@@ -1638,9 +1638,8 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdf2cfdef8f4a0b3f3fb10333512369a5b9cbf27ac12b5b631eae82deb888114"
+version = "0.6.4"
+source = "git+ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust?branch=55-update_proto_definitions#69c3ef7db292bb5e8a1118c3042f27b4ef5f6a1b"
 dependencies = [
  "async-trait",
  "dirs",
@@ -1659,9 +1658,8 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bc9c7025af2e4ef9fec25e9fc26f04a3877235aa690fd892c4bbe5373b21d5ba"
+version = "0.6.4"
+source = "git+ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust?branch=55-update_proto_definitions#69c3ef7db292bb5e8a1118c3042f27b4ef5f6a1b"
 dependencies = [
  "http",
  "http-body",
@@ -1688,9 +1686,8 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.7.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e80f1b61d0025cc95cf415de1fa1d53e2d51a88019f3c072bf846eb7f95b0585"
+version = "0.7.4"
+source = "git+ssh://git@gitlab.com/rigetti/qcs/clients/qcs-api-client-rust?branch=55-update_proto_definitions#69c3ef7db292bb5e8a1118c3042f27b4ef5f6a1b"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
