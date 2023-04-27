@@ -35,8 +35,8 @@ py_wrap_struct! {
                 let values = list.into_iter().map(|complex| {
                     let complex = NumComplex32::py_try_from(py, &complex)?;
                     Ok::<_, PyErr>(Complex64 {
-                        real: Some(complex.re),
-                        imaginary: Some(complex.im),
+                        real: complex.re,
+                        imaginary: complex.im,
                     })
                 }).collect::<Result<_, _>>()?;
 
@@ -47,8 +47,8 @@ py_wrap_struct! {
             values: Complex64ReadoutValues => Py<PyList> {
                 let list = values.values.into_iter().map(|complex| {
                     NumComplex32 {
-                        re: complex.real.unwrap_or_default(),
-                        im: complex.imaginary.unwrap_or_default(),
+                        re: complex.real,
+                        im: complex.imaginary,
                     }
                 }).collect::<Vec<_>>();
 

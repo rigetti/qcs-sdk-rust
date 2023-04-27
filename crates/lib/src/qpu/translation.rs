@@ -7,7 +7,7 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        TranslateQuilToEncryptedControllerJobRequest,
+        TranslateQuilToEncryptedControllerJobRequest, TranslationOptions,
     },
 };
 use qcs_api_client_openapi::{
@@ -38,6 +38,7 @@ pub async fn translate(
     quil_program: &str,
     num_shots: u32,
     client: &Qcs,
+    translation_options: Option<TranslationOptions>,
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
@@ -47,9 +48,10 @@ pub async fn translate(
     );
 
     let request = TranslateQuilToEncryptedControllerJobRequest {
-        quantum_processor_id: Some(quantum_processor_id.to_owned()),
+        quantum_processor_id: quantum_processor_id.to_owned(),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),
-        quil_program: Some(quil_program.to_owned()),
+        quil_program: quil_program.to_owned(),
+        options: translation_options,
     };
 
     let response = client
