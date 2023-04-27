@@ -2,16 +2,18 @@ use std::sync::Arc;
 
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
-    wrap_error, PyWrapper, ToPython, ToPythonError,
+    wrap_error, PyTryFrom, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
 
 use crate::{
     compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
+    grpc::models::translation::PyTranslationOptions,
     py_sync::{py_async, py_sync},
 };
 
@@ -144,20 +146,26 @@ impl PyExecutable {
     #[args(endpoint_id = "None")]
     pub fn execute_on_qpu(
         &self,
+        py: Python<'_>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyExecutionData> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
             Some(endpoint_id) => py_sync!(py_executable_data!(
                 self,
                 execute_on_qpu_with_endpoint,
                 quantum_processor_id,
-                endpoint_id
+                endpoint_id,
+                translation_options,
             )),
             None => py_sync!(py_executable_data!(
                 self,
                 execute_on_qpu,
-                quantum_processor_id
+                quantum_processor_id,
+                translation_options,
             )),
         }
     }
@@ -168,7 +176,10 @@ impl PyExecutable {
         py: Python<'py>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
             Some(endpoint_id) => py_async!(
                 py,
@@ -176,12 +187,18 @@ impl PyExecutable {
                     self,
                     execute_on_qpu_with_endpoint,
                     quantum_processor_id,
-                    endpoint_id
+                    endpoint_id,
+                    translation_options,
                 )
             ),
             None => py_async!(
                 py,
-                py_executable_data!(self, execute_on_qpu, quantum_processor_id)
+                py_executable_data!(
+                    self,
+                    execute_on_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
             ),
         }
     }
@@ -189,17 +206,27 @@ impl PyExecutable {
     #[args(endpoint_id = "None")]
     pub fn submit_to_qpu(
         &self,
+        py: Python<'_>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyJobHandle> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
             Some(endpoint_id) => py_sync!(py_job_handle!(
                 self,
                 submit_to_qpu_with_endpoint,
                 quantum_processor_id,
-                endpoint_id
+                endpoint_id,
+                translation_options,
             )),
-            None => py_sync!(py_job_handle!(self, submit_to_qpu, quantum_processor_id)),
+            None => py_sync!(py_job_handle!(
+                self,
+                submit_to_qpu,
+                quantum_processor_id,
+                translation_options
+            )),
         }
     }
 
@@ -209,7 +236,10 @@ impl PyExecutable {
         py: Python<'py>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
             Some(endpoint_id) => {
                 py_async!(
@@ -218,13 +248,19 @@ impl PyExecutable {
                         self,
                         submit_to_qpu_with_endpoint,
                         quantum_processor_id,
-                        endpoint_id
+                        endpoint_id,
+                        translation_options,
                     )
                 )
             }
             None => py_async!(
                 py,
-                py_job_handle!(self, submit_to_qpu, quantum_processor_id)
+                py_job_handle!(
+                    self,
+                    submit_to_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
             ),
         }
     }

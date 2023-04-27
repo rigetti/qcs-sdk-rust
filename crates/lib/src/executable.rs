@@ -8,6 +8,7 @@ use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_common::ClientConfiguration;
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
@@ -440,12 +441,13 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         endpoint_id: S,
+        translation_options: Option<TranslationOptions>,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
         let job_handle = self
-            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id)
+            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id, translation_options)
             .await?;
         self.retrieve_results(job_handle).await
     }
@@ -476,7 +478,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecutionResult
+    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S, translation_options: Option<TranslationOptions>) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
@@ -489,7 +491,7 @@ impl<'execution> Executable<'_, 'execution> {
             "running Executable on QPU",
         );
 
-        let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
+        let job_handle = self.submit_to_qpu(quantum_processor_id, translation_options).await?;
         self.retrieve_results(job_handle).await
     }
 
@@ -504,6 +506,7 @@ impl<'execution> Executable<'_, 'execution> {
     pub async fn submit_to_qpu<S>(
         &mut self,
         quantum_processor_id: S,
+        translation_options: Option<TranslationOptions>,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -520,7 +523,7 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit(&self.params)
+            .submit(&self.params, translation_options)
             .await?;
         Ok(job_handle)
     }
@@ -537,6 +540,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         endpoint_id: S,
+        translation_options: Option<TranslationOptions>,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -544,7 +548,7 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit_to_endpoint_id(&self.params, endpoint_id.into())
+            .submit_to_endpoint_id(&self.params, endpoint_id.into(), translation_options)
             .await?;
         Ok(job_handle)
     }

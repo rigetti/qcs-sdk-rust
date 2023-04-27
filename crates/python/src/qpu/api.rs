@@ -141,7 +141,7 @@ impl From<readout_values::Values> for ExecutionResult {
                 data: Register::Complex32(
                     cs.values
                         .into_iter()
-                        .map(|c| num_complex::Complex32::new(c.real(), c.imaginary()))
+                        .map(|c| num_complex::Complex32::new(c.real, c.imaginary))
                         .collect(),
                 )
                 .into(),
@@ -176,7 +176,7 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 
         Self {
             buffers,
-            execution_duration_microseconds: value.execution_duration_microseconds,
+            execution_duration_microseconds: Some(value.execution_duration_microseconds),
         }
     }
 }

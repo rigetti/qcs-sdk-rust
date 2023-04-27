@@ -14,7 +14,7 @@ const QUANTUM_PROCESSOR_ID: &str = "Aspen-M-3";
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
     let job_handle = exe
-        .submit_to_qpu(QUANTUM_PROCESSOR_ID)
+        .submit_to_qpu(QUANTUM_PROCESSOR_ID, None)
         .await
         .expect("Program should be successfully submitted for execution");
     // Do some other stuff

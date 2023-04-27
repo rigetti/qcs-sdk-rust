@@ -1,14 +1,17 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
-use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult};
+use pyo3::{
+    exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult, Python,
+};
 use qcs::qpu::client::GrpcClientError;
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, ToPythonError,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, PyTryFrom, ToPythonError,
 };
 
-use crate::py_sync::py_function_sync_async;
+use crate::{grpc::models::translation::PyTranslationOptions, py_sync::py_function_sync_async};
 
 use super::client::PyQcsClient;
 
@@ -109,10 +112,14 @@ py_function_sync_async! {
         num_shots: u32,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
         let client = PyQcsClient::get_or_create_client(client).await?;
+        let translation_options = Python::with_gil(|py| {
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)
+        })?;
         let result =
-            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client)
+            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options)
                 .await
                 .map_err(RustTranslationError::from)
                 .map_err(RustTranslationError::to_py_err)?;
