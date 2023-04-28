@@ -16,7 +16,7 @@ name = "qcs_sdk"
 crate-type = ["cdylib"]
 
 [dependencies]
-qcs = { path = "../lib" }
+qcs = { path = "../lib", version = "0.10.0-rc.21" }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
