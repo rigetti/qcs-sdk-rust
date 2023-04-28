@@ -54,6 +54,8 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     needs: is-python-release
+    env:
+      RUSTFLAGS: "-std=c++11"
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
@@ -86,17 +88,17 @@ jobs:
         name: wheels
         path: dist
 
-  release:
-    name: Release
-    runs-on: ubuntu-latest
-    needs: [ macos, linux ]
-    steps:
-      - uses: actions/download-artifact@v3
-      - name: Publish to PyPi
-        env:
-          MATURIN_USERNAME: ${{ secrets.PYPI_USERNAME }}
-          MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        uses: messense/maturin-action@v1
-        with:
-          command: upload 
-          args: --skip-existing wheels/*
+  # release:
+  #   name: Release
+  #   runs-on: ubuntu-latest
+  #   needs: [ macos, linux ]
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #     - name: Publish to PyPi
+  #       env:
+  #         MATURIN_USERNAME: ${{ secrets.PYPI_USERNAME }}
+  #         MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+  #       uses: messense/maturin-action@v1
+  #       with:
+  #         command: upload 
+  #         args: --skip-existing wheels/*
