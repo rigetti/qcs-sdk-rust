@@ -36,4 +36,3 @@ jobs:
         with:
           registry-token: ${{ secrets.CRATES_IO_TOKEN }}
           path: './crates/lib'
-          dry-run: true
