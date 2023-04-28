@@ -32,8 +32,4 @@ jobs:
         with:
           toolchain: stable
           override: true
-      - uses: katyo/publish-crates@v2
-        with:
-          registry-token: ${{ secrets.CRATES_IO_TOKEN }}
-          path: './crates/lib'
-          dry-run: true
+      - run: cargo publish --manifest-path=crates/lib/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }} --dry-run
