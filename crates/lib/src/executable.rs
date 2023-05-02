@@ -347,7 +347,7 @@ impl Executable<'_, '_> {
 
         let config = self.get_config().await?;
 
-        let mut qvm = if let Some(qvm) = self.qvm.take() {
+        let qvm = if let Some(qvm) = self.qvm.take() {
             qvm
         } else {
             qvm::Execution::new(&self.quil)?
@@ -478,7 +478,11 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S, translation_options: Option<TranslationOptions>) -> ExecutionResult
+    pub async fn execute_on_qpu<S>(
+        &mut self,
+        quantum_processor_id: S,
+        translation_options: Option<TranslationOptions>,
+    ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
@@ -491,7 +495,9 @@ impl<'execution> Executable<'_, 'execution> {
             "running Executable on QPU",
         );
 
-        let job_handle = self.submit_to_qpu(quantum_processor_id, translation_options).await?;
+        let job_handle = self
+            .submit_to_qpu(quantum_processor_id, translation_options)
+            .await?;
         self.retrieve_results(job_handle).await
     }
 

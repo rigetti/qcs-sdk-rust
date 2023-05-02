@@ -473,6 +473,6 @@ MEASURE 1 ro[1]
             GenerateRandomizedBenchmarkingSequenceResponse {
                 sequence: vec![vec![1, 0], vec![0, 1, 0, 1], vec![1, 0]],
             }
-        )
+        );
     }
 }

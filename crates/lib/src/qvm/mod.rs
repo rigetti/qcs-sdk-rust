@@ -3,12 +3,14 @@
 
 use std::{borrow::Cow, collections::HashMap};
 
+use quil_rs::{program::ProgramError, Program};
 use serde::{Deserialize, Serialize};
 
-pub(crate) use execution::{Error, Execution};
+pub(crate) use execution::Execution;
 
 use crate::RegisterData;
 
+pub mod api;
 mod execution;
 
 /// Encapsulates data returned after running a program on the QVM
@@ -77,6 +79,31 @@ impl<'request> Request<'request> {
 #[serde(rename_all = "lowercase")]
 enum RequestType {
     Multishot,
+}
+
+/// All of the errors that can occur when running a Quil program on QVM.
+#[allow(missing_docs)]
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("Error parsing Quil program: {0}")]
+    Parsing(#[from] ProgramError<Program>),
+    #[error("Shots must be a positive integer.")]
+    ShotsMustBePositive,
+    #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
+    RegionSizeMismatch {
+        name: Box<str>,
+        declared: u64,
+        parameters: usize,
+    },
+    #[error("Could not find region {name} for parameter. Are you missing a DECLARE instruction?")]
+    RegionNotFound { name: Box<str> },
+    #[error("Could not communicate with QVM at {qvm_url}")]
+    QvmCommunication {
+        qvm_url: String,
+        source: reqwest::Error,
+    },
+    #[error("QVM reported a problem running your program: {message}")]
+    Qvm { message: String },
 }
 
 #[cfg(test)]

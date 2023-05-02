@@ -8,6 +8,8 @@ use std::collections::HashMap;
 
 use crate::register_data::PyRegisterData;
 
+mod api;
+
 py_wrap_type! {
     PyQvmResultData(QvmResultData) as "QVMResultData"
 }
@@ -32,4 +34,7 @@ impl PyQvmResultData {
 
 create_init_submodule! {
     classes: [PyQvmResultData],
+    submodules: [
+        "api": api::init_submodule
+    ],
 }
