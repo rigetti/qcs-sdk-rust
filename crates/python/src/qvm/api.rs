@@ -1,19 +1,16 @@
 use std::borrow::Cow;
 use std::collections::HashMap;
 
-use crate::qvm::PyQvmResultData;
+use super::{PyQvmResultData, RustQvmError};
 use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
 
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_error,
-    pyo3::{exceptions::PyRuntimeError, pyfunction, PyResult},
-    wrap_error, ToPythonError,
+    create_init_submodule,
+    pyo3::{pyfunction, PyResult},
+    ToPythonError,
 };
 
 create_init_submodule! {
-    errors: [
-        QvmError
-    ],
     funcs: [
         py_get_version_info,
         py_get_version_info_async,
@@ -21,9 +18,6 @@ create_init_submodule! {
         py_run_async
     ],
 }
-
-wrap_error!(RustQvmError(qcs::qvm::Error));
-py_wrap_error!(api, RustQvmError, QvmError, PyRuntimeError);
 
 py_function_sync_async! {
     #[pyfunction(config = "None")]

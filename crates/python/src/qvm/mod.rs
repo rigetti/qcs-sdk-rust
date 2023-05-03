@@ -1,14 +1,17 @@
 use qcs::{qvm::QvmResultData, RegisterData};
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_type,
-    pyo3::{prelude::*, Python},
-    PyTryFrom, PyWrapper, ToPython,
+    create_init_submodule, py_wrap_error, py_wrap_type,
+    pyo3::{exceptions::PyRuntimeError, prelude::*, Python},
+    wrap_error, PyTryFrom, PyWrapper, ToPython,
 };
 use std::collections::HashMap;
 
 use crate::register_data::PyRegisterData;
 
 mod api;
+
+wrap_error!(RustQvmError(qcs::qvm::Error));
+py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
 
 py_wrap_type! {
     PyQvmResultData(QvmResultData) as "QVMResultData"
@@ -34,6 +37,7 @@ impl PyQvmResultData {
 
 create_init_submodule! {
     classes: [PyQvmResultData],
+    errors: [QVMError],
     submodules: [
         "api": api::init_submodule
     ],
