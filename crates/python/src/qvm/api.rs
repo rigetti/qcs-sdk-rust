@@ -20,7 +20,7 @@ create_init_submodule! {
 }
 
 py_function_sync_async! {
-    #[pyfunction(config = "None")]
+    #[pyfunction(client = "None")]
     async fn run(
         quil: String,
         shots: u16,
