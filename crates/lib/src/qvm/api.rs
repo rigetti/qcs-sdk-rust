@@ -15,16 +15,13 @@ use crate::{
 };
 
 /// Execute a program on the QVM.
-pub async fn run<'a, S>(
+pub async fn run(
     quil: &str,
     shots: u16,
-    readouts: S,
+    readouts: &[Cow<'_, str>],
     params: &Parameters,
     config: &ClientConfiguration,
-) -> Result<QvmResultData, Error>
-where
-    S: Into<Cow<'a, str>> + std::fmt::Debug,
-{
+) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
         %shots,
@@ -35,7 +32,7 @@ where
 
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
 
-    run_program(&program, shots, &[readouts.into()], params, config).await
+    run_program(&program, shots, readouts, params, config).await
 }
 
 pub(crate) async fn run_program(
