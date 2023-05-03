@@ -40,7 +40,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[pyfunction(config = "None")]
+    #[pyfunction(client = "None")]
     async fn get_version_info(client: Option<PyQcsClient>) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let config = client.get_config();
