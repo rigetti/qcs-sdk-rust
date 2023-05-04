@@ -36,13 +36,13 @@ impl QvmResultData {
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[serde(untagged)]
-pub(super) enum Response {
-    Success(Success),
+pub(super) enum MultishotResponse {
+    Success(MultishotSuccess),
     Failure(Failure),
 }
 
 #[derive(Debug, Deserialize, Clone, PartialEq)]
-pub(super) struct Success {
+pub(super) struct MultishotSuccess {
     #[serde(flatten)]
     pub(super) registers: HashMap<String, RegisterData>,
 }
@@ -55,7 +55,7 @@ pub(super) struct Failure {
 
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
-struct Request<'request> {
+struct MultishotRequest<'request> {
     quil_instructions: String,
     addresses: HashMap<&'request str, bool>,
     trials: u16,
@@ -63,7 +63,7 @@ struct Request<'request> {
     request_type: RequestType,
 }
 
-impl<'request> Request<'request> {
+impl<'request> MultishotRequest<'request> {
     fn new(program: &str, shots: u16, readouts: &'request [Cow<'request, str>]) -> Self {
         let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (v.as_ref(), true)).collect();
         Self {
@@ -75,10 +75,103 @@ impl<'request> Request<'request> {
     }
 }
 
+#[derive(Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+struct MultishotMeasureRequest {
+    quil_instructions: String,
+    trials: u16,
+    // Qubits to measure
+    qubits: Vec<u64>,
+    // Simulated measurement noise for the X, Y, and Z axes.
+    measurement_noise: Option<(f64, f64, f64)>,
+    // Seed for the random number generator
+    rng_seed: Option<i64>,
+    #[serde(rename = "type")]
+    request_type: RequestType,
+}
+
+#[derive(Debug, Deserialize, Clone, PartialEq)]
+#[serde(untagged)]
+pub(super) enum MultishotMeasureResponse {
+    Success(MultishotSuccess),
+    Failure(Failure),
+}
+
+impl MultishotMeasureRequest {
+    fn new(
+        program: &str,
+        shots: u16,
+        qubits: Vec<u64>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self {
+            quil_instructions: program.to_string(),
+            trials: shots,
+            qubits,
+            measurement_noise,
+            rng_seed,
+            request_type: RequestType::MultishotMeasure,
+        }
+    }
+}
+
+#[derive(Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+struct ExpectationRequest {
+    state_preparation: String,
+    operators: Vec<String>,
+    rng_seed: Option<i64>,
+    #[serde(rename = "type")]
+    request_type: RequestType,
+}
+
+impl ExpectationRequest {
+    fn new(state_preparation: &str, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
+        Self {
+            state_preparation: state_preparation.to_string(),
+            operators,
+            rng_seed,
+            request_type: RequestType::Expectation,
+        }
+    }
+}
+
+#[derive(Serialize, Debug, Clone, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+struct WavefunctionRequest {
+    compiled_quil: String,
+    measurement_noise: Option<(f64, f64, f64)>,
+    gate_noise: Option<(f64, f64, f64)>,
+    rng_seed: Option<i64>,
+    #[serde(rename = "type")]
+    request_type: RequestType,
+}
+
+impl WavefunctionRequest {
+    fn new(
+        compiled_quil: &str,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self {
+            compiled_quil: compiled_quil.to_string(),
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+            request_type: RequestType::Wavefunction,
+        }
+    }
+}
+
 #[derive(Serialize, Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "kebab-case")]
 enum RequestType {
     Multishot,
+    MultishotMeasure,
+    Expectation,
+    Wavefunction,
 }
 
 /// All of the errors that can occur when running a Quil program on QVM.
@@ -110,18 +203,18 @@ pub enum Error {
 mod describe_request {
     use std::borrow::Cow;
 
-    use super::Request;
+    use super::MultishotRequest;
 
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = Request::new(program, 1, &[]);
+        let request = MultishotRequest::new(program, 1, &[]);
         assert_eq!(&request.quil_instructions, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = Request::new("H 0", 10, &[Cow::Borrowed("ro")]);
+        let request = MultishotRequest::new("H 0", 10, &[Cow::Borrowed("ro")]);
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),

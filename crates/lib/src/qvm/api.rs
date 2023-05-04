@@ -8,10 +8,10 @@ use quil_rs::{
     Program,
 };
 
-use super::{Error, QvmResultData};
+use super::{Error, MultishotMeasureRequest, QvmResultData};
 use crate::{
     executable::Parameters,
-    qvm::{Request, Response},
+    qvm::{MultishotRequest, MultishotResponse},
 };
 
 /// Execute a program on the QVM.
@@ -33,6 +33,25 @@ pub async fn run(
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
 
     run_program(&program, shots, readouts, params, config).await
+}
+
+pub async fn run_and_measure(
+    shots: u16,
+    qubits: Vec<u64>,
+    measurement_noise: Option<(f64, f64, f64)>,
+    seed: Option<i64>,
+) -> Result<Vec<Vec<i64>>, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %shots,
+        ?readouts,
+        ?params,
+        "preparing program to run on QVM"
+    );
+
+    let program = Program::from_str(quil).map_err(Error::Parsing)?;
+
+    run_and_measure_program(&program, shots, readouts, params, config).await
 }
 
 pub(crate) async fn run_program(
@@ -80,19 +99,21 @@ pub(crate) async fn run_program(
     execute(&program, shots, readouts, config).await
 }
 
-pub(crate) async fn execute(
+pub(crate) async fn run_and_measure_program(
     program: &Program,
     shots: u16,
-    readouts: &[Cow<'_, str>],
+    qubits: Vec<u64>,
+    measurement_noise: Option<(f64, f64, f64)>,
+    seed: Option<i64>,
     config: &ClientConfiguration,
-) -> Result<QvmResultData, Error> {
-    #[cfg(feature = "tracing")]
-    tracing::debug!(
-        %shots,
-        ?readouts,
-        "executing program on QVM"
+) -> Result<Vec<Vec<i64>>, Error> {
+    let request = MultishotMeasureRequest::new(
+        &program.to_string(true),
+        shots,
+        qubits,
+        measurement_noise,
+        seed,
     );
-    let request = Request::new(&program.to_string(true), shots, readouts);
 
     let client = reqwest::Client::new();
     let response = client
@@ -105,13 +126,52 @@ pub(crate) async fn execute(
             source,
         })?;
 
-    match response.json::<Response>().await {
+    match response.json::<MultishotResponse>().await {
+        Ok(MultishotResponse::Success(response)) => Ok(response.into()),
+        Ok(MultishotResponse::Failure(response)) => Err(Error::Qvm {
+            message: response.status,
+        }),
         Err(source) => Err(Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
         }),
-        Ok(Response::Success(response)) => Ok(QvmResultData::from_memory_map(response.registers)),
-        Ok(Response::Failure(response)) => Err(Error::Qvm {
+    }
+}
+
+pub(crate) async fn execute(
+    program: &Program,
+    shots: u16,
+    readouts: &[Cow<'_, str>],
+    config: &ClientConfiguration,
+) -> Result<QvmResultData, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %shots,
+        ?readouts,
+        "executing program on QVM"
+    );
+    let request = MultishotRequest::new(&program.to_string(true), shots, readouts);
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(config.qvm_url())
+        .json(&request)
+        .send()
+        .await
+        .map_err(|source| Error::QvmCommunication {
+            qvm_url: config.qvm_url().into(),
+            source,
+        })?;
+
+    match response.json::<MultishotResponse>().await {
+        Err(source) => Err(Error::QvmCommunication {
+            qvm_url: config.qvm_url().into(),
+            source,
+        }),
+        Ok(MultishotResponse::Success(response)) => {
+            Ok(QvmResultData::from_memory_map(response.registers))
+        }
+        Ok(MultishotResponse::Failure(response)) => Err(Error::Qvm {
             message: response.status,
         }),
     }
