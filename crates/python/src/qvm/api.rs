@@ -44,6 +44,9 @@ py_function_sync_async! {
     async fn get_version_info(client: Option<PyQcsClient>) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let config = client.get_config();
-        qcs::qvm::api::get_version_info(&config).await.map_err(RustQvmError::from).map_err(RustQvmError::to_py_err)
+        qcs::qvm::api::get_version_info(&config)
+            .await
+            .map_err(RustQvmError::from)
+            .map_err(RustQvmError::to_py_err)
     }
 }
