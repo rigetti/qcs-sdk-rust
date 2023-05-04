@@ -1659,7 +1659,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.10.0"
+version = "0.11.0-rc.0"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1781,7 +1781,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.5.0"
+version = "0.6.0-rc.0"
 dependencies = [
  "numpy",
  "paste",
@@ -2004,9 +2004,9 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.1.0-rc.6"
+version = "0.1.0-rc.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1278482dd3684b2f648ce34eb2a9183eece8b6660398e2df40fdb3b7fca782a0"
+checksum = "7ed8f300735182b3f35a15f04c1dd9f733db8fa3ebfc23b5aeadaf3603196762"
 dependencies = [
  "num-complex",
  "num-traits",

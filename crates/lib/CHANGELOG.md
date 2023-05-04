@@ -1,3 +1,9 @@
+## 0.11.0-rc.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
 ## 0.10.0
 
 ### Breaking Changes
