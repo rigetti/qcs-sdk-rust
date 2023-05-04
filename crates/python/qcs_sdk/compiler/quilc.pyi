@@ -215,13 +215,14 @@ async def compile_program_async(
 class CompilationResult:
     @property
     def program(self) -> str:
-        """ """
+        """The compiled program."""
         ...
     @property
     def native_quil_metadata(self) -> Optional[NativeQuilMetadata]:
-        """ """
+        """Metadata about the compiled program."""
         ...
 
+@final
 class NativeQuilMetadata:
     """
     Metadata about a program compiled to native quil.
