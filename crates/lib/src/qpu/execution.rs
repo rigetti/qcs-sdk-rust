@@ -24,7 +24,7 @@ use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
-use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
+use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -147,7 +147,8 @@ impl<'a> Execution<'a> {
                     task_name: "quilc",
                     source,
                 })
-            })??
+            })?
+            .map(|CompilationResult { program, .. }| program)?
         } else {
             #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
@@ -163,7 +164,10 @@ impl<'a> Execution<'a> {
     }
 
     /// Translate the execution's quil program for it's given quantum processor.
-    pub(crate) async fn translate(&mut self, options: Option<TranslationOptions>) -> Result<EncryptedTranslationResult, Error> {
+    pub(crate) async fn translate(
+        &mut self,
+        options: Option<TranslationOptions>,
+    ) -> Result<EncryptedTranslationResult, Error> {
         let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
@@ -176,12 +180,17 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters, translation_options: Option<TranslationOptions>) -> Result<JobHandle<'a>, Error> {
+    pub(crate) async fn submit(
+        &mut self,
+        params: &Parameters,
+        translation_options: Option<TranslationOptions>,
+    ) -> Result<JobHandle<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
         let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
-        self.submit_to_target(params, job_target, translation_options).await
+        self.submit_to_target(params, job_target, translation_options)
+            .await
     }
 
     /// Run on specific QCS endpoint and wait for the results.
@@ -195,7 +204,8 @@ impl<'a> Execution<'a> {
         S: Into<Cow<'a, str>>,
     {
         let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
-        self.submit_to_target(params, job_target, translation_options).await
+        self.submit_to_target(params, job_target, translation_options)
+            .await
     }
 
     async fn submit_to_target(
@@ -204,7 +214,8 @@ impl<'a> Execution<'a> {
         job_target: JobTarget,
         translation_options: Option<TranslationOptions>,
     ) -> Result<JobHandle<'a>, Error> {
-        let EncryptedTranslationResult { job, readout_map } = self.translate(translation_options).await?;
+        let EncryptedTranslationResult { job, readout_map } =
+            self.translate(translation_options).await?;
 
         let patch_values = self
             .get_substitutions(params)
@@ -249,9 +260,7 @@ impl<'a> Execution<'a> {
                 job_handle.readout_map(),
                 &response.readout_values,
             )),
-            duration: Some(response
-                .execution_duration_microseconds)
-                .map(Duration::from_micros),
+            duration: Some(response.execution_duration_microseconds).map(Duration::from_micros),
         })
     }
 
