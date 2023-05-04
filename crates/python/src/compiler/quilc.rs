@@ -110,13 +110,14 @@ py_function_sync_async! {
     ) -> PyResult<PyCompilationResult> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let options = options.unwrap_or_default();
-        let result = qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
+        qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(RustQuilcError::from)
-            .map_err(RustQuilcError::to_py_err)?;
-        Ok(PyCompilationResult {
-            program: result.program.to_string(true),
-            native_quil_metadata: result.native_quil_metadata.map(PyNativeQuilMetadata)
-        })
+            .map_err(RustQuilcError::to_py_err)
+            .map(|result| PyCompilationResult {
+                program: result.program.to_string(true),
+                native_quil_metadata: result.native_quil_metadata.map(PyNativeQuilMetadata)
+            })
+
     }
 }
 
