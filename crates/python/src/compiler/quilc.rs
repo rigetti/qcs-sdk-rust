@@ -1,17 +1,19 @@
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
-    pyfunction, pymethods,
-    types::{PyInt, PyString},
-    Py, PyResult,
+    pyfunction, pymethods, Py, PyResult,
 };
 use qcs::compiler::quilc::{
     CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
-    GenerateRandomizedBenchmarkingSequenceResponse, PauliTerm, RandomizedBenchmarkingRequest,
-    TargetDevice, DEFAULT_COMPILER_TIMEOUT,
+    GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
+    RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_struct, py_wrap_type,
+    pyo3::{
+        pyclass,
+        types::{PyFloat, PyInt, PyString},
+    },
     wrap_error, ToPythonError,
 };
 
@@ -22,6 +24,8 @@ use crate::qpu::isa::PyInstructionSetArchitecture;
 create_init_submodule! {
     classes: [
         PyCompilerOpts,
+        PyCompilationResult,
+        PyNativeQuilMetadata,
         PyTargetDevice,
         PyPauliTerm,
         PyConjugateByCliffordRequest,
@@ -103,14 +107,40 @@ py_function_sync_async! {
         target: PyTargetDevice,
         client: Option<PyQcsClient>,
         options: Option<PyCompilerOpts>,
-    ) -> PyResult<String> {
+    ) -> PyResult<PyCompilationResult> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let options = options.unwrap_or_default();
         qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
-            .map(|p| p.to_string(true))
+            .map(|result| PyCompilationResult {
+                program: result.program.to_string(true),
+                native_quil_metadata: result.native_quil_metadata.map(PyNativeQuilMetadata)
+            })
+
     }
+}
+
+py_wrap_data_struct! {
+    PyNativeQuilMetadata(NativeQuilMetadata) as "NativeQuilMetadata" {
+        final_rewiring: Vec<u64> => Vec<Py<PyInt>>,
+        gate_depth: Option<u64> => Option<Py<PyInt>>,
+        gate_volume: Option<u64> => Option<Py<PyInt>>,
+        multiqubit_gate_depth: Option<u64> => Option<Py<PyInt>>,
+        program_duration: Option<f64> => Option<Py<PyFloat>>,
+        program_fidelity: Option<f64> => Option<Py<PyFloat>>,
+        topological_swaps: Option<u64> => Option<Py<PyInt>>,
+        qpu_runtime_estimation: Option<f64> => Option<Py<PyFloat>>
+
+    }
+}
+
+#[pyclass(name = "CompilationResult")]
+pub struct PyCompilationResult {
+    #[pyo3(get)]
+    program: String,
+    #[pyo3(get)]
+    native_quil_metadata: Option<PyNativeQuilMetadata>,
 }
 
 py_function_sync_async! {

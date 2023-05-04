@@ -1,4 +1,5 @@
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.compiler.quilc import (
@@ -21,6 +22,7 @@ from qcs_sdk.compiler.quilc import (
     generate_randomized_benchmarking_sequence_async,
 )
 
+
 @pytest.fixture
 def target_device(aspen_m_3_isa: InstructionSetArchitecture) -> TargetDevice:
     return TargetDevice.from_isa(aspen_m_3_isa)
@@ -39,8 +41,9 @@ def test_compiler_opts():
 def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
     """TargetDevice cannot be built when ISA lacks ``randomized_benchmark_simultaneous_1q`` benchmark."""
     isa = InstructionSetArchitecture.from_raw(aspen_m_3_isa.json())
-    isa.benchmarks=[
-        benchmark for benchmark in isa.benchmarks
+    isa.benchmarks = [
+        benchmark
+        for benchmark in isa.benchmarks
         if benchmark.name != "randomized_benchmark_simultaneous_1q"
     ]
     with pytest.raises(QuilcError):
@@ -50,10 +53,12 @@ def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
 def test_compile_program(
     bell_program: str,
     target_device: TargetDevice,
+    snapshot: SnapshotAssertion,
 ):
     """A simple program should compile successfully."""
-    compiled_program = compile_program(bell_program, target_device)
-    assert compiled_program
+    result = compile_program(bell_program, target_device)
+    assert result.program == snapshot
+    assert result.native_quil_metadata == snapshot
 
 
 @pytest.mark.asyncio
@@ -82,8 +87,7 @@ async def test_get_version_info_async():
 def test_conjugate_pauli_by_clifford():
     """Pauli should be conjugated by clifford."""
     request = ConjugateByCliffordRequest(
-        pauli=PauliTerm(indices=[0], symbols=["X"]),
-        clifford="H 0"
+        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
     )
     response = conjugate_pauli_by_clifford(request)
     assert type(response) == ConjugatePauliByCliffordResponse
@@ -95,8 +99,7 @@ def test_conjugate_pauli_by_clifford():
 async def test_conjugate_pauli_by_clifford_async():
     """Pauli should be conjugated by clifford."""
     request = ConjugateByCliffordRequest(
-        pauli=PauliTerm(indices=[0], symbols=["X"]),
-        clifford="H 0"
+        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
     )
     response = await conjugate_pauli_by_clifford_async(request)
     assert type(response) == ConjugatePauliByCliffordResponse
