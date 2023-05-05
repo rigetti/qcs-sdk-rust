@@ -1794,7 +1794,6 @@ dependencies = [
  "qcs-api-client-openapi",
  "quil-rs",
  "rigetti-pyo3",
- "serde",
  "serde_json",
  "thiserror",
  "tokio",

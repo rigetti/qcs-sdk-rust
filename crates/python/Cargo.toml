@@ -30,7 +30,6 @@ thiserror.workspace = true
 numpy.workspace = true
 rigetti-pyo3.workspace = true
 paste = "1.0.11"
-serde = "1.0.162"
 
 [build-dependencies]
 pyo3-build-config.workspace = true
