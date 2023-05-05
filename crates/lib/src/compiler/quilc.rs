@@ -488,6 +488,20 @@ MEASURE 1 ro[1]
     }
 
     #[tokio::test]
+    async fn test_compile_declare_only() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let output = compile_program(
+            "DECLARE ro BIT[1]\n",
+            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
+            &client,
+            CompilerOpts::default(),
+        )
+        .expect("Should be able to compile");
+        assert_eq!(output.program.to_string(true), "DECLARE ro BIT[1]\n");
+        assert_ne!(output.native_quil_metadata, None);
+    }
+
+    #[tokio::test]
     async fn get_version_info_from_quilc() {
         let client = Qcs::load().await.unwrap_or_default();
         let version = get_version_info(&client).expect("Should get version info from quilc");
@@ -535,6 +549,6 @@ MEASURE 1 ro[1]
             GenerateRandomizedBenchmarkingSequenceResponse {
                 sequence: vec![vec![1, 0], vec![0, 1, 0, 1], vec![1, 0]],
             }
-        )
+        );
     }
 }
