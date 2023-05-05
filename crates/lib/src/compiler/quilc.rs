@@ -311,32 +311,22 @@ struct QuilToNativeQuilResponse {
     metadata: Option<NativeQuilMetadata>,
 }
 
-fn deserialize_optional_unit_or_vec_as_vec<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
+#[allow(unused_qualifications)]
+fn deserialize_none_as_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
-    T: Deserialize<'de>,
+    T: Deserialize<'de> + std::default::Default,
 {
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum TypeOrList<T> {
-        None,
-        Type(T),
-        List(Vec<T>),
-    }
-
-    let type_or_list = TypeOrList::deserialize(deserializer)?;
-    match type_or_list {
-        TypeOrList::None => Ok(vec![]),
-        TypeOrList::Type(item) => Ok(vec![item]),
-        TypeOrList::List(items) => Ok(items),
-    }
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.unwrap_or_default())
 }
 
 /// Metadata about a program compiled to native quil.
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
-    #[serde(deserialize_with = "deserialize_optional_unit_or_vec_as_vec")]
+    // #[serde(deserialize_with = "deserialize_optional_unit_or_vec_as_vec")]
+    #[serde(deserialize_with = "deserialize_none_as_default")]
     pub final_rewiring: Vec<u64>,
     /// Maximum number of successive gates in the native Quil program.
     pub gate_depth: Option<u64>,
