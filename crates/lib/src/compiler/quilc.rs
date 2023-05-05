@@ -322,7 +322,7 @@ where
 }
 
 /// Metadata about a program compiled to native quil.
-#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Deserialize, Serialize, Debug, PartialEq, PartialOrd)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
     #[serde(deserialize_with = "deserialize_none_as_default")]

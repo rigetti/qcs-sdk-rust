@@ -1,7 +1,3 @@
-use pyo3::{
-    exceptions::{PyRuntimeError, PyValueError},
-    pyfunction, pymethods, Py, PyResult,
-};
 use qcs::compiler::quilc::{
     CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
     GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
@@ -12,10 +8,12 @@ use rigetti_pyo3::{
     create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_struct,
     py_wrap_type,
     pyo3::{
-        pyclass,
-        types::{PyFloat, PyInt, PyString},
+        exceptions::{PyRuntimeError, PyValueError},
+        pyclass, pyfunction, pymethods,
+        types::{PyBytes, PyFloat, PyInt, PyString},
+        Py, PyResult, Python,
     },
-    wrap_error, ToPythonError,
+    wrap_error, PyWrapper, ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -123,6 +121,7 @@ py_function_sync_async! {
 }
 
 py_wrap_data_struct! {
+    #[derive(Debug, PartialEq, PartialOrd)]
     PyNativeQuilMetadata(NativeQuilMetadata) as "NativeQuilMetadata" {
         final_rewiring: Vec<u64> => Vec<Py<PyInt>>,
         gate_depth: Option<u64> => Option<Py<PyInt>>,
@@ -136,6 +135,47 @@ py_wrap_data_struct! {
     }
 }
 impl_repr!(PyNativeQuilMetadata);
+
+#[pymethods]
+impl PyNativeQuilMetadata {
+    #[new]
+    #[allow(clippy::too_many_arguments)]
+    pub fn new(
+        final_rewiring: Option<Vec<u64>>,
+        gate_depth: Option<u64>,
+        gate_volume: Option<u64>,
+        multiqubit_gate_depth: Option<u64>,
+        program_duration: Option<f64>,
+        program_fidelity: Option<f64>,
+        topological_swaps: Option<u64>,
+        qpu_runtime_estimation: Option<f64>,
+    ) -> Self {
+        Self(NativeQuilMetadata {
+            final_rewiring: final_rewiring.unwrap_or_default(),
+            gate_depth,
+            gate_volume,
+            multiqubit_gate_depth,
+            program_duration,
+            program_fidelity,
+            topological_swaps,
+            qpu_runtime_estimation,
+        })
+    }
+    pub fn __getstate__<'a>(&self, py: Python<'a>) -> PyResult<&'a PyBytes> {
+        Ok(PyBytes::new(
+            py,
+            &serde_json::to_vec(self.as_inner())
+                .map_err(|e| PyRuntimeError::new_err(format!("failed to serialize: {e}")))?,
+        ))
+    }
+
+    pub fn __setstate__(&mut self, state: &PyBytes) -> PyResult<()> {
+        let metadata: NativeQuilMetadata = serde_json::from_slice(state.as_bytes())
+            .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
+        *self = Self(metadata);
+        Ok(())
+    }
+}
 
 #[pyclass(name = "CompilationResult")]
 pub struct PyCompilationResult {
