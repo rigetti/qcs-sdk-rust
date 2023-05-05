@@ -9,7 +9,8 @@ use qcs::compiler::quilc::{
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_struct, py_wrap_type,
+    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_struct,
+    py_wrap_type,
     pyo3::{
         pyclass,
         types::{PyFloat, PyInt, PyString},
@@ -134,6 +135,7 @@ py_wrap_data_struct! {
 
     }
 }
+impl_repr!(PyNativeQuilMetadata);
 
 #[pyclass(name = "CompilationResult")]
 pub struct PyCompilationResult {

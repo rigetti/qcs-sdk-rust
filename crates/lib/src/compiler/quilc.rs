@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 use std::str::FromStr;
 
 use quil_rs::program::{Program, ProgramError};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
@@ -307,13 +307,36 @@ struct QuilToNativeQuilResponse {
     /// The compiled program
     quil: String,
     /// Metadata about the compiled program
+    #[serde(default)]
     metadata: Option<NativeQuilMetadata>,
+}
+
+fn deserialize_optional_unit_or_vec_as_vec<'de, D, T>(deserializer: D) -> Result<Vec<T>, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de>,
+{
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum TypeOrList<T> {
+        None,
+        Type(T),
+        List(Vec<T>),
+    }
+
+    let type_or_list = TypeOrList::deserialize(deserializer)?;
+    match type_or_list {
+        TypeOrList::None => Ok(vec![]),
+        TypeOrList::Type(item) => Ok(vec![item]),
+        TypeOrList::List(items) => Ok(items),
+    }
 }
 
 /// Metadata about a program compiled to native quil.
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
+    #[serde(deserialize_with = "deserialize_optional_unit_or_vec_as_vec")]
     pub final_rewiring: Vec<u64>,
     /// Maximum number of successive gates in the native Quil program.
     pub gate_depth: Option<u64>,
