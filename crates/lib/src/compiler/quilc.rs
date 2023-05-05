@@ -325,7 +325,6 @@ where
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
-    // #[serde(deserialize_with = "deserialize_optional_unit_or_vec_as_vec")]
     #[serde(deserialize_with = "deserialize_none_as_default")]
     pub final_rewiring: Vec<u64>,
     /// Maximum number of successive gates in the native Quil program.
