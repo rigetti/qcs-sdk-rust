@@ -169,7 +169,7 @@ impl PyQcsClient {
             builder = builder.set_quilc_url(quilc_url);
         }
         if let Some(qvm_url) = qvm_url {
-            builder = builder.set_grpc_api_url(qvm_url);
+            builder = builder.set_qvm_url(qvm_url);
         }
         let client = builder
             .build()
