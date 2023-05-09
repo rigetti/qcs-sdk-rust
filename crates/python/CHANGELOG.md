@@ -1,3 +1,13 @@
+## 0.6.0-rc.1
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
 ## 0.6.0-rc.0
 
 ### Breaking Changes
