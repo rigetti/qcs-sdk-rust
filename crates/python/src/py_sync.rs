@@ -76,7 +76,21 @@ macro_rules! py_function_sync_async {
         async fn $name: ident($($arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
     ) => {
         async fn $name($($arg: $kind,)*) $(-> $ret)? {
-            $body
+            let mut fut = Box::pin(async move { $body });
+
+            loop {
+                match ::futures::poll!(&mut fut) {
+                    ::std::task::Poll::Ready(val) => break val,
+                    ::std::task::Poll::Pending => {
+                        if let Err(err) = ::pyo3::Python::with_gil(|py| {
+                            py.check_signals()
+                        }) {
+                            return Err(err);
+                        }
+                        ::tokio::time::sleep(::std::time::Duration::from_millis(100)).await;
+                    }
+                }
+            }
         }
 
         ::paste::paste! {

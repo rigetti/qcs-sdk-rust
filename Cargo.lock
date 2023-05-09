@@ -1783,6 +1783,7 @@ dependencies = [
 name = "qcs-sdk-python"
 version = "0.5.0"
 dependencies = [
+ "futures",
  "numpy",
  "paste",
  "pyo3",

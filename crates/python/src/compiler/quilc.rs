@@ -14,6 +14,7 @@ use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_struct, py_wrap_type,
     wrap_error, ToPythonError,
 };
+use tokio::task::JoinHandle;
 
 use crate::py_sync::py_function_sync_async;
 use crate::qpu::client::PyQcsClient;
