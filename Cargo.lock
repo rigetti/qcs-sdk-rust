@@ -1490,7 +1490,6 @@ dependencies = [
 [[package]]
 name = "quil-rs"
 version = "0.16.0-rc.1"
-source = "git+https://github.com/rigetti/quil-rs?branch=1455-python-support-for-program-and-beyond#da9cfb3bb9fd751bbf7822ff91ad71e50a64a9cf"
 dependencies = [
  "indexmap",
  "lexical",

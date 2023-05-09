@@ -364,7 +364,7 @@ impl TryFrom<Program> for RewrittenProgram {
 
 impl RewrittenProgram {
     pub(crate) fn to_string(&self) -> RewrittenQuil {
-        RewrittenQuil(self.inner.to_string(true))
+        RewrittenQuil(self.inner.to_string())
     }
 }
 

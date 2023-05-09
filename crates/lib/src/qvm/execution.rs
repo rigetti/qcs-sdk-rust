@@ -87,10 +87,10 @@ impl Execution {
                 self.program.instructions.insert(
                     0,
                     Instruction::Move(Move {
-                        destination: ArithmeticOperand::MemoryReference(MemoryReference {
+                        destination: MemoryReference {
                             name: name.to_string(),
                             index: index as u64,
-                        }),
+                        },
                         source: ArithmeticOperand::LiteralReal(*value),
                     }),
                 );
@@ -110,7 +110,7 @@ impl Execution {
         readouts: &[Cow<'_, str>],
         config: &ClientConfiguration,
     ) -> Result<QvmResultData, Error> {
-        let request = Request::new(&self.program.to_string(true), shots, readouts);
+        let request = Request::new(&self.program.to_string(), shots, readouts);
 
         let client = reqwest::Client::new();
         let response = client

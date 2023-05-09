@@ -91,7 +91,7 @@ py_function_sync_async! {
         qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
-            .map(|p| p.to_string(true))
+            .map(|p| p.to_string())
     }
 }
 

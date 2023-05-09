@@ -74,7 +74,7 @@ pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticRe
         .map_err(RustRewriteArithmeticError::from)
         .map_err(RustRewriteArithmeticError::to_py_err)?;
 
-    let program = program.to_string(true);
+    let program = program.to_string();
     let recalculation_table = index_set.into_iter().map(|e| e.to_string()).collect();
 
     Ok(PyRewriteArithmeticResult {
