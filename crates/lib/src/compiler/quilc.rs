@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 use std::str::FromStr;
 
 use quil_rs::program::{Program, ProgramError};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
@@ -307,13 +307,25 @@ struct QuilToNativeQuilResponse {
     /// The compiled program
     quil: String,
     /// Metadata about the compiled program
+    #[serde(default)]
     metadata: Option<NativeQuilMetadata>,
 }
 
+#[allow(unused_qualifications)]
+fn deserialize_none_as_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + std::default::Default,
+{
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.unwrap_or_default())
+}
+
 /// Metadata about a program compiled to native quil.
-#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+#[derive(Clone, Deserialize, Serialize, Debug, PartialEq, PartialOrd)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
+    #[serde(deserialize_with = "deserialize_none_as_default")]
     pub final_rewiring: Vec<u64>,
     /// Maximum number of successive gates in the native Quil program.
     pub gate_depth: Option<u64>,
@@ -465,6 +477,20 @@ MEASURE 1 ro[1]
     }
 
     #[tokio::test]
+    async fn test_compile_declare_only() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let output = compile_program(
+            "DECLARE ro BIT[1]\n",
+            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
+            &client,
+            CompilerOpts::default(),
+        )
+        .expect("Should be able to compile");
+        assert_eq!(output.program.to_string(true), "DECLARE ro BIT[1]\n");
+        assert_ne!(output.native_quil_metadata, None);
+    }
+
+    #[tokio::test]
     async fn get_version_info_from_quilc() {
         let client = Qcs::load().await.unwrap_or_default();
         let version = get_version_info(&client).expect("Should get version info from quilc");
@@ -512,6 +538,6 @@ MEASURE 1 ro[1]
             GenerateRandomizedBenchmarkingSequenceResponse {
                 sequence: vec![vec![1, 0], vec![0, 1, 0, 1], vec![1, 0]],
             }
-        )
+        );
     }
 }
