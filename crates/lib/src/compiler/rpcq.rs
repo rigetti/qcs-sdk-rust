@@ -1,6 +1,6 @@
 use std::{collections::HashMap, vec::IntoIter};
 
-use async_zmq::{request, Message, MultipartIter, Request};
+use async_zmq::{request, Message, Request};
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -20,9 +20,6 @@ impl Client {
             .map_err(Error::SocketCreation)?
             .connect()
             .map_err(Error::Communication)?;
-
-        // let x = dealer(endpoint).map_err(Err::SocketCreation)?;
-        // let y = x.connect().map_err(Error::Communication)?;
         Ok(Self { context })
     }
 
@@ -53,9 +50,9 @@ impl Client {
             .serialize(&mut Serializer::new(&mut data).with_struct_map())
             .map_err(Error::Serialization)?;
 
-        let message = MultipartIter::from(Message::from(data));
+        // let message = MultipartIter::from(Message::from(data));
         self.context
-            .send(message)
+            .send(Message::from(data))
             .await
             .map_err(Error::RequestReply)
     }
@@ -87,8 +84,10 @@ impl Client {
     /// Retrieve the raw bytes of a response
     async fn receive_raw(&self) -> Result<Vec<u8>, Error> {
         let response = self.context.recv().await.map_err(Error::RequestReply)?;
-        // todo: make better
-        Ok(response[0].to_vec())
+        response
+            .first()
+            .ok_or_else(|| Error::Response("Empty response".to_string()))
+            .map(|m| m.to_vec())
     }
 }
 

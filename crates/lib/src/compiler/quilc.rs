@@ -136,6 +136,7 @@ pub async fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let request = rpcq::RPCRequest::new("get_version_info", &binding);
     let mut rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
+    println!("Hello");
     match rpcq_client
         .run_request::<_, QuilcVersionResponse>(&request)
         .await
@@ -505,7 +506,7 @@ MEASURE 1 ro[1]
         assert_ne!(output.native_quil_metadata, None);
     }
 
-    #[tokio::test]
+    #[tokio::test(flavor = "multi_thread")]
     async fn get_version_info_from_quilc() {
         let client = Qcs::load().await.unwrap_or_default();
         let version = get_version_info(&client).await.expect("Should get version info from quilc");
