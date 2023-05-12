@@ -25,6 +25,9 @@ use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
 use tonic::transport::{Channel, Uri};
 use tonic::Status;
 
+#[cfg(feature = "tracing")]
+use tracing;
+
 pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
@@ -46,6 +49,13 @@ impl Qcs {
     pub async fn load() -> Result<Self, LoadError> {
         ClientConfiguration::load_default()
             .await
+            .or_else(|_| {
+                #[cfg(feature = "tracing")]
+                tracing::info!(
+                    "No QCS client configuration found, only generic QVMs will be accessible."
+                );
+                Ok(ClientConfiguration::default())
+            })
             .map(Self::with_config)
     }
 
