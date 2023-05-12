@@ -38,7 +38,7 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
     feature = "tracing",
     tracing::instrument(skip(client), level = "trace")
 )]
-pub fn compile_program(
+pub async fn compile_program(
     quil: &str,
     isa: TargetDevice,
     client: &Qcs,
@@ -52,9 +52,12 @@ pub fn compile_program(
     let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
     let request =
         rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
-    let rpcq_client = rpcq::Client::new(endpoint)
+    let mut rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilToNativeQuilResponse>(&request) {
+    match rpcq_client
+        .run_request::<_, QuilToNativeQuilResponse>(&request)
+        .await
+    {
         Ok(response) => Ok(CompilationResult {
             program: Program::from_str(&response.quil).map_err(Error::Parse)?,
             native_quil_metadata: response.metadata,
@@ -123,7 +126,7 @@ impl Default for CompilerOpts {
 }
 
 /// Fetch the version information from the running Quilc compiler.
-pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
+pub async fn get_version_info(client: &Qcs) -> Result<String, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting quilc version information");
 
@@ -131,9 +134,12 @@ pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let endpoint = config.quilc_url();
     let binding: HashMap<String, String> = HashMap::new();
     let request = rpcq::RPCRequest::new("get_version_info", &binding);
-    let rpcq_client = rpcq::Client::new(endpoint)
+    let mut rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilcVersionResponse>(&request) {
+    match rpcq_client
+        .run_request::<_, QuilcVersionResponse>(&request)
+        .await
+    {
         Ok(response) => Ok(response.quilc),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -188,7 +194,7 @@ pub struct ConjugatePauliByCliffordResponse {
 /// return its action on a `PauliTerm`.
 /// In particular, for Clifford ``C``, and Pauli ``P``, this returns the Pauli Term
 /// representing ``CPC^{\dagger}``.
-pub fn conjugate_pauli_by_clifford(
+pub async fn conjugate_pauli_by_clifford(
     client: &Qcs,
     request: ConjugateByCliffordRequest,
 ) -> Result<ConjugatePauliByCliffordResponse, Error> {
@@ -199,9 +205,12 @@ pub fn conjugate_pauli_by_clifford(
     let endpoint = config.quilc_url();
     let request: ConjugatePauliByCliffordRequest = request.into();
     let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
-    let rpcq_client = rpcq::Client::new(endpoint)
+    let mut rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
+    match rpcq_client
+        .run_request::<_, ConjugatePauliByCliffordResponse>(&request)
+        .await
+    {
         Ok(response) => Ok(response),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -256,7 +265,7 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
 /// interleaver ``G`` (which must be a Clifford, and which will be decomposed into the native
 /// gateset) is provided, then the sequence instead takes the form
 /// ```C_1 G C_2 G ... C_(depth-1) G C_inv .```
-pub fn generate_randomized_benchmarking_sequence(
+pub async fn generate_randomized_benchmarking_sequence(
     client: &Qcs,
     request: RandomizedBenchmarkingRequest,
 ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
@@ -267,9 +276,12 @@ pub fn generate_randomized_benchmarking_sequence(
     let endpoint = config.quilc_url();
     let request: GenerateRandomizedBenchmarkingSequenceRequest = request.into();
     let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
-    let rpcq_client = rpcq::Client::new(endpoint)
+    let mut rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
+    match rpcq_client
+        .run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request)
+        .await
+    {
         Ok(response) => Ok(response),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -431,6 +443,7 @@ mod tests {
             &Qcs::load().await.unwrap_or_default(),
             CompilerOpts::default(),
         )
+        .await
         .expect("Could not compile");
         assert_eq!(output.program.to_string(true), EXPECTED_H0_OUTPUT);
     }
@@ -453,6 +466,7 @@ MEASURE 1 ro[1]
             &client,
             CompilerOpts::default(),
         )
+        .await
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string(true))
             .unwrap()
@@ -485,6 +499,7 @@ MEASURE 1 ro[1]
             &client,
             CompilerOpts::default(),
         )
+        .await
         .expect("Should be able to compile");
         assert_eq!(output.program.to_string(true), "DECLARE ro BIT[1]\n");
         assert_ne!(output.native_quil_metadata, None);
@@ -493,7 +508,7 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn get_version_info_from_quilc() {
         let client = Qcs::load().await.unwrap_or_default();
-        let version = get_version_info(&client).expect("Should get version info from quilc");
+        let version = get_version_info(&client).await.expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }
@@ -509,6 +524,7 @@ MEASURE 1 ro[1]
             clifford: "H 0".into(),
         };
         let response = conjugate_pauli_by_clifford(&client, request)
+            .await
             .expect("Should conjugate pauli by clifford");
 
         assert_eq!(
@@ -531,6 +547,7 @@ MEASURE 1 ro[1]
             interleaver: Some("Y 0".into()),
         };
         let response = generate_randomized_benchmarking_sequence(&client, request)
+            .await
             .expect("Should generate randomized benchmark sequence");
 
         assert_eq!(

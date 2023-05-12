@@ -8,7 +8,6 @@ use std::time::Duration;
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
 use quil_rs::Program;
-use tokio::task::{spawn_blocking, JoinError};
 
 #[cfg(feature = "tracing")]
 use tracing::trace;
@@ -78,11 +77,6 @@ impl From<quilc::Error> for Error {
 /// Errors that are not expected to be returned—if they show up, it may be a bug in this library.
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Unexpected {
-    #[error("Task running {task_name} did not complete.")]
-    TaskError {
-        task_name: &'static str,
-        source: JoinError,
-    },
     #[error("Problem converting QCS ISA to quilc ISA")]
     Isa(String),
 }
@@ -138,17 +132,9 @@ impl<'a> Execution<'a> {
             #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
             let client = client.clone();
-            spawn_blocking(move || {
-                quilc::compile_program(&quil, target_device, &client, compiler_options)
-            })
-            .await
-            .map_err(|source| {
-                Error::Unexpected(Unexpected::TaskError {
-                    task_name: "quilc",
-                    source,
-                })
-            })?
-            .map(|CompilationResult { program, .. }| program)?
+            quilc::compile_program(&quil, target_device, &client, compiler_options)
+                .await
+                .map(|CompilationResult { program, .. }| program)?
         } else {
             #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
