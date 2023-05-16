@@ -21,7 +21,7 @@ numpy = "0.17"
 pyo3 = { version = "0.17", features = ["extension-module"] }
 pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
 pyo3-build-config = { version = "0.17" }
-rigetti-pyo3 = { version = "0.1.0-rc.6", features = [
+rigetti-pyo3 = { version = "0.1.0-rc.7", features = [
     "extension-module",
     "complex",
 ] }

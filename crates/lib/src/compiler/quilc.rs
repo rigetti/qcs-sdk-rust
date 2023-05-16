@@ -2,9 +2,10 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::str::FromStr;
 
 use quil_rs::program::{Program, ProgramError};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
@@ -42,7 +43,7 @@ pub fn compile_program(
     isa: TargetDevice,
     client: &Qcs,
     options: CompilerOpts,
-) -> Result<Program, Error> {
+) -> Result<CompilationResult, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
 
@@ -53,10 +54,22 @@ pub fn compile_program(
         rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
     let rpcq_client = rpcq::Client::new(endpoint)
         .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilcCompileProgramResponse>(&request) {
-        Ok(response) => response.quil.parse::<Program>().map_err(Error::Parse),
+    match rpcq_client.run_request::<_, QuilToNativeQuilResponse>(&request) {
+        Ok(response) => Ok(CompilationResult {
+            program: Program::from_str(&response.quil).map_err(Error::Parse)?,
+            native_quil_metadata: response.metadata,
+        }),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
+}
+
+/// The result of compiling a Quil program to native quil with `quilc`
+#[derive(Clone, Debug, PartialEq)]
+pub struct CompilationResult {
+    /// The compiled program
+    pub program: Program,
+    /// Metadata about the compiled program
+    pub native_quil_metadata: Option<NativeQuilMetadata>,
 }
 
 /// A set of options that determine the behavior of compiling programs with quilc
@@ -288,9 +301,47 @@ impl Error {
     }
 }
 
-#[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-struct QuilcCompileProgramResponse {
+/// The response from quilc for a `quil_to_native_quil` request.
+#[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+struct QuilToNativeQuilResponse {
+    /// The compiled program
     quil: String,
+    /// Metadata about the compiled program
+    #[serde(default)]
+    metadata: Option<NativeQuilMetadata>,
+}
+
+#[allow(unused_qualifications)]
+fn deserialize_none_as_default<'de, D, T>(deserializer: D) -> Result<T, D::Error>
+where
+    D: Deserializer<'de>,
+    T: Deserialize<'de> + std::default::Default,
+{
+    let opt = Option::deserialize(deserializer)?;
+    Ok(opt.unwrap_or_default())
+}
+
+/// Metadata about a program compiled to native quil.
+#[derive(Clone, Deserialize, Serialize, Debug, PartialEq, PartialOrd)]
+pub struct NativeQuilMetadata {
+    /// Output qubit index relabeling due to SWAP insertion.
+    #[serde(deserialize_with = "deserialize_none_as_default")]
+    pub final_rewiring: Vec<u64>,
+    /// Maximum number of successive gates in the native Quil program.
+    pub gate_depth: Option<u64>,
+    /// Total number of gates in the native Quil program.
+    pub gate_volume: Option<u64>,
+    /// Maximum number of two-qubit gates in the native Quil program.
+    pub multiqubit_gate_depth: Option<u64>,
+    /// Rough estimate of native quil program length in seconds.
+    pub program_duration: Option<f64>,
+    /// Rough estimate of fidelity of the native Quil program.
+    pub program_fidelity: Option<f64>,
+    /// Total number of swaps in the native Quil program.
+    pub topological_swaps: Option<u64>,
+    /// The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for
+    /// protoquil compliant programs.
+    pub qpu_runtime_estimation: Option<f64>,
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
@@ -381,7 +432,7 @@ mod tests {
             CompilerOpts::default(),
         )
         .expect("Could not compile");
-        assert_eq!(output.to_string(true), EXPECTED_H0_OUTPUT);
+        assert_eq!(output.program.to_string(true), EXPECTED_H0_OUTPUT);
     }
 
     const BELL_STATE: &str = r##"DECLARE ro BIT[2]
@@ -403,7 +454,7 @@ MEASURE 1 ro[1]
             CompilerOpts::default(),
         )
         .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.to_string(true))
+        let mut results = crate::qvm::Execution::new(&output.program.to_string(true))
             .unwrap()
             .run(
                 10,
@@ -423,6 +474,20 @@ MEASURE 1 ro[1]
             assert_eq!(shot.len(), 2);
             assert_eq!(shot[0], shot[1]);
         }
+    }
+
+    #[tokio::test]
+    async fn test_compile_declare_only() {
+        let client = Qcs::load().await.unwrap_or_default();
+        let output = compile_program(
+            "DECLARE ro BIT[1]\n",
+            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
+            &client,
+            CompilerOpts::default(),
+        )
+        .expect("Should be able to compile");
+        assert_eq!(output.program.to_string(true), "DECLARE ro BIT[1]\n");
+        assert_ne!(output.native_quil_metadata, None);
     }
 
     #[tokio::test]

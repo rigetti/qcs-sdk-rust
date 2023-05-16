@@ -1,3 +1,30 @@
+## 0.6.0-rc.2
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Fixes
+
+- qvm_url is now set correctly when intializing a QCSClient (#296)
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.6.0-rc.1
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.6.0-rc.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
 ## 0.5.0
 
 ### Breaking Changes
