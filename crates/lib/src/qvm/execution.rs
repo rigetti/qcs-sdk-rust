@@ -4,7 +4,7 @@ use std::str::FromStr;
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::Program;
 
-use crate::{executable::Parameters, qvm::api::run_program};
+use crate::{executable::Parameters, qvm::run_program};
 
 use super::{Error, QvmResultData};
 

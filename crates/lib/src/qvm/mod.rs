@@ -1,14 +1,19 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{borrow::Cow, collections::HashMap};
+use std::{borrow::Cow, collections::HashMap, str::FromStr};
 
-use quil_rs::{program::ProgramError, Program};
-use serde::{Deserialize, Serialize};
+use qcs_api_client_common::ClientConfiguration;
+use quil_rs::{
+    instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
+    program::ProgramError,
+    Program,
+};
+use serde::Deserialize;
 
 pub(crate) use execution::Execution;
 
-use crate::RegisterData;
+use crate::{executable::Parameters, RegisterData};
 
 pub mod api;
 mod execution;
@@ -34,144 +39,77 @@ impl QvmResultData {
     }
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-#[serde(untagged)]
-pub(super) enum MultishotResponse {
-    Success(MultishotSuccess),
-    Failure(Failure),
+/// Run a Quil program on the QVM. The given [`Parameters`] are used to parameterize the value of
+/// memory locations across shots.
+pub async fn run(
+    quil: &str,
+    shots: u16,
+    readouts: &[Cow<'_, str>],
+    params: &Parameters,
+    config: &ClientConfiguration,
+) -> Result<QvmResultData, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("parsing a program to be executed on the qvm");
+    let program = Program::from_str(quil).map_err(Error::Parsing)?;
+    run_program(&program, shots, readouts, params, config).await
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-pub(super) struct MultishotSuccess {
-    #[serde(flatten)]
-    pub(super) registers: HashMap<String, RegisterData>,
-}
+/// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
+/// memory locations across shots.
+pub async fn run_program(
+    program: &Program,
+    shots: u16,
+    readouts: &[Cow<'_, str>],
+    params: &Parameters,
+    config: &ClientConfiguration,
+) -> Result<QvmResultData, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %shots,
+        ?readouts,
+        ?params,
+        "executing program on QVM"
+    );
+    if shots == 0 {
+        return Err(Error::ShotsMustBePositive);
+    }
 
-#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
-pub(super) struct Failure {
-    /// The message from QVM describing what went wrong.
-    pub(super) status: String,
-}
+    // Create a clone of the program so MOVE statements can be prepended to it
+    let mut program = program.clone();
 
-#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "kebab-case")]
-struct MultishotRequest<'request> {
-    quil_instructions: String,
-    addresses: HashMap<&'request str, bool>,
-    trials: u16,
-    #[serde(rename = "type")]
-    request_type: RequestType,
-}
-
-impl<'request> MultishotRequest<'request> {
-    fn new(program: &str, shots: u16, readouts: &'request [Cow<'request, str>]) -> Self {
-        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (v.as_ref(), true)).collect();
-        Self {
-            quil_instructions: program.to_string(),
-            addresses,
-            trials: shots,
-            request_type: RequestType::Multishot,
+    for (name, values) in params {
+        match program.memory_regions.get(name.as_ref()) {
+            Some(region) => {
+                if region.size.length != values.len() as u64 {
+                    return Err(Error::RegionSizeMismatch {
+                        name: name.clone(),
+                        declared: region.size.length,
+                        parameters: values.len(),
+                    });
+                }
+            }
+            None => {
+                return Err(Error::RegionNotFound { name: name.clone() });
+            }
+        }
+        for (index, value) in values.iter().enumerate() {
+            program.instructions.insert(
+                0,
+                Instruction::Move(Move {
+                    destination: ArithmeticOperand::MemoryReference(MemoryReference {
+                        name: name.to_string(),
+                        index: index as u64,
+                    }),
+                    source: ArithmeticOperand::LiteralReal(*value),
+                }),
+            );
         }
     }
-}
 
-#[derive(Serialize, Debug, Clone, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-struct MultishotMeasureRequest {
-    quil_instructions: String,
-    trials: u16,
-    // Qubits to measure
-    qubits: Vec<u64>,
-    // Simulated measurement noise for the X, Y, and Z axes.
-    measurement_noise: Option<(f64, f64, f64)>,
-    // Seed for the random number generator
-    rng_seed: Option<i64>,
-    #[serde(rename = "type")]
-    request_type: RequestType,
-}
-
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-#[serde(untagged)]
-pub(super) enum MultishotMeasureResponse {
-    Success(MultishotSuccess),
-    Failure(Failure),
-}
-
-impl MultishotMeasureRequest {
-    fn new(
-        program: &str,
-        shots: u16,
-        qubits: Vec<u64>,
-        measurement_noise: Option<(f64, f64, f64)>,
-        rng_seed: Option<i64>,
-    ) -> Self {
-        Self {
-            quil_instructions: program.to_string(),
-            trials: shots,
-            qubits,
-            measurement_noise,
-            rng_seed,
-            request_type: RequestType::MultishotMeasure,
-        }
-    }
-}
-
-#[derive(Serialize, Debug, Clone, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-struct ExpectationRequest {
-    state_preparation: String,
-    operators: Vec<String>,
-    rng_seed: Option<i64>,
-    #[serde(rename = "type")]
-    request_type: RequestType,
-}
-
-impl ExpectationRequest {
-    fn new(state_preparation: &str, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
-        Self {
-            state_preparation: state_preparation.to_string(),
-            operators,
-            rng_seed,
-            request_type: RequestType::Expectation,
-        }
-    }
-}
-
-#[derive(Serialize, Debug, Clone, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-struct WavefunctionRequest {
-    compiled_quil: String,
-    measurement_noise: Option<(f64, f64, f64)>,
-    gate_noise: Option<(f64, f64, f64)>,
-    rng_seed: Option<i64>,
-    #[serde(rename = "type")]
-    request_type: RequestType,
-}
-
-impl WavefunctionRequest {
-    fn new(
-        compiled_quil: &str,
-        measurement_noise: Option<(f64, f64, f64)>,
-        gate_noise: Option<(f64, f64, f64)>,
-        rng_seed: Option<i64>,
-    ) -> Self {
-        Self {
-            compiled_quil: compiled_quil.to_string(),
-            measurement_noise,
-            gate_noise,
-            rng_seed,
-            request_type: RequestType::Wavefunction,
-        }
-    }
-}
-
-#[derive(Serialize, Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
-#[serde(rename_all = "kebab-case")]
-enum RequestType {
-    Multishot,
-    MultishotMeasure,
-    Expectation,
-    Wavefunction,
+    let request = api::MultishotRequest::new(&program.to_string(true), shots, readouts);
+    api::run(&request, config)
+        .await
+        .map(|response| QvmResultData::from_memory_map(response.registers))
 }
 
 /// All of the errors that can occur when running a Quil program on QVM.
@@ -197,28 +135,4 @@ pub enum Error {
     },
     #[error("QVM reported a problem running your program: {message}")]
     Qvm { message: String },
-}
-
-#[cfg(test)]
-mod describe_request {
-    use std::borrow::Cow;
-
-    use super::MultishotRequest;
-
-    #[test]
-    fn it_includes_the_program() {
-        let program = "H 0";
-        let request = MultishotRequest::new(program, 1, &[]);
-        assert_eq!(&request.quil_instructions, program);
-    }
-
-    #[test]
-    fn it_uses_kebab_case_for_json() {
-        let request = MultishotRequest::new("H 0", 10, &[Cow::Borrowed("ro")]);
-        let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
-        assert_eq!(
-            serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
-            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0"})
-        );
-    }
 }
