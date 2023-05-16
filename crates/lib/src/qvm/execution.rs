@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 use qcs_api_client_common::ClientConfiguration;
@@ -6,7 +6,7 @@ use quil_rs::Program;
 
 use crate::{executable::Parameters, qvm::run_program};
 
-use super::{Error, QvmResultData};
+use super::{api::AddressRequest, Error, QvmResultData};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -30,9 +30,11 @@ impl Execution {
     /// # Arguments
     ///
     /// 1. `shots`: The number of times the program should run.
-    /// 2. `register`: The name of the register containing results that should be read out from QVM.
-    /// 3. `params`: Values to substitute for parameters in Quil.
-    /// 4. `config`: A configuration object containing the connection URL of QVM.
+    /// 2. `addresses`: A mapping of memory region names to an [`AddressRequest`] describing what
+    ///    values should be returned for that address.
+    /// 3. `register`: The name of the register containing results that should be read out from QVM.
+    /// 4. `params`: Values to substitute for parameters in Quil.
+    /// 5. `config`: A configuration object containing the connection URL of QVM.
     ///
     /// Returns: [`ExecutionResult`].
     ///
@@ -53,16 +55,18 @@ impl Execution {
     pub(crate) async fn run(
         &self,
         shots: u16,
-        readouts: &[Cow<'_, str>],
+        addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
         config: &ClientConfiguration,
     ) -> Result<QvmResultData, Error> {
-        run_program(&self.program, shots, readouts, params, config).await
+        run_program(&self.program, shots, addresses, params, config).await
     }
 }
 
 #[cfg(test)]
 mod describe_execution {
+    use std::collections::HashMap;
+
     use super::{ClientConfiguration, Execution, Parameters};
 
     #[tokio::test]
@@ -73,7 +77,7 @@ mod describe_execution {
         params.insert("doesnt_exist".into(), vec![0.0]);
 
         let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
+            .run(1, HashMap::new(), &params, &ClientConfiguration::default())
             .await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
@@ -90,7 +94,7 @@ mod describe_execution {
         params.insert("ro".into(), vec![0.0]);
 
         let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
+            .run(1, HashMap::new(), &params, &ClientConfiguration::default())
             .await;
         if let Err(e) = result {
             let err_string = e.to_string();

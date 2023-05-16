@@ -1,7 +1,7 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{borrow::Cow, collections::HashMap, str::FromStr};
+use std::{collections::HashMap, str::FromStr};
 
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
@@ -14,6 +14,8 @@ use serde::Deserialize;
 pub(crate) use execution::Execution;
 
 use crate::{executable::Parameters, RegisterData};
+
+use self::api::AddressRequest;
 
 pub mod api;
 mod execution;
@@ -44,7 +46,7 @@ impl QvmResultData {
 pub async fn run(
     quil: &str,
     shots: u16,
-    readouts: &[Cow<'_, str>],
+    readouts: HashMap<String, AddressRequest>,
     params: &Parameters,
     config: &ClientConfiguration,
 ) -> Result<QvmResultData, Error> {
@@ -56,17 +58,18 @@ pub async fn run(
 
 /// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
 /// memory locations across shots.
+#[allow(clippy::implicit_hasher)]
 pub async fn run_program(
     program: &Program,
     shots: u16,
-    readouts: &[Cow<'_, str>],
+    addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     config: &ClientConfiguration,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
         %shots,
-        ?readouts,
+        ?addresses,
         ?params,
         "executing program on QVM"
     );
@@ -106,7 +109,7 @@ pub async fn run_program(
         }
     }
 
-    let request = api::MultishotRequest::new(&program.to_string(true), shots, readouts);
+    let request = api::MultishotRequest::new(&program.to_string(true), shots, addresses);
     api::run(&request, config)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))

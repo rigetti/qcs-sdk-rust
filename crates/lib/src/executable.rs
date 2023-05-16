@@ -16,6 +16,7 @@ use crate::qpu::api::{JobId, JobTarget};
 use crate::qpu::client::Qcs;
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
+use crate::qvm::api::AddressRequest;
 use crate::{qpu, qvm};
 use quil_rs::program::ProgramError;
 use quil_rs::Program;
@@ -353,7 +354,15 @@ impl Executable<'_, '_> {
             qvm::Execution::new(&self.quil)?
         };
         let result = qvm
-            .run(self.shots, self.get_readouts(), &self.params, &config)
+            .run(
+                self.shots,
+                self.get_readouts()
+                    .iter()
+                    .map(|address| (address.to_string(), AddressRequest::All(true)))
+                    .collect(),
+                &self.params,
+                &config,
+            )
             .await;
         self.qvm = Some(qvm);
         result

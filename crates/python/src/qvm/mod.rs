@@ -4,13 +4,15 @@ use rigetti_pyo3::{
     pyo3::{exceptions::PyRuntimeError, prelude::*, Python},
     wrap_error, PyTryFrom, PyWrapper, ToPython, ToPythonError,
 };
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 use crate::{
     py_sync::py_function_sync_async, qpu::client::PyQcsClient, register_data::PyRegisterData,
 };
 
 mod api;
+
+use api::PyAddressRequest;
 
 wrap_error!(RustQvmError(qcs::qvm::Error));
 py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
@@ -51,15 +53,15 @@ py_function_sync_async! {
     async fn run(
         quil: String,
         shots: u16,
-        readouts: Vec<String>,
+        addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyQvmResultData> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let config = client.get_config();
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
-        let readouts = readouts.into_iter().map(|value| Cow::Owned(value)).collect::<Vec<Cow<'_, str>>>();
-        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, &readouts, &params, &config)
+        let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
+        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, addresses, &params, &config)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)?))

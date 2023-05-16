@@ -408,10 +408,12 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 
 #[cfg(test)]
 mod tests {
+    use crate::qvm::api::AddressRequest;
+
     use super::*;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use regex::Regex;
-    use std::{borrow::Cow, fs::File};
+    use std::fs::File;
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
 
@@ -458,7 +460,10 @@ MEASURE 1 ro[1]
             .unwrap()
             .run(
                 10,
-                &[Cow::Borrowed("ro")],
+                [("ro".to_string(), AddressRequest::All(true))]
+                    .iter()
+                    .cloned()
+                    .collect(),
                 &HashMap::default(),
                 &client.get_config(),
             )

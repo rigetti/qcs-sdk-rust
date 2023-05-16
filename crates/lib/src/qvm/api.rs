@@ -1,7 +1,7 @@
 //! This module provides types and functions for making API calls directly to the QVM.
 //! Consider [`super::run_program`] for higher level access to the QVM that allows
 //! for running parameterized programs.
-use std::{borrow::Cow, collections::HashMap};
+use std::collections::HashMap;
 
 use qcs_api_client_common::ClientConfiguration;
 use reqwest::Response;
@@ -64,11 +64,11 @@ pub async fn get_version_info(config: &ClientConfiguration) -> Result<String, Er
 
 /// Execute a program on the QVM.
 pub async fn run(
-    request: &MultishotRequest<'_>,
+    request: &MultishotRequest,
     config: &ClientConfiguration,
 ) -> Result<MultishotResponse, Error> {
     #[cfg(feature = "tracing")]
-    tracing::debug!(?request, "making a multishot request to the QVM");
+    tracing::debug!("making a multishot request to the QVM");
     let response = make_request(request, config).await?;
     match response.json::<QvmResponse<MultishotResponse>>().await {
         Ok(QvmResponse::Success(response)) => Ok(response),
@@ -85,22 +85,32 @@ pub async fn run(
 /// The request body needed to make a multishot [`run`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
-pub struct MultishotRequest<'request> {
+pub struct MultishotRequest {
     /// The Quil program to run.
     pub quil_instructions: String,
     /// The memory regions to include in the response.
-    pub addresses: HashMap<&'request str, bool>,
+    pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
     pub trials: u16,
     #[serde(rename = "type")]
     request_type: RequestType,
 }
 
-impl<'request> MultishotRequest<'request> {
+/// An enum encapsulating the different ways to request data back from the QVM for an address.
+#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum AddressRequest {
+    /// Set to `true` to request all values at this address, or `false` to explicitly exclude
+    /// the address.
+    All(bool),
+    /// A list of specific indices to get back for the address.
+    Indices(Vec<usize>),
+}
+
+impl MultishotRequest {
     /// Creates a new [`MultishotRequest`] with the given parameters.
     #[must_use]
-    pub fn new(program: &str, shots: u16, readouts: &'request [Cow<'request, str>]) -> Self {
-        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (v.as_ref(), true)).collect();
+    pub fn new(program: &str, shots: u16, addresses: HashMap<String, AddressRequest>) -> Self {
         Self {
             quil_instructions: program.to_string(),
             addresses,
@@ -315,20 +325,29 @@ where
 
 #[cfg(test)]
 mod describe_request {
-    use std::borrow::Cow;
+    use std::collections::HashMap;
+
+    use crate::qvm::api::AddressRequest;
 
     use super::MultishotRequest;
 
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = MultishotRequest::new(program, 1, &[]);
+        let request = MultishotRequest::new(program, 1, HashMap::new());
         assert_eq!(&request.quil_instructions, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
-        let request = MultishotRequest::new("H 0", 10, &[Cow::Borrowed("ro")]);
+        let request = MultishotRequest::new(
+            "H 0",
+            10,
+            [("ro".to_string(), AddressRequest::All(true))]
+                .iter()
+                .cloned()
+                .collect(),
+        );
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
