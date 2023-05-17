@@ -46,6 +46,13 @@ impl Qcs {
     pub async fn load() -> Result<Self, LoadError> {
         ClientConfiguration::load_default()
             .await
+            .or_else(|_| {
+                #[cfg(feature = "tracing")]
+                tracing::info!(
+                    "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
+                );
+                Ok(ClientConfiguration::default())
+            })
             .map(Self::with_config)
     }
 
