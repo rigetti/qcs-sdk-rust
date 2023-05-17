@@ -46,14 +46,14 @@ impl QvmResultData {
 pub async fn run(
     quil: &str,
     shots: u16,
-    readouts: HashMap<String, AddressRequest>,
+    addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     config: &ClientConfiguration,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
-    run_program(&program, shots, readouts, params, config).await
+    run_program(&program, shots, addresses, params, config).await
 }
 
 /// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
