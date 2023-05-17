@@ -1,6 +1,9 @@
-from typing import Dict, final
+from typing import Dict, final, List, Optional
 
+from ..qpu.client import QCSClient
 from .._register_data import RegisterData
+
+from .api import AddressRequest
 
 @final
 class QVMResultData:
@@ -27,4 +30,48 @@ class QVMError(RuntimeError):
     Errors that can occur when running a Quil program on the QVM.
     """
 
+    ...
+
+def run(
+    quil: str,
+    shots: int,
+    addresses: Dict[str, AddressRequest],
+    params: Dict[str, List[float]],
+    client: Optional[QCSClient] = None,
+) -> QVMResultData:
+    """
+    Runs the given program on the QVM.
+
+    :param quil: A quil program as a string.
+    :param shots: The number of times to run the program. Should be a value greater than zero.
+    :param readouts: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param params: A mapping of memory region names to their desired values.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+
+    :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
+
+    :raises QVMError: If one of the parameters is invalid, or if there was a problem communicating with the QVM server.
+    """
+    ...
+
+async def run_async(
+    quil: str,
+    shots: int,
+    addresses: Dict[str, AddressRequest],
+    params: Dict[str, List[float]],
+    client: Optional[QCSClient] = None,
+) -> QVMResultData:
+    """
+    Asynchronously runs the given program on the QVM.
+
+    :param quil: A quil program as a string.
+    :param shots: The number of times to run the program. Should be a value greater than zero.
+    :param readouts: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param params: A mapping of memory region names to their desired values.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+
+    :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
+
+    :raises QVMError: If one of the parameters is invalid, or if there was a problem communicating with the QVM server.
+    """
     ...

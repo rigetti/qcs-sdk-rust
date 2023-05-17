@@ -62,7 +62,7 @@ pub async fn get_version_info(config: &ClientConfiguration) -> Result<String, Er
         })
 }
 
-/// Execute a program on the QVM.
+/// Executes a program on the QVM.
 pub async fn run(
     request: &MultishotRequest,
     config: &ClientConfiguration,
@@ -128,8 +128,8 @@ pub struct MultishotResponse {
     pub registers: HashMap<String, RegisterData>,
 }
 
-/// Run and measure a program on the QVM, returning its results.
-pub async fn run_and_measure_program(
+/// Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial.
+pub async fn run_and_measure(
     request: &MultishotMeasureRequest,
     config: &ClientConfiguration,
 ) -> Result<MultishotMeasureResponse, Error> {
