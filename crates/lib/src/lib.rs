@@ -32,7 +32,6 @@
     semicolon_in_expressions_from_macros,
     trivial_casts,
     trivial_numeric_casts,
-    unaligned_references,
     unconditional_recursion,
     unreachable_pub,
     unused,

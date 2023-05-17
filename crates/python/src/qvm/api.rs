@@ -1,24 +1,31 @@
 use std::collections::HashMap;
 
 use super::RustQvmError;
-use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
+use crate::{
+    py_sync::py_function_sync_async, qpu::client::PyQcsClient, register_data::PyRegisterData,
+};
 
 use pyo3::{
     pymethods,
     types::{PyBool, PyInt, PyString},
     Py, Python,
 };
-use qcs::qvm::api::{AddressRequest, MultishotRequest};
+use qcs::{
+    qvm::api::{AddressRequest, MultishotRequest, MultishotResponse},
+    RegisterData,
+};
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_union_enum,
     pyo3::{pyfunction, PyResult},
-    PyTryFrom, ToPythonError,
+    PyTryFrom, PyWrapper, ToPythonError,
 };
 
 create_init_submodule! {
     funcs: [
         py_get_version_info,
-        py_get_version_info_async
+        py_get_version_info_async,
+        py_run,
+        py_run_async
     ],
 }
 
@@ -64,5 +71,28 @@ impl PyMultishotRequest {
             shots,
             HashMap::<String, AddressRequest>::py_try_from(py, &addresses)?,
         )))
+    }
+}
+
+py_wrap_data_struct! {
+    #[derive(Debug, PartialEq)]
+    PyMultishotResponse(MultishotResponse) as "MultishotResponse" {
+        registers: HashMap<String, RegisterData> => HashMap<String, PyRegisterData>
+    }
+}
+
+py_function_sync_async! {
+    #[pyfunction(client = "None")]
+    async fn run(
+        request: PyMultishotRequest,
+        client: Option<PyQcsClient>,
+    ) -> PyResult<PyMultishotResponse> {
+        let client = PyQcsClient::get_or_create_client(client).await?;
+        let config = client.get_config();
+        qcs::qvm::api::run(request.as_inner(), &config)
+            .await
+            .map_err(RustQvmError::from)
+            .map_err(RustQvmError::to_py_err)
+            .map(|response| PyMultishotResponse(response))
     }
 }
