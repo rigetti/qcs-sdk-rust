@@ -52,7 +52,7 @@ impl Qcs {
             .or_else(|_| {
                 #[cfg(feature = "tracing")]
                 tracing::info!(
-                    "No QCS client configuration found, only generic QVMs will be accessible."
+                    "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
                 );
                 Ok(ClientConfiguration::default())
             })
