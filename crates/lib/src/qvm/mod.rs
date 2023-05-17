@@ -58,7 +58,6 @@ pub async fn run(
 
 /// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
 /// memory locations across shots.
-#[allow(clippy::implicit_hasher)]
 pub async fn run_program(
     program: &Program,
     shots: u16,

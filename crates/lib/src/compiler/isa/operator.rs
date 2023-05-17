@@ -85,7 +85,7 @@ mod describe_operator {
             "parameters": ["_"]
         });
         let serialized =
-            serde_json::to_value(&gate_op).expect("Could not serialize Operation::Gate");
+            serde_json::to_value(gate_op).expect("Could not serialize Operation::Gate");
         assert_eq!(serialized, expected);
     }
 
@@ -135,7 +135,7 @@ mod describe_operator {
             "target": "_"
         });
         let serialized =
-            serde_json::to_value(&measure).expect("Could not serialize Operation::Gate");
+            serde_json::to_value(measure).expect("Could not serialize Operation::Gate");
         assert_eq!(serialized, expected);
     }
 
@@ -159,7 +159,7 @@ mod describe_operator {
             "target": null
         });
         let serialized =
-            serde_json::to_value(&measure).expect("Could not serialize Operation::Gate");
+            serde_json::to_value(measure).expect("Could not serialize Operation::Gate");
         assert_eq!(serialized, expected);
     }
 
