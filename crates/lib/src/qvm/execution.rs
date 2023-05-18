@@ -59,7 +59,17 @@ impl Execution {
         params: &Parameters,
         config: &ClientConfiguration,
     ) -> Result<QvmResultData, Error> {
-        run_program(&self.program, shots, addresses, params, config).await
+        run_program(
+            &self.program,
+            shots,
+            addresses,
+            params,
+            None,
+            None,
+            None,
+            config,
+        )
+        .await
     }
 }
 

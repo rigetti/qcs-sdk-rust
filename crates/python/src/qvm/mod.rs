@@ -55,13 +55,16 @@ py_function_sync_async! {
         shots: u16,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyQvmResultData> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let config = client.get_config();
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
-        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, addresses, &params, &config)
+        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, addresses, &params, measurement_noise, gate_noise, rng_seed, &config)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)?))

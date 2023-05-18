@@ -71,11 +71,14 @@ py_wrap_union_enum! {
 impl_repr!(PyAddressRequest);
 
 py_wrap_data_struct! {
-    #[derive(Debug, PartialEq, Eq)]
+    #[derive(Debug, PartialEq)]
     PyMultishotRequest(MultishotRequest) as "MultishotRequest" {
         quil_instructions: String => Py<PyString>,
         addresses: HashMap<String, AddressRequest> => HashMap<String, PyAddressRequest>,
-        trials: u16 => Py<PyInt>
+        trials: u16 => Py<PyInt>,
+        measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
+        gate_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
+        rng_seed: Option<i64> => Option<Py<PyInt>>
     }
 }
 impl_repr!(PyMultishotRequest);
@@ -88,11 +91,17 @@ impl PyMultishotRequest {
         program: &str,
         shots: u16,
         addresses: HashMap<String, PyAddressRequest>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
     ) -> PyResult<Self> {
         Ok(Self(MultishotRequest::new(
             program,
             shots,
             HashMap::<String, AddressRequest>::py_try_from(py, &addresses)?,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
         )))
     }
 }
@@ -126,6 +135,7 @@ py_wrap_data_struct! {
         trials: u16 => Py<PyInt>,
         qubits: Vec<u64> => Vec<Py<PyInt>>,
         measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
+        gate_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
         rng_seed: Option<i64> => Option<Py<PyInt>>
     }
 }
@@ -139,6 +149,7 @@ impl PyMultishotMeasureRequest {
         shots: u16,
         qubits: Vec<u64>,
         measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> PyResult<Self> {
         Ok(Self(MultishotMeasureRequest::new(
@@ -146,6 +157,7 @@ impl PyMultishotMeasureRequest {
             shots,
             qubits,
             measurement_noise,
+            gate_noise,
             rng_seed,
         )))
     }

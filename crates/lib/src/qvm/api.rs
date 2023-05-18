@@ -83,7 +83,7 @@ pub async fn run(
 }
 
 /// The request body needed to make a multishot [`run`] request to the QVM.
-#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct MultishotRequest {
     /// The Quil program to run.
@@ -92,6 +92,12 @@ pub struct MultishotRequest {
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
     pub trials: u16,
+    /// Simulated measurement noise for the X, Y, and Z axes.
+    pub measurement_noise: Option<(f64, f64, f64)>,
+    /// Simulated gate noise for the X, Y, and Z axes.
+    pub gate_noise: Option<(f64, f64, f64)>,
+    /// An optional seed for the random number generator.
+    pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
 }
@@ -110,11 +116,21 @@ pub enum AddressRequest {
 impl MultishotRequest {
     /// Creates a new [`MultishotRequest`] with the given parameters.
     #[must_use]
-    pub fn new(program: &str, shots: u16, addresses: HashMap<String, AddressRequest>) -> Self {
+    pub fn new(
+        program: &str,
+        trials: u16,
+        addresses: HashMap<String, AddressRequest>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
         Self {
             quil_instructions: program.to_string(),
             addresses,
-            trials: shots,
+            trials,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
             request_type: RequestType::Multishot,
         }
     }
@@ -161,6 +177,8 @@ pub struct MultishotMeasureRequest {
     pub qubits: Vec<u64>,
     /// Simulated measurement noise for the X, Y, and Z axes.
     pub measurement_noise: Option<(f64, f64, f64)>,
+    /// Simulated gate noise for the X, Y, and Z axes.
+    pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
@@ -175,6 +193,7 @@ impl MultishotMeasureRequest {
         shots: u16,
         qubits: Vec<u64>,
         measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
@@ -182,6 +201,7 @@ impl MultishotMeasureRequest {
             trials: shots,
             qubits,
             measurement_noise,
+            gate_noise,
             rng_seed,
             request_type: RequestType::MultishotMeasure,
         }
@@ -334,7 +354,7 @@ mod describe_request {
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = MultishotRequest::new(program, 1, HashMap::new());
+        let request = MultishotRequest::new(program, 1, HashMap::new(), None, None, None);
         assert_eq!(&request.quil_instructions, program);
     }
 
@@ -347,11 +367,14 @@ mod describe_request {
                 .iter()
                 .cloned()
                 .collect(),
+            Some((1.0, 2.0, 3.0)),
+            Some((3.0, 2.0, 1.0)),
+            Some(100),
         );
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
-            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0"})
+            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0", "measurement-noise": [1.0, 2.0, 3.0], "gate-noise": [3.0, 2.0, 1.0], "rng-seed": 100})
         );
     }
 }

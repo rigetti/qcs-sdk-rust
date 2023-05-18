@@ -48,12 +48,25 @@ pub async fn run(
     shots: u16,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
+    measurement_noise: Option<(f64, f64, f64)>,
+    gate_noise: Option<(f64, f64, f64)>,
+    rng_seed: Option<i64>,
     config: &ClientConfiguration,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
-    run_program(&program, shots, addresses, params, config).await
+    run_program(
+        &program,
+        shots,
+        addresses,
+        params,
+        measurement_noise,
+        gate_noise,
+        rng_seed,
+        config,
+    )
+    .await
 }
 
 /// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
@@ -63,6 +76,9 @@ pub async fn run_program(
     shots: u16,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
+    measurement_noise: Option<(f64, f64, f64)>,
+    gate_noise: Option<(f64, f64, f64)>,
+    rng_seed: Option<i64>,
     config: &ClientConfiguration,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
@@ -108,7 +124,14 @@ pub async fn run_program(
         }
     }
 
-    let request = api::MultishotRequest::new(&program.to_string(true), shots, addresses);
+    let request = api::MultishotRequest::new(
+        &program.to_string(true),
+        shots,
+        addresses,
+        measurement_noise,
+        gate_noise,
+        rng_seed,
+    );
     api::run(&request, config)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
