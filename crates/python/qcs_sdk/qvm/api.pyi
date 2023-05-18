@@ -1,8 +1,8 @@
 from typing import Dict, List, Optional, final, Union, Tuple
 from typing_extensions import Self
 
-from ..qpu.client import QCSClient
-from .._register_data import RegisterData
+from qcs_sdk import RegisterData
+from qcs_sdk.qpu.client import QCSClient
 
 def get_version_info(client: Optional[QCSClient] = None) -> str:
     """

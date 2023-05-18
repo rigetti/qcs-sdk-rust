@@ -13,7 +13,7 @@ readme = "./README.md"
 
 [lib]
 name = "qcs_sdk"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 qcs = { path = "../lib" }

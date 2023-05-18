@@ -293,7 +293,7 @@ def conjugate_pauli_by_clifford(
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
-    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\\dagger}.
 
     :param request: Pauli Term conjugation request.
     :param client: Optional client configuration. If ``None``, a default one is created.
@@ -308,7 +308,7 @@ async def conjugate_pauli_by_clifford_async(
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
-    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\\dagger}.
     (async analog of ``conjugate_pauli_by_clifford``)
 
     :param request: Pauli Term conjugation request.

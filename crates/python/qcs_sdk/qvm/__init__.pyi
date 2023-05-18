@@ -1,9 +1,10 @@
 from typing import Dict, final, List, Optional
 
-from ..qpu.client import QCSClient
-from .._register_data import RegisterData
+from qcs_sdk import RegisterData, QCSClient
 
 from .api import AddressRequest
+
+from . import api
 
 @final
 class QVMResultData:
