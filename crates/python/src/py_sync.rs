@@ -19,9 +19,15 @@
 /// assert say_hello("Rigetti") == "hello Rigetti"
 /// ```
 macro_rules! py_sync {
-    ($body: expr) => {{
+    ($py: ident, $body: expr) => {{
         let runtime = ::pyo3_asyncio::tokio::get_runtime();
         let handle = runtime.spawn($body);
+        loop {
+            if handle.is_finished() {
+                break;
+            }
+            $py.check_signals()?;
+        }
         runtime
             .block_on(handle)
             .map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?
@@ -82,8 +88,8 @@ macro_rules! py_function_sync_async {
         ::paste::paste! {
         $(#[$meta])+
         #[pyo3(name = $name "")]
-        pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
-            $crate::py_sync::py_sync!($name($($arg),*))
+        pub fn [< py_ $name >](py: ::pyo3::Python<'_> $(, $arg: $kind)*) $(-> $ret)? {
+            $crate::py_sync::py_sync!(py, $name($($arg),*))
         }
 
         $(#[$meta])+
