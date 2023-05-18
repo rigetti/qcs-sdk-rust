@@ -10,7 +10,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 
 use super::isa::{self, Compiler};
-use super::rpcq;
+use super::rpcq::{self, send_recv, RPCRequest};
 
 use crate::qpu::client::Qcs;
 
@@ -50,14 +50,8 @@ pub async fn compile_program(
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
-    let request =
-        rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
-    let mut rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client
-        .run_request::<_, QuilToNativeQuilResponse>(&request)
-        .await
-    {
+    let request = RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
+    match send_recv::<_, QuilToNativeQuilResponse>(endpoint, &request).await {
         Ok(response) => Ok(CompilationResult {
             program: Program::from_str(&response.quil).map_err(Error::Parse)?,
             native_quil_metadata: response.metadata,
@@ -133,14 +127,8 @@ pub async fn get_version_info(client: &Qcs) -> Result<String, Error> {
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let binding: HashMap<String, String> = HashMap::new();
-    let request = rpcq::RPCRequest::new("get_version_info", &binding);
-    let mut rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    println!("Hello");
-    match rpcq_client
-        .run_request::<_, QuilcVersionResponse>(&request)
-        .await
-    {
+    let request = RPCRequest::new("get_version_info", &binding);
+    match send_recv::<_, QuilcVersionResponse>(endpoint, &request).await {
         Ok(response) => Ok(response.quilc),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -205,13 +193,8 @@ pub async fn conjugate_pauli_by_clifford(
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let request: ConjugatePauliByCliffordRequest = request.into();
-    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
-    let mut rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client
-        .run_request::<_, ConjugatePauliByCliffordResponse>(&request)
-        .await
-    {
+    let request = RPCRequest::new("conjugate_pauli_by_clifford", &request);
+    match send_recv::<_, ConjugatePauliByCliffordResponse>(endpoint, &request).await {
         Ok(response) => Ok(response),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -276,13 +259,8 @@ pub async fn generate_randomized_benchmarking_sequence(
     let config = client.get_config();
     let endpoint = config.quilc_url();
     let request: GenerateRandomizedBenchmarkingSequenceRequest = request.into();
-    let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
-    let mut rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client
-        .run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request)
-        .await
-    {
+    let request = RPCRequest::new("generate_rb_sequence", &request);
+    match send_recv::<_, GenerateRandomizedBenchmarkingSequenceResponse>(endpoint, &request).await {
         Ok(response) => Ok(response),
         Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
     }
@@ -509,7 +487,9 @@ MEASURE 1 ro[1]
     #[tokio::test(flavor = "multi_thread")]
     async fn get_version_info_from_quilc() {
         let client = Qcs::load().await.unwrap_or_default();
-        let version = get_version_info(&client).await.expect("Should get version info from quilc");
+        let version = get_version_info(&client)
+            .await
+            .expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }

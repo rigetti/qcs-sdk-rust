@@ -1,3 +1,6 @@
+use crate::py_sync::py_function_sync_async;
+use crate::qpu::client::PyQcsClient;
+use crate::qpu::isa::PyInstructionSetArchitecture;
 use qcs::compiler::quilc::{
     CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
     GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
@@ -15,10 +18,6 @@ use rigetti_pyo3::{
     },
     wrap_error, PyWrapper, ToPythonError,
 };
-
-use crate::py_sync::py_function_sync_async;
-use crate::qpu::client::PyQcsClient;
-use crate::qpu::isa::PyInstructionSetArchitecture;
 
 create_init_submodule! {
     classes: [
@@ -110,6 +109,7 @@ py_function_sync_async! {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let options = options.unwrap_or_default();
         qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
+            .await
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
@@ -190,8 +190,9 @@ py_function_sync_async! {
     async fn get_version_info(
         client: Option<PyQcsClient>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await.unwrap();
         qcs::compiler::quilc::get_version_info(&client)
+            .await
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
     }
@@ -245,6 +246,7 @@ py_function_sync_async! {
     ) -> PyResult<PyConjugatePauliByCliffordResponse> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::compiler::quilc::conjugate_pauli_by_clifford(&client, request.into())
+            .await
             .map(PyConjugatePauliByCliffordResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
@@ -295,6 +297,7 @@ py_function_sync_async! {
     ) -> PyResult<PyGenerateRandomizedBenchmarkingSequenceResponse> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client, request.into())
+            .await
             .map(PyGenerateRandomizedBenchmarkingSequenceResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
