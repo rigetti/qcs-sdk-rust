@@ -7,13 +7,13 @@ use crate::{
 
 use pyo3::{
     pymethods,
-    types::{PyBool, PyBytes, PyFloat, PyInt, PyString},
+    types::{PyBool, PyFloat, PyInt, PyString},
     Py, Python,
 };
 use qcs::{
     qvm::api::{
         AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
-        MultishotResponse, WavefunctionRequest, WavefunctionResponse,
+        MultishotResponse, WavefunctionRequest,
     },
     RegisterData,
 };
@@ -30,8 +30,7 @@ create_init_submodule! {
         PyMultishotResponse,
         PyMultishotMeasureRequest,
         PyExpectationRequest,
-        PyWavefunctionRequest,
-        PyWavefunctionResponse
+        PyWavefunctionRequest
     ],
     funcs: [
         py_get_version_info,
@@ -232,21 +231,13 @@ impl PyWavefunctionRequest {
     }
 }
 
-py_wrap_data_struct! {
-    PyWavefunctionResponse(WavefunctionResponse) as "WavefunctionResponse" {
-        wavefunction: Vec<u8> => Py<PyBytes>
-    }
-}
-impl_repr!(PyWavefunctionResponse);
-
 py_function_sync_async! {
     #[pyfunction(client = "None")]
-    async fn get_wavefunction(request: PyWavefunctionRequest, client: Option<PyQcsClient>) -> PyResult<PyWavefunctionResponse> {
+    async fn get_wavefunction(request: PyWavefunctionRequest, client: Option<PyQcsClient>) -> PyResult<Vec<u8>> {
         let config = PyQcsClient::get_or_create_client(client).await?.get_config();
         qcs::qvm::api::get_wavefunction(request.as_inner(), &config)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
-            .map(|response| PyWavefunctionResponse(response))
     }
 }

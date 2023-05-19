@@ -83,3 +83,12 @@ Z 2
 
     assert_eq!(expectations.len(), operators.len());
 }
+
+#[tokio::test]
+async fn test_get_wavefunction() {
+    let config = ClientConfiguration::default();
+    let request = api::WavefunctionRequest::new(PROGRAM, None, None, Some(0));
+    api::get_wavefunction(&request, &config)
+        .await
+        .expect("Should be able to get wavefunction");
+}

@@ -256,17 +256,25 @@ impl ExpectationRequest {
 pub async fn get_wavefunction(
     request: &WavefunctionRequest,
     config: &ClientConfiguration,
-) -> Result<WavefunctionResponse, Error> {
+) -> Result<Vec<u8>, Error> {
     let response = make_request(request, config).await?;
-    match response.json::<QvmResponse<WavefunctionResponse>>().await {
-        Ok(QvmResponse::Success(response)) => Ok(response),
-        Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
-            message: response.status,
-        }),
-        Err(source) => Err(Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
-            source,
-        }),
+    if response.status() == 200 {
+        response
+            .bytes()
+            .await
+            .map(Into::into)
+            .map_err(|source| Error::QvmCommunication {
+                qvm_url: config.qvm_url().into(),
+                source,
+            })
+    } else {
+        match response.json::<Failure>().await {
+            Ok(Failure { status: message }) => Err(Error::Qvm { message }),
+            Err(source) => Err(Error::QvmCommunication {
+                qvm_url: config.qvm_url().into(),
+                source,
+            }),
+        }
     }
 }
 
@@ -303,13 +311,6 @@ impl WavefunctionRequest {
             request_type: RequestType::Wavefunction,
         }
     }
-}
-
-/// The response body returned by the QVM for a [`get_wavefunction`] request.
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct WavefunctionResponse {
-    /// Bit-packed wavefunction string
-    pub wavefunction: Vec<u8>,
 }
 
 async fn make_request<T>(request: &T, config: &ClientConfiguration) -> Result<Response, Error>

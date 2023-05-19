@@ -143,24 +143,15 @@ class MultishotMeasureRequest:
     @rng_seed.setter
     def rng_seed(self, value: Optional[int]): ...
 
-@final
-class MultishotMeasureResponse:
-    """The response body returned by the QVM after a multishot ``run_and_measure`` request."""
-
-    @property
-    def results(self) -> Dict[str, List[List[int]]]: ...
-    @results.setter
-    def results(self, value: Dict[str, List[List[int]]]): ...
-
 def run_and_measure(
     request: MultishotMeasureRequest, client: Optional[QCSClient] = None
-) -> MultishotMeasureResponse:
+) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
 
 def run_and_measure_async(
     request: MultishotMeasureRequest, client: Optional[QCSClient] = None
-) -> MultishotMeasureResponse:
+) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
 
@@ -185,24 +176,15 @@ class ExpectationRequest:
     @rng_seed.setter
     def rng_seed(self, value: Optional[int]): ...
 
-@final
-class ExpectationResponse:
-    """The response body returned by the QVM after a ``measure_expectation`` request."""
-
-    @property
-    def expectations(self) -> List[float]: ...
-    @expectations.setter
-    def expectations(self, expectations: List[float]): ...
-
 def measure_expectation(
     request: ExpectationRequest, client: Optional[QCSClient] = None
-) -> ExpectationResponse:
+) -> List[float]:
     """Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state."""
     ...
 
 def measure_expectation_async(
     request: ExpectationRequest, client: Optional[QCSClient] = None
-) -> ExpectationResponse:
+) -> List[float]:
     """Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state."""
     ...
 
@@ -234,23 +216,14 @@ class WavefunctionRequest:
     @rng_seed.setter
     def rng_seed(self, value: Optional[int]): ...
 
-@final
-class WavefunctionResponse:
-    """The response body returned by the QVM after a ``get_wavefunction`` request."""
-
-    @property
-    def wavefunction(self) -> bytes: ...
-    @wavefunction.setter
-    def wavefunction(self, value: bytes): ...
-
 def get_wavefunction(
     request: WavefunctionRequest, client: Optional[QCSClient] = None
-) -> WavefunctionResponse:
+) -> bytes:
     """Executes a program on the QVM, returning the resulting wavefunction."""
     ...
 
 def get_wavefunction_async(
     request: WavefunctionRequest, client: Optional[QCSClient] = None
-) -> WavefunctionResponse:
-    """Executes a program on the QVM, returning the resulting wavefunction."""
+) -> bytes:
+    """Executes a program on the QVM, returning the resulting wavefunction as a bit packed string."""
     ...
