@@ -224,6 +224,6 @@ def get_wavefunction(
 
 def get_wavefunction_async(
     request: WavefunctionRequest, client: Optional[QCSClient] = None
-) -> bytes:
-    """Executes a program on the QVM, returning the resulting wavefunction as a bit packed string."""
+) -> List[int]:
+    """Executes a program on the QVM, returning the resulting list of bytes."""
     ...
