@@ -54,7 +54,7 @@ async fn test_run_and_measure() {
     let request = api::MultishotMeasureRequest::new(
         PROGRAM,
         5,
-        vec![0, 1],
+        &[0, 1],
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
         Some(1),
@@ -64,4 +64,22 @@ async fn test_run_and_measure() {
         .expect("Should be able to run and measure");
     assert_eq!(qubits.len(), 5);
     assert_eq!(qubits[0].len(), 2);
+}
+
+#[tokio::test]
+async fn test_measure_expectation() {
+    let config = ClientConfiguration::default();
+    let prep_program = r##"
+CSWAP 0 1 2
+XY(-1.0) 0 1
+Z 2
+"##;
+    let operators = vec!["X 0\nY 1\n".to_string(), "Z 2\n".to_string()];
+    let request = api::ExpectationRequest::new(prep_program, &operators, None);
+
+    let expectations = api::measure_expectation(&request, &config)
+        .await
+        .expect("Should be able to measure expectation");
+
+    assert_eq!(expectations.len(), operators.len());
 }

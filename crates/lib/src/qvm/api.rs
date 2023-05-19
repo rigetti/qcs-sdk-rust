@@ -152,8 +152,6 @@ pub async fn run_and_measure(
     config: &ClientConfiguration,
 ) -> Result<Vec<Vec<i64>>, Error> {
     let response = make_request(request, config).await?;
-    dbg!(&response.text().await.unwrap());
-    let response = make_request(request, config).await?;
     match response.json::<QvmResponse<Vec<Vec<i64>>>>().await {
         Ok(QvmResponse::Success(response)) => Ok(response),
         Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
@@ -192,7 +190,7 @@ impl MultishotMeasureRequest {
     pub fn new(
         program: &str,
         shots: u16,
-        qubits: Vec<u64>,
+        qubits: &[u64],
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
@@ -200,7 +198,7 @@ impl MultishotMeasureRequest {
         Self {
             quil_instructions: program.to_string(),
             trials: shots,
-            qubits,
+            qubits: qubits.to_vec(),
             measurement_noise,
             gate_noise,
             rng_seed,
@@ -213,9 +211,9 @@ impl MultishotMeasureRequest {
 pub async fn measure_expectation(
     request: &ExpectationRequest,
     config: &ClientConfiguration,
-) -> Result<ExpectationResponse, Error> {
+) -> Result<Vec<f64>, Error> {
     let response = make_request(request, config).await?;
-    match response.json::<QvmResponse<ExpectationResponse>>().await {
+    match response.json::<QvmResponse<Vec<f64>>>().await {
         Ok(QvmResponse::Success(response)) => Ok(response),
         Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
             message: response.status,
@@ -244,21 +242,14 @@ pub struct ExpectationRequest {
 impl ExpectationRequest {
     /// Creates a new [`ExpectationRequest`] using the given parameters.
     #[must_use]
-    pub fn new(state_preparation: &str, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
+    pub fn new(state_preparation: &str, operators: &[String], rng_seed: Option<i64>) -> Self {
         Self {
             state_preparation: state_preparation.to_string(),
-            operators,
+            operators: operators.to_vec(),
             rng_seed,
             request_type: RequestType::Expectation,
         }
     }
-}
-
-/// The response body returned by the QVM for a [`measure_expectation`] request.
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct ExpectationResponse {
-    /// The expectation value measured for each requested Pauli term.
-    pub expectations: Vec<f64>,
 }
 
 /// Run a program and retrieve the resulting wavefunction.

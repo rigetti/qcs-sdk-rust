@@ -12,8 +12,8 @@ use pyo3::{
 };
 use qcs::{
     qvm::api::{
-        AddressRequest, ExpectationRequest, ExpectationResponse, MultishotMeasureRequest,
-        MultishotRequest, MultishotResponse, WavefunctionRequest, WavefunctionResponse,
+        AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
+        MultishotResponse, WavefunctionRequest, WavefunctionResponse,
     },
     RegisterData,
 };
@@ -30,7 +30,6 @@ create_init_submodule! {
         PyMultishotResponse,
         PyMultishotMeasureRequest,
         PyExpectationRequest,
-        PyExpectationResponse,
         PyWavefunctionRequest,
         PyWavefunctionResponse
     ],
@@ -153,7 +152,7 @@ impl PyMultishotMeasureRequest {
         Ok(Self(MultishotMeasureRequest::new(
             program,
             shots,
-            qubits,
+            &qubits,
             measurement_noise,
             gate_noise,
             rng_seed,
@@ -188,28 +187,20 @@ impl PyExpectationRequest {
     pub fn new(state_preparation: &str, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
         Self(ExpectationRequest::new(
             state_preparation,
-            operators,
+            &operators,
             rng_seed,
         ))
     }
 }
 
-py_wrap_data_struct! {
-    PyExpectationResponse(ExpectationResponse) as "ExpectationResponse" {
-        expectations: Vec<f64> => Vec<Py<PyFloat>>
-    }
-}
-impl_repr!(PyExpectationResponse);
-
 py_function_sync_async! {
     #[pyfunction(client = "None")]
-    async fn measure_expectation(request: PyExpectationRequest, client: Option<PyQcsClient>) -> PyResult<PyExpectationResponse> {
+    async fn measure_expectation(request: PyExpectationRequest, client: Option<PyQcsClient>) -> PyResult<Vec<f64>> {
         let config = PyQcsClient::get_or_create_client(client).await?.get_config();
         qcs::qvm::api::measure_expectation(request.as_inner(), &config)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
-            .map(|response| PyExpectationResponse(response))
     }
 }
 
