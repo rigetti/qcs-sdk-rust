@@ -1,4 +1,4 @@
-from typing import List, Optional, final
+from typing import Sequence, Optional, final
 
 from ..qpu.isa import InstructionSetArchitecture
 from ..qpu.client import QCSClient
@@ -69,21 +69,21 @@ class PauliTerm:
     def __new__(
         cls,
         /,
-        indices: List[int],
-        symbols: List[str],
+        indices: Sequence[int],
+        symbols: Sequence[str],
     ) -> "PauliTerm": ...
     @property
-    def indices(self) -> List[int]:
+    def indices(self) -> Sequence[int]:
         """Qubit indices onto which the factors of the Pauli Term are applied."""
         ...
     @indices.setter
-    def indices(self, value: List[int]): ...
+    def indices(self, value: Sequence[int]): ...
     @property
-    def symbols(self) -> List[str]:
+    def symbols(self) -> Sequence[str]:
         """Ordered factors of the Pauli Term."""
         ...
     @symbols.setter
-    def symbols(self, value: List[str]): ...
+    def symbols(self, value: Sequence[str]): ...
 
 @final
 class ConjugateByCliffordRequest:
@@ -130,7 +130,7 @@ class RandomizedBenchmarkingRequest:
         /,
         depth: int,
         qubits: int,
-        gateset: List[str],
+        gateset: Sequence[str],
         seed: Optional[int] = None,
         interleaver: Optional[str] = None,
     ) -> "RandomizedBenchmarkingRequest": ...
@@ -147,11 +147,11 @@ class RandomizedBenchmarkingRequest:
     @qubits.setter
     def qubits(self, value: int): ...
     @property
-    def gateset(self) -> List[str]:
-        """List of Quil programs, each describing a Clifford."""
+    def gateset(self) -> Sequence[str]:
+        """Sequence of Quil programs, each describing a Clifford."""
         ...
     @gateset.setter
-    def gateset(self, value: List[str]): ...
+    def gateset(self, value: Sequence[str]): ...
     @property
     def seed(self) -> Optional[int]:
         """PRNG seed. Set this to guarantee repeatable results."""
@@ -170,8 +170,8 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
     """Randomly generated benchmarking sequence response."""
 
     @property
-    def sequence(self) -> List[List[int]]:
-        """List of Cliffords, each expressed as a list of generator indices."""
+    def sequence(self) -> Sequence[Sequence[int]]:
+        """Sequence of Cliffords, each expressed as a list of generator indices."""
         ...
 
 def compile_program(
@@ -229,7 +229,7 @@ class NativeQuilMetadata:
     """
 
     @property
-    def final_rewiring(self) -> List[int]:
+    def final_rewiring(self) -> Sequence[int]:
         """
         Output qubit index relabeling due to SWAP insertion.
         """

@@ -2,16 +2,15 @@ from typing import Dict, Optional, final
 
 from .client import QCSClient
 
-
 class GetQuiltCalibrationsError(RuntimeError):
     """An error occured while fetching Quil-T calibrations."""
-    ...
 
+    ...
 
 class TranslationError(RuntimeError):
     """An error occured while translating a program."""
-    ...
 
+    ...
 
 @final
 class QuiltCalibrations:
@@ -23,14 +22,12 @@ class QuiltCalibrations:
         ...
     @quilt.setter
     def quilt(self, value: str): ...
-
     @property
     def settings_timestamp(self) -> Optional[str]:
         """ISO8601 timestamp of the settings used to generate these calibrations."""
         ...
     @settings_timestamp.setter
     def settings_timestamp(self, value: Optional[str]): ...
-
 
 @final
 class TranslationResult:
@@ -42,12 +39,10 @@ class TranslationResult:
     def program(self) -> str:
         """The translated programs."""
         ...
-
     @property
     def ro_sources(self) -> Optional[Dict[str, str]]:
         """A mapping from the program's memory references to the key used to index the results map."""
         ...
-
 
 def get_quilt_calibrations(
     quantum_processor_id: str,
@@ -67,7 +62,6 @@ def get_quilt_calibrations(
     :raises GetQuiltCalibrationsError: If there was a problem fetching Quil-T calibrations.
     """
     ...
-
 
 async def get_quilt_calibrations_async(
     quantum_processor_id: str,
@@ -89,7 +83,6 @@ async def get_quilt_calibrations_async(
     """
     ...
 
-
 def translate(
     native_quil: str,
     num_shots: int,
@@ -110,7 +103,6 @@ def translate(
     :raises TranslationError: If the `native_quil` program could not be translated.
     """
     ...
-
 
 async def translate_async(
     native_quil: str,

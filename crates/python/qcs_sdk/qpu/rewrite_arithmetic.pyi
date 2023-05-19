@@ -1,5 +1,4 @@
-from typing import Dict, List, final
-
+from typing import Dict, Sequence, final
 
 class RewriteArithmeticError(RuntimeError):
     """
@@ -8,8 +7,8 @@ class RewriteArithmeticError(RuntimeError):
     - The Quil program could not be parsed.
     - Parametric arithmetic in the Quil program could not be rewritten.
     """
-    ...
 
+    ...
 
 class BuildPatchValuesError(RuntimeError):
     """
@@ -18,8 +17,8 @@ class BuildPatchValuesError(RuntimeError):
     - Failed to interpret the recalculation values.
     - Failed to build patch values.
     """
-    ...
 
+    ...
 
 @final
 class RewriteArithmeticResult:
@@ -33,27 +32,25 @@ class RewriteArithmeticResult:
     def program(self) -> str:
         """The rewritten program."""
         ...
-
     @property
-    def recalculation_table(self) -> List[str]:
+    def recalculation_table(self) -> Sequence[str]:
         """
         The expressions used to fill-in the `__SUBST` memory location.
-        
+
         The expression index in this vec is the same as that in `__SUBST`.
         """
         ...
 
 def build_patch_values(
-    recalculation_table: List[str],
-    memory: Dict[str, List[float]],
-) -> Dict[str, List[float]]:
+    recalculation_table: Sequence[str],
+    memory: Dict[str, Sequence[float]],
+) -> Dict[str, Sequence[float]]:
     """
     Evaluate the expressions in `recalculation_table` using the numeric values provided in `memory`.
 
     :raises BuildPatchValuesError: If patch values could not be built.
     """
     ...
-
 
 def rewrite_arithmetic(native_quil: str) -> RewriteArithmeticResult:
     """

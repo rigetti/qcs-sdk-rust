@@ -1,17 +1,17 @@
 from enum import Enum
-from typing import List, Optional, final
+from typing import Sequence, Optional, final
 
 from .client import QCSClient
 
 class SerializeISAError(ValueError):
     """If an ``InstructionSetArchitecture`` could not be serialized or deserialized correctly."""
-    ...
 
+    ...
 
 class GetISAError(RuntimeError):
     """If there was an issue fetching ``InstructionSetArchitecture`` from the QCS API."""
-    ...
 
+    ...
 
 @final
 class Family(Enum):
@@ -21,11 +21,10 @@ class Family(Enum):
     Value "Full"  implies that each node is connected to every other (fully-connected architecture).
     """
 
-    NONE = "NONE",
-    Full = "Full",
-    Aspen = "Aspen",
-    Ankaa = "Ankaa",
-
+    NONE = ("NONE",)
+    Full = ("Full",)
+    Aspen = ("Aspen",)
+    Ankaa = ("Ankaa",)
 
 @final
 class Node:
@@ -47,7 +46,6 @@ class Node:
     @node_id.setter
     def node_id(self, value: int): ...
 
-
 @final
 class Edge:
     """
@@ -62,15 +60,14 @@ class Edge:
     """
 
     @property
-    def node_ids(self) -> List[int]:
+    def node_ids(self) -> Sequence[int]:
         """
         The integer ids of the computational nodes at the two ends of the edge.
         Order is not important; an architecture edge is treated as undirected.
         """
         ...
     @node_ids.setter
-    def node_ids(self, value: List[int]): ...
-
+    def node_ids(self, value: Sequence[int]): ...
 
 @final
 class Parameter:
@@ -83,7 +80,6 @@ class Parameter:
     @name.setter
     def name(self, value: str): ...
 
-
 @final
 class Characteristic:
     """A measured characteristic of an operation."""
@@ -94,23 +90,20 @@ class Characteristic:
         ...
     @name.setter
     def name(self, value: str): ...
-
     @property
     def value(self) -> float:
         """The characteristic value measured."""
         ...
     @value.setter
     def value(self, value: float): ...
-
     @property
     def error(self) -> Optional[float]:
         """The error in the characteristic value, or None if otherwise."""
         ...
     @error.setter
     def error(self, value: Optional[float]): ...
-
     @property
-    def node_ids(self) -> Optional[List[int]]:
+    def node_ids(self) -> Optional[Sequence[int]]:
         """
         The list of architecture node ids for the site where the characteristic is
         measured, if that is different from the site of the enclosing operation.
@@ -119,17 +112,15 @@ class Characteristic:
         """
         ...
     @node_ids.setter
-    def node_ids(self, value: Optional[List[int]]): ...
-
+    def node_ids(self, value: Optional[Sequence[int]]): ...
     @property
     def timestamp(self) -> str:
         """ISO8601 date and time at which the characteristic was measured."""
         ...
     @timestamp.setter
     def timestamp(self, value: str): ...
-
     @property
-    def parameter_values(self) -> Optional[List[float]]:
+    def parameter_values(self) -> Optional[Sequence[float]]:
         """
         The optional ordered list of parameter values used to generate the characteristic.
         he order matches the parameters in the enclosing operation, and so the lengths of
@@ -137,30 +128,27 @@ class Characteristic:
         """
         ...
     @parameter_values.setter
-    def parameter_values(self, value: Optional[List[float]]): ...
-
+    def parameter_values(self, value: Optional[Sequence[float]]): ...
 
 @final
 class OperationSite:
     """A site for an operation, with its site-dependent characteristics."""
 
     @property
-    def node_ids(self) -> List[int]:
+    def node_ids(self) -> Sequence[int]:
         """
         The list of architecture node ids for the site. The order of these node ids
         obey the definition of node symmetry from the enclosing operation.
         """
         ...
     @node_ids.setter
-    def node_ids(self, value: List[int]): ...
-
+    def node_ids(self, value: Sequence[int]): ...
     @property
-    def characteristics(self) -> List[Characteristic]:
+    def characteristics(self) -> Sequence[Characteristic]:
         """The list of site-dependent characteristics of this operation."""
         ...
     @characteristics.setter
-    def characteristics(self, value: List[Characteristic]): ...
-
+    def characteristics(self, value: Sequence[Characteristic]): ...
 
 @final
 class Operation:
@@ -172,38 +160,33 @@ class Operation:
         ...
     @name.setter
     def name(self, value: str): ...
-
     @property
     def node_count(self) -> Optional[int]:
         """The number of nodes that this operation applies to. None if unspecified."""
         ...
     @node_count.setter
     def node_count(self, value: Optional[int]): ...
-
     @property
-    def parameters(self) -> List[Parameter]:
+    def parameters(self) -> Sequence[Parameter]:
         """The list of parameters. Each parameter must be uniquely named. May be empty."""
         ...
     @parameters.setter
-    def parameters(self, value: List[Parameter]): ...
-
+    def parameters(self, value: Sequence[Parameter]): ...
     @property
-    def sites(self) -> List[OperationSite]:
+    def sites(self) -> Sequence[OperationSite]:
         """
         The list of sites at which this operation can be applied,
         together with its site-dependent characteristics.
         """
         ...
     @sites.setter
-    def sites(self, value: List[OperationSite]): ...
-
+    def sites(self, value: Sequence[OperationSite]): ...
     @property
-    def characteristics(self) -> List[Characteristic]:
+    def characteristics(self) -> Sequence[Characteristic]:
         """The list of site-independent characteristics of this operation."""
         ...
     @characteristics.setter
-    def characteristics(self, value: List[Characteristic]): ...
-
+    def characteristics(self, value: Sequence[Characteristic]): ...
 
 @final
 class Architecture:
@@ -229,7 +212,7 @@ class Architecture:
     Edges are ordered top-left to bottom-right in this orientation as well, with horizontal rows
     alternating with vertical rows. Ankaa chips are, in vertical orientation,
     7 qubits wide and 12 tall. This architecture may also be presented in "landscape"
-    orientation, which is a simple 90-degree clockwise rotation of the vertical orientation. 
+    orientation, which is a simple 90-degree clockwise rotation of the vertical orientation.
 
     Note that the operations that are actually available are defined entirely by ``Operation``
     instances. The presence of a node or edge in the ``Architecture`` model provides no guarantee
@@ -242,22 +225,18 @@ class Architecture:
         ...
     @family.setter
     def family(self, value: Family): ...
-
     @property
-    def nodes(self) -> List[Node]:
+    def nodes(self) -> Sequence[Node]:
         """A list of all computational nodes in the instruction set architecture."""
         ...
     @nodes.setter
-    def nodes(self, value: List[Node]): ...
-
+    def nodes(self, value: Sequence[Node]): ...
     @property
-    def edges(self) -> List[Edge]:
+    def edges(self) -> Sequence[Edge]:
         """A list of all computational edges in the instruction set architecture."""
         ...
     @edges.setter
-    def edges(self, value: List[Edge]): ...
-
-
+    def edges(self, value: Sequence[Edge]): ...
 
 @final
 class InstructionSetArchitecture:
@@ -278,39 +257,34 @@ class InstructionSetArchitecture:
         ...
     @name.setter
     def name(self, value: str): ...
-
     @property
     def architecture(self) -> Architecture:
         """The architecture of the quantum processor."""
         ...
     @architecture.setter
     def architecture(self, value: Architecture): ...
-
     @property
-    def instructions(self) -> List[Operation]:
+    def instructions(self) -> Sequence[Operation]:
         """The list of native QUIL instructions supported by the quantum processor."""
         ...
     @instructions.setter
-    def instructions(self, value: List[Operation]): ...
-
+    def instructions(self, value: Sequence[Operation]): ...
     @property
-    def benchmarks(self) -> List[Operation]:
+    def benchmarks(self) -> Sequence[Operation]:
         """The list of benchmarks that have characterized the quantum processor."""
         ...
     @benchmarks.setter
-    def benchmarks(self, value: List[Operation]): ...
-
+    def benchmarks(self, value: Sequence[Operation]): ...
     @staticmethod
     def from_raw(value: str) -> "InstructionSetArchitecture":
         """
         Deserialize an ``InstructionSetArchitecture`` from a json representation.
 
         :param value: The json-serialized ``InstructionSetArchitecture`` to deserialize.
-        
+
         :raises SerializeISAError: If the input string was not deserialized correctly.
         """
         ...
-    
     def json(self, pretty: bool = False) -> str:
         """
         Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed.
@@ -320,7 +294,6 @@ class InstructionSetArchitecture:
         :raises SerializeISAError: If the input string was not serialized correctly.
         """
         ...
-
 
 def get_instruction_set_architecture(
     quantum_processor_id: str,
@@ -336,7 +309,6 @@ def get_instruction_set_architecture(
     :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     """
     ...
-
 
 async def get_instruction_set_architecture_async(
     quantum_processor_id: str,

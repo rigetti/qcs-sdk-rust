@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union, final
+from typing import Dict, Sequence, Optional, Union, final
 
 from .client import QCSClient
 
@@ -29,26 +29,26 @@ class Register:
 
     """
 
-    def inner(self) -> Union[List[int], List[complex]]:
+    def inner(self) -> Union[Sequence[int], Sequence[complex]]:
         """Returns the inner register data."""
         ...
     def is_i32(self) -> bool: ...
     def is_complex32(self) -> bool: ...
-    def as_i32(self) -> Optional[List[int]]: ...
-    def as_complex32(self) -> Optional[List[complex]]: ...
-    def to_i32(self) -> List[int]: ...
-    def to_complex32(self) -> List[complex]: ...
+    def as_i32(self) -> Optional[Sequence[int]]: ...
+    def as_complex32(self) -> Optional[Sequence[complex]]: ...
+    def to_i32(self) -> Sequence[int]: ...
+    def to_complex32(self) -> Sequence[complex]: ...
     @staticmethod
-    def from_i32(inner: List[int]) -> "Register": ...
+    def from_i32(inner: Sequence[int]) -> "Register": ...
     @staticmethod
-    def from_complex32(inner: List[complex]) -> "Register": ...
+    def from_complex32(inner: Sequence[complex]) -> "Register": ...
 
 @final
 class ExecutionResult:
     """Execution readout data from a particular memory location."""
 
     @property
-    def shape(self) -> List[int]:
+    def shape(self) -> Sequence[int]:
         """The shape of the result data."""
         ...
     @property
@@ -79,7 +79,7 @@ class ExecutionResults:
 
 def submit(
     program: str,
-    patch_values: Dict[str, List[float]],
+    patch_values: Dict[str, Sequence[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
     endpoint_id: Optional[str] = None,
@@ -102,7 +102,7 @@ def submit(
 
 async def submit_async(
     program: str,
-    patch_values: Dict[str, List[float]],
+    patch_values: Dict[str, Sequence[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
     endpoint_id: Optional[str] = None,

@@ -1,4 +1,4 @@
-from typing import Dict, final, List, Optional, Tuple
+from typing import Dict, final, Sequence, Optional, Tuple
 
 from qcs_sdk import RegisterData, QCSClient
 
@@ -37,7 +37,7 @@ def run(
     quil: str,
     shots: int,
     addresses: Dict[str, AddressRequest],
-    params: Dict[str, List[float]],
+    params: Dict[str, Sequence[float]],
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
@@ -62,7 +62,7 @@ async def run_async(
     quil: str,
     shots: int,
     addresses: Dict[str, AddressRequest],
-    params: Dict[str, List[float]],
+    params: Dict[str, Sequence[float]],
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
