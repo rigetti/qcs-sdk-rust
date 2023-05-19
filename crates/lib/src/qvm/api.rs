@@ -150,12 +150,11 @@ pub struct MultishotResponse {
 pub async fn run_and_measure(
     request: &MultishotMeasureRequest,
     config: &ClientConfiguration,
-) -> Result<MultishotMeasureResponse, Error> {
+) -> Result<Vec<Vec<i64>>, Error> {
     let response = make_request(request, config).await?;
-    match response
-        .json::<QvmResponse<MultishotMeasureResponse>>()
-        .await
-    {
+    dbg!(&response.text().await.unwrap());
+    let response = make_request(request, config).await?;
+    match response.json::<QvmResponse<Vec<Vec<i64>>>>().await {
         Ok(QvmResponse::Success(response)) => Ok(response),
         Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
             message: response.status,
@@ -208,13 +207,6 @@ impl MultishotMeasureRequest {
             request_type: RequestType::MultishotMeasure,
         }
     }
-}
-
-/// The result of a successful [`run_and_measure_program`] request.
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-pub struct MultishotMeasureResponse {
-    /// The result of each measured qubit at the end of each trial.
-    pub results: Vec<Vec<i64>>,
 }
 
 /// Measure the expectation value of pauli operators given a defined state.

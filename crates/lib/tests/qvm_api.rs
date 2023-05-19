@@ -39,7 +39,6 @@ async fn test_run() {
     let response = api::run(&request, &config)
         .await
         .expect("Should be able to run");
-    dbg!(&response);
     assert_eq!(response.registers.len(), 1);
     let ro = response
         .registers
@@ -47,4 +46,22 @@ async fn test_run() {
         .expect("Should get the 'ro' register back")
         .clone();
     assert_eq!(ro.into_i8().expect("A BIT register should be i8").len(), 2);
+}
+
+#[tokio::test]
+async fn test_run_and_measure() {
+    let config = ClientConfiguration::default();
+    let request = api::MultishotMeasureRequest::new(
+        PROGRAM,
+        5,
+        vec![0, 1],
+        Some((0.1, 0.5, 0.4)),
+        Some((0.1, 0.5, 0.4)),
+        Some(1),
+    );
+    let qubits = api::run_and_measure(&request, &config)
+        .await
+        .expect("Should be able to run and measure");
+    assert_eq!(qubits.len(), 5);
+    assert_eq!(qubits[0].len(), 2);
 }

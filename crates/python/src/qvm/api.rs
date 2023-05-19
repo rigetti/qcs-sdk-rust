@@ -13,8 +13,7 @@ use pyo3::{
 use qcs::{
     qvm::api::{
         AddressRequest, ExpectationRequest, ExpectationResponse, MultishotMeasureRequest,
-        MultishotMeasureResponse, MultishotRequest, MultishotResponse, WavefunctionRequest,
-        WavefunctionResponse,
+        MultishotRequest, MultishotResponse, WavefunctionRequest, WavefunctionResponse,
     },
     RegisterData,
 };
@@ -30,7 +29,6 @@ create_init_submodule! {
         PyMultishotRequest,
         PyMultishotResponse,
         PyMultishotMeasureRequest,
-        PyMultishotMeasureResponse,
         PyExpectationRequest,
         PyExpectationResponse,
         PyWavefunctionRequest,
@@ -163,23 +161,15 @@ impl PyMultishotMeasureRequest {
     }
 }
 
-py_wrap_data_struct! {
-    PyMultishotMeasureResponse(MultishotMeasureResponse) as "MultishotMeasureResponse" {
-        results: Vec<Vec<i64>> => Vec<Vec<Py<PyInt>>>
-    }
-}
-impl_repr!(PyMultishotMeasureResponse);
-
 py_function_sync_async! {
     #[pyfunction(client = "None")]
-    async fn run_and_measure(request: PyMultishotMeasureRequest, client: Option<PyQcsClient>) -> PyResult<PyMultishotMeasureResponse> {
+    async fn run_and_measure(request: PyMultishotMeasureRequest, client: Option<PyQcsClient>) -> PyResult<Vec<Vec<i64>>> {
         let client = PyQcsClient::get_or_create_client(client).await?;
         let config = client.get_config();
         qcs::qvm::api::run_and_measure(request.as_inner(), &config)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
-            .map(|response| PyMultishotMeasureResponse(response))
     }
 }
 
