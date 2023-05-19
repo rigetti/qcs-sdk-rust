@@ -43,23 +43,25 @@ where
 pub async fn get_version_info(config: &ClientConfiguration) -> Result<String, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting qvm version information");
-    let client = reqwest::Client::new();
-    let params = vec![("type", "version")];
-    client
-        .post(config.qvm_url())
-        .json(&params)
-        .send()
-        .await
-        .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
-            source,
-        })?
-        .text()
-        .await
-        .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
-            source,
-        })
+    let params = HashMap::from([("type", "version")]);
+    let response = make_request(&params, config).await?;
+    if response.status() == 200 {
+        response
+            .text()
+            .await
+            .map_err(|source| Error::QvmCommunication {
+                qvm_url: config.qvm_url().into(),
+                source,
+            })
+    } else {
+        match response.json::<Failure>().await {
+            Ok(Failure { status: message }) => Err(Error::Qvm { message }),
+            Err(source) => Err(Error::QvmCommunication {
+                qvm_url: config.qvm_url().into(),
+                source,
+            }),
+        }
+    }
 }
 
 /// Executes a program on the QVM.

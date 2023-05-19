@@ -114,9 +114,9 @@ class MultishotMeasureRequest:
         quil_instructions: str,
         trials: int,
         qubits: List[int],
-        measurement_noise: Optional[Tuple[float, float, float]],
-        gate_noise: Optional[Tuple[float, float, float]],
-        rng_seed: Optional[int],
+        measurement_noise: Optional[Tuple[float, float, float]] = None,
+        gate_noise: Optional[Tuple[float, float, float]] = None,
+        rng_seed: Optional[int] = None,
     ) -> Self: ...
     @property
     def quil_instructions(self) -> str: ...
@@ -170,7 +170,7 @@ class ExpectationRequest:
     """The request body needed for a ``measure_expectation`` request to the QVM."""
 
     def __new__(
-        cls, state_preparation: str, operators: List, rng_seed: Optional[int]
+        cls, state_preparation: str, operators: List, rng_seed: Optional[int] = None
     ) -> Self: ...
     @property
     def state_preparation(self) -> str: ...
@@ -213,9 +213,9 @@ class WavefunctionRequest:
     def __new__(
         cls,
         compiled_quil: str,
-        measurement_noise: Tuple[float, float, float],
-        gate_noise: Tuple[float, float, float],
-        rng_seed: Optional[int],
+        measurement_noise: Optional[Tuple[float, float, float]] = None,
+        gate_noise: Optional[Tuple[float, float, float]] = None,
+        rng_seed: Optional[int] = None,
     ) -> Self: ...
     @property
     def compiled_quil(self) -> str: ...

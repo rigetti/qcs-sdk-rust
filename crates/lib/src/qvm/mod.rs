@@ -43,6 +43,7 @@ impl QvmResultData {
 
 /// Run a Quil program on the QVM. The given [`Parameters`] are used to parameterize the value of
 /// memory locations across shots.
+#[allow(clippy::too_many_arguments)]
 pub async fn run(
     quil: &str,
     shots: u16,
@@ -71,6 +72,7 @@ pub async fn run(
 
 /// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
 /// memory locations across shots.
+#[allow(clippy::too_many_arguments)]
 pub async fn run_program(
     program: &Program,
     shots: u16,

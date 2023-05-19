@@ -330,7 +330,7 @@ class RegisterData:
 
     """
 
-    def inner(self) -> Union[int, float, complex]:
+    def inner(self) -> Union[List[List[int]], List[List[float]], List[List[complex]]]:
         """Returns the inner value."""
         ...
     def is_i8(self) -> bool: ...
