@@ -89,16 +89,19 @@ pub async fn run(
 #[serde(rename_all = "kebab-case")]
 pub struct MultishotRequest {
     /// The Quil program to run.
-    pub quil_instructions: String,
+    pub compiled_quil: String,
     /// The memory regions to include in the response.
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
     pub trials: u16,
     /// Simulated measurement noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -127,7 +130,7 @@ impl MultishotRequest {
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            quil_instructions: program.to_string(),
+            compiled_quil: program.to_string(),
             addresses,
             trials,
             measurement_noise,
@@ -169,16 +172,19 @@ pub async fn run_and_measure(
 #[serde(rename_all = "kebab-case")]
 pub struct MultishotMeasureRequest {
     /// The Quil program to run.
-    pub quil_instructions: String,
+    pub compiled_quil: String,
     /// The number of trials ("shots") to run the program.
     pub trials: u16,
     /// Qubits to measure
     pub qubits: Vec<u64>,
     /// Simulated measurement noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -196,7 +202,7 @@ impl MultishotMeasureRequest {
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            quil_instructions: program.to_string(),
+            compiled_quil: program.to_string(),
             trials: shots,
             qubits: qubits.to_vec(),
             measurement_noise,
@@ -234,6 +240,7 @@ pub struct ExpectationRequest {
     /// A list of Pauli operators to measure.
     pub operators: Vec<String>,
     /// An optional seed for the random number generator.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -285,10 +292,13 @@ pub struct WavefunctionRequest {
     /// The Quil program to run.
     pub compiled_quil: String,
     /// Simulated measurement noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -341,7 +351,7 @@ mod describe_request {
     fn it_includes_the_program() {
         let program = "H 0";
         let request = MultishotRequest::new(program, 1, HashMap::new(), None, None, None);
-        assert_eq!(&request.quil_instructions, program);
+        assert_eq!(&request.compiled_quil, program);
     }
 
     #[test]

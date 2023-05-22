@@ -69,7 +69,7 @@ impl_repr!(PyAddressRequest);
 py_wrap_data_struct! {
     #[derive(Debug, PartialEq)]
     PyMultishotRequest(MultishotRequest) as "MultishotRequest" {
-        quil_instructions: String => Py<PyString>,
+        compiled_quil: String => Py<PyString>,
         addresses: HashMap<String, AddressRequest> => HashMap<String, PyAddressRequest>,
         trials: u16 => Py<PyInt>,
         measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
@@ -127,7 +127,7 @@ py_function_sync_async! {
 
 py_wrap_data_struct! {
     PyMultishotMeasureRequest(MultishotMeasureRequest) as "MultishotMeasureRequest" {
-        quil_instructions: String => Py<PyString>,
+        compiled_quil: String => Py<PyString>,
         trials: u16 => Py<PyInt>,
         qubits: Vec<u64> => Vec<Py<PyInt>>,
         measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,

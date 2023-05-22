@@ -54,7 +54,7 @@ class MultishotRequest:
 
     def __new__(
         cls,
-        quil_instructions: str,
+        compiled_quil: str,
         trials: int,
         addresses: Dict[str, AddressRequest],
         measurement_noise: Optional[Tuple[float, float, float]],
@@ -62,9 +62,9 @@ class MultishotRequest:
         rng_seed: Optional[int],
     ) -> Self: ...
     @property
-    def quil_instructions(self) -> str: ...
-    @quil_instructions.setter
-    def quil_instructions(self, value: str): ...
+    def compiled_quil(self) -> str: ...
+    @compiled_quil.setter
+    def compiled_quil(self, value: str): ...
     @property
     def trials(self) -> int: ...
     @trials.setter
@@ -111,7 +111,7 @@ def run_async(
 class MultishotMeasureRequest:
     def __new__(
         cls,
-        quil_instructions: str,
+        compiled_quil: str,
         trials: int,
         qubits: Sequence[int],
         measurement_noise: Optional[Tuple[float, float, float]] = None,
@@ -119,9 +119,9 @@ class MultishotMeasureRequest:
         rng_seed: Optional[int] = None,
     ) -> Self: ...
     @property
-    def quil_instructions(self) -> str: ...
-    @quil_instructions.setter
-    def quil_instructions(self, value: str): ...
+    def compiled_quil(self) -> str: ...
+    @compiled_quil.setter
+    def compiled_quil(self, value: str): ...
     @property
     def trials(self) -> int: ...
     @trials.setter
