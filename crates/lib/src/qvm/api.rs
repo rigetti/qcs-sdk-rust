@@ -370,7 +370,7 @@ mod describe_request {
         let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
         assert_eq!(
             serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
-            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0", "measurement-noise": [1.0, 2.0, 3.0], "gate-noise": [3.0, 2.0, 1.0], "rng-seed": 100})
+            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "compiled-quil": "H 0", "measurement-noise": [1.0, 2.0, 3.0], "gate-noise": [3.0, 2.0, 1.0], "rng-seed": 100})
         );
     }
 }
