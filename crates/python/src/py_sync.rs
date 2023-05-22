@@ -19,9 +19,18 @@
 /// assert say_hello("Rigetti") == "hello Rigetti"
 /// ```
 macro_rules! py_sync {
-    ($body: expr) => {{
+    ($py: ident, $body: expr) => {{
         let runtime = ::pyo3_asyncio::tokio::get_runtime();
         let handle = runtime.spawn($body);
+
+        // A 100ms loop delay is a bit arbitrary, but seems to
+        // balance CPU usage and SIGINT responsiveness well enough.
+        let delay = ::std::time::Duration::from_millis(100);
+        while !handle.is_finished() {
+            $py.check_signals()?;
+            ::std::thread::sleep(delay);
+        }
+
         runtime
             .block_on(handle)
             .map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?
@@ -82,8 +91,8 @@ macro_rules! py_function_sync_async {
         ::paste::paste! {
         $(#[$meta])+
         #[pyo3(name = $name "")]
-        pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
-            $crate::py_sync::py_sync!($name($($arg),*))
+        pub fn [< py_ $name >](py: ::pyo3::Python<'_> $(, $arg: $kind)*) $(-> $ret)? {
+            $crate::py_sync::py_sync!(py, $name($($arg),*))
         }
 
         $(#[$meta])+

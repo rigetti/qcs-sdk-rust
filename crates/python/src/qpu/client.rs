@@ -183,8 +183,8 @@ impl PyQcsClient {
     #[staticmethod]
     #[args("/", profile_name = "None", use_gateway = "None")]
     #[pyo3(name = "load")]
-    pub fn py_load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
-        py_sync!(Self::load(profile_name, use_gateway))
+    pub fn py_load(py: Python<'_>, profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
+        py_sync!(py, Self::load(profile_name, use_gateway))
     }
 
     #[staticmethod]
