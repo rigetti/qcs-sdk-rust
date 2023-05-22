@@ -71,7 +71,7 @@ class QPUResultData:
         """
         ...
 
-class SequenceQuantumProcessorsError(RuntimeError):
+class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
 
     ...
@@ -86,7 +86,7 @@ def list_quantum_processors(
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param timeout: Maximum duration to wait for API calls to complete, in seconds.
 
-    :raises SequenceQuantumProcessorsError: If the request to list available QPU IDs failed.
+    :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     """
     ...
 
@@ -101,6 +101,6 @@ async def list_quantum_processors_async(
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param timeout: Maximum duration to wait for API calls to complete, in seconds.
 
-    :raises SequenceQuantumProcessorsError: If the request to list available QPU IDs failed.
+    :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     """
     ...
