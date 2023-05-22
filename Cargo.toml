@@ -2,10 +2,9 @@
 members = ["crates/*"]
 
 [workspace.dependencies]
-qcs-api = "0.2.1"
-qcs-api-client-common = "0.6.6"
-qcs-api-client-grpc = "0.6.1"
-qcs-api-client-openapi = "0.7.1"
+qcs-api-client-common = "0.6.7"
+qcs-api-client-grpc = "0.6.7"
+qcs-api-client-openapi = "0.7.7"
 quil-rs = "0.15"
 serde_json = "1.0.86"
 thiserror = "1.0.37"

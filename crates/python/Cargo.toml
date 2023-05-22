@@ -17,7 +17,6 @@ crate-type = ["cdylib"]
 
 [dependencies]
 qcs = { path = "../lib" }
-qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true
