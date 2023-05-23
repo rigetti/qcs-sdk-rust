@@ -73,7 +73,7 @@ macro_rules! py_async {
 macro_rules! py_function_sync_async {
     (
         $(#[$meta: meta])+
-        async fn $name: ident($($arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
+        async fn $name: ident($($(#[$arg_meta: meta])*$arg: ident : $kind: ty),* $(,)?) $(-> $ret: ty)? $body: block
     ) => {
         async fn $name($($arg: $kind,)*) $(-> $ret)? {
             $body
@@ -82,13 +82,13 @@ macro_rules! py_function_sync_async {
         ::paste::paste! {
         $(#[$meta])+
         #[pyo3(name = $name "")]
-        pub fn [< py_ $name >]($($arg: $kind),*) $(-> $ret)? {
+        pub fn [< py_ $name >]($($(#[$arg_meta])*$arg: $kind),*) $(-> $ret)? {
             $crate::py_sync::py_sync!($name($($arg),*))
         }
 
         $(#[$meta])+
         #[pyo3(name = $name "_async")]
-        pub fn [< py_ $name _async >](py: ::pyo3::Python<'_> $(, $arg: $kind)*) -> ::pyo3::PyResult<&::pyo3::PyAny> {
+        pub fn [< py_ $name _async >](py: ::pyo3::Python<'_> $(, $(#[$arg_meta])*$arg: $kind)*) -> ::pyo3::PyResult<&::pyo3::PyAny> {
             $crate::py_sync::py_async!(py, $name($($arg),*))
         }
         }

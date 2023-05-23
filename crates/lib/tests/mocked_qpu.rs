@@ -24,7 +24,7 @@ const QPU_ID: &str = "Aspen-M-3";
 async fn successful_bell_state() {
     setup().await;
     let result = Executable::from_quil(BELL_STATE)
-        .with_shots(2)
+        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
         .execute_on_qpu(QPU_ID, None)
         .await
         .expect("Failed to run program that should be successful");

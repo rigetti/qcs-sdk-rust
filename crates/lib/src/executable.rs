@@ -3,6 +3,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -83,7 +84,7 @@ use quil_rs::Program;
 #[derive(Debug, Clone)]
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
-    shots: u16,
+    shots: NonZeroU16,
     readout_memory_region_names: Option<Vec<Cow<'executable, str>>>,
     params: Parameters,
     compile_with_quilc: bool,
@@ -115,7 +116,7 @@ impl<'executable> Executable<'executable, '_> {
     pub fn from_quil<Quil: Into<Arc<str>>>(quil: Quil) -> Self {
         Self {
             quil: quil.into(),
-            shots: 1,
+            shots: NonZeroU16::new(1).expect("value is non-zero"),
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
@@ -298,7 +299,7 @@ pub type ExecutionResult = Result<execution_data::ExecutionData, Error>;
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
     #[must_use]
-    pub fn with_shots(mut self, shots: u16) -> Self {
+    pub fn with_shots(mut self, shots: NonZeroU16) -> Self {
         self.shots = shots;
         self
     }
@@ -789,6 +790,7 @@ mod describe_get_config {
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_qpu_for_id {
+    use std::num::NonZeroU16;
     use std::sync::Arc;
 
     use qcs_api_client_common::ClientConfiguration;
@@ -815,7 +817,7 @@ mod describe_qpu_for_id {
     #[tokio::test]
     async fn it_loads_cached_version() {
         let mut exe = Executable::from_quil("");
-        let shots = 17;
+        let shots = NonZeroU16::new(17).expect("value is non-zero");
         exe.shots = shots;
         exe.qpu = Some(
             qpu::Execution::new(
@@ -837,7 +839,7 @@ mod describe_qpu_for_id {
 
     #[tokio::test]
     async fn it_creates_new_after_shot_change() {
-        let original_shots = 23;
+        let original_shots = NonZeroU16::new(23).expect("value is non-zero");
         let mut exe = Executable::from_quil("").with_shots(original_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
@@ -845,7 +847,7 @@ mod describe_qpu_for_id {
 
         // Cache so we can verify cache is not used.
         exe.qpu = Some(qpu);
-        let new_shots = 32;
+        let new_shots = NonZeroU16::new(32).expect("value is non-zero");
         exe = exe.with_shots(new_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 

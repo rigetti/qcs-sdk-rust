@@ -1,7 +1,7 @@
 //! This module provides types and functions for making API calls directly to the QVM.
 //! Consider [`super::run_program`] for higher level access to the QVM that allows
 //! for running parameterized programs.
-use std::collections::HashMap;
+use std::{collections::HashMap, num::NonZeroU16};
 
 use qcs_api_client_common::ClientConfiguration;
 use reqwest::Response;
@@ -106,7 +106,7 @@ pub struct MultishotRequest {
     /// The memory regions to include in the response.
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
-    pub trials: u16,
+    pub trials: NonZeroU16,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_noise: Option<(f64, f64, f64)>,
@@ -152,15 +152,15 @@ impl MultishotRequest {
     /// Creates a new [`MultishotRequest`] with the given parameters.
     #[must_use]
     pub fn new(
-        program: String,
-        trials: u16,
+        compiled_quil: String,
+        trials: NonZeroU16,
         addresses: HashMap<String, AddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            compiled_quil: program,
+            compiled_quil,
             addresses,
             trials,
             measurement_noise,
@@ -202,7 +202,7 @@ pub struct MultishotMeasureRequest {
     /// The Quil program to run.
     pub compiled_quil: String,
     /// The number of trials ("shots") to run the program.
-    pub trials: u16,
+    pub trials: NonZeroU16,
     /// Qubits to measure
     pub qubits: Vec<u64>,
     /// Simulated measurement noise for the X, Y, and Z axes.
@@ -222,16 +222,16 @@ impl MultishotMeasureRequest {
     /// Construct a new [`MultishotMeasureRequest`] using the given parameters.
     #[must_use]
     pub fn new(
-        program: String,
-        shots: u16,
+        compiled_quil: String,
+        trials: NonZeroU16,
         qubits: &[u64],
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            compiled_quil: program,
-            trials: shots,
+            compiled_quil,
+            trials,
             qubits: qubits.to_vec(),
             measurement_noise,
             gate_noise,
@@ -367,7 +367,7 @@ where
 
 #[cfg(test)]
 mod describe_request {
-    use std::collections::HashMap;
+    use std::{collections::HashMap, num::NonZeroU16};
 
     use crate::qvm::api::AddressRequest;
 
@@ -376,8 +376,14 @@ mod describe_request {
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request =
-            MultishotRequest::new(program.to_string(), 1, HashMap::new(), None, None, None);
+        let request = MultishotRequest::new(
+            program.to_string(),
+            NonZeroU16::new(1).expect("value is non-zero"),
+            HashMap::new(),
+            None,
+            None,
+            None,
+        );
         assert_eq!(&request.compiled_quil, program);
     }
 
@@ -385,7 +391,7 @@ mod describe_request {
     fn it_uses_kebab_case_for_json() {
         let request = MultishotRequest::new(
             "H 0".to_string(),
-            10,
+            NonZeroU16::new(10).expect("value is non-zero"),
             [("ro".to_string(), AddressRequest::IncludeAll)]
                 .iter()
                 .cloned()

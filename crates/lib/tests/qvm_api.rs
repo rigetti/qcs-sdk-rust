@@ -1,7 +1,7 @@
 //! Integration tests for the [`qcs::qvm::api`] module. Requires the QVM
 //! web server to be running.
 
-use std::collections::HashMap;
+use std::{collections::HashMap, num::NonZeroU16};
 
 use qcs::qvm::api;
 use qcs_api_client_common::ClientConfiguration;
@@ -30,7 +30,7 @@ async fn test_run() {
     let config = ClientConfiguration::default();
     let request = api::MultishotRequest::new(
         PROGRAM.to_string(),
-        2,
+        NonZeroU16::new(2).expect("value is non-zero"),
         HashMap::from([("ro".to_string(), api::AddressRequest::IncludeAll)]),
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
@@ -53,7 +53,7 @@ async fn test_run_and_measure() {
     let config = ClientConfiguration::default();
     let request = api::MultishotMeasureRequest::new(
         PROGRAM.to_string(),
-        5,
+        NonZeroU16::new(5).expect("value is non-zero"),
         &[0, 1],
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),

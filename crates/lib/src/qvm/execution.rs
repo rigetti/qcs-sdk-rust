@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use std::str::FromStr;
+use std::{collections::HashMap, num::NonZeroU16};
 
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::Program;
@@ -54,7 +54,7 @@ impl Execution {
     /// Missing parameters, extra parameters, or parameters of the wrong type will all cause errors.
     pub(crate) async fn run(
         &self,
-        shots: u16,
+        shots: NonZeroU16,
         addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
         config: &ClientConfiguration,
@@ -75,7 +75,7 @@ impl Execution {
 
 #[cfg(test)]
 mod describe_execution {
-    use std::collections::HashMap;
+    use std::{collections::HashMap, num::NonZeroU16};
 
     use super::{ClientConfiguration, Execution, Parameters};
 
@@ -87,7 +87,12 @@ mod describe_execution {
         params.insert("doesnt_exist".into(), vec![0.0]);
 
         let result = exe
-            .run(1, HashMap::new(), &params, &ClientConfiguration::default())
+            .run(
+                NonZeroU16::new(1).expect("value is non-zero"),
+                HashMap::new(),
+                &params,
+                &ClientConfiguration::default(),
+            )
             .await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
@@ -104,7 +109,12 @@ mod describe_execution {
         params.insert("ro".into(), vec![0.0]);
 
         let result = exe
-            .run(1, HashMap::new(), &params, &ClientConfiguration::default())
+            .run(
+                NonZeroU16::new(1).expect("value is non-zero"),
+                HashMap::new(),
+                &params,
+                &ClientConfiguration::default(),
+            )
             .await;
         if let Err(e) = result {
             let err_string = e.to_string();

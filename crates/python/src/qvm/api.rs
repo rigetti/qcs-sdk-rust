@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, num::NonZeroU16};
 
 use super::RustQvmError;
 use crate::{
@@ -20,7 +20,7 @@ use qcs::{
 use rigetti_pyo3::{
     create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_type,
     pyo3::{pyfunction, PyResult},
-    PyTryFrom, PyWrapper, ToPythonError,
+    PyTryFrom, PyWrapper, PyWrapperMut, ToPythonError,
 };
 
 create_init_submodule! {
@@ -81,7 +81,6 @@ py_wrap_data_struct! {
     PyMultishotRequest(MultishotRequest) as "MultishotRequest" {
         compiled_quil: String => Py<PyString>,
         addresses: HashMap<String, AddressRequest> => HashMap<String, PyAddressRequest>,
-        trials: u16 => Py<PyInt>,
         measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
         gate_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
         rng_seed: Option<i64> => Option<Py<PyInt>>
@@ -95,7 +94,7 @@ impl PyMultishotRequest {
     pub fn new(
         py: Python<'_>,
         program: String,
-        shots: u16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")] shots: NonZeroU16,
         addresses: HashMap<String, PyAddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -109,6 +108,19 @@ impl PyMultishotRequest {
             gate_noise,
             rng_seed,
         )))
+    }
+
+    #[getter]
+    pub fn trials(&self) -> u16 {
+        self.as_inner().trials.get()
+    }
+
+    #[setter]
+    pub fn set_trials(&mut self, trials: u16) -> PyResult<()> {
+        // `NonZeroU16` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
+        // as a method argument, even when combined with a `from_py_with` attribute.
+        self.as_inner_mut().trials = crate::from_py::try_from_u16_to_non_zero_u16(trials)?;
+        Ok(())
     }
 }
 
@@ -138,7 +150,6 @@ py_function_sync_async! {
 py_wrap_data_struct! {
     PyMultishotMeasureRequest(MultishotMeasureRequest) as "MultishotMeasureRequest" {
         compiled_quil: String => Py<PyString>,
-        trials: u16 => Py<PyInt>,
         qubits: Vec<u64> => Vec<Py<PyInt>>,
         measurement_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
         gate_noise: Option<(f64, f64, f64)> => Option<(Py<PyFloat>, Py<PyFloat>, Py<PyFloat>)>,
@@ -152,7 +163,7 @@ impl PyMultishotMeasureRequest {
     #[new]
     pub fn new(
         program: String,
-        shots: u16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")] shots: NonZeroU16,
         qubits: Vec<u64>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -166,6 +177,19 @@ impl PyMultishotMeasureRequest {
             gate_noise,
             rng_seed,
         )))
+    }
+
+    #[getter]
+    pub fn trials(&self) -> u16 {
+        self.as_inner().trials.get()
+    }
+
+    #[setter]
+    pub fn set_trials(&mut self, trials: u16) -> PyResult<()> {
+        // `NonZeroU16` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
+        // as a method argument, even when combined with a `from_py_with` attribute.
+        self.as_inner_mut().trials = crate::from_py::try_from_u16_to_non_zero_u16(trials)?;
+        Ok(())
     }
 }
 

@@ -5,6 +5,7 @@ use rigetti_pyo3::{
     wrap_error, PyTryFrom, PyWrapper, ToPython, ToPythonError,
 };
 use std::collections::HashMap;
+use std::num::NonZeroU16;
 
 use crate::{
     py_sync::py_function_sync_async, qpu::client::PyQcsClient, register_data::PyRegisterData,
@@ -52,7 +53,8 @@ py_function_sync_async! {
     #[pyfunction(client = "None")]
     async fn run(
         quil: String,
-        shots: u16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]
+        shots: NonZeroU16,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
         measurement_noise: Option<(f64, f64, f64)>,

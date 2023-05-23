@@ -1,7 +1,7 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, num::NonZeroU16, str::FromStr};
 
 use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
@@ -46,7 +46,7 @@ impl QvmResultData {
 #[allow(clippy::too_many_arguments)]
 pub async fn run(
     quil: &str,
-    shots: u16,
+    shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     measurement_noise: Option<(f64, f64, f64)>,
@@ -75,7 +75,7 @@ pub async fn run(
 #[allow(clippy::too_many_arguments)]
 pub async fn run_program(
     program: &Program,
-    shots: u16,
+    shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     measurement_noise: Option<(f64, f64, f64)>,
@@ -90,10 +90,6 @@ pub async fn run_program(
         ?params,
         "executing program on QVM"
     );
-    if shots == 0 {
-        return Err(Error::ShotsMustBePositive);
-    }
-
     // Create a clone of the program so MOVE statements can be prepended to it
     let mut program = program.clone();
 
