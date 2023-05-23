@@ -41,7 +41,7 @@ impl QvmResultData {
     }
 }
 
-/// Run a Quil program on the QVM. The given [`Parameters`] are used to parameterize the value of
+/// Run a Quil program on the QVM. The given parameters are used to parameterize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
 pub async fn run(
@@ -70,7 +70,7 @@ pub async fn run(
     .await
 }
 
-/// Run a [`Program`] on the QVM. The given [`Parameters`] are used to parametrize the value of
+/// Run a [`Program`] on the QVM. The given parameters are used to parametrize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
 pub async fn run_program(
@@ -98,7 +98,7 @@ pub async fn run_program(
             Some(region) => {
                 if region.size.length != values.len() as u64 {
                     return Err(Error::RegionSizeMismatch {
-                        name: name.clone(),
+                        name: name.to_string(),
                         declared: region.size.length,
                         parameters: values.len(),
                     });
@@ -147,7 +147,7 @@ pub enum Error {
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
     RegionSizeMismatch {
-        name: Box<str>,
+        name: String,
         declared: u64,
         parameters: usize,
     },

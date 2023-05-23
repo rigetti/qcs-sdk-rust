@@ -43,7 +43,7 @@ use quil_rs::Program;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
+///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
 ///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers

@@ -195,7 +195,7 @@ pub async fn run_and_measure(
         })?
 }
 
-/// The request body needed for a [`run_and_measure_program`] request to the QVM.
+/// The request body needed for a [`run_and_measure`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct MultishotMeasureRequest {
