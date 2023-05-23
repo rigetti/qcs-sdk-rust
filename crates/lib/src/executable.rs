@@ -358,7 +358,7 @@ impl Executable<'_, '_> {
                 self.shots,
                 self.get_readouts()
                     .iter()
-                    .map(|address| (address.to_string(), AddressRequest::All(true)))
+                    .map(|address| (address.to_string(), AddressRequest::IncludeAll))
                     .collect(),
                 &self.params,
                 &config,

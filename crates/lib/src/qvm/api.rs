@@ -34,9 +34,24 @@ pub(super) enum QvmResponse<T>
 where
     T: DeserializeOwned,
 {
+    // This bound is required for `T` to be recognized as being `Deserialize`
+    // https://github.com/serde-rs/serde/issues/1296
     #[serde(bound = "")]
     Success(T),
     Failure(Failure),
+}
+
+impl<T: DeserializeOwned> QvmResponse<T> {
+    /// Converts a [`QvmResponse<T>`] into a [`Result<T, qvm::Error>`] containing the successful response,
+    /// as the Ok value or an [`Error`] containing the error message from the [`Failure`] response.
+    pub(super) fn ok(self) -> Result<T, Error> {
+        match self {
+            Self::Success(response) => Ok(response),
+            Self::Failure(response) => Err(Error::Qvm {
+                message: response.status,
+            }),
+        }
+    }
 }
 
 /// Fetch the version information from the running QVM server.
@@ -72,16 +87,14 @@ pub async fn run(
     #[cfg(feature = "tracing")]
     tracing::debug!("making a multishot request to the QVM");
     let response = make_request(request, config).await?;
-    match response.json::<QvmResponse<MultishotResponse>>().await {
-        Ok(QvmResponse::Success(response)) => Ok(response),
-        Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
-            message: response.status,
-        }),
-        Err(source) => Err(Error::QvmCommunication {
+    response
+        .json::<QvmResponse<MultishotResponse>>()
+        .await
+        .map(QvmResponse::ok)
+        .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
-        }),
-    }
+        })?
 }
 
 /// The request body needed to make a multishot [`run`] request to the QVM.
@@ -111,11 +124,28 @@ pub struct MultishotRequest {
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 pub enum AddressRequest {
-    /// Set to `true` to request all values at this address, or `false` to explicitly exclude
-    /// the address.
-    All(bool),
+    /// Get all values for the address.
+    #[serde(serialize_with = "serialize_true")]
+    IncludeAll,
+    /// Exclude all values for the address.
+    #[serde(serialize_with = "serialize_false")]
+    ExcludeAll,
     /// A list of specific indices to get back for the address.
     Indices(Vec<usize>),
+}
+
+fn serialize_true<S>(serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.serialize_bool(true)
+}
+
+fn serialize_false<S>(serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    serializer.serialize_bool(false)
 }
 
 impl MultishotRequest {
@@ -155,16 +185,14 @@ pub async fn run_and_measure(
     config: &ClientConfiguration,
 ) -> Result<Vec<Vec<i64>>, Error> {
     let response = make_request(request, config).await?;
-    match response.json::<QvmResponse<Vec<Vec<i64>>>>().await {
-        Ok(QvmResponse::Success(response)) => Ok(response),
-        Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
-            message: response.status,
-        }),
-        Err(source) => Err(Error::QvmCommunication {
+    response
+        .json::<QvmResponse<Vec<Vec<i64>>>>()
+        .await
+        .map(QvmResponse::ok)
+        .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
-        }),
-    }
+        })?
 }
 
 /// The request body needed for a [`run_and_measure_program`] request to the QVM.
@@ -219,16 +247,14 @@ pub async fn measure_expectation(
     config: &ClientConfiguration,
 ) -> Result<Vec<f64>, Error> {
     let response = make_request(request, config).await?;
-    match response.json::<QvmResponse<Vec<f64>>>().await {
-        Ok(QvmResponse::Success(response)) => Ok(response),
-        Ok(QvmResponse::Failure(response)) => Err(Error::Qvm {
-            message: response.status,
-        }),
-        Err(source) => Err(Error::QvmCommunication {
+    response
+        .json::<QvmResponse<Vec<f64>>>()
+        .await
+        .map(QvmResponse::ok)
+        .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
-        }),
-    }
+        })?
 }
 
 /// The request body needed for a [`measure_expectation`] request to the QVM.
@@ -360,7 +386,7 @@ mod describe_request {
         let request = MultishotRequest::new(
             "H 0".to_string(),
             10,
-            [("ro".to_string(), AddressRequest::All(true))]
+            [("ro".to_string(), AddressRequest::IncludeAll)]
                 .iter()
                 .cloned()
                 .collect(),

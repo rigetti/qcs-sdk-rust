@@ -31,7 +31,7 @@ async fn test_run() {
     let request = api::MultishotRequest::new(
         PROGRAM.to_string(),
         2,
-        HashMap::from([("ro".to_string(), api::AddressRequest::All(true))]),
+        HashMap::from([("ro".to_string(), api::AddressRequest::IncludeAll)]),
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
         Some(1),

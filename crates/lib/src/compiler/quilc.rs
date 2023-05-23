@@ -460,7 +460,7 @@ MEASURE 1 ro[1]
             .unwrap()
             .run(
                 10,
-                [("ro".to_string(), AddressRequest::All(true))]
+                [("ro".to_string(), AddressRequest::IncludeAll)]
                     .iter()
                     .cloned()
                     .collect(),

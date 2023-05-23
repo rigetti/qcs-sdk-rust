@@ -7,8 +7,8 @@ use crate::{
 
 use pyo3::{
     pymethods,
-    types::{PyBool, PyFloat, PyInt, PyString},
-    Py, Python,
+    types::{PyFloat, PyInt, PyString},
+    Py, PyAny, Python,
 };
 use qcs::{
     qvm::api::{
@@ -18,7 +18,7 @@ use qcs::{
     RegisterData,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_union_enum,
+    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_type,
     pyo3::{pyfunction, PyResult},
     PyTryFrom, PyWrapper, ToPythonError,
 };
@@ -58,13 +58,23 @@ py_function_sync_async! {
     }
 }
 
-py_wrap_union_enum! {
-    PyAddressRequest(AddressRequest) as "AddressRequest" {
-        all: All => Py<PyBool>,
-        indices: Indices => Vec<Py<PyInt>>
-    }
+py_wrap_type! {
+    PyAddressRequest(AddressRequest) as "AddressRequest"
 }
 impl_repr!(PyAddressRequest);
+
+#[pymethods]
+impl PyAddressRequest {
+    #[new]
+    pub fn new(value: &PyAny) -> PyResult<Self> {
+        let inner: Result<bool, _> = value.extract();
+        match inner {
+            Ok(true) => Ok(Self(AddressRequest::IncludeAll)),
+            Ok(false) => Ok(Self(AddressRequest::ExcludeAll)),
+            Err(_) => Ok(Self(AddressRequest::Indices(value.extract()?))),
+        }
+    }
+}
 
 py_wrap_data_struct! {
     #[derive(Debug, PartialEq)]
