@@ -29,7 +29,7 @@ async fn test_get_version_info() {
 async fn test_run() {
     let config = ClientConfiguration::default();
     let request = api::MultishotRequest::new(
-        PROGRAM,
+        PROGRAM.to_string(),
         2,
         HashMap::from([("ro".to_string(), api::AddressRequest::All(true))]),
         Some((0.1, 0.5, 0.4)),
@@ -52,7 +52,7 @@ async fn test_run() {
 async fn test_run_and_measure() {
     let config = ClientConfiguration::default();
     let request = api::MultishotMeasureRequest::new(
-        PROGRAM,
+        PROGRAM.to_string(),
         5,
         &[0, 1],
         Some((0.1, 0.5, 0.4)),
@@ -75,7 +75,7 @@ XY(-1.0) 0 1
 Z 2
 "##;
     let operators = vec!["X 0\nY 1\n".to_string(), "Z 2\n".to_string()];
-    let request = api::ExpectationRequest::new(prep_program, &operators, None);
+    let request = api::ExpectationRequest::new(prep_program.to_string(), &operators, None);
 
     let expectations = api::measure_expectation(&request, &config)
         .await
@@ -87,7 +87,7 @@ Z 2
 #[tokio::test]
 async fn test_get_wavefunction() {
     let config = ClientConfiguration::default();
-    let request = api::WavefunctionRequest::new(PROGRAM, None, None, Some(0));
+    let request = api::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
     api::get_wavefunction(&request, &config)
         .await
         .expect("Should be able to get wavefunction");

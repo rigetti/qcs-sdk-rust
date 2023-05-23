@@ -84,7 +84,7 @@ impl PyMultishotRequest {
     #[new]
     pub fn new(
         py: Python<'_>,
-        program: &str,
+        program: String,
         shots: u16,
         addresses: HashMap<String, PyAddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
@@ -141,7 +141,7 @@ impl_repr!(PyMultishotMeasureRequest);
 impl PyMultishotMeasureRequest {
     #[new]
     pub fn new(
-        program: &str,
+        program: String,
         shots: u16,
         qubits: Vec<u64>,
         measurement_noise: Option<(f64, f64, f64)>,
@@ -183,7 +183,7 @@ impl_repr!(PyExpectationRequest);
 #[pymethods]
 impl PyExpectationRequest {
     #[new]
-    pub fn new(state_preparation: &str, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
+    pub fn new(state_preparation: String, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
         Self(ExpectationRequest::new(
             state_preparation,
             &operators,
@@ -217,7 +217,7 @@ impl_repr!(PyWavefunctionRequest);
 impl PyWavefunctionRequest {
     #[new]
     fn new(
-        compiled_quil: &str,
+        compiled_quil: String,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,

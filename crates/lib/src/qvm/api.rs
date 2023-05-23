@@ -122,7 +122,7 @@ impl MultishotRequest {
     /// Creates a new [`MultishotRequest`] with the given parameters.
     #[must_use]
     pub fn new(
-        program: &str,
+        program: String,
         trials: u16,
         addresses: HashMap<String, AddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
@@ -130,7 +130,7 @@ impl MultishotRequest {
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            compiled_quil: program.to_string(),
+            compiled_quil: program,
             addresses,
             trials,
             measurement_noise,
@@ -194,7 +194,7 @@ impl MultishotMeasureRequest {
     /// Construct a new [`MultishotMeasureRequest`] using the given parameters.
     #[must_use]
     pub fn new(
-        program: &str,
+        program: String,
         shots: u16,
         qubits: &[u64],
         measurement_noise: Option<(f64, f64, f64)>,
@@ -202,7 +202,7 @@ impl MultishotMeasureRequest {
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            compiled_quil: program.to_string(),
+            compiled_quil: program,
             trials: shots,
             qubits: qubits.to_vec(),
             measurement_noise,
@@ -249,9 +249,9 @@ pub struct ExpectationRequest {
 impl ExpectationRequest {
     /// Creates a new [`ExpectationRequest`] using the given parameters.
     #[must_use]
-    pub fn new(state_preparation: &str, operators: &[String], rng_seed: Option<i64>) -> Self {
+    pub fn new(state_preparation: String, operators: &[String], rng_seed: Option<i64>) -> Self {
         Self {
-            state_preparation: state_preparation.to_string(),
+            state_preparation,
             operators: operators.to_vec(),
             rng_seed,
             request_type: RequestType::Expectation,
@@ -308,13 +308,13 @@ impl WavefunctionRequest {
     /// Create a new [`WavefunctionRequest`] with the given parameters.
     #[must_use]
     pub fn new(
-        compiled_quil: &str,
+        compiled_quil: String,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> Self {
         Self {
-            compiled_quil: compiled_quil.to_string(),
+            compiled_quil,
             measurement_noise,
             gate_noise,
             rng_seed,
@@ -350,14 +350,15 @@ mod describe_request {
     #[test]
     fn it_includes_the_program() {
         let program = "H 0";
-        let request = MultishotRequest::new(program, 1, HashMap::new(), None, None, None);
+        let request =
+            MultishotRequest::new(program.to_string(), 1, HashMap::new(), None, None, None);
         assert_eq!(&request.compiled_quil, program);
     }
 
     #[test]
     fn it_uses_kebab_case_for_json() {
         let request = MultishotRequest::new(
-            "H 0",
+            "H 0".to_string(),
             10,
             [("ro".to_string(), AddressRequest::All(true))]
                 .iter()
