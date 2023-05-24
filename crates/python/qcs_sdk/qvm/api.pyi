@@ -28,14 +28,26 @@ async def get_version_info_async(client: Optional[QCSClient] = None) -> str:
 class AddressRequest:
     """
     A description of what values the QVM should return for a memory region.
-
-    Usage:
-        ``AddressRequest(True)`` will request all values for a memory region.
-        ``AddressRequest(False)`` will request that the memory region be omitted.
-        ``AddressRequest(Sequence[int])`` will request that only the values at the given indices be returned.
     """
 
-    def __new__(cls, input: Union[bool, Sequence[int]]): ...
+    @staticmethod
+    def include_all() -> AddressRequest:
+        """
+        Request all values for a memory region.
+        """
+        ...
+    @staticmethod
+    def exclude_all() -> AddressRequest:
+        """
+        Exclude all values for a memory region.
+        """
+        ...
+    @staticmethod
+    def from_indices(indices: Sequence[int]) -> AddressRequest:
+        """
+        Request values at the given indices in a memory region.
+        """
+        ...
 
 @final
 class MultishotRequest:

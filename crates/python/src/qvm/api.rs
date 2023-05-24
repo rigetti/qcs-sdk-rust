@@ -8,7 +8,7 @@ use crate::{
 use pyo3::{
     pymethods,
     types::{PyFloat, PyInt, PyString},
-    Py, PyAny, Python,
+    Py, Python,
 };
 use qcs::{
     qvm::api::{
@@ -65,14 +65,19 @@ impl_repr!(PyAddressRequest);
 
 #[pymethods]
 impl PyAddressRequest {
-    #[new]
-    pub fn new(value: &PyAny) -> PyResult<Self> {
-        let inner: Result<bool, _> = value.extract();
-        match inner {
-            Ok(true) => Ok(Self(AddressRequest::IncludeAll)),
-            Ok(false) => Ok(Self(AddressRequest::ExcludeAll)),
-            Err(_) => Ok(Self(AddressRequest::Indices(value.extract()?))),
-        }
+    #[staticmethod]
+    pub fn include_all() -> Self {
+        Self(AddressRequest::IncludeAll)
+    }
+
+    #[staticmethod]
+    pub fn exclude_all() -> Self {
+        Self(AddressRequest::ExcludeAll)
+    }
+
+    #[staticmethod]
+    pub fn from_indices(indices: Vec<usize>) -> Self {
+        Self(AddressRequest::Indices(indices))
     }
 }
 
