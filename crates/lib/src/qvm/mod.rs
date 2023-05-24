@@ -122,8 +122,6 @@ pub async fn run_program(
         }
     }
 
-    dbg!(program.to_string(true));
-
     let request = api::MultishotRequest::new(
         program.to_string(true),
         shots,
