@@ -1,3 +1,17 @@
+## 0.11.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
 ## 0.11.0-rc.4
 
 ### Breaking Changes
