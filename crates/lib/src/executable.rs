@@ -43,6 +43,7 @@ use quil_rs::Program;
 ///
 /// #[tokio::main]
 /// async fn main() {
+///     use std::num::NonZeroU16;
 ///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
