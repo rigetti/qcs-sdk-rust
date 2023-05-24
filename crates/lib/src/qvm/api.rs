@@ -44,7 +44,7 @@ where
 impl<T: DeserializeOwned> QvmResponse<T> {
     /// Converts a [`QvmResponse<T>`] into a [`Result<T, qvm::Error>`] containing the successful response,
     /// as the Ok value or an [`Error`] containing the error message from the [`Failure`] response.
-    pub(super) fn ok(self) -> Result<T, Error> {
+    pub(super) fn into_result(self) -> Result<T, Error> {
         match self {
             Self::Success(response) => Ok(response),
             Self::Failure(response) => Err(Error::Qvm {
@@ -90,7 +90,7 @@ pub async fn run(
     response
         .json::<QvmResponse<MultishotResponse>>()
         .await
-        .map(QvmResponse::ok)
+        .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
@@ -188,7 +188,7 @@ pub async fn run_and_measure(
     response
         .json::<QvmResponse<Vec<Vec<i64>>>>()
         .await
-        .map(QvmResponse::ok)
+        .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
@@ -250,7 +250,7 @@ pub async fn measure_expectation(
     response
         .json::<QvmResponse<Vec<f64>>>()
         .await
-        .map(QvmResponse::ok)
+        .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
             qvm_url: config.qvm_url().into(),
             source,
