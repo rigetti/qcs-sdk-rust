@@ -90,38 +90,7 @@ pub async fn run_program(
         ?params,
         "executing program on QVM"
     );
-    // Create a clone of the program so MOVE statements can be prepended to it
-    let mut program = program.clone();
-
-    for (name, values) in params {
-        match program.memory_regions.get(name.as_ref()) {
-            Some(region) => {
-                if region.size.length != values.len() as u64 {
-                    return Err(Error::RegionSizeMismatch {
-                        name: name.to_string(),
-                        declared: region.size.length,
-                        parameters: values.len(),
-                    });
-                }
-            }
-            None => {
-                return Err(Error::RegionNotFound { name: name.clone() });
-            }
-        }
-        for (index, value) in values.iter().enumerate() {
-            program.instructions.insert(
-                0,
-                Instruction::Move(Move {
-                    destination: ArithmeticOperand::MemoryReference(MemoryReference {
-                        name: name.to_string(),
-                        index: index as u64,
-                    }),
-                    source: ArithmeticOperand::LiteralReal(*value),
-                }),
-            );
-        }
-    }
-
+    let program = apply_parameters_to_program(program, params)?;
     let request = api::MultishotRequest::new(
         program.to_string(true),
         shots,
@@ -133,6 +102,50 @@ pub async fn run_program(
     api::run(&request, config)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
+}
+
+/// Returns a copy of the [`Program`] with the given parameters applied to it.
+/// These parameters are expressed as `MOVE` statements prepended to the program.
+pub fn apply_parameters_to_program(
+    program: &Program,
+    params: &Parameters,
+) -> Result<Program, Error> {
+    let mut program = program.clone();
+
+    params.iter().try_for_each(|(name, values)| {
+        match program.memory_regions.get(name.as_ref()) {
+            Some(region) => {
+                if region.size.length == values.len() as u64 {
+                    Ok(())
+                } else {
+                    Err(Error::RegionSizeMismatch {
+                        name: name.to_string(),
+                        declared: region.size.length,
+                        parameters: values.len(),
+                    })
+                }
+            }
+            None => Err(Error::RegionNotFound { name: name.clone() }),
+        }
+    })?;
+
+    program.instructions = params
+        .iter()
+        .flat_map(|(name, values)| {
+            values.iter().enumerate().map(move |(index, value)| {
+                Instruction::Move(Move {
+                    destination: ArithmeticOperand::MemoryReference(MemoryReference {
+                        name: name.to_string(),
+                        index: index as u64,
+                    }),
+                    source: ArithmeticOperand::LiteralReal(*value),
+                })
+            })
+        })
+        .chain(program.instructions)
+        .collect();
+
+    Ok(program)
 }
 
 /// All of the errors that can occur when running a Quil program on QVM.
@@ -158,4 +171,51 @@ pub enum Error {
     },
     #[error("QVM reported a problem running your program: {message}")]
     Qvm { message: String },
+}
+
+#[cfg(test)]
+mod test {
+    use std::{collections::HashMap, str::FromStr};
+
+    use quil_rs::Program;
+    use rstest::{fixture, rstest};
+
+    use super::apply_parameters_to_program;
+
+    #[fixture]
+    fn program() -> Program {
+        Program::from_str("DECLARE ro BIT[3]\nH 0").expect("should parse valid program")
+    }
+
+    #[rstest]
+    fn test_apply_empty_parameters_to_program(program: Program) {
+        let parameterized_program = apply_parameters_to_program(&program, &HashMap::new())
+            .expect("should not error for empty parameters");
+
+        assert_eq!(parameterized_program, program);
+    }
+
+    #[rstest]
+    fn test_apply_valid_parameters_to_program(program: Program) {
+        let params = HashMap::from([(Box::from("ro"), vec![1.0, 2.0, 3.0])]);
+        let parameterized_program = apply_parameters_to_program(&program, &params)
+            .expect("should not error for empty parameters");
+
+        insta::assert_snapshot!(parameterized_program.to_string(true));
+    }
+
+    #[rstest]
+    fn test_apply_invalid_parameters_to_program(program: Program) {
+        let params = HashMap::from([(Box::from("ro"), vec![1.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because ro has too few values");
+
+        let params = HashMap::from([(Box::from("ro"), vec![1.0, 2.0, 3.0, 4.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because ro has too many values");
+
+        let params = HashMap::from([(Box::from("bar"), vec![1.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because bar is not a declared memory region in the program");
+    }
 }

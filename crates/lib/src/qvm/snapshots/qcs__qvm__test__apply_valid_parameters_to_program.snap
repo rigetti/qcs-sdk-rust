@@ -1,0 +1,10 @@
+---
+source: crates/lib/src/qvm/mod.rs
+expression: parameterized_program.to_string(true)
+---
+DECLARE ro BIT[3]
+MOVE ro[0] 1
+MOVE ro[1] 2
+MOVE ro[2] 3
+H 0
+
