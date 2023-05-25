@@ -1,3 +1,9 @@
+## 0.7.0
+
+### Breaking Changes
+
+- Loading a Qcs Client is now infallible and is the primary client used throughout the library. (#302)
+
 ## 0.7.0-rc.0
 
 ### Breaking Changes
