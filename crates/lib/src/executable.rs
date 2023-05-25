@@ -24,7 +24,7 @@ use quil_rs::Program;
 /// # Example
 ///
 /// ```rust
-/// use qcs_api_client_common::ClientConfiguration;
+/// use qcs::client::Qcs;
 /// use qcs::Executable;
 ///
 ///
@@ -137,7 +137,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs_api_client_common::ClientConfiguration;
+    /// use qcs::client::Qcs;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
@@ -211,7 +211,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs_api_client_common::ClientConfiguration;
+    /// use qcs::client::Qcs;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
@@ -342,7 +342,7 @@ impl Executable<'_, '_> {
             "running Executable on QVM",
         );
 
-        let config = self.get_client().await?.get_config();
+        let client = self.get_client().await?;
 
         let mut qvm = if let Some(qvm) = self.qvm.take() {
             qvm
@@ -350,7 +350,7 @@ impl Executable<'_, '_> {
             qvm::Execution::new(&self.quil)?
         };
         let result = qvm
-            .run(self.shots, self.get_readouts(), &self.params, &config)
+            .run(self.shots, self.get_readouts(), &self.params, &client)
             .await;
         self.qvm = Some(qvm);
         result
@@ -769,8 +769,6 @@ mod describe_get_config {
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_qpu_for_id {
-    use qcs_api_client_common::ClientConfiguration;
-
     use crate::compiler::quilc::CompilerOpts;
     use crate::qpu;
     use crate::{client::Qcs, Executable};

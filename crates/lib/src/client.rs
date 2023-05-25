@@ -79,10 +79,10 @@ impl Qcs {
         self
     }
 
-    /// Return a copy of all settings parsed and resolved from configuration sources.
+    /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.
     #[must_use]
-    pub fn get_config(&self) -> ClientConfiguration {
-        self.config.clone()
+    pub fn get_config(&self) -> &ClientConfiguration {
+        &self.config
     }
 
     pub(crate) async fn get_controller_client(
@@ -92,7 +92,7 @@ impl Qcs {
     {
         let uri = self.get_controller_endpoint(quantum_processor_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(ControllerClient::new(service))
     }
 
@@ -103,12 +103,12 @@ impl Qcs {
     {
         let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(ControllerClient::new(service))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
-        OpenApiConfiguration::with_qcs_config(self.get_config())
+        OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
 
     pub(crate) fn get_translation_client(
@@ -129,7 +129,7 @@ impl Qcs {
     > {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(TranslationClient::new(service))
     }
 
