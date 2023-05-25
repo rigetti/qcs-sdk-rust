@@ -4,7 +4,7 @@ use std::{collections::HashMap, time::Duration};
 use pyo3::{
     exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult, Python,
 };
-use qcs::qpu::client::GrpcClientError;
+use qcs::client::GrpcClientError;
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
@@ -13,7 +13,7 @@ use rigetti_pyo3::{
 
 use crate::{grpc::models::translation::PyTranslationOptions, py_sync::py_function_sync_async};
 
-use super::client::PyQcsClient;
+use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -58,7 +58,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<PyQuiltCalibrations> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::translation::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
             .await
@@ -114,7 +114,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let translation_options = Python::with_gil(|py| {
             Option::<TranslationOptions>::py_try_from(py, &translation_options)
         })?;

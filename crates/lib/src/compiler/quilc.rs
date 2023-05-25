@@ -12,7 +12,7 @@ use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use super::isa::{self, Compiler};
 use super::rpcq;
 
-use crate::qpu::client::Qcs;
+use crate::client::Qcs;
 
 /// Number of seconds to wait before timing out.
 pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
@@ -428,7 +428,7 @@ mod tests {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &Qcs::load().await.unwrap_or_default(),
+            &Qcs::load().await,
             CompilerOpts::default(),
         )
         .expect("Could not compile");
@@ -446,7 +446,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let client = Qcs::load().await.unwrap_or_default();
+        let client = Qcs::load().await;
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
@@ -478,7 +478,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_compile_declare_only() {
-        let client = Qcs::load().await.unwrap_or_default();
+        let client = Qcs::load().await;
         let output = compile_program(
             "DECLARE ro BIT[1]\n",
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
@@ -492,7 +492,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn get_version_info_from_quilc() {
-        let client = Qcs::load().await.unwrap_or_default();
+        let client = Qcs::load().await;
         let version = get_version_info(&client).expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
@@ -500,7 +500,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
-        let client = Qcs::load().await.unwrap_or_default();
+        let client = Qcs::load().await;
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {
                 indices: vec![0],
@@ -522,7 +522,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_generate_randomized_benchmark_sequence() {
-        let client = Qcs::load().await.unwrap_or_default();
+        let client = Qcs::load().await;
         let request = RandomizedBenchmarkingRequest {
             depth: 2,
             qubits: 1,

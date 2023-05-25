@@ -1,16 +1,15 @@
 from typing import List, Optional
 
-from .client import QCSClient
+from qcs_sdk.client import QCSClient
 from ._result_data import (
     QPUResultData as QPUResultData,
     ReadoutValues as ReadoutValues,
 )
 
-
 class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
-    ...
 
+    ...
 
 def list_quantum_processors(
     client: Optional[QCSClient] = None,
@@ -25,7 +24,6 @@ def list_quantum_processors(
     :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     """
     ...
-
 
 async def list_quantum_processors_async(
     client: Optional[QCSClient] = None,

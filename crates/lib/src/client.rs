@@ -43,17 +43,17 @@ pub struct Qcs {
 
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
-    pub async fn load() -> Result<Self, LoadError> {
-        ClientConfiguration::load_default()
-            .await
-            .or_else(|_| {
-                #[cfg(feature = "tracing")]
-                tracing::info!(
-                    "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
-                );
-                Ok(ClientConfiguration::default())
-            })
-            .map(Self::with_config)
+    pub async fn load() -> Self {
+        let config = if let Ok(config) = ClientConfiguration::load_default().await {
+            config
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::info!(
+                "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
+            );
+            ClientConfiguration::default()
+        };
+        Self::with_config(config)
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
@@ -63,6 +63,13 @@ impl Qcs {
             config,
             use_gateway: true,
         }
+    }
+
+    /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
+    pub async fn with_profile(profile: String) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_profile(profile)
+            .await
+            .map(Self::with_config)
     }
 
     /// Enable or disable the use of Gateway service for execution

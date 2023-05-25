@@ -6,12 +6,12 @@ use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error, ToPythonErr
 pub use result_data::{PyQpuResultData, PyReadoutValues};
 
 pub mod api;
-pub mod client;
 pub mod isa;
 mod result_data;
 pub mod rewrite_arithmetic;
 pub mod translation;
 
+use crate::client::PyQcsClient;
 use crate::py_sync::py_function_sync_async;
 
 create_init_submodule! {
@@ -28,7 +28,6 @@ create_init_submodule! {
     ],
     submodules: [
         "api": api::init_submodule,
-        "client": client::init_submodule,
         "isa": isa::init_submodule,
         "rewrite_arithmetic": rewrite_arithmetic::init_submodule,
         "translation": translation::init_submodule
@@ -48,10 +47,10 @@ py_wrap_error!(
 py_function_sync_async! {
     #[pyfunction(client = "None", timeout = "None")]
     async fn list_quantum_processors(
-        client: Option<client::PyQcsClient>,
+        client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<Vec<String>> {
-        let client = client::PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::list_quantum_processors(&client, timeout)
             .await
