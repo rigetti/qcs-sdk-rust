@@ -65,7 +65,12 @@ impl Qcs {
         }
     }
 
-    /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
+    /// Create a [`Qcs`] and initialized with the given `profile`.
+    ///
+    /// # Errors
+    ///
+    /// A [`LoadError`] will be returned if QCS credentials are
+    /// not correctly configured or the given profile is not defined.
     pub async fn with_profile(profile: String) -> Result<Qcs, LoadError> {
         ClientConfiguration::load_profile(profile)
             .await
