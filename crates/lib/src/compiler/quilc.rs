@@ -47,8 +47,7 @@ pub fn compile_program(
     #[cfg(feature = "tracing")]
     tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
 
-    let config = client.get_config();
-    let endpoint = config.quilc_url();
+    let endpoint = client.get_config().quilc_url();
     let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
     let request =
         rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
@@ -456,12 +455,7 @@ MEASURE 1 ro[1]
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string(true))
             .unwrap()
-            .run(
-                10,
-                &[Cow::Borrowed("ro")],
-                &HashMap::default(),
-                &client.get_config(),
-            )
+            .run(10, &[Cow::Borrowed("ro")], &HashMap::default(), &client)
             .await
             .expect("Could not run program on QVM");
         for shot in results

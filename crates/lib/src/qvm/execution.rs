@@ -180,7 +180,9 @@ pub(crate) enum Error {
 
 #[cfg(test)]
 mod describe_execution {
-    use super::{ClientConfiguration, Execution, Parameters};
+    use crate::client::Qcs;
+
+    use super::{Execution, Parameters};
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
@@ -189,9 +191,7 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("doesnt_exist".into(), vec![0.0]);
 
-        let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
-            .await;
+        let result = exe.run(1, &[], &params, &Qcs::default()).await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
         } else {
@@ -206,9 +206,7 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("ro".into(), vec![0.0]);
 
-        let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
-            .await;
+        let result = exe.run(1, &[], &params, &Qcs::default()).await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));
