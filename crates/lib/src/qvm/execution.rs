@@ -1,13 +1,13 @@
 use std::borrow::Cow;
 use std::str::FromStr;
 
-use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     program::ProgramError,
     Program,
 };
 
+use crate::client::Qcs;
 use crate::executable::Parameters;
 
 use super::{QvmResultData, Request, Response};
@@ -59,7 +59,7 @@ impl Execution {
         shots: u16,
         readouts: &[Cow<'_, str>],
         params: &Parameters,
-        config: &ClientConfiguration,
+        client: &Qcs,
     ) -> Result<QvmResultData, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
@@ -105,7 +105,7 @@ impl Execution {
                 instruction_count += 1;
             }
         }
-        let result = self.execute(shots, readouts, config).await;
+        let result = self.execute(shots, readouts, client).await;
         for _ in 0..instruction_count {
             self.program.instructions.remove(0);
         }
@@ -116,7 +116,7 @@ impl Execution {
         &self,
         shots: u16,
         readouts: &[Cow<'_, str>],
-        config: &ClientConfiguration,
+        client: &Qcs,
     ) -> Result<QvmResultData, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
@@ -126,21 +126,22 @@ impl Execution {
         );
 
         let request = Request::new(&self.program.to_string(true), shots, readouts);
+        let qvm_url = client.get_config().qvm_url();
 
         let client = reqwest::Client::new();
         let response = client
-            .post(config.qvm_url())
+            .post(qvm_url)
             .json(&request)
             .send()
             .await
             .map_err(|source| Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
+                qvm_url: qvm_url.to_string(),
                 source,
             })?;
 
         match response.json::<Response>().await {
             Err(source) => Err(Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
+                qvm_url: qvm_url.to_string(),
                 source,
             }),
             Ok(Response::Success(response)) => {
@@ -179,7 +180,9 @@ pub(crate) enum Error {
 
 #[cfg(test)]
 mod describe_execution {
-    use super::{ClientConfiguration, Execution, Parameters};
+    use crate::client::Qcs;
+
+    use super::{Execution, Parameters};
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
@@ -188,9 +191,7 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("doesnt_exist".into(), vec![0.0]);
 
-        let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
-            .await;
+        let result = exe.run(1, &[], &params, &Qcs::default()).await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
         } else {
@@ -205,9 +206,7 @@ mod describe_execution {
         let mut params = Parameters::new();
         params.insert("ro".into(), vec![0.0]);
 
-        let result = exe
-            .run(1, &[], &params, &ClientConfiguration::default())
-            .await;
+        let result = exe.run(1, &[], &params, &Qcs::default()).await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));

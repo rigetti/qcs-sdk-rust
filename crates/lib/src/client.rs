@@ -43,17 +43,17 @@ pub struct Qcs {
 
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
-    pub async fn load() -> Result<Self, LoadError> {
-        ClientConfiguration::load_default()
-            .await
-            .or_else(|_| {
-                #[cfg(feature = "tracing")]
-                tracing::info!(
-                    "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
-                );
-                Ok(ClientConfiguration::default())
-            })
-            .map(Self::with_config)
+    pub async fn load() -> Self {
+        let config = if let Ok(config) = ClientConfiguration::load_default().await {
+            config
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::info!(
+                "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
+            );
+            ClientConfiguration::default()
+        };
+        Self::with_config(config)
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
@@ -65,6 +65,18 @@ impl Qcs {
         }
     }
 
+    /// Create a [`Qcs`] and initialized with the given `profile`.
+    ///
+    /// # Errors
+    ///
+    /// A [`LoadError`] will be returned if QCS credentials are
+    /// not correctly configured or the given profile is not defined.
+    pub async fn with_profile(profile: String) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_profile(profile)
+            .await
+            .map(Self::with_config)
+    }
+
     /// Enable or disable the use of Gateway service for execution
     #[must_use]
     pub fn with_use_gateway(mut self, use_gateway: bool) -> Self {
@@ -72,10 +84,10 @@ impl Qcs {
         self
     }
 
-    /// Return a copy of all settings parsed and resolved from configuration sources.
+    /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.
     #[must_use]
-    pub fn get_config(&self) -> ClientConfiguration {
-        self.config.clone()
+    pub fn get_config(&self) -> &ClientConfiguration {
+        &self.config
     }
 
     pub(crate) async fn get_controller_client(
@@ -85,7 +97,7 @@ impl Qcs {
     {
         let uri = self.get_controller_endpoint(quantum_processor_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(ControllerClient::new(service))
     }
 
@@ -96,12 +108,12 @@ impl Qcs {
     {
         let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(ControllerClient::new(service))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
-        OpenApiConfiguration::with_qcs_config(self.get_config())
+        OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
 
     pub(crate) fn get_translation_client(
@@ -122,7 +134,7 @@ impl Qcs {
     > {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
-        let service = wrap_channel_with(channel, self.get_config());
+        let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(TranslationClient::new(service))
     }
 

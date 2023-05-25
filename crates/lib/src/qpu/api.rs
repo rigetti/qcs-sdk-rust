@@ -16,7 +16,7 @@ use qcs_api_client_grpc::{
 
 use crate::executable::Parameters;
 
-use super::client::{GrpcClientError, Qcs};
+use crate::client::{GrpcClientError, Qcs};
 
 pub(crate) fn params_into_job_execution_configuration(
     params: &Parameters,

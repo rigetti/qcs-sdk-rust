@@ -16,8 +16,8 @@ use rigetti_pyo3::{
     wrap_error, PyWrapper, ToPythonError,
 };
 
+use crate::client::PyQcsClient;
 use crate::py_sync::py_function_sync_async;
-use crate::qpu::client::PyQcsClient;
 use crate::qpu::isa::PyInstructionSetArchitecture;
 
 create_init_submodule! {
@@ -107,7 +107,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         options: Option<PyCompilerOpts>,
     ) -> PyResult<PyCompilationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let options = options.unwrap_or_default();
         qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(RustQuilcError::from)
@@ -190,7 +190,7 @@ py_function_sync_async! {
     async fn get_version_info(
         client: Option<PyQcsClient>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         qcs::compiler::quilc::get_version_info(&client)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
@@ -243,7 +243,7 @@ py_function_sync_async! {
         request: PyConjugateByCliffordRequest,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyConjugatePauliByCliffordResponse> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         qcs::compiler::quilc::conjugate_pauli_by_clifford(&client, request.into())
             .map(PyConjugatePauliByCliffordResponse::from)
             .map_err(RustQuilcError::from)
@@ -293,7 +293,7 @@ py_function_sync_async! {
         request: PyRandomizedBenchmarkingRequest,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyGenerateRandomizedBenchmarkingSequenceResponse> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client, request.into())
             .map(PyGenerateRandomizedBenchmarkingSequenceResponse::from)
             .map_err(RustQuilcError::from)

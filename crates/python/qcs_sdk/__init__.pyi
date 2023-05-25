@@ -23,7 +23,7 @@ from ._register_data import (
     RegisterData as RegisterData,
 )
 
-from .qpu.client import (
+from .client import (
     # classes
     QCSClient as QCSClient,
 )

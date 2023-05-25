@@ -1,17 +1,16 @@
 from typing import Dict, List, Optional, final
 
-from .client import QCSClient
-
+from qcs_sdk.client import QCSClient
 
 class SubmissionError(RuntimeError):
     """There was a problem submitting the program to QCS for execution."""
-    ...
 
+    ...
 
 class RetrieveResultsError(RuntimeError):
     """There was a problem retrieving program execution results from QCS."""
-    ...
 
+    ...
 
 @final
 class Register:
@@ -32,18 +31,14 @@ class Register:
 
     def is_i32(self) -> bool: ...
     def is_complex32(self) -> bool: ...
-
     def as_i32(self) -> Optional[List[int]]: ...
     def as_complex32(self) -> Optional[List[complex]]: ...
-
     def to_i32(self) -> List[int]: ...
     def to_complex32(self) -> List[complex]: ...
-
     @staticmethod
     def from_i32(inner: List[int]) -> "Register": ...
     @staticmethod
     def from_complex32(inner: List[complex]) -> "Register": ...
-
 
 @final
 class ExecutionResult:
@@ -53,17 +48,14 @@ class ExecutionResult:
     def shape(self) -> List[int]:
         """The shape of the result data."""
         ...
-
     @property
     def data(self) -> Register:
         """The result data for all shots by the particular memory location."""
         ...
-
     @property
     def dtype(self) -> str:
         """The type of the result data (as a `numpy` `dtype`)."""
         ...
-
 
 @final
 class ExecutionResults:
@@ -77,12 +69,10 @@ class ExecutionResults:
         See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
         """
         ...
-
     @property
     def execution_duration_microseconds(self) -> Optional[int]:
         """The time spent executing the program."""
         ...
-
 
 def submit(
     program: str,
@@ -106,7 +96,6 @@ def submit(
     :raises SubmissionError: If there was a problem submitting the program for execution.
     """
     ...
-
 
 async def submit_async(
     program: str,
@@ -132,7 +121,6 @@ async def submit_async(
     """
     ...
 
-
 def retrieve_results(
     job_id: str,
     quantum_processor_id: str,
@@ -153,7 +141,6 @@ def retrieve_results(
     :raises SubmissionError: If there was a problem during program execution.
     """
     ...
-
 
 async def retrieve_results_async(
     job_id: str,
