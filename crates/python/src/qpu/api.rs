@@ -8,7 +8,8 @@ use pyo3::{
     types::{PyComplex, PyInt},
     Py, PyResult,
 };
-use qcs::qpu::{api::JobTarget, client::GrpcClientError};
+use qcs::client::GrpcClientError;
+use qcs::qpu::api::JobTarget;
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
     create_init_submodule, num_complex, py_wrap_error, py_wrap_union_enum, wrap_error,
@@ -17,7 +18,7 @@ use rigetti_pyo3::{
 
 use crate::py_sync::py_function_sync_async;
 
-use super::client::PyQcsClient;
+use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -68,7 +69,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         endpoint_id: Option<String>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
 
         // Is there a better way to map these patch_values keys? This
         // negates the whole purpose of [`submit`] using `Box<str>`,
@@ -188,7 +189,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         endpoint_id: Option<String>,
     ) -> PyResult<ExecutionResults> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
 
         let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
 

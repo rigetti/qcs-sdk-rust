@@ -1,10 +1,11 @@
 use std::str::FromStr;
 use std::{collections::HashMap, num::NonZeroU16};
 
-use qcs_api_client_common::ClientConfiguration;
 use quil_rs::Program;
 
 use crate::{executable::Parameters, qvm::run_program};
+
+use crate::client::Qcs;
 
 use super::{api::AddressRequest, Error, QvmResultData};
 
@@ -57,7 +58,7 @@ impl Execution {
         shots: NonZeroU16,
         addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
-        config: &ClientConfiguration,
+        client: &Qcs,
     ) -> Result<QvmResultData, Error> {
         run_program(
             &self.program,
@@ -67,7 +68,7 @@ impl Execution {
             None,
             None,
             None,
-            config,
+            client,
         )
         .await
     }
@@ -77,7 +78,8 @@ impl Execution {
 mod describe_execution {
     use std::{collections::HashMap, num::NonZeroU16};
 
-    use super::{ClientConfiguration, Execution, Parameters};
+    use super::{Execution, Parameters};
+    use crate::client::Qcs;
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
@@ -91,7 +93,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &ClientConfiguration::default(),
+                &Qcs::default(),
             )
             .await;
         if let Err(e) = result {
@@ -113,7 +115,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &ClientConfiguration::default(),
+                &Qcs::default(),
             )
             .await;
         if let Err(e) = result {

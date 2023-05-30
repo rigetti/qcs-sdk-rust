@@ -1,9 +1,7 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
 use super::RustQvmError;
-use crate::{
-    py_sync::py_function_sync_async, qpu::client::PyQcsClient, register_data::PyRegisterData,
-};
+use crate::{client::PyQcsClient, py_sync::py_function_sync_async, register_data::PyRegisterData};
 
 use pyo3::{
     pymethods,
@@ -49,9 +47,8 @@ create_init_submodule! {
 py_function_sync_async! {
     #[pyfunction(client = "None")]
     async fn get_version_info(client: Option<PyQcsClient>) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let config = client.get_config();
-        qcs::qvm::api::get_version_info(&config)
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::qvm::api::get_version_info(&client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
@@ -142,13 +139,12 @@ py_function_sync_async! {
         request: PyMultishotRequest,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyMultishotResponse> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let config = client.get_config();
-        qcs::qvm::api::run(request.as_inner(), &config)
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::qvm::api::run(request.as_inner(), &client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
-            .map(|response| PyMultishotResponse(response))
+            .map(PyMultishotResponse)
     }
 }
 
@@ -201,9 +197,8 @@ impl PyMultishotMeasureRequest {
 py_function_sync_async! {
     #[pyfunction(client = "None")]
     async fn run_and_measure(request: PyMultishotMeasureRequest, client: Option<PyQcsClient>) -> PyResult<Vec<Vec<i64>>> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let config = client.get_config();
-        qcs::qvm::api::run_and_measure(request.as_inner(), &config)
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::qvm::api::run_and_measure(request.as_inner(), &client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
@@ -234,8 +229,8 @@ impl PyExpectationRequest {
 py_function_sync_async! {
     #[pyfunction(client = "None")]
     async fn measure_expectation(request: PyExpectationRequest, client: Option<PyQcsClient>) -> PyResult<Vec<f64>> {
-        let config = PyQcsClient::get_or_create_client(client).await?.get_config();
-        qcs::qvm::api::measure_expectation(request.as_inner(), &config)
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::qvm::api::measure_expectation(request.as_inner(), &client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)
@@ -273,8 +268,8 @@ impl PyWavefunctionRequest {
 py_function_sync_async! {
     #[pyfunction(client = "None")]
     async fn get_wavefunction(request: PyWavefunctionRequest, client: Option<PyQcsClient>) -> PyResult<Vec<u8>> {
-        let config = PyQcsClient::get_or_create_client(client).await?.get_config();
-        qcs::qvm::api::get_wavefunction(request.as_inner(), &config)
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::qvm::api::get_wavefunction(request.as_inner(), &client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)

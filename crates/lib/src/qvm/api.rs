@@ -3,11 +3,10 @@
 //! for running parameterized programs.
 use std::{collections::HashMap, num::NonZeroU16};
 
-use qcs_api_client_common::ClientConfiguration;
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use crate::RegisterData;
+use crate::{client::Qcs, RegisterData};
 
 use super::Error;
 
@@ -55,44 +54,36 @@ impl<T: DeserializeOwned> QvmResponse<T> {
 }
 
 /// Fetch the version information from the running QVM server.
-pub async fn get_version_info(config: &ClientConfiguration) -> Result<String, Error> {
+pub async fn get_version_info(client: &Qcs) -> Result<String, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("requesting qvm version information");
     let params = HashMap::from([("type", "version")]);
-    let response = make_request(&params, config).await?;
+    let response = make_request(&params, client).await?;
+    let qvm_url = client.get_config().qvm_url().into();
     if response.status() == 200 {
         response
             .text()
             .await
-            .map_err(|source| Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
-                source,
-            })
+            .map_err(|source| Error::QvmCommunication { qvm_url, source })
     } else {
         match response.json::<Failure>().await {
             Ok(Failure { status: message }) => Err(Error::Qvm { message }),
-            Err(source) => Err(Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
-                source,
-            }),
+            Err(source) => Err(Error::QvmCommunication { qvm_url, source }),
         }
     }
 }
 
 /// Executes a program on the QVM.
-pub async fn run(
-    request: &MultishotRequest,
-    config: &ClientConfiguration,
-) -> Result<MultishotResponse, Error> {
+pub async fn run(request: &MultishotRequest, client: &Qcs) -> Result<MultishotResponse, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("making a multishot request to the QVM");
-    let response = make_request(request, config).await?;
+    let response = make_request(request, client).await?;
     response
         .json::<QvmResponse<MultishotResponse>>()
         .await
         .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
+            qvm_url: client.get_config().qvm_url().into(),
             source,
         })?
 }
@@ -182,15 +173,15 @@ pub struct MultishotResponse {
 /// Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial.
 pub async fn run_and_measure(
     request: &MultishotMeasureRequest,
-    config: &ClientConfiguration,
+    client: &Qcs,
 ) -> Result<Vec<Vec<i64>>, Error> {
-    let response = make_request(request, config).await?;
+    let response = make_request(request, client).await?;
     response
         .json::<QvmResponse<Vec<Vec<i64>>>>()
         .await
         .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
+            qvm_url: client.get_config().qvm_url().into(),
             source,
         })?
 }
@@ -244,15 +235,15 @@ impl MultishotMeasureRequest {
 /// Measure the expectation value of pauli operators given a defined state.
 pub async fn measure_expectation(
     request: &ExpectationRequest,
-    config: &ClientConfiguration,
+    client: &Qcs,
 ) -> Result<Vec<f64>, Error> {
-    let response = make_request(request, config).await?;
+    let response = make_request(request, client).await?;
     response
         .json::<QvmResponse<Vec<f64>>>()
         .await
         .map(QvmResponse::into_result)
         .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
+            qvm_url: client.get_config().qvm_url().into(),
             source,
         })?
 }
@@ -288,23 +279,23 @@ impl ExpectationRequest {
 /// Run a program and retrieve the resulting wavefunction.
 pub async fn get_wavefunction(
     request: &WavefunctionRequest,
-    config: &ClientConfiguration,
+    client: &Qcs,
 ) -> Result<Vec<u8>, Error> {
-    let response = make_request(request, config).await?;
+    let response = make_request(request, client).await?;
     if response.status() == 200 {
         response
             .bytes()
             .await
             .map(Into::into)
             .map_err(|source| Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
+                qvm_url: client.get_config().qvm_url().into(),
                 source,
             })
     } else {
         match response.json::<Failure>().await {
             Ok(Failure { status: message }) => Err(Error::Qvm { message }),
             Err(source) => Err(Error::QvmCommunication {
-                qvm_url: config.qvm_url().into(),
+                qvm_url: client.get_config().qvm_url().into(),
                 source,
             }),
         }
@@ -349,18 +340,19 @@ impl WavefunctionRequest {
     }
 }
 
-async fn make_request<T>(request: &T, config: &ClientConfiguration) -> Result<Response, Error>
+async fn make_request<T>(request: &T, client: &Qcs) -> Result<Response, Error>
 where
     T: Serialize,
 {
+    let qvm_url = client.get_config().qvm_url();
     let client = reqwest::Client::new();
     client
-        .post(config.qvm_url())
+        .post(qvm_url)
         .json(request)
         .send()
         .await
         .map_err(|source| Error::QvmCommunication {
-            qvm_url: config.qvm_url().into(),
+            qvm_url: qvm_url.into(),
             source,
         })
 }

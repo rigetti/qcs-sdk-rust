@@ -1,3 +1,62 @@
+## 0.7.0
+
+### Breaking Changes
+
+- Loading a Qcs Client is now infallible and is the primary client used throughout the library. (#302)
+
+## 0.7.0-rc.0
+
+### Breaking Changes
+
+- Loading a Qcs Client is now infallible and is the primary client used throughout the library. (#302)
+
+## 0.6.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- check signals before blocking thread (#299)
+- qvm_url is now set correctly when intializing a QCSClient (#296)
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.6.0-rc.4
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- check signals before blocking thread (#299)
+- qvm_url is now set correctly when intializing a QCSClient (#296)
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.6.0-rc.3
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- qvm_url is now set correctly when intializing a QCSClient (#296)
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
 ## 0.6.0-rc.2
 
 ### Breaking Changes

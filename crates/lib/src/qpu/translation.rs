@@ -16,7 +16,7 @@ use qcs_api_client_openapi::{
 };
 use tokio::time::error::Elapsed;
 
-use super::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
+use crate::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
 
 /// An encrypted and translated program, along with `readout_map`
 /// to map job `readout_data` back to program-declared variables.

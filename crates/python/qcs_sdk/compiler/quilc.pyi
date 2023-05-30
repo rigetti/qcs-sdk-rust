@@ -1,7 +1,7 @@
 from typing import Sequence, Optional, final
 
 from ..qpu.isa import InstructionSetArchitecture
-from ..qpu.client import QCSClient
+from qcs_sdk.client import QCSClient
 
 DEFAULT_COMPILER_TIMEOUT: float
 """Number of seconds to wait before timing out."""

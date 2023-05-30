@@ -2,6 +2,7 @@
 //! the [`Execution`] struct in this module.
 use std::time::Duration;
 
+use crate::client::{OpenApiClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
 use qcs_api_client_openapi::{
     apis::{
         quantum_processors_api::{
@@ -14,13 +15,11 @@ use qcs_api_client_openapi::{
 use tokio::time::error::Elapsed;
 
 pub mod api;
-pub mod client;
 mod execution;
 pub mod result_data;
 pub mod rewrite_arithmetic;
 pub mod translation;
 
-pub use client::Qcs;
 pub(crate) use execution::{Error as ExecutionError, Execution};
 #[allow(clippy::module_name_repetitions)]
 pub use result_data::{QpuResultData, ReadoutValues};
@@ -44,11 +43,11 @@ pub async fn get_isa(
 
     get_instruction_set_architecture(&client.get_openapi_client(), quantum_processor_id)
         .await
-        .map_err(client::OpenApiClientError::RequestFailed)
+        .map_err(OpenApiClientError::RequestFailed)
 }
 
 /// Error raised due to failure to get an ISA
-pub type GetIsaError = client::OpenApiClientError<GetInstructionSetArchitectureError>;
+pub type GetIsaError = OpenApiClientError<GetInstructionSetArchitectureError>;
 
 /// API Errors encountered when trying to list available quantum processors.
 #[derive(Debug, thiserror::Error)]
@@ -71,7 +70,7 @@ pub async fn list_quantum_processors(
     #[cfg(feature = "tracing")]
     tracing::debug!("listing quantum processors");
 
-    let timeout = timeout.unwrap_or(client::DEFAULT_HTTP_API_TIMEOUT);
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
 
     tokio::time::timeout(timeout, async move {
         let mut quantum_processors = vec![];

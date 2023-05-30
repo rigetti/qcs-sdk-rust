@@ -20,11 +20,11 @@ use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
 use super::api::{retrieve_results, submit, JobTarget};
-use super::client::{GrpcClientError, Qcs};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
+use crate::client::{GrpcClientError, Qcs};
 use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be

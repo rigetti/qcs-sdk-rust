@@ -1,6 +1,10 @@
 from typing import Dict, Optional, final
 
+<<<<<<< HEAD
 from .client import QCSClient
+=======
+from qcs_sdk.client import QCSClient
+>>>>>>> main
 
 class GetQuiltCalibrationsError(RuntimeError):
     """An error occured while fetching Quil-T calibrations."""

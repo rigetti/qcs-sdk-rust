@@ -135,8 +135,8 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(self, execute_on_qvm))
+    pub fn execute_on_qvm(&self, py: Python<'_>) -> PyResult<PyExecutionData> {
+        py_sync!(py, py_executable_data!(self, execute_on_qvm))
     }
 
     pub fn execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
@@ -154,19 +154,25 @@ impl PyExecutable {
         let translation_options =
             Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
-            Some(endpoint_id) => py_sync!(py_executable_data!(
-                self,
-                execute_on_qpu_with_endpoint,
-                quantum_processor_id,
-                endpoint_id,
-                translation_options,
-            )),
-            None => py_sync!(py_executable_data!(
-                self,
-                execute_on_qpu,
-                quantum_processor_id,
-                translation_options,
-            )),
+            Some(endpoint_id) => py_sync!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                )
+            ),
+            None => py_sync!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu,
+                    quantum_processor_id,
+                    translation_options,
+                )
+            ),
         }
     }
 
@@ -214,19 +220,25 @@ impl PyExecutable {
         let translation_options =
             Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
         match endpoint_id {
-            Some(endpoint_id) => py_sync!(py_job_handle!(
-                self,
-                submit_to_qpu_with_endpoint,
-                quantum_processor_id,
-                endpoint_id,
-                translation_options,
-            )),
-            None => py_sync!(py_job_handle!(
-                self,
-                submit_to_qpu,
-                quantum_processor_id,
-                translation_options
-            )),
+            Some(endpoint_id) => py_sync!(
+                py,
+                py_job_handle!(
+                    self,
+                    submit_to_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                )
+            ),
+            None => py_sync!(
+                py,
+                py_job_handle!(
+                    self,
+                    submit_to_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
+            ),
         }
     }
 
@@ -265,12 +277,15 @@ impl PyExecutable {
         }
     }
 
-    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(
-            self,
-            retrieve_results,
-            job_handle.into()
-        ))
+    pub fn retrieve_results(
+        &mut self,
+        py: Python<'_>,
+        job_handle: PyJobHandle,
+    ) -> PyResult<PyExecutionData> {
+        py_sync!(
+            py,
+            py_executable_data!(self, retrieve_results, job_handle.into())
+        )
     }
 
     pub fn retrieve_results_async<'py>(

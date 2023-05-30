@@ -3,8 +3,7 @@
 
 use std::num::NonZeroU16;
 
-use qcs::Executable;
-use qcs_api_client_openapi::common::ClientConfiguration;
+use qcs::{client::Qcs, Executable};
 
 const PROGRAM: &str = r##"
 DECLARE first BIT
@@ -22,7 +21,7 @@ async fn test_bell_state() {
     let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
-        .with_config(ClientConfiguration::default())
+        .with_client(Qcs::load().await)
         .with_shots(shots)
         .read_from("first")
         .read_from("second")

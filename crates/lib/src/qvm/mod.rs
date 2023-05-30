@@ -3,7 +3,6 @@
 
 use std::{collections::HashMap, num::NonZeroU16, str::FromStr};
 
-use qcs_api_client_common::ClientConfiguration;
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     program::ProgramError,
@@ -13,7 +12,7 @@ use serde::Deserialize;
 
 pub(crate) use execution::Execution;
 
-use crate::{executable::Parameters, RegisterData};
+use crate::{client::Qcs, executable::Parameters, RegisterData};
 
 use self::api::AddressRequest;
 
@@ -52,7 +51,7 @@ pub async fn run(
     measurement_noise: Option<(f64, f64, f64)>,
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
-    config: &ClientConfiguration,
+    client: &Qcs,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
@@ -65,7 +64,7 @@ pub async fn run(
         measurement_noise,
         gate_noise,
         rng_seed,
-        config,
+        client,
     )
     .await
 }
@@ -81,7 +80,7 @@ pub async fn run_program(
     measurement_noise: Option<(f64, f64, f64)>,
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
-    config: &ClientConfiguration,
+    client: &Qcs,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
@@ -99,7 +98,7 @@ pub async fn run_program(
         gate_noise,
         rng_seed,
     );
-    api::run(&request, config)
+    api::run(&request, client)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
 }

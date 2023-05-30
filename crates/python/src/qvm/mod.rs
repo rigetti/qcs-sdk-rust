@@ -7,9 +7,7 @@ use rigetti_pyo3::{
 use std::collections::HashMap;
 use std::num::NonZeroU16;
 
-use crate::{
-    py_sync::py_function_sync_async, qpu::client::PyQcsClient, register_data::PyRegisterData,
-};
+use crate::{client::PyQcsClient, py_sync::py_function_sync_async, register_data::PyRegisterData};
 
 mod api;
 
@@ -62,11 +60,10 @@ py_function_sync_async! {
         rng_seed: Option<i64>,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyQvmResultData> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
-        let config = client.get_config();
+        let client = PyQcsClient::get_or_create_client(client).await;
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
-        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, addresses, &params, measurement_noise, gate_noise, rng_seed, &config)
+        Ok(PyQvmResultData(qcs::qvm::run(&quil, shots, addresses, &params, measurement_noise, gate_noise, rng_seed, &client)
             .await
             .map_err(RustQvmError::from)
             .map_err(RustQvmError::to_py_err)?))

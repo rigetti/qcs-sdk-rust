@@ -9,6 +9,7 @@ from .qpu import QPUResultData
 from .qvm import QVMResultData
 from .compiler.quilc import CompilerOpts
 
+<<<<<<< HEAD
 from .qpu.client import QCSClient as QCSClient
 
 class ExecutionError(RuntimeError):
@@ -357,3 +358,9 @@ class RegisterData:
     def from_f64(inner: Sequence[Sequence[float]]) -> "RegisterData": ...
     @staticmethod
     def from_complex32(inner: Sequence[Sequence[complex]]) -> "RegisterData": ...
+=======
+from .client import (
+    # classes
+    QCSClient as QCSClient,
+)
+>>>>>>> main
