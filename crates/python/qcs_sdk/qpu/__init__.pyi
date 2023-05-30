@@ -1,11 +1,9 @@
 from typing import Dict, Sequence, Optional, Union, final
 
-<<<<<<< HEAD
-from .client import QCSClient
+from qcs_sdk.client import QCSClient
 
 from . import (
     api as api,
-    client as client,
     isa as isa,
     rewrite_arithmetic as rewrite_arithmetic,
     translation as translation,
@@ -72,14 +70,6 @@ class QPUResultData:
         """
         ...
 
-=======
-from qcs_sdk.client import QCSClient
-from ._result_data import (
-    QPUResultData as QPUResultData,
-    ReadoutValues as ReadoutValues,
-)
-
->>>>>>> main
 class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
 

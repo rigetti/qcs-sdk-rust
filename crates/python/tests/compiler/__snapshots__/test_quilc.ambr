@@ -1,18 +1,18 @@
 # name: test_compile_program
   '''
   DECLARE ro BIT[2]
-  RZ(((-pi)/2)) 1
-  RX((pi/2)) 1
-  RZ((pi/2)) 1
+  RZ(-pi/2) 1
+  RX(pi/2) 1
+  RZ(pi/2) 1
   RZ(pi) 0
-  RX((pi/2)) 0
+  RX(pi/2) 0
   RZ(pi) 0
-  RX(((-pi)/2)) 0
+  RX(-pi/2) 0
   CZ 1 0
   RZ(pi) 0
-  RZ(((-3)*(pi/2))) 1
-  RX((pi/2)) 1
-  RZ((3*(pi/2))) 1
+  RZ((-3*pi)/2) 1
+  RX(pi/2) 1
+  RZ((3*pi)/2) 1
   MEASURE 0 ro[0]
   MEASURE 1 ro[1]
   

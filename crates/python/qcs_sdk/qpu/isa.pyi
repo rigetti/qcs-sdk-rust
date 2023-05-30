@@ -67,11 +67,7 @@ class Edge:
         """
         ...
     @node_ids.setter
-<<<<<<< HEAD
     def node_ids(self, value: Sequence[int]): ...
-=======
-    def node_ids(self, value: List[int]): ...
->>>>>>> main
 
 @final
 class Parameter:
@@ -116,11 +112,7 @@ class Characteristic:
         """
         ...
     @node_ids.setter
-<<<<<<< HEAD
     def node_ids(self, value: Optional[Sequence[int]]): ...
-=======
-    def node_ids(self, value: Optional[List[int]]): ...
->>>>>>> main
     @property
     def timestamp(self) -> str:
         """ISO8601 date and time at which the characteristic was measured."""
@@ -136,11 +128,7 @@ class Characteristic:
         """
         ...
     @parameter_values.setter
-<<<<<<< HEAD
     def parameter_values(self, value: Optional[Sequence[float]]): ...
-=======
-    def parameter_values(self, value: Optional[List[float]]): ...
->>>>>>> main
 
 @final
 class OperationSite:
@@ -154,21 +142,13 @@ class OperationSite:
         """
         ...
     @node_ids.setter
-<<<<<<< HEAD
     def node_ids(self, value: Sequence[int]): ...
-=======
-    def node_ids(self, value: List[int]): ...
->>>>>>> main
     @property
     def characteristics(self) -> Sequence[Characteristic]:
         """The list of site-dependent characteristics of this operation."""
         ...
     @characteristics.setter
-<<<<<<< HEAD
     def characteristics(self, value: Sequence[Characteristic]): ...
-=======
-    def characteristics(self, value: List[Characteristic]): ...
->>>>>>> main
 
 @final
 class Operation:
@@ -191,11 +171,7 @@ class Operation:
         """The list of parameters. Each parameter must be uniquely named. May be empty."""
         ...
     @parameters.setter
-<<<<<<< HEAD
     def parameters(self, value: Sequence[Parameter]): ...
-=======
-    def parameters(self, value: List[Parameter]): ...
->>>>>>> main
     @property
     def sites(self) -> Sequence[OperationSite]:
         """
@@ -204,21 +180,13 @@ class Operation:
         """
         ...
     @sites.setter
-<<<<<<< HEAD
     def sites(self, value: Sequence[OperationSite]): ...
-=======
-    def sites(self, value: List[OperationSite]): ...
->>>>>>> main
     @property
     def characteristics(self) -> Sequence[Characteristic]:
         """The list of site-independent characteristics of this operation."""
         ...
     @characteristics.setter
-<<<<<<< HEAD
     def characteristics(self, value: Sequence[Characteristic]): ...
-=======
-    def characteristics(self, value: List[Characteristic]): ...
->>>>>>> main
 
 @final
 class Architecture:
@@ -262,21 +230,13 @@ class Architecture:
         """A list of all computational nodes in the instruction set architecture."""
         ...
     @nodes.setter
-<<<<<<< HEAD
     def nodes(self, value: Sequence[Node]): ...
-=======
-    def nodes(self, value: List[Node]): ...
->>>>>>> main
     @property
     def edges(self) -> Sequence[Edge]:
         """A list of all computational edges in the instruction set architecture."""
         ...
     @edges.setter
-<<<<<<< HEAD
     def edges(self, value: Sequence[Edge]): ...
-=======
-    def edges(self, value: List[Edge]): ...
->>>>>>> main
 
 @final
 class InstructionSetArchitecture:
@@ -308,21 +268,13 @@ class InstructionSetArchitecture:
         """The list of native QUIL instructions supported by the quantum processor."""
         ...
     @instructions.setter
-<<<<<<< HEAD
     def instructions(self, value: Sequence[Operation]): ...
-=======
-    def instructions(self, value: List[Operation]): ...
->>>>>>> main
     @property
     def benchmarks(self) -> Sequence[Operation]:
         """The list of benchmarks that have characterized the quantum processor."""
         ...
     @benchmarks.setter
-<<<<<<< HEAD
     def benchmarks(self, value: Sequence[Operation]): ...
-=======
-    def benchmarks(self, value: List[Operation]): ...
->>>>>>> main
     @staticmethod
     def from_raw(value: str) -> "InstructionSetArchitecture":
         """

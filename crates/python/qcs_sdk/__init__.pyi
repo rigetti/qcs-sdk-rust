@@ -5,12 +5,11 @@ from typing import Dict, Sequence, Optional, Union, final
 import numpy as np
 from numpy.typing import NDArray
 
-from .qpu import QPUResultData
-from .qvm import QVMResultData
-from .compiler.quilc import CompilerOpts
+from qcs_sdk.qpu import QPUResultData
+from qcs_sdk.qvm import QVMResultData
+from qcs_sdk.compiler.quilc import CompilerOpts
 
-<<<<<<< HEAD
-from .qpu.client import QCSClient as QCSClient
+from qcs_sdk.client import QCSClient as QCSClient
 
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""
@@ -358,9 +357,3 @@ class RegisterData:
     def from_f64(inner: Sequence[Sequence[float]]) -> "RegisterData": ...
     @staticmethod
     def from_complex32(inner: Sequence[Sequence[complex]]) -> "RegisterData": ...
-=======
-from .client import (
-    # classes
-    QCSClient as QCSClient,
-)
->>>>>>> main

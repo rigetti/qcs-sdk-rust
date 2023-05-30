@@ -1,0 +1,5 @@
+---
+source: crates/lib/src/qpu/rewrite_arithmetic.rs
+expression: "substitutions[0].to_string()"
+---
+theta[0]/8

@@ -1,8 +1,12 @@
 import pytest
 from urllib.parse import urlparse
 
-from qcs_sdk import QCSClient
-from qcs_sdk.client import LoadClientError, QCSClientAuthServer, QCSClientTokens
+from qcs_sdk.client import (
+    QCSClient,
+    LoadClientError,
+    QCSClientAuthServer,
+    QCSClientTokens,
+)
 
 
 @pytest.fixture

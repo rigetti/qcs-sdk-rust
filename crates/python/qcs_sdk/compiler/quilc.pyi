@@ -1,6 +1,6 @@
 from typing import Sequence, Optional, final
 
-from ..qpu.isa import InstructionSetArchitecture
+from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
 
 DEFAULT_COMPILER_TIMEOUT: float

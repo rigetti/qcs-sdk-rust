@@ -2,7 +2,7 @@ from typing import Dict, Sequence, Optional, final, Union, Tuple
 from typing_extensions import Self
 
 from qcs_sdk import RegisterData
-from qcs_sdk.qpu.client import QCSClient
+from qcs_sdk.client import QCSClient
 
 def get_version_info(client: Optional[QCSClient] = None) -> str:
     """
