@@ -4,6 +4,7 @@ use std::{collections::HashMap, time::Duration};
 use pyo3::{
     exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult, Python,
 };
+
 use qcs::client::GrpcClientError;
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
@@ -101,12 +102,12 @@ pub struct PyTranslationResult {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
     /// Translates a native Quil program into an executable
     ///
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
+    #[pyfunction(client = "None")]
     async fn translate(
         native_quil: String,
         num_shots: u32,
@@ -134,3 +135,49 @@ py_function_sync_async! {
         })
     }
 }
+
+// #[pyfunction(client = "None")]
+// /// Translates a native Quil program into an executable
+// ///
+// /// # Errors
+// ///
+// /// Returns a [`TranslationError`] if translation fails.
+// fn translate(
+//     py: Python<'_>,
+//     native_quil: String,
+//     num_shots: u32,
+//     quantum_processor_id: String,
+//     client: Option<PyQcsClient>,
+//     translation_options: Option<PyTranslationOptions>,
+// ) -> PyResult<PyTranslationResult> {
+//     let runtime = pyo3_asyncio::tokio::get_runtime();
+//     let client = runtime.block_on(PyQcsClient::get_or_create_client(client));
+//     let translation_options =
+//         Python::with_gil(|py| Option::<TranslationOptions>::py_try_from(py, &translation_options))?;
+//
+//     let result = runtime.block_on(async { tokio::select! {
+//         translate_result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options) => {
+//             Ok(translate_result.map_err(RustTranslationError::from).map_err(RustTranslationError::to_py_err)?)
+//         }
+//         signal_result = async {
+//             loop {
+//                 if py.check_signals().is_err() {
+//                     break
+//                 }
+//                 tokio::time::sleep(Duration::from_millis(100)).await;
+//             }
+//             Err(::pyo3::exceptions::PyRuntimeError::new_err("ctrl-c received"))
+//         } => {
+//             signal_result
+//         }
+//     }})?;
+//
+//     let program = serde_json::to_string(&result.job)
+//         .map_err(RustTranslationError::from)
+//         .map_err(RustTranslationError::to_py_err)?;
+//
+//     Ok(PyTranslationResult {
+//         program,
+//         ro_sources: Some(result.readout_map),
+//     })
+// }
