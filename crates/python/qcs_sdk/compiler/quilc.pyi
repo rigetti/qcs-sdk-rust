@@ -1,4 +1,4 @@
-from typing import Sequence, Optional, final
+from typing import List, Sequence, Optional, final
 
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
@@ -73,13 +73,13 @@ class PauliTerm:
         symbols: Sequence[str],
     ) -> "PauliTerm": ...
     @property
-    def indices(self) -> Sequence[int]:
+    def indices(self) -> List[int]:
         """Qubit indices onto which the factors of the Pauli Term are applied."""
         ...
     @indices.setter
     def indices(self, value: Sequence[int]): ...
     @property
-    def symbols(self) -> Sequence[str]:
+    def symbols(self) -> List[str]:
         """Ordered factors of the Pauli Term."""
         ...
     @symbols.setter
@@ -147,7 +147,7 @@ class RandomizedBenchmarkingRequest:
     @qubits.setter
     def qubits(self, value: int): ...
     @property
-    def gateset(self) -> Sequence[str]:
+    def gateset(self) -> List[str]:
         """Sequence of Quil programs, each describing a Clifford."""
         ...
     @gateset.setter
@@ -170,7 +170,7 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
     """Randomly generated benchmarking sequence response."""
 
     @property
-    def sequence(self) -> Sequence[Sequence[int]]:
+    def sequence(self) -> List[List[int]]:
         """Sequence of Cliffords, each expressed as a list of generator indices."""
         ...
 
@@ -229,7 +229,7 @@ class NativeQuilMetadata:
     """
 
     @property
-    def final_rewiring(self) -> Sequence[int]:
+    def final_rewiring(self) -> List[int]:
         """
         Output qubit index relabeling due to SWAP insertion.
         """

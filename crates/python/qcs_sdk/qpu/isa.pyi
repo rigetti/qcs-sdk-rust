@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Sequence, Optional, final
+from typing import List, Sequence, Optional, final
 
 from qcs_sdk.client import QCSClient
 
@@ -60,14 +60,14 @@ class Edge:
     """
 
     @property
-    def node_ids(self) -> Sequence[int]:
+    def node_ids(self) -> List[int]:
         """
         The integer ids of the computational nodes at the two ends of the edge.
         Order is not important; an architecture edge is treated as undirected.
         """
         ...
     @node_ids.setter
-    def node_ids(self, value: Sequence[int]): ...
+    def node_ids(self, value: List[int]): ...
 
 @final
 class Parameter:
@@ -103,7 +103,7 @@ class Characteristic:
     @error.setter
     def error(self, value: Optional[float]): ...
     @property
-    def node_ids(self) -> Optional[Sequence[int]]:
+    def node_ids(self) -> Optional[List[int]]:
         """
         The list of architecture node ids for the site where the characteristic is
         measured, if that is different from the site of the enclosing operation.
@@ -120,7 +120,7 @@ class Characteristic:
     @timestamp.setter
     def timestamp(self, value: str): ...
     @property
-    def parameter_values(self) -> Optional[Sequence[float]]:
+    def parameter_values(self) -> Optional[List[float]]:
         """
         The optional ordered list of parameter values used to generate the characteristic.
         he order matches the parameters in the enclosing operation, and so the lengths of
@@ -135,7 +135,7 @@ class OperationSite:
     """A site for an operation, with its site-dependent characteristics."""
 
     @property
-    def node_ids(self) -> Sequence[int]:
+    def node_ids(self) -> List[int]:
         """
         The list of architecture node ids for the site. The order of these node ids
         obey the definition of node symmetry from the enclosing operation.
@@ -144,7 +144,7 @@ class OperationSite:
     @node_ids.setter
     def node_ids(self, value: Sequence[int]): ...
     @property
-    def characteristics(self) -> Sequence[Characteristic]:
+    def characteristics(self) -> List[Characteristic]:
         """The list of site-dependent characteristics of this operation."""
         ...
     @characteristics.setter
@@ -167,13 +167,13 @@ class Operation:
     @node_count.setter
     def node_count(self, value: Optional[int]): ...
     @property
-    def parameters(self) -> Sequence[Parameter]:
+    def parameters(self) -> List[Parameter]:
         """The list of parameters. Each parameter must be uniquely named. May be empty."""
         ...
     @parameters.setter
     def parameters(self, value: Sequence[Parameter]): ...
     @property
-    def sites(self) -> Sequence[OperationSite]:
+    def sites(self) -> List[OperationSite]:
         """
         The list of sites at which this operation can be applied,
         together with its site-dependent characteristics.
@@ -182,7 +182,7 @@ class Operation:
     @sites.setter
     def sites(self, value: Sequence[OperationSite]): ...
     @property
-    def characteristics(self) -> Sequence[Characteristic]:
+    def characteristics(self) -> List[Characteristic]:
         """The list of site-independent characteristics of this operation."""
         ...
     @characteristics.setter
@@ -226,13 +226,13 @@ class Architecture:
     @family.setter
     def family(self, value: Family): ...
     @property
-    def nodes(self) -> Sequence[Node]:
+    def nodes(self) -> List[Node]:
         """A list of all computational nodes in the instruction set architecture."""
         ...
     @nodes.setter
     def nodes(self, value: Sequence[Node]): ...
     @property
-    def edges(self) -> Sequence[Edge]:
+    def edges(self) -> List[Edge]:
         """A list of all computational edges in the instruction set architecture."""
         ...
     @edges.setter
@@ -264,13 +264,13 @@ class InstructionSetArchitecture:
     @architecture.setter
     def architecture(self, value: Architecture): ...
     @property
-    def instructions(self) -> Sequence[Operation]:
+    def instructions(self) -> List[Operation]:
         """The list of native QUIL instructions supported by the quantum processor."""
         ...
     @instructions.setter
     def instructions(self, value: Sequence[Operation]): ...
     @property
-    def benchmarks(self) -> Sequence[Operation]:
+    def benchmarks(self) -> List[Operation]:
         """The list of benchmarks that have characterized the quantum processor."""
         ...
     @benchmarks.setter

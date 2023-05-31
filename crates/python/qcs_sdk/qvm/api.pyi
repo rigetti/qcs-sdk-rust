@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, Optional, final, Union, Tuple
+from typing import Dict, List, Sequence, Mapping, Optional, Tuple, final
 from typing_extensions import Self
 
 from qcs_sdk import RegisterData
@@ -57,7 +57,7 @@ class MultishotRequest:
         cls,
         compiled_quil: str,
         trials: int,
-        addresses: Dict[str, AddressRequest],
+        addresses: Mapping[str, AddressRequest],
         measurement_noise: Optional[Tuple[float, float, float]],
         gate_noise: Optional[Tuple[float, float, float]],
         rng_seed: Optional[int],
@@ -94,7 +94,7 @@ class MultishotResponse:
     @property
     def registers(self) -> Dict[str, RegisterData]: ...
     @registers.setter
-    def registers(self, value: Dict[str, RegisterData]): ...
+    def registers(self, value: Mapping[str, RegisterData]): ...
 
 def run(
     request: MultishotRequest, client: Optional[QCSClient] = None
@@ -128,7 +128,7 @@ class MultishotMeasureRequest:
     @trials.setter
     def trials(self, value: int): ...
     @property
-    def qubits(self) -> Sequence[int]: ...
+    def qubits(self) -> List[int]: ...
     @qubits.setter
     def qubits(self, value: Sequence[int]): ...
     @property
@@ -146,13 +146,13 @@ class MultishotMeasureRequest:
 
 def run_and_measure(
     request: MultishotMeasureRequest, client: Optional[QCSClient] = None
-) -> Sequence[Sequence[int]]:
+) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
 
 def run_and_measure_async(
     request: MultishotMeasureRequest, client: Optional[QCSClient] = None
-) -> Sequence[Sequence[int]]:
+) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
 
@@ -169,7 +169,7 @@ class ExpectationRequest:
     @state_preparation.setter
     def state_preparation(self, value: str): ...
     @property
-    def operators(self) -> Sequence: ...
+    def operators(self) -> List: ...
     @operators.setter
     def operators(self, value: Sequence): ...
     @property
@@ -179,13 +179,13 @@ class ExpectationRequest:
 
 def measure_expectation(
     request: ExpectationRequest, client: Optional[QCSClient] = None
-) -> Sequence[float]:
+) -> List[float]:
     """Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state."""
     ...
 
 def measure_expectation_async(
     request: ExpectationRequest, client: Optional[QCSClient] = None
-) -> Sequence[float]:
+) -> List[float]:
     """Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state."""
     ...
 
@@ -225,6 +225,6 @@ def get_wavefunction(
 
 def get_wavefunction_async(
     request: WavefunctionRequest, client: Optional[QCSClient] = None
-) -> Sequence[int]:
+) -> List[int]:
     """Executes a program on the QVM, returning the resulting list of bytes."""
     ...

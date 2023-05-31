@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, final
+from typing import Dict, List, Sequence, Union, Mapping, final
 
 class RewriteArithmeticError(RuntimeError):
     """
@@ -33,7 +33,7 @@ class RewriteArithmeticResult:
         """The rewritten program."""
         ...
     @property
-    def recalculation_table(self) -> Sequence[str]:
+    def recalculation_table(self) -> List[str]:
         """
         The expressions used to fill-in the `__SUBST` memory location.
 
@@ -43,8 +43,8 @@ class RewriteArithmeticResult:
 
 def build_patch_values(
     recalculation_table: Sequence[str],
-    memory: Dict[str, Sequence[float]],
-) -> Dict[str, Sequence[float]]:
+    memory: Mapping[str, Union[Sequence[float], Sequence[int]]],
+) -> Dict[str, List[float]]:
     """
     Evaluate the expressions in `recalculation_table` using the numeric values provided in `memory`.
 

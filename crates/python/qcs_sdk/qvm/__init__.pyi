@@ -1,10 +1,10 @@
-from typing import Dict, final, Sequence, Optional, Tuple
+from typing import final, Mapping, Optional, Sequence, Tuple, Union
 
 from qcs_sdk import RegisterData, QCSClient
 
 from .api import AddressRequest
 
-from . import api
+from . import api as api
 
 @final
 class QVMResultData:
@@ -13,13 +13,13 @@ class QVMResultData:
     """
 
     @staticmethod
-    def from_memory_map(memory: Dict[str, RegisterData]) -> "QVMResultData":
+    def from_memory_map(memory: Mapping[str, RegisterData]) -> "QVMResultData":
         """
         Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.
         """
         ...
     @property
-    def memory(self) -> Dict[str, RegisterData]:
+    def memory(self) -> Mapping[str, RegisterData]:
         """
         Get the mapping of register names (ie. "ro") to a ``RegisterData`` matrix containing the register values.
         """
@@ -36,8 +36,8 @@ class QVMError(RuntimeError):
 def run(
     quil: str,
     shots: int,
-    addresses: Dict[str, AddressRequest],
-    params: Dict[str, Sequence[float]],
+    addresses: Mapping[str, AddressRequest],
+    params: Mapping[str, Union[Sequence[float], Sequence[int]]],
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
@@ -61,8 +61,8 @@ def run(
 async def run_async(
     quil: str,
     shots: int,
-    addresses: Dict[str, AddressRequest],
-    params: Dict[str, Sequence[float]],
+    addresses: Mapping[str, AddressRequest],
+    params: Mapping[str, Sequence[float]],
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
