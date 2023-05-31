@@ -21,19 +21,21 @@
 macro_rules! py_sync {
     ($py: ident, $body: expr) => {{
         let runtime = ::pyo3_asyncio::tokio::get_runtime();
-        let handle = runtime.spawn($body);
 
-        // A 100ms loop delay is a bit arbitrary, but seems to
-        // balance CPU usage and SIGINT responsiveness well enough.
-        let delay = ::std::time::Duration::from_millis(100);
-        while !handle.is_finished() {
-            $py.check_signals()?;
-            ::std::thread::sleep(delay);
-        }
-
-        runtime
-            .block_on(handle)
-            .map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?
+        runtime.block_on(async {
+            tokio::select! {
+                result = $body => result,
+                signal_err = async {
+                    // A 100ms loop delay is a bit arbitrary, but seems to
+                    // balance CPU usage and SIGINT responsiveness well enough.
+                    let delay = ::std::time::Duration::from_millis(100);
+                    loop {
+                        $py.check_signals()?;
+                        tokio::time::sleep(delay).await;
+                    }
+                } => signal_err,
+            }
+        })
     }};
 }
 
