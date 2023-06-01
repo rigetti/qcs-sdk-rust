@@ -283,16 +283,24 @@ testing = ["coverage (>=6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy 
 
 [[package]]
 name = "quil"
-version = "0.0.1"
+version = "0.1.0rc0"
 description = "A Python package for building and parsing Quil programs."
 optional = false
-python-versions = "^3.8"
-files = []
-develop = false
-
-[package.source]
-type = "directory"
-url = "../../../quil-rs/quil-py"
+python-versions = ">=3.8"
+files = [
+    {file = "quil-0.1.0rc0-cp310-cp310-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:86675608847b13b1a8ee319f8111675030d2a8dee7a668d74006812b83a2d78b"},
+    {file = "quil-0.1.0rc0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:29db0cf568bd61db51e5daaf285d650e8ba24af3f87318213b82e6d14b002768"},
+    {file = "quil-0.1.0rc0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:b779e212b8eb45aac7e7099061a6e814af0e53a6ebecddff4c7bf4fe1221eec1"},
+    {file = "quil-0.1.0rc0-cp311-cp311-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:de1f9ee1b6584b4605e743f4c2a9739e7b594bfdc1bd5ac1451de4899adc5e90"},
+    {file = "quil-0.1.0rc0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:b3badd1393bbe6c1c748970e0a8a0a6a8f28eea65fb19b4a0ce3d71e14237c84"},
+    {file = "quil-0.1.0rc0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5f104066e98e6ee4015add61f91ceaf37d515c4336a5ec3e22fc19864efb0c88"},
+    {file = "quil-0.1.0rc0-cp38-cp38-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:a281f30d756709f2396d57d02196f60cb310a43b5bda2a4751a75d424b79bc3d"},
+    {file = "quil-0.1.0rc0-cp38-cp38-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bb2330839fa63c610ee64dc3f7c04e00c7908ebb0ff39967c52d1d53f7f87123"},
+    {file = "quil-0.1.0rc0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f13bfcacec89a18c0478738b0481d1bb0adb094597627cbde262ba6d76a56772"},
+    {file = "quil-0.1.0rc0-cp39-cp39-macosx_10_9_x86_64.macosx_11_0_arm64.macosx_10_9_universal2.whl", hash = "sha256:12de84294bb1477011bafd7d3731d4dd397e801a7933a200e6a8f74ee21772ce"},
+    {file = "quil-0.1.0rc0-cp39-cp39-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:39766d0db1981e04cd4ec6e6f8ce80c241ea24334a1abdea67e2f2fa71db29ed"},
+    {file = "quil-0.1.0rc0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:be9d60e531bad1316199149a92e9b505b4ac4c3327dcfe6fc15578f5ab02f682"},
+]
 
 [[package]]
 name = "syrupy"
@@ -334,4 +342,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "644e6582971fe6f10a6ea445eb77a8e6e648ecb9cceb590df38767770c4513e4"
+content-hash = "7bb916435e56344fe1943ce8118fa367afee5a1e5ff9561a486e3b25cd494e3d"

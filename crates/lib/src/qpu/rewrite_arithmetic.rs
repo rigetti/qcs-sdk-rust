@@ -6,7 +6,7 @@ use std::{collections::HashMap, convert::TryFrom};
 use indexmap::set::IndexSet;
 use num::complex::Complex64;
 use quil_rs::{
-    expression::{Expression, InfixOperator},
+    expression::{Expression, InfixExpression, InfixOperator},
     instruction::{
         AttributeValue, FrameIdentifier, Gate, Instruction, MemoryReference, ScalarType,
         SetFrequency, SetPhase, SetScale, ShiftFrequency, ShiftPhase, Vector,
@@ -239,15 +239,15 @@ fn process_gate(mut gate: Gate, substitutions: &mut Substitutions) -> Instructio
 }
 
 fn divide_2_pi(expression: Expression) -> Expression {
-    Expression::Infix {
+    Expression::Infix(InfixExpression {
         left: Box::new(expression),
         operator: InfixOperator::Slash,
-        right: Box::new(Expression::Infix {
+        right: Box::new(Expression::Infix(InfixExpression {
             left: Box::new(Expression::Number(Complex64::from(2.0))),
             operator: InfixOperator::Star,
             right: Box::new(Expression::PiConstant),
-        }),
-    }
+        })),
+    })
     .into_simplified()
 }
 
@@ -259,11 +259,11 @@ fn process_set_scale(mut set_scale: SetScale, substitutions: &mut Substitutions)
 
     let SetScale { frame, scale } = set_scale;
 
-    let expression = Expression::Infix {
+    let expression = Expression::Infix(InfixExpression {
         left: Box::new(scale),
         operator: InfixOperator::Slash,
         right: Box::new(Expression::Number(Complex64::from(8.0))),
-    }
+    })
     .into_simplified();
 
     Instruction::SetScale(SetScale {
@@ -299,17 +299,17 @@ fn process_frequency_expression(
         }
     };
     if let Some(AttributeValue::Expression(center_frequency)) = attributes.get("CENTER-FREQUENCY") {
-        expression = Expression::Infix {
+        expression = Expression::Infix(InfixExpression {
             left: Box::new(expression),
             operator: InfixOperator::Minus,
             right: Box::new(center_frequency.clone()),
-        }
+        });
     }
-    expression = Expression::Infix {
+    expression = Expression::Infix(InfixExpression {
         left: Box::new(expression),
         operator: InfixOperator::Slash,
         right: Box::new(sample_rate.clone()),
-    };
+    });
     Ok(substitution(expression, substitutions))
 }
 
@@ -367,7 +367,7 @@ impl TryFrom<Program> for RewrittenProgram {
 
 impl RewrittenProgram {
     pub(crate) fn to_string(&self) -> RewrittenQuil {
-        RewrittenQuil(self.inner.to_string(true))
+        RewrittenQuil(self.inner.to_string())
     }
 }
 
@@ -388,7 +388,7 @@ mod describe_rewrite_arithmetic {
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/6.283185307179586)");
+        assert_eq!(substitutions[0].to_string(), "theta[0]/6.283185307179586");
     }
 
     #[test]
@@ -412,7 +412,7 @@ mod describe_rewrite_arithmetic {
         assert_eq!(substitutions.len(), 1);
         assert_eq!(
             substitutions[0].to_string(),
-            "((theta[0]*1.5)/6.283185307179586)"
+            "(theta[0]*1.5)/6.283185307179586"
         );
     }
 
@@ -442,11 +442,11 @@ RZ(__SUBST[1]) 0
         assert_eq!(substitutions.len(), 2);
         assert_eq!(
             substitutions[0].to_string(),
-            "((3*theta[0])/6.283185307179586)"
+            "(3*theta[0])/6.283185307179586"
         );
         assert_eq!(
             substitutions[1].to_string(),
-            "((beta[0]+theta[0])/6.283185307179586)"
+            "(beta[0]+theta[0])/6.283185307179586"
         );
     }
 
@@ -472,7 +472,7 @@ SET-SCALE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/8)");
+        assert_eq!(substitutions[0].to_string(), "theta[0]/8");
     }
 
     #[test]
@@ -509,8 +509,8 @@ SET-FREQUENCY 1 "rf" __SUBST[1]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        assert_eq!(substitutions[0].to_string(), "((theta[0]-10)/20)");
-        assert_eq!(substitutions[1].to_string(), "(theta[0]/20)");
+        assert_eq!(substitutions[0].to_string(), "(theta[0]-10)/20");
+        assert_eq!(substitutions[1].to_string(), "theta[0]/20");
     }
 
     #[test]
@@ -569,7 +569,7 @@ SHIFT-PHASE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/6.283185307179586)");
+        assert_eq!(substitutions[0].to_string(), "theta[0]/6.283185307179586");
     }
 }
 

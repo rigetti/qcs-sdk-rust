@@ -1677,7 +1677,7 @@ dependencies = [
  "qcs-api-client-common",
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
- "quil-rs 0.15.0",
+ "quil-rs 0.17.0-rc.0",
  "regex",
  "reqwest",
  "rmp-serde",
@@ -1793,7 +1793,7 @@ dependencies = [
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
  "quil-py",
- "quil-rs 0.15.0",
+ "quil-rs 0.17.0-rc.0",
  "rigetti-pyo3",
  "serde_json",
  "thiserror",
@@ -1813,16 +1813,16 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "430ad6ba33ade7e15fbd49c862b9433ecd1d0c8766046bdb42326038fbe5dbfa"
+version = "0.16.0"
 dependencies = [
  "indexmap",
  "lexical",
  "nom",
  "nom_locate",
  "num-complex",
+ "once_cell",
  "petgraph",
+ "regex",
  "serde",
  "strum",
  "thiserror",
@@ -1830,7 +1830,9 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.16.0"
+version = "0.17.0-rc.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e66fd2df6cfcb4e563b16b0ce9163973b7711fa8cbb4dceca44607daa02dfae"
 dependencies = [
  "indexmap",
  "lexical",

@@ -95,10 +95,10 @@ impl Execution {
                 self.program.instructions.insert(
                     0,
                     Instruction::Move(Move {
-                        destination: ArithmeticOperand::MemoryReference(MemoryReference {
+                        destination: MemoryReference {
                             name: name.to_string(),
                             index: index as u64,
-                        }),
+                        },
                         source: ArithmeticOperand::LiteralReal(*value),
                     }),
                 );
@@ -125,7 +125,7 @@ impl Execution {
             "executing program on QVM"
         );
 
-        let request = Request::new(&self.program.to_string(true), shots, readouts);
+        let request = Request::new(&self.program.to_string(), shots, readouts);
         let qvm_url = client.get_config().qvm_url();
 
         let client = reqwest::Client::new();
@@ -158,7 +158,7 @@ impl Execution {
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Error {
     #[error("Error parsing Quil program: {0}")]
-    Parsing(#[from] ProgramError<Program>),
+    Parsing(#[from] ProgramError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]

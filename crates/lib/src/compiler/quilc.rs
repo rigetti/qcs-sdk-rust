@@ -288,7 +288,7 @@ pub enum Error {
     QuilcCompilation(String),
     /// An error when trying to parse the compiled program.
     #[error("Problem when trying to parse the compiled program: {0}")]
-    Parse(ProgramError<Program>),
+    Parse(ProgramError),
 }
 
 impl Error {
@@ -431,7 +431,7 @@ mod tests {
             CompilerOpts::default(),
         )
         .expect("Could not compile");
-        assert_eq!(output.program.to_string(true), EXPECTED_H0_OUTPUT);
+        assert_eq!(output.program.to_string(), EXPECTED_H0_OUTPUT);
     }
 
     const BELL_STATE: &str = r##"DECLARE ro BIT[2]
@@ -453,7 +453,7 @@ MEASURE 1 ro[1]
             CompilerOpts::default(),
         )
         .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.program.to_string(true))
+        let mut results = crate::qvm::Execution::new(&output.program.to_string())
             .unwrap()
             .run(10, &[Cow::Borrowed("ro")], &HashMap::default(), &client)
             .await
@@ -480,7 +480,7 @@ MEASURE 1 ro[1]
             CompilerOpts::default(),
         )
         .expect("Should be able to compile");
-        assert_eq!(output.program.to_string(true), "DECLARE ro BIT[1]\n");
+        assert_eq!(output.program.to_string(), "DECLARE ro BIT[1]\n");
         assert_ne!(output.native_quil_metadata, None);
     }
 

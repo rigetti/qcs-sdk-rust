@@ -47,6 +47,8 @@ pub async fn translate(
         quantum_processor_id,
     );
 
+    dbg!("quil_program", &quil_program);
+
     let request = TranslateQuilToEncryptedControllerJobRequest {
         quantum_processor_id: quantum_processor_id.to_owned(),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),

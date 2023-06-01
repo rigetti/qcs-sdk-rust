@@ -6,19 +6,19 @@ description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 authors = [
-	{ name = "Rigetti Computing", email = "softapps@rigetti.com" },
-	{ name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
-	{ name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
-	{ name = "Randall Fulton", email = "rfulton@rigetti.com" },
+  { name = "Rigetti Computing", email = "softapps@rigetti.com" },
+  { name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
+  { name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
+  { name = "Randall Fulton", email = "rfulton@rigetti.com" },
 ]
 classifiers = [
-	"Development Status :: 3 - Alpha",
-	"License :: OSI Approved :: Apache Software License",
-	"Programming Language :: Python :: 3.8",
-	"Programming Language :: Python :: 3.9",
-	"Programming Language :: Python :: 3.10",
-	"Programming Language :: Python :: 3.11",
-	"Operating System :: OS Independent",
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Operating System :: OS Independent",
 ]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
@@ -29,10 +29,10 @@ version = "0.7.1"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 authors = [
-	"Rigetti Computing <softapps@rigetti.com>",
-	"Mark Skilbeck <mark.skilbeck@rigetti.com>",
-	"Marquess Valdez <mvaldez@rigetti.com>",
-	"Randall Fulton <rfulton@rigetti.com>",
+  "Rigetti Computing <softapps@rigetti.com>",
+  "Mark Skilbeck <mark.skilbeck@rigetti.com>",
+  "Marquess Valdez <mvaldez@rigetti.com>",
+  "Randall Fulton <rfulton@rigetti.com>",
 ]
 
 [tool.maturin]
@@ -42,7 +42,7 @@ sdist-include = ["README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-quil = { path = "../../../quil-rs/quil-py" }
+quil = "0.1.0-rc.0"
 
 [tool.poetry.dev-dependencies]
 numpy = "^1.24.1"
