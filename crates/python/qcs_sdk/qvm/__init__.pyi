@@ -48,7 +48,7 @@ def run(
 
     :param quil: A quil program as a string.
     :param shots: The number of times to run the program. Should be a value greater than zero.
-    :param readouts: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
     :param params: A mapping of memory region names to their desired values.
     :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
 
@@ -73,7 +73,7 @@ async def run_async(
 
     :param quil: A quil program as a string.
     :param shots: The number of times to run the program. Should be a value greater than zero.
-    :param readouts: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
     :param params: A mapping of memory region names to their desired values.
     :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
 
