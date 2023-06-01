@@ -297,7 +297,7 @@ class InstructionSetArchitecture:
 
 def get_instruction_set_architecture(
     quantum_processor_id: str,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> InstructionSetArchitecture:
     """
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.

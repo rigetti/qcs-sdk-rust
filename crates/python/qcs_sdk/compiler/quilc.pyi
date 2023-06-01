@@ -177,8 +177,8 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
 def compile_program(
     quil: str,
     target: TargetDevice,
-    client: Optional[QCSClient] = ...,
-    options: Optional[CompilerOpts] = ...,
+    client: Optional[QCSClient] = None,
+    options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
     Compile a quil program for a target device.
@@ -195,8 +195,8 @@ def compile_program(
 async def compile_program_async(
     quil: str,
     target: TargetDevice,
-    client: Optional[QCSClient] = ...,
-    options: Optional[CompilerOpts] = ...,
+    client: Optional[QCSClient] = None,
+    options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
     Compile a quil program for a target device.
@@ -263,7 +263,7 @@ class NativeQuilMetadata:
         ...
 
 def get_version_info(
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -275,7 +275,7 @@ def get_version_info(
     ...
 
 async def get_version_info_async(
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -289,7 +289,7 @@ async def get_version_info_async(
 
 def conjugate_pauli_by_clifford(
     request: ConjugateByCliffordRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
@@ -304,7 +304,7 @@ def conjugate_pauli_by_clifford(
 
 async def conjugate_pauli_by_clifford_async(
     request: ConjugateByCliffordRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
@@ -320,7 +320,7 @@ async def conjugate_pauli_by_clifford_async(
 
 def generate_randomized_benchmarking_sequence(
     request: RandomizedBenchmarkingRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
@@ -344,7 +344,7 @@ def generate_randomized_benchmarking_sequence(
 
 async def generate_randomized_benchmarking_sequence_async(
     request: RandomizedBenchmarkingRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
