@@ -143,7 +143,7 @@ class ExeParameter:
     """
 
     def __new__(
-        cls: type["ExeParameter"],
+        cls,
         name: str,
         index: int,
         value: float,

@@ -48,7 +48,7 @@ impl PyQvmResultData {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction]
     async fn run(
         quil: String,
         #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]
