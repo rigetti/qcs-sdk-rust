@@ -1,8 +1,7 @@
 //! These are the integration tests for [`qcs::Executable::execute_on_qvm`].
 //! In order to run them, QVM's web server must be running at localhost:5000.
 
-use qcs::Executable;
-use qcs_api_client_openapi::common::ClientConfiguration;
+use qcs::{client::Qcs, Executable};
 
 const PROGRAM: &str = r##"
 DECLARE first BIT
@@ -20,7 +19,7 @@ async fn test_bell_state() {
     const SHOTS: u16 = 10;
 
     let data = Executable::from_quil(PROGRAM)
-        .with_config(ClientConfiguration::default())
+        .with_client(Qcs::load().await)
         .with_shots(SHOTS)
         .read_from("first")
         .read_from("second")

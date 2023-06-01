@@ -15,7 +15,7 @@ use rigetti_pyo3::{
 
 use qcs::qpu::get_isa;
 
-use crate::{py_sync::py_function_sync_async, qpu::client::PyQcsClient};
+use crate::{client::PyQcsClient, py_sync::py_function_sync_async};
 
 create_init_submodule! {
     classes: [
@@ -56,13 +56,13 @@ py_wrap_simple_enum! {
 
 py_wrap_data_struct! {
     PyEdge(Edge) as "Edge" {
-        node_ids: Vec<i32> => Py<PyList>
+        node_ids: Vec<i64> => Py<PyList>
     }
 }
 
 py_wrap_data_struct! {
     PyNode(Node) as "Node" {
-        node_id: i32 => Py<PyInt>
+        node_id: i64 => Py<PyInt>
     }
 }
 
@@ -78,7 +78,7 @@ py_wrap_data_struct! {
     PyCharacteristic(Characteristic) as "Characteristic" {
         error: Option<f64> => Option<Py<PyFloat>>,
         name: String => Py<PyString>,
-        node_ids: Option<Vec<i32>> => Option<Py<PyList>>,
+        node_ids: Option<Vec<i64>> => Option<Py<PyList>>,
         parameter_values: Option<Vec<f64>> => Option<Py<PyList>>,
         timestamp: String => Py<PyString>,
         value: f64 => Py<PyFloat>
@@ -94,7 +94,7 @@ py_wrap_data_struct! {
 py_wrap_data_struct! {
     PyOperationSite(OperationSite) as "OperationSite" {
         characteristics: Vec<Characteristic> => Vec<PyCharacteristic>,
-        node_ids: Vec<i32> => Py<PyList>
+        node_ids: Vec<i64> => Py<PyList>
     }
 }
 
@@ -102,7 +102,7 @@ py_wrap_data_struct! {
     PyOperation(Operation) as "Operation" {
         characteristics: Vec<Characteristic> => Vec<PyCharacteristic>,
         name: String => Py<PyString>,
-        node_count: Option<i32> => Option<Py<PyInt>>,
+        node_count: Option<i64> => Option<Py<PyInt>>,
         parameters: Vec<Parameter> => Vec<PyParameter>,
         sites: Vec<OperationSite> => Vec<PyOperationSite>
     }
@@ -148,7 +148,7 @@ py_function_sync_async! {
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyInstructionSetArchitecture> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
 
         get_isa(&quantum_processor_id, &client)
             .await

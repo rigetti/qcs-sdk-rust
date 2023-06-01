@@ -1,28 +1,30 @@
 //! Contains QPU-specific executable stuff.
 
 use std::borrow::Cow;
-use std::collections::HashMap;
 use std::convert::TryFrom;
 use std::sync::Arc;
 use std::time::Duration;
 
-use log::trace;
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
 use quil_rs::Program;
 use tokio::task::{spawn_blocking, JoinError};
+
+#[cfg(feature = "tracing")]
+use tracing::trace;
 
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
-use super::api::{retrieve_results, submit, JobId};
-use super::client::{GrpcClientError, Qcs};
+use super::api::{retrieve_results, submit, JobTarget};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
-use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
+use crate::client::{GrpcClientError, Qcs};
+use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -120,10 +122,20 @@ impl<'a> Execution<'a> {
         compile_with_quilc: bool,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            num_shots=%shots,
+            %quantum_processor_id,
+            %compile_with_quilc,
+            ?compiler_options,
+            "creating new QPU Execution",
+        );
+
         let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
         let program = if compile_with_quilc {
+            #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
             let client = client.clone();
             spawn_blocking(move || {
@@ -135,8 +147,10 @@ impl<'a> Execution<'a> {
                     task_name: "quilc",
                     source,
                 })
-            })??
+            })?
+            .map(|CompilationResult { program, .. }| program)?
         } else {
+            #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
             quil.parse().map_err(Error::Quil)?
         };
@@ -149,55 +163,104 @@ impl<'a> Execution<'a> {
         })
     }
 
-    /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(&mut self, params: &Parameters) -> Result<JobHandle<'_>, Error> {
-        let EncryptedTranslationResult { job, readout_map } = translate(
+    /// Translate the execution's quil program for it's given quantum processor.
+    pub(crate) async fn translate(
+        &mut self,
+        options: Option<TranslationOptions>,
+    ) -> Result<EncryptedTranslationResult, Error> {
+        let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
             self.shots.into(),
             self.client.as_ref(),
+            options,
         )
         .await?;
+        Ok(encrpyted_translation_result)
+    }
+
+    /// Run on a real QPU and wait for the results.
+    pub(crate) async fn submit(
+        &mut self,
+        params: &Parameters,
+        translation_options: Option<TranslationOptions>,
+    ) -> Result<JobHandle<'a>, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
+
+        let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
+        self.submit_to_target(params, job_target, translation_options)
+            .await
+    }
+
+    /// Run on specific QCS endpoint and wait for the results.
+    pub(crate) async fn submit_to_endpoint_id<S>(
+        &mut self,
+        params: &Parameters,
+        endpoint_id: S,
+        translation_options: Option<TranslationOptions>,
+    ) -> Result<JobHandle<'a>, Error>
+    where
+        S: Into<Cow<'a, str>>,
+    {
+        let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
+        self.submit_to_target(params, job_target, translation_options)
+            .await
+    }
+
+    async fn submit_to_target(
+        &mut self,
+        params: &Parameters,
+        job_target: JobTarget,
+        translation_options: Option<TranslationOptions>,
+    ) -> Result<JobHandle<'a>, Error> {
+        let EncryptedTranslationResult { job, readout_map } =
+            self.translate(translation_options).await?;
 
         let patch_values = self
             .get_substitutions(params)
             .map_err(Error::Substitution)?;
 
-        let job_id = submit(
-            self.quantum_processor_id.as_ref(),
-            job,
-            &patch_values,
-            self.client.as_ref(),
-        )
-        .await?;
+        let job_id = submit(&job_target, job, &patch_values, self.client.as_ref()).await?;
+
+        let endpoint_id = match job_target {
+            JobTarget::EndpointId(endpoint_id) => Some(endpoint_id),
+            JobTarget::QuantumProcessorId(_) => None,
+        };
 
         Ok(JobHandle::new(
             job_id,
-            self.quantum_processor_id.clone(),
+            self.quantum_processor_id.to_string(),
+            endpoint_id,
             readout_map,
         ))
     }
 
     pub(crate) async fn retrieve_results(
         &self,
-        job_id: JobId,
-        readout_mappings: HashMap<String, String>,
+        job_handle: JobHandle<'a>,
     ) -> Result<ExecutionData, Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            job_id=%job_handle.job_id(),
+            num_shots = %self.shots,
+            quantum_processor_id=%self.quantum_processor_id,
+            "retrieving execution results for job",
+        );
+
         let response = retrieve_results(
-            job_id,
-            self.quantum_processor_id.as_ref(),
+            job_handle.job_id(),
+            &job_handle.job_target(),
             self.client.as_ref(),
         )
         .await?;
 
         Ok(ExecutionData {
             result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
-                &readout_mappings,
+                job_handle.readout_map(),
                 &response.readout_values,
             )),
-            duration: response
-                .execution_duration_microseconds
-                .map(Duration::from_micros),
+            duration: Some(response.execution_duration_microseconds).map(Duration::from_micros),
         })
     }
 

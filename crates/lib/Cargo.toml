@@ -1,7 +1,7 @@
 [package]
 name = "qcs"
 description = "High level interface for running Quil on a QPU"
-version = "0.10.0-rc.11"
+version = "0.12.0"
 edition = "2018"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
@@ -11,14 +11,30 @@ readme = "./README.md"
 
 [features]
 manual-tests = []
+tracing = [
+    "dep:tracing",
+    "qcs-api-client-common/tracing",
+    "qcs-api-client-grpc/tracing",
+    "qcs-api-client-openapi/tracing"
+]
+tracing-config = [
+    "tracing",
+    "qcs-api-client-common/tracing-config",
+    "qcs-api-client-grpc/tracing-config",
+    "qcs-api-client-openapi/tracing-config"
+]
+otel-tracing = [
+    "tracing-config",
+    "qcs-api-client-grpc/otel-tracing",
+    "qcs-api-client-openapi/otel-tracing",
+]
 
 [dependencies]
-dirs = "4.0.0"
+dirs = "5.0.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
 indexmap = "1.9.1"
 lazy_static = "1.4.0"
-log = "0.4.17"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
 qcs-api.workspace = true
@@ -29,14 +45,14 @@ quil-rs.workspace = true
 reqwest = { version = "0.11.12", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
-serde_bytes = "0.11.7"
 serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["fs"] }
-toml = "0.5.9"
+toml = "0.7.3"
+tracing = { version = "0.1", optional = true }
 uuid = { version = "1.2.1", features = ["v4"] }
-tonic = { version = "0.8.2", features = ["tls", "tls-roots"] }
-zmq = { version = "0.9.2", features = ["vendored"] }
+tonic = { version = "0.9.2", features = ["tls", "tls-roots"] }
+zmq = { version = "0.10.0" }
 itertools = "0.10.5"
 
 [dev-dependencies]
@@ -45,9 +61,9 @@ float-cmp = "0.9.0"
 hex = "0.4.3"
 maplit = "1.0.2"
 qcs-api-client-grpc = { workspace = true, features = ["server"] }
-simple_logger = { version = "2.3.0", default-features = false }
+simple_logger = { version = "4.1.0", default-features = false }
 tempfile = "3.3.0"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 warp = { version = "0.3.3", default-features = false }
 regex = "1.7.0"
-test-case = "2.2.2"
+test-case = "3.1.0"

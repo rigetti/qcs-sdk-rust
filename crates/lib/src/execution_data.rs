@@ -150,6 +150,9 @@ impl RegisterMap {
     fn from_qvm_result_data(
         result_data: &QvmResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
+        #[cfg(feature = "tracing")]
+        tracing::trace!("converting QVM result data to RegisterMap");
+
         Ok(Self(
             result_data
                 .memory
@@ -202,6 +205,9 @@ impl RegisterMap {
     fn from_qpu_result_data(
         qpu_result_data: &QpuResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
+        #[cfg(feature = "tracing")]
+        tracing::trace!("converting QPU result data to RegisterMap");
+
         let register_map = qpu_result_data
                     .mappings
                     .iter()

@@ -5,6 +5,7 @@ use rigetti_pyo3::create_init_submodule;
 use executable::ExecutionError;
 use execution_data::RegisterMatrixConversionError;
 
+pub mod client;
 pub mod compiler;
 pub mod executable;
 pub mod execution_data;
@@ -26,13 +27,14 @@ create_init_submodule! {
         executable::PyJobHandle,
         executable::PyService,
         register_data::PyRegisterData,
-        qpu::client::PyQcsClient
+        client::PyQcsClient
     ],
     errors: [
         ExecutionError,
         RegisterMatrixConversionError
     ],
     submodules: [
+        "client": client::init_submodule,
         "compiler": compiler::init_submodule,
         "qpu": qpu::init_submodule,
         "qvm": qvm::init_submodule,

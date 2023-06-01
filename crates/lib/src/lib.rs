@@ -32,7 +32,6 @@
     semicolon_in_expressions_from_macros,
     trivial_casts,
     trivial_numeric_casts,
-    unaligned_references,
     unconditional_recursion,
     unreachable_pub,
     unused,
@@ -56,6 +55,7 @@ pub use execution_data::{
 };
 pub use register_data::RegisterData;
 
+pub mod client;
 pub mod compiler;
 mod executable;
 mod execution_data;

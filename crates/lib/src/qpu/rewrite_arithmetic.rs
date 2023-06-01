@@ -50,6 +50,9 @@ use crate::executable::Parameters;
 /// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
 pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("rewriting arithmetic");
+
     let mut substitutions = Substitutions::new();
     let Program {
         calibrations,
@@ -476,7 +479,7 @@ SET-SCALE 0 "rf" __SUBST[0]
     fn it_converts_frequency_expressions() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
 DEFFRAME 1 "rf":
@@ -490,10 +493,10 @@ SET-FREQUENCY 1 "rf" theta
         .unwrap();
         let expected = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
-DEFFRAME 1 "rf": 
+DEFFRAME 1 "rf":
     SAMPLE-RATE: 20.0
 DECLARE __SUBST REAL[2]
 DECLARE theta REAL
@@ -514,7 +517,7 @@ SET-FREQUENCY 1 "rf" __SUBST[1]
     fn it_errs_when_converting_frequency_without_frame() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
 DECLARE theta REAL
@@ -532,7 +535,7 @@ SET-FREQUENCY 1 "rf" theta
     fn it_errs_when_converting_frequency_without_sample_rate() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
 DECLARE theta REAL
 SET-FREQUENCY 0 "rf" theta

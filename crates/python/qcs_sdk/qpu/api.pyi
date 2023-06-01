@@ -1,17 +1,16 @@
 from typing import Dict, List, Optional, final
 
-from .client import QCSClient
-
+from qcs_sdk.client import QCSClient
 
 class SubmissionError(RuntimeError):
     """There was a problem submitting the program to QCS for execution."""
-    ...
 
+    ...
 
 class RetrieveResultsError(RuntimeError):
     """There was a problem retrieving program execution results from QCS."""
-    ...
 
+    ...
 
 @final
 class Register:
@@ -32,18 +31,14 @@ class Register:
 
     def is_i32(self) -> bool: ...
     def is_complex32(self) -> bool: ...
-
     def as_i32(self) -> Optional[List[int]]: ...
     def as_complex32(self) -> Optional[List[complex]]: ...
-
     def to_i32(self) -> List[int]: ...
     def to_complex32(self) -> List[complex]: ...
-
     @staticmethod
     def from_i32(inner: List[int]) -> "Register": ...
     @staticmethod
     def from_complex32(inner: List[complex]) -> "Register": ...
-
 
 @final
 class ExecutionResult:
@@ -53,17 +48,14 @@ class ExecutionResult:
     def shape(self) -> List[int]:
         """The shape of the result data."""
         ...
-
     @property
     def data(self) -> Register:
         """The result data for all shots by the particular memory location."""
         ...
-
     @property
     def dtype(self) -> str:
         """The type of the result data (as a `numpy` `dtype`)."""
         ...
-
 
 @final
 class ExecutionResults:
@@ -77,18 +69,17 @@ class ExecutionResults:
         See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
         """
         ...
-
     @property
     def execution_duration_microseconds(self) -> Optional[int]:
         """The time spent executing the program."""
         ...
-
 
 def submit(
     program: str,
     patch_values: Dict[str, List[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    endpoint_id: Optional[str] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -97,6 +88,7 @@ def submit(
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -105,12 +97,12 @@ def submit(
     """
     ...
 
-
 async def submit_async(
     program: str,
     patch_values: Dict[str, List[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    endpoint_id: Optional[str] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -120,6 +112,7 @@ async def submit_async(
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -128,11 +121,11 @@ async def submit_async(
     """
     ...
 
-
 def retrieve_results(
     job_id: str,
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    endpoint_id: Optional[str] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
@@ -140,6 +133,7 @@ def retrieve_results(
     :param job_id: The ID of the job to retrieve results for.
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
 
     :returns: results from execution.
 
@@ -148,11 +142,11 @@ def retrieve_results(
     """
     ...
 
-
 async def retrieve_results_async(
     job_id: str,
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    endpoint_id: Optional[str] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
@@ -161,6 +155,7 @@ async def retrieve_results_async(
     :param job_id: The ID of the job to retrieve results for.
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
 
     :returns: results from execution.
 

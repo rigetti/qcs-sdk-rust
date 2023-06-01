@@ -4,7 +4,7 @@
 
 use std::time::Duration;
 
-use qcs_api_client_common::ClientConfiguration;
+use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
     services::{
@@ -14,7 +14,9 @@ use qcs_api_client_grpc::{
 };
 use qcs_api_client_openapi::apis::{
     configuration::Configuration as OpenApiConfiguration,
-    endpoints_api::{get_default_endpoint, GetDefaultEndpointError},
+    endpoints_api::{
+        get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
+    },
     quantum_processors_api::{
         list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
     },
@@ -41,10 +43,17 @@ pub struct Qcs {
 
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
-    pub async fn load() -> Result<Self, LoadError> {
-        ClientConfiguration::load_default()
-            .await
-            .map(Self::with_config)
+    pub async fn load() -> Self {
+        let config = if let Ok(config) = ClientConfiguration::load_default().await {
+            config
+        } else {
+            #[cfg(feature = "tracing")]
+            tracing::info!(
+                "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
+            );
+            ClientConfiguration::default()
+        };
+        Self::with_config(config)
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
@@ -56,6 +65,18 @@ impl Qcs {
         }
     }
 
+    /// Create a [`Qcs`] and initialized with the given `profile`.
+    ///
+    /// # Errors
+    ///
+    /// A [`LoadError`] will be returned if QCS credentials are
+    /// not correctly configured or the given profile is not defined.
+    pub async fn with_profile(profile: String) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_profile(profile)
+            .await
+            .map(Self::with_config)
+    }
+
     /// Enable or disable the use of Gateway service for execution
     #[must_use]
     pub fn with_use_gateway(mut self, use_gateway: bool) -> Self {
@@ -63,41 +84,58 @@ impl Qcs {
         self
     }
 
-    /// Return a copy of all settings parsed and resolved from configuration sources.
+    /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.
     #[must_use]
-    pub fn get_config(&self) -> ClientConfiguration {
-        self.config.clone()
+    pub fn get_config(&self) -> &ClientConfiguration {
+        &self.config
     }
 
     pub(crate) async fn get_controller_client(
         &self,
         quantum_processor_id: &str,
-    ) -> Result<ControllerClient<RefreshService<Channel>>, GrpcEndpointError> {
-        self.get_controller_endpoint(quantum_processor_id)
-            .await
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(ControllerClient::new)
+    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
+    {
+        let uri = self.get_controller_endpoint(quantum_processor_id).await?;
+        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
+        let service = wrap_channel_with(channel, self.get_config().clone());
+        Ok(ControllerClient::new(service))
+    }
+
+    pub(crate) async fn get_controller_client_with_endpoint_id(
+        &self,
+        endpoint_id: &str,
+    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
+    {
+        let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
+        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
+        let service = wrap_channel_with(channel, self.get_config().clone());
+        Ok(ControllerClient::new(service))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
-        OpenApiConfiguration::with_qcs_config(self.get_config())
+        OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
 
     pub(crate) fn get_translation_client(
         &self,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,
-    ) -> Result<TranslationClient<RefreshService<Channel>>, GrpcError> {
-        parse_uri(translation_grpc_endpoint)
-            .map(get_channel)
-            .map(|channel| wrap_channel_with(channel, self.get_config()))
-            .map(TranslationClient::new)
+    ) -> Result<
+        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
+        GrpcError<RefreshError>,
+    > {
+        let uri = parse_uri(translation_grpc_endpoint)?;
+        let channel = get_channel(uri)?;
+        let service = wrap_channel_with(channel, self.get_config().clone());
+        Ok(TranslationClient::new(service))
     }
 
     async fn get_controller_endpoint(
@@ -115,6 +153,19 @@ impl Qcs {
             .await
     }
 
+    /// Get address for direct connection to Controller, explicitly targeting an endpoint by ID.
+    async fn get_controller_endpoint_by_id(
+        &self,
+        endpoint_id: &str,
+    ) -> Result<Uri, GrpcEndpointError> {
+        let endpoint = get_endpoint(&self.get_openapi_client(), endpoint_id).await?;
+        let grpc_address = endpoint.addresses.grpc;
+
+        grpc_address
+            .ok_or_else(|| GrpcEndpointError::EndpointNotFound(endpoint_id.into()))
+            .map(|v| parse_uri(&v).map_err(GrpcEndpointError::GrpcError))?
+    }
+
     /// Get address for direction connection to Controller.
     async fn get_controller_default_endpoint(
         &self,
@@ -125,8 +176,8 @@ impl Qcs {
         let addresses = default_endpoint.addresses.as_ref();
         let grpc_address = addresses.grpc.as_ref();
         grpc_address
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.into()))
-            .map(|v| parse_uri(v).map_err(GrpcEndpointError::BadUri))?
+            .ok_or_else(|| GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.into()))
+            .map(|v| parse_uri(v).map_err(GrpcEndpointError::GrpcError))?
     }
 
     /// Get address for Gateway assigned to the provided `quantum_processor_id`, if one exists.
@@ -155,31 +206,39 @@ impl Qcs {
             }
         }
         gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways
-            .first()
-            .ok_or_else(|| GrpcEndpointError::NoEndpoint(quantum_processor_id.to_string()))?;
-        parse_uri(&target.url).map_err(GrpcEndpointError::BadUri)
+        let target = gateways.first().ok_or_else(|| {
+            GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.to_string())
+        })?;
+        parse_uri(&target.url).map_err(GrpcEndpointError::GrpcError)
     }
 }
 
 /// Errors that may occur while trying to resolve a `gRPC` endpoint
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcEndpointError {
-    /// Error due to a malformed URI
-    #[error("Malformed URI for endpoint: {0}")]
-    BadUri(#[from] GrpcError),
+    /// Error due to a bad gRPC configuration
+    #[error("Error configuring gRPC request: {0}")]
+    GrpcError(#[from] GrpcError<RefreshError>),
 
     /// Error due to failure to get endpoint for quantum processor
     #[error("Failed to get endpoint for quantum processor: {0}")]
-    RequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
+    QpuEndpointRequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
+
+    /// Error due to failure to get endpoint for quantum processor
+    #[error("Failed to get endpoint for the given ID: {0}")]
+    EndpointRequestFailed(#[from] OpenApiError<GetEndpointError>),
 
     /// Error due to failure to get accessors for quantum processor
     #[error("Failed to get accessors for quantum processor: {0}")]
     AccessorRequestFailed(#[from] OpenApiError<ListQuantumProcessorAccessorsError>),
 
     /// Error due to missing gRPC endpoint for quantum processor
-    #[error("Missing gRPC endpoint for quantum processor {0}")]
-    NoEndpoint(String),
+    #[error("Missing gRPC endpoint for quantum processor: {0}")]
+    QpuEndpointNotFound(String),
+
+    /// Error due to missing gRPC endpoint for endpoint ID
+    #[error("Missing gRPC endpoint for endpoint ID: {0}")]
+    EndpointNotFound(String),
 }
 
 /// Errors that may occur while trying to use a `gRPC` client
@@ -199,7 +258,7 @@ pub enum GrpcClientError {
 
     /// Error due to `gRPC` error
     #[error("gRPC error: {0}")]
-    GrpcError(#[from] GrpcError),
+    GrpcError(#[from] GrpcError<RefreshError>),
 }
 
 /// Errors that may occur while trying to use an `OpenAPI` client

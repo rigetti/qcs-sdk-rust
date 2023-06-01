@@ -2,13 +2,13 @@ from typing import Optional, final
 
 class LoadClientError(RuntimeError):
     """Error encountered while loading the QCS API client configuration from the environment configuration."""
-    ...
 
+    ...
 
 class BuildClientError(RuntimeError):
     """Error encountered while building the QCS API client configuration manually."""
-    ...
 
+    ...
 
 @final
 class QCSClient:
@@ -31,7 +31,6 @@ class QCSClient:
         Prefer to use ``QCSClient.load`` to construct an environment-based profile.
         """
         ...
-
     @staticmethod
     def load(
         profile_name: Optional[str] = None,
@@ -48,7 +47,6 @@ class QCSClient:
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
         """
         ...
-
     @staticmethod
     async def load_async(
         profile_name: Optional[str] = None,
@@ -66,22 +64,18 @@ class QCSClient:
         See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
         """
         ...
-
     @property
     def api_url(self) -> str:
         """URL to access the QCS API."""
         ...
-
     @property
     def grpc_api_url(self) -> str:
         """URL to access the gRPC API."""
         ...
-
     @property
     def quilc_url(self) -> str:
         """URL to access the `quilc` compiler."""
         ...
-
     @property
     def qvm_url(self) -> str:
         """URL to access the QVM."""
@@ -91,11 +85,7 @@ class QCSClient:
 class QCSClientAuthServer:
     """Authentication server configuration for the QCS API."""
 
-    def __new__(
-        cls,
-        client_id: str,
-        issuer: str
-    ) -> "QCSClientAuthServer":
+    def __new__(cls, client_id: str, issuer: str) -> "QCSClientAuthServer":
         """
         Manually define authentication server parameters.
 
@@ -103,16 +93,14 @@ class QCSClientAuthServer:
         :param issuer: The OAuth token issuer url. If ``None``, a default value is used.
         """
         ...
-
     @property
-    def client_id(self) -> str:...
+    def client_id(self) -> str: ...
     @client_id.setter
     def client_id(self, value: str): ...
     @property
     def issuer(self) -> str: ...
     @issuer.setter
     def issuer(self, value: str): ...
-
 
 @final
 class QCSClientTokens:
@@ -122,7 +110,7 @@ class QCSClientTokens:
         cls,
         bearer_access_token: str,
         refresh_token: str,
-    ) -> "QCSClientTokens": 
+    ) -> "QCSClientTokens":
         """
         Manually define authentication session tokens.
 
@@ -130,7 +118,6 @@ class QCSClientTokens:
         :param refresh_token: A credential to refresh the bearer_access_token when it expires.
         """
         ...
-
     @property
     def bearer_access_token(self) -> Optional[str]: ...
     @bearer_access_token.setter

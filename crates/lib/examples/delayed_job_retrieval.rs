@@ -8,11 +8,13 @@ RX(pi) 0
 MEASURE 0 ro[0]
 "#;
 
+const QUANTUM_PROCESSOR_ID: &str = "Aspen-M-3";
+
 #[tokio::main]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
     let job_handle = exe
-        .submit_to_qpu("Aspen-M-3")
+        .submit_to_qpu(QUANTUM_PROCESSOR_ID, None)
         .await
         .expect("Program should be successfully submitted for execution");
     // Do some other stuff

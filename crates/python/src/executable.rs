@@ -2,16 +2,18 @@ use std::sync::Arc;
 
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
-    wrap_error, PyWrapper, ToPython, ToPythonError,
+    wrap_error, PyTryFrom, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
 
 use crate::{
     compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
+    grpc::models::translation::PyTranslationOptions,
     py_sync::{py_async, py_sync},
 };
 
@@ -70,14 +72,15 @@ macro_rules! py_executable_data {
     }};
 }
 
-/// Invoke `submit_to_qpu` on an executable.
-macro_rules! py_submit_job {
-    ($self: ident, $quantum_processor_id: expr) => {{
+/// Invoke a PyExecutable's inner Executable::method with given arguments,
+/// then mapped to `Future<Output = Result<PyJobHandle, ExecutionError>>`
+macro_rules! py_job_handle {
+    ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
         let arc = $self.as_inner().clone();
         async move {
             arc.lock()
                 .await
-                .submit_to_qpu($quantum_processor_id)
+                .$method($($arg),*)
                 .await
                 .map(JobHandle::from)
                 .map(PyJobHandle::from)
@@ -132,51 +135,157 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm(&self) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(self, execute_on_qvm))
+    pub fn execute_on_qvm(&self, py: Python<'_>) -> PyResult<PyExecutionData> {
+        py_sync!(py, py_executable_data!(self, execute_on_qvm))
     }
 
     pub fn execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
         py_async!(py, py_executable_data!(self, execute_on_qvm))
     }
 
-    pub fn execute_on_qpu(&self, quantum_processor_id: String) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(
-            self,
-            execute_on_qpu,
-            quantum_processor_id,
-        ))
+    #[args(endpoint_id = "None")]
+    pub fn execute_on_qpu(
+        &self,
+        py: Python<'_>,
+        quantum_processor_id: String,
+        endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
+    ) -> PyResult<PyExecutionData> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        match endpoint_id {
+            Some(endpoint_id) => py_sync!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                )
+            ),
+            None => py_sync!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu,
+                    quantum_processor_id,
+                    translation_options,
+                )
+            ),
+        }
     }
 
+    #[args(endpoint_id = "None")]
     pub fn execute_on_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
+        endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
-        py_async!(
-            py,
-            py_executable_data!(self, execute_on_qpu, quantum_processor_id)
-        )
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        match endpoint_id {
+            Some(endpoint_id) => py_async!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                )
+            ),
+            None => py_async!(
+                py,
+                py_executable_data!(
+                    self,
+                    execute_on_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
+            ),
+        }
     }
 
-    pub fn submit_to_qpu(&self, quantum_processor_id: String) -> PyResult<PyJobHandle> {
-        py_sync!(py_submit_job!(self, quantum_processor_id))
+    #[args(endpoint_id = "None")]
+    pub fn submit_to_qpu(
+        &self,
+        py: Python<'_>,
+        quantum_processor_id: String,
+        endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
+    ) -> PyResult<PyJobHandle> {
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        match endpoint_id {
+            Some(endpoint_id) => py_sync!(
+                py,
+                py_job_handle!(
+                    self,
+                    submit_to_qpu_with_endpoint,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                )
+            ),
+            None => py_sync!(
+                py,
+                py_job_handle!(
+                    self,
+                    submit_to_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
+            ),
+        }
     }
 
+    #[args(endpoint_id = "None")]
     pub fn submit_to_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
         quantum_processor_id: String,
+        endpoint_id: Option<String>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
-        py_async!(py, py_submit_job!(self, quantum_processor_id))
+        let translation_options =
+            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        match endpoint_id {
+            Some(endpoint_id) => {
+                py_async!(
+                    py,
+                    py_job_handle!(
+                        self,
+                        submit_to_qpu_with_endpoint,
+                        quantum_processor_id,
+                        endpoint_id,
+                        translation_options,
+                    )
+                )
+            }
+            None => py_async!(
+                py,
+                py_job_handle!(
+                    self,
+                    submit_to_qpu,
+                    quantum_processor_id,
+                    translation_options
+                )
+            ),
+        }
     }
 
-    pub fn retrieve_results(&mut self, job_handle: PyJobHandle) -> PyResult<PyExecutionData> {
-        py_sync!(py_executable_data!(
-            self,
-            retrieve_results,
-            job_handle.into(),
-        ))
+    pub fn retrieve_results(
+        &mut self,
+        py: Python<'_>,
+        job_handle: PyJobHandle,
+    ) -> PyResult<PyExecutionData> {
+        py_sync!(
+            py,
+            py_executable_data!(self, retrieve_results, job_handle.into())
+        )
     }
 
     pub fn retrieve_results_async<'py>(
@@ -207,8 +316,8 @@ py_wrap_type! {
 #[pymethods]
 impl PyJobHandle {
     #[getter]
-    pub fn job_id(&self) -> &str {
-        self.as_inner().job_id()
+    pub fn job_id(&self) -> String {
+        self.as_inner().job_id().to_string()
     }
 
     #[getter]
