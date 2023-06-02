@@ -23,17 +23,20 @@ macro_rules! py_sync {
         let runtime = ::pyo3_asyncio::tokio::get_runtime();
         let handle = runtime.spawn($body);
 
-        // A 100ms loop delay is a bit arbitrary, but seems to
-        // balance CPU usage and SIGINT responsiveness well enough.
-        let delay = ::std::time::Duration::from_millis(100);
-        while !handle.is_finished() {
-            $py.check_signals()?;
-            ::std::thread::sleep(delay);
-        }
-
-        runtime
-            .block_on(handle)
-            .map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?
+        runtime.block_on(async {
+            tokio::select! {
+                result = handle => result.map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?,
+                signal_err = async {
+                    // A 100ms loop delay is a bit arbitrary, but seems to
+                    // balance CPU usage and SIGINT responsiveness well enough.
+                    let delay = ::std::time::Duration::from_millis(100);
+                    loop {
+                        $py.check_signals()?;
+                        ::tokio::time::sleep(delay).await;
+                    }
+                } => signal_err,
+            }
+        })
     }};
 }
 
@@ -49,6 +52,12 @@ macro_rules! py_async {
 /// create that function as private and two pyfunctions
 /// named after it that can be used to invoke either
 /// blocking or async variants of the same function.
+///
+/// The given function will be spawned on a Rust event loop
+/// this means functions like [`pyo3::Python::with_gil`]
+/// should not be used, as acquiring Python's global
+/// interpreter lock from a Rust runtime
+/// isn't possible.
 ///
 /// This macro cannot be used when lifetime specifiers are
 /// required, or the pyfunction bodies need additional

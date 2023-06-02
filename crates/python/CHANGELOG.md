@@ -1,3 +1,15 @@
+## 0.7.1
+
+### Fixes
+
+- The translate function no longer hangs infinitely (#305)
+
+## 0.7.1-rc.0
+
+### Fixes
+
+- The translate function no longer hangs infinitely (#305)
+
 ## 0.7.0
 
 ### Breaking Changes
