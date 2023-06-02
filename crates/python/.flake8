@@ -4,4 +4,4 @@ max-line-length = 120
 extend-ignore = E203, E302
 
 per-file-ignores = 
-    qcs_sdk/__init__.pyi:F401,F403 # Disable "unused" warning for top-level exports
+    **/__init__.pyi:F401,F403 # Disable "unused" warning for top-level exports

@@ -1,6 +1,6 @@
-from typing import List, Optional, final
+from typing import List, Sequence, Optional, final
 
-from ..qpu.isa import InstructionSetArchitecture
+from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
 
 DEFAULT_COMPILER_TIMEOUT: float
@@ -69,21 +69,21 @@ class PauliTerm:
     def __new__(
         cls,
         /,
-        indices: List[int],
-        symbols: List[str],
+        indices: Sequence[int],
+        symbols: Sequence[str],
     ) -> "PauliTerm": ...
     @property
     def indices(self) -> List[int]:
         """Qubit indices onto which the factors of the Pauli Term are applied."""
         ...
     @indices.setter
-    def indices(self, value: List[int]): ...
+    def indices(self, value: Sequence[int]): ...
     @property
     def symbols(self) -> List[str]:
         """Ordered factors of the Pauli Term."""
         ...
     @symbols.setter
-    def symbols(self, value: List[str]): ...
+    def symbols(self, value: Sequence[str]): ...
 
 @final
 class ConjugateByCliffordRequest:
@@ -130,7 +130,7 @@ class RandomizedBenchmarkingRequest:
         /,
         depth: int,
         qubits: int,
-        gateset: List[str],
+        gateset: Sequence[str],
         seed: Optional[int] = None,
         interleaver: Optional[str] = None,
     ) -> "RandomizedBenchmarkingRequest": ...
@@ -151,7 +151,7 @@ class RandomizedBenchmarkingRequest:
         """List of Quil programs, each describing a Clifford."""
         ...
     @gateset.setter
-    def gateset(self, value: List[str]): ...
+    def gateset(self, value: Sequence[str]): ...
     @property
     def seed(self) -> Optional[int]:
         """PRNG seed. Set this to guarantee repeatable results."""
@@ -171,14 +171,14 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
 
     @property
     def sequence(self) -> List[List[int]]:
-        """List of Cliffords, each expressed as a list of generator indices."""
+        """Sequence of Cliffords, each expressed as a list of generator indices."""
         ...
 
 def compile_program(
     quil: str,
     target: TargetDevice,
-    client: Optional[QCSClient] = ...,
-    options: Optional[CompilerOpts] = ...,
+    client: Optional[QCSClient] = None,
+    options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
     Compile a quil program for a target device.
@@ -195,8 +195,8 @@ def compile_program(
 async def compile_program_async(
     quil: str,
     target: TargetDevice,
-    client: Optional[QCSClient] = ...,
-    options: Optional[CompilerOpts] = ...,
+    client: Optional[QCSClient] = None,
+    options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
     Compile a quil program for a target device.
@@ -263,7 +263,7 @@ class NativeQuilMetadata:
         ...
 
 def get_version_info(
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -275,7 +275,7 @@ def get_version_info(
     ...
 
 async def get_version_info_async(
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -289,11 +289,11 @@ async def get_version_info_async(
 
 def conjugate_pauli_by_clifford(
     request: ConjugateByCliffordRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
-    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\\dagger}.
 
     :param request: Pauli Term conjugation request.
     :param client: Optional client configuration. If ``None``, a default one is created.
@@ -304,11 +304,11 @@ def conjugate_pauli_by_clifford(
 
 async def conjugate_pauli_by_clifford_async(
     request: ConjugateByCliffordRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
-    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\\dagger}.
     (async analog of ``conjugate_pauli_by_clifford``)
 
     :param request: Pauli Term conjugation request.
@@ -320,7 +320,7 @@ async def conjugate_pauli_by_clifford_async(
 
 def generate_randomized_benchmarking_sequence(
     request: RandomizedBenchmarkingRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
@@ -344,7 +344,7 @@ def generate_randomized_benchmarking_sequence(
 
 async def generate_randomized_benchmarking_sequence_async(
     request: RandomizedBenchmarkingRequest,
-    client: Optional[QCSClient] = ...,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into

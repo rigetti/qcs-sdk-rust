@@ -96,8 +96,8 @@ mod describe_edge {
             "gates": []
         });
 
-        let undead = serde_json::to_value(&undead_qubit).unwrap();
-        let dead = serde_json::to_value(&dead_qubit).unwrap();
+        let undead = serde_json::to_value(undead_qubit).unwrap();
+        let dead = serde_json::to_value(dead_qubit).unwrap();
 
         assert_eq!(undead, expected_undead);
         assert_eq!(dead, expected_dead);

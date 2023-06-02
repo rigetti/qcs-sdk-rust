@@ -35,27 +35,33 @@ authors = [
 	"Randall Fulton <rfulton@rigetti.com>",
 ]
 
-[tool.maturin]
-bindings = "pyo3"
-compatibility = "linux"
-sdist-include = ["README.md"]
-
 [tool.poetry.dependencies]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 numpy = "^1.24.1"
-maturin = "^0.13.2"
+maturin = "^0.14.17"
 pytest = "^7.1.3"
 pytest-asyncio = "^0.19.0"
 black = "^22.8.0"
 syrupy = "^3.0.6"
+
+[tool.maturin]
+features = ["pyo3/extension-module"]
+bindings = "pyo3"
+compatibility = "linux"
+sdist-include = ["README.md"]
+
+[build-system]
+requires = ["maturin>=0.14,<0.15"]
+build-backend = "maturin"
 
 [tool.black]
 line-length = 120
 target-version = ['py38', 'py39', 'py310', 'py311']
 include = '\.pyi?$'
 
-[build-system]
-requires = ["maturin>=0.13,<0.14"]
-build-backend = "maturin"
+[tool.pyright]
+# This diagnostic is raised when a type stub is found without a corresponding source file. This is
+# necessarily the case for a pure Rust pyo3 module, so disabling it.
+reportMissingModuleSource = false

@@ -1,6 +1,8 @@
 //! These are the integration tests for [`qcs::Executable::execute_on_qvm`].
 //! In order to run them, QVM's web server must be running at localhost:5000.
 
+use std::num::NonZeroU16;
+
 use qcs::{client::Qcs, Executable};
 
 const PROGRAM: &str = r##"
@@ -16,11 +18,11 @@ MEASURE 1 second
 
 #[tokio::test]
 async fn test_bell_state() {
-    const SHOTS: u16 = 10;
+    let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
         .with_client(Qcs::load().await)
-        .with_shots(SHOTS)
+        .with_shots(shots)
         .read_from("first")
         .read_from("second")
         .execute_on_qvm()
@@ -47,8 +49,8 @@ async fn test_bell_state() {
         .expect("second register should be integers")
         .to_owned();
 
-    assert_eq!(first.shape(), [SHOTS.into(), 1]);
-    assert_eq!(second.shape(), [SHOTS.into(), 1]);
+    assert_eq!(first.shape(), [shots.get().into(), 1]);
+    assert_eq!(second.shape(), [shots.get().into(), 1]);
 
     for (first, second) in first.into_iter().zip(second) {
         assert_eq!(first, second);

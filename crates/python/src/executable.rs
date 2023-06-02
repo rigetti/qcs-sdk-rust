@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{num::NonZeroU16, sync::Arc};
 
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
@@ -106,7 +106,7 @@ impl PyExecutable {
         quil: String,
         registers: Vec<String>,
         parameters: Vec<PyParameter>,
-        shots: Option<u16>,
+        #[pyo3(from_py_with = "crate::from_py::optional_non_zero_u16")] shots: Option<NonZeroU16>,
         compile_with_quilc: Option<bool>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {

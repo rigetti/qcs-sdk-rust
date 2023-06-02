@@ -61,7 +61,6 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[allow(clippy::implicit_hasher)]
     #[pyfunction(client = "None", endpoint_id = "None")]
     async fn submit(
         program: String,

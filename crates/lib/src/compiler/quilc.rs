@@ -407,10 +407,12 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 
 #[cfg(test)]
 mod tests {
+    use crate::qvm::api::AddressRequest;
+
     use super::*;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use regex::Regex;
-    use std::{borrow::Cow, fs::File};
+    use std::{fs::File, num::NonZeroU16};
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
 
@@ -455,7 +457,15 @@ MEASURE 1 ro[1]
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string(true))
             .unwrap()
-            .run(10, &[Cow::Borrowed("ro")], &HashMap::default(), &client)
+            .run(
+                NonZeroU16::new(10).expect("value is non-zero"),
+                [("ro".to_string(), AddressRequest::IncludeAll)]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                &HashMap::default(),
+                &client,
+            )
             .await
             .expect("Could not run program on QVM");
         for shot in results

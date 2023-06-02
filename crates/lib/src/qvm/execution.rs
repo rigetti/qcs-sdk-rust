@@ -1,16 +1,13 @@
-use std::borrow::Cow;
 use std::str::FromStr;
+use std::{collections::HashMap, num::NonZeroU16};
 
-use quil_rs::{
-    instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
-    program::ProgramError,
-    Program,
-};
+use quil_rs::Program;
+
+use crate::{executable::Parameters, qvm::run_program};
 
 use crate::client::Qcs;
-use crate::executable::Parameters;
 
-use super::{QvmResultData, Request, Response};
+use super::{api::AddressRequest, Error, QvmResultData};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -34,9 +31,11 @@ impl Execution {
     /// # Arguments
     ///
     /// 1. `shots`: The number of times the program should run.
-    /// 2. `register`: The name of the register containing results that should be read out from QVM.
-    /// 3. `params`: Values to substitute for parameters in Quil.
-    /// 4. `config`: A configuration object containing the connection URL of QVM.
+    /// 2. `addresses`: A mapping of memory region names to an [`AddressRequest`] describing what
+    ///    values should be returned for that address.
+    /// 3. `register`: The name of the register containing results that should be read out from QVM.
+    /// 4. `params`: Values to substitute for parameters in Quil.
+    /// 5. `config`: A configuration object containing the connection URL of QVM.
     ///
     /// Returns: [`ExecutionResult`].
     ///
@@ -55,143 +54,48 @@ impl Execution {
     ///
     /// Missing parameters, extra parameters, or parameters of the wrong type will all cause errors.
     pub(crate) async fn run(
-        &mut self,
-        shots: u16,
-        readouts: &[Cow<'_, str>],
+        &self,
+        shots: NonZeroU16,
+        addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
         client: &Qcs,
     ) -> Result<QvmResultData, Error> {
-        #[cfg(feature = "tracing")]
-        tracing::debug!(
-            %shots,
-            ?readouts,
-            ?params,
-            "running program on QVM"
-        );
-
-        if shots == 0 {
-            return Err(Error::ShotsMustBePositive);
-        }
-
-        let memory = &self.program.memory_regions;
-
-        let mut instruction_count = 0;
-        for (name, values) in params {
-            match memory.get(name.as_ref()) {
-                Some(region) => {
-                    if region.size.length != values.len() as u64 {
-                        return Err(Error::RegionSizeMismatch {
-                            name: name.clone(),
-                            declared: region.size.length,
-                            parameters: values.len(),
-                        });
-                    }
-                }
-                None => {
-                    return Err(Error::RegionNotFound { name: name.clone() });
-                }
-            }
-            for (index, value) in values.iter().enumerate() {
-                self.program.instructions.insert(
-                    0,
-                    Instruction::Move(Move {
-                        destination: ArithmeticOperand::MemoryReference(MemoryReference {
-                            name: name.to_string(),
-                            index: index as u64,
-                        }),
-                        source: ArithmeticOperand::LiteralReal(*value),
-                    }),
-                );
-                instruction_count += 1;
-            }
-        }
-        let result = self.execute(shots, readouts, client).await;
-        for _ in 0..instruction_count {
-            self.program.instructions.remove(0);
-        }
-        result
+        run_program(
+            &self.program,
+            shots,
+            addresses,
+            params,
+            None,
+            None,
+            None,
+            client,
+        )
+        .await
     }
-
-    async fn execute(
-        &self,
-        shots: u16,
-        readouts: &[Cow<'_, str>],
-        client: &Qcs,
-    ) -> Result<QvmResultData, Error> {
-        #[cfg(feature = "tracing")]
-        tracing::debug!(
-            %shots,
-            ?readouts,
-            "executing program on QVM"
-        );
-
-        let request = Request::new(&self.program.to_string(true), shots, readouts);
-        let qvm_url = client.get_config().qvm_url();
-
-        let client = reqwest::Client::new();
-        let response = client
-            .post(qvm_url)
-            .json(&request)
-            .send()
-            .await
-            .map_err(|source| Error::QvmCommunication {
-                qvm_url: qvm_url.to_string(),
-                source,
-            })?;
-
-        match response.json::<Response>().await {
-            Err(source) => Err(Error::QvmCommunication {
-                qvm_url: qvm_url.to_string(),
-                source,
-            }),
-            Ok(Response::Success(response)) => {
-                Ok(QvmResultData::from_memory_map(response.registers))
-            }
-            Ok(Response::Failure(response)) => Err(Error::Qvm {
-                message: response.status,
-            }),
-        }
-    }
-}
-
-/// All of the errors that can occur when running a Quil program on QVM.
-#[derive(Debug, thiserror::Error)]
-pub(crate) enum Error {
-    #[error("Error parsing Quil program: {0}")]
-    Parsing(#[from] ProgramError<Program>),
-    #[error("Shots must be a positive integer.")]
-    ShotsMustBePositive,
-    #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
-    RegionSizeMismatch {
-        name: Box<str>,
-        declared: u64,
-        parameters: usize,
-    },
-    #[error("Could not find region {name} for parameter. Are you missing a DECLARE instruction?")]
-    RegionNotFound { name: Box<str> },
-    #[error("Could not communicate with QVM at {qvm_url}")]
-    QvmCommunication {
-        qvm_url: String,
-        source: reqwest::Error,
-    },
-    #[error("QVM reported a problem running your program: {message}")]
-    Qvm { message: String },
 }
 
 #[cfg(test)]
 mod describe_execution {
-    use crate::client::Qcs;
+    use std::{collections::HashMap, num::NonZeroU16};
 
     use super::{Execution, Parameters};
+    use crate::client::Qcs;
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
-        let mut exe = Execution::new("DECLARE ro BIT").unwrap();
+        let exe = Execution::new("DECLARE ro BIT").unwrap();
 
         let mut params = Parameters::new();
         params.insert("doesnt_exist".into(), vec![0.0]);
 
-        let result = exe.run(1, &[], &params, &Qcs::default()).await;
+        let result = exe
+            .run(
+                NonZeroU16::new(1).expect("value is non-zero"),
+                HashMap::new(),
+                &params,
+                &Qcs::default(),
+            )
+            .await;
         if let Err(e) = result {
             assert!(e.to_string().contains("doesnt_exist"));
         } else {
@@ -201,12 +105,19 @@ mod describe_execution {
 
     #[tokio::test]
     async fn it_errors_when_any_param_is_the_wrong_size() {
-        let mut exe = Execution::new("DECLARE ro BIT[2]").unwrap();
+        let exe = Execution::new("DECLARE ro BIT[2]").unwrap();
 
         let mut params = Parameters::new();
         params.insert("ro".into(), vec![0.0]);
 
-        let result = exe.run(1, &[], &params, &Qcs::default()).await;
+        let result = exe
+            .run(
+                NonZeroU16::new(1).expect("value is non-zero"),
+                HashMap::new(),
+                &params,
+                &Qcs::default(),
+            )
+            .await;
         if let Err(e) = result {
             let err_string = e.to_string();
             assert!(err_string.contains("ro"));

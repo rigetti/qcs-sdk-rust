@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, final
+from typing import Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
 
@@ -29,6 +29,9 @@ class Register:
 
     """
 
+    def inner(self) -> Union[List[int], List[complex]]:
+        """Returns the inner register data."""
+        ...
     def is_i32(self) -> bool: ...
     def is_complex32(self) -> bool: ...
     def as_i32(self) -> Optional[List[int]]: ...
@@ -36,9 +39,9 @@ class Register:
     def to_i32(self) -> List[int]: ...
     def to_complex32(self) -> List[complex]: ...
     @staticmethod
-    def from_i32(inner: List[int]) -> "Register": ...
+    def from_i32(inner: Sequence[int]) -> "Register": ...
     @staticmethod
-    def from_complex32(inner: List[complex]) -> "Register": ...
+    def from_complex32(inner: Sequence[complex]) -> "Register": ...
 
 @final
 class ExecutionResult:
@@ -76,7 +79,7 @@ class ExecutionResults:
 
 def submit(
     program: str,
-    patch_values: Dict[str, List[float]],
+    patch_values: Mapping[str, Sequence[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
     endpoint_id: Optional[str] = None,
@@ -99,7 +102,7 @@ def submit(
 
 async def submit_async(
     program: str,
-    patch_values: Dict[str, List[float]],
+    patch_values: Mapping[str, Sequence[float]],
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
     endpoint_id: Optional[str] = None,

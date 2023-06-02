@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::convert::TryFrom;
+use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -33,7 +34,7 @@ use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice
 pub(crate) struct Execution<'a> {
     program: RewrittenProgram,
     pub(crate) quantum_processor_id: Cow<'a, str>,
-    pub(crate) shots: u16,
+    pub(crate) shots: NonZeroU16,
     client: Arc<Qcs>,
 }
 
@@ -116,7 +117,7 @@ impl<'a> Execution<'a> {
     ///     for the QPU or that there is a bug in this library.
     pub(crate) async fn new(
         quil: Arc<str>,
-        shots: u16,
+        shots: NonZeroU16,
         quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
         compile_with_quilc: bool,
@@ -171,7 +172,7 @@ impl<'a> Execution<'a> {
         let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_string().0,
-            self.shots.into(),
+            self.shots.get().into(),
             self.client.as_ref(),
             options,
         )
