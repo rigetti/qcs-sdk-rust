@@ -1,3 +1,9 @@
+## 0.8.0
+
+### Breaking Changes
+
+- The QVM API module has been expanded to include more types of requests. The existing methods in that module are now in the root of the QVM module and `NonZeroU16` is used for shot parameters throughout the library.
+
 ## 0.8.0-rc.0
 
 ### Breaking Changes

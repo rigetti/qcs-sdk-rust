@@ -1702,7 +1702,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.13.0-rc.0"
+version = "0.13.0"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1825,7 +1825,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.8.0-rc.0"
+version = "0.8.0"
 dependencies = [
  "numpy",
  "paste",
