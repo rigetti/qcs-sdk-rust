@@ -3,18 +3,20 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
-use qcs_api_client_common::ClientConfiguration;
+use qcs_api_client_grpc::services::translation::TranslationOptions;
 
+use crate::client::Qcs;
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::JobId;
-use crate::qpu::client::Qcs;
+use crate::qpu::api::{JobId, JobTarget};
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
+use crate::qvm::api::AddressRequest;
 use crate::{qpu, qvm};
 use quil_rs::program::ProgramError;
 
@@ -23,7 +25,7 @@ use quil_rs::program::ProgramError;
 /// # Example
 ///
 /// ```rust
-/// use qcs_api_client_common::ClientConfiguration;
+/// use qcs::client::Qcs;
 /// use qcs::Executable;
 ///
 ///
@@ -39,7 +41,8 @@ use quil_rs::program::ProgramError;
 ///
 /// #[tokio::main]
 /// async fn main() {
-///     let mut result = Executable::from_quil(PROGRAM).with_config(ClientConfiguration::default()).with_shots(4).execute_on_qvm().await.unwrap();
+///     use std::num::NonZeroU16;
+///     let mut result = Executable::from_quil(PROGRAM).with_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm().await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
 ///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
@@ -80,12 +83,11 @@ use quil_rs::program::ProgramError;
 #[derive(Debug, Clone)]
 pub struct Executable<'executable, 'execution> {
     quil: Arc<str>,
-    shots: u16,
+    shots: NonZeroU16,
     readout_memory_region_names: Option<Vec<Cow<'executable, str>>>,
     params: Parameters,
     compile_with_quilc: bool,
     compiler_options: CompilerOpts,
-    config: Option<ClientConfiguration>,
     client: Option<Arc<Qcs>>,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -112,12 +114,11 @@ impl<'executable> Executable<'executable, '_> {
     pub fn from_quil<Quil: Into<Arc<str>>>(quil: Quil) -> Self {
         Self {
             quil: quil.into(),
-            shots: 1,
+            shots: NonZeroU16::new(1).expect("value is non-zero"),
             readout_memory_region_names: None,
             params: Parameters::new(),
             compile_with_quilc: true,
             compiler_options: CompilerOpts::default(),
-            config: None,
             client: None,
             qpu: None,
             qvm: None,
@@ -138,7 +139,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs_api_client_common::ClientConfiguration;
+    /// use qcs::client::Qcs;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = r#"
@@ -152,7 +153,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut result = Executable::from_quil(PROGRAM)
-    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
     ///         .read_from("second")
     ///         .execute_on_qvm()
@@ -189,8 +190,11 @@ impl<'executable> Executable<'executable, '_> {
     where
         S: Into<Cow<'executable, str>>,
     {
+        let register = register.into();
+        #[cfg(feature = "tracing")]
+        tracing::trace!("reading from register {:?}", register);
         let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
-        readouts.push(register.into());
+        readouts.push(register);
         self.readout_memory_region_names = Some(readouts);
         self
     }
@@ -209,7 +213,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Example
     ///
     /// ```rust
-    /// use qcs_api_client_common::ClientConfiguration;
+    /// use qcs::client::Qcs;
     /// use qcs::Executable;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
@@ -217,7 +221,7 @@ impl<'executable> Executable<'executable, '_> {
     /// #[tokio::main]
     /// async fn main() {
     ///     let mut exe = Executable::from_quil(PROGRAM)
-    ///         .with_config(ClientConfiguration::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
     ///
     ///     for theta in 0..2 {
@@ -244,7 +248,7 @@ impl<'executable> Executable<'executable, '_> {
     ///             .get((0, 1))
     ///             .expect("first shot, second_index of theta should have value")
     ///             .to_owned();
-    ///         
+    ///
     ///         assert_eq!(first, theta);
     ///         assert_eq!(second, theta * 2.0);
     ///     }
@@ -259,6 +263,10 @@ impl<'executable> Executable<'executable, '_> {
         value: f64,
     ) -> &mut Self {
         let param_name = param_name.into();
+
+        #[cfg(feature = "tracing")]
+        tracing::trace!("setting parameter {}[{}] to {}", param_name, index, value);
+
         let mut values = self
             .params
             .remove(&param_name)
@@ -276,8 +284,8 @@ impl<'executable> Executable<'executable, '_> {
 
     /// Set the default configuration to be used when constructing clients
     #[must_use]
-    pub fn with_config(mut self, config: ClientConfiguration) -> Self {
-        self.config = Some(config);
+    pub fn with_client(mut self, client: Qcs) -> Self {
+        self.client = Some(Arc::from(client));
         self
     }
 }
@@ -288,7 +296,7 @@ pub type ExecutionResult = Result<execution_data::ExecutionData, Error>;
 impl Executable<'_, '_> {
     /// Specify a number of times to run the program for each execution. Defaults to 1 run or "shot".
     #[must_use]
-    pub fn with_shots(mut self, shots: u16) -> Self {
+    pub fn with_shots(mut self, shots: NonZeroU16) -> Self {
         self.shots = shots;
         self
     }
@@ -330,15 +338,29 @@ impl Executable<'_, '_> {
     ///
     /// See [`Error`].
     pub async fn execute_on_qvm(&mut self) -> ExecutionResult {
-        let config = self.get_config().await?;
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            num_shots = %self.shots,
+            "running Executable on QVM",
+        );
 
-        let mut qvm = if let Some(qvm) = self.qvm.take() {
+        let client = self.get_client().await?;
+
+        let qvm = if let Some(qvm) = self.qvm.take() {
             qvm
         } else {
             qvm::Execution::new(&self.quil)?
         };
         let result = qvm
-            .run(self.shots, self.get_readouts(), &self.params, &config)
+            .run(
+                self.shots,
+                self.get_readouts()
+                    .iter()
+                    .map(|address| (address.to_string(), AddressRequest::IncludeAll))
+                    .collect(),
+                &self.params,
+                &client,
+            )
             .await;
         self.qvm = Some(qvm);
         result
@@ -349,23 +371,12 @@ impl Executable<'_, '_> {
             })
     }
 
-    async fn get_config(&mut self) -> Result<ClientConfiguration, Error> {
-        if let Some(config) = &self.config {
-            Ok(config.clone())
-        } else {
-            let config = ClientConfiguration::load_default().await?;
-            self.config = Some(config.clone());
-            Ok(config)
-        }
-    }
-
     /// Load `self.client` if not yet loaded, then return a reference to it.
     async fn get_client(&mut self) -> Result<Arc<Qcs>, Error> {
         if let Some(client) = &self.client {
             Ok(client.clone())
         } else {
-            let config = self.get_config().await?;
-            let client = Arc::new(Qcs::with_config(config));
+            let client = Arc::new(Qcs::load().await);
             self.client = Some(client.clone());
             Ok(client)
         }
@@ -422,11 +433,67 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu<S>(&mut self, quantum_processor_id: S) -> ExecutionResult
+    pub async fn execute_on_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+        translation_options: Option<TranslationOptions>,
+    ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
-        let job_handle = self.submit_to_qpu(quantum_processor_id).await?;
+        let job_handle = self
+            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id, translation_options)
+            .await?;
+        self.retrieve_results(job_handle).await
+    }
+
+    /// Compile the program and execute it on a QCS endpoint, waiting for results.
+    ///
+    /// # Arguments
+    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    ///     This parameter affects the lifetime of the [`Executable`].
+    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    ///
+    /// # Warning
+    ///
+    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
+    /// to avoid blocking shutdown of the runtime.
+    ///
+    /// # Returns
+    ///
+    /// An [`ExecutionResult`].
+    ///
+    /// # Errors
+    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
+    ///
+    /// 1. You are not authenticated for QCS
+    /// 1. Your credentials don't have an active reservation for the QPU you requested
+    /// 1. [quilc] was not running.
+    /// 1. The `quil` that this [`Executable`] was constructed with was invalid.
+    /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
+    ///
+    /// [quilc]: https://github.com/quil-lang/quilc
+    pub async fn execute_on_qpu<S>(
+        &mut self,
+        quantum_processor_id: S,
+        translation_options: Option<TranslationOptions>,
+    ) -> ExecutionResult
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let quantum_processor_id = quantum_processor_id.into();
+
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            num_shots = %self.shots,
+            %quantum_processor_id,
+            "running Executable on QPU",
+        );
+
+        let job_handle = self
+            .submit_to_qpu(quantum_processor_id, translation_options)
+            .await?;
         self.retrieve_results(job_handle).await
     }
 
@@ -441,27 +508,51 @@ impl<'execution> Executable<'_, 'execution> {
     pub async fn submit_to_qpu<S>(
         &mut self,
         quantum_processor_id: S,
+        translation_options: Option<TranslationOptions>,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
     {
         let quantum_processor_id = quantum_processor_id.into();
-        let JobHandle {
-            job_id,
-            readout_map,
-            ..
-        } = self
-            .qpu_for_id(quantum_processor_id.clone())
-            .await?
-            .submit(&self.params)
-            .await?;
 
-        // The unpacking/re-packing here is to avoid lifetime issues.
-        Ok(JobHandle {
-            job_id,
-            quantum_processor_id,
-            readout_map,
-        })
+        #[cfg(feature = "tracing")]
+        tracing::debug!(
+            num_shots = %self.shots,
+            %quantum_processor_id,
+            "submitting Executable to QPU",
+        );
+
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
+            .await?
+            .submit(&self.params, translation_options)
+            .await?;
+        Ok(job_handle)
+    }
+
+    /// Compile and submit the program to a QCS endpoint, but do not wait for execution to complete.
+    ///
+    /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
+    /// results.
+    ///
+    /// # Errors
+    ///
+    /// See [`Executable::execute_on_qpu`].
+    pub async fn submit_to_qpu_with_endpoint<S>(
+        &mut self,
+        quantum_processor_id: S,
+        endpoint_id: S,
+        translation_options: Option<TranslationOptions>,
+    ) -> Result<JobHandle<'execution>, Error>
+    where
+        S: Into<Cow<'execution, str>>,
+    {
+        let job_handle = self
+            .qpu_for_id(quantum_processor_id)
+            .await?
+            .submit_to_endpoint_id(&self.params, endpoint_id.into(), translation_options)
+            .await?;
+        Ok(job_handle)
     }
 
     /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
@@ -470,10 +561,9 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// See [`Executable::execute_on_qpu`].
     pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
-        let qpu = self.qpu_for_id(job_handle.quantum_processor_id).await?;
-        qpu.retrieve_results(job_handle.job_id, job_handle.readout_map)
-            .await
-            .map_err(Error::from)
+        let quantum_processor_id = job_handle.quantum_processor_id.to_string();
+        let qpu = self.qpu_for_id(quantum_processor_id).await?;
+        qpu.retrieve_results(job_handle).await.map_err(Error::from)
     }
 }
 
@@ -605,6 +695,7 @@ impl From<qvm::Error> for Error {
 pub struct JobHandle<'executable> {
     job_id: JobId,
     quantum_processor_id: Cow<'executable, str>,
+    endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
 }
 
@@ -613,6 +704,7 @@ impl<'a> JobHandle<'a> {
     pub(crate) fn new<S>(
         job_id: JobId,
         quantum_processor_id: S,
+        endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
     ) -> Self
     where
@@ -621,14 +713,24 @@ impl<'a> JobHandle<'a> {
         Self {
             job_id,
             quantum_processor_id: quantum_processor_id.into(),
+            endpoint_id: endpoint_id.map(Into::into),
             readout_map,
         }
     }
 
     /// The string representation of the QCS Job ID. Useful for debugging.
     #[must_use]
-    pub fn job_id(&self) -> &str {
-        self.job_id.0.as_str()
+    pub fn job_id(&self) -> JobId {
+        self.job_id.clone()
+    }
+
+    /// The execution target of the QCS Job, either the quantum processor or an expicit endpoint.
+    #[must_use]
+    pub fn job_target(&self) -> JobTarget {
+        self.endpoint_id.as_ref().map_or_else(
+            || JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string()),
+            |endpoint_id| JobTarget::EndpointId(endpoint_id.to_string()),
+        )
     }
 
     /// The readout map from source readout memory locations to the
@@ -641,13 +743,16 @@ impl<'a> JobHandle<'a> {
 
 #[cfg(test)]
 mod describe_get_config {
+    #[cfg(feature = "manual-tests")]
+    use crate::client::Qcs;
+    #[cfg(feature = "manual-tests")]
     use qcs_api_client_openapi::common::ClientConfiguration;
 
     use crate::Executable;
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("").with_config(ClientConfiguration::default());
+        let mut exe = Executable::from_quil("");
         let foo_len = |exe: &mut Executable<'_, '_>| exe.params.get("foo").unwrap().len();
 
         exe.with_parameter("foo", 0, 0.0);
@@ -656,55 +761,68 @@ mod describe_get_config {
         exe.with_parameter("foo", 10, 10.0);
         assert_eq!(foo_len(&mut exe), 11);
     }
+
+    #[tokio::test]
+    #[cfg(feature = "manual-tests")]
+    async fn it_returns_cached_values() {
+        let config = ClientConfiguration::builder()
+            .set_quilc_url(String::from("test"))
+            .build()
+            .unwrap();
+        let client = Qcs::with_config(config.clone());
+        let mut exe = Executable::from_quil("").with_client(client);
+        let gotten = exe.get_client().await.unwrap_or_default();
+        assert_eq!(gotten.as_ref().get_config().quilc_url(), config.quilc_url());
+    }
 }
 
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_qpu_for_id {
-    use std::sync::Arc;
+    use std::num::NonZeroU16;
 
-    use crate::{configuration::Configuration, qpu, Executable};
+    use crate::compiler::quilc::CompilerOpts;
+    use crate::qpu;
+    use crate::{client::Qcs, Executable};
 
     #[tokio::test]
     async fn it_refreshes_auth_token() {
-        let mut exe = Executable::from_quil("");
         // Default config has no auth, so it should try to refresh
-        exe.config = Some(Arc::new(Configuration::default()));
+        let mut exe = Executable::from_quil("").with_client(Qcs::default());
         let result = exe.qpu_for_id("blah").await;
-        let err = if let Err(err) = result {
-            err
-        } else {
+        let Err(err) = result else {
             panic!("Expected an error!");
         };
-        let result_string = format!("{:?}", err);
+        let result_string = format!("{err:?}");
         assert!(result_string.contains("refresh_token"));
     }
 
     #[tokio::test]
     async fn it_loads_cached_version() {
         let mut exe = Executable::from_quil("");
-        let shots = 17;
+        let shots = NonZeroU16::new(17).expect("value is non-zero");
         exe.shots = shots;
         exe.qpu = Some(
             qpu::Execution::new(
                 "".into(),
                 shots,
-                "Aspen-M-3",
-                exe.get_config().await.unwrap_or_default(),
+                "Aspen-M-3".into(),
+                exe.get_client().await.expect("should have client"),
                 exe.compile_with_quilc,
+                CompilerOpts::default(),
             )
             .await
             .unwrap(),
         );
         // Load config with no credentials to prevent creating a new Execution if it tries
-        exe.config = Some(Arc::new(Configuration::default()));
+        let mut exe = exe.with_client(Qcs::default());
 
         assert!(exe.qpu_for_id("Aspen-M-3").await.is_ok());
     }
 
     #[tokio::test]
     async fn it_creates_new_after_shot_change() {
-        let original_shots = 23;
+        let original_shots = NonZeroU16::new(23).expect("value is non-zero");
         let mut exe = Executable::from_quil("").with_shots(original_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
@@ -712,7 +830,7 @@ mod describe_qpu_for_id {
 
         // Cache so we can verify cache is not used.
         exe.qpu = Some(qpu);
-        let new_shots = 32;
+        let new_shots = NonZeroU16::new(32).expect("value is non-zero");
         exe = exe.with_shots(new_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
@@ -729,29 +847,10 @@ mod describe_qpu_for_id {
         // Cache so we can verify cache is not used.
         exe.qpu = Some(qpu);
         // Load config with no credentials to prevent creating the new Execution (which would fail anyway)
-        exe.config = Some(Arc::new(Configuration::default()));
+        let mut exe = exe.with_client(Qcs::default());
         let result = exe.qpu_for_id("Aspen-8").await;
 
         assert!(matches!(result, Err(_)));
         assert!(matches!(exe.qpu, None));
-    }
-}
-
-#[cfg(test)]
-#[cfg(feature = "manual-tests")]
-mod describe_get_config {
-    use std::sync::Arc;
-
-    use crate::{configuration::Configuration, Executable};
-
-    #[tokio::test]
-    async fn it_returns_cached_values() {
-        let mut exe = Executable::from_quil("");
-        let mut config = Configuration::default();
-        config.quilc_url = String::from("test");
-        let config = Arc::new(config);
-        exe.config = Some(config.clone());
-        let gotten = exe.get_config().await.unwrap_or_default();
-        assert_eq!(gotten.quilc_url, config.quilc_url);
     }
 }

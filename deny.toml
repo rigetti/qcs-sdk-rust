@@ -33,6 +33,7 @@ ignore = []
 unlicensed = "deny"
 allow = [
     "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
     "ISC",
     "MIT",
     "OpenSSL",
@@ -67,9 +68,7 @@ default = "deny"
 confidence-threshold = 0.8
 # Allow 1 or more licenses on a per-crate basis, so that particular licenses
 # aren't accepted for every possible crate as with the normal allow list
-exceptions = [
-    { allow = ["MPL-2.0"], name = "webpki-roots", version = "*" },
-]
+exceptions = [{ allow = ["MPL-2.0"], name = "webpki-roots", version = "*" }]
 
 # Some crates don't have (easily) machine readable licensing information,
 # adding a clarification entry for it allows you to manually specify the
@@ -78,9 +77,7 @@ exceptions = [
 name = "ring"
 version = "*"
 expression = "MIT AND ISC AND OpenSSL"
-license-files = [
-    { path = "LICENSE", hash = 0xbd0eed23 }
-]
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
 
 [licenses.private]
 # If true, ignores workspace crates that aren't published, or are only
@@ -96,7 +93,9 @@ wildcards = "deny"
 highlight = "all"
 skip-tree = [
     { name = "toml", version = "*", depth = 20 },
-    { name = "warp", version = "*", depth = 20 },  # Only used for development
+    { name = "warp", version = "*", depth = 20 },              # Only used for development
+    { name = "hermit-abi", version = "*", depth = 20 },        # Only used for development
+    { name = "hyper-rustls", version = "<=0.23", depth = 20 }, # `hyper-proxy` relies on an older version than `reqwest`
 ]
 
 # This section is considered when running `cargo deny check sources`.

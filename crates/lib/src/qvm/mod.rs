@@ -1,14 +1,22 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{borrow::Cow, collections::HashMap};
+use std::{collections::HashMap, num::NonZeroU16, str::FromStr};
 
-use serde::{Deserialize, Serialize};
+use quil_rs::{
+    instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
+    program::ProgramError,
+    Program,
+};
+use serde::Deserialize;
 
-pub(crate) use execution::{Error, Execution};
+pub(crate) use execution::Execution;
 
-use crate::RegisterData;
+use crate::{client::Qcs, executable::Parameters, RegisterData};
 
+use self::api::AddressRequest;
+
+pub mod api;
 mod execution;
 
 /// Encapsulates data returned after running a program on the QVM
@@ -32,73 +40,181 @@ impl QvmResultData {
     }
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-#[serde(untagged)]
-pub(super) enum Response {
-    Success(Success),
-    Failure(Failure),
+/// Run a Quil program on the QVM. The given parameters are used to parameterize the value of
+/// memory locations across shots.
+#[allow(clippy::too_many_arguments)]
+pub async fn run(
+    quil: &str,
+    shots: NonZeroU16,
+    addresses: HashMap<String, AddressRequest>,
+    params: &Parameters,
+    measurement_noise: Option<(f64, f64, f64)>,
+    gate_noise: Option<(f64, f64, f64)>,
+    rng_seed: Option<i64>,
+    client: &Qcs,
+) -> Result<QvmResultData, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("parsing a program to be executed on the qvm");
+    let program = Program::from_str(quil).map_err(Error::Parsing)?;
+    run_program(
+        &program,
+        shots,
+        addresses,
+        params,
+        measurement_noise,
+        gate_noise,
+        rng_seed,
+        client,
+    )
+    .await
 }
 
-#[derive(Debug, Deserialize, Clone, PartialEq)]
-pub(super) struct Success {
-    #[serde(flatten)]
-    pub(super) registers: HashMap<String, RegisterData>,
+/// Run a [`Program`] on the QVM. The given parameters are used to parametrize the value of
+/// memory locations across shots.
+#[allow(clippy::too_many_arguments)]
+pub async fn run_program(
+    program: &Program,
+    shots: NonZeroU16,
+    addresses: HashMap<String, AddressRequest>,
+    params: &Parameters,
+    measurement_noise: Option<(f64, f64, f64)>,
+    gate_noise: Option<(f64, f64, f64)>,
+    rng_seed: Option<i64>,
+    client: &Qcs,
+) -> Result<QvmResultData, Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %shots,
+        ?addresses,
+        ?params,
+        "executing program on QVM"
+    );
+    let program = apply_parameters_to_program(program, params)?;
+    let request = api::MultishotRequest::new(
+        program.to_string(),
+        shots,
+        addresses,
+        measurement_noise,
+        gate_noise,
+        rng_seed,
+    );
+    api::run(&request, client)
+        .await
+        .map(|response| QvmResultData::from_memory_map(response.registers))
 }
 
-#[derive(Debug, Deserialize, Clone, Eq, PartialEq)]
-pub(super) struct Failure {
-    /// The message from QVM describing what went wrong.
-    pub(super) status: String,
-}
+/// Returns a copy of the [`Program`] with the given parameters applied to it.
+/// These parameters are expressed as `MOVE` statements prepended to the program.
+pub fn apply_parameters_to_program(
+    program: &Program,
+    params: &Parameters,
+) -> Result<Program, Error> {
+    let mut program = program.clone();
 
-#[derive(Serialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "kebab-case")]
-struct Request<'request> {
-    quil_instructions: String,
-    addresses: HashMap<&'request str, bool>,
-    trials: u16,
-    #[serde(rename = "type")]
-    request_type: RequestType,
-}
-
-impl<'request> Request<'request> {
-    fn new(program: &str, shots: u16, readouts: &'request [Cow<'request, str>]) -> Self {
-        let addresses: HashMap<&str, bool> = readouts.iter().map(|v| (v.as_ref(), true)).collect();
-        Self {
-            quil_instructions: program.to_string(),
-            addresses,
-            trials: shots,
-            request_type: RequestType::Multishot,
+    params.iter().try_for_each(|(name, values)| {
+        match program.memory_regions.get(name.as_ref()) {
+            Some(region) => {
+                if region.size.length == values.len() as u64 {
+                    Ok(())
+                } else {
+                    Err(Error::RegionSizeMismatch {
+                        name: name.to_string(),
+                        declared: region.size.length,
+                        parameters: values.len(),
+                    })
+                }
+            }
+            None => Err(Error::RegionNotFound { name: name.clone() }),
         }
-    }
+    })?;
+
+    program.instructions = params
+        .iter()
+        .flat_map(|(name, values)| {
+            values.iter().enumerate().map(move |(index, value)| {
+                Instruction::Move(Move {
+                    destination: MemoryReference {
+                        name: name.to_string(),
+                        index: index as u64,
+                    },
+                    source: ArithmeticOperand::LiteralReal(*value),
+                })
+            })
+        })
+        .chain(program.instructions)
+        .collect();
+
+    Ok(program)
 }
 
-#[derive(Serialize, Copy, Clone, Debug, Ord, PartialOrd, Eq, PartialEq)]
-#[serde(rename_all = "lowercase")]
-enum RequestType {
-    Multishot,
+/// All of the errors that can occur when running a Quil program on QVM.
+#[allow(missing_docs)]
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("Error parsing Quil program: {0}")]
+    Parsing(#[from] ProgramError),
+    #[error("Shots must be a positive integer.")]
+    ShotsMustBePositive,
+    #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
+    RegionSizeMismatch {
+        name: String,
+        declared: u64,
+        parameters: usize,
+    },
+    #[error("Could not find region {name} for parameter. Are you missing a DECLARE instruction?")]
+    RegionNotFound { name: Box<str> },
+    #[error("Could not communicate with QVM at {qvm_url}")]
+    QvmCommunication {
+        qvm_url: String,
+        source: reqwest::Error,
+    },
+    #[error("QVM reported a problem running your program: {message}")]
+    Qvm { message: String },
 }
 
 #[cfg(test)]
-mod describe_request {
-    use std::borrow::Cow;
+mod test {
+    use std::{collections::HashMap, str::FromStr};
 
-    use super::Request;
+    use quil_rs::Program;
+    use rstest::{fixture, rstest};
 
-    #[test]
-    fn it_includes_the_program() {
-        let program = "H 0";
-        let request = Request::new(program, 1, &[]);
-        assert_eq!(&request.quil_instructions, program);
+    use super::apply_parameters_to_program;
+
+    #[fixture]
+    fn program() -> Program {
+        Program::from_str("DECLARE ro BIT[3]\nH 0").expect("should parse valid program")
     }
 
-    #[test]
-    fn it_uses_kebab_case_for_json() {
-        let request = Request::new("H 0", 10, &[Cow::Borrowed("ro")]);
-        let json_string = serde_json::to_string(&request).expect("Could not serialize QVMRequest");
-        assert_eq!(
-            serde_json::from_str::<serde_json::Value>(&json_string).unwrap(),
-            serde_json::json!({"type": "multishot", "addresses": {"ro": true}, "trials": 10, "quil-instructions": "H 0"})
-        );
+    #[rstest]
+    fn test_apply_empty_parameters_to_program(program: Program) {
+        let parameterized_program = apply_parameters_to_program(&program, &HashMap::new())
+            .expect("should not error for empty parameters");
+
+        assert_eq!(parameterized_program, program);
+    }
+
+    #[rstest]
+    fn test_apply_valid_parameters_to_program(program: Program) {
+        let params = HashMap::from([(Box::from("ro"), vec![1.0, 2.0, 3.0])]);
+        let parameterized_program = apply_parameters_to_program(&program, &params)
+            .expect("should not error for empty parameters");
+
+        insta::assert_snapshot!(parameterized_program.to_string());
+    }
+
+    #[rstest]
+    fn test_apply_invalid_parameters_to_program(program: Program) {
+        let params = HashMap::from([(Box::from("ro"), vec![1.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because ro has too few values");
+
+        let params = HashMap::from([(Box::from("ro"), vec![1.0, 2.0, 3.0, 4.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because ro has too many values");
+
+        let params = HashMap::from([(Box::from("bar"), vec![1.0])]);
+        apply_parameters_to_program(&program, &params)
+            .expect_err("should error because bar is not a declared memory region in the program");
     }
 }

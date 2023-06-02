@@ -1,0 +1,5 @@
+---
+source: crates/lib/src/qpu/rewrite_arithmetic.rs
+expression: "substitutions[1].to_string()"
+---
+(beta[0]+theta[0])/6.283185307179586

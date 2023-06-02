@@ -2,15 +2,15 @@
 use std::{collections::HashMap, time::Duration};
 
 use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult};
-use qcs::qpu::client::GrpcClientError;
+use qcs::client::GrpcClientError;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, ToPythonError,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, PyWrapper, ToPythonError,
 };
 
-use crate::py_sync::py_function_sync_async;
+use crate::{grpc::models::translation::PyTranslationOptions, py_sync::py_function_sync_async};
 
-use super::client::PyQcsClient;
+use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -55,7 +55,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<PyQuiltCalibrations> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::translation::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
             .await
@@ -109,10 +109,12 @@ py_function_sync_async! {
         num_shots: u32,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
+        translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         let result =
-            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client)
+            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options)
                 .await
                 .map_err(RustTranslationError::from)
                 .map_err(RustTranslationError::to_py_err)?;

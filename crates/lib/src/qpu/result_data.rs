@@ -65,12 +65,7 @@ impl QpuResultData {
                                 ReadoutValues::Complex(
                                     v.values
                                         .iter()
-                                        .map(|c| {
-                                            Complex64::new(
-                                                c.real.unwrap_or(0.0).into(),
-                                                c.imaginary.unwrap_or(0.0).into(),
-                                            )
-                                        })
+                                        .map(|c| Complex64::new(c.real.into(), c.imaginary.into()))
                                         .collect(),
                                 )
                             }

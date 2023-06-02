@@ -8,7 +8,8 @@ use pyo3::{
     types::{PyComplex, PyInt},
     Py, PyResult,
 };
-use qcs::qpu::client::GrpcClientError;
+use qcs::client::GrpcClientError;
+use qcs::qpu::api::JobTarget;
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
     create_init_submodule, num_complex, py_wrap_error, py_wrap_union_enum, wrap_error,
@@ -17,7 +18,7 @@ use rigetti_pyo3::{
 
 use crate::py_sync::py_function_sync_async;
 
-use super::client::PyQcsClient;
+use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
@@ -60,15 +61,15 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[allow(clippy::implicit_hasher)]
-    #[pyfunction(client = "None")]
+    #[pyfunction(client = "None", endpoint_id = "None")]
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
+        endpoint_id: Option<String>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
 
         // Is there a better way to map these patch_values keys? This
         // negates the whole purpose of [`submit`] using `Box<str>`,
@@ -83,7 +84,9 @@ py_function_sync_async! {
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
-        let job_id = qcs::qpu::api::submit(&quantum_processor_id, job, &patch_values, &client).await
+        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
+
+        let job_id = qcs::qpu::api::submit(&job_target, job, &patch_values, &client).await
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
@@ -138,7 +141,7 @@ impl From<readout_values::Values> for ExecutionResult {
                 data: Register::Complex32(
                     cs.values
                         .into_iter()
-                        .map(|c| num_complex::Complex32::new(c.real(), c.imaginary()))
+                        .map(|c| num_complex::Complex32::new(c.real, c.imaginary))
                         .collect(),
                 )
                 .into(),
@@ -173,21 +176,24 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 
         Self {
             buffers,
-            execution_duration_microseconds: value.execution_duration_microseconds,
+            execution_duration_microseconds: Some(value.execution_duration_microseconds),
         }
     }
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction(client = "None", endpoint_id = "None")]
     async fn retrieve_results(
         job_id: String,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
+        endpoint_id: Option<String>,
     ) -> PyResult<ExecutionResults> {
-        let client = PyQcsClient::get_or_create_client(client).await?;
+        let client = PyQcsClient::get_or_create_client(client).await;
 
-        let results = qcs::qpu::api::retrieve_results(job_id.into(), &quantum_processor_id, &client)
+        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
+
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), &job_target, &client)
             .await
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;

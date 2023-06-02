@@ -1,3 +1,422 @@
+## 0.13.0-rc.0
+
+### Breaking Changes
+
+- The QVM API module has been expanded to include more types of requests. The existing methods in that module are now in the root of the QVM module and `NonZeroU16` is used for shot parameters throughout the library.
+
+## 0.12.0
+
+### Breaking Changes
+
+- Loading a Qcs Client is now infallible and is the primary client used throughout the library. (#302)
+
+## 0.12.0-rc.0
+
+### Breaking Changes
+
+- Loading a Qcs Client is now infallible and is the primary client used throughout the library. (#302)
+
+## 0.11.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.11.0-rc.4
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.11.0-rc.3
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Features
+
+- the default QCS Client configuration now respects environment variable overrides (#297)
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.11.0-rc.2
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.11.0-rc.1
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+### Fixes
+
+- Deserialize final_rewiring_values from None as an empty Vec (#293)
+
+## 0.11.0-rc.0
+
+### Breaking Changes
+
+- `compile_program` now returns `CompilationResult`, containing the native program and `NativeQuilMetadata`
+
+## 0.10.0
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add methods for quil-c `conjugate_pauli_by_clifford` and `generate_randomized_benchmarking_sequence` (#280)
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.23
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add methods for quil-c `conjugate_pauli_by_clifford` and `generate_randomized_benchmarking_sequence` (#280)
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.22
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add methods for quil-c `conjugate_pauli_by_clifford` and `generate_randomized_benchmarking_sequence` (#280)
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.21
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add methods for quil-c `conjugate_pauli_by_clifford` and `generate_randomized_benchmarking_sequence` (#280)
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.20
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add methods for quil-c `conjugate_pauli_by_clifford` and `generate_randomized_benchmarking_sequence` (#280)
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.19
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- fix broken tracing after merge conflicts (#278)
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.18
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- add tracing support (#264)
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.17
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.16
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- support endpoint_id job target (#262)
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.15
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- use qcs-api-client version with rustls and not openssl (#267)
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.14
+
+### Breaking Changes
+
+- support HTTPS_PROXY and HTTP_PROXY client proxies (#266)
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.13
+
+### Breaking Changes
+
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- cargo deny warning from hermit-abi conflicts (#265)
+- add missing types and fix others needed from pyquil (#257)
+
+## 0.10.0-rc.12
+
+### Breaking Changes
+
+- resolve breaking changes from api clients (#260)
+- remove python 3.7 support (#259)
+- remove intermediate `api` module (#255)
+- convert all pyo3 async functions to sync, use python name casing (#252)
+- The `execution_data` module now provides `ExecutionData` as a replacement for both `Qvm` and `Qpu` structs. It serves a common interface for interacting with both result shapes when possible. See the `ExecutionData` documentation for more details on how to use it. (#223)
+- implement Python wrappers for the full Rust API (#230)
+
+### Features
+
+- export qcs client url settings (#249)
+- support protoquil flag in compilation (rebase fix) (#243)
+- export get_quilt_calibrations (#247)
+
+### Fixes
+
+- add missing types and fix others needed from pyquil (#257)
+
 ## 0.10.0-rc.11
 
 ### Breaking Changes

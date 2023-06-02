@@ -106,7 +106,6 @@ py_wrap_error!(
 /// provided in `memory`.
 ///
 /// # Errors
-#[allow(clippy::implicit_hasher)]
 #[pyfunction]
 pub fn build_patch_values(
     recalculation_table: Vec<String>,

@@ -1,16 +1,27 @@
 import pytest
+from syrupy.assertion import SnapshotAssertion
 
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.compiler.quilc import (
     DEFAULT_COMPILER_TIMEOUT,
     CompilerOpts,
     TargetDevice,
+    PauliTerm,
+    GenerateRandomizedBenchmarkingSequenceResponse,
+    RandomizedBenchmarkingRequest,
+    ConjugateByCliffordRequest,
+    ConjugatePauliByCliffordResponse,
     QuilcError,
     compile_program,
     compile_program_async,
     get_version_info,
     get_version_info_async,
+    conjugate_pauli_by_clifford,
+    conjugate_pauli_by_clifford_async,
+    generate_randomized_benchmarking_sequence,
+    generate_randomized_benchmarking_sequence_async,
 )
+
 
 @pytest.fixture
 def target_device(aspen_m_3_isa: InstructionSetArchitecture) -> TargetDevice:
@@ -30,8 +41,9 @@ def test_compiler_opts():
 def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
     """TargetDevice cannot be built when ISA lacks ``randomized_benchmark_simultaneous_1q`` benchmark."""
     isa = InstructionSetArchitecture.from_raw(aspen_m_3_isa.json())
-    isa.benchmarks=[
-        benchmark for benchmark in isa.benchmarks
+    isa.benchmarks = [
+        benchmark
+        for benchmark in isa.benchmarks
         if benchmark.name != "randomized_benchmark_simultaneous_1q"
     ]
     with pytest.raises(QuilcError):
@@ -41,10 +53,12 @@ def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
 def test_compile_program(
     bell_program: str,
     target_device: TargetDevice,
+    snapshot: SnapshotAssertion,
 ):
     """A simple program should compile successfully."""
-    compiled_program = compile_program(bell_program, target_device)
-    assert compiled_program
+    result = compile_program(bell_program, target_device)
+    assert result.program == snapshot
+    assert result.native_quil_metadata == snapshot
 
 
 @pytest.mark.asyncio
@@ -68,3 +82,55 @@ async def test_get_version_info_async():
     """A valid version should be returned."""
     version = await get_version_info_async()
     assert version
+
+
+def test_conjugate_pauli_by_clifford():
+    """Pauli should be conjugated by clifford."""
+    request = ConjugateByCliffordRequest(
+        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
+    )
+    response = conjugate_pauli_by_clifford(request)
+    assert type(response) == ConjugatePauliByCliffordResponse
+    assert response.pauli == "Z"
+    assert response.phase == 0
+
+
+@pytest.mark.asyncio
+async def test_conjugate_pauli_by_clifford_async():
+    """Pauli should be conjugated by clifford."""
+    request = ConjugateByCliffordRequest(
+        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
+    )
+    response = await conjugate_pauli_by_clifford_async(request)
+    assert type(response) == ConjugatePauliByCliffordResponse
+    assert response.pauli == "Z"
+    assert response.phase == 0
+
+
+def test_generate_randomized_benchmark_sequence():
+    """Random benchmark should run predictably."""
+    request = RandomizedBenchmarkingRequest(
+        depth=2,
+        qubits=1,
+        gateset=["X 0", "H 0"],
+        seed=314,
+        interleaver="Y 0",
+    )
+    response = generate_randomized_benchmarking_sequence(request)
+    assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
+    assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]
+
+
+@pytest.mark.asyncio
+async def test_generate_randomized_benchmark_sequence_async():
+    """Random benchmark should run predictably."""
+    request = RandomizedBenchmarkingRequest(
+        depth=2,
+        qubits=1,
+        gateset=["X 0", "H 0"],
+        seed=314,
+        interleaver="Y 0",
+    )
+    response = await generate_randomized_benchmarking_sequence_async(request)
+    assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
+    assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]

@@ -3,9 +3,9 @@ members = ["crates/*"]
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.4.2"
-qcs-api-client-grpc = "0.4.2"
-qcs-api-client-openapi = "0.5.2"
+qcs-api-client-common = "0.6.6"
+qcs-api-client-grpc = "0.6.1"
+qcs-api-client-openapi = "0.7.1"
 serde_json = "1.0.86"
 thiserror = "1.0.37"
 tokio = "1.24.2"
@@ -16,14 +16,14 @@ tokio = "1.24.2"
 # that the specified version is the same as the version in the git repository.
 quil-rs = { git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.1.0", version = "0.17.0" }
 
-# ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a 
-# re-export through the numpy crate. They should be updated as a pair to keep both 
-# crates version of ndarray in sync.
-# Similarly, pyo3 packages (`numpy`, `rigetti-pyo3`, `pyo3*`) track versions together 
+# ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
+# re-export through the numpy crate. They should be updated as a pair to keep both
+# crates' versions of ndarray in sync.
+# Similarly, pyo3 packages (`numpy`, `rigetti-pyo3`, `pyo3*`) track versions together
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.17"
 pyo3 = { version = "0.17" }
 pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
 pyo3-build-config = { version = "0.17" }
-rigetti-pyo3 = { version = "0.1.0-rc.6", features = ["complex"] }
+rigetti-pyo3 = { version = "0.1.0", features = ["complex"] }

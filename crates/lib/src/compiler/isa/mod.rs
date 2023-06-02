@@ -74,14 +74,14 @@ impl TryFrom<InstructionSetArchitecture> for Compiler {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Operation {0} is defined for Qubit {1} but that Qubit does not exist")]
-    QubitDoesNotExist(String, i32),
+    QubitDoesNotExist(String, i64),
     #[error("Operation {0} is defined for Edge {1} but that Edge does not exist")]
     EdgeDoesNotExist(String, Id),
     #[error(
         "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
                         Got {0:?} while parsing operation {1} at site {2:?}"
     )]
-    IncorrectNodes((Option<i32>, usize), String, Vec<i32>),
+    IncorrectNodes((Option<i64>, usize), String, Vec<i64>),
     #[error(transparent)]
     Qubit(#[from] qubit::Error),
     #[error(transparent)]

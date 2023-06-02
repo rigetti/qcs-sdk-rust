@@ -7,7 +7,7 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        TranslateQuilToEncryptedControllerJobRequest,
+        TranslateQuilToEncryptedControllerJobRequest, TranslationOptions,
     },
 };
 use qcs_api_client_openapi::{
@@ -16,7 +16,7 @@ use qcs_api_client_openapi::{
 };
 use tokio::time::error::Elapsed;
 
-use super::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
+use crate::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
 
 /// An encrypted and translated program, along with `readout_map`
 /// to map job `readout_data` back to program-declared variables.
@@ -38,11 +38,20 @@ pub async fn translate(
     quil_program: &str,
     num_shots: u32,
     client: &Qcs,
+    translation_options: Option<TranslationOptions>,
 ) -> Result<EncryptedTranslationResult, GrpcClientError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %num_shots,
+        "translating program for {}",
+        quantum_processor_id,
+    );
+
     let request = TranslateQuilToEncryptedControllerJobRequest {
-        quantum_processor_id: Some(quantum_processor_id.to_owned()),
+        quantum_processor_id: quantum_processor_id.to_owned(),
         num_shots: Some(NumShots::NumShotsValue(num_shots)),
-        quil_program: Some(quil_program.to_owned()),
+        quil_program: quil_program.to_owned(),
+        options: translation_options,
     };
 
     let response = client
@@ -81,6 +90,9 @@ pub async fn get_quilt_calibrations(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<GetQuiltCalibrationsResponse, GetQuiltCalibrationsError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("getting Quil-T calibrations for {}", quantum_processor_id);
+
     let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
 
     tokio::time::timeout(timeout, async move {

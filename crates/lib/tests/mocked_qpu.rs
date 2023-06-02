@@ -24,8 +24,8 @@ const QPU_ID: &str = "Aspen-M-3";
 async fn successful_bell_state() {
     setup().await;
     let result = Executable::from_quil(BELL_STATE)
-        .with_shots(2)
-        .execute_on_qpu(QPU_ID)
+        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
+        .execute_on_qpu(QPU_ID, None)
         .await
         .expect("Failed to run program that should be successful");
     assert_eq!(
@@ -192,7 +192,7 @@ mod translation {
             Ok(Response::new(
                 TranslateQuilToEncryptedControllerJobResponse {
                     job: Some(EncryptedControllerJob {
-                        job: None,
+                        job: Vec::new(),
                         encryption: None,
                     }),
                     metadata: Some(QuilTranslationMetadata {
@@ -281,9 +281,9 @@ mod qpu {
                             },
                         ),
                     ]),
-                    status: Some(0),
+                    status: 0,
                     status_message: Some("success".to_string()),
-                    execution_duration_microseconds: Some(8675),
+                    execution_duration_microseconds: 8675,
                 }),
             }))
         }

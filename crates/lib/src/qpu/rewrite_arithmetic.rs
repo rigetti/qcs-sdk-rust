@@ -50,6 +50,9 @@ use crate::executable::Parameters;
 /// distinct parameter from theta. Note that the value of `__SUBST[0]` will actually be
 /// `theta * 1.5 / 2π`.
 pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), Error> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("rewriting arithmetic");
+
     let mut substitutions = Substitutions::new();
     let Program {
         calibrations,
@@ -385,7 +388,7 @@ mod describe_rewrite_arithmetic {
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/6.283185307179586)");
+        insta::assert_snapshot!(substitutions[0].to_string());
     }
 
     #[test]
@@ -407,10 +410,7 @@ mod describe_rewrite_arithmetic {
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(
-            substitutions[0].to_string(),
-            "((theta[0]*1.5)/6.283185307179586)"
-        );
+        insta::assert_snapshot!(substitutions[0].to_string());
     }
 
     #[test]
@@ -437,14 +437,8 @@ RZ(__SUBST[1]) 0
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        assert_eq!(
-            substitutions[0].to_string(),
-            "((3*theta[0])/6.283185307179586)"
-        );
-        assert_eq!(
-            substitutions[1].to_string(),
-            "((beta[0]+theta[0])/6.283185307179586)"
-        );
+        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[1].to_string());
     }
 
     #[test]
@@ -469,14 +463,14 @@ SET-SCALE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/8)");
+        insta::assert_snapshot!(substitutions[0].to_string());
     }
 
     #[test]
     fn it_converts_frequency_expressions() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
 DEFFRAME 1 "rf":
@@ -490,10 +484,10 @@ SET-FREQUENCY 1 "rf" theta
         .unwrap();
         let expected = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
-DEFFRAME 1 "rf": 
+DEFFRAME 1 "rf":
     SAMPLE-RATE: 20.0
 DECLARE __SUBST REAL[2]
 DECLARE theta REAL
@@ -506,15 +500,15 @@ SET-FREQUENCY 1 "rf" __SUBST[1]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        assert_eq!(substitutions[0].to_string(), "((theta[0]-10)/20)");
-        assert_eq!(substitutions[1].to_string(), "(theta[0]/20)");
+        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[1].to_string());
     }
 
     #[test]
     fn it_errs_when_converting_frequency_without_frame() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
     SAMPLE-RATE: 20.0
 DECLARE theta REAL
@@ -532,7 +526,7 @@ SET-FREQUENCY 1 "rf" theta
     fn it_errs_when_converting_frequency_without_sample_rate() {
         let program = Program::from_str(
             r#"
-DEFFRAME 0 "rf": 
+DEFFRAME 0 "rf":
     CENTER-FREQUENCY: 10.0
 DECLARE theta REAL
 SET-FREQUENCY 0 "rf" theta
@@ -566,7 +560,7 @@ SHIFT-PHASE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        assert_eq!(substitutions[0].to_string(), "(theta[0]/6.283185307179586)");
+        insta::assert_snapshot!(substitutions[0].to_string());
     }
 }
 

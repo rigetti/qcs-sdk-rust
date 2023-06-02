@@ -3,6 +3,8 @@
 #![deny(clippy::cargo)]
 #![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
 #![allow(clippy::missing_errors_doc)]
+#![allow(clippy::implicit_hasher)]
+#![allow(clippy::too_many_arguments)]
 #![forbid(unsafe_code)]
 #![warn(future_incompatible)]
 #![warn(rust_2018_compatibility, rust_2018_idioms)]
@@ -32,7 +34,6 @@
     semicolon_in_expressions_from_macros,
     trivial_casts,
     trivial_numeric_casts,
-    unaligned_references,
     unconditional_recursion,
     unreachable_pub,
     unused,
@@ -56,6 +57,7 @@ pub use execution_data::{
 };
 pub use register_data::RegisterData;
 
+pub mod client;
 pub mod compiler;
 mod executable;
 mod execution_data;
