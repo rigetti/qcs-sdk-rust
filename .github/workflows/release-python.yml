@@ -17,6 +17,8 @@ jobs:
   macos:
     runs-on: macos-11
     needs: is-python-release
+    env:
+      CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
         python-version: ['3.8', '3.9', '3.10', '3.11']
