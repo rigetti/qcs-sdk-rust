@@ -1846,9 +1846,8 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7dc835c7c971b47b1dc30b31df1cbf36998095a662d035442814a1ca08ddb755"
+version = "0.17.0"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.1.1#87bc88d38a94302523025e6bee3e0fe27c93981d"
 dependencies = [
  "indexmap",
  "lexical",
@@ -1857,6 +1856,7 @@ dependencies = [
  "num-complex",
  "once_cell",
  "petgraph",
+ "regex",
  "serde",
  "strum",
  "thiserror",
@@ -2049,9 +2049,9 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.1.0-rc.8"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bfabc6e4b14976beefc5f56214c9cfb01f0e71f1826823dbe7b115aba5edd1f"
+checksum = "4d5ebc489b238aa8229066ea79babf773a8206813c25dae17b9b826f9b935832"
 dependencies = [
  "num-complex",
  "num-traits",
