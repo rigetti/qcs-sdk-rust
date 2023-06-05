@@ -1,3 +1,9 @@
+## 0.13.1
+
+### Fixes
+
+- Upgrade quil-rs, resolving some issues with parsing function calls and parameterized DefGate
+
 ## 0.13.1-rc.0
 
 ### Fixes
