@@ -15,7 +15,7 @@ jobs:
       - run: echo "Release tag starts with python/v, proceeding with release"
 
   macos:
-    runs-on: macos-11
+    runs-on: macos-12
     needs: is-python-release
     env:
       CXXFLAGS: "-std=c++11"
