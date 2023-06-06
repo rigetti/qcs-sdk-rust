@@ -2,19 +2,18 @@ use std::{num::NonZeroU16, sync::Arc};
 
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
-use qcs_api_client_grpc::services::translation::TranslationOptions;
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
-    wrap_error, PyTryFrom, PyWrapper, ToPython, ToPythonError,
+    wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
 
 use crate::{
     compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
-    grpc::models::translation::PyTranslationOptions,
     py_sync::{py_async, py_sync},
+    qpu::translation::PyTranslationOptions,
 };
 
 wrap_error!(RustExecutionError(Error));
@@ -151,8 +150,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyExecutionData> {
-        let translation_options =
-            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -184,8 +182,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options =
-            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
             Some(endpoint_id) => py_async!(
                 py,
@@ -217,8 +214,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyJobHandle> {
-        let translation_options =
-            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -250,8 +246,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options =
-            Option::<TranslationOptions>::py_try_from(py, &translation_options)?;
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
             Some(endpoint_id) => {
                 py_async!(
