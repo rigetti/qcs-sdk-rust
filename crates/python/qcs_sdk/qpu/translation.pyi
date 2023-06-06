@@ -1,6 +1,7 @@
 from typing import Dict, Optional, final
 
 from qcs_sdk.client import QCSClient
+from qcs_sdk.grpc.models.translation import TranslationOptions
 
 class GetQuiltCalibrationsError(RuntimeError):
     """An error occured while fetching Quil-T calibrations."""
@@ -88,6 +89,7 @@ def translate(
     num_shots: int,
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    translation_options: Optional[TranslationOptions] = None,
 ) -> TranslationResult:
     """
     Translates a native Quil program into an executable program.
@@ -109,6 +111,7 @@ async def translate_async(
     num_shots: int,
     quantum_processor_id: str,
     client: Optional[QCSClient] = None,
+    translation_options: Optional[TranslationOptions] = None,
 ) -> TranslationResult:
     """
     Translates a native Quil program into an executable program.

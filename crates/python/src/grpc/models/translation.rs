@@ -1,7 +1,7 @@
 use qcs_api_client_grpc::services::translation::{
     translation_options::TranslationBackend, BackendV1Options, BackendV2Options, TranslationOptions,
 };
-use rigetti_pyo3::{py_wrap_data_struct, py_wrap_type, py_wrap_union_enum};
+use rigetti_pyo3::{py_wrap_data_struct, py_wrap_type, py_wrap_union_enum, create_init_submodule};
 
 py_wrap_type! {
     #[derive(Default)]
@@ -25,4 +25,13 @@ py_wrap_data_struct! {
     PyTranslationOptions(TranslationOptions) as "TranslationOptions" {
         translation_backend: Option<TranslationBackend> => Option<PyTranslationBackend>
     }
+}
+
+create_init_submodule! {
+    classes: [
+        PyTranslationBackend,
+        PyTranslationOptions,
+        PyBackendV1Options,
+        PyBackendV2Options
+    ],
 }
