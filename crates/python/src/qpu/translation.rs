@@ -1,20 +1,24 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
-use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, types::PyString, Py, PyResult};
+use pyo3::{
+    exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, types::PyString, Py, PyResult,
+};
 use qcs::client::GrpcClientError;
+use qcs::qpu::translation::TranslationOptions;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, PyWrapper, ToPythonError,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, ToPythonError,
 };
 
-use crate::{grpc::models::translation::PyTranslationOptions, py_sync::py_function_sync_async};
+use crate::py_sync::py_function_sync_async;
 
 use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
         PyQuiltCalibrations,
+        PyTranslationOptions,
         PyTranslationResult
     ],
     errors: [
@@ -82,6 +86,32 @@ py_wrap_error!(
     TranslationError,
     PyRuntimeError
 );
+
+#[derive(Clone, Default)]
+#[pyclass]
+pub struct PyTranslationOptions(TranslationOptions);
+
+impl PyTranslationOptions {
+    pub fn as_inner(&self) -> &TranslationOptions {
+        &self.0
+    }
+}
+
+#[pymethods]
+impl PyTranslationOptions {
+    #[new]
+    fn __new__() -> PyResult<Self> {
+        Ok(Self(Default::default()))
+    }
+
+    fn use_backend_v1(&mut self) {
+        self.0.use_backend_v1()
+    }
+
+    fn use_backend_v2(&mut self) {
+        self.0.use_backend_v2()
+    }
+}
 
 /// The result of a call to [`translate`] which provides information about the
 /// translated program.
