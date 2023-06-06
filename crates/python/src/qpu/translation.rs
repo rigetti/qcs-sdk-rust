@@ -88,7 +88,7 @@ py_wrap_error!(
 );
 
 #[derive(Clone, Default)]
-#[pyclass]
+#[pyclass(name = "TranslationOptions")]
 pub struct PyTranslationOptions(TranslationOptions);
 
 impl PyTranslationOptions {
