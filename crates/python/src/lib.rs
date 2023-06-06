@@ -36,6 +36,7 @@ create_init_submodule! {
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::init_submodule,
+        "grpc": grpc::init_submodule,
         "qpu": qpu::init_submodule,
         "qvm": qvm::init_submodule
     ],
