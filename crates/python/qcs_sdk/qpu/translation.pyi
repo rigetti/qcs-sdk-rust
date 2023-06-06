@@ -128,3 +128,19 @@ async def translate_async(
     :raises TranslationError: If the `native_quil` program could not be translated.
     """
     ...
+
+@final
+class TranslationOptions:
+    """
+    Options for translating via the QCS API.
+    """
+
+    def use_backend_v1(self) -> None:
+        """
+        Use the v1 backend for translation, available on QCS since 2018.
+        """
+
+    def use_backend_v2(self) -> None:
+        """
+        Use the v2 backend for translation, available on QCS since 2023.
+        """
