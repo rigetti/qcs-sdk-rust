@@ -113,7 +113,7 @@ py_function_sync_async! {
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
-                program: result.program.to_string(true),
+                program: result.program.to_string(),
                 native_quil_metadata: result.native_quil_metadata.map(PyNativeQuilMetadata)
             })
 

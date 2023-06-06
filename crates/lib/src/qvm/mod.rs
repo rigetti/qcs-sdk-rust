@@ -91,7 +91,7 @@ pub async fn run_program(
     );
     let program = apply_parameters_to_program(program, params)?;
     let request = api::MultishotRequest::new(
-        program.to_string(true),
+        program.to_string(),
         shots,
         addresses,
         measurement_noise,
@@ -133,10 +133,10 @@ pub fn apply_parameters_to_program(
         .flat_map(|(name, values)| {
             values.iter().enumerate().map(move |(index, value)| {
                 Instruction::Move(Move {
-                    destination: ArithmeticOperand::MemoryReference(MemoryReference {
+                    destination: MemoryReference {
                         name: name.to_string(),
                         index: index as u64,
-                    }),
+                    },
                     source: ArithmeticOperand::LiteralReal(*value),
                 })
             })
@@ -152,7 +152,7 @@ pub fn apply_parameters_to_program(
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("Error parsing Quil program: {0}")]
-    Parsing(#[from] ProgramError<Program>),
+    Parsing(#[from] ProgramError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
@@ -200,7 +200,7 @@ mod test {
         let parameterized_program = apply_parameters_to_program(&program, &params)
             .expect("should not error for empty parameters");
 
-        insta::assert_snapshot!(parameterized_program.to_string(true));
+        insta::assert_snapshot!(parameterized_program.to_string());
     }
 
     #[rstest]

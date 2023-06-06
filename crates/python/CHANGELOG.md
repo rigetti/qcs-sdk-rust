@@ -1,3 +1,15 @@
+## 0.8.1
+
+### Fixes
+
+- Upgrade quil-rs, resolving some issues with parsing function calls and parameterized DefGate
+
+## 0.8.1-rc.0
+
+### Fixes
+
+- Upgrade quil-rs, resolving some issues with parsing function calls and parameterized DefGate
+
 ## 0.8.0
 
 ### Breaking Changes
