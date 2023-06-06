@@ -1,3 +1,15 @@
+## 0.9.0-rc.0
+
+### Breaking Changes
+
+- change to signature of `qpu::translate` to be generic over translation options
+
+---------
+
+### Features
+
+- TranslationOptions builder-like struct with Python bindings (#308)
+
 ## 0.8.1
 
 ### Fixes
