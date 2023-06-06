@@ -1,7 +1,6 @@
 from typing import Dict, Optional, final
 
 from qcs_sdk.client import QCSClient
-from qcs_sdk.grpc.models.translation import TranslationOptions
 
 class GetQuiltCalibrationsError(RuntimeError):
     """An error occured while fetching Quil-T calibrations."""
