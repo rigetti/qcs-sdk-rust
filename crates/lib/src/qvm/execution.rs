@@ -7,6 +7,7 @@ use crate::{executable::Parameters, qvm::run_program};
 
 use crate::client::Qcs;
 
+use super::QvmOptions;
 use super::{api::AddressRequest, Error, QvmResultData};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
@@ -69,6 +70,7 @@ impl Execution {
             None,
             None,
             client,
+            &QvmOptions::default(),
         )
         .await
     }
