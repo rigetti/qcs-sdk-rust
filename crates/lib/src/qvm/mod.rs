@@ -20,7 +20,7 @@ pub mod api;
 mod execution;
 
 /// Number of seconds to wait before timing out.
-const DEFAULT_QVM_TIMEOUT: f32 = 30.0;
+const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Encapsulates data returned after running a program on the QVM
 #[allow(clippy::module_name_repetitions)]
@@ -175,7 +175,7 @@ impl QvmOptions {
 impl Default for QvmOptions {
     fn default() -> Self {
         Self {
-            timeout: Some(Duration::from_secs_f32(DEFAULT_QVM_TIMEOUT)),
+            timeout: Some(DEFAULT_QVM_TIMEOUT),
         }
     }
 }
