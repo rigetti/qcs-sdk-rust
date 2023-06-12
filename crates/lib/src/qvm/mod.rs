@@ -1,7 +1,7 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{collections::HashMap, num::NonZeroU16, str::FromStr};
+use std::{collections::HashMap, num::NonZeroU16, str::FromStr, time::Duration};
 
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
@@ -18,6 +18,9 @@ use self::api::AddressRequest;
 
 pub mod api;
 mod execution;
+
+/// Number of seconds to wait before timing out.
+const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
 
 /// Encapsulates data returned after running a program on the QVM
 #[allow(clippy::module_name_repetitions)]
@@ -52,6 +55,7 @@ pub async fn run(
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
     client: &Qcs,
+    options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
@@ -65,6 +69,7 @@ pub async fn run(
         gate_noise,
         rng_seed,
         client,
+        options,
     )
     .await
 }
@@ -81,6 +86,7 @@ pub async fn run_program(
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
     client: &Qcs,
+    options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
@@ -98,7 +104,7 @@ pub async fn run_program(
         gate_noise,
         rng_seed,
     );
-    api::run(&request, client)
+    api::run(&request, client, options)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
 }
@@ -147,6 +153,33 @@ pub fn apply_parameters_to_program(
     Ok(program)
 }
 
+/// Options avaialable for running programs on the QVM.
+#[allow(clippy::module_name_repetitions)]
+#[derive(Clone, Copy, Debug)]
+pub struct QvmOptions {
+    /// The timeout to use for requests to the QVM. If set to [`None`], there is no timeout.
+    pub timeout: Option<Duration>,
+}
+
+impl QvmOptions {
+    /// Builds a [`QvmOptions`] with the zero value for each option.
+    ///
+    /// Consider using [`Default`] to get a reasonable set of
+    /// configuration options as a starting point.
+    #[must_use]
+    pub fn new() -> Self {
+        Self { timeout: None }
+    }
+}
+
+impl Default for QvmOptions {
+    fn default() -> Self {
+        Self {
+            timeout: Some(DEFAULT_QVM_TIMEOUT),
+        }
+    }
+}
+
 /// All of the errors that can occur when running a Quil program on QVM.
 #[allow(missing_docs)]
 #[derive(Debug, thiserror::Error)]
@@ -170,6 +203,8 @@ pub enum Error {
     },
     #[error("QVM reported a problem running your program: {message}")]
     Qvm { message: String },
+    #[error("The client failed to make the request: {0}")]
+    Client(#[from] reqwest::Error),
 }
 
 #[cfg(test)]

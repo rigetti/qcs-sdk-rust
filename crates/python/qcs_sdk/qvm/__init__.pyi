@@ -26,6 +26,30 @@ class QVMResultData:
         ...
 
 @final
+class QVMOptions:
+    """
+    Options avaialable for running programs on the QVM.
+    """
+
+    def __new__(cls, timeout_seconds: Optional[float] = None) -> QVMOptions: ...
+    @staticmethod
+    def default() -> QVMOptions:
+        """Get the default set of ``QVMOptions`` used for QVM requests.
+
+        Settings:
+            timeout: 30.0 seconds
+        """
+        ...
+    @property
+    def timeout(cls):
+        """The timeout used for reqeusts to the QVM. If set to none, there is no timeout."""
+        ...
+    @timeout.setter
+    def timeout(cls, timeout: Optional[float]):
+        """The timeout used for reqeusts to the QVM. If set to none, there is no timeout."""
+        ...
+
+@final
 class QVMError(RuntimeError):
     """
     Errors that can occur when running a Quil program on the QVM.
@@ -42,6 +66,7 @@ def run(
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
     client: Optional[QCSClient] = None,
+    options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """
     Runs the given program on the QVM.
@@ -51,6 +76,7 @@ def run(
     :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
     :param params: A mapping of memory region names to their desired values.
     :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+    :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
 
     :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
 
@@ -67,6 +93,7 @@ async def run_async(
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
     client: Optional[QCSClient] = None,
+    options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """
     Asynchronously runs the given program on the QVM.
@@ -76,6 +103,7 @@ async def run_async(
     :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
     :param params: A mapping of memory region names to their desired values.
     :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+    :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
 
     :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
 

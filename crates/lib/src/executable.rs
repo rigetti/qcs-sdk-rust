@@ -679,7 +679,9 @@ impl From<ExecutionError> for Error {
 impl From<qvm::Error> for Error {
     fn from(err: qvm::Error) -> Self {
         match err {
-            qvm::Error::QvmCommunication { .. } => Self::Connection(Service::Qvm),
+            qvm::Error::QvmCommunication { .. } | qvm::Error::Client { .. } => {
+                Self::Connection(Service::Qvm)
+            }
             qvm::Error::Parsing(_)
             | qvm::Error::ShotsMustBePositive
             | qvm::Error::RegionSizeMismatch { .. }
