@@ -43,5 +43,6 @@ create_init_submodule! {
 
 #[pymodule]
 fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    pyo3_log::init();
     init_submodule("qcs_sdk", py, m)
 }
