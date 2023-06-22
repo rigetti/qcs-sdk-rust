@@ -32,7 +32,7 @@ logging.basicConfig(level=5)
 
 #### Runtime Configuration and Caching
  
-`pyo3_log` caches loggers and their level filters to improve performance. This means that logger re-configuration done at runtime may cause logs to log or not log as expected in certain situations. If this is a concern, [this section of the pyo3_log documentation](https://docs.rs/pyo3-log/latest/pyo3_log/#performance-filtering-and-caching) goes into more detail.
+`pyo3_log` caches loggers and their level filters to improve performance. This means that logger re-configuration done at runtime may cause unexpected logging behavior in certain situations. If this is a concern, [this section of the pyo3_log documentation](https://docs.rs/pyo3-log/latest/pyo3_log/#performance-filtering-and-caching) goes into more detail.
 
 #### Filtering Logs
 
