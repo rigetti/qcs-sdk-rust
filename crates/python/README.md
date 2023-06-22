@@ -34,6 +34,14 @@ logging.basicConfig(level=5)
  
 `pyo3_log` caches loggers and their level filters to improve performance. This means that logger re-configuration done at runtime may cause unexpected logging behavior in certain situations. If this is a concern, [this section of the pyo3_log documentation](https://docs.rs/pyo3-log/latest/pyo3_log/#performance-filtering-and-caching) goes into more detail.
 
+These caches can be reset using the following:
+
+```python
+qcs_sdk.reset_logging()
+```
+
+This will allow the logging handlers to pick up the most recently-applied configuration from the Python side.
+
 #### Filtering Logs
 
 Because the logs are emitted from a Rust library, the logger names will correspond to the fully qualified path of the Rust module in the library where the log occurred. These fully qualified paths all have their own logger, and have to be configured individually.
@@ -61,4 +69,4 @@ for handler in logging.root.handlers:
     handler.addFilter(QCSLogFilter())
 ```
 
-This applies to all logs, so you may want to tune the `filter` method to include other logs you care about.
+This applies to all logs, so you may want to tune the `filter` method to include other logs you care about. See the caching section above for important information about the application of these filters.
