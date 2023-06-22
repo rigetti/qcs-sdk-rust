@@ -43,6 +43,8 @@ create_init_submodule! {
 
 #[pymodule]
 fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    pyo3_log::init();
+    if let Err(e) = pyo3_log::try_init() {
+        eprintln!("Failed to initialize the qcs_sdk logger: {e}")
+    }
     init_submodule("qcs_sdk", py, m)
 }
