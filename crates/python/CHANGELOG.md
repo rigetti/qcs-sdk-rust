@@ -1,3 +1,17 @@
+## 0.9.0-rc.2
+
+### Breaking Changes
+
+- QVM timeout can now be configured via a new options parameter (#309)
+- change to signature of `qpu::translate` to be generic over translation options
+
+---------
+
+### Features
+
+- Integrate with logging (#311)
+- TranslationOptions builder-like struct with Python bindings (#308)
+
 ## 0.9.0-rc.1
 
 ### Breaking Changes
