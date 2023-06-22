@@ -36,7 +36,7 @@ logging.basicConfig(level=5)
 
 #### Filtering Logs
 
-Because the logs are emitted from a Rust library, the logger names will correspond to the fully qualified path of the Rust module in the library where the log occured. These fully qualified paths all have their own logger, and have to be configured individually.
+Because the logs are emitted from a Rust library, the logger names will correspond to the fully qualified path of the Rust module in the library where the log occurred. These fully qualified paths all have their own logger, and have to be configured individually.
 
 For example, say you wanted to disable the following log:
 
