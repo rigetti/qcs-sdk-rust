@@ -20,22 +20,26 @@
 /// ```
 macro_rules! py_sync {
     ($py: ident, $body: expr) => {{
-        let runtime = ::pyo3_asyncio::tokio::get_runtime();
-        let handle = runtime.spawn($body);
+        $py.allow_threads(|| {
+            let runtime = ::pyo3_asyncio::tokio::get_runtime();
+            let handle = runtime.spawn($body);
 
-        runtime.block_on(async {
-            tokio::select! {
-                result = handle => result.map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?,
-                signal_err = async {
-                    // A 100ms loop delay is a bit arbitrary, but seems to
-                    // balance CPU usage and SIGINT responsiveness well enough.
-                    let delay = ::std::time::Duration::from_millis(100);
-                    loop {
-                        $py.check_signals()?;
-                        ::tokio::time::sleep(delay).await;
-                    }
-                } => signal_err,
-            }
+            runtime.block_on(async {
+                tokio::select! {
+                    result = handle => result.map_err(|err| ::pyo3::exceptions::PyRuntimeError::new_err(err.to_string()))?,
+                    signal_err = async {
+                        // A 100ms loop delay is a bit arbitrary, but seems to
+                        // balance CPU usage and SIGINT responsiveness well enough.
+                        let delay = ::std::time::Duration::from_millis(100);
+                        loop {
+                            ::pyo3::Python::with_gil(|py| {
+                                py.check_signals()
+                            })?;
+                            ::tokio::time::sleep(delay).await;
+                        }
+                    } => signal_err,
+                }
+            })
         })
     }};
 }
