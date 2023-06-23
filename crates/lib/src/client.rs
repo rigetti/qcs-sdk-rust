@@ -9,11 +9,7 @@ use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
     services::translation::translation_client::TranslationClient,
 };
-use qcs_api_client_openapi::apis::{
-    configuration::Configuration as OpenApiConfiguration,
-    endpoints_api::{GetDefaultEndpointError, GetEndpointError},
-    quantum_processors_api::ListQuantumProcessorAccessorsError,
-};
+use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
 use tonic::transport::Channel;
 use tonic::Status;
 
@@ -97,41 +93,9 @@ impl Qcs {
     }
 }
 
-/// Errors that may occur while trying to resolve a `gRPC` endpoint
-#[derive(Debug, thiserror::Error)]
-pub enum GrpcEndpointError {
-    /// Error due to a bad gRPC configuration
-    #[error("Error configuring gRPC request: {0}")]
-    GrpcError(#[from] GrpcError<RefreshError>),
-
-    /// Error due to failure to get endpoint for quantum processor
-    #[error("Failed to get endpoint for quantum processor: {0}")]
-    QpuEndpointRequestFailed(#[from] OpenApiError<GetDefaultEndpointError>),
-
-    /// Error due to failure to get endpoint for quantum processor
-    #[error("Failed to get endpoint for the given ID: {0}")]
-    EndpointRequestFailed(#[from] OpenApiError<GetEndpointError>),
-
-    /// Error due to failure to get accessors for quantum processor
-    #[error("Failed to get accessors for quantum processor: {0}")]
-    AccessorRequestFailed(#[from] OpenApiError<ListQuantumProcessorAccessorsError>),
-
-    /// Error due to missing gRPC endpoint for quantum processor
-    #[error("Missing gRPC endpoint for quantum processor: {0}")]
-    QpuEndpointNotFound(String),
-
-    /// Error due to missing gRPC endpoint for endpoint ID
-    #[error("Missing gRPC endpoint for endpoint ID: {0}")]
-    EndpointNotFound(String),
-}
-
 /// Errors that may occur while trying to use a `gRPC` client
 #[derive(Debug, thiserror::Error)]
 pub enum GrpcClientError {
-    /// Error due to failure to resolve the endpoint
-    #[error("Failed to resolve the gRPC endoint: {0}")]
-    EndpointNotResolved(#[from] GrpcEndpointError),
-
     /// Error due to failure during request
     #[error("Call failed during gRPC request: {0}")]
     RequestFailed(#[from] Status),

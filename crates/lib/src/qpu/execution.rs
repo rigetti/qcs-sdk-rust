@@ -57,6 +57,8 @@ pub(crate) enum Error {
     RewriteArithmetic(#[from] rewrite_arithmetic::Error),
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
+    #[error("Problem making a request to the QPU: {0}")]
+    QpuApiError(#[from] super::api::QpuApiError),
 }
 
 impl From<quilc::Error> for Error {

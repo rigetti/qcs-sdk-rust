@@ -8,8 +8,8 @@ use pyo3::{
     types::{PyComplex, PyInt},
     Py, PyResult,
 };
+use qcs::qpu::api::ConnectionStrategy;
 use qcs::qpu::api::JobTarget;
-use qcs::{client::GrpcClientError, qpu::api::ConnectionStrategy};
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
     create_init_submodule, impl_repr, num_complex, py_wrap_error, py_wrap_simple_enum,
@@ -42,9 +42,9 @@ create_init_submodule! {
 /// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
 enum RustSubmissionError {
-    /// Failed a gRPC API call
-    #[error("Failed a gRPC call: {0}")]
-    GrpcError(#[from] GrpcClientError),
+    /// An API error occured
+    #[error("An API error occured: {0}")]
+    QpuApiError(#[from] qcs::qpu::api::QpuApiError),
 
     /// Job could not be deserialized
     #[error("Failed to deserialize job: {0}")]
@@ -96,7 +96,7 @@ py_function_sync_async! {
     }
 }
 
-wrap_error!(RustRetrieveResultsError(GrpcClientError));
+wrap_error!(RustRetrieveResultsError(qcs::qpu::api::QpuApiError));
 py_wrap_error!(
     runner,
     RustRetrieveResultsError,

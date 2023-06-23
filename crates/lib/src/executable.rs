@@ -604,9 +604,9 @@ pub enum Error {
     /// QPU.
     #[error("Could not authenticate a request to QCS for the requested QPU.")]
     Authentication,
-    /// The requested QPU was not found. Either the QPU does not exist or you do not have access to it.
-    #[error("The requested QPU was not found.")]
-    QpuNotFound,
+    /// An API error occured while connecting to the QPU.
+    #[error("An API error occured while connecting to the QPU: {0}")]
+    QpuApiError(#[from] qpu::api::QpuApiError),
     /// This happens when the QPU is down for maintenance and not accepting new jobs. If you receive
     /// this error, internal compilation caches will have been cleared as programs should be recompiled
     /// with new settings after a maintenance window. If you are mid-experiment, you might want to
@@ -691,6 +691,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
             ExecutionError::Substitution(message) => Self::Substitution(message),
+            ExecutionError::QpuApiError(e) => Self::QpuApiError(e),
         }
     }
 }
