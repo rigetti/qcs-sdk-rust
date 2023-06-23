@@ -178,7 +178,7 @@ async def retrieve_results_async(
 
 @final
 class ConnectionStrategy(Enum):
-    """ """
+    """An enum containing variants for each possible quantum processor connection strategy."""
 
     GatewayAlways = "GatewayAlways"
     """
