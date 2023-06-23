@@ -1,7 +1,7 @@
 [package]
 name = "qcs-sdk-python"
 description = "Python bindings to qcs-sdk-rust"
-version = "0.9.0-rc.1"
+version = "0.9.0-rc.2"
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
@@ -16,7 +16,7 @@ name = "qcs_sdk"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-qcs = { path = "../lib" }
+qcs = { path = "../lib", features = ["tracing"] }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
@@ -30,6 +30,8 @@ thiserror.workspace = true
 numpy.workspace = true
 rigetti-pyo3.workspace = true
 paste = "1.0.11"
+pyo3-log = "0.8.2"
+once_cell = "1.18.0"
 
 [build-dependencies]
 pyo3-build-config.workspace = true

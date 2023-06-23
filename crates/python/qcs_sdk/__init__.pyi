@@ -355,3 +355,12 @@ class RegisterData:
     def from_f64(inner: Sequence[Sequence[float]]) -> "RegisterData": ...
     @staticmethod
     def from_complex32(inner: Sequence[Sequence[complex]]) -> "RegisterData": ...
+
+
+def reset_logging():
+    """
+    Reset all caches for logging configuration within this library, allowing the most recent Python-side
+    changes to be applied.
+
+    See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
+    """

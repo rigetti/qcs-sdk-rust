@@ -1,3 +1,5 @@
+use std::sync::Mutex;
+
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
 
@@ -33,6 +35,7 @@ create_init_submodule! {
         ExecutionError,
         RegisterMatrixConversionError
     ],
+    funcs: [ reset_logging ],
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::init_submodule,
@@ -41,7 +44,27 @@ create_init_submodule! {
     ],
 }
 
+static PY_RESET_LOGGING_HANDLE: once_cell::sync::Lazy<Mutex<Option<pyo3_log::ResetHandle>>> =
+    once_cell::sync::Lazy::new(|| Mutex::new(None));
+
 #[pymodule]
 fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
+    match pyo3_log::try_init() {
+        Ok(reset_handle) => {
+            if let Ok(mut handle) = PY_RESET_LOGGING_HANDLE.lock() {
+                *handle = Some(reset_handle);
+            }
+        }
+        Err(e) => eprintln!("Failed to initialize the qcs_sdk logger: {e}"),
+    }
     init_submodule("qcs_sdk", py, m)
+}
+
+#[pyfunction]
+fn reset_logging() {
+    if let Ok(handle) = PY_RESET_LOGGING_HANDLE.lock() {
+        if let Some(handle) = handle.as_ref() {
+            handle.reset();
+        }
+    }
 }

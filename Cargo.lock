@@ -29,6 +29,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7de8ce5e0f9f8d88245311066a578d72b7af3e7088f32783804676302df237e4"
 
 [[package]]
+name = "arc-swap"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bddcadddf5e9015d310179a59bb28c4d4b9920ad0f11e8e14dbadf654890c9a6"
+
+[[package]]
 name = "async-socks5"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1340,9 +1346,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.17.1"
+version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
+checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
 
 [[package]]
 name = "openssl-probe"
@@ -1678,6 +1684,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "pyo3-log"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c94ff6535a6bae58d7d0b85e60d4c53f7f84d0d0aa35d6a28c3f3e70bfe51444"
+dependencies = [
+ "arc-swap",
+ "log",
+ "pyo3",
+]
+
+[[package]]
 name = "pyo3-macros"
 version = "0.17.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1702,7 +1719,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.14.0-rc.1"
+version = "0.14.0-rc.2"
 dependencies = [
  "dirs",
  "enum-as-inner",
@@ -1825,13 +1842,15 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.9.0-rc.1"
+version = "0.9.0-rc.2"
 dependencies = [
  "numpy",
+ "once_cell",
  "paste",
  "pyo3",
  "pyo3-asyncio",
  "pyo3-build-config",
+ "pyo3-log",
  "qcs",
  "qcs-api",
  "qcs-api-client-common",
