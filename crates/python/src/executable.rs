@@ -13,7 +13,7 @@ use crate::{
     compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
-    qpu::translation::PyTranslationOptions,
+    qpu::{api::PyConnectionStrategy, translation::PyTranslationOptions},
 };
 
 wrap_error!(RustExecutionError(Error));
@@ -149,6 +149,7 @@ impl PyExecutable {
         quantum_processor_id: String,
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
+        connection_strategy: Option<PyConnectionStrategy>,
     ) -> PyResult<PyExecutionData> {
         let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
@@ -169,6 +170,7 @@ impl PyExecutable {
                     execute_on_qpu,
                     quantum_processor_id,
                     translation_options,
+                    *connection_strategy.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -181,6 +183,7 @@ impl PyExecutable {
         quantum_processor_id: String,
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
+        connection_strategy: Option<PyConnectionStrategy>,
     ) -> PyResult<&PyAny> {
         let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
@@ -200,7 +203,8 @@ impl PyExecutable {
                     self,
                     execute_on_qpu,
                     quantum_processor_id,
-                    translation_options
+                    translation_options,
+                    *connection_strategy.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -213,6 +217,7 @@ impl PyExecutable {
         quantum_processor_id: String,
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
+        connection_strategy: Option<PyConnectionStrategy>,
     ) -> PyResult<PyJobHandle> {
         let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
@@ -232,7 +237,8 @@ impl PyExecutable {
                     self,
                     submit_to_qpu,
                     quantum_processor_id,
-                    translation_options
+                    translation_options,
+                    *connection_strategy.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -245,6 +251,7 @@ impl PyExecutable {
         quantum_processor_id: String,
         endpoint_id: Option<String>,
         translation_options: Option<PyTranslationOptions>,
+        connection_strategy: Option<PyConnectionStrategy>,
     ) -> PyResult<&PyAny> {
         let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
         match endpoint_id {
@@ -266,7 +273,8 @@ impl PyExecutable {
                     self,
                     submit_to_qpu,
                     quantum_processor_id,
-                    translation_options
+                    translation_options,
+                    *connection_strategy.unwrap_or_default().as_inner(),
                 )
             ),
         }

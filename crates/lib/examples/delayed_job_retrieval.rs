@@ -1,6 +1,6 @@
 //! Submit a program to a QPU but don't immediately wait for the result.
 
-use qcs::Executable;
+use qcs::{qpu::api::ConnectionStrategy, Executable};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT
@@ -14,7 +14,7 @@ const QUANTUM_PROCESSOR_ID: &str = "Aspen-M-3";
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM);
     let job_handle = exe
-        .submit_to_qpu(QUANTUM_PROCESSOR_ID, None)
+        .submit_to_qpu(QUANTUM_PROCESSOR_ID, None, ConnectionStrategy::default())
         .await
         .expect("Program should be successfully submitted for execution");
     // Do some other stuff

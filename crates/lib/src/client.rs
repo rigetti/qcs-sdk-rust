@@ -7,22 +7,14 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 use qcs_api_client_grpc::{
     channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
-    services::{
-        controller::controller_client::ControllerClient,
-        translation::translation_client::TranslationClient,
-    },
+    services::translation::translation_client::TranslationClient,
 };
 use qcs_api_client_openapi::apis::{
     configuration::Configuration as OpenApiConfiguration,
-    endpoints_api::{
-        get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
-    },
-    quantum_processors_api::{
-        list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
-    },
+    endpoints_api::{GetDefaultEndpointError, GetEndpointError},
+    quantum_processors_api::ListQuantumProcessorAccessorsError,
 };
-use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
-use tonic::transport::{Channel, Uri};
+use tonic::transport::Channel;
 use tonic::Status;
 
 pub use qcs_api_client_common::configuration::LoadError;
@@ -90,28 +82,6 @@ impl Qcs {
         &self.config
     }
 
-    pub(crate) async fn get_controller_client(
-        &self,
-        quantum_processor_id: &str,
-    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
-    {
-        let uri = self.get_controller_endpoint(quantum_processor_id).await?;
-        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config().clone());
-        Ok(ControllerClient::new(service))
-    }
-
-    pub(crate) async fn get_controller_client_with_endpoint_id(
-        &self,
-        endpoint_id: &str,
-    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, GrpcEndpointError>
-    {
-        let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
-        let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, self.get_config().clone());
-        Ok(ControllerClient::new(service))
-    }
-
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
         OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
@@ -136,80 +106,6 @@ impl Qcs {
         let channel = get_channel(uri)?;
         let service = wrap_channel_with(channel, self.get_config().clone());
         Ok(TranslationClient::new(service))
-    }
-
-    async fn get_controller_endpoint(
-        &self,
-        quantum_processor_id: &str,
-    ) -> Result<Uri, GrpcEndpointError> {
-        if self.use_gateway {
-            let gateway = self.get_gateway_endpoint(quantum_processor_id).await;
-            // when no gateway is available, we should fall through and attempt a direct connection
-            if gateway.is_ok() {
-                return gateway;
-            }
-        }
-        self.get_controller_default_endpoint(quantum_processor_id)
-            .await
-    }
-
-    /// Get address for direct connection to Controller, explicitly targeting an endpoint by ID.
-    async fn get_controller_endpoint_by_id(
-        &self,
-        endpoint_id: &str,
-    ) -> Result<Uri, GrpcEndpointError> {
-        let endpoint = get_endpoint(&self.get_openapi_client(), endpoint_id).await?;
-        let grpc_address = endpoint.addresses.grpc;
-
-        grpc_address
-            .ok_or_else(|| GrpcEndpointError::EndpointNotFound(endpoint_id.into()))
-            .map(|v| parse_uri(&v).map_err(GrpcEndpointError::GrpcError))?
-    }
-
-    /// Get address for direction connection to Controller.
-    async fn get_controller_default_endpoint(
-        &self,
-        quantum_processor_id: &str,
-    ) -> Result<Uri, GrpcEndpointError> {
-        let default_endpoint =
-            get_default_endpoint(&self.get_openapi_client(), quantum_processor_id).await?;
-        let addresses = default_endpoint.addresses.as_ref();
-        let grpc_address = addresses.grpc.as_ref();
-        grpc_address
-            .ok_or_else(|| GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.into()))
-            .map(|v| parse_uri(v).map_err(GrpcEndpointError::GrpcError))?
-    }
-
-    /// Get address for Gateway assigned to the provided `quantum_processor_id`, if one exists.
-    async fn get_gateway_endpoint(
-        &self,
-        quantum_processor_id: &str,
-    ) -> Result<Uri, GrpcEndpointError> {
-        let mut gateways = Vec::new();
-        let mut next_page_token = None;
-        loop {
-            let accessors = list_quantum_processor_accessors(
-                &self.get_openapi_client(),
-                quantum_processor_id,
-                Some(100),
-                next_page_token.as_deref(),
-            )
-            .await?;
-            gateways.extend(accessors.accessors.into_iter().filter(|acc| {
-                acc.live
-                    // `as_deref` needed to work around the `Option<Box<_>>` type.
-                    && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
-            }));
-            next_page_token = accessors.next_page_token.clone();
-            if next_page_token.is_none() {
-                break;
-            }
-        }
-        gateways.sort_by_key(|acc| acc.rank);
-        let target = gateways.first().ok_or_else(|| {
-            GrpcEndpointError::QpuEndpointNotFound(quantum_processor_id.to_string())
-        })?;
-        parse_uri(&target.url).map_err(GrpcEndpointError::GrpcError)
     }
 }
 

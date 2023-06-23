@@ -18,7 +18,7 @@ use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
-use super::api::{retrieve_results, submit, JobTarget};
+use super::api::{retrieve_results, submit, ConnectionStrategy, JobTarget};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
@@ -184,12 +184,13 @@ impl<'a> Execution<'a> {
         &mut self,
         params: &Parameters,
         translation_options: Option<TranslationOptions>,
+        connection_strategy: ConnectionStrategy,
     ) -> Result<JobHandle<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
         let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
-        self.submit_to_target(params, job_target, translation_options)
+        self.submit_to_target(params, job_target, translation_options, connection_strategy)
             .await
     }
 
@@ -204,8 +205,13 @@ impl<'a> Execution<'a> {
         S: Into<Cow<'a, str>>,
     {
         let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
-        self.submit_to_target(params, job_target, translation_options)
-            .await
+        self.submit_to_target(
+            params,
+            job_target,
+            translation_options,
+            ConnectionStrategy::DirectAccessAlways,
+        )
+        .await
     }
 
     async fn submit_to_target(
@@ -213,6 +219,7 @@ impl<'a> Execution<'a> {
         params: &Parameters,
         job_target: JobTarget,
         translation_options: Option<TranslationOptions>,
+        connection_strategy: ConnectionStrategy,
     ) -> Result<JobHandle<'a>, Error> {
         let EncryptedTranslationResult { job, readout_map } =
             self.translate(translation_options).await?;
@@ -221,7 +228,14 @@ impl<'a> Execution<'a> {
             .get_substitutions(params)
             .map_err(Error::Substitution)?;
 
-        let job_id = submit(&job_target, job, &patch_values, self.client.as_ref()).await?;
+        let job_id = submit(
+            &job_target,
+            job,
+            &patch_values,
+            self.client.as_ref(),
+            connection_strategy,
+        )
+        .await?;
 
         let endpoint_id = match job_target {
             JobTarget::EndpointId(endpoint_id) => Some(endpoint_id),
@@ -233,6 +247,7 @@ impl<'a> Execution<'a> {
             self.quantum_processor_id.to_string(),
             endpoint_id,
             readout_map,
+            connection_strategy,
         ))
     }
 
@@ -252,6 +267,7 @@ impl<'a> Execution<'a> {
             job_handle.job_id(),
             &job_handle.job_target(),
             self.client.as_ref(),
+            job_handle.connection_strategy(),
         )
         .await?;
 

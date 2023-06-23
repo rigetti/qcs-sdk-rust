@@ -13,7 +13,7 @@ use qcs_api_client_grpc::services::translation::TranslationOptions;
 use crate::client::Qcs;
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::{JobId, JobTarget};
+use crate::qpu::api::{ConnectionStrategy, JobId, JobTarget};
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
 use crate::qvm::api::AddressRequest;
@@ -478,6 +478,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
+        connection_strategy: ConnectionStrategy,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
@@ -492,7 +493,11 @@ impl<'execution> Executable<'_, 'execution> {
         );
 
         let job_handle = self
-            .submit_to_qpu(quantum_processor_id, translation_options)
+            .submit_to_qpu(
+                quantum_processor_id,
+                translation_options,
+                connection_strategy,
+            )
             .await?;
         self.retrieve_results(job_handle).await
     }
@@ -509,6 +514,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
+        connection_strategy: ConnectionStrategy,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -525,7 +531,7 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit(&self.params, translation_options)
+            .submit(&self.params, translation_options, connection_strategy)
             .await?;
         Ok(job_handle)
     }
@@ -699,6 +705,7 @@ pub struct JobHandle<'executable> {
     quantum_processor_id: Cow<'executable, str>,
     endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
+    connection_strategy: ConnectionStrategy,
 }
 
 impl<'a> JobHandle<'a> {
@@ -708,6 +715,7 @@ impl<'a> JobHandle<'a> {
         quantum_processor_id: S,
         endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
+        connection_strategy: ConnectionStrategy,
     ) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -717,6 +725,7 @@ impl<'a> JobHandle<'a> {
             quantum_processor_id: quantum_processor_id.into(),
             endpoint_id: endpoint_id.map(Into::into),
             readout_map,
+            connection_strategy,
         }
     }
 
@@ -740,6 +749,12 @@ impl<'a> JobHandle<'a> {
     #[must_use]
     pub fn readout_map(&self) -> &HashMap<String, String> {
         &self.readout_map
+    }
+
+    /// The [`ConnectionStrategy`] used to submit the job to the QPU.
+    #[must_use]
+    pub fn connection_strategy(&self) -> ConnectionStrategy {
+        self.connection_strategy
     }
 }
 

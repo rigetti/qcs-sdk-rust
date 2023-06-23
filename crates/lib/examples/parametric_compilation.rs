@@ -4,6 +4,7 @@
 use std::f64::consts::PI;
 use std::time::Duration;
 
+use qcs::qpu::api::ConnectionStrategy;
 use qcs::Executable;
 
 const PROGRAM: &str = r#"
@@ -29,7 +30,7 @@ async fn main() {
         let theta = step * f64::from(i);
         let data = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-M-3", None)
+            .execute_on_qpu("Aspen-M-3", None, ConnectionStrategy::default())
             .await
             .expect("Executed program on QPU");
         total_execution_time += data

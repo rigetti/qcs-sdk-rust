@@ -5,7 +5,7 @@ use std::time::Duration;
 
 use ndarray::arr2;
 
-use qcs::Executable;
+use qcs::{qpu::api::ConnectionStrategy, Executable};
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
 
 const BELL_STATE: &str = r#"
@@ -25,7 +25,7 @@ async fn successful_bell_state() {
     setup().await;
     let result = Executable::from_quil(BELL_STATE)
         .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
-        .execute_on_qpu(QPU_ID, None)
+        .execute_on_qpu(QPU_ID, None, ConnectionStrategy::DirectAccessAlways)
         .await
         .expect("Failed to run program that should be successful");
     assert_eq!(
