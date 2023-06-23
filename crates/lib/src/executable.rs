@@ -454,6 +454,10 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
     ///     This parameter affects the lifetime of the [`Executable`].
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
+    ///    the program in translated.
+    /// 3. `connection_strategy`: The [`ConnectionStrategy`] to use to connect to the QPU.
+    ///    QPU.
     ///
     /// # Warning
     ///
@@ -506,6 +510,15 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
     /// results.
+    ///
+    /// # Arguments
+    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    ///     This parameter affects the lifetime of the [`Executable`].
+    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
+    ///    the program in translated.
+    /// 3. `connection_strategy`: The [`ConnectionStrategy`] to use to connect to the QPU.
+    ///    QPU.
     ///
     /// # Errors
     ///

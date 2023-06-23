@@ -29,8 +29,6 @@ pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 #[derive(Debug, Clone, Default)]
 pub struct Qcs {
     config: ClientConfiguration,
-    /// When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.
-    use_gateway: bool,
 }
 
 impl Qcs {
@@ -51,10 +49,7 @@ impl Qcs {
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
     #[must_use]
     pub fn with_config(config: ClientConfiguration) -> Self {
-        Self {
-            config,
-            use_gateway: true,
-        }
+        Self { config }
     }
 
     /// Create a [`Qcs`] and initialized with the given `profile`.
@@ -67,13 +62,6 @@ impl Qcs {
         ClientConfiguration::load_profile(profile)
             .await
             .map(Self::with_config)
-    }
-
-    /// Enable or disable the use of Gateway service for execution
-    #[must_use]
-    pub fn with_use_gateway(mut self, use_gateway: bool) -> Self {
-        self.use_gateway = use_gateway;
-        self
     }
 
     /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.

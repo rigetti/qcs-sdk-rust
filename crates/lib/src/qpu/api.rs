@@ -93,7 +93,7 @@ impl JobTarget {
     {
         match self {
             Self::EndpointId(endpoint_id) => {
-                let endpoint = get_endpoint(&client.get_openapi_client(), &endpoint_id).await?;
+                let endpoint = get_endpoint(&client.get_openapi_client(), endpoint_id).await?;
                 let grpc_address = endpoint
                     .addresses
                     .grpc
@@ -191,6 +191,14 @@ impl From<String> for JobId {
 }
 
 /// Execute compiled program on a QPU.
+///
+/// # Arguments
+/// * `job_target` - A [`JobTarget`] describing the QPU or endpoint to run the program on.
+/// * `program` - The compiled program as an [`EncryptedControllerJob`]
+/// * `patch_values` - The parameters to use for the execution.
+/// * `client` - The [`Qcs`] client to use.
+/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If `job_target` is an
+///       endpoint ID, then direct access to that endpoint ID overrides this parameter.
 pub async fn submit(
     job_target: &JobTarget,
     program: EncryptedControllerJob,
@@ -225,6 +233,13 @@ pub async fn submit(
 }
 
 /// Fetch results from QPU job execution.
+///
+/// # Arguments
+/// * `job_id` - The [`JobId`] to retrieve results for.
+/// * `job_target` - The [`JobTarget`] the job was run on.
+/// * `client` - The [`Qcs`] client to use.
+/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If `job_target` is an
+///       endpoint ID, then direct access to that endpoint ID overrides this parameter.
 pub async fn retrieve_results(
     job_id: JobId,
     job_target: &JobTarget,
