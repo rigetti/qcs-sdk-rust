@@ -189,10 +189,10 @@ pub async fn retrieve_results(
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
     #[default]
-    GatewayAlways,
+    GatewayOnly,
     /// Connect directly to the QPU endpoint, bypassing the gateway. Should only be used when you
     /// have direct network access and an active reservation.
-    DirectAccessAlways,
+    DirectAccess,
 }
 
 /// Methods that help select the right controller service client given a [`JobTarget`] and
@@ -214,11 +214,11 @@ impl JobTarget {
             }
             Self::QuantumProcessorId(quantum_processor_id) => {
                 let address = match connection_strategy {
-                    ConnectionStrategy::GatewayAlways => {
+                    ConnectionStrategy::GatewayOnly => {
                         self.get_gateway_address(quantum_processor_id, client)
                             .await?
                     }
-                    ConnectionStrategy::DirectAccessAlways => {
+                    ConnectionStrategy::DirectAccess => {
                         self.get_default_endpoint_address(quantum_processor_id, client)
                             .await?
                     }

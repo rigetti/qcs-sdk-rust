@@ -208,8 +208,8 @@ py_function_sync_async! {
 py_wrap_simple_enum! {
     #[derive(Debug, PartialEq, Eq)]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy" {
-        GatewayAlways,
-        DirectAccessAlways
+        GatewayOnly,
+        DirectAccess
     }
 }
 impl_repr!(PyConnectionStrategy);

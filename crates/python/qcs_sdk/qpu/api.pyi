@@ -94,7 +94,7 @@ def submit(
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `endpoint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayOnly. If `endpoint_id` is set, then direct access to that endpoint overrides this parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -120,7 +120,7 @@ async def submit_async(
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -143,7 +143,7 @@ def retrieve_results(
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
 
     :returns: results from execution.
 
@@ -167,7 +167,7 @@ async def retrieve_results_async(
     :param quantum_processor_id: The ID of the quantum processor the job ran on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
 
     :returns: results from execution.
 
@@ -180,11 +180,11 @@ async def retrieve_results_async(
 class ConnectionStrategy(Enum):
     """An enum containing variants for each possible quantum processor connection strategy."""
 
-    GatewayAlways = "GatewayAlways"
+    GatewayOnly = "GatewayOnly"
     """
     Always connect through the publicly accessible gateway.
     """
-    DirectAccessAlways = "DirectAccessAlways"
+    DirectAccess = "DirectAccess"
     """
     Always connect to the QPU directly. Should only be used when direct access is available and with an active reservation.
     """

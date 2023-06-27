@@ -211,7 +211,7 @@ impl<'a> Execution<'a> {
             params,
             job_target,
             translation_options,
-            ConnectionStrategy::DirectAccessAlways,
+            ConnectionStrategy::DirectAccess,
         )
         .await
     }
