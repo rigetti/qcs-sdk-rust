@@ -94,7 +94,7 @@ def submit(
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayAlways. If `endpoint_id` is set, then direct access to that endpoint overrides this parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
