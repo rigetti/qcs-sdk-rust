@@ -243,7 +243,7 @@ impl JobTarget {
         quantum_processor_id: &str,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
-        let mut gateways = Vec::new();
+        let mut min = None;
         let mut next_page_token = None;
         loop {
             let accessors = list_quantum_processor_accessors(
@@ -253,20 +253,27 @@ impl JobTarget {
                 next_page_token.as_deref(),
             )
             .await?;
-            gateways.extend(accessors.accessors.into_iter().filter(|acc| {
-                acc.live
+
+            let accessor = accessors
+                .accessors
+                .into_iter()
+                .filter(|acc| {
+                    acc.live
                     // `as_deref` needed to work around the `Option<Box<_>>` type.
                     && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
-            }));
+                })
+                .min_by_key(|acc| acc.rank.unwrap_or(i64::MAX));
+
+            min = std::cmp::min_by_key(min, accessor, |acc| {
+                acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
+            });
+
             next_page_token = accessors.next_page_token.clone();
             if next_page_token.is_none() {
                 break;
             }
         }
-        gateways.sort_by_key(|acc| acc.rank);
-        gateways
-            .first()
-            .map(|accessor| accessor.url.clone())
+        min.map(|accessor| accessor.url)
             .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
     }
 
