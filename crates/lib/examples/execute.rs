@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use qcs::{qpu::api::ConnectionStrategy, Executable};
+use qcs::{qpu::api::ExecutionOptions, Executable};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT[2]
@@ -17,7 +17,7 @@ async fn main() {
 
     let result = exe
         .with_parameter("theta", 0, PI)
-        .execute_on_qpu("Aspen-M-3", None, ConnectionStrategy::default())
+        .execute_on_qpu("Aspen-M-3", None, ExecutionOptions::default())
         .await
         .expect("Program should execute successfully");
 

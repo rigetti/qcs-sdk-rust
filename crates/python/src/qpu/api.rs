@@ -3,17 +3,17 @@ use std::collections::HashMap;
 
 use numpy::Complex32;
 use pyo3::{
-    exceptions::PyRuntimeError,
-    pyclass, pyfunction,
+    exceptions::{PyRuntimeError, PyValueError},
+    pyclass, pyfunction, pymethods,
     types::{PyComplex, PyInt},
     Py, PyResult,
 };
-use qcs::qpu::api::ConnectionStrategy;
 use qcs::qpu::api::JobTarget;
+use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
-    create_init_submodule, impl_repr, num_complex, py_wrap_error, py_wrap_simple_enum,
-    py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
+    py_wrap_simple_enum, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -25,7 +25,9 @@ create_init_submodule! {
         PyRegister,
         ExecutionResult,
         ExecutionResults,
-        PyConnectionStrategy
+        PyConnectionStrategy,
+        PyExecutionOptions,
+        PyExecutionOptionsBuilder
     ],
     errors: [
         SubmissionError,
@@ -69,7 +71,7 @@ py_function_sync_async! {
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
         endpoint_id: Option<String>,
-        connection_strategy: Option<PyConnectionStrategy>,
+        execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
@@ -88,7 +90,7 @@ py_function_sync_async! {
 
         let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
 
-        let job_id = qcs::qpu::api::submit(&job_target, job, &patch_values, &client, *connection_strategy.unwrap_or_default().as_inner()).await
+        let job_id = qcs::qpu::api::submit(&job_target, job, &patch_values, &client, *execution_options.unwrap_or_default().as_inner()).await
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
@@ -190,18 +192,69 @@ py_function_sync_async! {
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
         endpoint_id: Option<String>,
-        connection_strategy: Option<PyConnectionStrategy>
+        execution_options: Option<PyExecutionOptions>
     ) -> PyResult<ExecutionResults> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
         let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
 
-        let results = qcs::qpu::api::retrieve_results(job_id.into(), &job_target, &client, *connection_strategy.unwrap_or_default().as_inner())
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), &job_target, &client, *execution_options.unwrap_or_default().as_inner())
             .await
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;
 
         Ok(results.into())
+    }
+}
+
+py_wrap_type! {
+    #[derive(Debug, Default)]
+    PyExecutionOptions(ExecutionOptions) as "ExecutionOptions"
+}
+impl_repr!(PyExecutionOptions);
+impl_as_mut_for_wrapper!(PyExecutionOptions);
+
+#[pymethods]
+impl PyExecutionOptions {
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ExecutionOptions::default())
+    }
+}
+
+py_wrap_type! {
+    PyExecutionOptionsBuilder(ExecutionOptionsBuilder) as "ExecutionOptionsBuilder"
+}
+
+#[pymethods]
+impl PyExecutionOptionsBuilder {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ExecutionOptionsBuilder::default())
+    }
+
+    fn connection_strategy(&self, connection_strategy: PyConnectionStrategy) -> Self {
+        // `derive_builder::Builder` doesn't implement AsMut, meaning we can't use `PyWrapperMut`,
+        // which forces us into this awkward clone.
+        Self::from(
+            self.as_inner()
+                .clone()
+                .connection_strategy(*connection_strategy.as_inner())
+                .clone(),
+        )
+    }
+
+    fn build(&self) -> PyResult<PyExecutionOptions> {
+        Ok(PyExecutionOptions::from(
+            self.as_inner()
+                .build()
+                .map_err(|err| PyValueError::new_err(err.to_string()))?,
+        ))
     }
 }
 

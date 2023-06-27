@@ -177,6 +177,27 @@ async def retrieve_results_async(
     ...
 
 @final
+class ExecutionOptions:
+    @staticmethod
+    def default() -> ExecutionOptions:
+        """Return ExecutionOptions with a reasonable set of defaults."""
+        ...
+
+@final
+class ExecutionOptionsBuilder:
+    def __new__(cls) -> ExecutionOptionsBuilder: ...
+    @staticmethod
+    def default() -> ExecutionOptionsBuilder:
+        """Return a builder with the default values for ``ExecutionOptions``"""
+        ...
+    def connection_strategy(
+        self, connection_strategy: ConnectionStrategy
+    ) -> ExecutionOptionsBuilder:
+        """Set the ``ConnectionStrategy`` used to establish a connection to the QPU."""
+    def build(self) -> ExecutionOptions:
+        """Build the ``ExecutionOptions`` using the options set in this builder."""
+
+@final
 class ConnectionStrategy(Enum):
     """An enum containing variants for each possible quantum processor connection strategy."""
 

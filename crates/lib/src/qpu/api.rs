@@ -3,6 +3,7 @@
 
 use std::fmt;
 
+use derive_builder::Builder;
 use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
@@ -120,7 +121,7 @@ pub async fn submit(
     program: EncryptedControllerJob,
     patch_values: &Parameters,
     client: &Qcs,
-    connection_strategy: ConnectionStrategy,
+    execution_options: ExecutionOptions,
 ) -> Result<JobId, QpuApiError> {
     #[cfg(feature = "tracing")]
     tracing::debug!("submitting job to {}", job_target);
@@ -132,7 +133,7 @@ pub async fn submit(
     };
 
     let mut controller_client = job_target
-        .get_controller_client(client, connection_strategy)
+        .get_controller_client(client, execution_options.connection_strategy)
         .await?;
 
     // we expect exactly one job ID since we only submit one execution configuration
@@ -161,7 +162,7 @@ pub async fn retrieve_results(
     job_id: JobId,
     job_target: &JobTarget,
     client: &Qcs,
-    connection_strategy: ConnectionStrategy,
+    execution_options: ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
     #[cfg(feature = "tracing")]
     tracing::debug!("retrieving job results for {} on {}", job_id, job_target,);
@@ -172,7 +173,7 @@ pub async fn retrieve_results(
     };
 
     let mut controller_client = job_target
-        .get_controller_client(client, connection_strategy)
+        .get_controller_client(client, execution_options.connection_strategy)
         .await?;
 
     Ok(controller_client
@@ -182,6 +183,16 @@ pub async fn retrieve_results(
         .into_inner()
         .result
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))?)
+}
+
+/// Options avaialable when executing a job on a QPU.
+///
+/// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
+/// to build a custom set of options.
+#[derive(Builder, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct ExecutionOptions {
+    #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
+    connection_strategy: ConnectionStrategy,
 }
 
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
