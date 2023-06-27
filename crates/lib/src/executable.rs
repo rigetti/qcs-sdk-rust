@@ -604,7 +604,7 @@ pub enum Error {
     /// QPU.
     #[error("Could not authenticate a request to QCS for the requested QPU.")]
     Authentication,
-    /// An API error occured while connecting to the QPU.
+    /// An API error occurred while connecting to the QPU.
     #[error("An API error occured while connecting to the QPU: {0}")]
     QpuApiError(#[from] qpu::api::QpuApiError),
     /// This happens when the QPU is down for maintenance and not accepting new jobs. If you receive
