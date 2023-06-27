@@ -191,7 +191,7 @@ pub enum ConnectionStrategy {
     #[default]
     GatewayAlways,
     /// Connect directly to the QPU endpoint, bypassing the gateway. Should only be used when you
-    /// have direct access and an active reservation.
+    /// have direct network access and an active reservation.
     DirectAccessAlways,
 }
 
