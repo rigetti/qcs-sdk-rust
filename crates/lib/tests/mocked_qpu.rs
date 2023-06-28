@@ -31,7 +31,7 @@ async fn successful_bell_state() {
         .execute_on_qpu(
             QPU_ID,
             None,
-            ExecutionOptionsBuilder::default()
+            &ExecutionOptionsBuilder::default()
                 .connection_strategy(ConnectionStrategy::DirectAccess)
                 .build()
                 .expect("should be valid execution options"),

@@ -55,42 +55,6 @@ pub(crate) fn params_into_job_execution_configuration(
     JobExecutionConfiguration { memory_values }
 }
 
-/// A QCS Job execution target, either a Quantum Processor ID or a specific endpoint.
-#[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
-pub enum JobTarget {
-    /// Execute against a QPU's default endpoint.
-    QuantumProcessorId(String),
-
-    /// Execute against a specific endpoint by ID.
-    EndpointId(String),
-}
-
-impl fmt::Display for JobTarget {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::EndpointId(id) | Self::QuantumProcessorId(id) => write!(f, "{id}"),
-        }
-    }
-}
-
-impl From<&JobTarget> for execute_controller_job_request::Target {
-    fn from(value: &JobTarget) -> Self {
-        match value {
-            JobTarget::EndpointId(v) => Self::EndpointId(v.into()),
-            JobTarget::QuantumProcessorId(v) => Self::QuantumProcessorId(v.into()),
-        }
-    }
-}
-
-impl From<&JobTarget> for get_controller_job_results_request::Target {
-    fn from(value: &JobTarget) -> Self {
-        match value {
-            JobTarget::EndpointId(v) => Self::EndpointId(v.into()),
-            JobTarget::QuantumProcessorId(v) => Self::QuantumProcessorId(v.into()),
-        }
-    }
-}
-
 /// The QCS Job ID. Useful for debugging or retrieving results later.
 #[derive(Debug, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub struct JobId(pub(crate) String);
@@ -110,30 +74,42 @@ impl From<String> for JobId {
 /// Execute compiled program on a QPU.
 ///
 /// # Arguments
-/// * `job_target` - A [`JobTarget`] describing the QPU or endpoint to run the program on.
+/// * `quantum_processor_id` - The quantum processor to execute the job on. Note that this
+///      parameter is overridden if the ``connection_strategy`` parameter provides a specific
+///      endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution.
 /// * `client` - The [`Qcs`] client to use.
-/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If `job_target` is an
-///       endpoint ID, then direct access to that endpoint ID overrides this parameter.
+/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If this is a
+///       [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+///       overrides the `quantum_processor_id` parameter.
 pub async fn submit(
-    job_target: &JobTarget,
+    quantum_processor_id: String,
     program: EncryptedControllerJob,
     patch_values: &Parameters,
     client: &Qcs,
-    execution_options: ExecutionOptions,
+    execution_options: &ExecutionOptions,
 ) -> Result<JobId, QpuApiError> {
     #[cfg(feature = "tracing")]
-    tracing::debug!("submitting job to {}", job_target);
+    tracing::debug!(
+        "submitting job to {} using options {:?}",
+        quantum_processor_id,
+        execution_options
+    );
 
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
-        target: Some(job_target.into()),
+        target: Some(
+            execution_options
+                .connection_strategy
+                .get_job_target(&quantum_processor_id),
+        ),
     };
 
-    let mut controller_client = job_target
-        .get_controller_client(client, execution_options.connection_strategy)
+    let mut controller_client = execution_options
+        .connection_strategy
+        .get_controller_client(client, &quantum_processor_id)
         .await?;
 
     // we expect exactly one job ID since we only submit one execution configuration
@@ -154,26 +130,37 @@ pub async fn submit(
 ///
 /// # Arguments
 /// * `job_id` - The [`JobId`] to retrieve results for.
-/// * `job_target` - The [`JobTarget`] the job was run on.
+/// * `quantum_processor_id` - The quantum processor the job was run on.
 /// * `client` - The [`Qcs`] client to use.
-/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If `job_target` is an
-///       endpoint ID, then direct access to that endpoint ID overrides this parameter.
+/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If this is a
+///       [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+///       overrides the `quantum_processor_id` parameter.
 pub async fn retrieve_results(
     job_id: JobId,
-    job_target: &JobTarget,
+    quantum_processor_id: String,
     client: &Qcs,
-    execution_options: ExecutionOptions,
+    execution_options: &ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
     #[cfg(feature = "tracing")]
-    tracing::debug!("retrieving job results for {} on {}", job_id, job_target,);
+    tracing::debug!(
+        "retrieving job results for {} on {} using options {:?}",
+        job_id,
+        quantum_processor_id,
+        execution_options,
+    );
 
     let request = GetControllerJobResultsRequest {
         job_execution_id: job_id.0,
-        target: Some(job_target.into()),
+        target: Some(
+            execution_options
+                .connection_strategy
+                .get_results_target(&quantum_processor_id),
+        ),
     };
 
-    let mut controller_client = job_target
-        .get_controller_client(client, execution_options.connection_strategy)
+    let mut controller_client = execution_options
+        .connection_strategy
+        .get_controller_client(client, &quantum_processor_id)
         .await?;
 
     Ok(controller_client
@@ -189,54 +176,85 @@ pub async fn retrieve_results(
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     connection_strategy: ConnectionStrategy,
 }
 
+impl ExecutionOptions {
+    /// Get the [`ConnectionStrategy`]
+    #[must_use]
+    pub fn connection_strategy(&self) -> &ConnectionStrategy {
+        &self.connection_strategy
+    }
+}
+
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
     #[default]
     GatewayOnly,
-    /// Connect directly to the QPU endpoint, bypassing the gateway. Should only be used when you
+    /// Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
     /// have direct network access and an active reservation.
     DirectAccess,
+
+    /// Connect directly to a specific endpoint using its ID.
+    EndpointId(String),
 }
 
-/// Methods that help select the right controller service client given a [`JobTarget`] and
+/// Methods that help select the right controller service client given a quantum processor ID and
 /// [`ConnectionStrategy`].
-impl JobTarget {
+impl ConnectionStrategy {
+    fn get_job_target(&self, quantum_processor_id: &str) -> execute_controller_job_request::Target {
+        match self {
+            Self::EndpointId(endpoint_id) => {
+                execute_controller_job_request::Target::EndpointId(endpoint_id.to_string())
+            }
+            _ => execute_controller_job_request::Target::QuantumProcessorId(
+                quantum_processor_id.to_string(),
+            ),
+        }
+    }
+
+    fn get_results_target(
+        &self,
+        quantum_processor_id: &str,
+    ) -> get_controller_job_results_request::Target {
+        match self {
+            Self::EndpointId(endpoint_id) => {
+                get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string())
+            }
+            _ => get_controller_job_results_request::Target::QuantumProcessorId(
+                quantum_processor_id.to_string(),
+            ),
+        }
+    }
+
     async fn get_controller_client(
         &self,
         client: &Qcs,
-        connection_strategy: ConnectionStrategy,
+        quantum_processor_id: &str,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
-        match self {
+        let address = match self {
             Self::EndpointId(endpoint_id) => {
                 let endpoint = get_endpoint(&client.get_openapi_client(), endpoint_id).await?;
-                let grpc_address = endpoint
+                endpoint
                     .addresses
                     .grpc
-                    .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?;
-                Self::grpc_address_to_client(&grpc_address, client)
+                    .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?
             }
-            Self::QuantumProcessorId(quantum_processor_id) => {
-                let address = match connection_strategy {
-                    ConnectionStrategy::GatewayOnly => {
-                        self.get_gateway_address(quantum_processor_id, client)
-                            .await?
-                    }
-                    ConnectionStrategy::DirectAccess => {
-                        self.get_default_endpoint_address(quantum_processor_id, client)
-                            .await?
-                    }
-                };
-                Self::grpc_address_to_client(&address, client)
+            Self::GatewayOnly => {
+                self.get_gateway_address(quantum_processor_id, client)
+                    .await?
             }
-        }
+            Self::DirectAccess => {
+                self.get_default_endpoint_address(quantum_processor_id, client)
+                    .await?
+            }
+        };
+        Self::grpc_address_to_client(&address, client)
     }
 
     fn grpc_address_to_client(

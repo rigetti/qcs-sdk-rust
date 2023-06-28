@@ -5,15 +5,14 @@ use numpy::Complex32;
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
     pyclass, pyfunction, pymethods,
-    types::{PyComplex, PyInt},
+    types::{PyComplex, PyInt, PyString},
     Py, PyResult,
 };
-use qcs::qpu::api::JobTarget;
 use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
     create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
-    py_wrap_simple_enum, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
+    py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -70,7 +69,6 @@ py_function_sync_async! {
         patch_values: HashMap<String, Vec<f64>>,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
-        endpoint_id: Option<String>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await;
@@ -88,9 +86,7 @@ py_function_sync_async! {
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
-        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
-
-        let job_id = qcs::qpu::api::submit(&job_target, job, &patch_values, &client, *execution_options.unwrap_or_default().as_inner()).await
+        let job_id = qcs::qpu::api::submit(quantum_processor_id, job, &patch_values, &client, execution_options.unwrap_or_default().as_inner()).await
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
@@ -191,14 +187,11 @@ py_function_sync_async! {
         job_id: String,
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
-        endpoint_id: Option<String>,
         execution_options: Option<PyExecutionOptions>
     ) -> PyResult<ExecutionResults> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
-        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
-
-        let results = qcs::qpu::api::retrieve_results(job_id.into(), &job_target, &client, *execution_options.unwrap_or_default().as_inner())
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id, &client, execution_options.unwrap_or_default().as_inner())
             .await
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;
@@ -244,7 +237,7 @@ impl PyExecutionOptionsBuilder {
         Self::from(
             self.as_inner()
                 .clone()
-                .connection_strategy(*connection_strategy.as_inner())
+                .connection_strategy(connection_strategy.as_inner().clone())
                 .clone(),
         )
     }
@@ -258,11 +251,12 @@ impl PyExecutionOptionsBuilder {
     }
 }
 
-py_wrap_simple_enum! {
+py_wrap_union_enum! {
     #[derive(Debug, PartialEq, Eq)]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy" {
-        GatewayOnly,
-        DirectAccess
+        gateway_only: GatewayOnly,
+        direct_access: DirectAccess,
+        endpoint_id: EndpointId => Py<PyString>
     }
 }
 impl_repr!(PyConnectionStrategy);

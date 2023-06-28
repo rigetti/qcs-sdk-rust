@@ -30,7 +30,7 @@ async fn main() {
         let theta = step * f64::from(i);
         let data = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-M-3", None, ExecutionOptions::default())
+            .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
             .await
             .expect("Executed program on QPU");
         total_execution_time += data

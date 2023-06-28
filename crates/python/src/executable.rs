@@ -170,7 +170,7 @@ impl PyExecutable {
                     execute_on_qpu,
                     quantum_processor_id,
                     translation_options,
-                    *execution_options.unwrap_or_default().as_inner(),
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -204,7 +204,7 @@ impl PyExecutable {
                     execute_on_qpu,
                     quantum_processor_id,
                     translation_options,
-                    *execution_options.unwrap_or_default().as_inner(),
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -238,7 +238,7 @@ impl PyExecutable {
                     submit_to_qpu,
                     quantum_processor_id,
                     translation_options,
-                    *execution_options.unwrap_or_default().as_inner(),
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
         }
@@ -274,7 +274,7 @@ impl PyExecutable {
                     submit_to_qpu,
                     quantum_processor_id,
                     translation_options,
-                    *execution_options.unwrap_or_default().as_inner(),
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
         }

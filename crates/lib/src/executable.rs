@@ -13,7 +13,7 @@ use qcs_api_client_grpc::services::translation::TranslationOptions;
 use crate::client::Qcs;
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::{ExecutionOptions, JobId, JobTarget};
+use crate::qpu::api::{ExecutionOptions, JobId};
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
 use crate::qvm::api::AddressRequest;
@@ -482,7 +482,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
-        execution_options: ExecutionOptions,
+        execution_options: &ExecutionOptions,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
@@ -523,7 +523,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
-        execution_options: ExecutionOptions,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -745,13 +745,10 @@ impl<'a> JobHandle<'a> {
         self.job_id.clone()
     }
 
-    /// The execution target of the QCS Job, either the quantum processor or an expicit endpoint.
+    /// The quatnum processor ID the job was submitted to.
     #[must_use]
-    pub fn job_target(&self) -> JobTarget {
-        self.endpoint_id.as_ref().map_or_else(
-            || JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string()),
-            |endpoint_id| JobTarget::EndpointId(endpoint_id.to_string()),
-        )
+    pub fn quantum_processor_id(&self) -> &str {
+        &self.quantum_processor_id
     }
 
     /// The readout map from source readout memory locations to the
@@ -763,8 +760,8 @@ impl<'a> JobHandle<'a> {
 
     /// The [`ConnectionStrategy`] used to submit the job to the QPU.
     #[must_use]
-    pub fn execution_options(&self) -> ExecutionOptions {
-        self.execution_options
+    pub fn execution_options(&self) -> &ExecutionOptions {
+        &self.execution_options
     }
 }
 

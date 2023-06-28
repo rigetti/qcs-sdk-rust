@@ -19,7 +19,7 @@ async fn main() {
 
     let result = exe
         .compile_with_quilc(false)
-        .execute_on_qpu("Aspen-M-3", None, ExecutionOptions::default())
+        .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
         .await
         .expect("Program should execute successfully")
         .result_data
