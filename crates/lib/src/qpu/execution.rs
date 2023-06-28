@@ -244,7 +244,7 @@ impl<'a> Execution<'a> {
             job,
             &patch_values,
             self.client.as_ref(),
-            &execution_options,
+            execution_options,
         )
         .await?;
 
@@ -278,7 +278,7 @@ impl<'a> Execution<'a> {
             job_handle.job_id(),
             job_handle.quantum_processor_id().to_string(),
             self.client.as_ref(),
-            &job_handle.execution_options(),
+            job_handle.execution_options(),
         )
         .await?;
 
