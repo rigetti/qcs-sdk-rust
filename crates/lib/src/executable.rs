@@ -514,7 +514,6 @@ impl<'execution> Executable<'_, 'execution> {
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
     /// 3. `connection_strategy`: The [`ConnectionStrategy`] to use to connect to the QPU.
-    ///    QPU.
     ///
     /// # Errors
     ///
