@@ -43,8 +43,8 @@ create_init_submodule! {
 /// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
 enum RustSubmissionError {
-    /// An API error occured
-    #[error("An API error occured: {0}")]
+    /// An API error occurred
+    #[error("An API error occurred: {0}")]
     QpuApiError(#[from] qcs::qpu::api::QpuApiError),
 
     /// Job could not be deserialized
