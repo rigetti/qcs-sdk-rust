@@ -254,7 +254,7 @@ impl PyExecutionOptionsBuilder {
 py_wrap_union_enum! {
     #[derive(Debug, PartialEq, Eq)]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy" {
-        gateway_only: GatewayOnly,
+        gateway: Gateway,
         direct_access: DirectAccess,
         endpoint_id: EndpointId => Py<PyString>
     }

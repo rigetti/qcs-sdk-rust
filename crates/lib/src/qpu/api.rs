@@ -195,7 +195,7 @@ impl ExecutionOptions {
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
     #[default]
-    GatewayOnly,
+    Gateway,
     /// Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
     /// have direct network access and an active reservation.
     DirectAccess,
@@ -245,7 +245,7 @@ impl ConnectionStrategy {
                     .grpc
                     .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?
             }
-            Self::GatewayOnly => {
+            Self::Gateway => {
                 self.get_gateway_address(quantum_processor_id, client)
                     .await?
             }
