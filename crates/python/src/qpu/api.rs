@@ -5,7 +5,7 @@ use numpy::Complex32;
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
     pyclass, pyfunction, pymethods,
-    types::{PyComplex, PyInt, PyString},
+    types::{PyComplex, PyInt},
     Py, PyResult,
 };
 use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
@@ -251,18 +251,32 @@ impl PyExecutionOptionsBuilder {
     }
 }
 
-py_wrap_union_enum! {
-    #[derive(Debug, PartialEq, Eq)]
-    PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy" {
-        gateway: Gateway,
-        direct_access: DirectAccess,
-        endpoint_id: EndpointId => Py<PyString>
-    }
+py_wrap_type! {
+    #[derive(Default)]
+    PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
 }
 impl_repr!(PyConnectionStrategy);
 
-impl Default for PyConnectionStrategy {
-    fn default() -> PyConnectionStrategy {
-        PyConnectionStrategy::from(ConnectionStrategy::default())
+#[pymethods]
+impl PyConnectionStrategy {
+    #[staticmethod]
+    #[pyo3(name = "default")]
+    fn py_default() -> Self {
+        Self::default()
+    }
+
+    #[staticmethod]
+    fn gateway() -> Self {
+        Self(ConnectionStrategy::Gateway)
+    }
+
+    #[staticmethod]
+    fn direct_access() -> Self {
+        Self(ConnectionStrategy::DirectAccess)
+    }
+
+    #[staticmethod]
+    fn endpoint_id(endpoint_id: String) -> PyResult<Self> {
+        Ok(Self(ConnectionStrategy::EndpointId(endpoint_id)))
     }
 }

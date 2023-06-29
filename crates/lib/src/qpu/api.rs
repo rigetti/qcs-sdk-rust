@@ -199,7 +199,6 @@ pub enum ConnectionStrategy {
     /// Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
     /// have direct network access and an active reservation.
     DirectAccess,
-
     /// Connect directly to a specific endpoint using its ID.
     EndpointId(String),
 }

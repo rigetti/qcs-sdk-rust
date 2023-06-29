@@ -198,14 +198,19 @@ class ExecutionOptionsBuilder:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
 
 @final
-class ConnectionStrategy(Enum):
+class ConnectionStrategy:
     """An enum containing variants for each possible quantum processor connection strategy."""
 
-    GatewayOnly = "GatewayOnly"
-    """
-    Always connect through the publicly accessible gateway.
-    """
-    DirectAccess = "DirectAccess"
-    """
-    Always connect to the QPU directly. Should only be used when direct access is available and with an active reservation.
-    """
+    @staticmethod
+    def default() -> ConnectionStrategy:
+        """Get the default connection strategy. Currently, this is ``ConnectionStrategy.GatewayOnly``"""
+    @staticmethod
+    def gateway() -> ConnectionStrategy:
+        """Connect through the publicly accessbile gateway."""
+    @staticmethod
+    def direct_access() -> ConnectionStrategy:
+        """Connect directly to the default endpoint, bypassing the gateway. Should only be used when you have
+        direct network access and an active reservation."""
+    @staticmethod
+    def endpoint_id(endpoint_id: str) -> ConnectionStrategy:
+        """Connect directly to a specific endpoint using its ID."""
