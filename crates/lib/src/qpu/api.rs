@@ -185,6 +185,9 @@ pub struct ExecutionOptions {
 }
 
 impl ExecutionOptions {
+  pub fn builder() -> ExecutionOptionsBuilder {
+    ExecutionOptionsBuilder::default()
+  }
     /// Get the [`ConnectionStrategy`]
     #[must_use]
     pub fn connection_strategy(&self) -> &ConnectionStrategy {
