@@ -81,9 +81,8 @@ class ExecutionResults:
 def submit(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
     connection_strategy: Optional[ConnectionStrategy] = None,
 ) -> str:
     """
@@ -91,10 +90,9 @@ def submit(
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is ConnectionStrategy.GatewayOnly. If `endpoint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -106,9 +104,8 @@ def submit(
 async def submit_async(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
     connection_strategy: Optional[ConnectionStrategy] = None,
 ) -> str:
     """
@@ -117,10 +114,9 @@ async def submit_async(
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -131,19 +127,18 @@ async def submit_async(
 
 def retrieve_results(
     job_id: str,
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
     connection_strategy: Optional[ConnectionStrategy] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
 
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: results from execution.
 
@@ -154,20 +149,19 @@ def retrieve_results(
 
 async def retrieve_results_async(
     job_id: str,
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
-    connection_strategy: Optional[ConnectionStrategy] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
     (async analog of ``retrieve_results``)
 
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
-    :param connection_strategy: The ``ConnectionStrategy`` to use to connect to the QPU. If unset, the default is `ConnectionStrategy.GatewayOnly`. If `enpodint_id` is set, then direct access to that endpoint overrides this parameter.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: results from execution.
 

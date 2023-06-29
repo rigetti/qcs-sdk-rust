@@ -67,7 +67,7 @@ py_function_sync_async! {
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
-        quantum_processor_id: String,
+        quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<String> {
@@ -86,7 +86,7 @@ py_function_sync_async! {
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
-        let job_id = qcs::qpu::api::submit(quantum_processor_id, job, &patch_values, &client, execution_options.unwrap_or_default().as_inner()).await
+        let job_id = qcs::qpu::api::submit(quantum_processor_id.as_deref(), job, &patch_values, &client, execution_options.unwrap_or_default().as_inner()).await
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
@@ -185,13 +185,13 @@ py_function_sync_async! {
     #[pyfunction(client = "None", endpoint_id = "None")]
     async fn retrieve_results(
         job_id: String,
-        quantum_processor_id: String,
+        quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>
     ) -> PyResult<ExecutionResults> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
-        let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id, &client, execution_options.unwrap_or_default().as_inner())
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id.as_deref(), &client, execution_options.unwrap_or_default().as_inner())
             .await
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;

@@ -74,17 +74,17 @@ impl From<String> for JobId {
 /// Execute compiled program on a QPU.
 ///
 /// # Arguments
-/// * `quantum_processor_id` - The quantum processor to execute the job on. Note that this
-///      parameter is overridden if the ``connection_strategy`` parameter provides a specific
-///      endpoint ID.
+/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
+///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///      to target a specific endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution.
 /// * `client` - The [`Qcs`] client to use.
-/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If this is a
-///       [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
+///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
 pub async fn submit(
-    quantum_processor_id: String,
+    quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
     patch_values: &Parameters,
     client: &Qcs,
@@ -92,7 +92,7 @@ pub async fn submit(
 ) -> Result<JobId, QpuApiError> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
-        "submitting job to {} using options {:?}",
+        "submitting job to {:?} using options {:?}",
         quantum_processor_id,
         execution_options
     );
@@ -103,13 +103,13 @@ pub async fn submit(
         target: Some(
             execution_options
                 .connection_strategy
-                .get_job_target(&quantum_processor_id),
+                .get_job_target(quantum_processor_id)?,
         ),
     };
 
     let mut controller_client = execution_options
         .connection_strategy
-        .get_controller_client(client, &quantum_processor_id)
+        .get_controller_client(client, quantum_processor_id)
         .await?;
 
     // we expect exactly one job ID since we only submit one execution configuration
@@ -130,20 +130,22 @@ pub async fn submit(
 ///
 /// # Arguments
 /// * `job_id` - The [`JobId`] to retrieve results for.
-/// * `quantum_processor_id` - The quantum processor the job was run on.
+/// * `quantum_processor_id` - The quantum processor the job was run on. This parameter
+///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///      to target a specific endpoint ID.
 /// * `client` - The [`Qcs`] client to use.
-/// * `connection_strategy` - The [`ConnectionStrategy`] to use. If this is a
-///       [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
+///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
 pub async fn retrieve_results(
     job_id: JobId,
-    quantum_processor_id: String,
+    quantum_processor_id: Option<&str>,
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
     #[cfg(feature = "tracing")]
     tracing::debug!(
-        "retrieving job results for {} on {} using options {:?}",
+        "retrieving job results for {} on {:?} using options {:?}",
         job_id,
         quantum_processor_id,
         execution_options,
@@ -154,13 +156,13 @@ pub async fn retrieve_results(
         target: Some(
             execution_options
                 .connection_strategy
-                .get_results_target(&quantum_processor_id),
+                .get_results_target(quantum_processor_id)?,
         ),
     };
 
     let mut controller_client = execution_options
         .connection_strategy
-        .get_controller_client(client, &quantum_processor_id)
+        .get_controller_client(client, quantum_processor_id)
         .await?;
 
     Ok(controller_client
@@ -206,39 +208,46 @@ pub enum ConnectionStrategy {
 /// Methods that help select the right controller service client given a quantum processor ID and
 /// [`ConnectionStrategy`].
 impl ConnectionStrategy {
-    fn get_job_target(&self, quantum_processor_id: &str) -> execute_controller_job_request::Target {
+    fn get_job_target(
+        &self,
+        quantum_processor_id: Option<&str>,
+    ) -> Result<execute_controller_job_request::Target, QpuApiError> {
         match self {
-            Self::EndpointId(endpoint_id) => {
-                execute_controller_job_request::Target::EndpointId(endpoint_id.to_string())
-            }
+            Self::EndpointId(endpoint_id) => Ok(
+                execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
+            ),
             Self::Gateway | Self::DirectAccess => {
-                execute_controller_job_request::Target::QuantumProcessorId(
-                    quantum_processor_id.to_string(),
-                )
+                Ok(execute_controller_job_request::Target::QuantumProcessorId(
+                    quantum_processor_id
+                        .ok_or(QpuApiError::MissingQpuId)?
+                        .to_string(),
+                ))
             }
         }
     }
 
     fn get_results_target(
         &self,
-        quantum_processor_id: &str,
-    ) -> get_controller_job_results_request::Target {
+        quantum_processor_id: Option<&str>,
+    ) -> Result<get_controller_job_results_request::Target, QpuApiError> {
         match self {
-            Self::EndpointId(endpoint_id) => {
-                get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string())
-            }
-            Self::Gateway | Self::DirectAccess => {
+            Self::EndpointId(endpoint_id) => Ok(
+                get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string()),
+            ),
+            Self::Gateway | Self::DirectAccess => Ok(
                 get_controller_job_results_request::Target::QuantumProcessorId(
-                    quantum_processor_id.to_string(),
-                )
-            }
+                    quantum_processor_id
+                        .ok_or(QpuApiError::MissingQpuId)?
+                        .to_string(),
+                ),
+            ),
         }
     }
 
     async fn get_controller_client(
         &self,
         client: &Qcs,
-        quantum_processor_id: &str,
+        quantum_processor_id: Option<&str>,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
         let address = match self {
             Self::EndpointId(endpoint_id) => {
@@ -249,12 +258,18 @@ impl ConnectionStrategy {
                     .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?
             }
             Self::Gateway => {
-                self.get_gateway_address(quantum_processor_id, client)
-                    .await?
+                self.get_gateway_address(
+                    quantum_processor_id.ok_or(QpuApiError::MissingQpuId)?,
+                    client,
+                )
+                .await?
             }
             Self::DirectAccess => {
-                self.get_default_endpoint_address(quantum_processor_id, client)
-                    .await?
+                self.get_default_endpoint_address(
+                    quantum_processor_id.ok_or(QpuApiError::MissingQpuId)?,
+                    client,
+                )
+                .await?
             }
         };
         Self::grpc_address_to_client(&address, client)
@@ -358,4 +373,8 @@ pub enum QpuApiError {
     /// Errors that may occur while trying to use a `gRPC` client
     #[error(transparent)]
     GrpcClientError(#[from] GrpcClientError),
+
+    /// Error due to missing quantum processor ID and endpoint ID.
+    #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId")]
+    MissingQpuId,
 }

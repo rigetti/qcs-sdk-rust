@@ -195,7 +195,7 @@ impl<'a> Execution<'a> {
 
         self.submit_to_target(
             params,
-            self.quantum_processor_id.to_string(),
+            Some(&self.quantum_processor_id.clone()),
             translation_options,
             execution_options,
         )
@@ -212,13 +212,14 @@ impl<'a> Execution<'a> {
     where
         S: Into<Cow<'a, str>>,
     {
-        let endpoint_id = endpoint_id.into().to_string();
         self.submit_to_target(
             params,
-            endpoint_id,
+            None,
             translation_options,
             &ExecutionOptionsBuilder::default()
-                .connection_strategy(ConnectionStrategy::DirectAccess)
+                .connection_strategy(ConnectionStrategy::EndpointId(
+                    endpoint_id.into().to_string(),
+                ))
                 .build()
                 .expect("valid execution options"),
         )
@@ -228,7 +229,7 @@ impl<'a> Execution<'a> {
     async fn submit_to_target(
         &mut self,
         params: &Parameters,
-        quantum_processor_id: String,
+        quantum_processor_id: Option<&str>,
         translation_options: Option<TranslationOptions>,
         execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'a>, Error> {
@@ -276,7 +277,7 @@ impl<'a> Execution<'a> {
 
         let response = retrieve_results(
             job_handle.job_id(),
-            job_handle.quantum_processor_id().to_string(),
+            Some(job_handle.quantum_processor_id()),
             self.client.as_ref(),
             job_handle.execution_options(),
         )
