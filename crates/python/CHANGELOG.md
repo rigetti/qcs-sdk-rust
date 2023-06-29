@@ -1,3 +1,18 @@
+## 0.9.0-rc.3
+
+### Breaking Changes
+
+- QVM timeout can now be configured via a new options parameter (#309)
+- change to signature of `qpu::translate` to be generic over translation options
+
+---------
+
+### Features
+
+- The QCS Client now fallbacks to default values when loading incomplete settings. The default `grpc_api_url` has been updated. (#314)
+- Integrate with logging (#311)
+- TranslationOptions builder-like struct with Python bindings (#308)
+
 ## 0.9.0-rc.2
 
 ### Breaking Changes
