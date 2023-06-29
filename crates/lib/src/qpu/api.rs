@@ -211,9 +211,11 @@ impl ConnectionStrategy {
             Self::EndpointId(endpoint_id) => {
                 execute_controller_job_request::Target::EndpointId(endpoint_id.to_string())
             }
-            _ => execute_controller_job_request::Target::QuantumProcessorId(
-                quantum_processor_id.to_string(),
-            ),
+            Self::Gateway | Self::DirectAccess => {
+                execute_controller_job_request::Target::QuantumProcessorId(
+                    quantum_processor_id.to_string(),
+                )
+            }
         }
     }
 
@@ -225,9 +227,11 @@ impl ConnectionStrategy {
             Self::EndpointId(endpoint_id) => {
                 get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string())
             }
-            _ => get_controller_job_results_request::Target::QuantumProcessorId(
-                quantum_processor_id.to_string(),
-            ),
+            Self::Gateway | Self::DirectAccess => {
+                get_controller_job_results_request::Target::QuantumProcessorId(
+                    quantum_processor_id.to_string(),
+                )
+            }
         }
     }
 
