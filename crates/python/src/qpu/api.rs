@@ -231,15 +231,17 @@ impl PyExecutionOptionsBuilder {
         Self::from(ExecutionOptionsBuilder::default())
     }
 
-    fn connection_strategy(&self, connection_strategy: PyConnectionStrategy) -> Self {
+    #[setter]
+    fn connection_strategy(&mut self, connection_strategy: PyConnectionStrategy) {
         // `derive_builder::Builder` doesn't implement AsMut, meaning we can't use `PyWrapperMut`,
         // which forces us into this awkward clone.
-        Self::from(
+
+        *self = Self::from(
             self.as_inner()
                 .clone()
                 .connection_strategy(connection_strategy.as_inner().clone())
                 .clone(),
-        )
+        );
     }
 
     fn build(&self) -> PyResult<PyExecutionOptions> {

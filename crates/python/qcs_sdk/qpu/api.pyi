@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Dict, List, Sequence, Mapping, Optional, Union, final
+from typing import Callable, Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
 
@@ -190,20 +190,25 @@ class ExecutionOptionsBuilder:
     def default() -> ExecutionOptionsBuilder:
         """Return a builder with the default values for ``ExecutionOptions``"""
         ...
-    def connection_strategy(
-        self, connection_strategy: ConnectionStrategy
-    ) -> ExecutionOptionsBuilder:
+    @property
+    def connection_strategy(self):
+        # This was the least clunky way of expressing connection_strategy as write only.
+        # Other methods exposed helper functions that didn't actually exist, while still
+        # requiring a getter was defined in some way.
+        raise AttributeError("connection_strategy is not readable")
+    @connection_strategy.setter
+    def connection_strategy(self, connection_strategy: ConnectionStrategy):
         """Set the ``ConnectionStrategy`` used to establish a connection to the QPU."""
     def build(self) -> ExecutionOptions:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
 
 @final
 class ConnectionStrategy:
-    """An enum containing variants for each possible quantum processor connection strategy."""
+    """The connection strategy to use when submitting and retrieiving jobs from a quantum processor."""
 
     @staticmethod
     def default() -> ConnectionStrategy:
-        """Get the default connection strategy. Currently, this is ``ConnectionStrategy.GatewayOnly``"""
+        """Get the default connection strategy. Currently, this is ``ConnectionStrategy.gateway()``"""
     @staticmethod
     def gateway() -> ConnectionStrategy:
         """Connect through the publicly accessbile gateway."""
