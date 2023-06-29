@@ -744,7 +744,7 @@ impl<'a> JobHandle<'a> {
         self.job_id.clone()
     }
 
-    /// The quatnum processor ID the job was submitted to.
+    /// The ID of the quantum processor to which the job was submitted.
     #[must_use]
     pub fn quantum_processor_id(&self) -> &str {
         &self.quantum_processor_id
