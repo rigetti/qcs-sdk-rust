@@ -1,3 +1,9 @@
+## 0.14.1
+
+### Fixes
+
+- Increase gRPC message size limit (#318)
+
 ## 0.14.1-rc.0
 
 ### Fixes
