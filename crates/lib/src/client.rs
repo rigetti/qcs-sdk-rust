@@ -33,7 +33,7 @@ pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
-const MAX_DECODING_MESSAGE_SIZE_KB: usize = 256_000;
+const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
 
 /// A client providing helper functionality for accessing QCS APIs
 #[derive(Debug, Clone, Default)]
@@ -100,7 +100,8 @@ impl Qcs {
         let uri = self.get_controller_endpoint(quantum_processor_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
         let service = wrap_channel_with(channel, self.get_config().clone());
-        Ok(ControllerClient::new(service).max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_KB))
+        Ok(ControllerClient::new(service)
+            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
     }
 
     pub(crate) async fn get_controller_client_with_endpoint_id(
@@ -111,7 +112,8 @@ impl Qcs {
         let uri = self.get_controller_endpoint_by_id(endpoint_id).await?;
         let channel = get_channel(uri).map_err(|err| GrpcEndpointError::GrpcError(err.into()))?;
         let service = wrap_channel_with(channel, self.get_config().clone());
-        Ok(ControllerClient::new(service).max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_KB))
+        Ok(ControllerClient::new(service)
+            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
     }
 
     pub(crate) fn get_openapi_client(&self) -> OpenApiConfiguration {
