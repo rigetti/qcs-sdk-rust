@@ -1,3 +1,9 @@
+## 0.9.1-rc.0
+
+### Fixes
+
+- Increase gRPC message size limit (#318)
+
 ## 0.9.0
 
 ### Breaking Changes
