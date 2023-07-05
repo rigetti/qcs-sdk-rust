@@ -35,6 +35,8 @@ use crate::executable::Parameters;
 
 use crate::client::{GrpcClientError, Qcs};
 
+const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
+
 pub(crate) fn params_into_job_execution_configuration(
     params: &Parameters,
 ) -> JobExecutionConfiguration {
@@ -218,7 +220,7 @@ impl ConnectionStrategy {
         &self,
         quantum_processor_id: Option<&str>,
     ) -> Result<execute_controller_job_request::Target, QpuApiError> {
-        match self {
+         self {
             Self::EndpointId(endpoint_id) => Ok(
                 execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
             ),
@@ -288,7 +290,8 @@ impl ConnectionStrategy {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel(uri).map_err(|err| QpuApiError::GrpcError(err.into()))?;
         let service = wrap_channel_with(channel, client.get_config().clone());
-        Ok(ControllerClient::new(service))
+        Ok(ControllerClient::new(service)
+            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
     }
 
     async fn get_gateway_address(

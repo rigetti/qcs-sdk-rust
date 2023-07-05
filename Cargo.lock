@@ -806,6 +806,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "home"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5444c27eef6923071f7ebcc33e3444508466a76f7a2b93da00ed6e19f30c1ddb"
+dependencies = [
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "http"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -914,9 +923,9 @@ dependencies = [
 
 [[package]]
 name = "hyper-socks2"
-version = "0.7.0"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "119e7612ab732dd10c43a3babbc75f212e9a8656c524fb1f85d0a7490c9cd5dd"
+checksum = "cc38166fc2732d450e9372388d269eb38ff0b75a3cfb4c542e65b2f6893629c4"
 dependencies = [
  "async-socks5",
  "futures",
@@ -1791,7 +1800,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.14.0-rc.2"
+version = "0.14.1"
 dependencies = [
  "derive_builder",
  "dirs",
@@ -1846,13 +1855,13 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.6.6"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a83036b124a28d605c626560638a4d73da873922088574f1d0f14a1412840dad"
+checksum = "bab2c2dcab267ecf92db219c903112bde9cd68c2f689c23f76baab89833766fe"
 dependencies = [
  "async-trait",
- "dirs",
  "futures",
+ "home",
  "http",
  "jsonwebtoken",
  "reqwest",
@@ -1867,9 +1876,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.6.5"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f5e2eadc0630b04178b6fa94f733f8c100f6f192da76c1dee47d2f2f6e25b951"
+checksum = "5a3a4071f449e2da8e81633494199bb64be0adf02ab21a616a404fa3cb543825"
 dependencies = [
  "http",
  "http-body",
@@ -1896,9 +1905,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.7.5"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "141a0f2523179a6f8d29ade3e80d12b41a300922c196c61d0e2aad26b27eddfc"
+checksum = "041154f95c4d54ea38c57619587c97e5b1d5e74ce3cf5f2905d20179eeb3b770"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
@@ -1915,7 +1924,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.9.0-rc.2"
+version = "0.9.1"
 dependencies = [
  "numpy",
  "once_cell",
@@ -2092,6 +2101,7 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "rustls 0.20.8",
+ "rustls-native-certs 0.6.2",
  "rustls-pemfile",
  "serde",
  "serde_json",
