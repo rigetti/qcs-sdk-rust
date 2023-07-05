@@ -451,7 +451,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// Compile the program and execute it on a QCS endpoint, waiting for results.
     ///
     /// # Arguments
-    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    /// 1. `quantum_processor_id`: The ID of the QPU for which to translate the program.
     ///     This parameter affects the lifetime of the [`Executable`].
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
