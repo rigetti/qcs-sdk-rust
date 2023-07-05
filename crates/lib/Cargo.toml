@@ -61,10 +61,6 @@ rstest = "0.17.0"
 insta = "1.29.0"
 derive_builder = "0.12.0"
 
-# Not used directly by the crate, but required to avoid using yanked versions of crates that trigger
-# `cargo-deny` errors
-hermit-abi = "^0.3.2"
-
 [dev-dependencies]
 erased-serde = "0.3.23"
 float-cmp = "0.9.0"
