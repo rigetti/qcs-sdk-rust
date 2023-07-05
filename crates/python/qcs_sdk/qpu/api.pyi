@@ -90,7 +90,7 @@ def submit(
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
@@ -114,7 +114,7 @@ async def submit_async(
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
