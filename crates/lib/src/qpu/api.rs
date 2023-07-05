@@ -220,7 +220,7 @@ impl ConnectionStrategy {
         &self,
         quantum_processor_id: Option<&str>,
     ) -> Result<execute_controller_job_request::Target, QpuApiError> {
-         self {
+        match self {
             Self::EndpointId(endpoint_id) => Ok(
                 execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
             ),

@@ -760,7 +760,7 @@ impl<'a> JobHandle<'a> {
         &self.readout_map
     }
 
-    /// The [`ConnectionStrategy`] used to submit the job to the QPU.
+    /// The [`ExecutionOptions`] used to submit the job to the QPU.
     #[must_use]
     pub fn execution_options(&self) -> &ExecutionOptions {
         &self.execution_options

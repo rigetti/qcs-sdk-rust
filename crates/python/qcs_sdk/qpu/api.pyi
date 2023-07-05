@@ -83,7 +83,7 @@ def submit(
     patch_values: Mapping[str, Sequence[float]],
     quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    connection_strategy: Optional[ConnectionStrategy] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -106,7 +106,7 @@ async def submit_async(
     patch_values: Mapping[str, Sequence[float]],
     quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    connection_strategy: Optional[ConnectionStrategy] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -129,7 +129,7 @@ def retrieve_results(
     job_id: str,
     quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    connection_strategy: Optional[ConnectionStrategy] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
