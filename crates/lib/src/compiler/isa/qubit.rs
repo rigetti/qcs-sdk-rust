@@ -170,7 +170,14 @@ impl FrbSim1q {
 const DEFAULT_DURATION_RX: f64 = 50.0;
 
 fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
-    let fidelity = frb_sim_1q.fidelity_for_qubit(node_id)?;
+    let fidelity = match frb_sim_1q.fidelity_for_qubit(node_id) {
+        Ok(fidelity) => Ok(fidelity),
+        Err(Error::MissingBenchmarkForQubit(e)) => {
+            tracing::warn!(e);
+            Ok(0.0)
+        }
+        Err(e) => Err(e),
+    }?;
 
     let mut gates = Vec::with_capacity(5);
     let operator = "RX".to_string();
@@ -227,7 +234,7 @@ mod describe_rx_gates {
                 parameter_values: None,
             },
         ]);
-        let gates = rx_gates(node_id, &frb_sim_1q).expect("Failed to create RX gates");
+        let gates = rx_gates(node_id, &frb_sim_1q).expect("Should create RX gates");
         let expected = vec![
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
@@ -261,6 +268,50 @@ mod describe_rx_gates {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_6,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-FRAC_PI_2)],
+            },
+        ];
+        assert_eq!(gates, expected);
+    }
+
+    #[test]
+    fn it_defaults_to_0_for_missing_benchmark() {
+        let frb_sim_1q = FrbSim1q(Vec::new());
+        let gates = rx_gates(1, &frb_sim_1q).expect("should not error for missing benchmark");
+        let expected = vec![
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 1.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(0.0)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(PI)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-PI)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(FRAC_PI_2)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(-FRAC_PI_2)],
             },
