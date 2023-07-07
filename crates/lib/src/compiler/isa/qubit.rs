@@ -171,6 +171,8 @@ fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error>
     let fidelity = frb_sim_1q
         .fidelity_for_qubit(node_id)
         .or_else(|e| match e {
+            // Prevents compilation error when building without the `tracing` feature flag
+            #[allow(unused_variables)]
             error @ Error::MissingBenchmarkForQubit(_) => {
                 #[cfg(feature = "tracing")]
                 tracing::warn!(%error);
