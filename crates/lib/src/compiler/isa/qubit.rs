@@ -172,8 +172,9 @@ const DEFAULT_DURATION_RX: f64 = 50.0;
 fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
     let fidelity = match frb_sim_1q.fidelity_for_qubit(node_id) {
         Ok(fidelity) => Ok(fidelity),
-        Err(Error::MissingBenchmarkForQubit(e)) => {
-            tracing::warn!(e);
+        Err(error @ Error::MissingBenchmarkForQubit(_)) => {
+                    #[cfg(feature = "tracing")]
+                    tracing::warn!(%error);
             Ok(0.0)
         }
         Err(e) => Err(e),
