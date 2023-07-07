@@ -51,9 +51,7 @@ impl Qubit {
     /// # Errors
     /// 1. `randomized_benchmark_simultaneous_1q` was not present in `benchmarks`: this is necessary
     ///     for RX and RZ gates.
-    /// 2. The `randomized_benchmark_simultaneous_1q` benchmark did not contain data for a Qubit
-    ///     which has a defined RX or RZ gate.
-    /// 3. An unknown `op_name` was provided.
+    /// 2. An unknown `op_name` was provided.
     pub(crate) fn add_operation(
         &mut self,
         op_name: &str,
@@ -170,16 +168,16 @@ impl FrbSim1q {
 const DEFAULT_DURATION_RX: f64 = 50.0;
 
 fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
-    let fidelity = match frb_sim_1q.fidelity_for_qubit(node_id) {
-        Ok(fidelity) => Ok(fidelity),
-        Err(error @ Error::MissingBenchmarkForQubit(_)) => {
-                    #[cfg(feature = "tracing")]
-                    tracing::warn!(%error);
-            Ok(0.0)
-        }
-        Err(e) => Err(e),
-    }?;
-
+    let fidelity = frb_sim_1q
+        .fidelity_for_qubit(node_id)
+        .or_else(|e| match e {
+            error @ Error::MissingBenchmarkForQubit(_) => {
+                #[cfg(feature = "tracing")]
+                tracing::warn!(%error);
+                Ok(0.0)
+            }
+            _ => Err(e),
+        })?;
     let mut gates = Vec::with_capacity(5);
     let operator = "RX".to_string();
     gates.push(Operator::Gate {
