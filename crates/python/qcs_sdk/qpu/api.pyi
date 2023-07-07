@@ -1,4 +1,5 @@
-from typing import Dict, List, Sequence, Mapping, Optional, Union, final
+from enum import Enum
+from typing import Callable, Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
 
@@ -80,18 +81,18 @@ class ExecutionResults:
 def submit(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -103,9 +104,9 @@ def submit(
 async def submit_async(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
     """
     Submits an executable `program` to be run on the specified QPU.
@@ -113,9 +114,9 @@ async def submit_async(
 
     :param program: An executable program (see `translate`).
     :param patch_values: A mapping of symbols to their desired values (see `build_patch_values`).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param endpoint_id: submit the program to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: The ID of the submitted job which can be used to fetch results
 
@@ -126,17 +127,18 @@ async def submit_async(
 
 def retrieve_results(
     job_id: str,
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
 
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: results from execution.
 
@@ -147,18 +149,19 @@ def retrieve_results(
 
 async def retrieve_results_async(
     job_id: str,
-    quantum_processor_id: str,
+    quantum_processor_id: Optional[str],
     client: Optional[QCSClient] = None,
-    endpoint_id: Optional[str] = None,
+    execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:
     """
     Fetches execution results for the given QCS Job ID.
     (async analog of ``retrieve_results``)
 
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
     :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param endpoint_id: retrieve the results of a program submitted to an explicitly provided endpoint. If `None`, the default endpoint for the given quantum_processor_id is used.
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
 
     :returns: results from execution.
 
@@ -166,3 +169,47 @@ async def retrieve_results_async(
     :raises SubmissionError: If there was a problem during program execution.
     """
     ...
+
+@final
+class ExecutionOptions:
+    @staticmethod
+    def default() -> ExecutionOptions:
+        """Return ExecutionOptions with a reasonable set of defaults."""
+        ...
+
+@final
+class ExecutionOptionsBuilder:
+    def __new__(cls) -> ExecutionOptionsBuilder: ...
+    @staticmethod
+    def default() -> ExecutionOptionsBuilder:
+        """Return a builder with the default values for ``ExecutionOptions``"""
+        ...
+    @property
+    def connection_strategy(self):
+        # This was the least clunky way of expressing connection_strategy as write only.
+        # Other methods exposed helper functions that didn't actually exist, while still
+        # requiring a getter was defined in some way.
+        raise AttributeError("connection_strategy is not readable")
+    @connection_strategy.setter
+    def connection_strategy(self, connection_strategy: ConnectionStrategy):
+        """Set the ``ConnectionStrategy`` used to establish a connection to the QPU."""
+    def build(self) -> ExecutionOptions:
+        """Build the ``ExecutionOptions`` using the options set in this builder."""
+
+@final
+class ConnectionStrategy:
+    """The connection strategy to use when submitting and retrieiving jobs from a quantum processor."""
+
+    @staticmethod
+    def default() -> ConnectionStrategy:
+        """Get the default connection strategy. Currently, this is ``ConnectionStrategy.gateway()``"""
+    @staticmethod
+    def gateway() -> ConnectionStrategy:
+        """Connect through the publicly accessbile gateway."""
+    @staticmethod
+    def direct_access() -> ConnectionStrategy:
+        """Connect directly to the default endpoint, bypassing the gateway. Should only be used when you have
+        direct network access and an active reservation."""
+    @staticmethod
+    def endpoint_id(endpoint_id: str) -> ConnectionStrategy:
+        """Connect directly to a specific endpoint using its ID."""

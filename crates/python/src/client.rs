@@ -102,21 +102,15 @@ impl PyQcsClient {
         }
     }
 
-    async fn load(profile_name: Option<String>, use_gateway: Option<bool>) -> PyResult<Self> {
-        let client = match profile_name {
+    async fn load(profile_name: Option<String>) -> PyResult<Self> {
+        Ok(match profile_name {
             Some(profile_name) => Qcs::with_profile(profile_name)
                 .await
+                .map(PyQcsClient)
                 .map_err(RustLoadClientError)
                 .map_err(RustLoadClientError::to_py_err)?,
-            None => Qcs::load().await,
-        };
-
-        let client = match use_gateway {
-            None => client,
-            Some(use_gateway) => client.with_use_gateway(use_gateway),
-        };
-
-        Ok(Self(client))
+            None => Self(Qcs::load().await),
+        })
     }
 }
 
@@ -175,25 +169,17 @@ impl PyQcsClient {
     }
 
     #[staticmethod]
-    #[args("/", profile_name = "None", use_gateway = "None")]
+    #[args("/", profile_name = "None")]
     #[pyo3(name = "load")]
-    pub fn py_load(
-        py: Python<'_>,
-        profile_name: Option<String>,
-        use_gateway: Option<bool>,
-    ) -> PyResult<Self> {
-        py_sync!(py, Self::load(profile_name, use_gateway))
+    pub fn py_load(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
+        py_sync!(py, Self::load(profile_name))
     }
 
     #[staticmethod]
-    #[args("/", profile_name = "None", use_gateway = "None")]
+    #[args("/", profile_name = "None")]
     #[pyo3(name = "load_async")]
-    pub fn py_load_async(
-        py: Python<'_>,
-        profile_name: Option<String>,
-        use_gateway: Option<bool>,
-    ) -> PyResult<&PyAny> {
-        py_async!(py, Self::load(profile_name, use_gateway))
+    pub fn py_load_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
+        py_async!(py, Self::load(profile_name))
     }
 
     #[getter]

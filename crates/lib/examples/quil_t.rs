@@ -2,7 +2,7 @@
 //!
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/quilt_getting_started.html#Another-example:-a-simple-T1-experiment
 
-use qcs::Executable;
+use qcs::{qpu::api::ExecutionOptions, Executable};
 
 /// This program doesn't do much, the main point is that it will fail if quilc is invoked.
 const PROGRAM: &str = r#"
@@ -19,7 +19,7 @@ async fn main() {
 
     let result = exe
         .compile_with_quilc(false)
-        .execute_on_qpu("Aspen-M-3", None)
+        .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
         .await
         .expect("Program should execute successfully")
         .result_data
