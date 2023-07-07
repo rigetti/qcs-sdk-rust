@@ -1800,7 +1800,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.14.1"
+version = "0.15.0-rc.0"
 dependencies = [
  "derive_builder",
  "dirs",
@@ -1808,7 +1808,6 @@ dependencies = [
  "erased-serde",
  "float-cmp",
  "futures",
- "hermit-abi 0.3.2",
  "hex",
  "indexmap",
  "insta",
@@ -1925,7 +1924,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.9.1"
+version = "0.10.0-rc.0"
 dependencies = [
  "numpy",
  "once_cell",
