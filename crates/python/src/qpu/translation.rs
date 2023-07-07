@@ -111,6 +111,10 @@ impl PyTranslationOptions {
     fn use_backend_v2(&mut self) {
         self.0.use_backend_v2()
     }
+
+    fn __repr__(&self) -> String {
+        format!("{:?}", self.0)
+    }
 }
 
 /// The result of a call to [`translate`] which provides information about the

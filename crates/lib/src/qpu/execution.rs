@@ -18,7 +18,9 @@ use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
 use crate::{ExecutionData, JobHandle};
 
-use super::api::{retrieve_results, submit, JobTarget};
+use super::api::{
+    retrieve_results, submit, ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
+};
 use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
@@ -57,6 +59,8 @@ pub(crate) enum Error {
     RewriteArithmetic(#[from] rewrite_arithmetic::Error),
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
+    #[error("Problem making a request to the QPU: {0}")]
+    QpuApiError(#[from] super::api::QpuApiError),
 }
 
 impl From<quilc::Error> for Error {
@@ -184,13 +188,18 @@ impl<'a> Execution<'a> {
         &mut self,
         params: &Parameters,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
-        let job_target = JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string());
-        self.submit_to_target(params, job_target, translation_options)
-            .await
+        self.submit_to_target(
+            params,
+            Some(&self.quantum_processor_id.clone()),
+            translation_options,
+            execution_options,
+        )
+        .await
     }
 
     /// Run on specific QCS endpoint and wait for the results.
@@ -203,16 +212,26 @@ impl<'a> Execution<'a> {
     where
         S: Into<Cow<'a, str>>,
     {
-        let job_target = JobTarget::EndpointId(endpoint_id.into().to_string());
-        self.submit_to_target(params, job_target, translation_options)
-            .await
+        self.submit_to_target(
+            params,
+            None,
+            translation_options,
+            &ExecutionOptionsBuilder::default()
+                .connection_strategy(ConnectionStrategy::EndpointId(
+                    endpoint_id.into().to_string(),
+                ))
+                .build()
+                .expect("valid execution options"),
+        )
+        .await
     }
 
     async fn submit_to_target(
         &mut self,
         params: &Parameters,
-        job_target: JobTarget,
+        quantum_processor_id: Option<&str>,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'a>, Error> {
         let EncryptedTranslationResult { job, readout_map } =
             self.translate(translation_options).await?;
@@ -221,18 +240,26 @@ impl<'a> Execution<'a> {
             .get_substitutions(params)
             .map_err(Error::Substitution)?;
 
-        let job_id = submit(&job_target, job, &patch_values, self.client.as_ref()).await?;
+        let job_id = submit(
+            quantum_processor_id,
+            job,
+            &patch_values,
+            self.client.as_ref(),
+            execution_options,
+        )
+        .await?;
 
-        let endpoint_id = match job_target {
-            JobTarget::EndpointId(endpoint_id) => Some(endpoint_id),
-            JobTarget::QuantumProcessorId(_) => None,
+        let endpoint_id = match execution_options.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(endpoint_id),
+            _ => None,
         };
 
         Ok(JobHandle::new(
             job_id,
             self.quantum_processor_id.to_string(),
-            endpoint_id,
+            endpoint_id.cloned(),
             readout_map,
+            execution_options.clone(),
         ))
     }
 
@@ -250,8 +277,9 @@ impl<'a> Execution<'a> {
 
         let response = retrieve_results(
             job_handle.job_id(),
-            &job_handle.job_target(),
+            Some(job_handle.quantum_processor_id()),
             self.client.as_ref(),
+            job_handle.execution_options(),
         )
         .await?;
 
