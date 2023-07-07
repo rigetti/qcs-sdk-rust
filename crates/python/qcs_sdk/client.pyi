@@ -34,13 +34,11 @@ class QCSClient:
     @staticmethod
     def load(
         profile_name: Optional[str] = None,
-        use_gateway: Optional[bool] = None,
     ) -> "QCSClient":
         """
         Create a ``QCSClient`` configuration using an environment-based configuration.
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
-        :param use_gateway: When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.
 
         :raises LoadClientError: If there is an issue loading the profile defails from the environment.
 
@@ -50,14 +48,12 @@ class QCSClient:
     @staticmethod
     async def load_async(
         profile_name: Optional[str] = None,
-        use_gateway: Optional[bool] = None,
     ) -> "QCSClient":
         """
         Create a ``QCSClient`` configuration using an environment-based configuration.
         (async analog of ``QCSClient.load``)
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
-        :param use_gateway: When enabled, default to Gateway service for execution. Fallback to QPU's default endpoint otherwise.
 
         :raises LoadClientError: If there is an issue loading the profile defails from the environment.
 

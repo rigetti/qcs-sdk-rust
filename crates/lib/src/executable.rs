@@ -13,7 +13,7 @@ use qcs_api_client_grpc::services::translation::TranslationOptions;
 use crate::client::Qcs;
 use crate::compiler::quilc::CompilerOpts;
 use crate::execution_data::{self, ResultData};
-use crate::qpu::api::{JobId, JobTarget};
+use crate::qpu::api::{ExecutionOptions, JobId};
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
 use crate::qvm::api::AddressRequest;
@@ -451,9 +451,14 @@ impl<'execution> Executable<'_, 'execution> {
     /// Compile the program and execute it on a QCS endpoint, waiting for results.
     ///
     /// # Arguments
-    /// 1. `quantum_processor_id`: The name of the QPU to translate the program for on.
+    /// 1. `quantum_processor_id`: The ID of the QPU for which to translate the program.
     ///     This parameter affects the lifetime of the [`Executable`].
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
+    ///    the program in translated.
+    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///       overrides the `quantum_processor_id` parameter.
     ///
     /// # Warning
     ///
@@ -478,6 +483,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
@@ -492,7 +498,7 @@ impl<'execution> Executable<'_, 'execution> {
         );
 
         let job_handle = self
-            .submit_to_qpu(quantum_processor_id, translation_options)
+            .submit_to_qpu(quantum_processor_id, translation_options, execution_options)
             .await?;
         self.retrieve_results(job_handle).await
     }
@@ -502,6 +508,16 @@ impl<'execution> Executable<'_, 'execution> {
     /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
     /// results.
     ///
+    /// # Arguments
+    /// 1. `quantum_processor_id`: The ID of the QPU for which to translate the program.
+    ///     This parameter affects the lifetime of the [`Executable`].
+    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
+    ///    the program in translated.
+    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///       overrides the `quantum_processor_id` parameter.
+    ///
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
@@ -509,6 +525,7 @@ impl<'execution> Executable<'_, 'execution> {
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -525,7 +542,7 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit(&self.params, translation_options)
+            .submit(&self.params, translation_options, execution_options)
             .await?;
         Ok(job_handle)
     }
@@ -585,9 +602,9 @@ pub enum Error {
     /// QPU.
     #[error("Could not authenticate a request to QCS for the requested QPU.")]
     Authentication,
-    /// The requested QPU was not found. Either the QPU does not exist or you do not have access to it.
-    #[error("The requested QPU was not found.")]
-    QpuNotFound,
+    /// An API error occurred while connecting to the QPU.
+    #[error("An API error occurred while connecting to the QPU: {0}")]
+    QpuApiError(#[from] qpu::api::QpuApiError),
     /// This happens when the QPU is down for maintenance and not accepting new jobs. If you receive
     /// this error, internal compilation caches will have been cleared as programs should be recompiled
     /// with new settings after a maintenance window. If you are mid-experiment, you might want to
@@ -672,6 +689,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
             ExecutionError::Substitution(message) => Self::Substitution(message),
+            ExecutionError::QpuApiError(e) => Self::QpuApiError(e),
         }
     }
 }
@@ -699,6 +717,7 @@ pub struct JobHandle<'executable> {
     quantum_processor_id: Cow<'executable, str>,
     endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
+    execution_options: ExecutionOptions,
 }
 
 impl<'a> JobHandle<'a> {
@@ -708,6 +727,7 @@ impl<'a> JobHandle<'a> {
         quantum_processor_id: S,
         endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
+        execution_options: ExecutionOptions,
     ) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -717,6 +737,7 @@ impl<'a> JobHandle<'a> {
             quantum_processor_id: quantum_processor_id.into(),
             endpoint_id: endpoint_id.map(Into::into),
             readout_map,
+            execution_options,
         }
     }
 
@@ -726,13 +747,10 @@ impl<'a> JobHandle<'a> {
         self.job_id.clone()
     }
 
-    /// The execution target of the QCS Job, either the quantum processor or an expicit endpoint.
+    /// The ID of the quantum processor to which the job was submitted.
     #[must_use]
-    pub fn job_target(&self) -> JobTarget {
-        self.endpoint_id.as_ref().map_or_else(
-            || JobTarget::QuantumProcessorId(self.quantum_processor_id.to_string()),
-            |endpoint_id| JobTarget::EndpointId(endpoint_id.to_string()),
-        )
+    pub fn quantum_processor_id(&self) -> &str {
+        &self.quantum_processor_id
     }
 
     /// The readout map from source readout memory locations to the
@@ -740,6 +758,12 @@ impl<'a> JobHandle<'a> {
     #[must_use]
     pub fn readout_map(&self) -> &HashMap<String, String> {
         &self.readout_map
+    }
+
+    /// The [`ExecutionOptions`] used to submit the job to the QPU.
+    #[must_use]
+    pub fn execution_options(&self) -> &ExecutionOptions {
+        &self.execution_options
     }
 }
 

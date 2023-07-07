@@ -3,17 +3,16 @@ use std::collections::HashMap;
 
 use numpy::Complex32;
 use pyo3::{
-    exceptions::PyRuntimeError,
-    pyclass, pyfunction,
+    exceptions::{PyRuntimeError, PyValueError},
+    pyclass, pyfunction, pymethods,
     types::{PyComplex, PyInt},
     Py, PyResult,
 };
-use qcs::client::GrpcClientError;
-use qcs::qpu::api::JobTarget;
+use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
 use rigetti_pyo3::{
-    create_init_submodule, num_complex, py_wrap_error, py_wrap_union_enum, wrap_error,
-    ToPythonError,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
+    py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -24,7 +23,10 @@ create_init_submodule! {
     classes: [
         PyRegister,
         ExecutionResult,
-        ExecutionResults
+        ExecutionResults,
+        PyConnectionStrategy,
+        PyExecutionOptions,
+        PyExecutionOptionsBuilder
     ],
     errors: [
         SubmissionError,
@@ -41,9 +43,9 @@ create_init_submodule! {
 /// Errors that may occur when submitting a program for execution
 #[derive(Debug, thiserror::Error)]
 enum RustSubmissionError {
-    /// Failed a gRPC API call
-    #[error("Failed a gRPC call: {0}")]
-    GrpcError(#[from] GrpcClientError),
+    /// An API error occurred
+    #[error("An API error occurred: {0}")]
+    QpuApiError(#[from] qcs::qpu::api::QpuApiError),
 
     /// Job could not be deserialized
     #[error("Failed to deserialize job: {0}")]
@@ -65,9 +67,9 @@ py_function_sync_async! {
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
-        quantum_processor_id: String,
+        quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
-        endpoint_id: Option<String>,
+        execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
@@ -84,9 +86,7 @@ py_function_sync_async! {
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
-        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
-
-        let job_id = qcs::qpu::api::submit(&job_target, job, &patch_values, &client).await
+        let job_id = qcs::qpu::api::submit(quantum_processor_id.as_deref(), job, &patch_values, &client, execution_options.unwrap_or_default().as_inner()).await
             .map_err(RustSubmissionError::from)
             .map_err(RustSubmissionError::to_py_err)?;
 
@@ -94,7 +94,7 @@ py_function_sync_async! {
     }
 }
 
-wrap_error!(RustRetrieveResultsError(GrpcClientError));
+wrap_error!(RustRetrieveResultsError(qcs::qpu::api::QpuApiError));
 py_wrap_error!(
     runner,
     RustRetrieveResultsError,
@@ -185,19 +185,100 @@ py_function_sync_async! {
     #[pyfunction(client = "None", endpoint_id = "None")]
     async fn retrieve_results(
         job_id: String,
-        quantum_processor_id: String,
+        quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
-        endpoint_id: Option<String>,
+        execution_options: Option<PyExecutionOptions>
     ) -> PyResult<ExecutionResults> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
-        let job_target = endpoint_id.map_or_else(|| JobTarget::QuantumProcessorId(quantum_processor_id), JobTarget::EndpointId);
-
-        let results = qcs::qpu::api::retrieve_results(job_id.into(), &job_target, &client)
+        let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id.as_deref(), &client, execution_options.unwrap_or_default().as_inner())
             .await
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;
 
         Ok(results.into())
+    }
+}
+
+py_wrap_type! {
+    #[derive(Debug, Default)]
+    PyExecutionOptions(ExecutionOptions) as "ExecutionOptions"
+}
+impl_repr!(PyExecutionOptions);
+impl_as_mut_for_wrapper!(PyExecutionOptions);
+
+#[pymethods]
+impl PyExecutionOptions {
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ExecutionOptions::default())
+    }
+}
+
+py_wrap_type! {
+    PyExecutionOptionsBuilder(ExecutionOptionsBuilder) as "ExecutionOptionsBuilder"
+}
+
+#[pymethods]
+impl PyExecutionOptionsBuilder {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ExecutionOptionsBuilder::default())
+    }
+
+    #[setter]
+    fn connection_strategy(&mut self, connection_strategy: PyConnectionStrategy) {
+        // `derive_builder::Builder` doesn't implement AsMut, meaning we can't use `PyWrapperMut`,
+        // which forces us into this awkward clone.
+
+        *self = Self::from(
+            self.as_inner()
+                .clone()
+                .connection_strategy(connection_strategy.as_inner().clone())
+                .clone(),
+        );
+    }
+
+    fn build(&self) -> PyResult<PyExecutionOptions> {
+        Ok(PyExecutionOptions::from(
+            self.as_inner()
+                .build()
+                .map_err(|err| PyValueError::new_err(err.to_string()))?,
+        ))
+    }
+}
+
+py_wrap_type! {
+    #[derive(Default)]
+    PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
+}
+impl_repr!(PyConnectionStrategy);
+
+#[pymethods]
+impl PyConnectionStrategy {
+    #[staticmethod]
+    #[pyo3(name = "default")]
+    fn py_default() -> Self {
+        Self::default()
+    }
+
+    #[staticmethod]
+    fn gateway() -> Self {
+        Self(ConnectionStrategy::Gateway)
+    }
+
+    #[staticmethod]
+    fn direct_access() -> Self {
+        Self(ConnectionStrategy::DirectAccess)
+    }
+
+    #[staticmethod]
+    fn endpoint_id(endpoint_id: String) -> PyResult<Self> {
+        Ok(Self(ConnectionStrategy::EndpointId(endpoint_id)))
     }
 }
