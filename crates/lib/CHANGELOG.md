@@ -1,3 +1,9 @@
+## 0.15.0-rc.1
+
+### Breaking Changes
+
+- `submit` and `retrieve_results` now take an `ExecutionOptions` parameter for configuring the request. The contained `ConnectionStrategy` option is now used instead of setting `use_gateway` on the `QCSClient`
+
 ## 0.15.0-rc.0
 
 ### Breaking Changes
