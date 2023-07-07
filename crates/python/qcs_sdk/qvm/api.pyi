@@ -171,13 +171,17 @@ class MultishotMeasureRequest:
     def rng_seed(self, value: Optional[int]): ...
 
 def run_and_measure(
-    request: MultishotMeasureRequest, client: Optional[QCSClient] = None
+    request: MultishotMeasureRequest,
+    client: Optional[QCSClient] = None,
+    options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
 
 def run_and_measure_async(
-    request: MultishotMeasureRequest, client: Optional[QCSClient] = None
+    request: MultishotMeasureRequest,
+    client: Optional[QCSClient] = None,
+    options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
     ...
