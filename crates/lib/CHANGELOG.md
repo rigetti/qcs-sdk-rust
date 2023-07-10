@@ -1,3 +1,9 @@
+## 0.15.1-rc.0
+
+### Fixes
+
+- The MissingQubitBenchmark error has been demoted to a warning. (#322)
+
 ## 0.15.0
 
 ### Breaking Changes
