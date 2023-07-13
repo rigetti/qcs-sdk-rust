@@ -102,7 +102,7 @@ pub async fn submit(
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
-        target: Some(execution_options.get_job_target(quantum_processor_id)?),
+        target: execution_options.get_job_target(quantum_processor_id),
     };
 
     let mut controller_client = execution_options
@@ -150,7 +150,7 @@ pub async fn retrieve_results(
 
     let request = GetControllerJobResultsRequest {
         job_execution_id: job_id.0,
-        target: Some(execution_options.get_results_target(quantum_processor_id)?),
+        target: execution_options.get_results_target(quantum_processor_id),
     };
 
     let mut controller_client = execution_options
@@ -218,36 +218,28 @@ impl ExecutionOptions {
     fn get_job_target(
         &self,
         quantum_processor_id: Option<&str>,
-    ) -> Result<execute_controller_job_request::Target, QpuApiError> {
+    ) -> Option<execute_controller_job_request::Target> {
         match self.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Ok(
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
             ),
-            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => {
-                Ok(execute_controller_job_request::Target::QuantumProcessorId(
-                    quantum_processor_id
-                        .ok_or(QpuApiError::MissingQpuId)?
-                        .to_string(),
-                ))
-            }
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(execute_controller_job_request::Target::QuantumProcessorId),
         }
     }
 
     fn get_results_target(
         &self,
         quantum_processor_id: Option<&str>,
-    ) -> Result<get_controller_job_results_request::Target, QpuApiError> {
+    ) -> Option<get_controller_job_results_request::Target> {
         match self.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Ok(
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string()),
             ),
-            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => Ok(
-                get_controller_job_results_request::Target::QuantumProcessorId(
-                    quantum_processor_id
-                        .ok_or(QpuApiError::MissingQpuId)?
-                        .to_string(),
-                ),
-            ),
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(get_controller_job_results_request::Target::QuantumProcessorId),
         }
     }
 
