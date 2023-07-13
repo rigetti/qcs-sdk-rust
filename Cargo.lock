@@ -1870,7 +1870,7 @@ dependencies = [
  "hex",
  "indexmap",
  "insta",
- "itertools 0.10.5",
+ "itertools 0.11.0",
  "lazy_static",
  "maplit",
  "ndarray",
