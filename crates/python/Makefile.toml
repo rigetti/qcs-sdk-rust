@@ -52,4 +52,4 @@ dependencies = ["dev-test-flow", "pytest-flow", "stubtest"]
 alias = "dev-flow"
 
 [tasks.ci-flow]
-alias = "dev-flow"
+alias = ["pytest-flow", "stubtest"]
