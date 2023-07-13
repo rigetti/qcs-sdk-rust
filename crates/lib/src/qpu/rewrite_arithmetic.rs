@@ -54,21 +54,18 @@ pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), 
     tracing::debug!("rewriting arithmetic");
 
     let mut substitutions = Substitutions::new();
-    let Program {
-        calibrations,
-        frames,
-        mut memory_regions,
-        waveforms,
-        instructions,
-    } = program;
+    let mut new_program = program.clone_without_body_instructions();
+    let instructions = program.into_body_instructions();
 
     let instructions = instructions
         .into_iter()
-        .map(|instruction| process_instruction(instruction, &mut substitutions, &frames))
+        .map(|instruction| {
+            process_instruction(instruction, &mut substitutions, &new_program.frames)
+        })
         .collect::<Result<Vec<Instruction>, Error>>()?;
 
     if !substitutions.is_empty() {
-        memory_regions.insert(
+        new_program.memory_regions.insert(
             String::from(SUBSTITUTION_NAME),
             MemoryRegion {
                 size: Vector {
@@ -80,16 +77,9 @@ pub fn rewrite_arithmetic(program: Program) -> Result<(Program, Substitutions), 
         );
     }
 
-    Ok((
-        Program {
-            calibrations,
-            frames,
-            memory_regions,
-            waveforms,
-            instructions,
-        },
-        substitutions,
-    ))
+    new_program.add_instructions(instructions);
+
+    Ok((new_program, substitutions))
 }
 
 /// Take the user-provided map of [`Parameters`] and produce the map of substitutions which
