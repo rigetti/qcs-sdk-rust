@@ -148,7 +148,7 @@ pub fn apply_parameters_to_program(
                     })
                 })
             })
-            .chain(program.to_body_instructions().iter().cloned())
+            .chain(program.body_instructions().iter().cloned())
             .collect::<Vec<_>>(),
     );
 
