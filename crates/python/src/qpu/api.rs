@@ -1,5 +1,6 @@
 //! Running programs on a QPU.
 use std::collections::HashMap;
+use std::time::Duration;
 
 use numpy::Complex32;
 use pyo3::{
@@ -252,12 +253,7 @@ impl PyExecutionOptionsBuilder {
     #[setter]
     fn timeout_seconds(&mut self, timeout_seconds: Option<u64>) {
         let timeout = timeout_seconds.map(Duration::from_secs);
-        *self = Self::from(
-            self.as_inner()
-                .clone()
-                .timeout_seconds(connection_strategy.as_inner().clone())
-                .clone(),
-        );
+        *self = Self::from(self.as_inner().clone().timeout(timeout).clone());
     }
 
     fn build(&self) -> PyResult<PyExecutionOptions> {
