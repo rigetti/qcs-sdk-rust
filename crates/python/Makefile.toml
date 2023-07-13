@@ -31,11 +31,11 @@ args = ["run", "pytest", "tests", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.pytest-flow]
 dependencies = [
-    "pre-test-docker-up",
-    "poetry-install",
-    "install-lib",
-    "test",
-    "post-test",
+  "pre-test-docker-up",
+  "poetry-install",
+  "install-lib",
+  "test",
+  "post-test",
 ]
 
 [tasks.stubtest]
@@ -43,14 +43,13 @@ command = "poetry"
 args = ["run", "stubtest", "--allowlist", ".stubtest-allowlist", "qcs_sdk"]
 
 [tasks.stubtest-flow]
-dependencies = [
-    "poetry-install",
-    "install-lib",
-    "stubtest",
-]
+dependencies = ["poetry-install", "install-lib", "stubtest"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest"]
 
 [tasks.default]
+alias = "dev-flow"
+
+[tasks.ci-flow]
 alias = "dev-flow"
