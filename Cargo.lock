@@ -1800,7 +1800,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.15.0"
+version = "0.15.1-rc.0"
 dependencies = [
  "derive_builder",
  "dirs",
@@ -1924,7 +1924,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.10.0"
+version = "0.10.1-rc.0"
 dependencies = [
  "numpy",
  "once_cell",

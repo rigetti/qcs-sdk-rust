@@ -51,9 +51,7 @@ impl Qubit {
     /// # Errors
     /// 1. `randomized_benchmark_simultaneous_1q` was not present in `benchmarks`: this is necessary
     ///     for RX and RZ gates.
-    /// 2. The `randomized_benchmark_simultaneous_1q` benchmark did not contain data for a Qubit
-    ///     which has a defined RX or RZ gate.
-    /// 3. An unknown `op_name` was provided.
+    /// 2. An unknown `op_name` was provided.
     pub(crate) fn add_operation(
         &mut self,
         op_name: &str,
@@ -170,8 +168,18 @@ impl FrbSim1q {
 const DEFAULT_DURATION_RX: f64 = 50.0;
 
 fn rx_gates(node_id: i64, frb_sim_1q: &FrbSim1q) -> Result<Vec<Operator>, Error> {
-    let fidelity = frb_sim_1q.fidelity_for_qubit(node_id)?;
-
+    let fidelity = frb_sim_1q
+        .fidelity_for_qubit(node_id)
+        .or_else(|e| match e {
+            // Prevents compilation error when building without the `tracing` feature flag
+            #[allow(unused_variables)]
+            error @ Error::MissingBenchmarkForQubit(_) => {
+                #[cfg(feature = "tracing")]
+                tracing::warn!(%error);
+                Ok(0.0)
+            }
+            _ => Err(e),
+        })?;
     let mut gates = Vec::with_capacity(5);
     let operator = "RX".to_string();
     gates.push(Operator::Gate {
@@ -227,7 +235,7 @@ mod describe_rx_gates {
                 parameter_values: None,
             },
         ]);
-        let gates = rx_gates(node_id, &frb_sim_1q).expect("Failed to create RX gates");
+        let gates = rx_gates(node_id, &frb_sim_1q).expect("Should create RX gates");
         let expected = vec![
             Operator::Gate {
                 arguments: vec![Argument::Int(1)],
@@ -261,6 +269,50 @@ mod describe_rx_gates {
                 arguments: vec![Argument::Int(1)],
                 duration: 50.0,
                 fidelity: 0.996_832_6,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-FRAC_PI_2)],
+            },
+        ];
+        assert_eq!(gates, expected);
+    }
+
+    #[test]
+    fn it_defaults_to_0_for_missing_benchmark() {
+        let frb_sim_1q = FrbSim1q(Vec::new());
+        let gates = rx_gates(1, &frb_sim_1q).expect("should not error for missing benchmark");
+        let expected = vec![
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 1.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(0.0)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(PI)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(-PI)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
+                operator: "RX".to_string(),
+                parameters: vec![Parameter::Float(FRAC_PI_2)],
+            },
+            Operator::Gate {
+                arguments: vec![Argument::Int(1)],
+                duration: 50.0,
+                fidelity: 0.0,
                 operator: "RX".to_string(),
                 parameters: vec![Parameter::Float(-FRAC_PI_2)],
             },
