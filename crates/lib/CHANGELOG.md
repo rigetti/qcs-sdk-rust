@@ -1,3 +1,13 @@
+## 0.15.1
+
+### Features
+
+- Add timeout to `ExecutionOptions` builder (#323)
+
+### Fixes
+
+- The MissingQubitBenchmark error has been demoted to a warning. (#322)
+
 ## 0.15.1-rc.1
 
 ### Features
