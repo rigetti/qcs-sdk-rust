@@ -46,7 +46,7 @@ args = ["run", "stubtest", "--allowlist", ".stubtest-allowlist", "qcs_sdk"]
 dependencies = [
     "poetry-install",
     "install-lib",
-    "stubtest"
+    "stubtest",
 ]
 
 [tasks.dev-flow]
