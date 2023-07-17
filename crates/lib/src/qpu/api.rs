@@ -1,14 +1,14 @@
 //! This module provides bindings to for submitting jobs to and retrieving them from
 //! Rigetti QPUs using the QCS API.
 
-use std::fmt;
+use std::{fmt, time::Duration};
 
 use derive_builder::Builder;
 use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
     channel::{parse_uri, wrap_channel_with, RefreshService},
-    get_channel,
+    get_channel_with_timeout,
     models::controller::{
         data_value::Value, ControllerJobExecutionResult, DataValue, EncryptedControllerJob,
         JobExecutionConfiguration, RealDataValue,
@@ -102,15 +102,10 @@ pub async fn submit(
     let request = ExecuteControllerJobRequest {
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
-        target: Some(
-            execution_options
-                .connection_strategy
-                .get_job_target(quantum_processor_id)?,
-        ),
+        target: execution_options.get_job_target(quantum_processor_id),
     };
 
     let mut controller_client = execution_options
-        .connection_strategy
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
@@ -155,15 +150,10 @@ pub async fn retrieve_results(
 
     let request = GetControllerJobResultsRequest {
         job_execution_id: job_id.0,
-        target: Some(
-            execution_options
-                .connection_strategy
-                .get_results_target(quantum_processor_id)?,
-        ),
+        target: execution_options.get_results_target(quantum_processor_id),
     };
 
     let mut controller_client = execution_options
-        .connection_strategy
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
@@ -184,6 +174,9 @@ pub async fn retrieve_results(
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     connection_strategy: ConnectionStrategy,
+    #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
+    #[builder(default = "Some(Duration::from_secs(30))")]
+    timeout: Option<Duration>,
 }
 
 impl ExecutionOptions {
@@ -193,10 +186,16 @@ impl ExecutionOptions {
         ExecutionOptionsBuilder::default()
     }
 
-    /// Get the [`ConnectionStrategy`]
+    /// Get the [`ConnectionStrategy`].
     #[must_use]
     pub fn connection_strategy(&self) -> &ConnectionStrategy {
         &self.connection_strategy
+    }
+
+    /// Get the timeout.
+    #[must_use]
+    pub fn timeout(&self) -> Option<Duration> {
+        self.timeout
     }
 }
 
@@ -213,42 +212,34 @@ pub enum ConnectionStrategy {
     EndpointId(String),
 }
 
-/// Methods that help select the right controller service client given a quantum processor ID and
-/// [`ConnectionStrategy`].
-impl ConnectionStrategy {
+/// Methods that help select and configure a controller service client given a set of
+/// [`ExecutionOptions`] and QPU ID.
+impl ExecutionOptions {
     fn get_job_target(
         &self,
         quantum_processor_id: Option<&str>,
-    ) -> Result<execute_controller_job_request::Target, QpuApiError> {
-        match self {
-            Self::EndpointId(endpoint_id) => Ok(
+    ) -> Option<execute_controller_job_request::Target> {
+        match self.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
             ),
-            Self::Gateway | Self::DirectAccess => {
-                Ok(execute_controller_job_request::Target::QuantumProcessorId(
-                    quantum_processor_id
-                        .ok_or(QpuApiError::MissingQpuId)?
-                        .to_string(),
-                ))
-            }
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(execute_controller_job_request::Target::QuantumProcessorId),
         }
     }
 
     fn get_results_target(
         &self,
         quantum_processor_id: Option<&str>,
-    ) -> Result<get_controller_job_results_request::Target, QpuApiError> {
-        match self {
-            Self::EndpointId(endpoint_id) => Ok(
+    ) -> Option<get_controller_job_results_request::Target> {
+        match self.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string()),
             ),
-            Self::Gateway | Self::DirectAccess => Ok(
-                get_controller_job_results_request::Target::QuantumProcessorId(
-                    quantum_processor_id
-                        .ok_or(QpuApiError::MissingQpuId)?
-                        .to_string(),
-                ),
-            ),
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(get_controller_job_results_request::Target::QuantumProcessorId),
         }
     }
 
@@ -257,22 +248,22 @@ impl ConnectionStrategy {
         client: &Qcs,
         quantum_processor_id: Option<&str>,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
-        let address = match self {
-            Self::EndpointId(endpoint_id) => {
+        let address = match self.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => {
                 let endpoint = get_endpoint(&client.get_openapi_client(), endpoint_id).await?;
                 endpoint
                     .addresses
                     .grpc
                     .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?
             }
-            Self::Gateway => {
+            ConnectionStrategy::Gateway => {
                 self.get_gateway_address(
                     quantum_processor_id.ok_or(QpuApiError::MissingQpuId)?,
                     client,
                 )
                 .await?
             }
-            Self::DirectAccess => {
+            ConnectionStrategy::DirectAccess => {
                 self.get_default_endpoint_address(
                     quantum_processor_id.ok_or(QpuApiError::MissingQpuId)?,
                     client,
@@ -280,15 +271,17 @@ impl ConnectionStrategy {
                 .await?
             }
         };
-        Self::grpc_address_to_client(&address, client)
+        self.grpc_address_to_client(&address, client)
     }
 
     fn grpc_address_to_client(
+        &self,
         address: &str,
         client: &Qcs,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
-        let channel = get_channel(uri).map_err(|err| QpuApiError::GrpcError(err.into()))?;
+        let channel = get_channel_with_timeout(uri, self.timeout())
+            .map_err(|err| QpuApiError::GrpcError(err.into()))?;
         let service = wrap_channel_with(channel, client.get_config().clone());
         Ok(ControllerClient::new(service)
             .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
