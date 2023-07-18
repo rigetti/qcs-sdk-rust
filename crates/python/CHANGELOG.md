@@ -1,3 +1,9 @@
+## 0.10.2-rc.1
+
+### Fixes
+
+- add missing typehints for ExecutionOptions and ExecutionOptionsBuilder
+
 ## 0.10.2-rc.0
 
 ### Fixes
