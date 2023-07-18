@@ -14,7 +14,7 @@ tokio = "1.24.2"
 # be a `quil-py` tag and should match the version used in `crates/python/pyproject.toml`
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.17.0", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.1.1" }
+quil-rs = { version = "0.19.0", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.3.0" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
