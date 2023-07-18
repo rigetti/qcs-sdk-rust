@@ -115,7 +115,7 @@ pub fn apply_parameters_to_program(
     program: &Program,
     params: &Parameters,
 ) -> Result<Program, Error> {
-    let mut program = program.clone();
+    let mut new_program = program.clone_without_body_instructions();
 
     params.iter().try_for_each(|(name, values)| {
         match program.memory_regions.get(name.as_ref()) {
@@ -134,23 +134,25 @@ pub fn apply_parameters_to_program(
         }
     })?;
 
-    program.instructions = params
-        .iter()
-        .flat_map(|(name, values)| {
-            values.iter().enumerate().map(move |(index, value)| {
-                Instruction::Move(Move {
-                    destination: MemoryReference {
-                        name: name.to_string(),
-                        index: index as u64,
-                    },
-                    source: ArithmeticOperand::LiteralReal(*value),
+    new_program.add_instructions(
+        params
+            .iter()
+            .flat_map(|(name, values)| {
+                values.iter().enumerate().map(move |(index, value)| {
+                    Instruction::Move(Move {
+                        destination: MemoryReference {
+                            name: name.to_string(),
+                            index: index as u64,
+                        },
+                        source: ArithmeticOperand::LiteralReal(*value),
+                    })
                 })
             })
-        })
-        .chain(program.instructions)
-        .collect();
+            .chain(program.body_instructions().cloned())
+            .collect::<Vec<_>>(),
+    );
 
-    Ok(program)
+    Ok(new_program)
 }
 
 /// Options avaialable for running programs on the QVM.
