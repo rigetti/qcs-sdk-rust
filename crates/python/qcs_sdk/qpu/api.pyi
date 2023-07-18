@@ -176,6 +176,9 @@ class ExecutionOptions:
     def default() -> ExecutionOptions:
         """Return ExecutionOptions with a reasonable set of defaults."""
         ...
+    @staticmethod
+    def builder() -> ExecutionOptionsBuilder:
+        """Get an ``ExecutionOptionsBuilder`` that can be used to build a custom set of ``ExecutionOptions``"""
 
 @final
 class ExecutionOptionsBuilder:
@@ -193,6 +196,12 @@ class ExecutionOptionsBuilder:
     @connection_strategy.setter
     def connection_strategy(self, connection_strategy: ConnectionStrategy):
         """Set the ``ConnectionStrategy`` used to establish a connection to the QPU."""
+    @property
+    def timeout_seconds(self):
+        raise AttributeError("timeout_seconds is not readable")
+    @timeout_seconds.setter
+    def timeout_seconds(self, timeout_seconds: Optional[int]):
+        """Set the number of seconds to wait before timing out. If set to `None` there is no timeout."""
     def build(self) -> ExecutionOptions:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
 
