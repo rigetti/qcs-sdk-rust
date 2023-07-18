@@ -219,6 +219,18 @@ impl PyExecutionOptions {
     fn builder() -> PyExecutionOptionsBuilder {
         PyExecutionOptionsBuilder::default()
     }
+
+    #[getter]
+    fn connection_strategy(&self) -> PyConnectionStrategy {
+        PyConnectionStrategy(self.as_inner().connection_strategy().clone())
+    }
+
+    #[getter]
+    fn timeout_seconds(&self) -> Option<f64> {
+        self.as_inner()
+            .timeout()
+            .map(|timeout| timeout.as_secs_f64())
+    }
 }
 
 py_wrap_type! {
@@ -251,8 +263,8 @@ impl PyExecutionOptionsBuilder {
     }
 
     #[setter]
-    fn timeout_seconds(&mut self, timeout_seconds: Option<u64>) {
-        let timeout = timeout_seconds.map(Duration::from_secs);
+    fn timeout_seconds(&mut self, timeout_seconds: Option<f64>) {
+        let timeout = timeout_seconds.map(Duration::from_secs_f64);
         *self = Self::from(self.as_inner().clone().timeout(timeout).clone());
     }
 
