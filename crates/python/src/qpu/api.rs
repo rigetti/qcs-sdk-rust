@@ -5,9 +5,11 @@ use std::time::Duration;
 use numpy::Complex32;
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
-    pyclass, pyfunction, pymethods,
+    pyclass,
+    pyclass::CompareOp,
+    pyfunction, pymethods,
     types::{PyComplex, PyInt},
-    Py, PyResult,
+    IntoPy, Py, PyObject, PyResult, Python,
 };
 use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
 use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
@@ -231,6 +233,13 @@ impl PyExecutionOptions {
             .timeout()
             .map(|timeout| timeout.as_secs_f64())
     }
+
+    fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {
+        match op {
+            CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
+            _ => py.NotImplemented(),
+        }
+    }
 }
 
 py_wrap_type! {
@@ -304,5 +313,12 @@ impl PyConnectionStrategy {
     #[staticmethod]
     fn endpoint_id(endpoint_id: String) -> PyResult<Self> {
         Ok(Self(ConnectionStrategy::EndpointId(endpoint_id)))
+    }
+
+    fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {
+        match op {
+            CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
+            _ => py.NotImplemented(),
+        }
     }
 }

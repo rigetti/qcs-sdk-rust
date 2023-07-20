@@ -173,6 +173,7 @@ pub async fn retrieve_results(
 #[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
+    #[builder(default)]
     connection_strategy: ConnectionStrategy,
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
