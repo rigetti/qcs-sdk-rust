@@ -1,3 +1,9 @@
+## 0.10.3
+
+### Features
+
+- Broaden ExecutionOptions timeout_seconds type to float, add getters for properties
+
 ## 0.10.3-rc.1
 
 ### Features
