@@ -291,7 +291,7 @@ mod qpu {
                             },
                         ),
                     ]),
-                    status: 0,
+                    status: 1,
                     status_message: Some("success".to_string()),
                     execution_duration_microseconds: 8675,
                 }),
