@@ -1983,7 +1983,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.10.3-rc.1"
+version = "0.10.3"
 dependencies = [
  "numpy",
  "once_cell",
