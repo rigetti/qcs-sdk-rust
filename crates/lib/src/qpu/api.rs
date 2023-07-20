@@ -157,7 +157,7 @@ pub async fn retrieve_results(
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
-    Ok(controller_client
+    controller_client
         .get_controller_job_results(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
@@ -165,20 +165,19 @@ pub async fn retrieve_results(
         .result
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
         .map_err(QpuApiError::from)
-        .and_then(|result| {
-            match controller_job_execution_result::Status::from_i32(result.status) {
+        .and_then(
+            |result| match controller_job_execution_result::Status::from_i32(result.status) {
                 Some(controller_job_execution_result::Status::Success) => Ok(result),
-                status @ _ => Err(QpuApiError::JobExecutionFailed {
+                status => Err(QpuApiError::JobExecutionFailed {
                     status: status
-                        .map(|status| status.as_str_name())
-                        .unwrap_or("UNDEFINED")
+                        .map_or("UNDEFINED", |status| status.as_str_name())
                         .to_string(),
                     message: result
                         .status_message
                         .unwrap_or("No message provided.".to_string()),
                 }),
-            }
-        })?)
+            },
+        )
 }
 
 /// Options avaialable when executing a job on a QPU.
