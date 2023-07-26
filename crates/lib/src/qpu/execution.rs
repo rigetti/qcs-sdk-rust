@@ -159,8 +159,12 @@ impl<'a> Execution<'a> {
             quil.parse().map_err(Error::Quil)?
         };
 
+        println!("program: {program}");
+        let rewritten = RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?;
+        println!("rewritten: {}", rewritten.to_string().0);
+
         Ok(Self {
-            program: RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?,
+            program: rewritten,
             quantum_processor_id,
             client,
             shots,
