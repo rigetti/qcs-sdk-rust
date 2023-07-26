@@ -1,4 +1,4 @@
-use std::{sync::Mutex, convert::Infallible};
+use std::sync::Mutex;
 
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
@@ -70,8 +70,8 @@ fn reset_logging() {
 }
 
 py_sync::py_function_sync_async! {
-    #[cfg()]
-    async fn gather_diagnostics() -> PyResult<String> {
-        Ok(qcs::diagnostics::gather().await)
+    #[pyfunction]
+    async fn gather_diagnostics() -> String {
+        qcs::diagnostics::get_report().await
     }
 }

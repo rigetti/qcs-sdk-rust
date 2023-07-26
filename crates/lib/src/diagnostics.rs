@@ -8,7 +8,7 @@ use qcs_api_client_openapi::models::User;
 use crate::{build_info, client::Qcs, qvm::QvmOptions};
 
 /// Collect package diagnostics in string form
-pub async fn gather() -> String {
+pub async fn get_report() -> String {
     Diagnostics::gather().await.to_string()
 }
 
