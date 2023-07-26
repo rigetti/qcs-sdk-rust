@@ -43,10 +43,7 @@ impl Diagnostics {
         Self {
             version: build_info::PKG_VERSION.to_owned(),
             rust_version: build_info::RUSTC_VERSION.to_owned(),
-            features: build_info::FEATURES
-                .iter()
-                .map(std::borrow::ToOwned::to_owned)
-                .collect(),
+            features: build_info::FEATURES.to_vec(),
             qcs,
             quilc: QuilcDiagnostics::gather(&client),
             qvm,
