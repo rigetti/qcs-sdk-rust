@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::{sync::Mutex, convert::Infallible};
 
 use pyo3::prelude::*;
 use rigetti_pyo3::create_init_submodule;
@@ -35,7 +35,7 @@ create_init_submodule! {
         ExecutionError,
         RegisterMatrixConversionError
     ],
-    funcs: [ reset_logging ],
+    funcs: [ reset_logging, py_gather_diagnostics, py_gather_diagnostics_async ],
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::init_submodule,
@@ -66,5 +66,12 @@ fn reset_logging() {
         if let Some(handle) = handle.as_ref() {
             handle.reset();
         }
+    }
+}
+
+py_sync::py_function_sync_async! {
+    #[cfg()]
+    async fn gather_diagnostics() -> PyResult<String> {
+        Ok(qcs::diagnostics::gather().await)
     }
 }
