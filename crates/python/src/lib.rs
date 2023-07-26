@@ -71,7 +71,7 @@ fn reset_logging() {
 
 py_sync::py_function_sync_async! {
     #[pyfunction]
-    async fn gather_diagnostics() -> String {
-        qcs::diagnostics::get_report().await
+    async fn gather_diagnostics() -> PyResult<String> {
+        Ok(qcs::diagnostics::get_report().await)
     }
 }
