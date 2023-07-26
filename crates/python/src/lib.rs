@@ -35,7 +35,7 @@ create_init_submodule! {
         ExecutionError,
         RegisterMatrixConversionError
     ],
-    funcs: [ reset_logging, py_gather_diagnostics, py_gather_diagnostics_async ],
+    funcs: [ reset_logging, gather_diagnostics ],
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::init_submodule,
@@ -57,7 +57,8 @@ fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         }
         Err(e) => eprintln!("Failed to initialize the qcs_sdk logger: {e}"),
     }
-    init_submodule("qcs_sdk", py, m)
+    init_submodule("qcs_sdk", py, m)?;
+    m.add("__version__", env!("CARGO_PKG_VERSION"))
 }
 
 #[pyfunction]
@@ -69,43 +70,8 @@ fn reset_logging() {
     }
 }
 
-py_sync::py_function_sync_async! {
-    #[pyfunction]
-    async fn gather_diagnostics() -> PyResult<String> {
-        let mut report = PyDiagnostics::gather().to_string();
-        report.push_str(&qcs::diagnostics::get_report().await);
-        Ok(report)
-    }
-}
-
-struct PyDiagnostics {
-    version: String,
-    python_version: String,
-    python_abi_version: i32,
-    python_api_version: i32,
-}
-
-impl PyDiagnostics {
-    fn gather() -> Self {
-        let mut python_version: String = String::from("");
-        Python::with_gil(|py| {
-            python_version = Python::version(py).to_string();
-        });
-        PyDiagnostics {
-            version: env!("CARGO_PKG_VERSION").to_string(),
-            python_version,
-            python_abi_version: pyo3::ffi::PYTHON_ABI_VERSION,
-            python_api_version: pyo3::ffi::PYTHON_API_VERSION,
-        }
-    }
-}
-
-impl std::fmt::Display for PyDiagnostics {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "qcs-sdk-python version: {}", self.version)?;
-        writeln!(f, "python version: {}", self.python_version)?;
-        writeln!(f, "python_abi_version: {}", self.python_abi_version)?;
-        writeln!(f, "python_api_version: {}", self.python_api_version)?;
-        Ok(())
-    }
+#[pyfunction]
+#[pyo3(name = "_gather_diagnostics")]
+fn gather_diagnostics(py: Python<'_>) -> PyResult<String> {
+    py_sync::py_sync!(py, async { Ok(qcs::diagnostics::get_report().await) })
 }
