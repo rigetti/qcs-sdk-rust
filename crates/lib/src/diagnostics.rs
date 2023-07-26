@@ -53,7 +53,7 @@ impl Diagnostics {
 
 impl std::fmt::Display for Diagnostics {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "package version: {}", self.version)?;
+        writeln!(f, "qcs-sdk-rust version: {}", self.version)?;
         writeln!(f, "rustc version: {}", self.rust_version)?;
         writeln!(f, "features: {}", self.features.join(", "))?;
         writeln!(f, "qcs:")?;
