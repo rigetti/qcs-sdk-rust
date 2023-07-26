@@ -21,4 +21,4 @@ platform: {sys.platform}
 
 
 __doc__ = qcs_sdk.__doc__
-__all__ = qcs_sdk.__all__ + ["gather_diagnostics"]
+__all__ = ["gather_diagnostics"] + getattr(qcs_sdk, "__all__", [])
