@@ -12,7 +12,7 @@ def gather_diagnostics() -> str:
 Python version: {sys.version}
 Python implementation: {sys.implementation.name}
 Python implementation version: {sys.implementation.version.major}.{sys.implementation.version.minor}.{sys.implementation.version.micro}
-Python C api version: {sys.api_version}
+Python C API version: {sys.api_version}
 Python executable: {sys.executable}
 venv prefix: {sys.prefix}
 platform: {sys.platform}
