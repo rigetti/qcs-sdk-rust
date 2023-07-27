@@ -361,8 +361,9 @@ def reset_logging():
     See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
     """
 
-def gather_diagnostics() -> str:
+def get_diagnostics_report() -> str:
     """
-    Gather and return a summary of diagnostics that describe how the package was built and the environment
-    it's running in. Helpful for diagnosing unexpected behavior.
+    Return a string describing the package and its environment for use in bug reporting and diagnosis.
+
+    Note: this format is not stable and its content may change between versions.
     """
