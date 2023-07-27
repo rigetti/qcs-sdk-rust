@@ -1,4 +1,4 @@
-from qcs_sdk import gather_diagnostics
+from qcs_sdk import get_diagnostics_report
 
 
 def test_gather_diagnostics():
