@@ -5,4 +5,4 @@ def test_gather_diagnostics():
     """
     Assert that gathering diagnostics doesn't panic.
     """
-    gather_diagnostics()
+    get_diagnostics_report()
