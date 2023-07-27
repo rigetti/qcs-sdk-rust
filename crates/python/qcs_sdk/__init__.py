@@ -7,7 +7,12 @@ import sys
 from .qcs_sdk import *
 
 
-def gather_diagnostics() -> str:
+def get_diagnostics_report() -> str:
+    """
+    Return a string describing the package and its environment for use in bug reporting and diagnosis.
+    
+    Note: this format is not stable and its content may change between versions.
+    """
     return f"""qcs-sdk-python version: {__version__}
 Python version: {sys.version}
 Python implementation: {sys.implementation.name}
