@@ -57,6 +57,12 @@ macro_rules! py_async {
 /// named after it that can be used to invoke either
 /// blocking or async variants of the same function.
 ///
+/// In order to export the function to Python using pyo3
+/// you must include the `#[pyfunction]` attribute. This
+/// isn't included in the macro by default since one may
+/// wish to annotate `#[pyfunction]` with additional
+/// arguments.
+///
 /// The given function will be spawned on a Rust event loop
 /// this means functions like [`pyo3::Python::with_gil`]
 /// should not be used, as acquiring Python's global
@@ -78,6 +84,7 @@ macro_rules! py_async {
 /// }
 ///
 /// py_function_sync_async! {
+///     #[pyfunction]
 ///     #[args(timeout = "None")]
 ///     async fn do_thing(timeout: Option<u64>) -> PyResult<String> {
 ///         // ... sleep for timeout ...

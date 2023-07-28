@@ -8,7 +8,7 @@
 #![forbid(unsafe_code)]
 #![warn(future_incompatible)]
 #![warn(rust_2018_compatibility, rust_2018_idioms)]
-#![deny(
+#![warn(
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,
     bad_style,
@@ -59,8 +59,14 @@ pub use register_data::RegisterData;
 
 pub mod client;
 pub mod compiler;
+pub mod diagnostics;
 mod executable;
 mod execution_data;
 pub mod qpu;
 pub mod qvm;
 mod register_data;
+
+/// Build information about the crate and environment in which it was built.
+pub mod build_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}

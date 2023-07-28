@@ -35,7 +35,7 @@ create_init_submodule! {
         ExecutionError,
         RegisterMatrixConversionError
     ],
-    funcs: [ reset_logging ],
+    funcs: [ reset_logging, gather_diagnostics ],
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::init_submodule,
@@ -57,7 +57,8 @@ fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         }
         Err(e) => eprintln!("Failed to initialize the qcs_sdk logger: {e}"),
     }
-    init_submodule("qcs_sdk", py, m)
+    init_submodule("qcs_sdk", py, m)?;
+    m.add("__version__", env!("CARGO_PKG_VERSION"))
 }
 
 #[pyfunction]
@@ -67,4 +68,10 @@ fn reset_logging() {
             handle.reset();
         }
     }
+}
+
+#[pyfunction]
+#[pyo3(name = "_gather_diagnostics")]
+fn gather_diagnostics(py: Python<'_>) -> PyResult<String> {
+    py_sync::py_sync!(py, async { Ok(qcs::diagnostics::get_report().await) })
 }
