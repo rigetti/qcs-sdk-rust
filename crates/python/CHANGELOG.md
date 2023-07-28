@@ -1,3 +1,9 @@
+## 0.10.4
+
+### Features
+
+- A new `diagnostics` module has been added. The `get_report` function will print a summary of key diagnostic data to aid in debugging. (#334)
+
 ## 0.10.4-rc.0
 
 ### Features
