@@ -360,10 +360,3 @@ def reset_logging():
 
     See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
     """
-
-def get_diagnostics_report() -> str:
-    """
-    Return a string describing the package and its environment for use in bug reporting and diagnosis.
-
-    Note: this format is not stable and its content may change between versions.
-    """
