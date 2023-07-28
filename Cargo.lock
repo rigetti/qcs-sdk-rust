@@ -2045,8 +2045,8 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.19.0"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.3.0#d359c8b19fb4096aff84653c8c0819e1375f37dc"
+version = "0.20.0"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.4.0#27ba509ae99e1aa18a5c8021ca85944f39094a20"
 dependencies = [
  "approx",
  "egg",
