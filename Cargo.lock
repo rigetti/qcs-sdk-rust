@@ -1896,7 +1896,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.15.3-rc.1"
+version = "0.15.3"
 dependencies = [
  "built",
  "derive_builder",
@@ -2022,7 +2022,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.10.5-rc.1"
+version = "0.10.5"
 dependencies = [
  "numpy",
  "once_cell",

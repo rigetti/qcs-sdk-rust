@@ -1,3 +1,9 @@
+## 0.10.5
+
+### Features
+
+- Update quil-rs to 0.20.0, quil-py to 0.4.0
+
 ## 0.10.5-rc.1
 
 ### Features
