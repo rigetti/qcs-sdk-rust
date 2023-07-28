@@ -3,6 +3,7 @@
 
 use std::{fmt, time::Duration};
 
+use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
@@ -293,38 +294,7 @@ impl ExecutionOptions {
         quantum_processor_id: &str,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
-        let mut min = None;
-        let mut next_page_token = None;
-        loop {
-            let accessors = list_quantum_processor_accessors(
-                &client.get_openapi_client(),
-                quantum_processor_id,
-                Some(100),
-                next_page_token.as_deref(),
-            )
-            .await?;
-
-            let accessor = accessors
-                .accessors
-                .into_iter()
-                .filter(|acc| {
-                    acc.live
-                    // `as_deref` needed to work around the `Option<Box<_>>` type.
-                    && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
-                })
-                .min_by_key(|acc| acc.rank.unwrap_or(i64::MAX));
-
-            min = std::cmp::min_by_key(min, accessor, |acc| {
-                acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
-            });
-
-            next_page_token = accessors.next_page_token.clone();
-            if next_page_token.is_none() {
-                break;
-            }
-        }
-        min.map(|accessor| accessor.url)
-            .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
+        get_accessor(quantum_processor_id, client).await
     }
 
     async fn get_default_endpoint_address(
@@ -340,6 +310,47 @@ impl ExecutionOptions {
             .ok_or_else(|| QpuApiError::QpuEndpointNotFound(quantum_processor_id.into()))
             .cloned()
     }
+}
+
+#[cached(
+    result = true,
+    time = 60,
+    key = "String",
+    convert = r"{ String::from(quantum_processor_id)}"
+)]
+async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String, QpuApiError> {
+    let mut min = None;
+    let mut next_page_token = None;
+    loop {
+        let accessors = list_quantum_processor_accessors(
+            &client.get_openapi_client(),
+            quantum_processor_id,
+            Some(100),
+            next_page_token.as_deref(),
+        )
+        .await?;
+
+        let accessor = accessors
+            .accessors
+            .into_iter()
+            .filter(|acc| {
+                acc.live
+                // `as_deref` needed to work around the `Option<Box<_>>` type.
+                && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
+            })
+            .min_by_key(|acc| acc.rank.unwrap_or(i64::MAX));
+
+        min = std::cmp::min_by_key(min, accessor, |acc| {
+            acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
+        });
+
+        next_page_token = accessors.next_page_token.clone();
+        if next_page_token.is_none() {
+            break;
+        }
+    }
+    min.map(|accessor| accessor.url)
+        .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
 }
 
 /// Errors that can occur while attempting to establish a connection to the QPU.
