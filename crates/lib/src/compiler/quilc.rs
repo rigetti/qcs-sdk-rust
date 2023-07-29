@@ -2,8 +2,10 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
+use std::ffi::CString;
 use std::str::FromStr;
 
+use libquil_sys::{Chip, Program as LibProgram};
 use quil_rs::program::{Program, ProgramError};
 use serde::{Deserialize, Deserializer, Serialize};
 
@@ -47,6 +49,12 @@ pub fn compile_program(
     #[cfg(feature = "tracing")]
     tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
 
+    let program: LibProgram = CString::new(quil).unwrap().into();
+    let isa_str = serde_json::to_string(&isa).unwrap();
+    println!("{}", isa_str);
+    let chip: Chip = CString::new(isa_str).unwrap().into();
+    let compiled = libquil_sys::compile_program(&program, &chip);
+    println!("here: {compiled}");
     let endpoint = client.get_config().quilc_url();
     let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
     let request =
@@ -455,6 +463,7 @@ MEASURE 1 ro[1]
             CompilerOpts::default(),
         )
         .expect("Could not compile");
+        println!("{}", output.program);
         let mut results = crate::qvm::Execution::new(&output.program.to_string())
             .unwrap()
             .run(

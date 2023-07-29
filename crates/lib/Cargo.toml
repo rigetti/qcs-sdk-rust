@@ -46,6 +46,7 @@ itertools = "0.11.0"
 rstest = "0.17.0"
 insta = "1.29.0"
 derive_builder = "0.12.0"
+libquil-sys = { path = "../../../libquil-sys/lib" }
 
 [dev-dependencies]
 erased-serde = "0.3.23"
