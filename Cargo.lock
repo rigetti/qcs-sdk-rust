@@ -1558,12 +1558,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "once"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "60bfe75a40f755f162b794140436c57845cb106fd1467598631c76c6fff08e28"
-
-[[package]]
 name = "once_cell"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1962,7 +1956,6 @@ dependencies = [
  "maplit",
  "ndarray",
  "num",
- "once",
  "qcs-api",
  "qcs-api-client-common",
  "qcs-api-client-grpc",
