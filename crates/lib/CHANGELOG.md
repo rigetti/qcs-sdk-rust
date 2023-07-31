@@ -1,3 +1,9 @@
+## 0.15.4-rc.0
+
+### Fixes
+
+- Return an error when execution results indicate that the job failed to run. (#331)
+
 ## 0.15.3
 
 ### Features
