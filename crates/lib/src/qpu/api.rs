@@ -11,8 +11,8 @@ use qcs_api_client_grpc::{
     channel::{parse_uri, wrap_channel_with, RefreshService},
     get_channel_with_timeout,
     models::controller::{
-        data_value::Value, ControllerJobExecutionResult, DataValue, EncryptedControllerJob,
-        JobExecutionConfiguration, RealDataValue,
+        controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
+        DataValue, EncryptedControllerJob, JobExecutionConfiguration, RealDataValue,
     },
     services::controller::{
         controller_client::ControllerClient, execute_controller_job_request,
@@ -158,13 +158,27 @@ pub async fn retrieve_results(
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
-    Ok(controller_client
+    controller_client
         .get_controller_job_results(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
         .into_inner()
         .result
-        .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))?)
+        .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
+        .map_err(QpuApiError::from)
+        .and_then(
+            |result| match controller_job_execution_result::Status::from_i32(result.status) {
+                Some(controller_job_execution_result::Status::Success) => Ok(result),
+                status => Err(QpuApiError::JobExecutionFailed {
+                    status: status
+                        .map_or("UNDEFINED", |status| status.as_str_name())
+                        .to_string(),
+                    message: result
+                        .status_message
+                        .unwrap_or("No message provided.".to_string()),
+                }),
+            },
+        )
 }
 
 /// Options avaialable when executing a job on a QPU.
@@ -399,4 +413,13 @@ pub enum QpuApiError {
     /// Error due to missing quantum processor ID and endpoint ID.
     #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId")]
     MissingQpuId,
+
+    /// Error that can occur when controller service fails to execute a job
+    #[error("The submitted job failed with status: {status}. {message}")]
+    JobExecutionFailed {
+        /// The status of the failed job.
+        status: String,
+        /// The message associated with the failed job.
+        message: String,
+    },
 }
