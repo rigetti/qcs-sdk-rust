@@ -1,7 +1,7 @@
 # This is the metadata Maturin uploads to PyPI on publish
 [project]
 name = "qcs-sdk-python"
-version = "0.10.3"
+version = "0.10.5"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -20,12 +20,13 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Operating System :: OS Independent",
 ]
+dependencies = ["quil==0.4.0"]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
 # We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
 [tool.poetry]
 name = "qcs-sdk-python"
-version = "0.10.3"
+version = "0.10.5"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 authors = [

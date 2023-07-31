@@ -11,6 +11,11 @@ from qcs_sdk.compiler.quilc import CompilerOpts
 
 from qcs_sdk.client import QCSClient as QCSClient
 
+from . import qpu as qpu
+from . import qvm as qvm
+from . import compiler as compiler
+from . import client as client
+
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""
 
@@ -47,9 +52,7 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def execute_on_qpu(
-        self, quantum_processor_id: str, endpoint_id: Optional[str] = None
-    ) -> ExecutionData:
+    def execute_on_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -59,9 +62,7 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def execute_on_qpu_async(
-        self, quantum_processor_id: str, endpoint_id: Optional[str] = None
-    ) -> ExecutionData:
+    async def execute_on_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -72,9 +73,7 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def submit_to_qpu(
-        self, quantum_processor_id: str, endpoint_id: Optional[str] = None
-    ) -> JobHandle:
+    def submit_to_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
 
@@ -84,9 +83,7 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def submit_to_qpu_async(
-        self, quantum_processor_id: str, endpoint_id: Optional[str] = None
-    ) -> JobHandle:
+    async def submit_to_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -355,7 +352,6 @@ class RegisterData:
     def from_f64(inner: Sequence[Sequence[float]]) -> "RegisterData": ...
     @staticmethod
     def from_complex32(inner: Sequence[Sequence[complex]]) -> "RegisterData": ...
-
 
 def reset_logging():
     """

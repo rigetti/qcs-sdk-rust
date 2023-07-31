@@ -46,7 +46,7 @@ jobs:
           args: -i python --release --universal2 --manifest-path crates/python/Cargo.toml --out dist
       - name: Install wheel
         run: |
-          pip install qcs-sdk-python --no-index --find-links dist --force-reinstall
+          pip install qcs-sdk-python --find-links dist --force-reinstall
       - name: Upload wheels
         uses: actions/upload-artifact@v3
         with:

@@ -1,3 +1,33 @@
+## 0.15.3
+
+### Features
+
+- Update quil-rs to 0.20.0, quil-py to 0.4.0
+
+## 0.15.3-rc.1
+
+### Features
+
+- Update quil-rs to 0.20.0, quil-py to 0.4.0
+
+## 0.15.3-rc.0
+
+### Features
+
+- Update quil-rs to 0.20.0, quil-py to 0.4.0
+
+## 0.15.2
+
+### Features
+
+- A new `diagnostics` module has been added. The `get_report` function will print a summary of key diagnostic data to aid in debugging. (#334)
+
+## 0.15.2-rc.0
+
+### Features
+
+- A new `diagnostics` module has been added. The `get_report` function will print a summary of key diagnostic data to aid in debugging. (#334)
+
 ## 0.15.1
 
 ### Features
