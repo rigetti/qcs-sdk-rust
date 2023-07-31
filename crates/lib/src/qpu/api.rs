@@ -294,7 +294,7 @@ impl ExecutionOptions {
         quantum_processor_id: &str,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
-        get_accessor(quantum_processor_id, client).await
+        get_accessor_with_cache(quantum_processor_id, client).await
     }
 
     async fn get_default_endpoint_address(
@@ -318,6 +318,14 @@ impl ExecutionOptions {
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]
+async fn get_accessor_with_cache(
+    quantum_processor_id: &str,
+    client: &Qcs,
+) -> Result<String, QpuApiError> {
+    println!("hydrating cache!");
+    get_accessor(quantum_processor_id, client).await
+}
+
 async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String, QpuApiError> {
     let mut min = None;
     let mut next_page_token = None;
