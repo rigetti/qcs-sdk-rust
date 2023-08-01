@@ -3,11 +3,12 @@
 
 use std::time::Duration;
 
+use futures::future;
 use ndarray::arr2;
 
 use qcs::{
     qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
-    Executable, ExecutionData,
+    Executable,
 };
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
 
@@ -28,57 +29,22 @@ async fn test_qcs_against_mocks() {
     // Shared setup
     setup().await;
 
-    let mut executable_two_shots = Executable::from_quil(BELL_STATE)
-        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"));
-    let check_result = |result: ExecutionData| {
-        assert_eq!(
-            result
-                .result_data
-                .to_register_map()
-                .expect("should convert to RegisterMap")
-                .get_register_matrix("ro")
-                .expect("should have values for `ro`")
-                .as_integer()
-                .expect("`ro` should have integer values"),
-            arr2(&[[0, 1], [0, 1],]),
-        );
-        assert_eq!(result.duration, Some(Duration::from_micros(8675)));
-    };
-
-    // Test direct access
-    let execution_options_direct_access = ExecutionOptionsBuilder::default()
-                .connection_strategy(ConnectionStrategy::DirectAccess)
-                .build()
-                .expect("should be valid execution options");
+    let mut handles = Vec::new();
     for _ in 0..3 {
-        let result = executable_two_shots
-            .execute_on_qpu(
-                QPU_ID,
-                None,
-                &execution_options_direct_access,
-            )
-            .await
-            .expect("Failed to run program that should be successful");
-        check_result(result);
+        // Test direct access
+        handles.push(tokio::spawn(run_bell_state(
+            ConnectionStrategy::DirectAccess,
+        )));
+        // Check gateway access
+        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway)));
     }
+
+    // Ensure both access methods were cached
+    future::try_join_all(handles).await.unwrap();
     assert_eq!(
         1,
         mock_qcs::DEFAULT_ENDPOINT_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
     );
-
-    // Check gateway access
-    let execution_options_gateway = ExecutionOptionsBuilder::default()
-        .connection_strategy(ConnectionStrategy::Gateway)
-        .build()
-        .expect("should be valid execution options");
-    for _ in 0..3 {
-        let result = executable_two_shots
-            .clone()
-            .execute_on_qpu(QPU_ID, None, &execution_options_gateway)
-            .await
-            .expect("Failed to run program that should be successful");
-        check_result(result);
-    }
     assert_eq!(
         1,
         mock_qcs::ACCESSORS_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
@@ -93,6 +59,30 @@ async fn setup() {
     tokio::spawn(translation::run());
     tokio::spawn(auth_server::run());
     tokio::spawn(mock_qcs::run());
+}
+
+async fn run_bell_state(connection_strategy: ConnectionStrategy) {
+    let execution_options_direct_access = ExecutionOptionsBuilder::default()
+        .connection_strategy(connection_strategy)
+        .build()
+        .expect("should be valid execution options");
+    let result = Executable::from_quil(BELL_STATE)
+        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
+        .execute_on_qpu(QPU_ID, None, &execution_options_direct_access)
+        .await
+        .expect("Failed to run program that should be successful");
+    assert_eq!(
+        result
+            .result_data
+            .to_register_map()
+            .expect("should convert to RegisterMap")
+            .get_register_matrix("ro")
+            .expect("should have values for `ro`")
+            .as_integer()
+            .expect("`ro` should have integer values"),
+        arr2(&[[0, 1], [0, 1],]),
+    );
+    assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 }
 
 #[allow(dead_code)]
@@ -134,9 +124,9 @@ mod mock_qcs {
     use warp::Filter;
 
     use qcs_api_client_openapi::models::{
-        InstructionSetArchitecture, QuantumProcessorAccessor, QuantumProcessorAccessorType,
+        InstructionSetArchitecture, ListQuantumProcessorAccessorsResponse,
+        QuantumProcessorAccessor, QuantumProcessorAccessorType,
         TranslateNativeQuilToEncryptedBinaryRequest, TranslateNativeQuilToEncryptedBinaryResponse,
-        ListQuantumProcessorAccessorsResponse,
     };
 
     const MOCK_QPU_ADDRESS: &str = "http://127.0.0.1:8002";
@@ -188,7 +178,7 @@ mod mock_qcs {
                     settings_timestamp: None,
                 })
             });
-        
+
         use std::sync::atomic::Ordering::SeqCst;
         let default_endpoint = warp::path(QPU_ID)
             .and(warp::path("endpoints:getDefault"))

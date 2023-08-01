@@ -23,7 +23,8 @@ use qcs_api_client_grpc::{
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{
     endpoints_api::{
-        get_default_endpoint as api_get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
+        get_default_endpoint as api_get_default_endpoint, get_endpoint, GetDefaultEndpointError,
+        GetEndpointError,
     },
     quantum_processors_api::{
         list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
@@ -323,6 +324,7 @@ impl ExecutionOptions {
 #[cached(
     result = true,
     time = 3600,
+    sync_writes = true,
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]
@@ -373,6 +375,7 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
 #[cached(
     result = true,
     time = 3600,
+    sync_writes = true,
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]
