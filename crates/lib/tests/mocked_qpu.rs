@@ -24,7 +24,7 @@ MEASURE 1 ro[1]
 
 const QPU_ID: &str = "Aspen-M-3";
 
-#[tokio::test]
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn test_qcs_against_mocks() {
     // Shared setup
     setup().await;
