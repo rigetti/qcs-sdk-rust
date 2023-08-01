@@ -139,6 +139,7 @@ mod mock_qcs {
         ListQuantumProcessorAccessorsResponse,
     };
 
+    const MOCK_QPU_ADDRESS: &str = "http://127.0.0.1:8002";
     pub(crate) static DEFAULT_ENDPOINT_CALL_COUNT: std::sync::atomic::AtomicUsize =
         std::sync::atomic::AtomicUsize::new(0);
     pub(crate) static ACCESSORS_CALL_COUNT: std::sync::atomic::AtomicUsize =
@@ -197,7 +198,7 @@ mod mock_qcs {
                 let endpoint = json!({
                     "address": "",
                     "addresses": {
-                        "grpc": "http://127.0.0.1:8002",
+                        "grpc": MOCK_QPU_ADDRESS,
                     },
                     "datacenter": "west-1",
                     "healthy": true,
@@ -219,8 +220,7 @@ mod mock_qcs {
                         live: true,
                         rank: Some(0),
                         id: Some(QPU_ID.to_string()),
-                        // TODO: does the content of this string matter?
-                        url: "http://127.0.0.1:8002".into(),
+                        url: MOCK_QPU_ADDRESS.into(),
                     }],
                     next_page_token: None,
                 };
@@ -377,6 +377,7 @@ mod qpu {
         let service = ControllerService::default();
         Server::builder()
             .add_service(ControllerServer::new(service))
+            // port must match MOCK_QPU_ADDRESS
             .serve("127.0.0.1:8002".parse().expect("address can be parsed"))
             .await
             .expect("service can be awaited");
