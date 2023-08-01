@@ -24,8 +24,21 @@ MEASURE 1 ro[1]
 const QPU_ID: &str = "Aspen-M-3";
 
 #[tokio::test]
-async fn successful_bell_state() {
+async fn test_qcs_against_mocks() {
+    // Shared setup
+    // TODO: even with `cached`, this can be called multiple times if present in
+    // multiple tests, which is why the different test cases are lumped into a
+    // single function.
+    // How can we clean this up?
+    // a) manually guarantee that `setup()` is only called once
+    // b) use a crate to enable shared setup & teardown:
+    //    * https://crates.io/crates/tokio-shared-rt
+    //    * https://docs.rs/test-with-tokio/latest/test_with_tokio/
+    // c) split into multiple test modules -- would that be sufficient?
+    // d) ...something else?
     setup().await;
+
+    // Test a basic case
     let result = Executable::from_quil(BELL_STATE)
         .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
         .execute_on_qpu(
@@ -50,6 +63,24 @@ async fn successful_bell_state() {
         arr2(&[[0, 1], [0, 1],]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));
+
+    // Check that accessors are cached
+    let execution_options = ExecutionOptionsBuilder::default()
+        .connection_strategy(ConnectionStrategy::Gateway)
+        .build()
+        .expect("should be valid execution options");
+    let executable = Executable::from_quil(BELL_STATE);
+    for _ in 0..10 {
+        let _ = executable
+            .clone()
+            .execute_on_qpu(QPU_ID, None, &execution_options)
+            .await
+            .expect("Failed to run program that should be successful");
+    }
+    assert_eq!(
+        1,
+        mock_qcs::ACCESSORS_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
+    );
 }
 
 async fn setup() {
@@ -101,9 +132,12 @@ mod mock_qcs {
     use warp::Filter;
 
     use qcs_api_client_openapi::models::{
-        InstructionSetArchitecture, TranslateNativeQuilToEncryptedBinaryRequest,
-        TranslateNativeQuilToEncryptedBinaryResponse,
+        InstructionSetArchitecture, QuantumProcessorAccessor, QuantumProcessorAccessorType,
+        TranslateNativeQuilToEncryptedBinaryRequest, TranslateNativeQuilToEncryptedBinaryResponse,
     };
+
+    pub(crate) static ACCESSORS_CALL_COUNT: std::sync::atomic::AtomicUsize =
+        std::sync::atomic::AtomicUsize::new(0);
 
     use super::QPU_ID;
 
@@ -167,8 +201,27 @@ mod mock_qcs {
                 warp::reply::json(&endpoint)
             });
 
-        let quantum_processors =
-            warp::path("quantumProcessors").and(isa.or(translate).or(default_endpoint));
+        let accessors = warp::path(QPU_ID)
+            .and(warp::path("accessors"))
+            .and(warp::get())
+            .map(|| {
+                ACCESSORS_CALL_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                let rsp = qcs_api_client_openapi::models::ListQuantumProcessorAccessorsResponse {
+                    accessors: vec![QuantumProcessorAccessor {
+                        access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
+                        live: true,
+                        rank: Some(0),
+                        id: Some(QPU_ID.to_string()),
+                        // TODO: does the content of this string matter?
+                        url: "http://127.0.0.1:8002".into(),
+                    }],
+                    next_page_token: None,
+                };
+                warp::reply::json(&rsp)
+            });
+
+        let quantum_processors = warp::path("quantumProcessors")
+            .and(isa.or(translate).or(default_endpoint).or(accessors));
 
         warp::serve(warp::path("v1").and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))

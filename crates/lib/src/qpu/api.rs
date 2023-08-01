@@ -328,7 +328,7 @@ impl ExecutionOptions {
 
 #[cached(
     result = true,
-    time = 60,
+    time = 3600,
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]
@@ -336,7 +336,8 @@ async fn get_accessor_with_cache(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    println!("hydrating cache!");
+    #[cfg(feature = "tracing")]
+    tracing::info!(quantum_processor_id=%quantum_processor_id, "accessor cache miss");
     get_accessor(quantum_processor_id, client).await
 }
 
