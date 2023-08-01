@@ -7,7 +7,7 @@ use ndarray::arr2;
 
 use qcs::{
     qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
-    Executable,
+    Executable, ExecutionData,
 };
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
 
@@ -26,57 +26,58 @@ const QPU_ID: &str = "Aspen-M-3";
 #[tokio::test]
 async fn test_qcs_against_mocks() {
     // Shared setup
-    // TODO: even with `cached`, this `setup` function can be called multiple
-    // times if present in multiple tests, which is why the different test cases
-    // are lumped into a single function.
-    // How can we clean this up?
-    // a) manually guarantee that `setup()` is only called once
-    // b) use a crate to enable shared setup & teardown:
-    //    * https://crates.io/crates/tokio-shared-rt
-    //    * https://docs.rs/test-with-tokio/latest/test_with_tokio/
-    // c) copy-and-paste all this code into a separate file (...don't love this)
-    // d) move the mock server to a utility crate
-    // e) ...something else?
     setup().await;
 
-    // Test a basic case
-    let result = Executable::from_quil(BELL_STATE)
-        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
-        .execute_on_qpu(
-            QPU_ID,
-            None,
-            &ExecutionOptionsBuilder::default()
+    let mut executable_two_shots = Executable::from_quil(BELL_STATE)
+        .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"));
+    let check_result = |result: ExecutionData| {
+        assert_eq!(
+            result
+                .result_data
+                .to_register_map()
+                .expect("should convert to RegisterMap")
+                .get_register_matrix("ro")
+                .expect("should have values for `ro`")
+                .as_integer()
+                .expect("`ro` should have integer values"),
+            arr2(&[[0, 1], [0, 1],]),
+        );
+        assert_eq!(result.duration, Some(Duration::from_micros(8675)));
+    };
+
+    // Test direct access
+    let execution_options_direct_access = ExecutionOptionsBuilder::default()
                 .connection_strategy(ConnectionStrategy::DirectAccess)
                 .build()
-                .expect("should be valid execution options"),
-        )
-        .await
-        .expect("Failed to run program that should be successful");
+                .expect("should be valid execution options");
+    for _ in 0..3 {
+        let result = executable_two_shots
+            .execute_on_qpu(
+                QPU_ID,
+                None,
+                &execution_options_direct_access,
+            )
+            .await
+            .expect("Failed to run program that should be successful");
+        check_result(result);
+    }
     assert_eq!(
-        result
-            .result_data
-            .to_register_map()
-            .expect("should convert to RegisterMap")
-            .get_register_matrix("ro")
-            .expect("should have values for `ro`")
-            .as_integer()
-            .expect("`ro` should have integer values"),
-        arr2(&[[0, 1], [0, 1],]),
+        1,
+        mock_qcs::DEFAULT_ENDPOINT_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
     );
-    assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 
-    // Check that accessors are cached
-    let execution_options = ExecutionOptionsBuilder::default()
+    // Check gateway access
+    let execution_options_gateway = ExecutionOptionsBuilder::default()
         .connection_strategy(ConnectionStrategy::Gateway)
         .build()
         .expect("should be valid execution options");
-    let executable = Executable::from_quil(BELL_STATE);
     for _ in 0..3 {
-        let _ = executable
+        let result = executable_two_shots
             .clone()
-            .execute_on_qpu(QPU_ID, None, &execution_options)
+            .execute_on_qpu(QPU_ID, None, &execution_options_gateway)
             .await
             .expect("Failed to run program that should be successful");
+        check_result(result);
     }
     assert_eq!(
         1,
@@ -135,8 +136,11 @@ mod mock_qcs {
     use qcs_api_client_openapi::models::{
         InstructionSetArchitecture, QuantumProcessorAccessor, QuantumProcessorAccessorType,
         TranslateNativeQuilToEncryptedBinaryRequest, TranslateNativeQuilToEncryptedBinaryResponse,
+        ListQuantumProcessorAccessorsResponse,
     };
 
+    pub(crate) static DEFAULT_ENDPOINT_CALL_COUNT: std::sync::atomic::AtomicUsize =
+        std::sync::atomic::AtomicUsize::new(0);
     pub(crate) static ACCESSORS_CALL_COUNT: std::sync::atomic::AtomicUsize =
         std::sync::atomic::AtomicUsize::new(0);
 
@@ -183,11 +187,13 @@ mod mock_qcs {
                     settings_timestamp: None,
                 })
             });
-
+        
+        use std::sync::atomic::Ordering::SeqCst;
         let default_endpoint = warp::path(QPU_ID)
             .and(warp::path("endpoints:getDefault"))
             .and(warp::get())
             .map(|| {
+                DEFAULT_ENDPOINT_CALL_COUNT.fetch_add(1, SeqCst);
                 let endpoint = json!({
                     "address": "",
                     "addresses": {
@@ -206,8 +212,8 @@ mod mock_qcs {
             .and(warp::path("accessors"))
             .and(warp::get())
             .map(|| {
-                ACCESSORS_CALL_COUNT.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-                let rsp = qcs_api_client_openapi::models::ListQuantumProcessorAccessorsResponse {
+                ACCESSORS_CALL_COUNT.fetch_add(1, SeqCst);
+                let rsp = ListQuantumProcessorAccessorsResponse {
                     accessors: vec![QuantumProcessorAccessor {
                         access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
                         live: true,
