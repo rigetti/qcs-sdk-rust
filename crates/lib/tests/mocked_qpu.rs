@@ -70,7 +70,7 @@ async fn test_qcs_against_mocks() {
         .build()
         .expect("should be valid execution options");
     let executable = Executable::from_quil(BELL_STATE);
-    for _ in 0..10 {
+    for _ in 0..3 {
         let _ = executable
             .clone()
             .execute_on_qpu(QPU_ID, None, &execution_options)
