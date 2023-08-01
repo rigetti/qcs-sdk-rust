@@ -23,7 +23,7 @@ use qcs_api_client_grpc::{
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{
     endpoints_api::{
-        get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
+        get_default_endpoint as api_get_default_endpoint, get_endpoint, GetDefaultEndpointError, GetEndpointError,
     },
     quantum_processors_api::{
         list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
@@ -316,13 +316,7 @@ impl ExecutionOptions {
         quantum_processor_id: &str,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
-        let default_endpoint =
-            get_default_endpoint(&client.get_openapi_client(), quantum_processor_id).await?;
-        let addresses = default_endpoint.addresses.as_ref();
-        let grpc_address = addresses.grpc.as_ref();
-        grpc_address
-            .ok_or_else(|| QpuApiError::QpuEndpointNotFound(quantum_processor_id.into()))
-            .cloned()
+        get_default_endpoint_with_cache(quantum_processor_id, client).await
     }
 }
 
@@ -337,7 +331,7 @@ async fn get_accessor_with_cache(
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
     #[cfg(feature = "tracing")]
-    tracing::info!(quantum_processor_id=%quantum_processor_id, "accessor cache miss");
+    tracing::info!(quantum_processor_id=%quantum_processor_id, "get_accessor cache miss");
     get_accessor(quantum_processor_id, client).await
 }
 
@@ -374,6 +368,34 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
     }
     min.map(|accessor| accessor.url)
         .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
+}
+
+#[cached(
+    result = true,
+    time = 3600,
+    key = "String",
+    convert = r"{ String::from(quantum_processor_id)}"
+)]
+async fn get_default_endpoint_with_cache(
+    quantum_processor_id: &str,
+    client: &Qcs,
+) -> Result<String, QpuApiError> {
+    #[cfg(feature = "tracing")]
+    tracing::info!(quantum_processor_id=%quantum_processor_id, "get_default_endpoint cache miss");
+    get_default_endpoint(quantum_processor_id, client).await
+}
+
+async fn get_default_endpoint(
+    quantum_processor_id: &str,
+    client: &Qcs,
+) -> Result<String, QpuApiError> {
+    let default_endpoint =
+        api_get_default_endpoint(&client.get_openapi_client(), quantum_processor_id).await?;
+    let addresses = default_endpoint.addresses.as_ref();
+    let grpc_address = addresses.grpc.as_ref();
+    grpc_address
+        .ok_or_else(|| QpuApiError::QpuEndpointNotFound(quantum_processor_id.into()))
+        .cloned()
 }
 
 /// Errors that can occur while attempting to establish a connection to the QPU.
