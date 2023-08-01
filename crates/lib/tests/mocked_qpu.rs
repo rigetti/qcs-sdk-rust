@@ -26,16 +26,17 @@ const QPU_ID: &str = "Aspen-M-3";
 #[tokio::test]
 async fn test_qcs_against_mocks() {
     // Shared setup
-    // TODO: even with `cached`, this can be called multiple times if present in
-    // multiple tests, which is why the different test cases are lumped into a
-    // single function.
+    // TODO: even with `cached`, this `setup` function can be called multiple
+    // times if present in multiple tests, which is why the different test cases
+    // are lumped into a single function.
     // How can we clean this up?
     // a) manually guarantee that `setup()` is only called once
     // b) use a crate to enable shared setup & teardown:
     //    * https://crates.io/crates/tokio-shared-rt
     //    * https://docs.rs/test-with-tokio/latest/test_with_tokio/
-    // c) split into multiple test modules -- would that be sufficient?
-    // d) ...something else?
+    // c) copy-and-paste all this code into a separate file (...don't love this)
+    // d) move the mock server to a utility crate
+    // e) ...something else?
     setup().await;
 
     // Test a basic case
