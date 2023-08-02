@@ -324,6 +324,7 @@ impl ExecutionOptions {
 #[cached(
     result = true,
     time = 3600,
+    time_refresh = true,
     sync_writes = true,
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
@@ -375,6 +376,7 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
 #[cached(
     result = true,
     time = 3600,
+    time_refresh = true,
     sync_writes = true,
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
