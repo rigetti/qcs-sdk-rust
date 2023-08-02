@@ -1,3 +1,9 @@
+## 0.10.7-rc.0
+
+### Fixes
+
+- The compiler, qpu, and qvm submodules are now packages again
+
 ## 0.10.6
 
 ### Fixes
