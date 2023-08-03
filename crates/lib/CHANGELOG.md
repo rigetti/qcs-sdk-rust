@@ -1,3 +1,9 @@
+## 0.15.5
+
+### Features
+
+- Default endpoints and gateway accessors are cached between requests (#337)
+
 ## 0.15.5-rc.0
 
 ### Features
