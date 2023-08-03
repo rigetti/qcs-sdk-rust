@@ -3,6 +3,7 @@
 
 use std::time::Duration;
 
+use futures::future;
 use ndarray::arr2;
 
 use qcs::{
@@ -23,19 +24,51 @@ MEASURE 1 ro[1]
 
 const QPU_ID: &str = "Aspen-M-3";
 
-#[tokio::test]
-async fn successful_bell_state() {
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn test_qcs_against_mocks() {
+    // Shared setup
     setup().await;
+
+    let mut handles = Vec::new();
+    for _ in 0..3 {
+        // Test direct access
+        handles.push(tokio::spawn(run_bell_state(
+            ConnectionStrategy::DirectAccess,
+        )));
+        // Check gateway access
+        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway)));
+    }
+
+    // Ensure both access methods were cached
+    future::try_join_all(handles).await.unwrap();
+    assert_eq!(
+        1,
+        mock_qcs::DEFAULT_ENDPOINT_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
+    );
+    assert_eq!(
+        1,
+        mock_qcs::ACCESSORS_CALL_COUNT.load(std::sync::atomic::Ordering::SeqCst)
+    );
+}
+
+async fn setup() {
+    simple_logger::init_with_env().unwrap();
+    std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
+    std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
+    tokio::spawn(qpu::run());
+    tokio::spawn(translation::run());
+    tokio::spawn(auth_server::run());
+    tokio::spawn(mock_qcs::run());
+}
+
+async fn run_bell_state(connection_strategy: ConnectionStrategy) {
+    let execution_options_direct_access = ExecutionOptionsBuilder::default()
+        .connection_strategy(connection_strategy)
+        .build()
+        .expect("should be valid execution options");
     let result = Executable::from_quil(BELL_STATE)
         .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
-        .execute_on_qpu(
-            QPU_ID,
-            None,
-            &ExecutionOptionsBuilder::default()
-                .connection_strategy(ConnectionStrategy::DirectAccess)
-                .build()
-                .expect("should be valid execution options"),
-        )
+        .execute_on_qpu(QPU_ID, None, &execution_options_direct_access)
         .await
         .expect("Failed to run program that should be successful");
     assert_eq!(
@@ -50,16 +83,6 @@ async fn successful_bell_state() {
         arr2(&[[0, 1], [0, 1],]),
     );
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));
-}
-
-async fn setup() {
-    simple_logger::init_with_env().unwrap();
-    std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
-    std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
-    tokio::spawn(qpu::run());
-    tokio::spawn(translation::run());
-    tokio::spawn(auth_server::run());
-    tokio::spawn(mock_qcs::run());
 }
 
 #[allow(dead_code)]
@@ -101,9 +124,16 @@ mod mock_qcs {
     use warp::Filter;
 
     use qcs_api_client_openapi::models::{
-        InstructionSetArchitecture, TranslateNativeQuilToEncryptedBinaryRequest,
-        TranslateNativeQuilToEncryptedBinaryResponse,
+        InstructionSetArchitecture, ListQuantumProcessorAccessorsResponse,
+        QuantumProcessorAccessor, QuantumProcessorAccessorType,
+        TranslateNativeQuilToEncryptedBinaryRequest, TranslateNativeQuilToEncryptedBinaryResponse,
     };
+
+    const MOCK_QPU_ADDRESS: &str = "http://127.0.0.1:8002";
+    pub(crate) static DEFAULT_ENDPOINT_CALL_COUNT: std::sync::atomic::AtomicUsize =
+        std::sync::atomic::AtomicUsize::new(0);
+    pub(crate) static ACCESSORS_CALL_COUNT: std::sync::atomic::AtomicUsize =
+        std::sync::atomic::AtomicUsize::new(0);
 
     use super::QPU_ID;
 
@@ -149,14 +179,16 @@ mod mock_qcs {
                 })
             });
 
+        use std::sync::atomic::Ordering::SeqCst;
         let default_endpoint = warp::path(QPU_ID)
             .and(warp::path("endpoints:getDefault"))
             .and(warp::get())
             .map(|| {
+                DEFAULT_ENDPOINT_CALL_COUNT.fetch_add(1, SeqCst);
                 let endpoint = json!({
                     "address": "",
                     "addresses": {
-                        "grpc": "http://127.0.0.1:8002",
+                        "grpc": MOCK_QPU_ADDRESS,
                     },
                     "datacenter": "west-1",
                     "healthy": true,
@@ -167,8 +199,26 @@ mod mock_qcs {
                 warp::reply::json(&endpoint)
             });
 
-        let quantum_processors =
-            warp::path("quantumProcessors").and(isa.or(translate).or(default_endpoint));
+        let accessors = warp::path(QPU_ID)
+            .and(warp::path("accessors"))
+            .and(warp::get())
+            .map(|| {
+                ACCESSORS_CALL_COUNT.fetch_add(1, SeqCst);
+                let rsp = ListQuantumProcessorAccessorsResponse {
+                    accessors: vec![QuantumProcessorAccessor {
+                        access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
+                        live: true,
+                        rank: Some(0),
+                        id: Some(QPU_ID.to_string()),
+                        url: MOCK_QPU_ADDRESS.into(),
+                    }],
+                    next_page_token: None,
+                };
+                warp::reply::json(&rsp)
+            });
+
+        let quantum_processors = warp::path("quantumProcessors")
+            .and(isa.or(translate).or(default_endpoint).or(accessors));
 
         warp::serve(warp::path("v1").and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))
@@ -317,6 +367,7 @@ mod qpu {
         let service = ControllerService::default();
         Server::builder()
             .add_service(ControllerServer::new(service))
+            // port must match MOCK_QPU_ADDRESS
             .serve("127.0.0.1:8002".parse().expect("address can be parsed"))
             .await
             .expect("service can be awaited");
