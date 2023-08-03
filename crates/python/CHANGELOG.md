@@ -1,3 +1,9 @@
+## 0.10.8-rc.0
+
+### Features
+
+- Default endpoints and gateway accessors are cached between requests (#337)
+
 ## 0.10.7
 
 ### Fixes
