@@ -10,7 +10,7 @@ use rigetti_pyo3::{
 };
 
 use crate::qvm::PyQvmResultData;
-use crate::{grpc::models::controller::PyReadoutValuesValues, qpu::PyQpuResultData};
+use crate::{grpc::models::controller::{PyReadoutValues, PyReadoutValuesValues}, qpu::PyQpuResultData};
 
 py_wrap_union_enum! {
     PyResultData(ResultData) as "ResultData" {
@@ -55,13 +55,6 @@ impl PyExecutionData {
             result_data: ResultData::py_try_from(py, &result_data)?,
             duration: duration.map(Duration::from_micros),
         }))
-    }
-}
-
-// From gRPC
-py_wrap_data_struct! {
-    PyReadoutValues(ReadoutValues) as "ReadoutValues" {
-        values: Option<Values> => Option<PyReadoutValuesValues>
     }
 }
 
