@@ -29,6 +29,10 @@ class ReadoutValues:
 
     """
 
+    def __new__(cls, values: Union[List[int], List[float], List[complex]]):
+        """Construct a new ReadoutValues from a list of values."""
+        ...
+
     def inner(self) -> Union[List[int], List[float], List[complex]]:
         """Return the inner list of readout values."""
         ...

@@ -261,6 +261,12 @@ class ResultData:
         - ``from_*``: wrap underlying values as this enum type.
     """
 
+    def __new__(cls, inner: Union[QPUResultData, QVMResultData]) -> "ResultData":
+        """
+        Create a new ResultData from either QVM or QPU result data.
+        """
+        ...
+
     def to_register_map(self) -> RegisterMap:
         """
         Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
@@ -299,6 +305,7 @@ class ResultData:
 
 @final
 class ExecutionData:
+    def __new__(cls, result_data: ResultData, duration: Optional[datetime.timedelta]): ...
     @property
     def result_data(self) -> ResultData: ...
     @result_data.setter
@@ -331,6 +338,9 @@ class RegisterData:
         self,
     ) -> Union[List[List[int]], List[List[float]], List[List[complex]]]:
         """Returns the inner value."""
+        ...
+    def as_ndarray(self) -> Union[NDArray[np.int64], NDArray[np.float64], NDArray[np.complex128]]:
+        """Returns the values as an ``ndarray``."""
         ...
     def is_i8(self) -> bool: ...
     def is_i16(self) -> bool: ...

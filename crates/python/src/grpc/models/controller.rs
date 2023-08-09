@@ -1,3 +1,4 @@
+use numpy::PyArray;
 use pyo3::{
     prelude::*,
     types::{PyComplex, PyInt, PyList},
@@ -5,12 +6,26 @@ use pyo3::{
 use qcs_api_client_grpc::models::controller::{
     readout_values::Values, Complex64, Complex64ReadoutValues, IntegerReadoutValues, ReadoutValues,
 };
-use rigetti_pyo3::{num_complex::Complex32 as NumComplex32, py_wrap_struct};
+use rigetti_pyo3::{num_complex::Complex32 as NumComplex32, py_wrap_struct, PyWrapper};
 use rigetti_pyo3::{py_wrap_data_struct, py_wrap_union_enum, PyTryFrom, ToPython};
 
 py_wrap_data_struct! {
     PyReadoutValues(ReadoutValues) as "ReadoutValues" {
         values: Option<Values> => Option<PyReadoutValuesValues>
+    }
+}
+
+#[pymethods]
+impl PyReadoutValues {
+    pub fn as_ndarray(&self, py: Python<'_>) -> PyResult<Option<PyObject>> {
+        match &self.as_inner().values {
+            None => Ok(None),
+            Some(Values::IntegerValues(ints)) => Ok(Some(PyArray::from_slice(py, &ints.values).to_object(py))),
+            Some(Values::ComplexValues(complex)) => Ok(Some(PyArray::from_iter(py, {
+                complex.values.iter().map(|value| NumComplex32::new(value.real, value.imaginary))
+            }).to_object(py))),
+
+        }
     }
 }
 

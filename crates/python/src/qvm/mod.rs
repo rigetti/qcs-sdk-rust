@@ -16,13 +16,6 @@ mod api;
 
 use api::PyAddressRequest;
 
-wrap_error!(RustQvmError(qcs::qvm::Error));
-py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
-
-py_wrap_type! {
-    PyQvmResultData(QvmResultData) as "QVMResultData"
-}
-
 create_init_submodule! {
     classes: [PyQvmResultData, PyQvmOptions],
     errors: [QVMError],
@@ -32,8 +25,23 @@ create_init_submodule! {
     ],
 }
 
+wrap_error!(RustQvmError(qcs::qvm::Error));
+py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
+
+py_wrap_type! {
+    PyQvmResultData(QvmResultData) as "QVMResultData"
+}
+
 #[pymethods]
 impl PyQvmResultData {
+    #[new]
+    fn new(memory: HashMap<String, PyRegisterData>) -> Self {
+        let memory = memory.into_iter()
+            .map(|(key, value)| (key, value.into_inner()))
+            .collect();
+        Self::from(QvmResultData::from_memory_map(memory))
+    }
+
     #[staticmethod]
     fn from_memory_map(py: Python<'_>, memory: HashMap<String, PyRegisterData>) -> PyResult<Self> {
         Ok(Self(QvmResultData::from_memory_map(HashMap::<
