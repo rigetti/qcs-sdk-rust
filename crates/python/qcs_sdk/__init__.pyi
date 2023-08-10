@@ -266,7 +266,6 @@ class ResultData:
         Create a new ResultData from either QVM or QPU result data.
         """
         ...
-
     def to_register_map(self) -> RegisterMap:
         """
         Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
@@ -305,7 +304,7 @@ class ResultData:
 
 @final
 class ExecutionData:
-    def __new__(cls, result_data: ResultData, duration: Optional[datetime.timedelta]): ...
+    def __new__(cls, result_data: ResultData, duration: Optional[datetime.timedelta] = None): ...
     @property
     def result_data(self) -> ResultData: ...
     @result_data.setter

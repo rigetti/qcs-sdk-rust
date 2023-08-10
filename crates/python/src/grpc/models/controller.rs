@@ -20,11 +20,18 @@ impl PyReadoutValues {
     pub fn as_ndarray(&self, py: Python<'_>) -> PyResult<Option<PyObject>> {
         match &self.as_inner().values {
             None => Ok(None),
-            Some(Values::IntegerValues(ints)) => Ok(Some(PyArray::from_slice(py, &ints.values).to_object(py))),
-            Some(Values::ComplexValues(complex)) => Ok(Some(PyArray::from_iter(py, {
-                complex.values.iter().map(|value| NumComplex32::new(value.real, value.imaginary))
-            }).to_object(py))),
-
+            Some(Values::IntegerValues(ints)) => {
+                Ok(Some(PyArray::from_slice(py, &ints.values).to_object(py)))
+            }
+            Some(Values::ComplexValues(complex)) => Ok(Some(
+                PyArray::from_iter(py, {
+                    complex
+                        .values
+                        .iter()
+                        .map(|value| NumComplex32::new(value.real, value.imaginary))
+                })
+                .to_object(py),
+            )),
         }
     }
 }

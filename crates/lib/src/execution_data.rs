@@ -83,7 +83,7 @@ pub enum RegisterMatrix {
 /// register.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
-pub struct RegisterMap(HashMap<String, RegisterMatrix>);
+pub struct RegisterMap(pub HashMap<String, RegisterMatrix>);
 
 /// Errors that may occur when trying to build a [`RegisterMatrix`] from execution data
 #[allow(missing_docs)]

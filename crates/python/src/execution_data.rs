@@ -1,16 +1,20 @@
 use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
-use pyo3::{exceptions::PyValueError, pymethods, types::PyDelta, Py, PyResult, Python};
+use pyo3::exceptions::PyKeyError;
+use pyo3::{
+    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, Py, PyRef, PyRefMut, PyResult,
+    Python,
+};
+use pyo3::{IntoPy, PyAny};
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
-use qcs_api_client_grpc::models::controller::{readout_values::Values, ReadoutValues};
 use rigetti_pyo3::{
     py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyTryFrom,
     PyWrapper, ToPython, ToPythonError,
 };
 
+use crate::qpu::PyQpuResultData;
 use crate::qvm::PyQvmResultData;
-use crate::{grpc::models::controller::{PyReadoutValues, PyReadoutValuesValues}, qpu::PyQpuResultData};
 
 py_wrap_union_enum! {
     PyResultData(ResultData) as "ResultData" {
@@ -59,6 +63,7 @@ impl PyExecutionData {
 }
 
 py_wrap_type! {
+    #[pyo3(mapping)]
     PyRegisterMap(RegisterMap) as "RegisterMap";
 }
 
@@ -68,6 +73,14 @@ py_wrap_type! {
 
 #[pymethods]
 impl PyRegisterMatrix {
+    fn to_ndarray(&self, py: Python<'_>) -> Py<PyAny> {
+        self.as_integer(py)
+            .map(|array| array.into_py(py))
+            .or(self.as_real(py).map(|array| array.into_py(py)))
+            .or(self.as_complex(py).map(|array| array.into_py(py)))
+            .expect("A RegisterMatrix can't be any other type.")
+    }
+
     #[staticmethod]
     fn from_integer(matrix: &PyArray2<i64>) -> PyRegisterMatrix {
         Self(RegisterMatrix::Integer(matrix.to_owned_array()))
@@ -146,9 +159,109 @@ impl PyRegisterMatrix {
 
 #[pymethods]
 impl PyRegisterMap {
-    pub fn get_register_matrix(&self, register_name: String) -> Option<PyRegisterMatrix> {
+    pub fn get_register_matrix(&self, register_name: &str) -> Option<PyRegisterMatrix> {
         self.as_inner()
-            .get_register_matrix(&register_name)
+            .get_register_matrix(register_name)
             .map(PyRegisterMatrix::from)
+    }
+
+    pub fn __len__(&self) -> usize {
+        self.as_inner().0.len()
+    }
+
+    pub fn __contains__(&self, key: String) -> bool {
+        self.as_inner().0.contains_key(&key)
+    }
+
+    pub fn __getitem__(&self, item: &str) -> PyResult<PyRegisterMatrix> {
+        self.get_register_matrix(item)
+            .ok_or(PyKeyError::new_err(format!(
+                "Key {item} not found in RegisterMap"
+            )))
+    }
+
+    pub fn __iter__(&self, py: Python<'_>) -> PyResult<Py<PyRegisterMapKeysIter>> {
+        Py::new(
+            py,
+            PyRegisterMapKeysIter {
+                inner: self.as_inner().0.clone().into_iter(),
+            },
+        )
+    }
+
+    pub fn keys(&self, py: Python<'_>) -> PyResult<Py<PyRegisterMapKeysIter>> {
+        self.__iter__(py)
+    }
+
+    pub fn values(&self, py: Python<'_>) -> PyResult<Py<PyRegisterMapValuesIter>> {
+        Py::new(
+            py,
+            PyRegisterMapValuesIter {
+                inner: self.as_inner().0.clone().into_iter(),
+            },
+        )
+    }
+
+    pub fn items(&self, py: Python<'_>) -> PyResult<Py<PyRegisterMapItemsIter>> {
+        Py::new(
+            py,
+            PyRegisterMapItemsIter {
+                inner: self.as_inner().0.clone().into_iter(),
+            },
+        )
+    }
+
+    pub fn get(&self, key: &str, default: Option<PyRegisterMatrix>) -> Option<PyRegisterMatrix> {
+        self.__getitem__(key).ok().or(default)
+    }
+}
+
+#[pyclass]
+pub struct PyRegisterMapItemsIter {
+    inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
+}
+
+#[pymethods]
+impl PyRegisterMapItemsIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<(String, PyRegisterMatrix)> {
+        slf.inner
+            .next()
+            .map(|(register, matrix)| (register, PyRegisterMatrix(matrix)))
+    }
+}
+
+#[pyclass]
+pub struct PyRegisterMapKeysIter {
+    inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
+}
+
+#[pymethods]
+impl PyRegisterMapKeysIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<String> {
+        slf.inner.next().map(|(register, _)| register)
+    }
+}
+
+#[pyclass]
+pub struct PyRegisterMapValuesIter {
+    inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
+}
+
+#[pymethods]
+impl PyRegisterMapValuesIter {
+    fn __iter__(slf: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        slf
+    }
+
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<PyRegisterMatrix> {
+        slf.inner.next().map(|(_, matrix)| PyRegisterMatrix(matrix))
     }
 }

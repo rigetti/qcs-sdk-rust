@@ -169,7 +169,10 @@ pub async fn retrieve_results(
         .map_err(QpuApiError::from)
         .and_then(
             |result| match controller_job_execution_result::Status::from_i32(result.status) {
-                Some(controller_job_execution_result::Status::Success) => Ok(result),
+                Some(controller_job_execution_result::Status::Success) => {
+                    dbg!(&result);
+                    Ok(result)
+                }
                 status => Err(QpuApiError::JobExecutionFailed {
                     status: status
                         .map_or("UNDEFINED", |status| status.as_str_name())

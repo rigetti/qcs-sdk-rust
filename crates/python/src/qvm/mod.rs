@@ -36,7 +36,8 @@ py_wrap_type! {
 impl PyQvmResultData {
     #[new]
     fn new(memory: HashMap<String, PyRegisterData>) -> Self {
-        let memory = memory.into_iter()
+        let memory = memory
+            .into_iter()
             .map(|(key, value)| (key, value.into_inner()))
             .collect();
         Self::from(QvmResultData::from_memory_map(memory))
