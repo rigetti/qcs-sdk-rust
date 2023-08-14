@@ -1,4 +1,4 @@
-from typing import Dict, List, Mapping, Sequence, Optional, Union, final
+from typing import Dict, List, Mapping, Sequence, Optional, TypedDict, Union, final
 
 from qcs_sdk.client import QCSClient
 
@@ -32,7 +32,6 @@ class ReadoutValues:
     def __new__(cls, values: Union[List[int], List[float], List[complex]]):
         """Construct a new ReadoutValues from a list of values."""
         ...
-
     def inner(self) -> Union[List[int], List[float], List[complex]]:
         """Return the inner list of readout values."""
         ...
@@ -58,9 +57,7 @@ class QPUResultData:
     Encapsulates data returned from the QPU after executing a job.
     """
 
-    def __new__(
-        cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues]
-    ): ...
+    def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues]): ...
     @property
     def mappings(self) -> Dict[str, str]:
         """
@@ -73,6 +70,15 @@ class QPUResultData:
         Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
         """
         ...
+    def asdict(
+        self,
+    ) -> QPUResultDataDict:
+        """ """
+        ...
+
+class QPUResultDataDict(TypedDict):
+    mappings: Dict[str, str]
+    readout_values: Dict[str, Union[List[int], List[complex], List[float]]]
 
 class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
