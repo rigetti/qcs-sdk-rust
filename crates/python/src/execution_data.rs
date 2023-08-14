@@ -9,8 +9,8 @@ use pyo3::{
 use pyo3::{IntoPy, PyAny};
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use rigetti_pyo3::{
-    py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyTryFrom,
-    PyWrapper, ToPython, ToPythonError,
+    impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error,
+    PyTryFrom, PyWrapper, ToPython, ToPythonError,
 };
 
 use crate::qpu::PyQpuResultData;
@@ -22,6 +22,7 @@ py_wrap_union_enum! {
         qvm: Qvm => PyQvmResultData
     }
 }
+impl_repr!(PyQpuResultData);
 
 wrap_error!(RustRegisterMatrixConversionError(
     qcs::RegisterMatrixConversionError
@@ -50,14 +51,28 @@ py_wrap_data_struct! {
         duration: Option<Duration> => Option<Py<PyDelta>>
     }
 }
+impl_repr!(PyExecutionData);
 
 #[pymethods]
 impl PyExecutionData {
     #[new]
-    fn __new__(py: Python<'_>, result_data: PyResultData, duration: Option<u64>) -> PyResult<Self> {
+    fn __new__(
+        py: Python<'_>,
+        result_data: PyResultData,
+        duration: Option<Py<PyDelta>>,
+    ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
             result_data: ResultData::py_try_from(py, &result_data)?,
-            duration: duration.map(Duration::from_micros),
+            duration: match duration {
+                None => None,
+                Some(delta) => Some(
+                    delta
+                        .as_ref(py)
+                        .call_method0("total_seconds")
+                        .map(|result| result.extract::<f64>())?
+                        .map(Duration::from_secs_f64)?,
+                ),
+            },
         }))
     }
 }
@@ -66,10 +81,12 @@ py_wrap_type! {
     #[pyo3(mapping)]
     PyRegisterMap(RegisterMap) as "RegisterMap";
 }
+impl_repr!(PyRegisterMap);
 
 py_wrap_type! {
     PyRegisterMatrix(RegisterMatrix) as "RegisterMatrix"
 }
+impl_repr!(PyRegisterMatrix);
 
 #[pymethods]
 impl PyRegisterMatrix {
@@ -234,6 +251,11 @@ impl PyRegisterMapItemsIter {
     }
 }
 
+// The keys and values iterators are built on the iterator of the full
+// `HashMap`, because the iterators returned by `keys()` and `values()`
+// return an iterator with a _reference_ to the underlying `HashMap`.
+// The reference would require these structs to specify a lifetime,
+// which is incompatible with `#[pyclass]`.
 #[pyclass]
 pub struct PyRegisterMapKeysIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
