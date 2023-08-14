@@ -1,4 +1,4 @@
-from typing import Dict, List, Mapping, Sequence, Optional, TypedDict, Union, final
+from typing import Dict, List, Mapping, Sequence, Optional, Union, final, Any
 
 from qcs_sdk.client import QCSClient
 
@@ -55,6 +55,11 @@ class ReadoutValues:
 class QPUResultData:
     """
     Encapsulates data returned from the QPU after executing a job.
+
+    ``QPUResultData`` contains "mappings", which map declared memory regions
+    in a program (ie. "ro[0]") to that regions readout key in "readout_values".
+    "readout_values" maps those readout keys to the values emitted for that region
+    across all shots.
     """
 
     def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues]): ...
@@ -70,16 +75,27 @@ class QPUResultData:
         Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
         """
         ...
-    def asdict(
+    def to_raw_readout_data(
         self,
-    ) -> QPUResultDataDict:
-        """ """
+    ) -> RawQPUReadoutData:
+        """
+        Get a copy of this result data flattened into a ``RawQPUReadoutData``
+        """
         ...
 
-QPUResultDataDict = TypedDict(
-    "QPUResultDataDict",
-    {"mappings": Dict[str, str], "readout_values": Dict[str, Union[List[int], List[complex], List[float]]]},
-)
+class RawQPUReadoutData:
+    @property
+    def mapping(self) -> Dict[str, str]:
+        """
+        Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
+        """
+        ...
+    @property
+    def readout_values(self) -> Dict[str, Union[List[int], List[float], List[complex]]]:
+        """
+        Get the mappings of a readout values identifier (ie. "q0") to a list of those readout values
+        """
+        ...
 
 class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
