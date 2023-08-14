@@ -30,7 +30,9 @@ def test_qpu_result_data():
 
     assert result_data.mappings == mappings
     assert result_data.readout_values["a"].as_integer() == readout_values["a"].as_integer()
-    assert result_data.asdict() == {"mappings": {"a": "_q0"}, "readout_values": {"a": [0, 1]}}
+    raw_data = result_data.to_raw_readout_data()
+    assert raw_data.mappings == {"a": "_q0"}
+    assert raw_data.readout_values == {"a": [0, 1]}
 
 
 @pytest.mark.qcs_session
