@@ -76,9 +76,10 @@ class QPUResultData:
         """ """
         ...
 
-class QPUResultDataDict(TypedDict):
-    mappings: Dict[str, str]
-    readout_values: Dict[str, Union[List[int], List[complex], List[float]]]
+QPUResultDataDict = TypedDict(
+    "QPUResultDataDict",
+    {"mappings": Dict[str, str], "readout_values": Dict[str, Union[List[int], List[complex], List[float]]]},
+)
 
 class ListQuantumProcessorsError(RuntimeError):
     """A request to list available Quantum Processors failed."""
