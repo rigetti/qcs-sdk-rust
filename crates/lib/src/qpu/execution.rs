@@ -13,6 +13,7 @@ use tokio::task::{spawn_blocking, JoinError};
 #[cfg(feature = "tracing")]
 use tracing::trace;
 
+use crate::compiler::rpcq;
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
@@ -57,6 +58,8 @@ pub(crate) enum Error {
     Compilation { details: String },
     #[error("Program when translating the program: {0}")]
     RewriteArithmetic(#[from] rewrite_arithmetic::Error),
+    #[error("Problem when getting RPCQ client: {0}")]
+    RpcqClient(#[from] rpcq::Error),
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
@@ -142,8 +145,9 @@ impl<'a> Execution<'a> {
             #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
             let client = client.clone();
+            let rpcq_client = rpcq::Client::new(client.get_config().quilc_url())?;
             spawn_blocking(move || {
-                quilc::compile_program(&quil, target_device, &client, compiler_options)
+                quilc::compile_program(&quil, target_device, compiler_options, rpcq_client)
             })
             .await
             .map_err(|source| {

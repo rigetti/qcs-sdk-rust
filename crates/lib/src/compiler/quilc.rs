@@ -2,7 +2,6 @@
 
 use std::collections::HashMap;
 use std::convert::TryFrom;
-use std::str::FromStr;
 
 use quil_rs::program::{Program, ProgramError};
 use serde::{Deserialize, Deserializer, Serialize};
@@ -16,6 +15,18 @@ use crate::client::Qcs;
 
 /// Number of seconds to wait before timing out.
 pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
+
+/// The Quilc compiler methods
+pub trait Client {
+    /// Compile the program `quil` for the given target device `isa`
+    /// with the compilation options `options`.
+    fn compile_program(
+        &self,
+        quil: &str,
+        isa: TargetDevice,
+        options: CompilerOpts,
+    ) -> Result<CompilationResult, Error>;
+}
 
 /// Take in a Quil program and produce a "native quil" output from quilc
 ///
@@ -38,28 +49,15 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
     feature = "tracing",
     tracing::instrument(skip(client), level = "trace")
 )]
-pub fn compile_program(
+pub fn compile_program<C: Client>(
     quil: &str,
     isa: TargetDevice,
-    client: &Qcs,
     options: CompilerOpts,
+    client: C,
 ) -> Result<CompilationResult, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
-
-    let endpoint = client.get_config().quilc_url();
-    let params = QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
-    let request =
-        rpcq::RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
-    let rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilToNativeQuilResponse>(&request) {
-        Ok(response) => Ok(CompilationResult {
-            program: Program::from_str(&response.quil).map_err(Error::Parse)?,
-            native_quil_metadata: response.metadata,
-        }),
-        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
-    }
+    client.compile_program(quil, isa, options)
 }
 
 /// The result of compiling a Quil program to native quil with `quilc`
@@ -75,11 +73,11 @@ pub struct CompilationResult {
 #[derive(Clone, Copy, Debug)]
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
-    timeout: Option<f64>,
+    pub(crate) timeout: Option<f64>,
 
     /// If the compiler should produce "protoquil" as output. If `None`, the default
     /// behavior configured in the compiler service is used.
-    protoquil: Option<bool>,
+    pub(crate) protoquil: Option<bool>,
 }
 
 /// Functions for building a [`CompilerOpts`] instance
@@ -292,7 +290,7 @@ pub enum Error {
 }
 
 impl Error {
-    fn from_quilc_error(quilc_uri: String, source: rpcq::Error) -> Self {
+    pub(crate) fn from_quilc_error(quilc_uri: String, source: rpcq::Error) -> Self {
         match source {
             rpcq::Error::Response(message) => Error::QuilcCompilation(message),
             source => Error::QuilcConnection(quilc_uri, source),
@@ -302,12 +300,12 @@ impl Error {
 
 /// The response from quilc for a `quil_to_native_quil` request.
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
-struct QuilToNativeQuilResponse {
+pub(crate) struct QuilToNativeQuilResponse {
     /// The compiled program
-    quil: String,
+    pub(crate) quil: String,
     /// Metadata about the compiled program
     #[serde(default)]
-    metadata: Option<NativeQuilMetadata>,
+    pub(crate) metadata: Option<NativeQuilMetadata>,
 }
 
 #[allow(unused_qualifications)]
@@ -350,21 +348,21 @@ struct QuilcVersionResponse {
 
 /// The top level params that get passed to quilc
 #[derive(Serialize, Debug, Clone, PartialEq)]
-struct QuilcParams {
-    protoquil: Option<bool>,
+pub(crate) struct QuilcParams {
+    pub(crate) protoquil: Option<bool>,
     #[serde(rename = "*args")]
     args: [NativeQuilRequest; 1],
 }
 
 impl QuilcParams {
-    fn new(quil: &str, isa: TargetDevice) -> Self {
+    pub(crate) fn new(quil: &str, isa: TargetDevice) -> Self {
         Self {
             protoquil: None,
             args: [NativeQuilRequest::new(quil, isa)],
         }
     }
 
-    fn with_protoquil(self, protoquil: Option<bool>) -> Self {
+    pub(crate) fn with_protoquil(self, protoquil: Option<bool>) -> Self {
         Self { protoquil, ..self }
     }
 }
@@ -424,13 +422,19 @@ mod tests {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
+    async fn rpcq_client() -> rpcq::Client {
+        let qcs = Qcs::load().await;
+        let endpoint = qcs.get_config().quilc_url();
+        rpcq::Client::new(endpoint).unwrap()
+    }
+
     #[tokio::test]
     async fn compare_native_quil_to_expected_output() {
         let output = compile_program(
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            &Qcs::load().await,
             CompilerOpts::default(),
+            rpcq_client().await,
         )
         .expect("Could not compile");
         assert_eq!(output.program.to_string(), EXPECTED_H0_OUTPUT);
@@ -451,8 +455,8 @@ MEASURE 1 ro[1]
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            &client,
             CompilerOpts::default(),
+            rpcq_client().await,
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string())
@@ -482,12 +486,11 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_compile_declare_only() {
-        let client = Qcs::load().await;
         let output = compile_program(
             "DECLARE ro BIT[1]\n",
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            &client,
             CompilerOpts::default(),
+            rpcq_client().await,
         )
         .expect("Should be able to compile");
         assert_eq!(output.program.to_string(), "DECLARE ro BIT[1]\n");

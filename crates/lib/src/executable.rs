@@ -688,6 +688,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
+            ExecutionError::RpcqClient(e) => Self::Unexpected(format!("{e:?}")),
             ExecutionError::Substitution(message) => Self::Substitution(message),
             ExecutionError::QpuApiError(e) => Self::QpuApiError(e),
         }

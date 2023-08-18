@@ -1,7 +1,13 @@
-use qcs::compiler::quilc::{
-    CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
-    GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
-    RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
+use qcs::{
+    client::Qcs,
+    compiler::{
+        quilc::{
+            CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
+            GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
+            RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
+        },
+        rpcq::{self},
+    },
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use rigetti_pyo3::{
@@ -30,7 +36,8 @@ create_init_submodule! {
         PyConjugateByCliffordRequest,
         PyConjugatePauliByCliffordResponse,
         PyRandomizedBenchmarkingRequest,
-        PyGenerateRandomizedBenchmarkingSequenceResponse
+        PyGenerateRandomizedBenchmarkingSequenceResponse,
+        PyRpcqClient
     ],
     consts: [DEFAULT_COMPILER_TIMEOUT],
     errors: [QuilcError],
@@ -99,17 +106,42 @@ impl PyTargetDevice {
     }
 }
 
+wrap_error!(RustRpcqError(rpcq::Error));
+py_wrap_error!(quilc, RustRpcqError, RpcqError, PyRuntimeError);
+
+#[pyclass]
+#[pyo3(name = "RPCQClient")]
+#[derive(Clone)]
+pub struct PyRpcqClient(rpcq::Client);
+
+#[pymethods]
+impl PyRpcqClient {
+    #[new]
+    pub fn new(endpoint: &str) -> PyResult<Self> {
+        Ok(Self(
+            rpcq::Client::new(endpoint)
+                .map_err(RustRpcqError)
+                .map_err(RustRpcqError::to_py_err)?,
+        ))
+    }
+}
+
+#[derive(pyo3::FromPyObject)]
+pub enum QuilcClient {
+    Rpcq(PyRpcqClient),
+}
+
 py_function_sync_async! {
-    #[pyfunction(client = "None", options = "None")]
+    #[pyfunction(options = "None")]
     async fn compile_program(
         quil: String,
         target: PyTargetDevice,
-        client: Option<PyQcsClient>,
+        client: QuilcClient,
         options: Option<PyCompilerOpts>,
     ) -> PyResult<PyCompilationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let QuilcClient::Rpcq(client) = client;
         let options = options.unwrap_or_default();
-        qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
+        qcs::compiler::quilc::compile_program(&quil, target.into(), options.into(), client.0)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {

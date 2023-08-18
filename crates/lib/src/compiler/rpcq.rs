@@ -1,26 +1,49 @@
-use std::collections::HashMap;
+//! Provides an RPCQ client for Quilc
 
+use std::collections::HashMap;
+use std::str::FromStr;
+
+use quil_rs::Program;
 use rmp_serde::Serializer;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use zmq::{Context, Socket, SocketType};
 
+use super::quilc;
+
 pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 
 /// A minimal RPCQ client that does just enough to talk to `quilc`
-pub(crate) struct Client {
+pub struct Client {
+    pub(crate) endpoint: String,
     socket: Socket,
+}
+
+impl Clone for Client {
+    fn clone(&self) -> Self {
+        // TODO
+        Self::new(&self.endpoint).unwrap()
+    }
+}
+
+impl std::fmt::Debug for Client {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "RPCQ client for {}", self.endpoint)
+    }
 }
 
 impl Client {
     /// Construct a new [`Client`] with no authentication configured.
-    pub(crate) fn new(endpoint: &str) -> Result<Self, Error> {
+    pub fn new(endpoint: &str) -> Result<Self, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
         socket.connect(endpoint).map_err(Error::Communication)?;
-        Ok(Self { socket })
+        Ok(Self {
+            socket,
+            endpoint: endpoint.to_owned(),
+        })
     }
 
     /// Send an RPC request and immediately retrieve and decode the results.
@@ -80,21 +103,53 @@ impl Client {
     }
 }
 
+impl quilc::Client for Client {
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
+    fn compile_program(
+        &self,
+        quil: &str,
+        isa: quilc::TargetDevice,
+        options: quilc::CompilerOpts,
+    ) -> Result<quilc::CompilationResult, quilc::Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!(compiler_options=?options, "compiling quil program with quilc (RPCQ)",);
+        let params = quilc::QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
+        let request = RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
+        match self.run_request::<_, quilc::QuilToNativeQuilResponse>(&request) {
+            Ok(response) => Ok(quilc::CompilationResult {
+                program: Program::from_str(&response.quil).map_err(quilc::Error::Parse)?,
+                native_quil_metadata: response.metadata,
+            }),
+            Err(source) => Err(quilc::Error::from_quilc_error(
+                self.endpoint.clone(),
+                source,
+            )),
+        }
+    }
+}
+
 /// All of the possible errors for this module
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// The ZMQ socket could not be created
     #[error("Could not create a socket.")]
     SocketCreation(#[source] zmq::Error),
+    /// Failed to set up auth for ZMQ
     #[error("Failed while trying to set up auth. This is likely a bug in this library.")]
     AuthSetup(#[source] zmq::Error),
+    /// Encountered error when communicating with server
     #[error("Trouble communicating with the ZMQ server")]
     Communication(#[source] zmq::Error),
+    /// Failed to serialize request
     #[error("Could not serialize request as MessagePack. This is a bug in this library.")]
     Serialization(#[from] rmp_serde::encode::Error),
+    /// Failed to deserialize response
     #[error("Could not decode ZMQ server's response. This is likely a bug in this library.")]
     Deserialization(#[from] rmp_serde::decode::Error),
+    /// Response ID did not match request ID
     #[error("Response ID did not match request ID")]
     ResponseIdMismatch,
+    /// Server responded with an error message
     #[error("Received error message from server: {0}")]
     Response(String),
 }

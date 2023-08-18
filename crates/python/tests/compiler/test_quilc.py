@@ -134,3 +134,16 @@ async def test_generate_randomized_benchmark_sequence_async():
     response = await generate_randomized_benchmarking_sequence_async(request)
     assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
     assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]
+
+
+@pytest.mark.asyncio
+async def test_things(
+    bell_program: str,
+    target_device: TargetDevice,   
+):
+    from qcs_sdk.compiler.quilc import RPCQClient
+
+    client = RPCQClient("tcp://localhost:5555")
+    print(compile_program(bell_program, target_device, client=None).program)
+
+    print(client)
