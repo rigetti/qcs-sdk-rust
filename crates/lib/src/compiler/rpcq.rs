@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 use std::str::FromStr;
+use std::sync::{Arc, Mutex};
 
 use quil_rs::Program;
 use rmp_serde::Serializer;
@@ -17,13 +18,15 @@ pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 /// A minimal RPCQ client that does just enough to talk to `quilc`
 pub struct Client {
     pub(crate) endpoint: String,
-    socket: Socket,
+    socket: Arc<Socket>,
 }
 
 impl Clone for Client {
     fn clone(&self) -> Self {
-        // TODO
-        Self::new(&self.endpoint).unwrap()
+        Self {
+            endpoint: self.endpoint.clone(),
+            socket: self.socket.clone(),
+        }
     }
 }
 
@@ -41,7 +44,7 @@ impl Client {
             .map_err(Error::SocketCreation)?;
         socket.connect(endpoint).map_err(Error::Communication)?;
         Ok(Self {
-            socket,
+            socket: Arc::new(socket),
             endpoint: endpoint.to_owned(),
         })
     }

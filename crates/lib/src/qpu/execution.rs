@@ -146,17 +146,11 @@ impl<'a> Execution<'a> {
             trace!("Converting to Native Quil");
             let client = client.clone();
             let rpcq_client = rpcq::Client::new(client.get_config().quilc_url())?;
-            spawn_blocking(move || {
-                quilc::compile_program(&quil, target_device, compiler_options, rpcq_client)
-            })
-            .await
-            .map_err(|source| {
-                Error::Unexpected(Unexpected::TaskError {
-                    task_name: "quilc",
-                    source,
-                })
-            })?
-            .map(|CompilationResult { program, .. }| program)?
+            quilc::compile_program(&quil, target_device, compiler_options, rpcq_client)
+                .map_err(|e| Error::Compilation {
+                    details: e.to_string(),
+                })?
+                .program
         } else {
             #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
