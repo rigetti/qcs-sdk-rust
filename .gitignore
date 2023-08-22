@@ -1,5 +1,6 @@
 # Cargo / rustc artifacts
 /target
+Cargo.lock
 
 # Python artifacts
 __pycache__/
