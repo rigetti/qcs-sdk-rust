@@ -17,14 +17,12 @@ otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-c
 
 [dependencies]
 cached = "0.44.0"
-dirs = "5.0.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
 indexmap = "1.9.1"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
-qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
