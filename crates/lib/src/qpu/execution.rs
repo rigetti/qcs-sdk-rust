@@ -8,7 +8,6 @@ use std::time::Duration;
 
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
-use tokio::task::{spawn_blocking, JoinError};
 
 #[cfg(feature = "tracing")]
 use tracing::trace;
@@ -27,7 +26,7 @@ use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
 use crate::client::{GrpcClientError, Qcs};
-use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice};
+use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -85,12 +84,7 @@ impl From<quilc::Error> for Error {
 /// Errors that are not expected to be returned—if they show up, it may be a bug in this library.
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Unexpected {
-    #[error("Task running {task_name} did not complete.")]
-    TaskError {
-        task_name: &'static str,
-        source: JoinError,
-    },
-    #[error("Problem converting QCS ISA to quilc ISA")]
+    #[error("Problem converting QCS ISA to quilc ISA: {0}")]
     Isa(String),
 }
 

@@ -18,7 +18,7 @@ pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 /// A minimal RPCQ client that does just enough to talk to `quilc`
 pub struct Client {
     pub(crate) endpoint: String,
-    socket: Arc<Socket>,
+    socket: Arc<Mutex<Socket>>,
 }
 
 impl Clone for Client {
@@ -44,7 +44,7 @@ impl Client {
             .map_err(Error::SocketCreation)?;
         socket.connect(endpoint).map_err(Error::Communication)?;
         Ok(Self {
-            socket: Arc::new(socket),
+            socket: Arc::new(Mutex::new(socket)),
             endpoint: endpoint.to_owned(),
         })
     }
@@ -76,7 +76,11 @@ impl Client {
             .serialize(&mut Serializer::new(&mut data).with_struct_map())
             .map_err(Error::Serialization)?;
 
-        self.socket.send(data, 0).map_err(Error::Communication)
+        self.socket
+            .lock()
+            .map_err(|e| Error::ZmqSocketLock(e.to_string()))?
+            .send(data, 0)
+            .map_err(Error::Communication)
     }
 
     /// Retrieve and decode a response
@@ -102,7 +106,11 @@ impl Client {
 
     /// Retrieve the raw bytes of a response
     pub(crate) fn receive_raw(&self) -> Result<Vec<u8>, Error> {
-        self.socket.recv_bytes(0).map_err(Error::Communication)
+        self.socket
+            .lock()
+            .map_err(|e| Error::ZmqSocketLock(e.to_string()))?
+            .recv_bytes(0)
+            .map_err(Error::Communication)
     }
 }
 
@@ -155,6 +163,9 @@ pub enum Error {
     /// Server responded with an error message
     #[error("Received error message from server: {0}")]
     Response(String),
+    /// Error occurred when trying to lock the ZMQ socket
+    #[error("Could not lock RPCQ client: {0}")]
+    ZmqSocketLock(String),
 }
 
 /// A single request object according to the JSONRPC standard.

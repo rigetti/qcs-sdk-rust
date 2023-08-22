@@ -1,13 +1,10 @@
-use qcs::{
-    client::Qcs,
-    compiler::{
-        quilc::{
-            CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
-            GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
-            RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
-        },
-        rpcq::{self},
+use qcs::compiler::{
+    quilc::{
+        CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
+        GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
+        RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
     },
+    rpcq,
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use rigetti_pyo3::{
