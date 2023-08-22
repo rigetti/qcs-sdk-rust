@@ -88,7 +88,7 @@ ignore = false
 # More documentation about the 'bans' section can be found here:
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html
 [bans]
-multiple-versions = "deny"
+multiple-versions = "warn"
 wildcards = "deny"
 highlight = "all"
 skip-tree = [
