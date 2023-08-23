@@ -140,7 +140,7 @@ impl<'a> Execution<'a> {
             trace!("Converting to Native Quil");
             let client = client.clone();
             let rpcq_client = rpcq::Client::new(client.get_config().quilc_url())?;
-            quilc::compile_program(&quil, target_device, compiler_options, rpcq_client)
+            quilc::compile_program(&quil, target_device, compiler_options, &rpcq_client)
                 .map_err(|e| Error::Compilation {
                     details: e.to_string(),
                 })?

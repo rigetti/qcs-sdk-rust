@@ -19,7 +19,6 @@ use rigetti_pyo3::{
     wrap_error, PyWrapper, ToPythonError,
 };
 
-use crate::client::PyQcsClient;
 use crate::py_sync::py_function_sync_async;
 use crate::qpu::isa::PyInstructionSetArchitecture;
 
@@ -138,7 +137,7 @@ py_function_sync_async! {
     ) -> PyResult<PyCompilationResult> {
         let QuilcClient::Rpcq(client) = client;
         let options = options.unwrap_or_default();
-        qcs::compiler::quilc::compile_program(&quil, target.into(), options.into(), client.0)
+        qcs::compiler::quilc::compile_program(&quil, target.into(), options.into(), &client.0)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
@@ -215,12 +214,12 @@ pub struct PyCompilationResult {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction()]
     async fn get_version_info(
-        client: Option<PyQcsClient>,
+        client: QuilcClient,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await;
-        qcs::compiler::quilc::get_version_info(&client)
+        let QuilcClient::Rpcq(client) = client;
+        qcs::compiler::quilc::get_version_info(&client.0)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
     }
@@ -267,13 +266,13 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction()]
     async fn conjugate_pauli_by_clifford(
         request: PyConjugateByCliffordRequest,
-        client: Option<PyQcsClient>,
+        client: QuilcClient,
     ) -> PyResult<PyConjugatePauliByCliffordResponse> {
-        let client = PyQcsClient::get_or_create_client(client).await;
-        qcs::compiler::quilc::conjugate_pauli_by_clifford(&client, request.into())
+        let QuilcClient::Rpcq(client) = client;
+        qcs::compiler::quilc::conjugate_pauli_by_clifford(&client.0, request.into())
             .map(PyConjugatePauliByCliffordResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
@@ -317,13 +316,13 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction()]
     async fn generate_randomized_benchmarking_sequence(
         request: PyRandomizedBenchmarkingRequest,
-        client: Option<PyQcsClient>,
+        client: QuilcClient,
     ) -> PyResult<PyGenerateRandomizedBenchmarkingSequenceResponse> {
-        let client = PyQcsClient::get_or_create_client(client).await;
-        qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client, request.into())
+        let QuilcClient::Rpcq(client) = client;
+        qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client.0, request.into())
             .map(PyGenerateRandomizedBenchmarkingSequenceResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)

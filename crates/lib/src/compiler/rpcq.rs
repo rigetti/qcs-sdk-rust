@@ -129,6 +129,59 @@ impl quilc::Client for Client {
             )),
         }
     }
+
+    fn get_version_info(&self) -> Result<String, quilc::Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!("requesting quilc version information");
+
+        // todo check this hashmap type
+        let bindings: HashMap<String, String> = HashMap::new();
+        let request = RPCRequest::new("get_version_info", &bindings);
+        match self.run_request::<_, quilc::QuilcVersionResponse>(&request) {
+            Ok(response) => Ok(response.quilc),
+            Err(source) => Err(quilc::Error::from_quilc_error(
+                self.endpoint.clone(),
+                source,
+            )),
+        }
+    }
+
+    fn conjugate_pauli_by_clifford(
+        &self,
+        request: quilc::ConjugateByCliffordRequest,
+    ) -> Result<quilc::ConjugatePauliByCliffordResponse, quilc::Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
+
+        let request: quilc::ConjugatePauliByCliffordRequest = request.into();
+        let request = RPCRequest::new("conjugate_pauli_by_clifford", &request);
+        match self.run_request::<_, quilc::ConjugatePauliByCliffordResponse>(&request) {
+            Ok(response) => Ok(response),
+            Err(source) => Err(quilc::Error::from_quilc_error(
+                self.endpoint.clone(),
+                source,
+            )),
+        }
+    }
+
+    fn generate_randomized_benchmarking_sequence(
+        &self,
+        request: quilc::RandomizedBenchmarkingRequest,
+    ) -> Result<quilc::GenerateRandomizedBenchmarkingSequenceResponse, quilc::Error> {
+        #[cfg(feature = "tracing")]
+        tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
+
+        let request: quilc::GenerateRandomizedBenchmarkingSequenceRequest = request.into();
+        let request = RPCRequest::new("generate_rb_sequence", &request);
+        match self.run_request::<_, quilc::GenerateRandomizedBenchmarkingSequenceResponse>(&request)
+        {
+            Ok(response) => Ok(response),
+            Err(source) => Err(quilc::Error::from_quilc_error(
+                self.endpoint.clone(),
+                source,
+            )),
+        }
+    }
 }
 
 /// All of the possible errors for this module

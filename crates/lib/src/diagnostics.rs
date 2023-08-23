@@ -5,7 +5,7 @@ use std::{borrow::Cow, time::Duration};
 
 use qcs_api_client_openapi::models::User;
 
-use crate::{build_info, client::Qcs, qvm::QvmOptions};
+use crate::{build_info, client::Qcs, compiler::rpcq, qvm::QvmOptions};
 
 /// Collect package diagnostics in string form
 pub async fn get_report() -> String {
@@ -157,16 +157,24 @@ struct QuilcDiagnostics {
 impl QuilcDiagnostics {
     fn gather(client: &Qcs) -> Self {
         let address = client.get_config().quilc_url().to_string();
+        match rpcq::Client::new(&address) {
+            Ok(client) => {
+                let (version, available) = match crate::compiler::quilc::get_version_info(&client) {
+                    Ok(version) => (Some(version), true),
+                    Err(_) => (None, false),
+                };
 
-        let (version, available) = match crate::compiler::quilc::get_version_info(client) {
-            Ok(version) => (Some(version), true),
-            Err(_) => (None, false),
-        };
-
-        Self {
-            address,
-            version,
-            available,
+                Self {
+                    address,
+                    version,
+                    available,
+                }
+            }
+            Err(_) => Self {
+                address,
+                version: None,
+                available: false,
+            },
         }
     }
 }

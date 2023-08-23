@@ -11,8 +11,6 @@ use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use super::isa::{self, Compiler};
 use super::rpcq;
 
-use crate::client::Qcs;
-
 /// Number of seconds to wait before timing out.
 pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
@@ -26,6 +24,32 @@ pub trait Client {
         isa: TargetDevice,
         options: CompilerOpts,
     ) -> Result<CompilationResult, Error>;
+
+    /// Get the version of Quilc
+    fn get_version_info(&self) -> Result<String, Error>;
+
+    /// Given a circuit that consists only of elements of the Clifford group,
+    /// return its action on a `PauliTerm`.
+    /// In particular, for Clifford `C`, and Pauli `P`, this returns the Pauli Term
+    /// representing `CPC^{\dagger}`.
+    fn conjugate_pauli_by_clifford(
+        &self,
+        request: ConjugateByCliffordRequest,
+    ) -> Result<ConjugatePauliByCliffordResponse, Error>;
+
+    /// Construct a randomized benchmarking experiment on the given qubits, decomposing into
+    /// gateset. If interleaver is not provided, the returned sequence will have the form
+    /// ```C_1 C_2 ... C_(depth-1) C_inv ,```
+    ///
+    /// where each C is a Clifford element drawn from gateset, ``C_{< depth}`` are randomly selected,
+    /// and ``C_inv`` is selected so that the entire sequence composes to the identity.  If an
+    /// interleaver ``G`` (which must be a Clifford, and which will be decomposed into the native
+    /// gateset) is provided, then the sequence instead takes the form
+    /// ```C_1 G C_2 G ... C_(depth-1) G C_inv .```
+    fn generate_randomized_benchmarking_sequence(
+        &self,
+        request: RandomizedBenchmarkingRequest,
+    ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error>;
 }
 
 /// Take in a Quil program and produce a "native quil" output from quilc
@@ -53,7 +77,7 @@ pub fn compile_program<C: Client>(
     quil: &str,
     isa: TargetDevice,
     options: CompilerOpts,
-    client: C,
+    client: &C,
 ) -> Result<CompilationResult, Error> {
     #[cfg(feature = "tracing")]
     tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
@@ -119,21 +143,9 @@ impl Default for CompilerOpts {
     }
 }
 
-/// Fetch the version information from the running Quilc compiler.
-pub fn get_version_info(client: &Qcs) -> Result<String, Error> {
-    #[cfg(feature = "tracing")]
-    tracing::debug!("requesting quilc version information");
-
-    let config = client.get_config();
-    let endpoint = config.quilc_url();
-    let binding: HashMap<String, String> = HashMap::new();
-    let request = rpcq::RPCRequest::new("get_version_info", &binding);
-    let rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, QuilcVersionResponse>(&request) {
-        Ok(response) => Ok(response.quilc),
-        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
-    }
+/// See documentation for [`Client::get_version_info`]
+pub fn get_version_info<C: Client>(client: &C) -> Result<String, Error> {
+    client.get_version_info()
 }
 
 /// Pauli Term
@@ -160,7 +172,7 @@ pub struct ConjugateByCliffordRequest {
 
 /// The "outer" request shape for a `conjugate_pauli_by_clifford` request.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
-struct ConjugatePauliByCliffordRequest {
+pub(crate) struct ConjugatePauliByCliffordRequest {
     #[serde(rename = "*args")]
     args: [ConjugateByCliffordRequest; 1],
 }
@@ -181,27 +193,12 @@ pub struct ConjugatePauliByCliffordResponse {
     pub pauli: String,
 }
 
-/// Given a circuit that consists only of elements of the Clifford group,
-/// return its action on a `PauliTerm`.
-/// In particular, for Clifford ``C``, and Pauli ``P``, this returns the Pauli Term
-/// representing ``CPC^{\dagger}``.
-pub fn conjugate_pauli_by_clifford(
-    client: &Qcs,
+/// See documentation for [`Client::conjugate_pauli_by_clifford`]
+pub fn conjugate_pauli_by_clifford<C: Client>(
+    client: &C,
     request: ConjugateByCliffordRequest,
 ) -> Result<ConjugatePauliByCliffordResponse, Error> {
-    #[cfg(feature = "tracing")]
-    tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
-
-    let config = client.get_config();
-    let endpoint = config.quilc_url();
-    let request: ConjugatePauliByCliffordRequest = request.into();
-    let request = rpcq::RPCRequest::new("conjugate_pauli_by_clifford", &request);
-    let rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, ConjugatePauliByCliffordResponse>(&request) {
-        Ok(response) => Ok(response),
-        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
-    }
+    client.conjugate_pauli_by_clifford(request)
 }
 
 /// Request to generate a randomized benchmarking sequence.
@@ -226,7 +223,7 @@ pub struct RandomizedBenchmarkingRequest {
 
 /// The "outer" request shape for a `generate_rb_sequence` request.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
-struct GenerateRandomizedBenchmarkingSequenceRequest {
+pub(crate) struct GenerateRandomizedBenchmarkingSequenceRequest {
     #[serde(rename = "*args")]
     args: [RandomizedBenchmarkingRequest; 1],
 }
@@ -244,32 +241,12 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     pub sequence: Vec<Vec<i64>>,
 }
 
-/// Construct a randomized benchmarking experiment on the given qubits, decomposing into
-/// gateset. If interleaver is not provided, the returned sequence will have the form
-/// ```C_1 C_2 ... C_(depth-1) C_inv ,```
-///
-/// where each C is a Clifford element drawn from gateset, ``C_{< depth}`` are randomly selected,
-/// and ``C_inv`` is selected so that the entire sequence composes to the identity.  If an
-/// interleaver ``G`` (which must be a Clifford, and which will be decomposed into the native
-/// gateset) is provided, then the sequence instead takes the form
-/// ```C_1 G C_2 G ... C_(depth-1) G C_inv .```
-pub fn generate_randomized_benchmarking_sequence(
-    client: &Qcs,
+/// See documentation for [`Client::generate_randomized_benchmarking_sequence`]
+pub fn generate_randomized_benchmarking_sequence<C: Client>(
+    client: &C,
     request: RandomizedBenchmarkingRequest,
 ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
-    #[cfg(feature = "tracing")]
-    tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
-
-    let config = client.get_config();
-    let endpoint = config.quilc_url();
-    let request: GenerateRandomizedBenchmarkingSequenceRequest = request.into();
-    let request = rpcq::RPCRequest::new("generate_rb_sequence", &request);
-    let rpcq_client = rpcq::Client::new(endpoint)
-        .map_err(|source| Error::from_quilc_error(endpoint.into(), source))?;
-    match rpcq_client.run_request::<_, GenerateRandomizedBenchmarkingSequenceResponse>(&request) {
-        Ok(response) => Ok(response),
-        Err(source) => Err(Error::from_quilc_error(endpoint.into(), source)),
-    }
+    client.generate_randomized_benchmarking_sequence(request)
 }
 
 /// All of the errors that can occur within this module.
@@ -342,8 +319,8 @@ pub struct NativeQuilMetadata {
 }
 
 #[derive(Clone, Deserialize, Debug, Eq, PartialEq, Ord, PartialOrd)]
-struct QuilcVersionResponse {
-    quilc: String,
+pub(crate) struct QuilcVersionResponse {
+    pub(crate) quilc: String,
 }
 
 /// The top level params that get passed to quilc
@@ -408,6 +385,7 @@ mod tests {
     use crate::qvm::api::AddressRequest;
 
     use super::*;
+    use crate::client::Qcs;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use regex::Regex;
     use std::{fs::File, num::NonZeroU16};
@@ -434,7 +412,7 @@ mod tests {
             "MEASURE 0",
             TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
             CompilerOpts::default(),
-            rpcq_client().await,
+            &rpcq_client().await,
         )
         .expect("Could not compile");
         assert_eq!(output.program.to_string(), EXPECTED_H0_OUTPUT);
@@ -456,7 +434,7 @@ MEASURE 1 ro[1]
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             CompilerOpts::default(),
-            rpcq_client().await,
+            &rpcq_client().await,
         )
         .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string())
@@ -490,7 +468,7 @@ MEASURE 1 ro[1]
             "DECLARE ro BIT[1]\n",
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
             CompilerOpts::default(),
-            rpcq_client().await,
+            &rpcq_client().await,
         )
         .expect("Should be able to compile");
         assert_eq!(output.program.to_string(), "DECLARE ro BIT[1]\n");
@@ -499,15 +477,15 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn get_version_info_from_quilc() {
-        let client = Qcs::load().await;
-        let version = get_version_info(&client).expect("Should get version info from quilc");
+        let rpcq_client = rpcq_client().await;
+        let version = get_version_info(&rpcq_client).expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
-        let client = Qcs::load().await;
+        let rpcq_client = rpcq_client().await;
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {
                 indices: vec![0],
@@ -515,7 +493,7 @@ MEASURE 1 ro[1]
             },
             clifford: "H 0".into(),
         };
-        let response = conjugate_pauli_by_clifford(&client, request)
+        let response = conjugate_pauli_by_clifford(&rpcq_client, request)
             .expect("Should conjugate pauli by clifford");
 
         assert_eq!(
@@ -529,7 +507,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_generate_randomized_benchmark_sequence() {
-        let client = Qcs::load().await;
+        let rpcq_client = rpcq_client().await;
         let request = RandomizedBenchmarkingRequest {
             depth: 2,
             qubits: 1,
@@ -537,7 +515,7 @@ MEASURE 1 ro[1]
             seed: Some(314),
             interleaver: Some("Y 0".into()),
         };
-        let response = generate_randomized_benchmarking_sequence(&client, request)
+        let response = generate_randomized_benchmarking_sequence(&rpcq_client, request)
             .expect("Should generate randomized benchmark sequence");
 
         assert_eq!(
