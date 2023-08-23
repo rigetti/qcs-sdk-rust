@@ -16,18 +16,10 @@ use super::quilc;
 pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 
 /// A minimal RPCQ client that does just enough to talk to `quilc`
+#[derive(Clone)]
 pub struct Client {
     pub(crate) endpoint: String,
     socket: Arc<Mutex<Socket>>,
-}
-
-impl Clone for Client {
-    fn clone(&self) -> Self {
-        Self {
-            endpoint: self.endpoint.clone(),
-            socket: self.socket.clone(),
-        }
-    }
 }
 
 impl std::fmt::Debug for Client {
