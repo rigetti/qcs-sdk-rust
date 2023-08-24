@@ -1,5 +1,5 @@
 use qcs::{
-    qvm::{QvmOptions, QvmResultData},
+    qvm::{self, QvmOptions, QvmResultData},
     RegisterData,
 };
 use rigetti_pyo3::{
@@ -24,12 +24,30 @@ py_wrap_type! {
 }
 
 create_init_submodule! {
-    classes: [PyQvmResultData, PyQvmOptions],
+    classes: [PyQvmResultData, PyQvmOptions, PyQvmHttpClient],
     errors: [QVMError],
     funcs: [py_run, py_run_async],
     submodules: [
         "api": api::init_submodule
     ],
+}
+
+#[pyo3::pyclass]
+#[pyo3(name = "QVMHTTPClient")]
+#[derive(Debug, Clone)]
+pub struct PyQvmHttpClient(pub qvm::api::HttpClient);
+
+#[pymethods]
+impl PyQvmHttpClient {
+    #[new]
+    pub fn new(address: String) -> Self {
+        Self(qvm::api::HttpClient::new(address))
+    }
+}
+
+#[derive(Debug, pyo3::FromPyObject)]
+pub enum QvmClient {
+    Http(PyQvmHttpClient),
 }
 
 #[pymethods]
@@ -94,13 +112,13 @@ py_function_sync_async! {
         shots: NonZeroU16,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
+        client: QvmClient,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
-        client: Option<PyQcsClient>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let QvmClient::Http(client) = client;
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();
@@ -114,7 +132,7 @@ py_function_sync_async! {
                     measurement_noise,
                     gate_noise,
                     rng_seed,
-                    &client,
+                    &client.0,
                     options.as_inner()
             )
             .await

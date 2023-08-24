@@ -1966,6 +1966,7 @@ dependencies = [
 name = "qcs"
 version = "0.15.5"
 dependencies = [
+ "async-trait",
  "built",
  "cached",
  "derive_builder",

@@ -108,7 +108,7 @@ py_wrap_error!(quilc, RustRpcqError, RpcqError, PyRuntimeError);
 #[pyclass]
 #[pyo3(name = "RPCQClient")]
 #[derive(Clone)]
-pub struct PyRpcqClient(rpcq::Client);
+pub struct PyRpcqClient(pub rpcq::Client);
 
 #[pymethods]
 impl PyRpcqClient {

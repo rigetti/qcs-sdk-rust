@@ -5,7 +5,12 @@ use std::{borrow::Cow, time::Duration};
 
 use qcs_api_client_openapi::models::User;
 
-use crate::{build_info, client::Qcs, compiler::rpcq, qvm::QvmOptions};
+use crate::{
+    build_info,
+    client::Qcs,
+    compiler::rpcq,
+    qvm::{self, Client, QvmOptions},
+};
 
 /// Collect package diagnostics in string form
 pub async fn get_report() -> String {
@@ -193,7 +198,8 @@ impl QvmDiagnostics {
             timeout: Some(Duration::from_secs(1)),
         };
 
-        let (version, available) = match crate::qvm::api::get_version_info(client, &options).await {
+        let qvm_client = qvm::api::HttpClient::new(address.clone());
+        let (version, available) = match qvm_client.get_version_info(&options).await {
             Ok(version) => (Some(version), true),
             Err(_) => (None, false),
         };

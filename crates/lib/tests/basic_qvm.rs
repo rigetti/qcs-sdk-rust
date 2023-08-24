@@ -3,7 +3,7 @@
 
 use std::num::NonZeroU16;
 
-use qcs::{client::Qcs, Executable};
+use qcs::{client::Qcs, compiler::rpcq, qvm, Executable};
 
 const PROGRAM: &str = r##"
 DECLARE first BIT
@@ -16,16 +16,29 @@ MEASURE 0 first
 MEASURE 1 second
 "##;
 
+async fn quilc_client() -> rpcq::Client {
+    let qcs = Qcs::load().await;
+    let endpoint = qcs.get_config().quilc_url();
+    rpcq::Client::new(endpoint).unwrap()
+}
+
+async fn qvm_client() -> qvm::api::HttpClient {
+    let qcs = Qcs::load().await;
+    let endpoint = qcs.get_config().qvm_url();
+    qvm::api::HttpClient::new(endpoint.to_string())
+}
+
 #[tokio::test]
 async fn test_bell_state() {
     let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
-        .with_client(Qcs::load().await)
+        .quilc_client(Some(quilc_client().await))
+        .with_qcs_client(Qcs::load().await)
         .with_shots(shots)
         .read_from("first")
         .read_from("second")
-        .execute_on_qvm()
+        .execute_on_qvm(&qvm_client().await)
         .await
         .expect("Could not run on QVM");
 

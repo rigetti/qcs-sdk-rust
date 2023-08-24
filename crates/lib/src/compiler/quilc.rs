@@ -382,7 +382,7 @@ impl TryFrom<InstructionSetArchitecture> for TargetDevice {
 
 #[cfg(test)]
 mod tests {
-    use crate::qvm::api::AddressRequest;
+    use crate::qvm::{self, api::AddressRequest};
 
     use super::*;
     use crate::client::Qcs;
@@ -430,6 +430,7 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
         let client = Qcs::load().await;
+        let client = qvm::api::HttpClient::new(client.get_config().qvm_url().to_string());
         let output = compile_program(
             BELL_STATE,
             TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
