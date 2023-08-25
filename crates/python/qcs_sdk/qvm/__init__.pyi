@@ -24,7 +24,6 @@ class QVMResultData:
         Get the mapping of register names (ie. "ro") to a ``RegisterData`` matrix containing the register values.
         """
         ...
-    @property
     def to_raw_readout_data(
         self,
     ) -> RawQVMReadoutData:

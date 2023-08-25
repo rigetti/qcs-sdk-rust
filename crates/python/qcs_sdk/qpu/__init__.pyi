@@ -83,9 +83,10 @@ class QPUResultData:
         """
         ...
 
+@final
 class RawQPUReadoutData:
     @property
-    def mapping(self) -> Dict[str, str]:
+    def mappings(self) -> Dict[str, str]:
         """
         Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values
         """
