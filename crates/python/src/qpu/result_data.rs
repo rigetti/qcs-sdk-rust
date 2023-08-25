@@ -66,6 +66,10 @@ impl PyQpuResultData {
     }
 }
 
+/// A wrapper type for data returned by the QPU in a more flat structure than
+/// [`PyQpuResultData`] offers. This makes it more convenient to work with
+/// the data if you don't care what type of number the readout values for
+/// each register contains.
 #[derive(Debug)]
 #[pyclass(name = "RawQPUReadoutData")]
 pub struct RawQpuReadoutData {

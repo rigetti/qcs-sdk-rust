@@ -63,16 +63,13 @@ impl PyExecutionData {
     ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
             result_data: ResultData::py_try_from(py, &result_data)?,
-            duration: match duration {
-                None => None,
-                Some(delta) => Some(
-                    delta
-                        .as_ref(py)
-                        .call_method0("total_seconds")
-                        .map(|result| result.extract::<f64>())?
-                        .map(Duration::from_secs_f64)?,
-                ),
-            },
+            duration: duration.map(|delta| {
+                delta
+                    .as_ref(py)
+                    .call_method0("total_seconds")
+                    .map(|result| result.extract::<f64>())?
+                    .map(Duration::from_secs_f64)
+            })?,
         }))
     }
 }
@@ -186,8 +183,8 @@ impl PyRegisterMap {
         self.as_inner().0.len()
     }
 
-    pub fn __contains__(&self, key: String) -> bool {
-        self.as_inner().0.contains_key(&key)
+    pub fn __contains__(&self, key: &str) -> bool {
+        self.as_inner().0.contains_key(key)
     }
 
     pub fn __getitem__(&self, item: &str) -> PyResult<PyRegisterMatrix> {
