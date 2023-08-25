@@ -3,8 +3,8 @@ use std::time::Duration;
 use numpy::{Complex64, PyArray2};
 use pyo3::exceptions::PyKeyError;
 use pyo3::{
-    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, Py, PyObject, PyRef, PyRefMut,
-    PyResult, Python, ToPyObject,
+    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, IntoPy, Py, PyObject, PyRef,
+    PyRefMut, PyResult, Python, ToPyObject,
 };
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use rigetti_pyo3::{
@@ -41,6 +41,17 @@ impl PyResultData {
             .map_err(RustRegisterMatrixConversionError)
             .map_err(ToPythonError::to_py_err)?
             .to_python(py)
+    }
+
+    pub fn to_raw_readout_data(&self, py: Python) -> PyResult<PyObject> {
+        match self.as_inner() {
+            ResultData::Qpu(_) => self
+                .to_qpu(py)
+                .map(|data| data.to_raw_readout_data(py).into_py(py)),
+            ResultData::Qvm(_) => self
+                .to_qvm(py)
+                .map(|data| data.to_raw_readout_data(py).into_py(py)),
+        }
     }
 }
 

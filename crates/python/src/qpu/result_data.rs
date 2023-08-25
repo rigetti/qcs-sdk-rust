@@ -44,7 +44,7 @@ impl PyQpuResultData {
         self.as_inner().readout_values().to_python(py)
     }
 
-    fn to_raw_readout_data(&self, py: Python<'_>) -> RawQpuReadoutData {
+    pub(crate) fn to_raw_readout_data(&self, py: Python<'_>) -> RawQpuReadoutData {
         RawQpuReadoutData {
             mappings: self.as_inner().mappings().clone(),
             readout_values: self

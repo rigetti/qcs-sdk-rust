@@ -79,12 +79,20 @@ class QPUResultData:
         self,
     ) -> RawQPUReadoutData:
         """
-        Get a copy of this result data flattened into a ``RawQPUReadoutData``
+        Get a copy of this result data flattened into a ``RawQPUReadoutData``. This reduces
+        the contained data down to primitive types, offering a simpler structure at the
+        cost of the type safety provided by ``ReadoutValues``.
         """
         ...
 
 @final
 class RawQPUReadoutData:
+    """
+    Encapsulates data returned from the QPU after executing a job. Compared to
+    ``QPUReadoutData``, the readout values in this class are returned as lists
+    of numbers instead of values wrapped by the ``ReadoutValues`` class.
+    """
+
     @property
     def mappings(self) -> Dict[str, str]:
         """

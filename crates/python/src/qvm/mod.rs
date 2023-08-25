@@ -59,7 +59,7 @@ impl PyQvmResultData {
         self.as_inner().memory().to_python(py)
     }
 
-    fn to_raw_readout_data(&self, py: Python<'_>) -> RawQvmReadoutData {
+    pub(crate) fn to_raw_readout_data(&self, py: Python<'_>) -> RawQvmReadoutData {
         RawQvmReadoutData {
             memory: self
                 .as_inner()
@@ -83,7 +83,7 @@ impl PyQvmResultData {
 
 #[pyclass(name = "RawQVMReadoutData")]
 #[derive(Debug)]
-struct RawQvmReadoutData {
+pub(crate) struct RawQvmReadoutData {
     #[pyo3(get)]
     memory: HashMap<String, Py<PyList>>,
 }

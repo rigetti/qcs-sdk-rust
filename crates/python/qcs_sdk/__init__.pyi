@@ -5,8 +5,8 @@ from typing import Dict, List, Sequence, Optional, Union, final, Iterable, Tuple
 import numpy as np
 from numpy.typing import NDArray
 
-from qcs_sdk.qpu import QPUResultData
-from qcs_sdk.qvm import QVMResultData
+from qcs_sdk.qpu import QPUResultData, RawQpuReadoutData
+from qcs_sdk.qvm import QVMResultData, RawQvmReadoutData
 from qcs_sdk.compiler.quilc import CompilerOpts
 
 from qcs_sdk.client import QCSClient as QCSClient
@@ -299,6 +299,11 @@ class ResultData:
         selects the last value per-shot based on the program that was run.
         """
         ...
+    def to_raw_readout_data(self) -> Union[RawQpuReadoutData, RawQvmReadoutData]:
+        """
+        Get the raw data returned from the QVM or QPU. See ``RawQpuReadoutData`` and
+        ``RawQvmReadoutData`` for more information.
+        """
     def inner(
         self,
     ) -> Union[QVMResultData, QPUResultData]:
