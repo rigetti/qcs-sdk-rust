@@ -16,7 +16,7 @@ use crate::execution_data::{self, ResultData};
 use crate::qpu::api::{ExecutionOptions, JobId};
 use crate::qpu::rewrite_arithmetic;
 use crate::qpu::ExecutionError;
-use crate::qvm::api::AddressRequest;
+use crate::qvm::http::AddressRequest;
 use crate::{qpu, qvm};
 use quil_rs::program::ProgramError;
 

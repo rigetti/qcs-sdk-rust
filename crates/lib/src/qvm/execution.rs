@@ -5,7 +5,7 @@ use quil_rs::Program;
 
 use crate::{executable::Parameters, qvm::run_program};
 
-use super::{api::AddressRequest, Error, QvmResultData};
+use super::{http::AddressRequest, Error, QvmResultData};
 use super::{Client, QvmOptions};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
@@ -81,10 +81,10 @@ mod describe_execution {
     use super::{Execution, Parameters};
     use crate::{client::Qcs, qvm};
 
-    async fn qvm_client() -> qvm::api::HttpClient {
+    async fn qvm_client() -> qvm::http::HttpClient {
         let qcs = Qcs::load().await;
         let endpoint = qcs.get_config().qvm_url();
-        qvm::api::HttpClient::new(endpoint.to_string())
+        qvm::http::HttpClient::new(endpoint.to_string())
     }
 
     #[tokio::test]

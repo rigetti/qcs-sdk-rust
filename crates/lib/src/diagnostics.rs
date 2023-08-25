@@ -198,7 +198,7 @@ impl QvmDiagnostics {
             timeout: Some(Duration::from_secs(1)),
         };
 
-        let qvm_client = qvm::api::HttpClient::new(address.clone());
+        let qvm_client = qvm::http::HttpClient::new(address.clone());
         let (version, available) = match qvm_client.get_version_info(&options).await {
             Ok(version) => (Some(version), true),
             Err(_) => (None, false),

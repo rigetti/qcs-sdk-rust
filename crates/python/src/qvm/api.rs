@@ -10,7 +10,7 @@ use pyo3::{
 };
 use qcs::{
     qvm::{
-        api::{
+        http::{
             AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
             MultishotResponse, WavefunctionRequest,
         },

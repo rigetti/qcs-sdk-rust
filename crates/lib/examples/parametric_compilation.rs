@@ -7,7 +7,7 @@ use std::time::Duration;
 use qcs::client::Qcs;
 use qcs::compiler::rpcq;
 use qcs::qpu::api::ExecutionOptions;
-use qcs::{qvm, Executable};
+use qcs::Executable;
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT

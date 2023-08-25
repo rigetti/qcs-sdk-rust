@@ -1,4 +1,4 @@
-//! This module provides types and functions for making API calls directly to the QVM.
+//! This module provides types and functions for making HTTP-based API calls to the QVM.
 //! Consider [`super::run_program`] for higher level access to the QVM that allows
 //! for running parameterized programs.
 use std::{collections::HashMap, num::NonZeroU16};
@@ -247,13 +247,16 @@ impl WavefunctionRequest {
     }
 }
 
+/// Provides HTTP-based access to QVM functionality
 #[derive(Debug, Clone)]
 pub struct HttpClient {
     client: reqwest::Client,
+    /// Address used to connect to the QVM
     pub qvm_url: String,
 }
 
 impl HttpClient {
+    /// Build a new [`HttpClient`] to connect to a QVM server at `qvm_url`.
     #[must_use]
     pub fn new(qvm_url: String) -> Self {
         let client = reqwest::Client::new();
@@ -381,7 +384,7 @@ where
 mod describe_request {
     use std::{collections::HashMap, num::NonZeroU16};
 
-    use crate::qvm::api::AddressRequest;
+    use crate::qvm::http::AddressRequest;
 
     use super::MultishotRequest;
 

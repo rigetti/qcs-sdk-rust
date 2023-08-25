@@ -22,10 +22,10 @@ async fn quilc_client() -> rpcq::Client {
     rpcq::Client::new(endpoint).unwrap()
 }
 
-async fn qvm_client() -> qvm::api::HttpClient {
+async fn qvm_client() -> qvm::http::HttpClient {
     let qcs = Qcs::load().await;
     let endpoint = qcs.get_config().qvm_url();
-    qvm::api::HttpClient::new(endpoint.to_string())
+    qvm::http::HttpClient::new(endpoint.to_string())
 }
 
 #[tokio::test]

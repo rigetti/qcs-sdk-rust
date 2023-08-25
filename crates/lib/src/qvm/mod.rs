@@ -14,35 +14,49 @@ pub(crate) use execution::Execution;
 
 use crate::{executable::Parameters, RegisterData};
 
-use self::api::AddressRequest;
+use self::http::AddressRequest;
 
-pub mod api;
 mod execution;
+pub mod http;
 
 /// Number of seconds to wait before timing out.
 const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
 
+/// Methods supported by the QVM
 #[async_trait::async_trait]
 pub trait Client {
+    /// The QVM version string. Not guaranteed to comply to the semver spec.
     async fn get_version_info(&self, options: &QvmOptions) -> Result<String, Error>;
+    /// Execute a program on the QVM.
     async fn run(
         &self,
-        request: &api::MultishotRequest,
+        request: &http::MultishotRequest,
         options: &QvmOptions,
-    ) -> Result<api::MultishotResponse, Error>;
+    ) -> Result<http::MultishotResponse, Error>;
+    /// Execute a program on the QVM.
+    ///
+    /// The behavior of this method is different to that of [`Self::run`]
+    /// in that [`Self::run_and_measure`] will execute the program a single
+    /// time; the resulting wavefunction is then sampled some number of times
+    /// (specified in [`http::MultishotMeasureRequest`]).
+    ///
+    /// This can be useful if the program is expensive to execute and does
+    /// not change per "shot".
     async fn run_and_measure(
         &self,
-        request: &api::MultishotMeasureRequest,
+        request: &http::MultishotMeasureRequest,
         options: &QvmOptions,
     ) -> Result<Vec<Vec<i64>>, Error>;
+    /// Measure the expectation value of a program
     async fn measure_expectation(
         &self,
-        request: &api::ExpectationRequest,
+        request: &http::ExpectationRequest,
         options: &QvmOptions,
     ) -> Result<Vec<f64>, Error>;
+    /// Get the wavefunction produces by a program
     async fn get_wavefunction(
         &self,
-        request: &api::WavefunctionRequest,
+        request: &http::WavefunctionRequest,
         options: &QvmOptions,
     ) -> Result<Vec<u8>, Error>;
 }
@@ -55,15 +69,15 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 
     async fn run(
         &self,
-        request: &api::MultishotRequest,
+        request: &http::MultishotRequest,
         options: &QvmOptions,
-    ) -> Result<api::MultishotResponse, Error> {
+    ) -> Result<http::MultishotResponse, Error> {
         self.as_ref().run(request, options).await
     }
 
     async fn run_and_measure(
         &self,
-        request: &api::MultishotMeasureRequest,
+        request: &http::MultishotMeasureRequest,
         options: &QvmOptions,
     ) -> Result<Vec<Vec<i64>>, Error> {
         self.as_ref().run_and_measure(request, options).await
@@ -71,7 +85,7 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 
     async fn measure_expectation(
         &self,
-        request: &api::ExpectationRequest,
+        request: &http::ExpectationRequest,
         options: &QvmOptions,
     ) -> Result<Vec<f64>, Error> {
         self.as_ref().measure_expectation(request, options).await
@@ -79,7 +93,7 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 
     async fn get_wavefunction(
         &self,
-        request: &api::WavefunctionRequest,
+        request: &http::WavefunctionRequest,
         options: &QvmOptions,
     ) -> Result<Vec<u8>, Error> {
         self.as_ref().get_wavefunction(request, options).await
@@ -160,7 +174,7 @@ pub async fn run_program<C: Client>(
         "executing program on QVM"
     );
     let program = apply_parameters_to_program(program, params)?;
-    let request = api::MultishotRequest::new(
+    let request = http::MultishotRequest::new(
         program.to_string(),
         shots,
         addresses,

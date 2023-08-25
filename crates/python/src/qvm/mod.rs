@@ -10,7 +10,7 @@ use rigetti_pyo3::{
 use std::num::NonZeroU16;
 use std::{collections::HashMap, time::Duration};
 
-use crate::{client::PyQcsClient, py_sync::py_function_sync_async, register_data::PyRegisterData};
+use crate::{py_sync::py_function_sync_async, register_data::PyRegisterData};
 
 mod api;
 
@@ -35,13 +35,13 @@ create_init_submodule! {
 #[pyo3::pyclass]
 #[pyo3(name = "QVMHTTPClient")]
 #[derive(Debug, Clone)]
-pub struct PyQvmHttpClient(pub qvm::api::HttpClient);
+pub struct PyQvmHttpClient(pub qvm::http::HttpClient);
 
 #[pymethods]
 impl PyQvmHttpClient {
     #[new]
     pub fn new(address: String) -> Self {
-        Self(qvm::api::HttpClient::new(address))
+        Self(qvm::http::HttpClient::new(address))
     }
 }
 
