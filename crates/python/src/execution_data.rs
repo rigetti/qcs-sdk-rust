@@ -88,11 +88,11 @@ impl_repr!(PyRegisterMatrix);
 #[pymethods]
 impl PyRegisterMatrix {
     fn to_ndarray(&self, py: Python<'_>) -> Py<PyAny> {
-        self.as_integer(py)
-            .map(|array| array.into_py(py))
-            .or(self.as_real(py).map(|array| array.into_py(py)))
-            .or(self.as_complex(py).map(|array| array.into_py(py)))
-            .expect("A RegisterMatrix can't be any other type.")
+        match self.as_inner() {
+            RegisterMatrix::Integer(_) => self.to_integer(py).into_py(py),
+            RegisterMatrix::Real(_) => self.to_real(py).into_py(py),
+            RegisterMatrix::Complex(_) => self.to_complex(py).into_py(py),
+        }
     }
 
     #[staticmethod]
