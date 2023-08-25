@@ -1,4 +1,3 @@
-use numpy::PyArray;
 use pyo3::{
     prelude::*,
     types::{PyComplex, PyInt, PyList},
@@ -6,7 +5,7 @@ use pyo3::{
 use qcs_api_client_grpc::models::controller::{
     readout_values::Values, Complex64, Complex64ReadoutValues, IntegerReadoutValues, ReadoutValues,
 };
-use rigetti_pyo3::{num_complex::Complex32 as NumComplex32, py_wrap_struct, PyWrapper};
+use rigetti_pyo3::{num_complex::Complex32 as NumComplex32, py_wrap_struct};
 use rigetti_pyo3::{py_wrap_data_struct, py_wrap_union_enum, PyTryFrom, ToPython};
 
 py_wrap_data_struct! {

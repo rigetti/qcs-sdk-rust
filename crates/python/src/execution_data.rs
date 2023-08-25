@@ -3,10 +3,9 @@ use std::time::Duration;
 use numpy::{Complex64, PyArray2};
 use pyo3::exceptions::PyKeyError;
 use pyo3::{
-    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, Py, PyRef, PyRefMut, PyResult,
-    Python,
+    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, Py, PyObject, PyRef, PyRefMut,
+    PyResult, Python, ToPyObject,
 };
-use pyo3::{IntoPy, PyAny};
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use rigetti_pyo3::{
     impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error,
@@ -63,13 +62,15 @@ impl PyExecutionData {
     ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
             result_data: ResultData::py_try_from(py, &result_data)?,
-            duration: duration.map(|delta| {
-                delta
-                    .as_ref(py)
-                    .call_method0("total_seconds")
-                    .map(|result| result.extract::<f64>())?
-                    .map(Duration::from_secs_f64)
-            })?,
+            duration: duration
+                .map(|delta| {
+                    delta
+                        .as_ref(py)
+                        .call_method0("total_seconds")
+                        .map(|result| result.extract::<f64>())?
+                        .map(Duration::from_secs_f64)
+                })
+                .transpose()?,
         }))
     }
 }
@@ -87,11 +88,11 @@ impl_repr!(PyRegisterMatrix);
 
 #[pymethods]
 impl PyRegisterMatrix {
-    fn to_ndarray(&self, py: Python<'_>) -> Py<PyAny> {
+    fn to_ndarray(&self, py: Python<'_>) -> PyResult<PyObject> {
         match self.as_inner() {
-            RegisterMatrix::Integer(_) => self.to_integer(py).into_py(py),
-            RegisterMatrix::Real(_) => self.to_real(py).into_py(py),
-            RegisterMatrix::Complex(_) => self.to_complex(py).into_py(py),
+            RegisterMatrix::Integer(_) => self.to_integer(py).map(|matrix| matrix.to_object(py)),
+            RegisterMatrix::Real(_) => self.to_real(py).map(|matrix| matrix.to_object(py)),
+            RegisterMatrix::Complex(_) => self.to_complex(py).map(|matrix| matrix.to_object(py)),
         }
     }
 
