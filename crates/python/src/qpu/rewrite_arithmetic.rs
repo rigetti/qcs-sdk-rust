@@ -81,7 +81,7 @@ pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticRe
         .into_iter()
         .map(|e| {
             e.to_quil().expect(
-                "Expressions built from successfully parsed program should convert to valid Quil.",
+                "Expressions built from a successfully parsed program should convert to valid Quil.",
             )
         })
         .collect();
