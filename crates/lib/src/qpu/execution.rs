@@ -8,6 +8,7 @@ use std::time::Duration;
 
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
+use quil_rs::quil::ToQuilError;
 use tokio::task::{spawn_blocking, JoinError};
 
 #[cfg(feature = "tracing")]
@@ -43,6 +44,8 @@ pub(crate) struct Execution<'a> {
 pub(crate) enum Error {
     #[error("problem processing the provided Quil: {0}")]
     Quil(#[from] ProgramError),
+    #[error("problem converting the program to valid Quil: {0}")]
+    ToQuil(#[from] ToQuilError),
     #[error("An error that is not expected to occur. If this shows up it may be a bug in this SDK or QCS")]
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
@@ -176,7 +179,7 @@ impl<'a> Execution<'a> {
     ) -> Result<EncryptedTranslationResult, Error> {
         let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
-            &self.program.to_string().0,
+            &self.program.to_string()?.0,
             self.shots.get().into(),
             self.client.as_ref(),
             options,
