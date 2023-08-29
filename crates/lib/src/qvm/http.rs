@@ -249,6 +249,7 @@ impl WavefunctionRequest {
 
 /// Provides HTTP-based access to QVM functionality
 #[derive(Debug, Clone)]
+#[allow(clippy::module_name_repetitions)]
 pub struct HttpClient {
     client: reqwest::Client,
     /// Address used to connect to the QVM

@@ -18,7 +18,7 @@ async fn quilc_client() -> rpcq::Client {
 
 #[tokio::main]
 async fn main() {
-    let mut exe = Executable::from_quil(PROGRAM).quilc_client(Some(quilc_client().await));
+    let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
     let job_handle = exe
         .submit_to_qpu(QUANTUM_PROCESSOR_ID, None, &ExecutionOptions::default())
         .await

@@ -31,7 +31,7 @@ async fn qvm_client() -> qvm::http::HttpClient {
 #[tokio::test]
 async fn basic_substitution() {
     let mut exe = Executable::from_quil(BASIC_SUBSTITUTION)
-        .quilc_client(Some(quilc_client().await))
+        .with_quilc_client(Some(quilc_client().await))
         .with_qcs_client(Qcs::default());
     let qvm_client = qvm_client().await;
     let mut parametric_measurements = Vec::with_capacity(200);

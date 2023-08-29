@@ -27,6 +27,7 @@ use quil_rs::program::ProgramError;
 /// ```rust
 /// use qcs::client::Qcs;
 /// use qcs::Executable;
+/// use qcs::qvm;
 ///
 ///
 /// const PROGRAM: &str = r##"
@@ -42,7 +43,9 @@ use quil_rs::program::ProgramError;
 /// #[tokio::main]
 /// async fn main() {
 ///     use std::num::NonZeroU16;
-///     let mut result = Executable::from_quil(PROGRAM).with_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm().await.unwrap();
+///     use qcs::qvm;
+///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
+///     let mut result = Executable::from_quil(PROGRAM).with_qcs_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm(&qvm_client).await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
 ///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
@@ -89,7 +92,6 @@ pub struct Executable<'executable, 'execution> {
     params: Parameters,
     qcs_client: Option<Arc<Qcs>>,
     quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
-    compile_with_quilc: bool,
     compiler_options: CompilerOpts,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -119,7 +121,6 @@ impl<'executable> Executable<'executable, '_> {
             shots: NonZeroU16::new(1).expect("value is non-zero"),
             readout_memory_region_names: None,
             params: Parameters::new(),
-            compile_with_quilc: true,
             compiler_options: CompilerOpts::default(),
             qpu: None,
             qvm: None,
@@ -144,6 +145,7 @@ impl<'executable> Executable<'executable, '_> {
     /// ```rust
     /// use qcs::client::Qcs;
     /// use qcs::Executable;
+    /// use qcs::qvm;
     ///
     /// const PROGRAM: &str = r#"
     /// DECLARE first REAL[1]
@@ -155,11 +157,12 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
     ///     let mut result = Executable::from_quil(PROGRAM)
-    ///         .with_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
     ///         .read_from("second")
-    ///         .execute_on_qvm()
+    ///         .execute_on_qvm(&qvm_client)
     ///         .await
     ///         .unwrap();
     ///     let first_value = result
@@ -218,13 +221,15 @@ impl<'executable> Executable<'executable, '_> {
     /// ```rust
     /// use qcs::client::Qcs;
     /// use qcs::Executable;
+    /// use qcs::qvm;
     ///
     /// const PROGRAM: &str = "DECLARE theta REAL[2]";
     ///
     /// #[tokio::main]
     /// async fn main() {
+    ///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
     ///     let mut exe = Executable::from_quil(PROGRAM)
-    ///         .with_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
+    ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
     ///
     ///     for theta in 0..2 {
@@ -232,7 +237,7 @@ impl<'executable> Executable<'executable, '_> {
     ///         let mut result = exe
     ///             .with_parameter("theta", 0, theta)
     ///             .with_parameter("theta", 1, theta * 2.0)
-    ///             .execute_on_qvm().await.unwrap();
+    ///             .execute_on_qvm(&qvm_client).await.unwrap();
     ///         let theta_register = result
     ///             .result_data
     ///             .to_register_map()
@@ -320,7 +325,7 @@ impl Executable<'_, '_> {
     /// To disable compilation, set this to `None`.
     #[must_use]
     #[allow(trivial_casts)]
-    pub fn quilc_client<C: quilc::Client + Send + Sync + 'static>(
+    pub fn with_quilc_client<C: quilc::Client + Send + Sync + 'static>(
         mut self,
         client: Option<C>,
     ) -> Self {
@@ -406,7 +411,7 @@ impl<'execution> Executable<'_, 'execution> {
             self.shots,
             id,
             self.get_qcs_client().await?,
-            self.compile_with_quilc,
+            self.quilc_client.clone(),
             self.compiler_options,
         )
         .await
@@ -788,7 +793,7 @@ mod describe_get_config {
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("").quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
 
         exe.with_parameter("foo", 0, 0.0);
         let params = exe.params.get("foo").unwrap().len();
@@ -821,7 +826,7 @@ mod describe_qpu_for_id {
         // Default config has no auth, so it should try to refresh
         let mut exe = Executable::from_quil("")
             .with_qcs_client(Qcs::default())
-            .quilc_client(Some(quilc_client().await));
+            .with_quilc_client(Some(quilc_client().await));
         let result = exe.qpu_for_id("blah").await;
         let Err(err) = result else {
             panic!("Expected an error!");
@@ -832,7 +837,7 @@ mod describe_qpu_for_id {
 
     #[tokio::test]
     async fn it_loads_cached_version() {
-        let mut exe = Executable::from_quil("").quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
         let shots = NonZeroU16::new(17).expect("value is non-zero");
         exe.shots = shots;
         exe.qpu = Some(
@@ -841,7 +846,7 @@ mod describe_qpu_for_id {
                 shots,
                 "Aspen-M-3".into(),
                 exe.get_qcs_client().await.expect("should have client"),
-                exe.compile_with_quilc,
+                exe.quilc_client.clone(),
                 CompilerOpts::default(),
             )
             .await
@@ -857,7 +862,7 @@ mod describe_qpu_for_id {
     async fn it_creates_new_after_shot_change() {
         let original_shots = NonZeroU16::new(23).expect("value is non-zero");
         let mut exe = Executable::from_quil("")
-            .quilc_client(Some(quilc_client().await))
+            .with_quilc_client(Some(quilc_client().await))
             .with_shots(original_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
@@ -874,7 +879,7 @@ mod describe_qpu_for_id {
 
     #[tokio::test]
     async fn it_creates_new_for_new_qpu_id() {
-        let mut exe = Executable::from_quil("").quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
         assert_eq!(qpu.quantum_processor_id, "Aspen-9");

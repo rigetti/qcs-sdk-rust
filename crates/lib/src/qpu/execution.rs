@@ -120,14 +120,13 @@ impl<'a> Execution<'a> {
         shots: NonZeroU16,
         quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
-        compile_with_quilc: bool,
+        quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots=%shots,
             %quantum_processor_id,
-            %compile_with_quilc,
             ?compiler_options,
             "creating new QPU Execution",
         );
@@ -135,12 +134,10 @@ impl<'a> Execution<'a> {
         let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
-        let program = if compile_with_quilc {
+        let program = if let Some(client) = quilc_client {
             #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
-            let client = client.clone();
-            let rpcq_client = rpcq::Client::new(client.get_config().quilc_url())?;
-            quilc::compile_program(&quil, target_device, compiler_options, &rpcq_client)
+            quilc::compile_program(&quil, target_device, compiler_options, client.as_ref())
                 .map_err(|e| Error::Compilation {
                     details: e.to_string(),
                 })?

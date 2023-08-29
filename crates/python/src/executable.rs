@@ -113,7 +113,7 @@ impl PyExecutable {
         let quilc_client = quilc_client.map(|c| match c {
             QuilcClient::Rpcq(c) => c.0,
         });
-        let mut exe = Executable::from_quil(quil).quilc_client(quilc_client);
+        let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);
 
         for reg in registers {
             exe = exe.read_from(reg);

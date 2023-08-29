@@ -33,7 +33,7 @@ async fn test_bell_state() {
     let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
-        .quilc_client(Some(quilc_client().await))
+        .with_quilc_client(Some(quilc_client().await))
         .with_qcs_client(Qcs::load().await)
         .with_shots(shots)
         .read_from("first")

@@ -73,7 +73,7 @@ pub trait Client {
     feature = "tracing",
     tracing::instrument(skip(client), level = "trace")
 )]
-pub fn compile_program<C: Client>(
+pub fn compile_program<C: Client + ?Sized>(
     quil: &str,
     isa: TargetDevice,
     options: CompilerOpts,

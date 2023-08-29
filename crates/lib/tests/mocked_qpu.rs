@@ -75,7 +75,7 @@ async fn run_bell_state(connection_strategy: ConnectionStrategy) {
         .build()
         .expect("should be valid execution options");
     let result = Executable::from_quil(BELL_STATE)
-        .quilc_client(Some(quilc_client().await))
+        .with_quilc_client(Some(quilc_client().await))
         .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
         .execute_on_qpu(QPU_ID, None, &execution_options_direct_access)
         .await

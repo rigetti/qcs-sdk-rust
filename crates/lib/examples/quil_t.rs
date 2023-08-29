@@ -20,7 +20,7 @@ async fn quilc_client() -> rpcq::Client {
 
 #[tokio::main]
 async fn main() {
-    let mut exe = Executable::from_quil(PROGRAM).quilc_client(Some(quilc_client().await));
+    let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
 
     let result = exe
         .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())

@@ -1,4 +1,4 @@
-//! Integration tests for the [`qcs::qvm::api`] module. Requires the QVM
+//! Integration tests for the [`qcs::qvm::http`] module. Requires the QVM
 //! web server to be running.
 
 use std::{collections::HashMap, num::NonZeroU16};
