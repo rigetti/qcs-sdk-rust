@@ -1,3 +1,13 @@
+## 0.11.0
+
+### Breaking Changes
+
+- Constructors, iterators, and other utility methods have been added to make working with `ResultData`, `RegisterMap`, and others easier. The `ExecutionData` constructor now takes a `timedelta` for duration instead of a float. (#342)
+
+### Features
+
+- Update quil-rs (#350)
+
 ## 0.11.0-rc.1
 
 ### Breaking Changes
