@@ -620,10 +620,10 @@ pub enum Error {
     /// There was some problem with the provided Quil program. This could be a syntax error with
     /// quil, providing Quil-T to `quilc` or `qvm` (which is not supported), or forgetting to set
     /// some parameters.
-    #[error("There was a problem converting the program to valid Quil: {0}")]
+    #[error("There was a problem with the Quil program: {0}")]
     Quil(#[from] ProgramError),
     /// There was some problem converting the provided Quil program to valid Quil.
-    #[error("There was a problem with the Quil program: {0}")]
+    #[error("There was a problem converting the program to valid Quil: {0}")]
     ToQuil(#[from] ToQuilError),
     /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
