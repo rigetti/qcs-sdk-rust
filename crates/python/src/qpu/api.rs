@@ -158,6 +158,25 @@ impl From<readout_values::Values> for ExecutionResult {
     }
 }
 
+#[pymethods]
+impl ExecutionResult {
+    #[staticmethod]
+    fn from_register(register: PyRegister) -> Self {
+        match register.as_inner() {
+            Register::I32(values) => ExecutionResult {
+                shape: [values.len(), 1],
+                dtype: "integer".into(),
+                data: register,
+            },
+            Register::Complex32(values) => ExecutionResult {
+                shape: [values.len(), 1],
+                dtype: "complex".into(),
+                data: register,
+            },
+        }
+    }
+}
+
 #[pyclass]
 #[derive(Clone, Debug)]
 pub struct ExecutionResults {
@@ -167,6 +186,20 @@ pub struct ExecutionResults {
     /// QPU execution duration.
     #[pyo3(get)]
     pub execution_duration_microseconds: Option<u64>,
+}
+
+#[pymethods]
+impl ExecutionResults {
+    #[new]
+    fn new(
+        buffers: HashMap<String, ExecutionResult>,
+        execution_duration_microseconds: Option<u64>,
+    ) -> Self {
+        Self {
+            buffers,
+            execution_duration_microseconds,
+        }
+    }
 }
 
 impl From<ControllerJobExecutionResult> for ExecutionResults {

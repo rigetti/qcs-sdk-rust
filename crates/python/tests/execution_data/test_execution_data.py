@@ -64,9 +64,7 @@ class TestRegisterMatrix:
         register_matrix = RegisterMatrix.from_integer(m)
         assert register_matrix.is_integer()
         register_matrix = register_matrix.as_integer()
-        assert (
-            register_matrix is not None
-        ), "register_matrix should be an integer matrix"
+        assert register_matrix is not None, "register_matrix should be an integer matrix"
         assert_array_equal(register_matrix, m)
 
     def test_real(self):
@@ -89,3 +87,21 @@ class TestRegisterMatrix:
         register_matrix = register_matrix.as_complex()
         assert register_matrix is not None, "register_matrix should be a complex matrix"
         assert_array_equal(register_matrix, m)
+
+
+class TestRegisterMap:
+    def test_iter(self):
+        memory_map = {
+            "ro": RegisterData.from_i16([[0, 1, 2], [1, 2, 3]]),
+            "foo": RegisterData.from_i16([[0, 1, 2], [1, 2, 3]]),
+        }
+        qvm_result_data = QVMResultData.from_memory_map(memory_map)
+        result_data = ResultData.from_qvm(qvm_result_data)
+        register_map = result_data.to_register_map()
+        expected_keys = {"ro", "foo"}
+        actual_keys = set()
+        for key, matrix in register_map.items():
+            actual_keys.add(key)
+            assert np.all(matrix.to_ndarray() == np.matrix([[0, 1, 2], [1, 2, 3]]))
+
+        assert expected_keys == actual_keys == set(register_map.keys())

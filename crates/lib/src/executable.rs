@@ -111,6 +111,7 @@ impl<'executable> Executable<'executable, '_> {
     /// 1. `quil` is a string slice representing the original program to be run. The returned
     ///     [`Executable`] will only live as long as this reference.
     #[must_use]
+    #[allow(clippy::missing_panics_doc)]
     pub fn from_quil<Quil: Into<Arc<str>>>(quil: Quil) -> Self {
         Self {
             quil: quil.into(),
