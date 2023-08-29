@@ -9,6 +9,7 @@ use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
 use qcs_api_client_grpc::services::translation::TranslationOptions;
+use quil_rs::quil::ToQuilError;
 
 use crate::client::Qcs;
 use crate::compiler::quilc::CompilerOpts;
@@ -621,6 +622,9 @@ pub enum Error {
     /// some parameters.
     #[error("There was a problem with the Quil program: {0}")]
     Quil(#[from] ProgramError),
+    /// There was some problem converting the provided Quil program to valid Quil.
+    #[error("There was a problem converting the program to valid Quil: {0}")]
+    ToQuil(#[from] ToQuilError),
     /// There was a problem when compiling the Quil program.
     #[error("There was a problem compiling the Quil program: {0}")]
     Compilation(String),
@@ -687,6 +691,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::IsaError(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),
+            ExecutionError::ToQuil(e) => Self::ToQuil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
             ExecutionError::Substitution(message) => Self::Substitution(message),
@@ -701,6 +706,7 @@ impl From<qvm::Error> for Error {
             qvm::Error::QvmCommunication { .. } | qvm::Error::Client { .. } => {
                 Self::Connection(Service::Qvm)
             }
+            qvm::Error::ToQuil(q) => Self::ToQuil(q),
             qvm::Error::Parsing(_)
             | qvm::Error::ShotsMustBePositive
             | qvm::Error::RegionSizeMismatch { .. }

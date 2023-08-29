@@ -2,7 +2,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, PyResult};
-use quil_rs::expression::Expression;
+use quil_rs::{expression::Expression, quil::Quil};
 use rigetti_pyo3::{create_init_submodule, py_wrap_error, ToPythonError};
 
 create_init_submodule! {
@@ -74,8 +74,17 @@ pub fn rewrite_arithmetic(native_quil: String) -> PyResult<PyRewriteArithmeticRe
         .map_err(RustRewriteArithmeticError::from)
         .map_err(RustRewriteArithmeticError::to_py_err)?;
 
-    let program = program.to_string();
-    let recalculation_table = index_set.into_iter().map(|e| e.to_string()).collect();
+    let program = program
+        .to_quil()
+        .expect("Successfully parsed program should convert to valid Quil.");
+    let recalculation_table = index_set
+        .into_iter()
+        .map(|e| {
+            e.to_quil().expect(
+                "Expressions built from a successfully parsed program should convert to valid Quil.",
+            )
+        })
+        .collect();
 
     Ok(PyRewriteArithmeticResult {
         program,

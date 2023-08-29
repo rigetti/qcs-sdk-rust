@@ -12,6 +12,7 @@ use quil_rs::{
         SetFrequency, SetPhase, SetScale, ShiftFrequency, ShiftPhase, Vector,
     },
     program::{FrameSet, MemoryRegion},
+    quil::{Quil, ToQuilError},
     Program,
 };
 
@@ -125,7 +126,12 @@ pub fn get_substitutions(
         .map(|substitution: &Expression| {
             substitution
                 .evaluate(&HashMap::new(), &params)
-                .map_err(|e| format!("Could not evaluate expression {substitution}: {e:?}"))
+                .map_err(|e| {
+                    format!(
+                        "Could not evaluate expression {}: {e:?}",
+                        substitution.to_quil_or_debug()
+                    )
+                })
                 .and_then(|complex| {
                     if complex.im == 0.0 {
                         Ok(complex.re)
@@ -356,8 +362,8 @@ impl TryFrom<Program> for RewrittenProgram {
 }
 
 impl RewrittenProgram {
-    pub(crate) fn to_string(&self) -> RewrittenQuil {
-        RewrittenQuil(self.inner.to_string())
+    pub(crate) fn to_string(&self) -> Result<RewrittenQuil, ToQuilError> {
+        Ok(RewrittenQuil(self.inner.to_quil()?))
     }
 }
 
@@ -365,7 +371,7 @@ impl RewrittenProgram {
 mod describe_rewrite_arithmetic {
     use std::str::FromStr;
 
-    use quil_rs::Program;
+    use quil_rs::{quil::Quil, Program};
 
     use crate::qpu::rewrite_arithmetic::rewrite_arithmetic;
 
@@ -378,7 +384,7 @@ mod describe_rewrite_arithmetic {
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
     }
 
     #[test]
@@ -400,7 +406,7 @@ mod describe_rewrite_arithmetic {
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
     }
 
     #[test]
@@ -427,8 +433,8 @@ RZ(__SUBST[1]) 0
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        insta::assert_snapshot!(substitutions[0].to_string());
-        insta::assert_snapshot!(substitutions[1].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
+        insta::assert_snapshot!(substitutions[1].to_quil_or_debug());
     }
 
     #[test]
@@ -453,7 +459,7 @@ SET-SCALE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
     }
 
     #[test]
@@ -490,8 +496,8 @@ SET-FREQUENCY 1 "rf" __SUBST[1]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 2);
-        insta::assert_snapshot!(substitutions[0].to_string());
-        insta::assert_snapshot!(substitutions[1].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
+        insta::assert_snapshot!(substitutions[1].to_quil_or_debug());
     }
 
     #[test]
@@ -550,7 +556,7 @@ SHIFT-PHASE 0 "rf" __SUBST[0]
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();
         assert_eq!(actual, expected);
         assert_eq!(substitutions.len(), 1);
-        insta::assert_snapshot!(substitutions[0].to_string());
+        insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
     }
 }
 
