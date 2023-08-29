@@ -1,3 +1,9 @@
+## 0.15.6-rc.0
+
+### Features
+
+- Update quil-rs (#350)
+
 ## 0.15.5
 
 ### Features

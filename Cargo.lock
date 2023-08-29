@@ -1939,7 +1939,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.15.5"
+version = "0.15.6-rc.0"
 dependencies = [
  "built",
  "cached",
@@ -2066,7 +2066,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.11.0-rc.0"
+version = "0.11.0-rc.1"
 dependencies = [
  "numpy",
  "once_cell",
