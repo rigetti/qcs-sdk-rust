@@ -20,6 +20,7 @@ from qcs_sdk.compiler.quilc import (
     conjugate_pauli_by_clifford_async,
     generate_randomized_benchmarking_sequence,
     generate_randomized_benchmarking_sequence_async,
+    RPCQClient,
 )
 
 
@@ -54,9 +55,10 @@ def test_compile_program(
     bell_program: str,
     target_device: TargetDevice,
     snapshot: SnapshotAssertion,
+    quilc_rpcq_client: RPCQClient,
 ):
     """A simple program should compile successfully."""
-    result = compile_program(bell_program, target_device)
+    result = compile_program(bell_program, target_device, client=quilc_rpcq_client)
     assert result.program == snapshot
     assert result.native_quil_metadata == snapshot
 
@@ -65,49 +67,50 @@ def test_compile_program(
 async def test_compile_program_async(
     bell_program: str,
     target_device: TargetDevice,
+    quilc_rpcq_client: RPCQClient,
 ):
     """A simple program should compile successfully."""
-    compiled_program = await compile_program_async(bell_program, target_device)
+    compiled_program = await compile_program_async(bell_program, target_device, client=quilc_rpcq_client)
     assert compiled_program
 
 
-def test_get_version_info():
+def test_get_version_info(quilc_rpcq_client: RPCQClient):
     """A valid version should be returned."""
-    version = get_version_info()
+    version = get_version_info(client=quilc_rpcq_client)
     assert version
 
 
 @pytest.mark.asyncio
-async def test_get_version_info_async():
+async def test_get_version_info_async(quilc_rpcq_client: RPCQClient):
     """A valid version should be returned."""
-    version = await get_version_info_async()
+    version = await get_version_info_async(client=quilc_rpcq_client)
     assert version
 
 
-def test_conjugate_pauli_by_clifford():
+def test_conjugate_pauli_by_clifford(quilc_rpcq_client: RPCQClient):
     """Pauli should be conjugated by clifford."""
     request = ConjugateByCliffordRequest(
         pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
     )
-    response = conjugate_pauli_by_clifford(request)
+    response = conjugate_pauli_by_clifford(request, client=quilc_rpcq_client)
     assert type(response) == ConjugatePauliByCliffordResponse
     assert response.pauli == "Z"
     assert response.phase == 0
 
 
 @pytest.mark.asyncio
-async def test_conjugate_pauli_by_clifford_async():
+async def test_conjugate_pauli_by_clifford_async(quilc_rpcq_client: RPCQClient):
     """Pauli should be conjugated by clifford."""
     request = ConjugateByCliffordRequest(
         pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
     )
-    response = await conjugate_pauli_by_clifford_async(request)
+    response = await conjugate_pauli_by_clifford_async(request, client=quilc_rpcq_client)
     assert type(response) == ConjugatePauliByCliffordResponse
     assert response.pauli == "Z"
     assert response.phase == 0
 
 
-def test_generate_randomized_benchmark_sequence():
+def test_generate_randomized_benchmark_sequence(quilc_rpcq_client: RPCQClient):
     """Random benchmark should run predictably."""
     request = RandomizedBenchmarkingRequest(
         depth=2,
@@ -116,13 +119,13 @@ def test_generate_randomized_benchmark_sequence():
         seed=314,
         interleaver="Y 0",
     )
-    response = generate_randomized_benchmarking_sequence(request)
+    response = generate_randomized_benchmarking_sequence(request, client=quilc_rpcq_client)
     assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
     assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]
 
 
 @pytest.mark.asyncio
-async def test_generate_randomized_benchmark_sequence_async():
+async def test_generate_randomized_benchmark_sequence_async(quilc_rpcq_client: RPCQClient):
     """Random benchmark should run predictably."""
     request = RandomizedBenchmarkingRequest(
         depth=2,
@@ -131,19 +134,6 @@ async def test_generate_randomized_benchmark_sequence_async():
         seed=314,
         interleaver="Y 0",
     )
-    response = await generate_randomized_benchmarking_sequence_async(request)
+    response = await generate_randomized_benchmarking_sequence_async(request, client=quilc_rpcq_client)
     assert type(response) == GenerateRandomizedBenchmarkingSequenceResponse
     assert response.sequence == [[1, 0], [0, 1, 0, 1], [1, 0]]
-
-
-@pytest.mark.asyncio
-async def test_things(
-    bell_program: str,
-    target_device: TargetDevice,   
-):
-    from qcs_sdk.compiler.quilc import RPCQClient
-
-    client = RPCQClient("tcp://localhost:5555")
-    print(compile_program(bell_program, target_device, client=None).program)
-
-    print(client)
