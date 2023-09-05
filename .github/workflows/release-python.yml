@@ -114,9 +114,6 @@ jobs:
           target: x86_64-pc-windows-msvc 
           profile: minimal 
           default: true 
-      - name: Build 
-        if: matrix.target == 'x64' 
-        run: cargo build --release 
       - name: Build wheels 
         uses: messense/maturin-action@v1 
         with: 
