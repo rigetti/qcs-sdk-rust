@@ -114,10 +114,11 @@ jobs:
           target: x86_64-pc-windows-msvc 
           profile: minimal 
           default: true 
-      - name: Setup cmake
-        uses: jwlawson/actions-setup-cmake@v1.13
+      - name: Install compiler
+        id: install_cc
+        uses: rlalik/setup-cpp-compiler@master
         with:
-          cmake-version: '3.x'
+          compiler: latest
       - name: Build 
         if: matrix.target == 'x64' 
         run: cargo build --release 
@@ -126,10 +127,9 @@ jobs:
         with: 
           target: ${{ matrix.target }} 
           args: -i python --release --manifest-path crates/python/Cargo.toml --out dist 
-
       - name: Install built wheel 
         run: | 
-          pip install qcs-sdk-python --find-links dist --force-reinstall
+          pip install qcs-sdk-python --find-links dist --force-reinstall --no-deps --no-index
       - name: Upload wheels 
         uses: actions/upload-artifact@v2 
         with: 
