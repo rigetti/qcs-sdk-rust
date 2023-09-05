@@ -121,7 +121,7 @@ jobs:
         uses: messense/maturin-action@v1 
         with: 
           target: ${{ matrix.target }} 
-          args: -i python --release --manifest-path quil-py/Cargo.toml --out dist 
+          args: -i python --release --manifest-path crates/python/Cargo.toml --out dist 
       - name: Install built wheel 
         run: | 
           pip install qcs-sdk-python --find-links dist --force-reinstall --no-deps --no-index
