@@ -65,7 +65,7 @@ impl From<PyQcsClientAuthServer> for AuthServer {
 #[pymethods]
 impl PyQcsClientAuthServer {
     #[new]
-    #[args(client_id = "None", issuer = "None")]
+    #[pyo3(signature = (client_id = None, issuer = None))]
     pub fn new(client_id: Option<String>, issuer: Option<String>) -> Self {
         Self { client_id, issuer }
     }
@@ -81,7 +81,7 @@ py_wrap_data_struct! {
 #[pymethods]
 impl PyQcsClientTokens {
     #[new]
-    #[args(bearer_access_token = "None", refresh_token = "None")]
+    #[pyo3(signature = (bearer_access_token = None, refresh_token = None))]
     pub fn new(bearer_access_token: Option<String>, refresh_token: Option<String>) -> Self {
         Self(Tokens {
             bearer_access_token,
@@ -123,15 +123,15 @@ impl PartialEq for PyQcsClient {
 #[pymethods]
 impl PyQcsClient {
     #[new]
-    #[args(
-        "/",
-        tokens = "None",
-        api_url = "None",
-        auth_server = "None",
-        grpc_api_url = "None",
-        quilc_url = "None",
-        qvm_url = "None"
-    )]
+    #[pyo3(signature = (
+        /,
+        tokens = None,
+        api_url = None,
+        auth_server = None,
+        grpc_api_url = None,
+        quilc_url = None,
+        qvm_url = None
+    ))]
     pub fn new(
         tokens: Option<PyQcsClientTokens>,
         api_url: Option<String>,
@@ -169,14 +169,14 @@ impl PyQcsClient {
     }
 
     #[staticmethod]
-    #[args("/", profile_name = "None")]
+    #[pyo3(signature = (/, profile_name = None))]
     #[pyo3(name = "load")]
     pub fn py_load(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
         py_sync!(py, Self::load(profile_name))
     }
 
     #[staticmethod]
-    #[args("/", profile_name = "None")]
+    #[pyo3(signature = (/, profile_name = None))]
     #[pyo3(name = "load_async")]
     pub fn py_load_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
         py_async!(py, Self::load(profile_name))

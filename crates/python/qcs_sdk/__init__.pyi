@@ -6,6 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
+from qcs_sdk.qpu.api import ExecutionOptions
+from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData
 from qcs_sdk.compiler.quilc import CompilerOpts
 
@@ -52,7 +54,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def execute_on_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
+    def execute_on_qpu(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -62,7 +70,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def execute_on_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
+    async def execute_on_qpu_async(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -73,7 +87,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def submit_to_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
+    def submit_to_qpu(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
 
@@ -83,7 +103,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def submit_to_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
+    async def submit_to_qpu_async(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -200,11 +226,11 @@ class RegisterMatrix:
     def to_real(self) -> NDArray[np.float64]: ...
     def to_complex(self) -> NDArray[np.complex128]: ...
     @staticmethod
-    def from_integer(inner: NDArray[np.int64]) -> "RegisterMatrix": ...
+    def from_integer(matrix: NDArray[np.int64]) -> "RegisterMatrix": ...
     @staticmethod
-    def from_real(inner: NDArray[np.float64]) -> "RegisterMatrix": ...
+    def from_real(matrix: NDArray[np.float64]) -> "RegisterMatrix": ...
     @staticmethod
-    def from_complex(inner: NDArray[np.complex128]) -> "RegisterMatrix": ...
+    def from_complex(matrix: NDArray[np.complex128]) -> "RegisterMatrix": ...
     def to_ndarray(self) -> Union[NDArray[np.complex128], NDArray[np.int64], NDArray[np.float64]]:
         """
         Get the RegisterMatrix as numpy ``ndarray``.
@@ -218,7 +244,7 @@ class RegisterMap:
     def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]:
         """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
         ...
-    def get(self, default: Optional[RegisterMatrix] = None) -> Optional[RegisterMatrix]: ...
+    def get(self, key: str, default: Optional[RegisterMatrix] = None) -> Optional[RegisterMatrix]: ...
     def items(self) -> Iterable[Tuple[str, RegisterMatrix]]: ...
     def keys(self) -> Iterable[str]: ...
     def values(self) -> Iterable[RegisterMatrix]: ...

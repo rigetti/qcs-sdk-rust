@@ -46,7 +46,8 @@ py_wrap_error!(
 );
 
 py_function_sync_async! {
-    #[pyfunction(client = "None", timeout = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (client = None, timeout = None))]
     async fn list_quantum_processors(
         client: Option<PyQcsClient>,
         timeout: Option<f64>,

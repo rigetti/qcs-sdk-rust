@@ -45,7 +45,7 @@ sdist-include = ["README.md"]
 [tool.poetry.dependencies]
 python = "^3.8"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 numpy = "^1.24.1"
 maturin = "^0.14.17"
 pytest = "^7.1.3"

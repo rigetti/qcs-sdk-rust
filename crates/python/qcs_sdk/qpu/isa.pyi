@@ -276,7 +276,7 @@ class InstructionSetArchitecture:
     @benchmarks.setter
     def benchmarks(self, value: Sequence[Operation]): ...
     @staticmethod
-    def from_raw(value: str) -> "InstructionSetArchitecture":
+    def from_raw(json: str) -> "InstructionSetArchitecture":
         """
         Deserialize an ``InstructionSetArchitecture`` from a json representation.
 
@@ -311,8 +311,7 @@ def get_instruction_set_architecture(
     ...
 
 async def get_instruction_set_architecture_async(
-    quantum_processor_id: str,
-    client: QCSClient = ...,
+    quantum_processor_id: str, client: Optional[QCSClient] = None
 ) -> InstructionSetArchitecture:
     """
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.

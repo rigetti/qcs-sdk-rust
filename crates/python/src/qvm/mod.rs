@@ -104,7 +104,7 @@ impl_repr!(PyQvmOptions);
 #[pymethods]
 impl PyQvmOptions {
     #[new]
-    #[args("/", timeout_seconds = "30.0")]
+    #[pyo3(signature = (timeout_seconds = None))]
     pub fn new(timeout_seconds: Option<f64>) -> Self {
         Self(QvmOptions {
             timeout: timeout_seconds.map(Duration::from_secs_f64),
