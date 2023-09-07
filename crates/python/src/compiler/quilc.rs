@@ -1,6 +1,6 @@
 use qcs::compiler::{
     quilc::{
-        CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
+        Client, CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
         GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
         RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
     },
@@ -137,7 +137,7 @@ py_function_sync_async! {
     ) -> PyResult<PyCompilationResult> {
         let QuilcClient::Rpcq(client) = client;
         let options = options.unwrap_or_default();
-        qcs::compiler::quilc::compile_program(&quil, target.into(), options.into(), &client.0)
+        client.0.compile_program(&quil, target.into(), options.into())
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
@@ -219,7 +219,7 @@ py_function_sync_async! {
         client: QuilcClient,
     ) -> PyResult<String> {
         let QuilcClient::Rpcq(client) = client;
-        qcs::compiler::quilc::get_version_info(&client.0)
+        client.0.get_version_info()
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
     }
@@ -272,7 +272,7 @@ py_function_sync_async! {
         client: QuilcClient,
     ) -> PyResult<PyConjugatePauliByCliffordResponse> {
         let QuilcClient::Rpcq(client) = client;
-        qcs::compiler::quilc::conjugate_pauli_by_clifford(&client.0, request.into())
+        client.0.conjugate_pauli_by_clifford(request.into())
             .map(PyConjugatePauliByCliffordResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
@@ -322,7 +322,7 @@ py_function_sync_async! {
         client: QuilcClient,
     ) -> PyResult<PyGenerateRandomizedBenchmarkingSequenceResponse> {
         let QuilcClient::Rpcq(client) = client;
-        qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client.0, request.into())
+        client.0.generate_randomized_benchmarking_sequence(request.into())
             .map(PyGenerateRandomizedBenchmarkingSequenceResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)

@@ -55,38 +55,6 @@ pub trait Client {
     ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error>;
 }
 
-/// Take in a Quil program and produce a "native quil" output from quilc
-///
-/// # Arguments
-///
-/// * `program`: The Quil program to compile.
-/// * `isa`: The [`InstructionSetArchitecture`] of the targeted platform. Get this using
-///     [`super::get_isa`].
-/// * `timeout`: The number of seconds to wait before timing out. If not set, defaults to [`DEFAULT_COMPILER_TIMEOUT`].
-///
-/// returns: `eyre::Result<quil_rs::Program>`
-///
-/// # Errors
-///
-/// `eyre` is used to create human-readable error messages, since most of the errors are not
-/// recoverable at runtime. This function can fail generally if the provided ISA cannot be converted
-/// into a form that `quilc` recognizes, if `quilc` cannot be contacted, or if the program cannot
-/// be converted by `quilc`.
-#[cfg_attr(
-    feature = "tracing",
-    tracing::instrument(skip(client), level = "trace")
-)]
-pub fn compile_program<C: Client + ?Sized>(
-    quil: &str,
-    isa: TargetDevice,
-    options: CompilerOpts,
-    client: &C,
-) -> Result<CompilationResult, Error> {
-    #[cfg(feature = "tracing")]
-    tracing::debug!(compiler_options=?options, "compiling quil program with quilc",);
-    client.compile_program(quil, isa, options)
-}
-
 /// The result of compiling a Quil program to native quil with `quilc`
 #[derive(Clone, Debug, PartialEq)]
 pub struct CompilationResult {
@@ -146,11 +114,6 @@ impl Default for CompilerOpts {
     }
 }
 
-/// See documentation for [`Client::get_version_info`]
-pub fn get_version_info<C: Client>(client: &C) -> Result<String, Error> {
-    client.get_version_info()
-}
-
 /// Pauli Term
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
@@ -196,14 +159,6 @@ pub struct ConjugatePauliByCliffordResponse {
     pub pauli: String,
 }
 
-/// See documentation for [`Client::conjugate_pauli_by_clifford`]
-pub fn conjugate_pauli_by_clifford<C: Client>(
-    client: &C,
-    request: ConjugateByCliffordRequest,
-) -> Result<ConjugatePauliByCliffordResponse, Error> {
-    client.conjugate_pauli_by_clifford(request)
-}
-
 /// Request to generate a randomized benchmarking sequence.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
@@ -242,14 +197,6 @@ impl From<RandomizedBenchmarkingRequest> for GenerateRandomizedBenchmarkingSeque
 pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     /// List of Cliffords, each expressed as a list of generator indices.
     pub sequence: Vec<Vec<i64>>,
-}
-
-/// See documentation for [`Client::generate_randomized_benchmarking_sequence`]
-pub fn generate_randomized_benchmarking_sequence<C: Client>(
-    client: &C,
-    request: RandomizedBenchmarkingRequest,
-) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error> {
-    client.generate_randomized_benchmarking_sequence(request)
 }
 
 /// All of the errors that can occur within this module.
@@ -411,13 +358,14 @@ mod tests {
 
     #[tokio::test]
     async fn compare_native_quil_to_expected_output() {
-        let output = compile_program(
-            "MEASURE 0",
-            TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
-            CompilerOpts::default(),
-            &rpcq_client().await,
-        )
-        .expect("Could not compile");
+        let output = rpcq_client()
+            .await
+            .compile_program(
+                "MEASURE 0",
+                TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
+                CompilerOpts::default(),
+            )
+            .expect("Could not compile");
         assert_eq!(output.program.to_string(), EXPECTED_H0_OUTPUT);
     }
 
@@ -434,13 +382,15 @@ MEASURE 1 ro[1]
     async fn run_compiled_bell_state_on_qvm() {
         let client = Qcs::load().await;
         let client = qvm::http::HttpClient::new(client.get_config().qvm_url().to_string());
-        let output = compile_program(
-            BELL_STATE,
-            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            CompilerOpts::default(),
-            &rpcq_client().await,
-        )
-        .expect("Could not compile");
+        let output = rpcq_client()
+            .await
+            .compile_program(
+                BELL_STATE,
+                TargetDevice::try_from(aspen_9_isa())
+                    .expect("Couldn't build target device from ISA"),
+                CompilerOpts::default(),
+            )
+            .expect("Could not compile");
         let mut results = crate::qvm::Execution::new(&output.program.to_string())
             .unwrap()
             .run(
@@ -468,13 +418,15 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_compile_declare_only() {
-        let output = compile_program(
-            "DECLARE ro BIT[1]\n",
-            TargetDevice::try_from(aspen_9_isa()).expect("Couldn't build target device from ISA"),
-            CompilerOpts::default(),
-            &rpcq_client().await,
-        )
-        .expect("Should be able to compile");
+        let output = rpcq_client()
+            .await
+            .compile_program(
+                "DECLARE ro BIT[1]\n",
+                TargetDevice::try_from(aspen_9_isa())
+                    .expect("Couldn't build target device from ISA"),
+                CompilerOpts::default(),
+            )
+            .expect("Should be able to compile");
         assert_eq!(output.program.to_string(), "DECLARE ro BIT[1]\n");
         assert_ne!(output.native_quil_metadata, None);
     }
@@ -482,7 +434,9 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn get_version_info_from_quilc() {
         let rpcq_client = rpcq_client().await;
-        let version = get_version_info(&rpcq_client).expect("Should get version info from quilc");
+        let version = rpcq_client
+            .get_version_info()
+            .expect("Should get version info from quilc");
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }
@@ -497,7 +451,8 @@ MEASURE 1 ro[1]
             },
             clifford: "H 0".into(),
         };
-        let response = conjugate_pauli_by_clifford(&rpcq_client, request)
+        let response = rpcq_client
+            .conjugate_pauli_by_clifford(request)
             .expect("Should conjugate pauli by clifford");
 
         assert_eq!(
@@ -519,7 +474,8 @@ MEASURE 1 ro[1]
             seed: Some(314),
             interleaver: Some("Y 0".into()),
         };
-        let response = generate_randomized_benchmarking_sequence(&rpcq_client, request)
+        let response = rpcq_client
+            .generate_randomized_benchmarking_sequence(request)
             .expect("Should generate randomized benchmark sequence");
 
         assert_eq!(

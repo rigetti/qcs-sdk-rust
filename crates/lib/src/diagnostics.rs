@@ -8,8 +8,8 @@ use qcs_api_client_openapi::models::User;
 use crate::{
     build_info,
     client::Qcs,
-    compiler::rpcq,
-    qvm::{self, Client, QvmOptions},
+    compiler::{quilc::Client as _, rpcq},
+    qvm::{self, Client as _, QvmOptions},
 };
 
 /// Collect package diagnostics in string form
@@ -164,7 +164,7 @@ impl QuilcDiagnostics {
         let address = client.get_config().quilc_url().to_string();
         match rpcq::Client::new(&address) {
             Ok(client) => {
-                let (version, available) = match crate::compiler::quilc::get_version_info(&client) {
+                let (version, available) = match client.get_version_info() {
                     Ok(version) => (Some(version), true),
                     Err(_) => (None, false),
                 };

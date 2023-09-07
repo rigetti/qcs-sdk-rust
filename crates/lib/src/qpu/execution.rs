@@ -137,7 +137,8 @@ impl<'a> Execution<'a> {
         let program = if let Some(client) = quilc_client {
             #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
-            quilc::compile_program(&quil, target_device, compiler_options, client.as_ref())
+            client
+                .compile_program(&quil, target_device, compiler_options)
                 .map_err(|e| Error::Compilation {
                     details: e.to_string(),
                 })?
