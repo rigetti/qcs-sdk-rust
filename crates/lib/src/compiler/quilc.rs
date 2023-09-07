@@ -39,7 +39,9 @@ pub trait Client {
     ) -> Result<ConjugatePauliByCliffordResponse, Error>;
 
     /// Construct a randomized benchmarking experiment on the given qubits, decomposing into
-    /// gateset. If interleaver is not provided, the returned sequence will have the form
+    /// gateset.
+    ///
+    /// If interleaver is not provided, the returned sequence will have the form
     /// ```C_1 C_2 ... C_(depth-1) C_inv ,```
     ///
     /// where each C is a Clifford element drawn from gateset, ``C_{< depth}`` are randomly selected,
