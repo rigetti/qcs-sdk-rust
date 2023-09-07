@@ -30,6 +30,7 @@ pub trait Client {
 
     /// Given a circuit that consists only of elements of the Clifford group,
     /// return its action on a `PauliTerm`.
+    ///
     /// In particular, for Clifford `C`, and Pauli `P`, this returns the Pauli Term
     /// representing `CPC^{\dagger}`.
     fn conjugate_pauli_by_clifford(
