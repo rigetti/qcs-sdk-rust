@@ -6,7 +6,7 @@ use std::{collections::HashMap, num::NonZeroU16};
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-use crate::RegisterData;
+use crate::{client::Qcs, RegisterData};
 
 use super::{Error, QvmOptions};
 
@@ -262,6 +262,12 @@ impl HttpClient {
     pub fn new(qvm_url: String) -> Self {
         let client = reqwest::Client::new();
         Self { client, qvm_url }
+    }
+}
+
+impl From<&Qcs> for HttpClient {
+    fn from(qcs: &Qcs) -> Self {
+        Self::new(qcs.get_config().qvm_url().to_string())
     }
 }
 

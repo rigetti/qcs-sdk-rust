@@ -105,10 +105,9 @@ impl PyTargetDevice {
 wrap_error!(RustRpcqError(rpcq::Error));
 py_wrap_error!(quilc, RustRpcqError, RpcqError, PyRuntimeError);
 
-#[pyclass]
-#[pyo3(name = "RPCQClient")]
-#[derive(Clone)]
-pub struct PyRpcqClient(pub rpcq::Client);
+py_wrap_type! {
+    PyRpcqClient(rpcq::Client) as "RPCQClient";
+}
 
 #[pymethods]
 impl PyRpcqClient {
@@ -119,6 +118,35 @@ impl PyRpcqClient {
                 .map_err(RustRpcqError)
                 .map_err(RustRpcqError::to_py_err)?,
         ))
+    }
+}
+
+impl Client for PyRpcqClient {
+    fn compile_program(
+        &self,
+        quil: &str,
+        isa: TargetDevice,
+        options: CompilerOpts,
+    ) -> Result<qcs::compiler::quilc::CompilationResult, qcs::compiler::quilc::Error> {
+        self.0.compile_program(quil, isa, options)
+    }
+
+    fn get_version_info(&self) -> Result<String, qcs::compiler::quilc::Error> {
+        self.0.get_version_info()
+    }
+
+    fn conjugate_pauli_by_clifford(
+        &self,
+        request: ConjugateByCliffordRequest,
+    ) -> Result<ConjugatePauliByCliffordResponse, qcs::compiler::quilc::Error> {
+        self.0.conjugate_pauli_by_clifford(request)
+    }
+
+    fn generate_randomized_benchmarking_sequence(
+        &self,
+        request: RandomizedBenchmarkingRequest,
+    ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, qcs::compiler::quilc::Error> {
+        self.0.generate_randomized_benchmarking_sequence(request)
     }
 }
 

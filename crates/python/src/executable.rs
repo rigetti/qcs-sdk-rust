@@ -111,7 +111,7 @@ impl PyExecutable {
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
         let quilc_client = quilc_client.map(|c| match c {
-            QuilcClient::Rpcq(c) => c.0,
+            QuilcClient::Rpcq(c) => c,
         });
         let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);
 
@@ -136,7 +136,7 @@ impl PyExecutable {
 
     pub fn execute_on_qvm(&self, py: Python<'_>, client: QvmClient) -> PyResult<PyExecutionData> {
         let QvmClient::Http(client) = client;
-        py_sync!(py, py_executable_data!(self, execute_on_qvm, &client.0))
+        py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
     pub fn execute_on_qvm_async<'py>(
@@ -145,7 +145,7 @@ impl PyExecutable {
         client: QvmClient,
     ) -> PyResult<&PyAny> {
         let QvmClient::Http(client) = client;
-        py_async!(py, py_executable_data!(self, execute_on_qvm, &client.0))
+        py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
     #[args(endpoint_id = "None")]

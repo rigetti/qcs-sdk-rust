@@ -1,5 +1,5 @@
 use qcs::{
-    qvm::{self, QvmOptions, QvmResultData},
+    qvm::{self, Client, QvmOptions, QvmResultData},
     RegisterData,
 };
 use rigetti_pyo3::{
@@ -32,16 +32,55 @@ create_init_submodule! {
     ],
 }
 
-#[pyo3::pyclass]
-#[pyo3(name = "QVMHTTPClient")]
-#[derive(Debug, Clone)]
-pub struct PyQvmHttpClient(pub qvm::http::HttpClient);
+py_wrap_type! {
+    #[derive(Debug)]
+    PyQvmHttpClient(qvm::http::HttpClient) as "QVMHTTPClient";
+}
 
 #[pymethods]
 impl PyQvmHttpClient {
     #[new]
     pub fn new(address: String) -> Self {
         Self(qvm::http::HttpClient::new(address))
+    }
+}
+
+#[async_trait::async_trait]
+impl Client for PyQvmHttpClient {
+    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, qcs::qvm::Error> {
+        self.0.get_version_info(options).await
+    }
+
+    async fn run(
+        &self,
+        request: &qcs::qvm::http::MultishotRequest,
+        options: &QvmOptions,
+    ) -> Result<qcs::qvm::http::MultishotResponse, qcs::qvm::Error> {
+        self.0.run(request, options).await
+    }
+
+    async fn run_and_measure(
+        &self,
+        request: &qcs::qvm::http::MultishotMeasureRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<Vec<i64>>, qcs::qvm::Error> {
+        self.0.run_and_measure(request, options).await
+    }
+
+    async fn measure_expectation(
+        &self,
+        request: &qcs::qvm::http::ExpectationRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<f64>, qcs::qvm::Error> {
+        self.0.measure_expectation(request, options).await
+    }
+
+    async fn get_wavefunction(
+        &self,
+        request: &qcs::qvm::http::WavefunctionRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<u8>, qcs::qvm::Error> {
+        self.0.get_wavefunction(request, options).await
     }
 }
 

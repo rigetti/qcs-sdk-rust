@@ -22,7 +22,7 @@ MEASURE 1 ro[1]
 
 async fn qvm_client() -> HttpClient {
     let qcs_client = Qcs::load().await;
-    HttpClient::new(qcs_client.get_config().qvm_url().to_string())
+    HttpClient::from(&qcs_client)
 }
 
 #[tokio::test]

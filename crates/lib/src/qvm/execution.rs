@@ -83,8 +83,7 @@ mod describe_execution {
 
     async fn qvm_client() -> qvm::http::HttpClient {
         let qcs = Qcs::load().await;
-        let endpoint = qcs.get_config().qvm_url();
-        qvm::http::HttpClient::new(endpoint.to_string())
+        qvm::http::HttpClient::from(&qcs)
     }
 
     #[tokio::test]

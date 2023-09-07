@@ -193,19 +193,17 @@ struct QvmDiagnostics {
 
 impl QvmDiagnostics {
     async fn gather(client: &Qcs) -> Self {
-        let address = client.get_config().qvm_url().to_string();
         let options = QvmOptions {
             timeout: Some(Duration::from_secs(1)),
         };
-
-        let qvm_client = qvm::http::HttpClient::new(address.clone());
+        let qvm_client = qvm::http::HttpClient::from(client);
         let (version, available) = match qvm_client.get_version_info(&options).await {
             Ok(version) => (Some(version), true),
             Err(_) => (None, false),
         };
 
         Self {
-            address,
+            address: qvm_client.qvm_url,
             version,
             available,
         }

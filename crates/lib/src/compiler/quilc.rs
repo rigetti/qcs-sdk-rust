@@ -381,7 +381,7 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
         let client = Qcs::load().await;
-        let client = qvm::http::HttpClient::new(client.get_config().qvm_url().to_string());
+        let client = qvm::http::HttpClient::from(&client);
         let output = rpcq_client()
             .await
             .compile_program(

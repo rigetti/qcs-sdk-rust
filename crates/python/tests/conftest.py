@@ -6,6 +6,7 @@ from _pytest.config import Config
 from _pytest.config.argparsing import Parser
 from _pytest.nodes import Item
 
+from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.qvm import QVMHTTPClient
 from qcs_sdk.compiler.quilc import RPCQClient
@@ -95,9 +96,9 @@ MEASURE 1 ro[1]
 
 @pytest.fixture
 def qvm_http_client() -> QVMHTTPClient:
-    return QVMHTTPClient("http://localhost:5000")
+    return QVMHTTPClient(QCSClient.load().qvm_url)
 
 
 @pytest.fixture
 def quilc_rpcq_client() -> RPCQClient:
-    return RPCQClient("tcp://localhost:5555")
+    return RPCQClient(QCSClient.load().quilc_url)

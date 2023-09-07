@@ -44,7 +44,7 @@ use quil_rs::program::ProgramError;
 /// async fn main() {
 ///     use std::num::NonZeroU16;
 ///     use qcs::qvm;
-///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
+///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
 ///     let mut result = Executable::from_quil(PROGRAM).with_qcs_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm(&qvm_client).await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
@@ -157,7 +157,7 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
+    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
     ///     let mut result = Executable::from_quil(PROGRAM)
     ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
@@ -227,7 +227,7 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let qvm_client = qvm::http::HttpClient::new(Qcs::load().await.get_config().qvm_url().to_string());
+    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
     ///     let mut exe = Executable::from_quil(PROGRAM)
     ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");

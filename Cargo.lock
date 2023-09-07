@@ -2094,6 +2094,7 @@ dependencies = [
 name = "qcs-sdk-python"
 version = "0.10.8"
 dependencies = [
+ "async-trait",
  "numpy",
  "once_cell",
  "paste",
