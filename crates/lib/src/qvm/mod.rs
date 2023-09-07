@@ -53,7 +53,7 @@ pub trait Client {
         request: &http::ExpectationRequest,
         options: &QvmOptions,
     ) -> Result<Vec<f64>, Error>;
-    /// Get the wavefunction produces by a program
+    /// Get the wavefunction produced by a program
     async fn get_wavefunction(
         &self,
         request: &http::WavefunctionRequest,
