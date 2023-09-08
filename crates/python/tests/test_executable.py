@@ -13,7 +13,7 @@ from qcs_sdk import (
     ExecutionError,
     RegisterMatrixConversionError,
 )
-from qcs_sdk.qvm import QVMHTTPClient
+from qcs_sdk.qvm import QVMClient
 
 @pytest.mark.qcs_session
 @pytest.mark.qcs_execution
@@ -54,7 +54,7 @@ def test_submit_and_retrieve_qpu(
 
 def test_execute_qvm(
     bell_program: str,
-    qvm_http_client: QVMHTTPClient,
+    qvm_http_client: QVMClient,
 ):
     executable = Executable(bell_program, shots=1)
     results = executable.execute_on_qvm(qvm_http_client)

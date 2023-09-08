@@ -8,7 +8,7 @@ from _pytest.nodes import Item
 
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
-from qcs_sdk.qvm import QVMHTTPClient
+from qcs_sdk.qvm import QVMClient
 from qcs_sdk.compiler.quilc import QuilcClient
 
 
@@ -95,8 +95,8 @@ MEASURE 1 ro[1]
 
 
 @pytest.fixture
-def qvm_http_client() -> QVMHTTPClient:
-    return QVMHTTPClient(QCSClient.load().qvm_url)
+def qvm_http_client() -> QVMClient:
+    return QVMClient(QCSClient.load().qvm_url)
 
 
 @pytest.fixture

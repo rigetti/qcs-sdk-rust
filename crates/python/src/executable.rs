@@ -134,17 +134,21 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm(&self, py: Python<'_>, client: QvmClient) -> PyResult<PyExecutionData> {
-        let QvmClient::Http(client) = client;
+    pub fn execute_on_qvm(
+        &self,
+        py: Python<'_>,
+        client: crate::qvm::PyQvmClient,
+    ) -> PyResult<PyExecutionData> {
+        let QvmClient::Http(client) = client.inner;
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
     pub fn execute_on_qvm_async<'py>(
         &'py self,
         py: Python<'py>,
-        client: QvmClient,
+        client: crate::qvm::PyQvmClient,
     ) -> PyResult<&PyAny> {
-        let QvmClient::Http(client) = client;
+        let QvmClient::Http(client) = client.inner;
         py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 

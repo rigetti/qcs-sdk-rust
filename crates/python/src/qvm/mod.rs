@@ -1,6 +1,6 @@
 use pyo3::types::PyList;
 use qcs::{
-    qvm::{self, Client, QvmOptions, QvmResultData},
+    qvm::{self, QvmOptions, QvmResultData},
     RegisterData,
 };
 use rigetti_pyo3::{
@@ -18,7 +18,7 @@ mod api;
 use api::PyAddressRequest;
 
 create_init_submodule! {
-    classes: [PyQvmResultData, PyQvmOptions, RawQvmReadoutData, PyQvmHttpClient],
+    classes: [PyQvmResultData, PyQvmOptions, RawQvmReadoutData, PyQvmClient],
     errors: [QVMError],
     funcs: [py_run, py_run_async],
     submodules: [
@@ -26,61 +26,31 @@ create_init_submodule! {
     ],
 }
 
-py_wrap_type! {
-    #[derive(Debug)]
-    PyQvmHttpClient(qvm::http::HttpClient) as "QVMHTTPClient";
+#[derive(Clone)]
+pub enum QvmClient {
+    Http(qvm::http::HttpClient),
+}
+
+#[pyclass(name = "QVMClient")]
+#[derive(Clone)]
+pub struct PyQvmClient {
+    pub inner: QvmClient,
 }
 
 #[pymethods]
-impl PyQvmHttpClient {
+impl PyQvmClient {
     #[new]
-    pub fn new(address: String) -> Self {
-        Self(qvm::http::HttpClient::new(address))
-    }
-}
-
-#[async_trait::async_trait]
-impl Client for PyQvmHttpClient {
-    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, qcs::qvm::Error> {
-        self.0.get_version_info(options).await
+    fn new() -> PyResult<Self> {
+        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http()."))
     }
 
-    async fn run(
-        &self,
-        request: &qcs::qvm::http::MultishotRequest,
-        options: &QvmOptions,
-    ) -> Result<qcs::qvm::http::MultishotResponse, qcs::qvm::Error> {
-        self.0.run(request, options).await
+    #[staticmethod]
+    fn new_http(endpoint: &str) -> PyResult<Self> {
+        let http_client = qvm::http::HttpClient::new(endpoint.to_string());
+        Ok(Self {
+            inner: QvmClient::Http(http_client),
+        })
     }
-
-    async fn run_and_measure(
-        &self,
-        request: &qcs::qvm::http::MultishotMeasureRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<Vec<i64>>, qcs::qvm::Error> {
-        self.0.run_and_measure(request, options).await
-    }
-
-    async fn measure_expectation(
-        &self,
-        request: &qcs::qvm::http::ExpectationRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<f64>, qcs::qvm::Error> {
-        self.0.measure_expectation(request, options).await
-    }
-
-    async fn get_wavefunction(
-        &self,
-        request: &qcs::qvm::http::WavefunctionRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<u8>, qcs::qvm::Error> {
-        self.0.get_wavefunction(request, options).await
-    }
-}
-
-#[derive(Debug, pyo3::FromPyObject)]
-pub enum QvmClient {
-    Http(PyQvmHttpClient),
 }
 
 wrap_error!(RustQvmError(qcs::qvm::Error));
@@ -195,13 +165,13 @@ py_function_sync_async! {
         shots: NonZeroU16,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
-        client: QvmClient,
+        client: PyQvmClient,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let QvmClient::Http(client) = client;
+        let QvmClient::Http(client) = client.inner;
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();
@@ -215,7 +185,7 @@ py_function_sync_async! {
                     measurement_noise,
                     gate_noise,
                     rng_seed,
-                    &client.0,
+                    &client,
                     options.as_inner()
             )
             .await

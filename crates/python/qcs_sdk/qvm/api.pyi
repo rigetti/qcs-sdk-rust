@@ -3,10 +3,10 @@ from typing_extensions import Self
 
 from qcs_sdk import RegisterData
 from qcs_sdk.client import QCSClient
-from qcs_sdk.qvm import QVMOptions, QVMHTTPClient
+from qcs_sdk.qvm import QVMOptions, QVMClient
 
 def get_version_info(
-    client: QVMHTTPClient, options: Optional[QVMOptions] = None
+    client: QVMClient, options: Optional[QVMOptions] = None
 ) -> str:
     """
     Gets version information from the running QVM server.
@@ -21,7 +21,7 @@ def get_version_info(
     ...
 
 async def get_version_info_async(
-    client: QVMHTTPClient, options: Optional[QVMOptions] = None
+    client: QVMClient, options: Optional[QVMOptions] = None
 ) -> str:
     """
     Asynchronously gets version information from the running QVM server.
@@ -109,7 +109,7 @@ class MultishotResponse:
 
 def run(
     request: MultishotRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> MultishotResponse:
     """Executes a program on the QVM
@@ -123,7 +123,7 @@ def run(
 
 def run_async(
     request: MultishotRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> MultishotResponse:
     """Executes a program on the QVM
@@ -172,7 +172,7 @@ class MultishotMeasureRequest:
 
 def run_and_measure(
     request: MultishotMeasureRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
@@ -180,7 +180,7 @@ def run_and_measure(
 
 def run_and_measure_async(
     request: MultishotMeasureRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
@@ -209,7 +209,7 @@ class ExpectationRequest:
 
 def measure_expectation(
     request: ExpectationRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> List[float]:
     """
@@ -223,7 +223,7 @@ def measure_expectation(
 
 def measure_expectation_async(
     request: ExpectationRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> List[float]:
     """
@@ -265,7 +265,7 @@ class WavefunctionRequest:
 
 def get_wavefunction(
     request: WavefunctionRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> bytes:
     """
@@ -279,7 +279,7 @@ def get_wavefunction(
 
 def get_wavefunction_async(
     request: WavefunctionRequest,
-    client: QVMHTTPClient,
+    client: QVMClient,
     options: Optional[QVMOptions] = None,
 ) -> List[int]:
     """
