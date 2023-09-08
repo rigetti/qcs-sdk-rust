@@ -48,6 +48,9 @@ class Register:
 class ExecutionResult:
     """Execution readout data from a particular memory location."""
 
+    @staticmethod
+    def from_register(register: Register) -> "ExecutionResult":
+        """Build an `ExecutionResult` from a `Register`."""
     @property
     def shape(self) -> List[int]:
         """The shape of the result data."""

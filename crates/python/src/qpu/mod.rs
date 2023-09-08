@@ -3,7 +3,7 @@ use std::time::Duration;
 use pyo3::{exceptions::PyRuntimeError, pyfunction, PyResult};
 use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error, ToPythonError};
 
-pub use result_data::{PyQpuResultData, PyReadoutValues};
+pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 
 pub mod api;
 pub mod isa;
@@ -17,6 +17,7 @@ use crate::py_sync::py_function_sync_async;
 create_init_submodule! {
     classes: [
         PyQpuResultData,
+        RawQpuReadoutData,
         PyReadoutValues
     ],
     errors: [

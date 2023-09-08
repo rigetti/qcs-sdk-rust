@@ -1,3 +1,4 @@
+use pyo3::types::PyList;
 use qcs::{
     qvm::{self, Client, QvmOptions, QvmResultData},
     RegisterData,
@@ -16,15 +17,8 @@ mod api;
 
 use api::PyAddressRequest;
 
-wrap_error!(RustQvmError(qcs::qvm::Error));
-py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
-
-py_wrap_type! {
-    PyQvmResultData(QvmResultData) as "QVMResultData"
-}
-
 create_init_submodule! {
-    classes: [PyQvmResultData, PyQvmOptions, PyQvmHttpClient],
+    classes: [PyQvmResultData, PyQvmOptions, RawQvmReadoutData, PyQvmHttpClient],
     errors: [QVMError],
     funcs: [py_run, py_run_async],
     submodules: [
@@ -89,8 +83,24 @@ pub enum QvmClient {
     Http(PyQvmHttpClient),
 }
 
+wrap_error!(RustQvmError(qcs::qvm::Error));
+py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
+
+py_wrap_type! {
+    PyQvmResultData(QvmResultData) as "QVMResultData"
+}
+
 #[pymethods]
 impl PyQvmResultData {
+    #[new]
+    fn new(memory: HashMap<String, PyRegisterData>) -> Self {
+        let memory = memory
+            .into_iter()
+            .map(|(key, value)| (key, value.into_inner()))
+            .collect();
+        Self::from(QvmResultData::from_memory_map(memory))
+    }
+
     #[staticmethod]
     fn from_memory_map(py: Python<'_>, memory: HashMap<String, PyRegisterData>) -> PyResult<Self> {
         Ok(Self(QvmResultData::from_memory_map(HashMap::<
@@ -104,6 +114,40 @@ impl PyQvmResultData {
     #[getter]
     fn memory(&self, py: Python<'_>) -> PyResult<HashMap<String, PyRegisterData>> {
         self.as_inner().memory().to_python(py)
+    }
+
+    pub(crate) fn to_raw_readout_data(&self, py: Python<'_>) -> RawQvmReadoutData {
+        RawQvmReadoutData {
+            memory: self
+                .as_inner()
+                .memory()
+                .iter()
+                .map(|(register, matrix)| {
+                    (
+                        register.to_string(),
+                        match matrix {
+                            RegisterData::I8(matrix) => PyList::new(py, matrix).into_py(py),
+                            RegisterData::F64(matrix) => PyList::new(py, matrix).into_py(py),
+                            RegisterData::I16(matrix) => PyList::new(py, matrix).into_py(py),
+                            RegisterData::Complex32(matrix) => PyList::new(py, matrix).into_py(py),
+                        },
+                    )
+                })
+                .collect::<HashMap<String, Py<PyList>>>(),
+        }
+    }
+}
+
+#[pyclass(name = "RawQVMReadoutData")]
+#[derive(Debug)]
+pub(crate) struct RawQvmReadoutData {
+    #[pyo3(get)]
+    memory: HashMap<String, Py<PyList>>,
+}
+
+impl RawQvmReadoutData {
+    fn __repr__(&self) -> String {
+        format!("{self:?}")
     }
 }
 

@@ -6,6 +6,7 @@ use std::{collections::HashMap, num::NonZeroU16, str::FromStr, sync::Arc, time::
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     program::ProgramError,
+    quil::{Quil, ToQuilError},
     Program,
 };
 use serde::Deserialize;
@@ -175,7 +176,7 @@ pub async fn run_program<C: Client>(
     );
     let program = apply_parameters_to_program(program, params)?;
     let request = http::MultishotRequest::new(
-        program.to_string(),
+        program.to_quil()?,
         shots,
         addresses,
         measurement_noise,
@@ -267,6 +268,8 @@ impl Default for QvmOptions {
 pub enum Error {
     #[error("Error parsing Quil program: {0}")]
     Parsing(#[from] ProgramError),
+    #[error("Error converting program to valid Quil: {0}")]
+    ToQuil(#[from] ToQuilError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
@@ -292,7 +295,7 @@ pub enum Error {
 mod test {
     use std::{collections::HashMap, str::FromStr};
 
-    use quil_rs::Program;
+    use quil_rs::{quil::Quil, Program};
     use rstest::{fixture, rstest};
 
     use super::apply_parameters_to_program;
@@ -316,7 +319,7 @@ mod test {
         let parameterized_program = apply_parameters_to_program(&program, &params)
             .expect("should not error for empty parameters");
 
-        insta::assert_snapshot!(parameterized_program.to_string());
+        insta::assert_snapshot!(parameterized_program.to_quil_or_debug());
     }
 
     #[rstest]

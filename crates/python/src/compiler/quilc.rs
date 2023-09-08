@@ -7,6 +7,7 @@ use qcs::compiler::{
     rpcq,
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
+use quil_rs::quil::Quil;
 use rigetti_pyo3::{
     create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_struct,
     py_wrap_type,
@@ -169,7 +170,7 @@ py_function_sync_async! {
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
-                program: result.program.to_string(),
+                program: result.program.to_quil().expect("successfully compiled program should convert to valid quil"),
                 native_quil_metadata: result.native_quil_metadata.map(PyNativeQuilMetadata)
             })
 

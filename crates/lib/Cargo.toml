@@ -1,7 +1,7 @@
 [package]
 name = "qcs"
 description = "High level interface for running Quil on a QPU"
-version = "0.15.5"
+version = "0.15.6"
 edition = "2018"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
@@ -29,7 +29,7 @@ qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
-reqwest = { version = "0.11.12", default-features = false, features = [
+reqwest = { version = "0.11.20", default-features = false, features = [
   "rustls-tls",
   "json",
 ] }
@@ -37,7 +37,7 @@ rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_json.workspace = true
 thiserror.workspace = true
-tokio = { workspace = true, features = ["fs"] }
+tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 toml = "0.7.3"
 tracing = { version = "0.1", optional = true, features = ["log"] }
 uuid = { version = "1.2.1", features = ["v4"] }

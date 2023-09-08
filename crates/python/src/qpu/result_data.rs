@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use pyo3::{
-    pymethods,
-    types::{PyComplex, PyFloat, PyInt},
-    Py, PyResult, Python,
+    pyclass, pymethods,
+    types::{PyComplex, PyFloat, PyInt, PyList},
+    IntoPy, Py, PyResult, Python,
 };
 use qcs::qpu::{QpuResultData, ReadoutValues};
 use rigetti_pyo3::{py_wrap_type, py_wrap_union_enum, PyTryFrom, PyWrapper, ToPython};
@@ -42,5 +42,45 @@ impl PyQpuResultData {
     #[getter]
     fn readout_values(&self, py: Python<'_>) -> PyResult<HashMap<String, PyReadoutValues>> {
         self.as_inner().readout_values().to_python(py)
+    }
+
+    pub(crate) fn to_raw_readout_data(&self, py: Python<'_>) -> RawQpuReadoutData {
+        RawQpuReadoutData {
+            mappings: self.as_inner().mappings().clone(),
+            readout_values: self
+                .as_inner()
+                .readout_values()
+                .iter()
+                .map(|(register, values)| {
+                    (
+                        register.to_string(),
+                        match values {
+                            ReadoutValues::Integer(values) => PyList::new(py, values).into_py(py),
+                            ReadoutValues::Real(values) => PyList::new(py, values).into_py(py),
+                            ReadoutValues::Complex(values) => PyList::new(py, values).into_py(py),
+                        },
+                    )
+                })
+                .collect::<HashMap<String, Py<PyList>>>(),
+        }
+    }
+}
+
+/// A wrapper type for data returned by the QPU in a more flat structure than
+/// [`PyQpuResultData`] offers. This makes it more convenient to work with
+/// the data if you don't care what type of number the readout values for
+/// each register contains.
+#[derive(Debug)]
+#[pyclass(name = "RawQPUReadoutData")]
+pub struct RawQpuReadoutData {
+    #[pyo3(get)]
+    mappings: HashMap<String, String>,
+    #[pyo3(get)]
+    readout_values: HashMap<String, Py<PyList>>,
+}
+
+impl RawQpuReadoutData {
+    fn __repr__(&self) -> String {
+        format!("{self:?}")
     }
 }

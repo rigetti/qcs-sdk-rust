@@ -1,4 +1,4 @@
-from typing import final, Mapping, Optional, Sequence, Tuple, Union
+from typing import final, Mapping, Optional, Sequence, Tuple, Union, Dict, List
 
 from qcs_sdk import RegisterData, QCSClient
 
@@ -24,6 +24,22 @@ class QVMResultData:
         Get the mapping of register names (ie. "ro") to a ``RegisterData`` matrix containing the register values.
         """
         ...
+    def to_raw_readout_data(
+        self,
+    ) -> RawQVMReadoutData:
+        """
+        Get a copy of this result data flattened into a ``RawQVMReadoutData``
+        """
+        ...
+
+@final
+class RawQVMReadoutData:
+    @property
+    def memory(self) -> Dict[str, Union[List[List[int]], List[List[float]]]]:
+        """
+        The mapping of register names (ie. "ro") to a 2-d list containing the
+        values for that register.
+        """
 
 @final
 class QVMOptions:

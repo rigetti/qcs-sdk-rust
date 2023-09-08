@@ -337,6 +337,7 @@ mod tests {
     use super::*;
     use crate::client::Qcs;
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
+    use quil_rs::quil::Quil;
     use regex::Regex;
     use std::{fs::File, num::NonZeroU16};
 
@@ -391,7 +392,7 @@ MEASURE 1 ro[1]
                 CompilerOpts::default(),
             )
             .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.program.to_string())
+        let mut results = crate::qvm::Execution::new(&output.program.to_quil_or_debug())
             .unwrap()
             .run(
                 NonZeroU16::new(10).expect("value is non-zero"),
@@ -427,7 +428,7 @@ MEASURE 1 ro[1]
                 CompilerOpts::default(),
             )
             .expect("Should be able to compile");
-        assert_eq!(output.program.to_string(), "DECLARE ro BIT[1]\n");
+        assert_eq!(output.program.to_quil_or_debug(), "DECLARE ro BIT[1]\n");
         assert_ne!(output.native_quil_metadata, None);
     }
 

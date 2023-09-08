@@ -1,12 +1,12 @@
 import datetime
 from enum import Enum
-from typing import Dict, List, Sequence, Optional, Union, final
+from typing import Dict, List, Sequence, Optional, Union, final, Iterable, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
 
-from qcs_sdk.qpu import QPUResultData
-from qcs_sdk.qvm import QVMResultData, QVMHTTPClient
+from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
+from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData, QVMHTTPClient
 from qcs_sdk.compiler.quilc import CompilerOpts
 
 from qcs_sdk.client import QCSClient as QCSClient
@@ -205,6 +205,11 @@ class RegisterMatrix:
     def from_real(inner: NDArray[np.float64]) -> "RegisterMatrix": ...
     @staticmethod
     def from_complex(inner: NDArray[np.complex128]) -> "RegisterMatrix": ...
+    def to_ndarray(self) -> Union[NDArray[np.complex128], NDArray[np.int64], NDArray[np.float64]]:
+        """
+        Get the RegisterMatrix as numpy ``ndarray``.
+        """
+        ...
 
 @final
 class RegisterMap:
@@ -213,6 +218,14 @@ class RegisterMap:
     def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]:
         """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
         ...
+    def get(self, default: Optional[RegisterMatrix] = None) -> Optional[RegisterMatrix]: ...
+    def items(self) -> Iterable[Tuple[str, RegisterMatrix]]: ...
+    def keys(self) -> Iterable[str]: ...
+    def values(self) -> Iterable[RegisterMatrix]: ...
+    def __iter__(self) -> Iterable[str]: ...
+    def __getitem__(self, item: str) -> RegisterMatrix: ...
+    def __contains__(self, key: str) -> bool: ...
+    def __len__(self) -> int: ...
 
 @final
 class ResultData:
@@ -261,6 +274,11 @@ class ResultData:
         - ``from_*``: wrap underlying values as this enum type.
     """
 
+    def __new__(cls, inner: Union[QPUResultData, QVMResultData]) -> "ResultData":
+        """
+        Create a new ResultData from either QVM or QPU result data.
+        """
+        ...
     def to_register_map(self) -> RegisterMap:
         """
         Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
@@ -281,6 +299,11 @@ class ResultData:
         selects the last value per-shot based on the program that was run.
         """
         ...
+    def to_raw_readout_data(self) -> Union[RawQPUReadoutData, RawQVMReadoutData]:
+        """
+        Get the raw data returned from the QVM or QPU. See ``RawQPUReadoutData`` and
+        ``RawQVMReadoutData`` for more information.
+        """
     def inner(
         self,
     ) -> Union[QVMResultData, QPUResultData]:
@@ -299,6 +322,7 @@ class ResultData:
 
 @final
 class ExecutionData:
+    def __new__(cls, result_data: ResultData, duration: Optional[datetime.timedelta] = None): ...
     @property
     def result_data(self) -> ResultData: ...
     @result_data.setter
@@ -327,10 +351,14 @@ class RegisterData:
 
     """
 
+    def __new__(cls, inner: Union[List[List[int]], List[List[float]], List[List[complex]]]) -> "RegisterData": ...
     def inner(
         self,
     ) -> Union[List[List[int]], List[List[float]], List[List[complex]]]:
         """Returns the inner value."""
+        ...
+    def as_ndarray(self) -> Union[NDArray[np.int64], NDArray[np.float64], NDArray[np.complex128]]:
+        """Returns the values as an ``ndarray``."""
         ...
     def is_i8(self) -> bool: ...
     def is_i16(self) -> bool: ...
