@@ -10,7 +10,7 @@ use rigetti_pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
-    compiler::quilc::{PyCompilerOpts, QuilcClient},
+    compiler::quilc::{PyCompilerOpts, PyQuilcClient, QuilcClient},
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
     qpu::{api::PyExecutionOptions, translation::PyTranslationOptions},
@@ -107,10 +107,10 @@ impl PyExecutable {
         registers: Vec<String>,
         parameters: Vec<PyParameter>,
         #[pyo3(from_py_with = "crate::from_py::optional_non_zero_u16")] shots: Option<NonZeroU16>,
-        quilc_client: Option<QuilcClient>,
+        quilc_client: Option<PyQuilcClient>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
-        let quilc_client = quilc_client.map(|c| match c {
+        let quilc_client = quilc_client.map(|c| match c.inner {
             QuilcClient::Rpcq(c) => c,
         });
         let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);

@@ -2,6 +2,7 @@ from typing import List, Sequence, Optional, final
 
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
+from qcs_sdk.compiler.quilc import QuilcClient
 
 DEFAULT_COMPILER_TIMEOUT: float
 """Number of seconds to wait before timing out."""
@@ -177,7 +178,7 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
 def compile_program(
     quil: str,
     target: TargetDevice,
-    client: RPCQClient,
+    client: QuilcClient,
     options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
@@ -195,7 +196,7 @@ def compile_program(
 async def compile_program_async(
     quil: str,
     target: TargetDevice,
-    client: RPCQClient,
+    client: QuilcClient,
     options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
@@ -262,18 +263,18 @@ class NativeQuilMetadata:
         """The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for protoquil compliant programs."""
         ...
 
-class RPCQClient:
+class QuilcClient:
     """Client used to communicate with Quilc via RPCQ"""
     def __new__(
         cls,
         /,
         endpoint: str,
-    ) -> RPCQClient:
+    ) -> QuilcClient:
         """Initialize an RPCQ client for a quilc server at the given address"""
         ...
 
 def get_version_info(
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -285,7 +286,7 @@ def get_version_info(
     ...
 
 async def get_version_info_async(
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
@@ -299,7 +300,7 @@ async def get_version_info_async(
 
 def conjugate_pauli_by_clifford(
     request: ConjugateByCliffordRequest,
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
@@ -314,7 +315,7 @@ def conjugate_pauli_by_clifford(
 
 async def conjugate_pauli_by_clifford_async(
     request: ConjugateByCliffordRequest,
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
@@ -330,7 +331,7 @@ async def conjugate_pauli_by_clifford_async(
 
 def generate_randomized_benchmarking_sequence(
     request: RandomizedBenchmarkingRequest,
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
@@ -354,7 +355,7 @@ def generate_randomized_benchmarking_sequence(
 
 async def generate_randomized_benchmarking_sequence_async(
     request: RandomizedBenchmarkingRequest,
-    client: RPCQClient,
+    client: QuilcClient,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into

@@ -9,7 +9,7 @@ from _pytest.nodes import Item
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.qvm import QVMHTTPClient
-from qcs_sdk.compiler.quilc import RPCQClient
+from qcs_sdk.compiler.quilc import QuilcClient
 
 
 TEST_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -100,5 +100,5 @@ def qvm_http_client() -> QVMHTTPClient:
 
 
 @pytest.fixture
-def quilc_rpcq_client() -> RPCQClient:
-    return RPCQClient(QCSClient.load().quilc_url)
+def quilc_rpcq_client() -> QuilcClient:
+    return QuilcClient.new_rpcq(QCSClient.load().quilc_url)

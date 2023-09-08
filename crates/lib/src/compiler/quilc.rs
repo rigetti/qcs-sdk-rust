@@ -367,7 +367,7 @@ mod tests {
                 CompilerOpts::default(),
             )
             .expect("Could not compile");
-        assert_eq!(output.program.to_string(), EXPECTED_H0_OUTPUT);
+        assert_eq!(output.program.to_quil_or_debug(), EXPECTED_H0_OUTPUT);
     }
 
     const BELL_STATE: &str = r##"DECLARE ro BIT[2]

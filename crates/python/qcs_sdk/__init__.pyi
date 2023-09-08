@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
 from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData, QVMHTTPClient
-from qcs_sdk.compiler.quilc import CompilerOpts
+from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
 
 from qcs_sdk.client import QCSClient as QCSClient
 
@@ -34,7 +34,7 @@ class Executable:
         registers: Optional[Sequence[str]] = None,
         parameters: Optional[Sequence[ExeParameter]] = None,
         shots: Optional[int] = None,
-        quilc_client: Optional[RPCQClient] = None,
+        quilc_client: Optional[QuilcClient] = None,
         compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
     def execute_on_qvm(self, client: QVMHTTPClient) -> ExecutionData:
