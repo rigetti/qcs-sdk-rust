@@ -96,7 +96,7 @@ MEASURE 1 ro[1]
 
 @pytest.fixture
 def qvm_http_client() -> QVMClient:
-    return QVMClient(QCSClient.load().qvm_url)
+    return QVMClient.new_http(QCSClient.load().qvm_url)
 
 
 @pytest.fixture
