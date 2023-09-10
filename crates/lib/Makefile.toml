@@ -26,10 +26,5 @@ install_crate = "cargo-deny"
 command = "cargo"
 args = ["deny", "--all-features", "check"]
 
-[tasks.print-deny-version]
-install_crate = "cargo-deny"
-command = "cargo"
-args = ["deny", "--version"]
-
 [tasks.pre-ci-flow]
-dependencies = ["print-deny-version", "deny", "lint"]
+dependencies = ["deny", "lint"]
