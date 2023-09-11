@@ -6,6 +6,16 @@ from .api import AddressRequest
 
 from . import api as api
 
+
+@final
+class QVMClient:
+    """Client used to communicate with QVM"""
+    @staticmethod
+    def new_http(endpoint: str) -> QVMClient:
+        """Construct a new client which uses HTTP to communicate with QVM"""
+        ...
+
+
 @final
 class QVMResultData:
     """
@@ -81,7 +91,7 @@ def run(
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
-    client: Optional[QCSClient] = None,
+    client: Optional[QVMClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """
@@ -108,7 +118,7 @@ async def run_async(
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
-    client: Optional[QCSClient] = None,
+    client: Optional[QVMClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """

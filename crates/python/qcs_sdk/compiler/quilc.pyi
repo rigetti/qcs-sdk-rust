@@ -2,7 +2,6 @@ from typing import List, Sequence, Optional, final
 
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
-from qcs_sdk.compiler.quilc import QuilcClient
 
 DEFAULT_COMPILER_TIMEOUT: float
 """Number of seconds to wait before timing out."""
@@ -17,6 +16,18 @@ class QuilcError(RuntimeError):
     """
 
     ...
+
+
+@final
+class QuilcClient:
+    """
+    Client used to communicate with Quilc 
+    """
+    @staticmethod
+    def new_rpcq(endpoint: str) -> QuilcClient:
+        """Construct a QuilcClient that uses RPCQ to communicate with Quilc"""
+        ...
+
 
 @final
 class CompilerOpts:
@@ -263,15 +274,6 @@ class NativeQuilMetadata:
         """The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for protoquil compliant programs."""
         ...
 
-class QuilcClient:
-    """Client used to communicate with Quilc via RPCQ"""
-    def __new__(
-        cls,
-        /,
-        endpoint: str,
-    ) -> QuilcClient:
-        """Initialize an RPCQ client for a quilc server at the given address"""
-        ...
 
 def get_version_info(
     client: QuilcClient,
