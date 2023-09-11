@@ -51,6 +51,12 @@ impl PyQvmClient {
             inner: QvmClient::Http(http_client),
         })
     }
+
+    #[getter]
+    fn qvm_url(&self) -> PyResult<String> {
+        let QvmClient::Http(client) = &self.inner;
+        Ok(client.qvm_url.to_string())
+    }
 }
 
 wrap_error!(RustQvmError(qcs::qvm::Error));
