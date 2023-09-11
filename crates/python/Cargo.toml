@@ -16,6 +16,7 @@ name = "qcs_sdk"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
+async-trait = "0.1.73"
 qcs = { path = "../lib", features = ["tracing"] }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true

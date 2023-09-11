@@ -7,6 +7,8 @@ use futures::future;
 use ndarray::arr2;
 
 use qcs::{
+    client::Qcs,
+    compiler::rpcq,
     qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
     Executable,
 };
@@ -61,12 +63,19 @@ async fn setup() {
     tokio::spawn(mock_qcs::run());
 }
 
+async fn quilc_client() -> rpcq::Client {
+    let qcs = Qcs::load().await;
+    let endpoint = qcs.get_config().quilc_url();
+    rpcq::Client::new(endpoint).unwrap()
+}
+
 async fn run_bell_state(connection_strategy: ConnectionStrategy) {
     let execution_options_direct_access = ExecutionOptionsBuilder::default()
         .connection_strategy(connection_strategy)
         .build()
         .expect("should be valid execution options");
     let result = Executable::from_quil(BELL_STATE)
+        .with_quilc_client(Some(quilc_client().await))
         .with_shots(std::num::NonZeroU16::new(2).expect("value is non-zero"))
         .execute_on_qpu(QPU_ID, None, &execution_options_direct_access)
         .await

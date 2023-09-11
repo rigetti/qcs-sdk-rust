@@ -1,6 +1,6 @@
 use pyo3::types::PyList;
 use qcs::{
-    qvm::{QvmOptions, QvmResultData},
+    qvm::{self, QvmOptions, QvmResultData},
     RegisterData,
 };
 use rigetti_pyo3::{
@@ -11,19 +11,52 @@ use rigetti_pyo3::{
 use std::num::NonZeroU16;
 use std::{collections::HashMap, time::Duration};
 
-use crate::{client::PyQcsClient, py_sync::py_function_sync_async, register_data::PyRegisterData};
+use crate::{py_sync::py_function_sync_async, register_data::PyRegisterData};
 
 mod api;
 
 use api::PyAddressRequest;
 
 create_init_submodule! {
-    classes: [PyQvmResultData, PyQvmOptions, RawQvmReadoutData],
+    classes: [PyQvmResultData, PyQvmOptions, RawQvmReadoutData, PyQvmClient],
     errors: [QVMError],
     funcs: [py_run, py_run_async],
     submodules: [
         "api": api::init_submodule
     ],
+}
+
+#[derive(Clone)]
+pub enum QvmClient {
+    Http(qvm::http::HttpClient),
+}
+
+#[pyclass(name = "QVMClient")]
+#[derive(Clone)]
+pub struct PyQvmClient {
+    pub inner: QvmClient,
+}
+
+#[pymethods]
+impl PyQvmClient {
+    #[new]
+    fn new() -> PyResult<Self> {
+        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http()."))
+    }
+
+    #[staticmethod]
+    fn new_http(endpoint: &str) -> PyResult<Self> {
+        let http_client = qvm::http::HttpClient::new(endpoint.to_string());
+        Ok(Self {
+            inner: QvmClient::Http(http_client),
+        })
+    }
+
+    #[getter]
+    fn qvm_url(&self) -> PyResult<String> {
+        let QvmClient::Http(client) = &self.inner;
+        Ok(client.qvm_url.to_string())
+    }
 }
 
 wrap_error!(RustQvmError(qcs::qvm::Error));
@@ -138,13 +171,13 @@ py_function_sync_async! {
         shots: NonZeroU16,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
+        client: PyQvmClient,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
-        client: Option<PyQcsClient>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let QvmClient::Http(client) = client.inner;
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();
