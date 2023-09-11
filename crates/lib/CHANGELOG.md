@@ -1,3 +1,13 @@
+## 0.16.0
+
+### Breaking Changes
+
+- much of the API code now requires an explicit client to be provided by the caller.
+
+### Features
+
+- Quilc/QVM clients (#353)
+
 ## 0.16.0-rc.0
 
 ### Breaking Changes
