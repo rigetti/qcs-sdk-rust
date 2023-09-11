@@ -17,18 +17,6 @@ class QuilcError(RuntimeError):
 
     ...
 
-
-@final
-class QuilcClient:
-    """
-    Client used to communicate with Quilc 
-    """
-    @staticmethod
-    def new_rpcq(endpoint: str) -> QuilcClient:
-        """Construct a QuilcClient that uses RPCQ to communicate with Quilc"""
-        ...
-
-
 @final
 class CompilerOpts:
     """A set of options that determine the behavior of compiling programs with quilc."""
@@ -189,7 +177,7 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
 def compile_program(
     quil: str,
     target: TargetDevice,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
     options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
@@ -197,7 +185,7 @@ def compile_program(
 
     :param quil: The Quil program to compile.
     :param target: Architectural description of device to compile for.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
     :param options: Optional compiler options. If ``None``, default values are used.
 
     :raises QuilcError: If compilation fails.
@@ -207,7 +195,7 @@ def compile_program(
 async def compile_program_async(
     quil: str,
     target: TargetDevice,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
     options: Optional[CompilerOpts] = None,
 ) -> CompilationResult:
     """
@@ -216,7 +204,7 @@ async def compile_program_async(
 
     :param quil: The Quil program to compile.
     :param target: Architectural description of device to compile for.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
     :param options: Optional compiler options. If ``None``, default values are used.
 
     :raises QuilcError: If compilation fails.
@@ -274,27 +262,26 @@ class NativeQuilMetadata:
         """The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for protoquil compliant programs."""
         ...
 
-
 def get_version_info(
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
 
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc.
     """
     ...
 
 async def get_version_info_async(
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> str:
     """
     Fetch the version information from the running Quilc service.
     (async analog of ``get_version_info``)
 
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc.
     """
@@ -302,14 +289,14 @@ async def get_version_info_async(
 
 def conjugate_pauli_by_clifford(
     request: ConjugateByCliffordRequest,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
     In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\\dagger}.
 
     :param request: Pauli Term conjugation request.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc or if the request is malformed.
     """
@@ -317,7 +304,7 @@ def conjugate_pauli_by_clifford(
 
 async def conjugate_pauli_by_clifford_async(
     request: ConjugateByCliffordRequest,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> ConjugatePauliByCliffordResponse:
     """
     Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
@@ -325,7 +312,7 @@ async def conjugate_pauli_by_clifford_async(
     (async analog of ``conjugate_pauli_by_clifford``)
 
     :param request: Pauli Term conjugation request.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc or if the request is malformed.
     """
@@ -333,7 +320,7 @@ async def conjugate_pauli_by_clifford_async(
 
 def generate_randomized_benchmarking_sequence(
     request: RandomizedBenchmarkingRequest,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
@@ -349,7 +336,7 @@ def generate_randomized_benchmarking_sequence(
         C_1 G C_2 G ... C_(depth-1) G C_inv .
 
     :param request: Pauli Term conjugation request.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc or if the request is malformed.
     """
@@ -357,7 +344,7 @@ def generate_randomized_benchmarking_sequence(
 
 async def generate_randomized_benchmarking_sequence_async(
     request: RandomizedBenchmarkingRequest,
-    client: QuilcClient,
+    client: Optional[QCSClient] = None,
 ) -> GenerateRandomizedBenchmarkingSequenceResponse:
     """
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
@@ -374,7 +361,7 @@ async def generate_randomized_benchmarking_sequence_async(
     (async analog of ``generate_randomized_benchmarking_sequence``)
 
     :param request: Pauli Term conjugation request.
-    :param client: Client used to send compilation requests to Quilc.
+    :param client: Optional client configuration. If ``None``, a default one is created.
 
     :raises QuilcError: If the is a failure connecting to Quilc or if the request is malformed.
     """

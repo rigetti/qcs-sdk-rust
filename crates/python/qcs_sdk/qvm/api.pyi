@@ -3,15 +3,15 @@ from typing_extensions import Self
 
 from qcs_sdk import RegisterData
 from qcs_sdk.client import QCSClient
-from qcs_sdk.qvm import QVMOptions, QVMClient
+from qcs_sdk.qvm import QVMOptions
 
 def get_version_info(
-    client: QVMClient, options: Optional[QVMOptions] = None
+    client: Optional[QCSClient] = None, options: Optional[QVMOptions] = None
 ) -> str:
     """
     Gets version information from the running QVM server.
 
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
 
     :returns: The QVM version as a string
@@ -21,12 +21,12 @@ def get_version_info(
     ...
 
 async def get_version_info_async(
-    client: QVMClient, options: Optional[QVMOptions] = None
+    client: Optional[QCSClient] = None, options: Optional[QVMOptions] = None
 ) -> str:
     """
     Asynchronously gets version information from the running QVM server.
 
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
 
     :returns: The QVM version as a string
@@ -109,13 +109,13 @@ class MultishotResponse:
 
 def run(
     request: MultishotRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> MultishotResponse:
     """Executes a program on the QVM
 
     :param request: The ``MultishotRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
 
     """
@@ -123,13 +123,13 @@ def run(
 
 def run_async(
     request: MultishotRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> MultishotResponse:
     """Executes a program on the QVM
 
     :param request: The ``MultishotRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
     """
     ...
@@ -172,7 +172,7 @@ class MultishotMeasureRequest:
 
 def run_and_measure(
     request: MultishotMeasureRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
@@ -180,7 +180,7 @@ def run_and_measure(
 
 def run_and_measure_async(
     request: MultishotMeasureRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> List[List[int]]:
     """Executes a program on the QVM, measuring and returning the state of the qubits at the end of each trial."""
@@ -209,28 +209,28 @@ class ExpectationRequest:
 
 def measure_expectation(
     request: ExpectationRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> List[float]:
     """
     Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state.
 
     :param request: The ``ExpectationRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
     """
     ...
 
 def measure_expectation_async(
     request: ExpectationRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> List[float]:
     """
     Executes a program on the QVM, measuring and returning the expectation value of the given Pauli operators using a prepared state.
 
     :param request: The ``ExpectationRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
     """
     ...
@@ -265,28 +265,28 @@ class WavefunctionRequest:
 
 def get_wavefunction(
     request: WavefunctionRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> bytes:
     """
     Executes a program on the QVM, returning the resulting wavefunction.
 
     :param request: The ``WavefunctionRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
     """
     ...
 
 def get_wavefunction_async(
     request: WavefunctionRequest,
-    client: QVMClient,
+    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> List[int]:
     """
     Executes a program on the QVM, returning the resulting wavefunction.
 
     :param request: The ``WavefunctionRequest`` to use.
-    :param client: Client used to send requests to QVM.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environment configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
     :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
     """
     ...

@@ -10,11 +10,10 @@ use rigetti_pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
-    compiler::quilc::{PyCompilerOpts, PyQuilcClient, QuilcClient},
+    compiler::quilc::PyCompilerOpts,
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
     qpu::{api::PyExecutionOptions, translation::PyTranslationOptions},
-    qvm::QvmClient,
 };
 
 wrap_error!(RustExecutionError(Error));
@@ -99,7 +98,7 @@ impl PyExecutable {
         registers = "Vec::new()",
         parameters = "Vec::new()",
         shots = "None",
-        quilc_client = "None",
+        compile_with_quilc = "None",
         compiler_options = "None"
     )]
     pub fn new(
@@ -107,13 +106,10 @@ impl PyExecutable {
         registers: Vec<String>,
         parameters: Vec<PyParameter>,
         #[pyo3(from_py_with = "crate::from_py::optional_non_zero_u16")] shots: Option<NonZeroU16>,
-        quilc_client: Option<PyQuilcClient>,
+        compile_with_quilc: Option<bool>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
-        let quilc_client = quilc_client.map(|c| match c.inner {
-            QuilcClient::Rpcq(c) => c,
-        });
-        let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);
+        let mut exe = Executable::from_quil(quil);
 
         for reg in registers {
             exe = exe.read_from(reg);
@@ -127,6 +123,10 @@ impl PyExecutable {
             exe = exe.with_shots(shots);
         }
 
+        if let Some(compile_with_quilc) = compile_with_quilc {
+            exe = exe.compile_with_quilc(compile_with_quilc);
+        }
+
         if let Some(options) = compiler_options {
             exe = exe.compiler_options(options.into_inner());
         }
@@ -134,22 +134,12 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    pub fn execute_on_qvm(
-        &self,
-        py: Python<'_>,
-        client: crate::qvm::PyQvmClient,
-    ) -> PyResult<PyExecutionData> {
-        let QvmClient::Http(client) = client.inner;
-        py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
+    pub fn execute_on_qvm(&self, py: Python<'_>) -> PyResult<PyExecutionData> {
+        py_sync!(py, py_executable_data!(self, execute_on_qvm))
     }
 
-    pub fn execute_on_qvm_async<'py>(
-        &'py self,
-        py: Python<'py>,
-        client: crate::qvm::PyQvmClient,
-    ) -> PyResult<&PyAny> {
-        let QvmClient::Http(client) = client.inner;
-        py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
+    pub fn execute_on_qvm_async<'py>(&'py self, py: Python<'py>) -> PyResult<&PyAny> {
+        py_async!(py, py_executable_data!(self, execute_on_qvm))
     }
 
     #[args(endpoint_id = "None")]

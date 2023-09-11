@@ -1,7 +1,7 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{collections::HashMap, num::NonZeroU16, str::FromStr, sync::Arc, time::Duration};
+use std::{collections::HashMap, num::NonZeroU16, str::FromStr, time::Duration};
 
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
@@ -13,93 +13,15 @@ use serde::Deserialize;
 
 pub(crate) use execution::Execution;
 
-use crate::{executable::Parameters, RegisterData};
+use crate::{client::Qcs, executable::Parameters, RegisterData};
 
-use self::http::AddressRequest;
+use self::api::AddressRequest;
 
+pub mod api;
 mod execution;
-pub mod http;
 
 /// Number of seconds to wait before timing out.
 const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
-
-/// Methods supported by the QVM
-#[async_trait::async_trait]
-pub trait Client {
-    /// The QVM version string. Not guaranteed to comply to the semver spec.
-    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, Error>;
-    /// Execute a program on the QVM.
-    async fn run(
-        &self,
-        request: &http::MultishotRequest,
-        options: &QvmOptions,
-    ) -> Result<http::MultishotResponse, Error>;
-    /// Execute a program on the QVM.
-    ///
-    /// The behavior of this method is different to that of [`Self::run`]
-    /// in that [`Self::run_and_measure`] will execute the program a single
-    /// time; the resulting wavefunction is then sampled some number of times
-    /// (specified in [`http::MultishotMeasureRequest`]).
-    ///
-    /// This can be useful if the program is expensive to execute and does
-    /// not change per "shot".
-    async fn run_and_measure(
-        &self,
-        request: &http::MultishotMeasureRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<Vec<i64>>, Error>;
-    /// Measure the expectation value of a program
-    async fn measure_expectation(
-        &self,
-        request: &http::ExpectationRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<f64>, Error>;
-    /// Get the wavefunction produced by a program
-    async fn get_wavefunction(
-        &self,
-        request: &http::WavefunctionRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<u8>, Error>;
-}
-
-#[async_trait::async_trait]
-impl<T: Client + Sync + Send> Client for Arc<T> {
-    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, Error> {
-        self.as_ref().get_version_info(options).await
-    }
-
-    async fn run(
-        &self,
-        request: &http::MultishotRequest,
-        options: &QvmOptions,
-    ) -> Result<http::MultishotResponse, Error> {
-        self.as_ref().run(request, options).await
-    }
-
-    async fn run_and_measure(
-        &self,
-        request: &http::MultishotMeasureRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<Vec<i64>>, Error> {
-        self.as_ref().run_and_measure(request, options).await
-    }
-
-    async fn measure_expectation(
-        &self,
-        request: &http::ExpectationRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<f64>, Error> {
-        self.as_ref().measure_expectation(request, options).await
-    }
-
-    async fn get_wavefunction(
-        &self,
-        request: &http::WavefunctionRequest,
-        options: &QvmOptions,
-    ) -> Result<Vec<u8>, Error> {
-        self.as_ref().get_wavefunction(request, options).await
-    }
-}
 
 /// Encapsulates data returned after running a program on the QVM
 #[allow(clippy::module_name_repetitions)]
@@ -125,7 +47,7 @@ impl QvmResultData {
 /// Run a Quil program on the QVM. The given parameters are used to parameterize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
-pub async fn run<C: Client + Send + Sync>(
+pub async fn run(
     quil: &str,
     shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,
@@ -133,7 +55,7 @@ pub async fn run<C: Client + Send + Sync>(
     measurement_noise: Option<(f64, f64, f64)>,
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
-    client: &C,
+    client: &Qcs,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
@@ -156,7 +78,7 @@ pub async fn run<C: Client + Send + Sync>(
 /// Run a [`Program`] on the QVM. The given parameters are used to parametrize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
-pub async fn run_program<C: Client>(
+pub async fn run_program(
     program: &Program,
     shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,
@@ -164,7 +86,7 @@ pub async fn run_program<C: Client>(
     measurement_noise: Option<(f64, f64, f64)>,
     gate_noise: Option<(f64, f64, f64)>,
     rng_seed: Option<i64>,
-    client: &C,
+    client: &Qcs,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
     #[cfg(feature = "tracing")]
@@ -175,7 +97,7 @@ pub async fn run_program<C: Client>(
         "executing program on QVM"
     );
     let program = apply_parameters_to_program(program, params)?;
-    let request = http::MultishotRequest::new(
+    let request = api::MultishotRequest::new(
         program.to_quil()?,
         shots,
         addresses,
@@ -183,8 +105,7 @@ pub async fn run_program<C: Client>(
         gate_noise,
         rng_seed,
     );
-    client
-        .run(&request, options)
+    api::run(&request, client, options)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
 }

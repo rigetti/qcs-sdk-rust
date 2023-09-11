@@ -1,14 +1,11 @@
-//! Integration tests for the [`qcs::qvm::http`] module. Requires the QVM
+//! Integration tests for the [`qcs::qvm::api`] module. Requires the QVM
 //! web server to be running.
 
 use std::{collections::HashMap, num::NonZeroU16};
 
 use qcs::{
     client::Qcs,
-    qvm::{
-        http::{self, HttpClient},
-        Client, QvmOptions,
-    },
+    qvm::{api, QvmOptions},
 };
 use regex::Regex;
 
@@ -20,16 +17,9 @@ MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "##;
 
-async fn qvm_client() -> HttpClient {
-    let qcs_client = Qcs::load().await;
-    HttpClient::from(&qcs_client)
-}
-
 #[tokio::test]
 async fn test_get_version_info() {
-    let client = qvm_client().await;
-    let version = client
-        .get_version_info(&QvmOptions::default())
+    let version = api::get_version_info(&Qcs::default(), &QvmOptions::default())
         .await
         .expect("Should be able to get version info.");
     let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)").unwrap();
@@ -38,17 +28,16 @@ async fn test_get_version_info() {
 
 #[tokio::test]
 async fn test_run() {
-    let client = qvm_client().await;
-    let request = http::MultishotRequest::new(
+    let client = Qcs::default();
+    let request = api::MultishotRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(2).expect("value is non-zero"),
-        HashMap::from([("ro".to_string(), http::AddressRequest::IncludeAll)]),
+        HashMap::from([("ro".to_string(), api::AddressRequest::IncludeAll)]),
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
         Some(1),
     );
-    let response = client
-        .run(&request, &QvmOptions::default())
+    let response = api::run(&request, &client, &QvmOptions::default())
         .await
         .expect("Should be able to run");
     assert_eq!(response.registers.len(), 1);
@@ -62,8 +51,8 @@ async fn test_run() {
 
 #[tokio::test]
 async fn test_run_and_measure() {
-    let client = qvm_client().await;
-    let request = http::MultishotMeasureRequest::new(
+    let client = Qcs::default();
+    let request = api::MultishotMeasureRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(5).expect("value is non-zero"),
         &[0, 1],
@@ -71,8 +60,7 @@ async fn test_run_and_measure() {
         Some((0.1, 0.5, 0.4)),
         Some(1),
     );
-    let qubits = client
-        .run_and_measure(&request, &QvmOptions::default())
+    let qubits = api::run_and_measure(&request, &client, &QvmOptions::default())
         .await
         .expect("Should be able to run and measure");
     assert_eq!(qubits.len(), 5);
@@ -81,17 +69,16 @@ async fn test_run_and_measure() {
 
 #[tokio::test]
 async fn test_measure_expectation() {
-    let client = qvm_client().await;
+    let client = Qcs::default();
     let prep_program = r##"
 CSWAP 0 1 2
 XY(-1.0) 0 1
 Z 2
 "##;
     let operators = vec!["X 0\nY 1\n".to_string(), "Z 2\n".to_string()];
-    let request = http::ExpectationRequest::new(prep_program.to_string(), &operators, None);
+    let request = api::ExpectationRequest::new(prep_program.to_string(), &operators, None);
 
-    let expectations = client
-        .measure_expectation(&request, &QvmOptions::default())
+    let expectations = api::measure_expectation(&request, &client, &QvmOptions::default())
         .await
         .expect("Should be able to measure expectation");
 
@@ -100,10 +87,9 @@ Z 2
 
 #[tokio::test]
 async fn test_get_wavefunction() {
-    let client = qvm_client().await;
-    let request = http::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
-    client
-        .get_wavefunction(&request, &QvmOptions::default())
+    let client = Qcs::default();
+    let request = api::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
+    api::get_wavefunction(&request, &client, &QvmOptions::default())
         .await
         .expect("Should be able to get wavefunction");
 }

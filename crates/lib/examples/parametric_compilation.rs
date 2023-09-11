@@ -4,8 +4,6 @@
 use std::f64::consts::PI;
 use std::time::Duration;
 
-use qcs::client::Qcs;
-use qcs::compiler::rpcq;
 use qcs::qpu::api::ExecutionOptions;
 use qcs::Executable;
 
@@ -19,15 +17,10 @@ RX(-pi / 2) 0
 
 MEASURE 0 ro[0]
 "#;
-async fn quilc_client() -> rpcq::Client {
-    let qcs = Qcs::load().await;
-    let endpoint = qcs.get_config().quilc_url();
-    rpcq::Client::new(endpoint).unwrap()
-}
 
 #[tokio::main]
 async fn main() {
-    let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
+    let mut exe = Executable::from_quil(PROGRAM);
     let mut parametric_measurements = Vec::with_capacity(200);
 
     let step = 2.0 * PI / 50.0;

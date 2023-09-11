@@ -9,11 +9,11 @@ use std::time::Duration;
 use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
 use quil_rs::quil::ToQuilError;
+use tokio::task::{spawn_blocking, JoinError};
 
 #[cfg(feature = "tracing")]
 use tracing::trace;
 
-use crate::compiler::rpcq;
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::{rewrite_arithmetic, translation::translate};
@@ -27,7 +27,7 @@ use super::translation::EncryptedTranslationResult;
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
 use crate::client::{GrpcClientError, Qcs};
-use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
+use crate::compiler::quilc::{self, CompilationResult, CompilerOpts, TargetDevice};
 
 /// Contains all the info needed for a single run of an [`crate::Executable`] against a QPU. Can be
 /// updated with fresh parameters in order to re-run the same program against the same QPU with the
@@ -60,8 +60,6 @@ pub(crate) enum Error {
     Compilation { details: String },
     #[error("Program when translating the program: {0}")]
     RewriteArithmetic(#[from] rewrite_arithmetic::Error),
-    #[error("Problem when getting RPCQ client: {0}")]
-    RpcqClient(#[from] rpcq::Error),
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
@@ -87,7 +85,12 @@ impl From<quilc::Error> for Error {
 /// Errors that are not expected to be returned—if they show up, it may be a bug in this library.
 #[derive(Debug, thiserror::Error)]
 pub(crate) enum Unexpected {
-    #[error("Problem converting QCS ISA to quilc ISA: {0}")]
+    #[error("Task running {task_name} did not complete.")]
+    TaskError {
+        task_name: &'static str,
+        source: JoinError,
+    },
+    #[error("Problem converting QCS ISA to quilc ISA")]
     Isa(String),
 }
 
@@ -123,13 +126,14 @@ impl<'a> Execution<'a> {
         shots: NonZeroU16,
         quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
-        quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
+        compile_with_quilc: bool,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots=%shots,
             %quantum_processor_id,
+            %compile_with_quilc,
             ?compiler_options,
             "creating new QPU Execution",
         );
@@ -137,15 +141,21 @@ impl<'a> Execution<'a> {
         let isa = get_isa(quantum_processor_id.as_ref(), &client).await?;
         let target_device = TargetDevice::try_from(isa)?;
 
-        let program = if let Some(client) = quilc_client {
+        let program = if compile_with_quilc {
             #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
-            client
-                .compile_program(&quil, target_device, compiler_options)
-                .map_err(|e| Error::Compilation {
-                    details: e.to_string(),
-                })?
-                .program
+            let client = client.clone();
+            spawn_blocking(move || {
+                quilc::compile_program(&quil, target_device, &client, compiler_options)
+            })
+            .await
+            .map_err(|source| {
+                Error::Unexpected(Unexpected::TaskError {
+                    task_name: "quilc",
+                    source,
+                })
+            })?
+            .map(|CompilationResult { program, .. }| program)?
         } else {
             #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");

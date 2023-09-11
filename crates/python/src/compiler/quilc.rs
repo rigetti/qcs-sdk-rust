@@ -1,10 +1,7 @@
-use qcs::compiler::{
-    quilc::{
-        Client, CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
-        GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
-        RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
-    },
-    rpcq,
+use qcs::compiler::quilc::{
+    CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
+    GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
+    RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
 };
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use quil_rs::quil::Quil;
@@ -20,6 +17,7 @@ use rigetti_pyo3::{
     wrap_error, PyWrapper, ToPythonError,
 };
 
+use crate::client::PyQcsClient;
 use crate::py_sync::py_function_sync_async;
 use crate::qpu::isa::PyInstructionSetArchitecture;
 
@@ -33,8 +31,7 @@ create_init_submodule! {
         PyConjugateByCliffordRequest,
         PyConjugatePauliByCliffordResponse,
         PyRandomizedBenchmarkingRequest,
-        PyGenerateRandomizedBenchmarkingSequenceResponse,
-        PyQuilcClient
+        PyGenerateRandomizedBenchmarkingSequenceResponse
     ],
     consts: [DEFAULT_COMPILER_TIMEOUT],
     errors: [QuilcError],
@@ -103,49 +100,17 @@ impl PyTargetDevice {
     }
 }
 
-wrap_error!(RustRpcqError(rpcq::Error));
-py_wrap_error!(quilc, RustRpcqError, RpcqError, PyRuntimeError);
-
-#[derive(Clone)]
-pub enum QuilcClient {
-    Rpcq(qcs::compiler::rpcq::Client),
-}
-
-#[pyclass(name = "QuilcClient")]
-#[derive(Clone)]
-pub struct PyQuilcClient {
-    pub inner: QuilcClient,
-}
-
-#[pymethods]
-impl PyQuilcClient {
-    #[new]
-    fn new() -> PyResult<Self> {
-        Err(PyRuntimeError::new_err(
-            "QuilcClient cannot not be instantiated directly. See the static methods: QuilcClient.new_rpcq().",
-        ))
-    }
-
-    #[staticmethod]
-    fn new_rpcq(endpoint: &str) -> PyResult<Self> {
-        let rpcq_client = qcs::compiler::rpcq::Client::new(endpoint).unwrap();
-        Ok(Self {
-            inner: QuilcClient::Rpcq(rpcq_client),
-        })
-    }
-}
-
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction(client = "None", options = "None")]
     async fn compile_program(
         quil: String,
         target: PyTargetDevice,
-        client: PyQuilcClient,
+        client: Option<PyQcsClient>,
         options: Option<PyCompilerOpts>,
     ) -> PyResult<PyCompilationResult> {
-        let QuilcClient::Rpcq(client) = client.inner;
+        let client = PyQcsClient::get_or_create_client(client).await;
         let options = options.unwrap_or_default();
-        client.compile_program(&quil, target.into(), options.into())
+        qcs::compiler::quilc::compile_program(&quil, target.into(), &client, options.into())
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
             .map(|result| PyCompilationResult {
@@ -222,12 +187,12 @@ pub struct PyCompilationResult {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction(client = "None")]
     async fn get_version_info(
-        client: PyQuilcClient,
+        client: Option<PyQcsClient>,
     ) -> PyResult<String> {
-        let QuilcClient::Rpcq(client) = client.inner;
-        client.get_version_info()
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::compiler::quilc::get_version_info(&client)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
     }
@@ -274,13 +239,13 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction(client = "None")]
     async fn conjugate_pauli_by_clifford(
         request: PyConjugateByCliffordRequest,
-        client: PyQuilcClient,
+        client: Option<PyQcsClient>,
     ) -> PyResult<PyConjugatePauliByCliffordResponse> {
-        let QuilcClient::Rpcq(client) = client.inner;
-        client.conjugate_pauli_by_clifford(request.into())
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::compiler::quilc::conjugate_pauli_by_clifford(&client, request.into())
             .map(PyConjugatePauliByCliffordResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
@@ -324,13 +289,13 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction(client = "None")]
     async fn generate_randomized_benchmarking_sequence(
         request: PyRandomizedBenchmarkingRequest,
-        client: PyQuilcClient,
+        client: Option<PyQcsClient>,
     ) -> PyResult<PyGenerateRandomizedBenchmarkingSequenceResponse> {
-        let QuilcClient::Rpcq(client) = client.inner;
-        client.generate_randomized_benchmarking_sequence(request.into())
+        let client = PyQcsClient::get_or_create_client(client).await;
+        qcs::compiler::quilc::generate_randomized_benchmarking_sequence(&client, request.into())
             .map(PyGenerateRandomizedBenchmarkingSequenceResponse::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)
