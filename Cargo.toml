@@ -26,6 +26,6 @@ ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.17"
 pyo3 = { version = "0.17" }
 pyo3-asyncio = { version = "0.17", features = ["tokio-runtime"] }
-pyo3-build-config = { version = "0.17" }
+pyo3-build-config = { version = "0.17, ||, 0.19" }
 rigetti-pyo3 = { version = "0.1.0", features = ["complex"] }
 
