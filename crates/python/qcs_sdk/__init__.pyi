@@ -6,8 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
-from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData
-from qcs_sdk.compiler.quilc import CompilerOpts
+from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData, QVMClient
+from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
 
 from qcs_sdk.client import QCSClient as QCSClient
 
@@ -34,20 +34,20 @@ class Executable:
         registers: Optional[Sequence[str]] = None,
         parameters: Optional[Sequence[ExeParameter]] = None,
         shots: Optional[int] = None,
-        compile_with_quilc: Optional[bool] = None,
+        quilc_client: Optional[QuilcClient] = None,
         compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
-    def execute_on_qvm(self) -> ExecutionData:
+    def execute_on_qvm(self, client: QVMClient) -> ExecutionData:
         """
-        Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
+        Execute on a QVM which is accessible via the provided client.
 
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def execute_on_qvm_async(self) -> ExecutionData:
+    async def execute_on_qvm_async(self, client: QVMClient) -> ExecutionData:
         """
-        Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
-        (async analog of ``Executable.execute_on_qvm``)
+        Execute on a QVM which is accessible via the provided client.
+        (async analog of ``Executable.execute_on_qvm``.)
 
         :raises ExecutionError: If the job fails to execute.
         """
