@@ -3,4 +3,4 @@
 
 mod isa;
 pub mod quilc;
-mod rpcq;
+pub mod rpcq;

@@ -5,10 +5,8 @@ use quil_rs::Program;
 
 use crate::{executable::Parameters, qvm::run_program};
 
-use crate::client::Qcs;
-
-use super::QvmOptions;
-use super::{api::AddressRequest, Error, QvmResultData};
+use super::{http::AddressRequest, Error, QvmResultData};
+use super::{Client, QvmOptions};
 
 /// Contains all the info needed to execute on a QVM a single time, with the ability to be reused for
 /// faster subsequent runs.
@@ -54,12 +52,12 @@ impl Execution {
     /// ## Parameter Errors
     ///
     /// Missing parameters, extra parameters, or parameters of the wrong type will all cause errors.
-    pub(crate) async fn run(
+    pub(crate) async fn run<C: Client>(
         &self,
         shots: NonZeroU16,
         addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
-        client: &Qcs,
+        client: &C,
     ) -> Result<QvmResultData, Error> {
         run_program(
             &self.program,
@@ -81,7 +79,12 @@ mod describe_execution {
     use std::{collections::HashMap, num::NonZeroU16};
 
     use super::{Execution, Parameters};
-    use crate::client::Qcs;
+    use crate::{client::Qcs, qvm};
+
+    async fn qvm_client() -> qvm::http::HttpClient {
+        let qcs = Qcs::load().await;
+        qvm::http::HttpClient::from(&qcs)
+    }
 
     #[tokio::test]
     async fn it_errs_on_excess_parameters() {
@@ -95,7 +98,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &Qcs::default(),
+                &qvm_client().await,
             )
             .await;
         if let Err(e) = result {
@@ -117,7 +120,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &Qcs::default(),
+                &qvm_client().await,
             )
             .await;
         if let Err(e) = result {

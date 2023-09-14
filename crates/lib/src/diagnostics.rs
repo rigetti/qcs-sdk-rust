@@ -5,7 +5,12 @@ use std::{borrow::Cow, time::Duration};
 
 use qcs_api_client_openapi::models::User;
 
-use crate::{build_info, client::Qcs, qvm::QvmOptions};
+use crate::{
+    build_info,
+    client::Qcs,
+    compiler::{quilc::Client as _, rpcq},
+    qvm::{self, Client as _, QvmOptions},
+};
 
 /// Collect package diagnostics in string form
 pub async fn get_report() -> String {
@@ -157,16 +162,24 @@ struct QuilcDiagnostics {
 impl QuilcDiagnostics {
     fn gather(client: &Qcs) -> Self {
         let address = client.get_config().quilc_url().to_string();
+        match rpcq::Client::new(&address) {
+            Ok(client) => {
+                let (version, available) = match client.get_version_info() {
+                    Ok(version) => (Some(version), true),
+                    Err(_) => (None, false),
+                };
 
-        let (version, available) = match crate::compiler::quilc::get_version_info(client) {
-            Ok(version) => (Some(version), true),
-            Err(_) => (None, false),
-        };
-
-        Self {
-            address,
-            version,
-            available,
+                Self {
+                    address,
+                    version,
+                    available,
+                }
+            }
+            Err(_) => Self {
+                address,
+                version: None,
+                available: false,
+            },
         }
     }
 }
@@ -180,18 +193,17 @@ struct QvmDiagnostics {
 
 impl QvmDiagnostics {
     async fn gather(client: &Qcs) -> Self {
-        let address = client.get_config().qvm_url().to_string();
         let options = QvmOptions {
             timeout: Some(Duration::from_secs(1)),
         };
-
-        let (version, available) = match crate::qvm::api::get_version_info(client, &options).await {
+        let qvm_client = qvm::http::HttpClient::from(client);
+        let (version, available) = match qvm_client.get_version_info(&options).await {
             Ok(version) => (Some(version), true),
             Err(_) => (None, false),
         };
 
         Self {
-            address,
+            address: qvm_client.qvm_url,
             version,
             available,
         }

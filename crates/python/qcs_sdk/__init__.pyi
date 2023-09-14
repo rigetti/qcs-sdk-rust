@@ -1,22 +1,21 @@
 import datetime
 from enum import Enum
-from typing import Dict, List, Sequence, Optional, Union, final, Iterable, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union, final
 
 import numpy as np
 from numpy.typing import NDArray
 
+from qcs_sdk.client import QCSClient as QCSClient
+from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
 from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
-from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData
-from qcs_sdk.compiler.quilc import CompilerOpts
+from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
 
-from qcs_sdk.client import QCSClient as QCSClient
-
+from . import client as client
+from . import compiler as compiler
 from . import qpu as qpu
 from . import qvm as qvm
-from . import compiler as compiler
-from . import client as client
 
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""
@@ -36,20 +35,20 @@ class Executable:
         registers: Optional[Sequence[str]] = None,
         parameters: Optional[Sequence[ExeParameter]] = None,
         shots: Optional[int] = None,
-        compile_with_quilc: Optional[bool] = None,
+        quilc_client: Optional[QuilcClient] = None,
         compiler_options: Optional[CompilerOpts] = None,
     ) -> "Executable": ...
-    def execute_on_qvm(self) -> ExecutionData:
+    def execute_on_qvm(self, client: QVMClient) -> ExecutionData:
         """
-        Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
+        Execute on a QVM which is accessible via the provided client.
 
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def execute_on_qvm_async(self) -> ExecutionData:
+    async def execute_on_qvm_async(self, client: QVMClient) -> ExecutionData:
         """
-        Execute on a QVM which must be available at the configured URL (default http://localhost:5000).
-        (async analog of ``Executable.execute_on_qvm``)
+        Execute on a QVM which is accessible via the provided client.
+        (async analog of ``Executable.execute_on_qvm``.)
 
         :raises ExecutionError: If the job fails to execute.
         """

@@ -6,7 +6,10 @@ from _pytest.config import Config
 from _pytest.config.argparsing import Parser
 from _pytest.nodes import Item
 
+from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
+from qcs_sdk.qvm import QVMClient
+from qcs_sdk.compiler.quilc import QuilcClient
 
 
 TEST_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -89,3 +92,13 @@ CNOT 0 1
 MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 """
+
+
+@pytest.fixture
+def qvm_http_client() -> QVMClient:
+    return QVMClient.new_http(QCSClient.load().qvm_url)
+
+
+@pytest.fixture
+def quilc_rpcq_client() -> QuilcClient:
+    return QuilcClient.new_rpcq(QCSClient.load().quilc_url)

@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use qcs::{qpu::api::ExecutionOptions, Executable};
+use qcs::{client::Qcs, compiler::rpcq, qpu::api::ExecutionOptions, Executable};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT[2]
@@ -12,9 +12,15 @@ MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "#;
 
+async fn quilc_client() -> rpcq::Client {
+    let qcs = Qcs::load().await;
+    let endpoint = qcs.get_config().quilc_url();
+    rpcq::Client::new(endpoint).unwrap()
+}
+
 #[tokio::main]
 async fn main() {
-    let mut exe = Executable::from_quil(PROGRAM);
+    let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
 
     let result = exe
         .with_parameter("theta", 0, PI)

@@ -1,10 +1,24 @@
-from typing import final, Mapping, Optional, Sequence, Tuple, Union, Dict, List
+from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, final
 
-from qcs_sdk import RegisterData, QCSClient
-
-from .api import AddressRequest
+from qcs_sdk import QCSClient, RegisterData
 
 from . import api as api
+from .api import AddressRequest
+
+@final
+class QVMClient:
+    """Client used to communicate with QVM"""
+
+    @staticmethod
+    def new_http(endpoint: str) -> QVMClient:
+        """Construct a new client which uses HTTP to communicate with QVM"""
+        ...
+    @property
+    def qvm_url(self) -> str:
+        """
+        Return the address of the client
+        """
+        ...
 
 @final
 class QVMResultData:
@@ -78,10 +92,10 @@ def run(
     shots: int,
     addresses: Mapping[str, AddressRequest],
     params: Mapping[str, Union[Sequence[float], Sequence[int]]],
+    client: QVMClient,
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
-    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """
@@ -105,10 +119,10 @@ async def run_async(
     shots: int,
     addresses: Mapping[str, AddressRequest],
     params: Mapping[str, Sequence[float]],
+    client: QVMClient,
     measurement_noise: Optional[Tuple[float, float, float]] = None,
     gate_noise: Optional[Tuple[float, float, float]] = None,
     rng_seed: Optional[int] = None,
-    client: Optional[QCSClient] = None,
     options: Optional[QVMOptions] = None,
 ) -> QVMResultData:
     """
