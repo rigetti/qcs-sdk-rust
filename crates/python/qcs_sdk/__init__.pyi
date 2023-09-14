@@ -1,20 +1,21 @@
 import datetime
 from enum import Enum
-from typing import Dict, List, Sequence, Optional, Union, final, Iterable, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union, final
 
 import numpy as np
 from numpy.typing import NDArray
 
-from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
-from qcs_sdk.qvm import QVMResultData, RawQVMReadoutData, QVMClient
-from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
-
 from qcs_sdk.client import QCSClient as QCSClient
+from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
+from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
+from qcs_sdk.qpu.api import ExecutionOptions
+from qcs_sdk.qpu.translation import TranslationOptions
+from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
 
+from . import client as client
+from . import compiler as compiler
 from . import qpu as qpu
 from . import qvm as qvm
-from . import compiler as compiler
-from . import client as client
 
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""
@@ -52,7 +53,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def execute_on_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
+    def execute_on_qpu(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
 
@@ -62,7 +69,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def execute_on_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> ExecutionData:
+    async def execute_on_qpu_async(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -73,7 +86,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    def submit_to_qpu(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
+    def submit_to_qpu(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
 
@@ -83,7 +102,13 @@ class Executable:
         :raises ExecutionError: If the job fails to execute.
         """
         ...
-    async def submit_to_qpu_async(self, quantum_processor_id: str, endpoint_id: Optional[str] = None) -> JobHandle:
+    async def submit_to_qpu_async(
+        self,
+        quantum_processor_id: str,
+        endpoint_id: Optional[str] = None,
+        translation_options: Optional[TranslationOptions] = None,
+        execution_options: Optional[ExecutionOptions] = None,
+    ) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
         (async analog of ``Executable.execute_on_qpu``)
@@ -218,7 +243,7 @@ class RegisterMap:
     def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]:
         """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
         ...
-    def get(self, default: Optional[RegisterMatrix] = None) -> Optional[RegisterMatrix]: ...
+    def get(self, key: str, default: Optional[RegisterMatrix] = None) -> Optional[RegisterMatrix]: ...
     def items(self) -> Iterable[Tuple[str, RegisterMatrix]]: ...
     def keys(self) -> Iterable[str]: ...
     def values(self) -> Iterable[RegisterMatrix]: ...
