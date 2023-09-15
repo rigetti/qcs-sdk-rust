@@ -1,5 +1,5 @@
 ---
 source: crates/lib/src/qpu/rewrite_arithmetic.rs
-expression: "substitutions[0].to_string()"
+expression: "substitutions[0].to_quil_or_debug()"
 ---
-(theta[0]*1.5)/6.283185307179586
+theta[0]*0.238732414637843
