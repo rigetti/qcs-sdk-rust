@@ -182,11 +182,11 @@ pub async fn retrieve_results(
         )
 }
 
-// The ExecutionOptions are really generic over all QPU operations.
 /// Options available when connecting to a QPU.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`QpuConnectionOptionsBuilder`]
 /// to build a custom set of options.
+// These are aliases because the ExecutionOptions are actually generic over all QPU operations.
 pub type QpuConnectionOptions = ExecutionOptions;
 /// Builder for setting up [`QpuConnectionOptions`].
 pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
