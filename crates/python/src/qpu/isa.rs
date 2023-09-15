@@ -127,7 +127,7 @@ impl PyInstructionSetArchitecture {
         Ok(Self(isa))
     }
 
-    #[args(pretty = "false")]
+    #[pyo3(signature = (pretty = false))]
     pub fn json(&self, pretty: bool) -> PyResult<String> {
         let data = {
             if pretty {
@@ -143,7 +143,8 @@ impl PyInstructionSetArchitecture {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (quantum_processor_id, client = None))]
     async fn get_instruction_set_architecture(
         quantum_processor_id: String,
         client: Option<PyQcsClient>,

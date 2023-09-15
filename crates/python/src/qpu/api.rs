@@ -66,7 +66,8 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[pyfunction(client = "None", endpoint_id = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
@@ -218,7 +219,8 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None", endpoint_id = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn retrieve_results(
         job_id: String,
         quantum_processor_id: Option<String>,

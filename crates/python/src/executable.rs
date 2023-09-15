@@ -93,15 +93,15 @@ macro_rules! py_job_handle {
 #[pymethods]
 impl PyExecutable {
     #[new]
-    #[args(
+    #[pyo3(signature = (
         quil,
-        "/",
-        registers = "Vec::new()",
-        parameters = "Vec::new()",
-        shots = "None",
-        quilc_client = "None",
-        compiler_options = "None"
-    )]
+        /,
+        registers = Vec::new(),
+        parameters = Vec::new(),
+        shots = None,
+        quilc_client = None,
+        compiler_options = None,
+    ))]
     pub fn new(
         quil: String,
         registers: Vec<String>,
@@ -152,7 +152,7 @@ impl PyExecutable {
         py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
-    #[args(endpoint_id = "None")]
+    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu(
         &self,
         py: Python<'_>,
@@ -186,7 +186,7 @@ impl PyExecutable {
         }
     }
 
-    #[args(endpoint_id = "None")]
+    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu_async<'py>(
         &'py self,
         py: Python<'py>,
@@ -220,7 +220,7 @@ impl PyExecutable {
         }
     }
 
-    #[args(endpoint_id = "None")]
+    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu(
         &self,
         py: Python<'_>,
@@ -254,7 +254,7 @@ impl PyExecutable {
         }
     }
 
-    #[args(endpoint_id = "None")]
+    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu_async<'py>(
         &'py self,
         py: Python<'py>,

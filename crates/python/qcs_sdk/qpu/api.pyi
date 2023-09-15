@@ -84,7 +84,7 @@ class ExecutionResults:
 def submit(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: Optional[str],
+    quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
@@ -107,7 +107,7 @@ def submit(
 async def submit_async(
     program: str,
     patch_values: Mapping[str, Sequence[float]],
-    quantum_processor_id: Optional[str],
+    quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ) -> str:
@@ -130,7 +130,7 @@ async def submit_async(
 
 def retrieve_results(
     job_id: str,
-    quantum_processor_id: Optional[str],
+    quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:
@@ -152,7 +152,7 @@ def retrieve_results(
 
 async def retrieve_results_async(
     job_id: str,
-    quantum_processor_id: Optional[str],
+    quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ) -> ExecutionResults:

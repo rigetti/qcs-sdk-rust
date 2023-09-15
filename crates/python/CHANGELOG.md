@@ -1,3 +1,9 @@
+## 0.12.1-rc.0
+
+### Features
+
+- Build & publish wheels for Windows (#351)
+
 ## 0.12.0
 
 ### Breaking Changes

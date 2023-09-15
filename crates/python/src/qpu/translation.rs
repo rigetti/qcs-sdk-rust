@@ -53,7 +53,8 @@ py_wrap_error!(
 py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
-    #[pyfunction(client = "None", timeout = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
     async fn get_quilt_calibrations(
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
@@ -132,12 +133,13 @@ pub struct PyTranslationResult {
 }
 
 py_function_sync_async! {
-    #[pyfunction(client = "None")]
     /// Translates a native Quil program into an executable
     ///
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
+    #[pyfunction]
+    #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     async fn translate(
         native_quil: String,
         num_shots: u32,

@@ -58,7 +58,7 @@ py_wrap_type! {
 #[pymethods]
 impl PyCompilerOpts {
     #[new]
-    #[args("/", timeout = "DEFAULT_COMPILER_TIMEOUT", protoquil = "None")]
+    #[pyo3(signature = (/, timeout = DEFAULT_COMPILER_TIMEOUT, protoquil = None))]
     pub fn new(timeout: Option<f64>, protoquil: Option<bool>) -> Self {
         let opts = CompilerOpts::new()
             .with_timeout(timeout)
@@ -136,7 +136,8 @@ impl PyQuilcClient {
 }
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (quil, target, client, options = None))]
     async fn compile_program(
         quil: String,
         target: PyTargetDevice,
@@ -222,7 +223,7 @@ pub struct PyCompilationResult {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction]
     async fn get_version_info(
         client: PyQuilcClient,
     ) -> PyResult<String> {
@@ -274,7 +275,7 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction]
     async fn conjugate_pauli_by_clifford(
         request: PyConjugateByCliffordRequest,
         client: PyQuilcClient,
@@ -324,7 +325,7 @@ py_wrap_data_struct! {
 }
 
 py_function_sync_async! {
-    #[pyfunction()]
+    #[pyfunction]
     async fn generate_randomized_benchmarking_sequence(
         request: PyRandomizedBenchmarkingRequest,
         client: PyQuilcClient,

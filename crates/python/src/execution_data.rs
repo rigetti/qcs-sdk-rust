@@ -108,8 +108,8 @@ impl PyRegisterMatrix {
     }
 
     #[staticmethod]
-    fn from_integer(matrix: &PyArray2<i64>) -> PyRegisterMatrix {
-        Self(RegisterMatrix::Integer(matrix.to_owned_array()))
+    fn from_integer(inner: &PyArray2<i64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Integer(inner.to_owned_array()))
     }
 
     fn to_integer<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<i64>> {
@@ -133,8 +133,8 @@ impl PyRegisterMatrix {
     }
 
     #[staticmethod]
-    fn from_real(matrix: &PyArray2<f64>) -> PyRegisterMatrix {
-        Self(RegisterMatrix::Real(matrix.to_owned_array()))
+    fn from_real(inner: &PyArray2<f64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Real(inner.to_owned_array()))
     }
 
     fn to_real<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
@@ -158,8 +158,8 @@ impl PyRegisterMatrix {
     }
 
     #[staticmethod]
-    fn from_complex(matrix: &PyArray2<Complex64>) -> PyRegisterMatrix {
-        Self(RegisterMatrix::Complex(matrix.to_owned_array()))
+    fn from_complex(inner: &PyArray2<Complex64>) -> PyRegisterMatrix {
+        Self(RegisterMatrix::Complex(inner.to_owned_array()))
     }
 
     fn to_complex<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<Complex64>> {

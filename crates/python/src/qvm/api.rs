@@ -48,7 +48,8 @@ create_init_submodule! {
 }
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (client, options = None))]
     async fn get_version_info(client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<String> {
         let QvmClient::Http(client) = client.inner;
         client.get_version_info(options.unwrap_or_default().as_inner())
@@ -138,7 +139,8 @@ py_wrap_data_struct! {
 impl_repr!(PyMultishotResponse);
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (request, client, options = None))]
     async fn run(
         request: PyMultishotRequest,
         client: super::PyQvmClient,
@@ -200,7 +202,8 @@ impl PyMultishotMeasureRequest {
 }
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (request, client, options = None))]
     async fn run_and_measure(request: PyMultishotMeasureRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<Vec<i64>>> {
         let QvmClient::Http(client) = client.inner;
         client.run_and_measure(request.as_inner(), options.unwrap_or_default().as_inner())
@@ -232,7 +235,8 @@ impl PyExpectationRequest {
 }
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (request, client, options = None))]
     async fn measure_expectation(request: PyExpectationRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<f64>> {
         let QvmClient::Http(client) = client.inner;
         client.measure_expectation(request.as_inner(), options.unwrap_or_default().as_inner())
@@ -271,7 +275,8 @@ impl PyWavefunctionRequest {
 }
 
 py_function_sync_async! {
-    #[pyfunction(options = "None")]
+    #[pyfunction]
+    #[pyo3(signature = (request, client, options = None))]
     async fn get_wavefunction(request: PyWavefunctionRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<u8>> {
         let QvmClient::Http(client) = client.inner;
         client.get_wavefunction(request.as_inner(), options.unwrap_or_default().as_inner())
