@@ -1,3 +1,17 @@
+## 0.12.1
+
+### Features
+
+- Update quil-rs (#361)
+- Build & publish wheels for Windows (#351)
+
+## 0.12.1-rc.1
+
+### Features
+
+- Update quil-rs (#361)
+- Build & publish wheels for Windows (#351)
+
 ## 0.12.1-rc.0
 
 ### Features

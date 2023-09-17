@@ -3,17 +3,6 @@
 version = 3
 
 [[package]]
-name = "ahash"
-version = "0.7.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
-dependencies = [
- "getrandom",
- "once_cell",
- "version_check",
-]
-
-[[package]]
 name = "aho-corasick"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -536,24 +525,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "egg"
-version = "0.9.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "96beaf9d35dbc4686bc86a4ecb851fd6a406f0bf32d9f646b1225a5c5cf5b5d7"
-dependencies = [
- "env_logger",
- "fxhash",
- "hashbrown 0.12.3",
- "indexmap",
- "instant",
- "log",
- "smallvec",
- "symbol_table",
- "symbolic_expressions",
- "thiserror",
-]
-
-[[package]]
 name = "either"
 version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -584,15 +555,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
-]
-
-[[package]]
-name = "env_logger"
-version = "0.9.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a12e6657c4c97ebab115a42dcee77225f7f482cdd841cf7088c657a42e9e00e7"
-dependencies = [
- "log",
 ]
 
 [[package]]
@@ -760,15 +722,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fxhash"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c31b6d751ae2c7f11320402d34e41349dd1016f8d5d45e48c4312bc8625af50c"
-dependencies = [
- "byteorder",
-]
-
-[[package]]
 name = "generic-array"
 version = "0.14.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -826,9 +779,6 @@ name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
-dependencies = [
- "ahash",
-]
 
 [[package]]
 name = "hashbrown"
@@ -1919,7 +1869,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.16.0"
+version = "0.16.1"
 dependencies = [
  "async-trait",
  "built",
@@ -2046,7 +1996,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.12.1-rc.0"
+version = "0.12.1"
 dependencies = [
  "async-trait",
  "numpy",
@@ -2070,11 +2020,10 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.21.0"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.5.1#882ffb37929c55553f1120a8a6a3d0444bc12781"
+version = "0.21.1"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.5.2#e2783954a87df37893f3a8b3ce84509e3b4cf4e1"
 dependencies = [
  "approx",
- "egg",
  "indexmap",
  "itertools 0.11.0",
  "lexical",
@@ -2697,22 +2646,6 @@ dependencies = [
  "rustversion",
  "syn 1.0.109",
 ]
-
-[[package]]
-name = "symbol_table"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32bf088d1d7df2b2b6711b06da3471bc86677383c57b27251e18c56df8deac14"
-dependencies = [
- "ahash",
- "hashbrown 0.12.3",
-]
-
-[[package]]
-name = "symbolic_expressions"
-version = "5.0.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c68d531d83ec6c531150584c42a4290911964d5f0d79132b193b67252a23b71"
 
 [[package]]
 name = "syn"

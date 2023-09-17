@@ -1,3 +1,15 @@
+## 0.16.1
+
+### Features
+
+- Update quil-rs (#361)
+
+## 0.16.1-rc.0
+
+### Features
+
+- Update quil-rs (#361)
+
 ## 0.16.0
 
 ### Breaking Changes
