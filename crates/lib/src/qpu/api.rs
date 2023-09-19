@@ -33,7 +33,7 @@ use qcs_api_client_openapi::apis::{
 use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
 use tonic::transport::Channel;
 
-use crate::{compiler::quilc::Client, executable::Parameters};
+use crate::executable::Parameters;
 
 use crate::client::{GrpcClientError, Qcs};
 
