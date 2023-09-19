@@ -182,6 +182,15 @@ pub async fn retrieve_results(
         )
 }
 
+/// Options available when connecting to a QPU.
+///
+/// Use [`Default`] to get a reasonable set of defaults, or start with [`QpuConnectionOptionsBuilder`]
+/// to build a custom set of options.
+// These are aliases because the ExecutionOptions are actually generic over all QPU operations.
+pub type QpuConnectionOptions = ExecutionOptions;
+/// Builder for setting up [`QpuConnectionOptions`].
+pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
+
 /// Options avaialable when executing a job on a QPU.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
@@ -260,11 +269,25 @@ impl ExecutionOptions {
         }
     }
 
-    async fn get_controller_client(
+    /// Get a controller client for the given QPU ID.
+    pub async fn get_controller_client(
         &self,
         client: &Qcs,
         quantum_processor_id: Option<&str>,
     ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
+        let service = self
+            .get_qpu_grpc_connection(client, quantum_processor_id)
+            .await?;
+        Ok(ControllerClient::new(service)
+            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
+    }
+
+    /// Get a GRPC connection to a QPU, without specifying the API to use.
+    pub async fn get_qpu_grpc_connection(
+        &self,
+        client: &Qcs,
+        quantum_processor_id: Option<&str>,
+    ) -> Result<RefreshService<Channel, ClientConfiguration>, QpuApiError> {
         let address = match self.connection_strategy() {
             ConnectionStrategy::EndpointId(endpoint_id) => {
                 let endpoint = get_endpoint(&client.get_openapi_client(), endpoint_id).await?;
@@ -288,20 +311,18 @@ impl ExecutionOptions {
                 .await?
             }
         };
-        self.grpc_address_to_client(&address, client)
+        self.grpc_address_to_channel(&address, client)
     }
 
-    fn grpc_address_to_client(
+    fn grpc_address_to_channel(
         &self,
         address: &str,
         client: &Qcs,
-    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
+    ) -> Result<RefreshService<Channel, ClientConfiguration>, QpuApiError> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        let service = wrap_channel_with(channel, client.get_config().clone());
-        Ok(ControllerClient::new(service)
-            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
+        Ok(wrap_channel_with(channel, client.get_config().clone()))
     }
 
     async fn get_gateway_address(
