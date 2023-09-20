@@ -1,3 +1,9 @@
+## 0.12.3-rc.0
+
+### Features
+
+- release with new grpc-channel construction method (#364)
+
 ## 0.12.2
 
 ### Features
