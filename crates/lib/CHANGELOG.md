@@ -1,3 +1,9 @@
+## 0.16.4-rc.0
+
+### Features
+
+- Update quil-rs (#365)
+
 ## 0.16.3
 
 ### Features
