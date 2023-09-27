@@ -123,11 +123,42 @@ jobs:
         with: 
           name: wheels 
           path: dist 
+  sdist:
+    runs-on: ubuntu-latest
+    needs: is-python-release
+    env:
+      CXXFLAGS: "-std=c++11"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        profile: minimal
+        default: true
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
+    - name: Build sdist
+      uses: messense/maturin-action@v1
+      with:
+        command: sdist
+        args: --manifest-path crates/python/Cargo.toml --out dist
+    - name: Upload sdist
+      uses: actions/upload-artifact@v3
+      with:
+        name: wheels
+        path: dist
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [ macos, linux, windows ]
+    needs: [ macos, linux, windows, sdist ]
     steps:
       - uses: actions/download-artifact@v3
       - name: Publish to PyPi
