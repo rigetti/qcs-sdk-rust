@@ -29,3 +29,11 @@ pyo3-asyncio = { version = "0.19", features = ["tokio-runtime"] }
 pyo3-build-config = "0.19.2"
 rigetti-pyo3 = { version = "0.2.0", features = ["complex"] }
 
+# The primary intent of these options is to reduce the binary size for Python wheels
+# since PyPi has limits on how much storage a project can use.
+# The LTO and codegen-units settings should have the added benefit of improving
+# performance. The only benefit of stripping symbols is reducing binary size.
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
