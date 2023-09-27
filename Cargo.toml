@@ -29,3 +29,7 @@ pyo3-asyncio = { version = "0.19", features = ["tokio-runtime"] }
 pyo3-build-config = "0.19.2"
 rigetti-pyo3 = { version = "0.2.0", features = ["complex"] }
 
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
