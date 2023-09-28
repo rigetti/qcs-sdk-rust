@@ -53,6 +53,10 @@ To release, manually run the `Prepare Release` workflow in GitHub Actions.
 
 Pre-releases for both the library crate and Python package happen automatically on merge to main.
 
+## CI
+
+This repository uses GitHub actions. If you are making changes to a workflow, consider using our [test events](.github/test_events/README.md) to help validate the changes.
+
 [cargo-make]: https://sagiegurari.github.io/cargo-make/
 [Quantum Cloud Services]: https://docs.rigetti.com/qcs/
 [Quil]: https://github.com/quil-lang/quil
