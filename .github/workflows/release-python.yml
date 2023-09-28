@@ -169,7 +169,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     # `needs` forces this job to wait until all specified jobs
-    # are finished to run. On it's own, those jobs all have
+    # are finished to run. Typically, those jobs would all have
     # to be successful, but when combined with `if: always()`,
     # this job is allowed to run after all the needed jobs
     # finish, regardless of their outcome. In this case, we
