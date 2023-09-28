@@ -137,7 +137,6 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     needs: is-python-release
-    if: false
     env:
       CXXFLAGS: "-std=c++11"
     steps:
