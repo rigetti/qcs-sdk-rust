@@ -21,7 +21,7 @@ jobs:
     if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Publishing wheels (${{ github.event_name == 'release' }} && ${{ !github.event.release.prerelease }}) ${{ (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease) }})"
+      - run: echo "Publishing wheels"
 
   macos:
     runs-on: macos-12
