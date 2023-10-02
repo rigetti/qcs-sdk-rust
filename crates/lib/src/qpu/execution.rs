@@ -123,7 +123,7 @@ impl<'a> Execution<'a> {
         shots: NonZeroU16,
         quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
-        quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
+        quilc_client: Option<Arc<dyn quilc::Client<Error = quilc::Error> + Send + Sync>>,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
         #[cfg(feature = "tracing")]

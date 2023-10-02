@@ -107,6 +107,8 @@ impl Client {
 }
 
 impl quilc::Client for Client {
+    type Error = quilc::Error;
+
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
     fn compile_program(
         &self,

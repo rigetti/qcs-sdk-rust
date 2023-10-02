@@ -92,7 +92,7 @@ pub struct Executable<'executable, 'execution> {
     readout_memory_region_names: Option<Vec<Cow<'executable, str>>>,
     params: Parameters,
     qcs_client: Option<Arc<Qcs>>,
-    quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
+    quilc_client: Option<Arc<dyn quilc::Client<Error = quilc::Error> + Send + Sync>>,
     compiler_options: CompilerOpts,
     qpu: Option<qpu::Execution<'execution>>,
     qvm: Option<qvm::Execution>,
@@ -327,7 +327,7 @@ impl Executable<'_, '_> {
     /// To disable compilation, set this to `None`.
     #[must_use]
     #[allow(trivial_casts)]
-    pub fn with_quilc_client<C: quilc::Client + Send + Sync + 'static>(
+    pub fn with_quilc_client<C: quilc::Client<Error = quilc::Error> + Send + Sync + 'static>(
         mut self,
         client: Option<C>,
     ) -> Self {
