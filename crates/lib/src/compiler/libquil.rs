@@ -55,6 +55,7 @@ impl quilc::Client for Client {
         let program = libquil_sys::quilc::Program::from_str(quil)?;
         let isa = serde_json::to_string(&isa)?;
         let chip = libquil_sys::quilc::Chip::from_str(&isa)?;
+
         let compilation_result = if options.protoquil.unwrap_or_default() {
             libquil_sys::quilc::compile_protoquil(&program, &chip)
         } else {
@@ -181,7 +182,50 @@ MEASURE 1 ro[1]
 "##;
 
     #[tokio::test]
+    async fn test_print_isa() {
+        let isa = TargetDevice::try_from(aspen_9_isa()).unwrap();
+        let isa = serde_json::to_string_pretty(&isa).unwrap();
+    }
+
+    #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
+        let client = Qcs::load().await;
+        let client = qvm::http::HttpClient::from(&client);
+        let output = libquil_client()
+            .compile_program(
+                BELL_STATE,
+                TargetDevice::try_from(aspen_9_isa())
+                    .expect("Couldn't build target device from ISA"),
+                CompilerOpts::default(),
+            )
+            .expect("Could not compile");
+        let mut results = crate::qvm::Execution::new(&output.program.to_quil_or_debug())
+            .unwrap()
+            .run(
+                NonZeroU16::new(10).expect("value is non-zero"),
+                [("ro".to_string(), AddressRequest::IncludeAll)]
+                    .iter()
+                    .cloned()
+                    .collect(),
+                &HashMap::default(),
+                &client,
+            )
+            .await
+            .expect("Could not run program on QVM");
+        for shot in results
+            .memory
+            .remove("ro")
+            .expect("Did not receive ro buffer")
+            .into_i8()
+            .unwrap()
+        {
+            assert_eq!(shot.len(), 2);
+            assert_eq!(shot[0], shot[1]);
+        }
+    }
+
+    #[tokio::test]
+    async fn run_compiled_bell_state_on_qvm_2() {
         let client = Qcs::load().await;
         let client = qvm::http::HttpClient::from(&client);
         let output = libquil_client()
@@ -244,6 +288,29 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
+        let rpcq_client = libquil_client();
+        let request = ConjugateByCliffordRequest {
+            pauli: PauliTerm {
+                indices: vec![0],
+                symbols: vec!["X".into()],
+            },
+            clifford: "H 0".into(),
+        };
+        let response = rpcq_client
+            .conjugate_pauli_by_clifford(request)
+            .expect("Should conjugate pauli by clifford");
+
+        assert_eq!(
+            response,
+            ConjugatePauliByCliffordResponse {
+                phase: 0,
+                pauli: "Z".into(),
+            }
+        );
+    }
+
+    #[tokio::test]
+    async fn test_conjugate_pauli_by_clifford_2() {
         let rpcq_client = libquil_client();
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {

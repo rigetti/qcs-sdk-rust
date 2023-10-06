@@ -3,6 +3,6 @@
 
 mod isa;
 #[cfg(feature = "libquil")]
-mod libquil;
+pub mod libquil;
 pub mod quilc;
 pub mod rpcq;
