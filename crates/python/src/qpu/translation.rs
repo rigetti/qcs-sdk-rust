@@ -8,7 +8,8 @@ use qcs::client::GrpcClientError;
 use qcs::qpu::translation::TranslationOptions;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, ToPythonError,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_simple_enum, wrap_error,
+    ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -19,7 +20,8 @@ create_init_submodule! {
     classes: [
         PyQuiltCalibrations,
         PyTranslationOptions,
-        PyTranslationResult
+        PyTranslationResult,
+        PyBackend
     ],
     errors: [
         GetQuiltCalibrationsError,
@@ -88,13 +90,29 @@ py_wrap_error!(
     PyRuntimeError
 );
 
+#[derive(Copy, Clone)]
+pub enum Backend {
+    V1,
+    V2,
+}
+
+py_wrap_simple_enum! {
+    PyBackend(Backend) as "Backend" {
+        V1,
+        V2
+    }
+}
+
 #[derive(Clone, Default)]
 #[pyclass(name = "TranslationOptions")]
-pub struct PyTranslationOptions(TranslationOptions);
+pub struct PyTranslationOptions {
+    inner: TranslationOptions,
+    backend: Option<Backend>,
+}
 
 impl PyTranslationOptions {
     pub fn as_inner(&self) -> &TranslationOptions {
-        &self.0
+        &self.inner
     }
 }
 
@@ -102,19 +120,29 @@ impl PyTranslationOptions {
 impl PyTranslationOptions {
     #[new]
     fn __new__() -> PyResult<Self> {
-        Ok(Self(Default::default()))
+        Ok(Self {
+            inner: Default::default(),
+            backend: None,
+        })
+    }
+
+    #[getter]
+    fn backend(&self) -> Option<PyBackend> {
+        self.backend.map(Into::into)
     }
 
     fn use_backend_v1(&mut self) {
-        self.0.use_backend_v1()
+        self.backend = Some(Backend::V1);
+        self.inner.use_backend_v1()
     }
 
     fn use_backend_v2(&mut self) {
-        self.0.use_backend_v2()
+        self.backend = Some(Backend::V2);
+        self.inner.use_backend_v2()
     }
 
     fn __repr__(&self) -> String {
-        format!("{:?}", self.0)
+        format!("{:?}", self.inner)
     }
 }
 

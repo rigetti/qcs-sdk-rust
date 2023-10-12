@@ -58,3 +58,13 @@ async def test_get_quilt_calibrations(
 ):
     program = await get_quilt_calibrations_async(quantum_processor_id)
     assert program
+
+
+def test_translation_backend():
+    from qcs_sdk.qpu.translation import Backend, TranslationOptions
+    opts = TranslationOptions()
+    assert opts.backend is None
+    opts.use_backend_v1()
+    assert opts.backend == Backend.V1
+    opts.use_backend_v2()
+    assert opts.backend == Backend.V2
