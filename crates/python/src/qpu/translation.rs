@@ -21,7 +21,7 @@ create_init_submodule! {
         PyQuiltCalibrations,
         PyTranslationOptions,
         PyTranslationResult,
-        PyBackend
+        PyTranslationBackend
     ],
     errors: [
         GetQuiltCalibrationsError,
@@ -91,13 +91,13 @@ py_wrap_error!(
 );
 
 #[derive(Copy, Clone)]
-pub enum Backend {
+pub enum TranslationBackend {
     V1,
     V2,
 }
 
 py_wrap_simple_enum! {
-    PyBackend(Backend) as "Backend" {
+    PyTranslationBackend(TranslationBackend) as "TranslationBackend" {
         V1,
         V2
     }
@@ -107,7 +107,7 @@ py_wrap_simple_enum! {
 #[pyclass(name = "TranslationOptions")]
 pub struct PyTranslationOptions {
     inner: TranslationOptions,
-    backend: Option<Backend>,
+    backend: Option<TranslationBackend>,
 }
 
 impl PyTranslationOptions {
@@ -127,17 +127,17 @@ impl PyTranslationOptions {
     }
 
     #[getter]
-    fn backend(&self) -> Option<PyBackend> {
+    fn backend(&self) -> Option<PyTranslationBackend> {
         self.backend.map(Into::into)
     }
 
     fn use_backend_v1(&mut self) {
-        self.backend = Some(Backend::V1);
+        self.backend = Some(TranslationBackend::V1);
         self.inner.use_backend_v1()
     }
 
     fn use_backend_v2(&mut self) {
-        self.backend = Some(Backend::V2);
+        self.backend = Some(TranslationBackend::V2);
         self.inner.use_backend_v2()
     }
 

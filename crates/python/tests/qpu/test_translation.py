@@ -61,10 +61,10 @@ async def test_get_quilt_calibrations(
 
 
 def test_translation_backend():
-    from qcs_sdk.qpu.translation import Backend, TranslationOptions
+    from qcs_sdk.qpu.translation import TranslationBackend, TranslationOptions
     opts = TranslationOptions()
     assert opts.backend is None
     opts.use_backend_v1()
-    assert opts.backend == Backend.V1
+    assert opts.backend == TranslationBackend.V1
     opts.use_backend_v2()
-    assert opts.backend == Backend.V2
+    assert opts.backend == TranslationBackend.V2
