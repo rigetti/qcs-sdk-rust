@@ -1,3 +1,9 @@
+## 0.16.5
+
+### Fixes
+
+- update quil-rs to pull Program::get_qubits fix (#375)
+
 ## 0.16.5-rc.0
 
 ### Fixes
