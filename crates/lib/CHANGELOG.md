@@ -1,3 +1,9 @@
+## 0.16.6-rc.0
+
+### Fixes
+
+- update quil version (#377)
+
 ## 0.16.5
 
 ### Fixes

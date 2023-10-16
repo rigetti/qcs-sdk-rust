@@ -1,3 +1,9 @@
+## 0.12.7-rc.0
+
+### Fixes
+
+- update quil version (#377)
+
 ## 0.12.6
 
 ### Fixes
