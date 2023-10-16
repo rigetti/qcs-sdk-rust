@@ -1866,7 +1866,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.16.4"
+version = "0.16.6"
 dependencies = [
  "async-trait",
  "built",
@@ -1993,7 +1993,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.12.4"
+version = "0.12.7"
 dependencies = [
  "async-trait",
  "numpy",
@@ -2017,8 +2017,8 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.21.4"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.5.5#20173f851df942f0250bdb51ae13886f855ec8b8"
+version = "0.21.6"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.5.7#7fb3491bcbcdedbb96a21fb500da358c22e92de3"
 dependencies = [
  "approx",
  "indexmap 1.9.3",
