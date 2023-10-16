@@ -1,3 +1,57 @@
+## 0.12.7
+
+### Fixes
+
+- update quil version (#377)
+
+## 0.12.7-rc.0
+
+### Fixes
+
+- update quil version (#377)
+
+## 0.12.6
+
+### Fixes
+
+- update quil version (#376)
+
+## 0.12.6-rc.0
+
+### Fixes
+
+- update quil version (#376)
+
+## 0.12.5
+
+### Fixes
+
+- update quil-rs to pull Program::get_qubits fix (#375)
+
+## 0.12.5-rc.0
+
+### Fixes
+
+- update quil-rs to pull Program::get_qubits fix (#375)
+
+## 0.12.4
+
+### Features
+
+- Update quil-rs (#365)
+
+## 0.12.4-rc.1
+
+### Features
+
+- Update quil-rs (#365)
+
+## 0.12.4-rc.0
+
+### Features
+
+- Update quil-rs (#365)
+
 ## 0.12.3
 
 ### Features

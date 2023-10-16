@@ -15,7 +15,7 @@ tokio = "1.24.2"
 # be a `quil-py` tag and should match the version used in `crates/python/pyproject.toml`
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.21.2", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.5.3" }
+quil-rs = { version = "0.21.6", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.5.7" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
@@ -29,3 +29,11 @@ pyo3-asyncio = { version = "0.19", features = ["tokio-runtime"] }
 pyo3-build-config = "0.19.2"
 rigetti-pyo3 = { version = "0.2.0", features = ["complex"] }
 
+# The primary intent of these options is to reduce the binary size for Python wheels
+# since PyPi has limits on how much storage a project can use.
+# The LTO and codegen-units settings should have the added benefit of improving
+# performance. The only benefit of stripping symbols is reducing binary size.
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
