@@ -1363,7 +1363,9 @@ dependencies = [
 
 [[package]]
 name = "libquil-sys"
-version = "0.1.0"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7cc6d53757ad938c007330c4fa377ada0cbb7019e1fc5783fa3d14b973ad4821"
 dependencies = [
  "bindgen",
  "cc",
