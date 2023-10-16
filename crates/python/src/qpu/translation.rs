@@ -6,6 +6,7 @@ use pyo3::{
 };
 use qcs::client::GrpcClientError;
 use qcs::qpu::translation::TranslationOptions;
+use qcs_api_client_grpc::services::translation::translation_options::TranslationBackend as ApiTranslationBackend;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_simple_enum, wrap_error,
@@ -105,14 +106,11 @@ py_wrap_simple_enum! {
 
 #[derive(Clone, Default)]
 #[pyclass(name = "TranslationOptions")]
-pub struct PyTranslationOptions {
-    inner: TranslationOptions,
-    backend: Option<TranslationBackend>,
-}
+pub struct PyTranslationOptions(TranslationOptions);
 
 impl PyTranslationOptions {
     pub fn as_inner(&self) -> &TranslationOptions {
-        &self.inner
+        &self.0
     }
 }
 
@@ -120,29 +118,27 @@ impl PyTranslationOptions {
 impl PyTranslationOptions {
     #[new]
     fn __new__() -> PyResult<Self> {
-        Ok(Self {
-            inner: Default::default(),
-            backend: None,
-        })
+        Ok(Self(Default::default()))
     }
 
     #[getter]
     fn backend(&self) -> Option<PyTranslationBackend> {
-        self.backend.map(Into::into)
+        self.0.get_backend().map(|b| match b {
+            ApiTranslationBackend::V1(_) => PyTranslationBackend::V1,
+            ApiTranslationBackend::V2(_) => PyTranslationBackend::V2,
+        })
     }
 
     fn use_backend_v1(&mut self) {
-        self.backend = Some(TranslationBackend::V1);
-        self.inner.use_backend_v1()
+        self.0.use_backend_v1()
     }
 
     fn use_backend_v2(&mut self) {
-        self.backend = Some(TranslationBackend::V2);
-        self.inner.use_backend_v2()
+        self.0.use_backend_v2()
     }
 
     fn __repr__(&self) -> String {
-        format!("{:?}", self.inner)
+        format!("{:?}", self.0)
     }
 }
 
