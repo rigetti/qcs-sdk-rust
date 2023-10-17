@@ -123,7 +123,7 @@ impl PyTranslationOptions {
 
     #[getter]
     fn backend(&self) -> Option<PyTranslationBackend> {
-        self.0.get_backend().map(|b| match b {
+        self.0.backend().map(|b| match b {
             ApiTranslationBackend::V1(_) => PyTranslationBackend::V1,
             ApiTranslationBackend::V2(_) => PyTranslationBackend::V2,
         })
