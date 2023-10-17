@@ -6,9 +6,11 @@ use pyo3::{
 };
 use qcs::client::GrpcClientError;
 use qcs::qpu::translation::TranslationOptions;
+use qcs_api_client_grpc::services::translation::translation_options::TranslationBackend as ApiTranslationBackend;
 use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, wrap_error, ToPythonError,
+    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_simple_enum, wrap_error,
+    ToPythonError,
 };
 
 use crate::py_sync::py_function_sync_async;
@@ -19,7 +21,8 @@ create_init_submodule! {
     classes: [
         PyQuiltCalibrations,
         PyTranslationOptions,
-        PyTranslationResult
+        PyTranslationResult,
+        PyTranslationBackend
     ],
     errors: [
         GetQuiltCalibrationsError,
@@ -88,6 +91,19 @@ py_wrap_error!(
     PyRuntimeError
 );
 
+#[derive(Copy, Clone)]
+pub enum TranslationBackend {
+    V1,
+    V2,
+}
+
+py_wrap_simple_enum! {
+    PyTranslationBackend(TranslationBackend) as "TranslationBackend" {
+        V1,
+        V2
+    }
+}
+
 #[derive(Clone, Default)]
 #[pyclass(name = "TranslationOptions")]
 pub struct PyTranslationOptions(TranslationOptions);
@@ -103,6 +119,14 @@ impl PyTranslationOptions {
     #[new]
     fn __new__() -> PyResult<Self> {
         Ok(Self(Default::default()))
+    }
+
+    #[getter]
+    fn backend(&self) -> Option<PyTranslationBackend> {
+        self.0.backend().map(|b| match b {
+            ApiTranslationBackend::V1(_) => PyTranslationBackend::V1,
+            ApiTranslationBackend::V2(_) => PyTranslationBackend::V2,
+        })
     }
 
     fn use_backend_v1(&mut self) {

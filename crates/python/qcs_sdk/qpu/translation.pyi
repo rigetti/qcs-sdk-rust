@@ -1,4 +1,5 @@
 from typing import Dict, Optional, final
+from enum import Enum, auto
 
 from qcs_sdk.client import QCSClient
 
@@ -43,6 +44,12 @@ class TranslationResult:
     def ro_sources(self) -> Optional[Dict[str, str]]:
         """A mapping from the program's memory references to the key used to index the results map."""
         ...
+
+
+@final
+class TranslationBackend(Enum):
+    V1 = auto()
+    V2 = auto()
 
 def get_quilt_calibrations(
     quantum_processor_id: str,
@@ -133,6 +140,12 @@ class TranslationOptions:
     """
     Options for translating via the QCS API.
     """
+
+    @property
+    def backend(self) -> Optional[TranslationBackend]:
+        """
+        Get the selected translation backend
+        """
 
     def use_backend_v1(self) -> None:
         """

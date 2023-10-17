@@ -122,6 +122,12 @@ pub struct TranslationOptions {
 }
 
 impl TranslationOptions {
+    /// Get the backend used for translation
+    #[must_use]
+    pub fn backend(&self) -> Option<&TranslationBackend> {
+        self.inner.translation_backend.as_ref()
+    }
+
     /// Use the first-generation translation backend available on QCS since 2018.
     pub fn use_backend_v1(&mut self) {
         self.inner.translation_backend =
