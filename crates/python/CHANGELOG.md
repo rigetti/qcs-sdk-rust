@@ -1,3 +1,9 @@
+## 0.12.8-rc.0
+
+### Features
+
+- provide access to the translation backend option (#373)
+
 ## 0.12.7
 
 ### Fixes
