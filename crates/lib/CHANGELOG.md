@@ -1,3 +1,9 @@
+## 0.16.7
+
+### Features
+
+- provide access to the translation backend option (#373)
+
 ## 0.16.7-rc.0
 
 ### Features
