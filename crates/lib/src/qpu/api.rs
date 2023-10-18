@@ -5,10 +5,10 @@ use std::{fmt, time::Duration};
 
 use cached::proc_macro::cached;
 use derive_builder::Builder;
-use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
+use qcs_api_client_common::configuration::RefreshError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with, RefreshService},
+    channel::{parse_uri, wrap_channel_with},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
@@ -31,11 +31,10 @@ use qcs_api_client_openapi::apis::{
     },
 };
 use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
-use tonic::transport::Channel;
 
 use crate::executable::Parameters;
 
-use crate::client::{GrpcClientError, Qcs};
+use crate::client::{GrpcClientError, GrpcConnection, Qcs};
 
 const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
 
@@ -274,7 +273,7 @@ impl ExecutionOptions {
         &self,
         client: &Qcs,
         quantum_processor_id: Option<&str>,
-    ) -> Result<ControllerClient<RefreshService<Channel, ClientConfiguration>>, QpuApiError> {
+    ) -> Result<ControllerClient<GrpcConnection>, QpuApiError> {
         let service = self
             .get_qpu_grpc_connection(client, quantum_processor_id)
             .await?;
@@ -287,7 +286,7 @@ impl ExecutionOptions {
         &self,
         client: &Qcs,
         quantum_processor_id: Option<&str>,
-    ) -> Result<RefreshService<Channel, ClientConfiguration>, QpuApiError> {
+    ) -> Result<GrpcConnection, QpuApiError> {
         let address = match self.connection_strategy() {
             ConnectionStrategy::EndpointId(endpoint_id) => {
                 let endpoint = get_endpoint(&client.get_openapi_client(), endpoint_id).await?;
@@ -318,7 +317,7 @@ impl ExecutionOptions {
         &self,
         address: &str,
         client: &Qcs,
-    ) -> Result<RefreshService<Channel, ClientConfiguration>, QpuApiError> {
+    ) -> Result<GrpcConnection, QpuApiError> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
