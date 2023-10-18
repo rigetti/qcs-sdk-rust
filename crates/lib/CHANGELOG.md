@@ -1,3 +1,9 @@
+## 0.16.8
+
+### Features
+
+- add a type alias for 'generic' gRPC connections (#378)
+
 ## 0.16.8-rc.0
 
 ### Features
