@@ -5,10 +5,10 @@ use std::{fmt, time::Duration};
 
 use cached::proc_macro::cached;
 use derive_builder::Builder;
-use qcs_api_client_common::{configuration::RefreshError, ClientConfiguration};
+use qcs_api_client_common::configuration::RefreshError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with, RefreshService},
+    channel::{parse_uri, wrap_channel_with},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
