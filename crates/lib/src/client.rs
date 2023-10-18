@@ -17,6 +17,12 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+/// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
+/// It is public so that users can create gRPC clients with different APIs using a "raw" connection
+/// initialized by this library. This ensures that the exact Tonic version used for such clients
+/// matches what this library uses.
+pub type GrpcConnection = RefreshService<Channel, ClientConfiguration>;
+
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
@@ -72,20 +78,14 @@ impl Qcs {
 
     pub(crate) fn get_translation_client(
         &self,
-    ) -> Result<
-        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
-        GrpcError<RefreshError>,
-    > {
+    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<RefreshError>> {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,
-    ) -> Result<
-        TranslationClient<RefreshService<Channel, ClientConfiguration>>,
-        GrpcError<RefreshError>,
-    > {
+    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<RefreshError>> {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
         let service = wrap_channel_with(channel, self.get_config().clone());
