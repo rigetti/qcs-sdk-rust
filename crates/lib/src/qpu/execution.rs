@@ -6,7 +6,6 @@ use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
-use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::program::ProgramError;
 use quil_rs::quil::ToQuilError;
 
@@ -23,7 +22,7 @@ use super::api::{
     retrieve_results, submit, ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
 };
 use super::rewrite_arithmetic::RewrittenProgram;
-use super::translation::EncryptedTranslationResult;
+use super::translation::{EncryptedTranslationResult, TranslationOptions};
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
 use crate::client::{GrpcClientError, Qcs};
