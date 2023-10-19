@@ -1,3 +1,9 @@
+## 0.13.0-rc.0
+
+### Breaking Changes
+
+- use crate-defined translation options (#379)
+
 ## 0.12.9
 
 ### Features
