@@ -1,3 +1,13 @@
+## 0.17.0
+
+### Breaking Changes
+
+- use crate-defined translation options (#379)
+
+### Features
+
+- make Executable.get_qcs_client public (#380)
+
 ## 0.17.0-rc.1
 
 ### Breaking Changes
