@@ -8,7 +8,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
-use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::quil::ToQuilError;
 
 use crate::client::Qcs;
@@ -16,6 +15,7 @@ use crate::compiler::quilc::{self, CompilerOpts};
 use crate::execution_data::{self, ResultData};
 use crate::qpu::api::{ExecutionOptions, JobId};
 use crate::qpu::rewrite_arithmetic;
+use crate::qpu::translation::TranslationOptions;
 use crate::qpu::ExecutionError;
 use crate::qvm::http::AddressRequest;
 use crate::{qpu, qvm};
