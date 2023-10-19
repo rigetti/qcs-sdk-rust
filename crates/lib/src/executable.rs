@@ -299,8 +299,9 @@ impl<'executable> Executable<'executable, '_> {
         self
     }
 
-    /// Get a reference to the [`Qcs`] client used by the executable,
-    /// which loads and stores a default client if one has not been set.
+    /// Get a reference to the [`Qcs`] client used by the executable.
+    ///
+    /// If one has not been set, a default client is loaded, set, and returned.
     pub async fn get_qcs_client(&mut self) -> Arc<Qcs> {
         if let Some(client) = &self.qcs_client {
             client.clone()
