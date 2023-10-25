@@ -1,3 +1,9 @@
+## 0.17.1-rc.0
+
+### Fixes
+
+- update quil-rs to pull fixes (#381)
+
 ## 0.17.0
 
 ### Breaking Changes
