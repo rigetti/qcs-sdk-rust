@@ -1,3 +1,9 @@
+## 0.13.1
+
+### Fixes
+
+- update quil-rs to pull fixes (#381)
+
 ## 0.13.1-rc.0
 
 ### Fixes
