@@ -1,3 +1,9 @@
+## 0.13.2-rc.0
+
+### Features
+
+- Update quil-rs (#383)
+
 ## 0.13.1
 
 ### Fixes
