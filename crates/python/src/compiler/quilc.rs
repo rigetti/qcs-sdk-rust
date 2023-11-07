@@ -111,7 +111,7 @@ wrap_error!(RustLibquilError(qcs::compiler::libquil::Error));
 #[cfg(feature = "libquil")]
 py_wrap_error!(quilc, RustLibquilError, LibquilError, PyRuntimeError);
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum QuilcClient {
     Rpcq(qcs::compiler::rpcq::Client),
     #[cfg(feature = "libquil")]
