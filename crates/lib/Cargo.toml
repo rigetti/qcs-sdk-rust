@@ -46,7 +46,8 @@ zmq = { version = "0.10.0" }
 itertools = "0.11.0"
 derive_builder = "0.12.0"
 async-trait = "0.1.73"
-libquil-sys = { version = "0.1.4", optional = true }
+# libquil-sys = { version = "0.1.4", optional = true }
+libquil-sys = { path = "../../../libquil-sys/lib", optional = true }
 
 [dev-dependencies]
 erased-serde = "0.3.23"

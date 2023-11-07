@@ -8,16 +8,22 @@ use std::{convert::TryFrom, ffi::CString};
 
 use super::quilc::{self, NativeQuilMetadata};
 
+/// The errors that can arise when using libquil as a QVM client
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// Error when calling libquil_sys::quilc
     #[error("error when calling libquil_sys: {0}")]
-    Library(#[from] libquil_sys::quilc::Error),
+    Quilc(#[from] libquil_sys::quilc::Error),
+    /// Error when serializing a program
     #[error("error when serializing program: {0}")]
     SerializeProgram(#[from] serde_json::Error),
+    /// Error when parsing a program
     #[error("error when parsing program: {0}")]
     ParseProgram(#[from] quil_rs::program::ProgramError),
+    /// Error when casting u64 to u32
     #[error("error when casting u64 to u32: {0}")]
     U64Truncation(#[from] TryFromIntError),
+    /// Error when creating a CString
     #[error("error when creating CString: {0}")]
     CString(#[from] NulError),
 }
@@ -41,7 +47,8 @@ impl From<libquil_sys::quilc::CompilationMetadata> for NativeQuilMetadata {
     }
 }
 
-#[derive(Debug, Clone)]
+/// A libquil client providing Quilc functionality
+#[derive(Debug, Clone, Copy)]
 pub struct Client;
 
 impl quilc::Client for Client {
@@ -140,7 +147,7 @@ mod test {
     };
 
     use super::*;
-    use crate::client::Qcs;
+
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use quil_rs::quil::Quil;
     use regex::Regex;
@@ -156,13 +163,13 @@ mod test {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
-    fn libquil_client() -> Client {
+    fn quilc_client() -> Client {
         Client {}
     }
 
     #[tokio::test]
     async fn compare_native_quil_to_expected_output() {
-        let output = libquil_client()
+        let output = quilc_client()
             .compile_program(
                 "MEASURE 0",
                 TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
@@ -184,14 +191,13 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn test_print_isa() {
         let isa = TargetDevice::try_from(aspen_9_isa()).unwrap();
-        let isa = serde_json::to_string_pretty(&isa).unwrap();
+        serde_json::to_string_pretty(&isa).unwrap();
     }
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let client = Qcs::load().await;
-        let client = qvm::http::HttpClient::from(&client);
-        let output = libquil_client()
+        let qvm_client = qvm::libquil::Client {};
+        let output = quilc_client()
             .compile_program(
                 BELL_STATE,
                 TargetDevice::try_from(aspen_9_isa())
@@ -208,44 +214,7 @@ MEASURE 1 ro[1]
                     .cloned()
                     .collect(),
                 &HashMap::default(),
-                &client,
-            )
-            .await
-            .expect("Could not run program on QVM");
-        for shot in results
-            .memory
-            .remove("ro")
-            .expect("Did not receive ro buffer")
-            .into_i8()
-            .unwrap()
-        {
-            assert_eq!(shot.len(), 2);
-            assert_eq!(shot[0], shot[1]);
-        }
-    }
-
-    #[tokio::test]
-    async fn run_compiled_bell_state_on_qvm_2() {
-        let client = Qcs::load().await;
-        let client = qvm::http::HttpClient::from(&client);
-        let output = libquil_client()
-            .compile_program(
-                BELL_STATE,
-                TargetDevice::try_from(aspen_9_isa())
-                    .expect("Couldn't build target device from ISA"),
-                CompilerOpts::default(),
-            )
-            .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.program.to_quil_or_debug())
-            .unwrap()
-            .run(
-                NonZeroU16::new(10).expect("value is non-zero"),
-                [("ro".to_string(), AddressRequest::IncludeAll)]
-                    .iter()
-                    .cloned()
-                    .collect(),
-                &HashMap::default(),
-                &client,
+                &qvm_client,
             )
             .await
             .expect("Could not run program on QVM");
@@ -263,7 +232,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_compile_declare_only() {
-        let output = libquil_client()
+        let output = quilc_client()
             .compile_program(
                 "DECLARE ro BIT[1]\n",
                 TargetDevice::try_from(aspen_9_isa())
@@ -277,7 +246,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn get_version_info_from_quilc() {
-        let rpcq_client = libquil_client();
+        let rpcq_client = quilc_client();
         let version = rpcq_client
             .get_version_info()
             .expect("Should get version info from quilc");
@@ -288,7 +257,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
-        let rpcq_client = libquil_client();
+        let rpcq_client = quilc_client();
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {
                 indices: vec![0],
@@ -311,7 +280,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford_2() {
-        let rpcq_client = libquil_client();
+        let rpcq_client = quilc_client();
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {
                 indices: vec![0],
@@ -334,7 +303,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_generate_randomized_benchmark_sequence() {
-        let rpcq_client = libquil_client();
+        let rpcq_client = quilc_client();
         let request = RandomizedBenchmarkingRequest {
             depth: 2,
             qubits: 1,

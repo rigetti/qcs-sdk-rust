@@ -19,6 +19,8 @@ use self::http::AddressRequest;
 
 mod execution;
 pub mod http;
+#[cfg(feature = "libquil")]
+pub mod libquil;
 
 /// Number of seconds to wait before timing out.
 const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
@@ -187,6 +189,7 @@ pub async fn run_program<C: Client>(
         .run(&request, options)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
+        .map_err(Into::into)
 }
 
 /// Returns a copy of the [`Program`] with the given parameters applied to it.

@@ -16,6 +16,7 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
 /// The Quilc compiler methods
 pub trait Client {
+    /// Errors that can happen when calling libquil's quilc code
     type Error;
     /// Compile the program `quil` for the given target device `isa`
     /// with the compilation options `options`.

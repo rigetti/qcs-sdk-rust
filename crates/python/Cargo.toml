@@ -9,7 +9,8 @@ keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
 categories = ["api-bindings", "compilers", "science", "emulators"]
 readme = "./README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[features]
+libquil = ["qcs/libquil"]
 
 [lib]
 name = "qcs_sdk"

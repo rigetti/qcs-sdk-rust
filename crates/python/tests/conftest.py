@@ -102,3 +102,8 @@ def qvm_http_client() -> QVMClient:
 @pytest.fixture
 def quilc_rpcq_client() -> QuilcClient:
     return QuilcClient.new_rpcq(QCSClient.load().quilc_url)
+
+
+@pytest.fixture
+def quilc_libquil_client() -> QuilcClient:
+    return QuilcClient.new_libquil()

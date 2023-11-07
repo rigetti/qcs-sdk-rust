@@ -6,6 +6,7 @@ use std::{collections::HashMap, num::NonZeroU16};
 use qcs::{
     client::Qcs,
     qvm::{
+        self,
         http::{self, HttpClient},
         Client, QvmOptions,
     },
@@ -14,20 +15,24 @@ use regex::Regex;
 
 const PROGRAM: &str = r##"
 DECLARE ro BIT[2]
-H 0
-CNOT 0 1
+I 0
+X 1
 MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "##;
 
-async fn qvm_client() -> HttpClient {
+async fn http_qvm_client() -> HttpClient {
     let qcs_client = Qcs::load().await;
     HttpClient::from(&qcs_client)
 }
 
+async fn libquil_qvm_client() -> qvm::libquil::Client {
+    qvm::libquil::Client {}
+}
+
 #[tokio::test]
 async fn test_get_version_info() {
-    let client = qvm_client().await;
+    let client = libquil_qvm_client().await;
     let version = client
         .get_version_info(&QvmOptions::default())
         .await
@@ -38,7 +43,7 @@ async fn test_get_version_info() {
 
 #[tokio::test]
 async fn test_run() {
-    let client = qvm_client().await;
+    let client = libquil_qvm_client().await;
     let request = http::MultishotRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(2).expect("value is non-zero"),
@@ -62,7 +67,7 @@ async fn test_run() {
 
 #[tokio::test]
 async fn test_run_and_measure() {
-    let client = qvm_client().await;
+    let client = libquil_qvm_client().await;
     let request = http::MultishotMeasureRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(5).expect("value is non-zero"),
@@ -81,7 +86,7 @@ async fn test_run_and_measure() {
 
 #[tokio::test]
 async fn test_measure_expectation() {
-    let client = qvm_client().await;
+    let client = libquil_qvm_client().await;
     let prep_program = r##"
 CSWAP 0 1 2
 XY(-1.0) 0 1
@@ -100,7 +105,7 @@ Z 2
 
 #[tokio::test]
 async fn test_get_wavefunction() {
-    let client = qvm_client().await;
+    let client = libquil_qvm_client().await;
     let request = http::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
     client
         .get_wavefunction(&request, &QvmOptions::default())

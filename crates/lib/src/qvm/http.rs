@@ -87,7 +87,7 @@ pub enum AddressRequest {
     #[serde(serialize_with = "serialize_false")]
     ExcludeAll,
     /// A list of specific indices to get back for the address.
-    Indices(Vec<usize>),
+    Indices(Vec<u32>),
 }
 
 fn serialize_true<S>(serializer: S) -> Result<S::Ok, S::Error>
