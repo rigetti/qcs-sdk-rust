@@ -8,7 +8,6 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
-use qcs_api_client_grpc::services::translation::TranslationOptions;
 use quil_rs::quil::ToQuilError;
 
 use crate::client::Qcs;
@@ -16,6 +15,7 @@ use crate::compiler::quilc::{self, CompilerOpts};
 use crate::execution_data::{self, ResultData};
 use crate::qpu::api::{ExecutionOptions, JobId};
 use crate::qpu::rewrite_arithmetic;
+use crate::qpu::translation::TranslationOptions;
 use crate::qpu::ExecutionError;
 use crate::qvm::http::AddressRequest;
 use crate::{qpu, qvm};
@@ -299,14 +299,16 @@ impl<'executable> Executable<'executable, '_> {
         self
     }
 
-    /// Load `self.client` if not yet loaded, then return a reference to it.
-    async fn get_qcs_client(&mut self) -> Result<Arc<Qcs>, Error> {
+    /// Get a reference to the [`Qcs`] client used by the executable.
+    ///
+    /// If one has not been set, a default client is loaded, set, and returned.
+    pub async fn qcs_client(&mut self) -> Arc<Qcs> {
         if let Some(client) = &self.qcs_client {
-            Ok(client.clone())
+            client.clone()
         } else {
             let client = Arc::new(Qcs::load().await);
             self.qcs_client = Some(client.clone());
-            Ok(client)
+            client
         }
     }
 }
@@ -412,7 +414,7 @@ impl<'execution> Executable<'_, 'execution> {
             self.quil.clone(),
             self.shots,
             id,
-            self.get_qcs_client().await?,
+            self.qcs_client().await,
             self.quilc_client.clone(),
             self.compiler_options,
         )
@@ -852,7 +854,7 @@ mod describe_qpu_for_id {
                 "".into(),
                 shots,
                 "Aspen-M-3".into(),
-                exe.get_qcs_client().await.expect("should have client"),
+                exe.qcs_client().await,
                 exe.quilc_client.clone(),
                 CompilerOpts::default(),
             )

@@ -1,3 +1,77 @@
+## 0.13.2
+
+### Features
+
+- Update quil-rs (#383)
+
+## 0.13.2-rc.0
+
+### Features
+
+- Update quil-rs (#383)
+
+## 0.13.1
+
+### Fixes
+
+- update quil-rs to pull fixes (#381)
+
+## 0.13.1-rc.0
+
+### Fixes
+
+- update quil-rs to pull fixes (#381)
+
+## 0.13.0
+
+### Breaking Changes
+
+- use crate-defined translation options (#379)
+
+### Features
+
+- make Executable.get_qcs_client public (#380)
+
+## 0.13.0-rc.1
+
+### Breaking Changes
+
+- use crate-defined translation options (#379)
+
+### Features
+
+- make Executable.get_qcs_client public (#380)
+
+## 0.13.0-rc.0
+
+### Breaking Changes
+
+- use crate-defined translation options (#379)
+
+## 0.12.9
+
+### Features
+
+- add a type alias for 'generic' gRPC connections (#378)
+
+## 0.12.9-rc.0
+
+### Features
+
+- add a type alias for 'generic' gRPC connections (#378)
+
+## 0.12.8
+
+### Features
+
+- provide access to the translation backend option (#373)
+
+## 0.12.8-rc.0
+
+### Features
+
+- provide access to the translation backend option (#373)
+
 ## 0.12.7
 
 ### Fixes
