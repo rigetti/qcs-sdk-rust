@@ -150,9 +150,9 @@ impl qcs::compiler::quilc::Client for QuilcClient {
 
     fn get_version_info(&self) -> Result<String, Self::Error> {
         match self {
-            QuilcClient::Rpcq(client) => Ok(client.get_version_info().unwrap()),
+            QuilcClient::Rpcq(client) => client.get_version_info().map_err(Into::into),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => Ok(client.get_version_info().unwrap()),
+            QuilcClient::LibquilSys(client) => client.get_version_info().map_err(Into::into),
         }
     }
 
@@ -161,11 +161,13 @@ impl qcs::compiler::quilc::Client for QuilcClient {
         request: ConjugateByCliffordRequest,
     ) -> Result<ConjugatePauliByCliffordResponse, Self::Error> {
         match self {
-            QuilcClient::Rpcq(client) => Ok(client.conjugate_pauli_by_clifford(request).unwrap()),
+            QuilcClient::Rpcq(client) => client
+                .conjugate_pauli_by_clifford(request)
+                .map_err(Into::into),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => {
-                Ok(client.conjugate_pauli_by_clifford(request).unwrap())
-            }
+            QuilcClient::LibquilSys(client) => client
+                .conjugate_pauli_by_clifford(request)
+                .map_err(Into::into),
         }
     }
 
@@ -174,13 +176,13 @@ impl qcs::compiler::quilc::Client for QuilcClient {
         request: RandomizedBenchmarkingRequest,
     ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Self::Error> {
         match self {
-            QuilcClient::Rpcq(client) => Ok(client
+            QuilcClient::Rpcq(client) => client
                 .generate_randomized_benchmarking_sequence(request)
-                .unwrap()),
+                .map_err(Into::into),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => Ok(client
+            QuilcClient::LibquilSys(client) => client
                 .generate_randomized_benchmarking_sequence(request)
-                .unwrap()),
+                .map_err(Into::into),
         }
     }
 }
@@ -202,7 +204,11 @@ impl PyQuilcClient {
 
     #[staticmethod]
     fn new_rpcq(endpoint: &str) -> PyResult<Self> {
-        let rpcq_client = qcs::compiler::rpcq::Client::new(endpoint)?;
+        let rpcq_client = qcs::compiler::rpcq::Client::new(endpoint)
+            .map_err(|e| qcs::compiler::quilc::Error::QuilcConnection(endpoint.into(), e))
+            .map_err(Error::from)
+            .map_err(RustQuilcError::from)
+            .map_err(RustQuilcError::to_py_err)?;
         Ok(Self {
             inner: QuilcClient::Rpcq(rpcq_client),
         })
