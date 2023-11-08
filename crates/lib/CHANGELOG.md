@@ -1,3 +1,15 @@
+## 0.17.3
+
+### Features
+
+- Improve error message when a quilc connection fails. (#384)
+
+## 0.17.3-rc.0
+
+### Features
+
+- Improve error message when a quilc connection fails. (#384)
+
 ## 0.17.2
 
 ### Features

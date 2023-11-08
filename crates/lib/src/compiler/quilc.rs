@@ -208,7 +208,7 @@ pub enum Error {
     #[error("Problem converting ISA to quilc format. This is a bug in this library or in QCS.")]
     Isa(#[from] isa::Error),
     /// An error when trying to connect to quilc.
-    #[error("Problem connecting to quilc at {0}")]
+    #[error("Problem connecting to quilc at {0}: {1}")]
     QuilcConnection(String, #[source] rpcq::Error),
     /// An error when trying to compile using quilc.
     #[error("Problem compiling quil program: {0}")]
