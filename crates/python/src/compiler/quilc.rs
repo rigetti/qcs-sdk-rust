@@ -112,13 +112,6 @@ wrap_error!(RustLibquilError(qcs::compiler::libquil::Error));
 #[cfg(feature = "libquil")]
 py_wrap_error!(quilc, RustLibquilError, LibquilError, PyRuntimeError);
 
-#[derive(Clone, Debug)]
-pub enum QuilcClient {
-    Rpcq(qcs::compiler::rpcq::Client),
-    #[cfg(feature = "libquil")]
-    LibquilSys(qcs::compiler::libquil::Client),
-}
-
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     #[error("error when compiling with RPCQ client: {0}")]
@@ -126,6 +119,13 @@ pub enum Error {
     #[cfg(feature = "libquil")]
     #[error("error when compiling with libquil client: {0}")]
     Libquil(#[from] qcs::compiler::libquil::Error),
+}
+
+#[derive(Clone, Debug)]
+pub enum QuilcClient {
+    Rpcq(qcs::compiler::rpcq::Client),
+    #[cfg(feature = "libquil")]
+    LibquilSys(qcs::compiler::libquil::Client),
 }
 
 impl qcs::compiler::quilc::Client for QuilcClient {
@@ -202,7 +202,7 @@ impl PyQuilcClient {
 
     #[staticmethod]
     fn new_rpcq(endpoint: &str) -> PyResult<Self> {
-        let rpcq_client = qcs::compiler::rpcq::Client::new(endpoint).unwrap();
+        let rpcq_client = qcs::compiler::rpcq::Client::new(endpoint)?;
         Ok(Self {
             inner: QuilcClient::Rpcq(rpcq_client),
         })
