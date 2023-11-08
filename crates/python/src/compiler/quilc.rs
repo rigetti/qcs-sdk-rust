@@ -73,7 +73,7 @@ impl PyCompilerOpts {
     }
 }
 
-wrap_error!(RustQuilcError(qcs::compiler::quilc::Error));
+wrap_error!(RustQuilcError(Error));
 py_wrap_error!(quilc, RustQuilcError, QuilcError, PyRuntimeError);
 
 py_wrap_struct! {
@@ -87,6 +87,7 @@ impl PyTargetDevice {
         let isa: InstructionSetArchitecture = isa.into();
         let target: TargetDevice = isa
             .try_into()
+            .map_err(Error::from)
             .map_err(RustQuilcError::from)
             .map_err(RustQuilcError::to_py_err)?;
 
@@ -118,8 +119,17 @@ pub enum QuilcClient {
     LibquilSys(qcs::compiler::libquil::Client),
 }
 
+#[derive(Debug, thiserror::Error)]
+pub enum Error {
+    #[error("error when compiling with RPCQ client: {0}")]
+    Rpcq(#[from] qcs::compiler::quilc::Error),
+    #[cfg(feature = "libquil")]
+    #[error("error when compiling with libquil client: {0}")]
+    Libquil(#[from] qcs::compiler::libquil::Error),
+}
+
 impl qcs::compiler::quilc::Client for QuilcClient {
-    type Error = RustQuilcError;
+    type Error = Error;
 
     fn compile_program(
         &self,
@@ -128,11 +138,13 @@ impl qcs::compiler::quilc::Client for QuilcClient {
         options: CompilerOpts,
     ) -> Result<qcs::compiler::quilc::CompilationResult, Self::Error> {
         match self {
-            QuilcClient::Rpcq(client) => Ok(client.compile_program(quil, isa, options).unwrap()),
+            QuilcClient::Rpcq(client) => client
+                .compile_program(quil, isa, options)
+                .map_err(Into::into),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => {
-                Ok(client.compile_program(quil, isa, options).unwrap())
-            }
+            QuilcClient::LibquilSys(client) => client
+                .compile_program(quil, isa, options)
+                .map_err(Into::into),
         }
     }
 
@@ -140,7 +152,7 @@ impl qcs::compiler::quilc::Client for QuilcClient {
         match self {
             QuilcClient::Rpcq(client) => Ok(client.get_version_info().unwrap()),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => todo!(),
+            QuilcClient::LibquilSys(client) => Ok(client.get_version_info().unwrap()),
         }
     }
 
@@ -151,7 +163,9 @@ impl qcs::compiler::quilc::Client for QuilcClient {
         match self {
             QuilcClient::Rpcq(client) => Ok(client.conjugate_pauli_by_clifford(request).unwrap()),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => todo!(),
+            QuilcClient::LibquilSys(client) => {
+                Ok(client.conjugate_pauli_by_clifford(request).unwrap())
+            }
         }
     }
 
@@ -164,7 +178,9 @@ impl qcs::compiler::quilc::Client for QuilcClient {
                 .generate_randomized_benchmarking_sequence(request)
                 .unwrap()),
             #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(client) => todo!(),
+            QuilcClient::LibquilSys(client) => Ok(client
+                .generate_randomized_benchmarking_sequence(request)
+                .unwrap()),
         }
     }
 }

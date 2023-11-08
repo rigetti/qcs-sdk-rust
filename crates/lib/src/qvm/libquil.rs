@@ -1,3 +1,5 @@
+//! Provides QVM functionality via libquil
+
 use std::collections::HashMap;
 use std::convert::TryFrom;
 

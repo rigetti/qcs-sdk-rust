@@ -14,7 +14,6 @@ use crate::{
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
     qpu::{api::PyExecutionOptions, translation::PyTranslationOptions},
-    qvm::QvmClient,
 };
 
 wrap_error!(RustExecutionError(Error));
@@ -141,7 +140,7 @@ impl PyExecutable {
         py: Python<'_>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<PyExecutionData> {
-        let QvmClient::Http(client) = client.inner;
+        let client = client.inner;
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
@@ -150,7 +149,7 @@ impl PyExecutable {
         py: Python<'py>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<&PyAny> {
-        let QvmClient::Http(client) = client.inner;
+        let client = client.inner;
         py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
