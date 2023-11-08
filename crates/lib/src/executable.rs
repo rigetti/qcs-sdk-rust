@@ -902,4 +902,10 @@ mod describe_qpu_for_id {
         assert!(matches!(result, Err(_)));
         assert!(matches!(exe.qpu, None));
     }
+
+    #[cfg(feature = "libquil")]
+    fn test_uses_libquil_quilc_client() {
+        let _ = Executable::from_quil("")
+            .with_quilc_client(Some(crate::compiler::libquil::Client));
+    }
 }
