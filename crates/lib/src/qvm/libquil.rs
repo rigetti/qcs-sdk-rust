@@ -70,8 +70,7 @@ impl crate::qvm::Client for Client {
                 )),
                 AddressRequest::ExcludeAll => Err(Error::UnsupportedIndicesRequestType),
             })
-            .collect::<Result<HashMap<String, libquil_sys::qvm::MultishotAddressRequest>, Error>>(
-            )?;
+            .collect::<Result<_, _>>()?;
         let result =
             libquil_sys::qvm::multishot(&program, addresses, i32::from(request.trials.get()))
                 .map_err(Error::LibquilSysQvm)?;
