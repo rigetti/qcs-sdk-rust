@@ -51,22 +51,14 @@ def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
         TargetDevice.from_isa(isa)
 
 
-def test_compile_program_with_libquil(bell_program: str, target_device: TargetDevice, quilc_libquil_client: QuilcClient):
-    """A simple program should compile successfully."""
-    result = compile_program(bell_program, target_device, client=quilc_libquil_client, options=CompilerOpts(protoquil=True))
-    print(result.program)
-    # assert result.program == snapshot
-    # assert result.native_quil_metadata == snapshot    
-
-
 def test_compile_program(
     bell_program: str,
     target_device: TargetDevice,
     snapshot: SnapshotAssertion,
-    quilc_libquil_client: QuilcClient,
+    quilc_rpcq_client: QuilcClient,
 ):
     """A simple program should compile successfully."""
-    result = compile_program(bell_program, target_device, client=quilc_libquil_client, options=CompilerOpts(protoquil=True))
+    result = compile_program(bell_program, target_device, client=quilc_rpcq_client, options=CompilerOpts(protoquil=True))
     assert result.program == snapshot
     assert result.native_quil_metadata == snapshot
 
