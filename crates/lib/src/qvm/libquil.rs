@@ -151,7 +151,7 @@ impl crate::qvm::Client for Client {
         let amplitudes = amplitudes
             .into_iter()
             .flat_map(|c| vec![c.re, c.im])
-            .flat_map(|f| f.to_be_bytes())
+            .flat_map(f64::to_be_bytes)
             .collect();
         Ok(amplitudes)
     }
