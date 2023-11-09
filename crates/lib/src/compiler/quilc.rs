@@ -16,8 +16,6 @@ pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
 /// The Quilc compiler methods
 pub trait Client {
-    /// Errors that can happen when calling libquil's quilc code
-    type Error;
     /// Compile the program `quil` for the given target device `isa`
     /// with the compilation options `options`.
     fn compile_program(
@@ -25,10 +23,10 @@ pub trait Client {
         quil: &str,
         isa: TargetDevice,
         options: CompilerOpts,
-    ) -> Result<CompilationResult, Self::Error>;
+    ) -> Result<CompilationResult, Error>;
 
     /// Get the version of Quilc
-    fn get_version_info(&self) -> Result<String, Self::Error>;
+    fn get_version_info(&self) -> Result<String, Error>;
 
     /// Given a circuit that consists only of elements of the Clifford group,
     /// return its action on a `PauliTerm`.
@@ -38,7 +36,7 @@ pub trait Client {
     fn conjugate_pauli_by_clifford(
         &self,
         request: ConjugateByCliffordRequest,
-    ) -> Result<ConjugatePauliByCliffordResponse, Self::Error>;
+    ) -> Result<ConjugatePauliByCliffordResponse, Error>;
 
     /// Construct a randomized benchmarking experiment on the given qubits, decomposing into
     /// gateset.
@@ -54,7 +52,7 @@ pub trait Client {
     fn generate_randomized_benchmarking_sequence(
         &self,
         request: RandomizedBenchmarkingRequest,
-    ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Self::Error>;
+    ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, Error>;
 }
 
 /// The result of compiling a Quil program to native quil with `quilc`

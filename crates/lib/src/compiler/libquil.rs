@@ -28,6 +28,12 @@ pub enum Error {
     CString(#[from] NulError),
 }
 
+impl From<Error> for quilc::Error {
+    fn from(error: Error) -> Self {
+        quilc::Error::QuilcCompilation(error.to_string())
+    }
+}
+
 impl From<libquil_sys::quilc::CompilationMetadata> for NativeQuilMetadata {
     fn from(value: libquil_sys::quilc::CompilationMetadata) -> Self {
         NativeQuilMetadata {
@@ -52,53 +58,64 @@ impl From<libquil_sys::quilc::CompilationMetadata> for NativeQuilMetadata {
 pub struct Client;
 
 impl quilc::Client for Client {
-    type Error = Error;
     fn compile_program(
         &self,
         quil: &str,
         isa: quilc::TargetDevice,
         options: quilc::CompilerOpts,
-    ) -> Result<quilc::CompilationResult, Self::Error> {
-        let program = libquil_sys::quilc::Program::from_str(quil)?;
-        let isa = serde_json::to_string(&isa)?;
-        let chip = libquil_sys::quilc::Chip::from_str(&isa)?;
+    ) -> Result<quilc::CompilationResult, quilc::Error> {
+        let program = libquil_sys::quilc::Program::from_str(quil).map_err(Error::from)?;
+        let isa = serde_json::to_string(&isa).map_err(Error::from)?;
+        let chip = libquil_sys::quilc::Chip::from_str(&isa).map_err(Error::from)?;
 
         let compilation_result = if options.protoquil.unwrap_or_default() {
             libquil_sys::quilc::compile_protoquil(&program, &chip)
         } else {
             libquil_sys::quilc::compile_program(&program, &chip)
-        }?;
+        }
+        .map_err(Error::from)?;
 
+        let program = compilation_result
+            .program
+            .to_string()
+            .map_err(Error::from)?
+            .parse()
+            .map_err(Error::from)?;
         Ok(quilc::CompilationResult {
-            program: compilation_result.program.to_string()?.parse()?,
+            program,
             native_quil_metadata: compilation_result.metadata.map(Into::into),
         })
     }
 
-    fn get_version_info(&self) -> Result<String, Self::Error> {
-        Ok(libquil_sys::quilc::get_version_info()?.version)
+    fn get_version_info(&self) -> Result<String, quilc::Error> {
+        Ok(libquil_sys::quilc::get_version_info()
+            .map_err(Error::from)?
+            .version)
     }
 
     fn conjugate_pauli_by_clifford(
         &self,
         request: quilc::ConjugateByCliffordRequest,
-    ) -> Result<quilc::ConjugatePauliByCliffordResponse, Self::Error> {
+    ) -> Result<quilc::ConjugatePauliByCliffordResponse, quilc::Error> {
         let pauli_terms = request
             .pauli
             .symbols
             .into_iter()
             .map(CString::new)
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(Error::from)?;
         let result = libquil_sys::quilc::conjugate_pauli_by_clifford(
             request
                 .pauli
                 .indices
                 .into_iter()
                 .map(u32::try_from)
-                .collect::<Result<_, _>>()?,
+                .collect::<Result<_, _>>()
+                .map_err(Error::from)?,
             pauli_terms,
-            &request.clifford.parse()?,
-        )?;
+            &request.clifford.parse().map_err(Error::from)?,
+        )
+        .map_err(Error::from)?;
         Ok(quilc::ConjugatePauliByCliffordResponse {
             phase: i64::from(result.phase),
             pauli: result.pauli,
@@ -108,24 +125,31 @@ impl quilc::Client for Client {
     fn generate_randomized_benchmarking_sequence(
         &self,
         request: quilc::RandomizedBenchmarkingRequest,
-    ) -> Result<quilc::GenerateRandomizedBenchmarkingSequenceResponse, Self::Error> {
+    ) -> Result<quilc::GenerateRandomizedBenchmarkingSequenceResponse, quilc::Error> {
         let gateset = request
             .gateset
             .iter()
             .map(String::as_str)
             .map(str::parse)
-            .collect::<Result<Vec<_>, _>>()?;
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(Error::from)?;
         let interleaver = request
             .interleaver
             .map(|s| s.parse::<libquil_sys::quilc::Program>())
-            .transpose()?;
+            .transpose()
+            .map_err(Error::from)?;
         let result = libquil_sys::quilc::generate_rb_sequence(
-            i32::try_from(request.depth)?,
-            i32::try_from(request.qubits)?,
+            i32::try_from(request.depth).map_err(Error::from)?,
+            i32::try_from(request.qubits).map_err(Error::from)?,
             gateset.iter().collect(),
-            request.seed.map(i32::try_from).transpose()?,
+            request
+                .seed
+                .map(i32::try_from)
+                .transpose()
+                .map_err(Error::from)?,
             interleaver.as_ref(),
-        )?;
+        )
+        .map_err(Error::from)?;
         Ok(quilc::GenerateRandomizedBenchmarkingSequenceResponse {
             sequence: result
                 .into_iter()
