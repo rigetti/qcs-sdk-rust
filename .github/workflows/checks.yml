@@ -36,7 +36,6 @@ jobs:
         env:
           CARGO_MAKE_RUN_CHECK_FORMAT: true
           CARGO_MAKE_RUN_CLIPPY: true
-          CARGO_MAKE_BUILD_EXAMPLES: true
         with:
           command: make
           args: --cwd crates/lib --makefile Makefile.toml ci-flow
