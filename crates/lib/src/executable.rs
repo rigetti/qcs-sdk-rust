@@ -365,7 +365,7 @@ impl Executable<'_, '_> {
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm<V: qvm::Client>(&mut self, client: &V) -> ExecutionResult {
+    pub async fn execute_on_qvm<V: qvm::Client + ?Sized>(&mut self, client: &V) -> ExecutionResult {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots = %self.shots,

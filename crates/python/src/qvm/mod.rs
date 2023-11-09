@@ -36,6 +36,15 @@ pub enum QvmClient {
     Libquil(qvm::libquil::Client),
 }
 
+impl QvmClient {
+    pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
+        match self {
+            QvmClient::Http(client) => client,
+            QvmClient::Libquil(client) => client,
+        }
+    }
+}
+
 #[pyclass(name = "QVMClient")]
 #[derive(Clone)]
 pub struct PyQvmClient {
@@ -87,11 +96,7 @@ impl PyQvmClient {
 impl qvm::Client for QvmClient {
     /// The QVM version string. Not guaranteed to comply to the semver spec.
     async fn get_version_info(&self, options: &QvmOptions) -> Result<String, qvm::Error> {
-        match self {
-            QvmClient::Http(client) => client.get_version_info(options).await,
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(client) => client.get_version_info(options).await,
-        }
+        self.as_client().get_version_info(options).await
     }
     /// Execute a program on the QVM.
     async fn run(
@@ -99,11 +104,7 @@ impl qvm::Client for QvmClient {
         request: &http::MultishotRequest,
         options: &QvmOptions,
     ) -> Result<http::MultishotResponse, qvm::Error> {
-        match self {
-            QvmClient::Http(client) => client.run(request, options).await,
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(client) => client.run(request, options).await,
-        }
+        self.as_client().run(request, options).await
     }
     /// Execute a program on the QVM.
     ///
@@ -119,11 +120,7 @@ impl qvm::Client for QvmClient {
         request: &http::MultishotMeasureRequest,
         options: &QvmOptions,
     ) -> Result<Vec<Vec<i64>>, qvm::Error> {
-        match self {
-            QvmClient::Http(client) => client.run_and_measure(request, options).await,
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(client) => client.run_and_measure(request, options).await,
-        }
+        self.as_client().run_and_measure(request, options).await
     }
     /// Measure the expectation value of a program
     async fn measure_expectation(
@@ -131,11 +128,7 @@ impl qvm::Client for QvmClient {
         request: &http::ExpectationRequest,
         options: &QvmOptions,
     ) -> Result<Vec<f64>, qvm::Error> {
-        match self {
-            QvmClient::Http(client) => client.measure_expectation(request, options).await,
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(client) => client.measure_expectation(request, options).await,
-        }
+        self.as_client().measure_expectation(request, options).await
     }
     /// Get the wavefunction produced by a program
     async fn get_wavefunction(
@@ -143,11 +136,7 @@ impl qvm::Client for QvmClient {
         request: &http::WavefunctionRequest,
         options: &QvmOptions,
     ) -> Result<Vec<u8>, qvm::Error> {
-        match self {
-            QvmClient::Http(client) => client.get_wavefunction(request, options).await,
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(client) => client.get_wavefunction(request, options).await,
-        }
+        self.as_client().get_wavefunction(request, options).await
     }
 }
 
@@ -266,7 +255,7 @@ py_function_sync_async! {
         rng_seed: Option<i64>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let client = client.inner;
+        let client = client.inner.as_client();
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();
@@ -280,7 +269,7 @@ py_function_sync_async! {
                     measurement_noise,
                     gate_noise,
                     rng_seed,
-                    &client,
+                    client,
                     options.as_inner()
             )
             .await

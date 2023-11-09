@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use qcs::{qpu::api::ExecutionOptions, Executable};
+use qcs::Executable;
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT[2]

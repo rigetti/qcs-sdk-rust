@@ -127,7 +127,7 @@ impl QvmResultData {
 /// Run a Quil program on the QVM. The given parameters are used to parameterize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
-pub async fn run<C: Client + Send + Sync>(
+pub async fn run<C: Client + Send + Sync + ?Sized>(
     quil: &str,
     shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,
@@ -158,7 +158,7 @@ pub async fn run<C: Client + Send + Sync>(
 /// Run a [`Program`] on the QVM. The given parameters are used to parametrize the value of
 /// memory locations across shots.
 #[allow(clippy::too_many_arguments)]
-pub async fn run_program<C: Client>(
+pub async fn run_program<C: Client + ?Sized>(
     program: &Program,
     shots: NonZeroU16,
     addresses: HashMap<String, AddressRequest>,

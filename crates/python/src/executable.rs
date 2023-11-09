@@ -140,8 +140,10 @@ impl PyExecutable {
         py: Python<'_>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<PyExecutionData> {
-        let client = client.inner;
-        py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
+        py_sync!(
+            py,
+            py_executable_data!(self, execute_on_qvm, client.inner.as_client())
+        )
     }
 
     pub fn execute_on_qvm_async<'py>(
@@ -149,8 +151,10 @@ impl PyExecutable {
         py: Python<'py>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<&PyAny> {
-        let client = client.inner;
-        py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
+        py_async!(
+            py,
+            py_executable_data!(self, execute_on_qvm, client.inner.as_client())
+        )
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
