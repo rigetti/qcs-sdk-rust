@@ -44,8 +44,8 @@ impl Client {
         request: &RPCRequest<'_, Request>,
     ) -> Result<Response, Error> {
         let socket = self.create_socket()?;
-        self.send(request, &socket)?;
-        self.receive::<Response>(&request.id, &socket)
+        Self::send(request, &socket)?;
+        Self::receive::<Response>(&request.id, &socket)
     }
 
     /// Send an RPC request.
@@ -55,7 +55,6 @@ impl Client {
     /// * `request`: An [`RPCRequest`] containing some params.
     /// * `socket`: The ZMQ socket to send the request on.
     fn send<Request: Serialize>(
-        &self,
         request: &RPCRequest<'_, Request>,
         socket: &Socket,
     ) -> Result<(), Error> {
@@ -64,8 +63,7 @@ impl Client {
             .serialize(&mut Serializer::new(&mut data).with_struct_map())
             .map_err(Error::Serialization)?;
 
-        let result = socket.send(data, 0).map_err(Error::Communication);
-        result
+        socket.send(data, 0).map_err(Error::Communication)
     }
 
     /// Creates a new ZMQ socket and connects it to the endpoint.
@@ -90,11 +88,10 @@ impl Client {
     /// returns: Result<Response, Error> where Response is a generic type that implements
     /// [`DeserializeOwned`] (meaning [`Deserialize`] with no lifetimes).
     fn receive<Response: DeserializeOwned>(
-        &self,
         request_id: &str,
         socket: &Socket,
     ) -> Result<Response, Error> {
-        let data = self.receive_raw(socket)?;
+        let data = Self::receive_raw(socket)?;
 
         let reply: RPCResponse<Response> =
             rmp_serde::from_read(data.as_slice()).map_err(Error::Deserialization)?;
@@ -111,9 +108,8 @@ impl Client {
     }
 
     /// Retrieve the raw bytes of a response
-    fn receive_raw(&self, socket: &Socket) -> Result<Vec<u8>, Error> {
-        let result = socket.recv_bytes(0).map_err(Error::Communication);
-        result
+    fn receive_raw(socket: &Socket) -> Result<Vec<u8>, Error> {
+        socket.recv_bytes(0).map_err(Error::Communication)
     }
 }
 
