@@ -162,7 +162,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<PyExecutionData> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -196,7 +196,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_async!(
                 py,
@@ -230,7 +230,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<PyJobHandle> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -264,7 +264,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => {
                 py_async!(
