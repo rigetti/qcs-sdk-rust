@@ -1,3 +1,9 @@
+## 0.13.4-rc.0
+
+### Fixes
+
+- The quilc RPCQ client is now safe to share between threads. (#389)
+
 ## 0.13.3
 
 ### Features
