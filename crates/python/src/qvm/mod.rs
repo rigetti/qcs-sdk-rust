@@ -40,6 +40,7 @@ impl QvmClient {
     pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
         match self {
             QvmClient::Http(client) => client,
+            #[cfg(feature = "libquil")]
             QvmClient::Libquil(client) => client,
         }
     }
