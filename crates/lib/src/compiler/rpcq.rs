@@ -2,7 +2,6 @@
 
 use std::collections::HashMap;
 use std::str::FromStr;
-use std::sync::{Arc, Mutex};
 
 use quil_rs::Program;
 use rmp_serde::Serializer;
@@ -19,7 +18,6 @@ pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 #[derive(Clone)]
 pub struct Client {
     pub(crate) endpoint: String,
-    socket: Arc<Mutex<Socket>>,
 }
 
 impl std::fmt::Debug for Client {
@@ -31,12 +29,7 @@ impl std::fmt::Debug for Client {
 impl Client {
     /// Construct a new [`Client`] with no authentication configured.
     pub fn new(endpoint: &str) -> Result<Self, Error> {
-        let socket = Context::new()
-            .socket(SocketType::DEALER)
-            .map_err(Error::SocketCreation)?;
-        socket.connect(endpoint).map_err(Error::Communication)?;
         Ok(Self {
-            socket: Arc::new(Mutex::new(socket)),
             endpoint: endpoint.to_owned(),
         })
     }
@@ -50,8 +43,9 @@ impl Client {
         &self,
         request: &RPCRequest<'_, Request>,
     ) -> Result<Response, Error> {
-        self.send(request)?;
-        self.receive::<Response>(&request.id)
+        let socket = self.create_socket()?;
+        Self::send(request, &socket)?;
+        Self::receive::<Response>(&request.id, &socket)
     }
 
     /// Send an RPC request.
@@ -59,28 +53,45 @@ impl Client {
     /// # Arguments
     ///
     /// * `request`: An [`RPCRequest`] containing some params.
-    pub(crate) fn send<Request: Serialize>(
-        &self,
+    /// * `socket`: The ZMQ socket to send the request on.
+    fn send<Request: Serialize>(
         request: &RPCRequest<'_, Request>,
+        socket: &Socket,
     ) -> Result<(), Error> {
         let mut data = vec![];
         request
             .serialize(&mut Serializer::new(&mut data).with_struct_map())
             .map_err(Error::Serialization)?;
 
-        self.socket
-            .lock()
-            .map_err(|e| Error::ZmqSocketLock(e.to_string()))?
-            .send(data, 0)
-            .map_err(Error::Communication)
+        socket.send(data, 0).map_err(Error::Communication)
+    }
+
+    /// Creates a new ZMQ socket and connects it to the endpoint.
+    ///
+    /// [`SocketType::DEALER`] for compatiblity with the quilc servers
+    /// [`SocketType::ROUTER`]. These sockets are _not_ thread safe, even
+    /// with a mutex, so a new socket should be created for each request,
+    /// and the socket should not be shared between threads.
+    fn create_socket(&self) -> Result<Socket, Error> {
+        let socket = Context::new()
+            .socket(SocketType::DEALER)
+            .map_err(Error::SocketCreation)?;
+        socket
+            .connect(&self.endpoint.clone())
+            .map_err(Error::Communication)?;
+        socket.set_linger(0).map_err(Error::Communication)?;
+        Ok(socket)
     }
 
     /// Retrieve and decode a response
     ///
     /// returns: Result<Response, Error> where Response is a generic type that implements
     /// [`DeserializeOwned`] (meaning [`Deserialize`] with no lifetimes).
-    fn receive<Response: DeserializeOwned>(&self, request_id: &str) -> Result<Response, Error> {
-        let data = self.receive_raw()?;
+    fn receive<Response: DeserializeOwned>(
+        request_id: &str,
+        socket: &Socket,
+    ) -> Result<Response, Error> {
+        let data = Self::receive_raw(socket)?;
 
         let reply: RPCResponse<Response> =
             rmp_serde::from_read(data.as_slice()).map_err(Error::Deserialization)?;
@@ -97,12 +108,8 @@ impl Client {
     }
 
     /// Retrieve the raw bytes of a response
-    pub(crate) fn receive_raw(&self) -> Result<Vec<u8>, Error> {
-        self.socket
-            .lock()
-            .map_err(|e| Error::ZmqSocketLock(e.to_string()))?
-            .recv_bytes(0)
-            .map_err(Error::Communication)
+    fn receive_raw(socket: &Socket) -> Result<Vec<u8>, Error> {
+        socket.recv_bytes(0).map_err(Error::Communication)
     }
 }
 
