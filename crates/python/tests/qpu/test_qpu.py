@@ -3,6 +3,7 @@ import pytest
 from qcs_sdk.qpu import (
     QPUResultData,
     ReadoutValues,
+    MemoryValues,
     ListQuantumProcessorsError,
     list_quantum_processors,
     list_quantum_processors_async,
@@ -26,13 +27,16 @@ def test_readout_values():
 def test_qpu_result_data():
     mappings = {"a": "_q0"}
     readout_values = {"a": ReadoutValues.from_integer([0, 1])}
-    result_data = QPUResultData(mappings, readout_values)
+    memory_values = { "a": MemoryValues.from_integer([2, 3]), "b": None }
+    result_data = QPUResultData(mappings, readout_values, memory_values)
 
     assert result_data.mappings == mappings
     assert result_data.readout_values["a"].as_integer() == readout_values["a"].as_integer()
+    assert result_data.memory_values["a"].as_integer() == memory_values["a"].as_integer()
     raw_data = result_data.to_raw_readout_data()
     assert raw_data.mappings == {"a": "_q0"}
     assert raw_data.readout_values == {"a": [0, 1]}
+    assert raw_data.memory_values == {"a": [2, 3], "b": None}
 
 
 @pytest.mark.qcs_session
