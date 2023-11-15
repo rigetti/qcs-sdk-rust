@@ -1,4 +1,4 @@
-from typing import Dict, List, Mapping, Sequence, Optional, Union, final
+from typing import Dict, List, Mapping, Sequence, Optional, Union, final, Any
 
 from qcs_sdk.client import QCSClient
 
@@ -52,46 +52,6 @@ class ReadoutValues:
     def from_complex(inner: Sequence[complex]) -> "ReadoutValues": ...
 
 @final
-class MemoryValues:
-    """
-    A row of data containing the contents of a memory region at the end of a job. There
-    is a variant for each possible type the memory region could be.
-
-    Variants:
-        - ``binary``: Corresponds to the Quil `BIT` and `OCTET` types.
-        - ``integer``: Corresponds to the Quil `INTEGER` types.
-        - ``real``: Corresponds to the Quil `REAL` type.
-
-    Methods (each per variant):
-        - ``is_*``: if the underlying values are that type.
-        - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-        - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
-        - ``from_*``: wrap underlying values as this enum type.
-    """
-    def __new__(cls, values: Union[List[int], List[float]]):
-        """Construct a new ReadoutValues from a list of values."""
-        ...
-    def inner(self) -> Union[List[int], List[float]]:
-        """Return the inner list of readout values."""
-        ...
-    def is_integer(self) -> bool: ...
-    def is_binary(self) -> bool: ...
-    def is_real(self) -> bool: ...
-    def as_integer(self) -> Optional[List[int]]: ...
-    def as_binary(self) -> Optional[List[int]]: ...
-    def as_real(self) -> Optional[List[float]]: ...
-    def to_integer(self) -> List[int]: ...
-    def to_binary(self) -> List[int]: ...
-    def to_real(self) -> List[float]: ...
-    @staticmethod
-    def from_integer(inner: Sequence[int]) -> "ReadoutValues": ...
-    @staticmethod
-    def from_binary(inner: Sequence[int]) -> "ReadoutValues": ...
-    @staticmethod
-    def from_real(inner: Sequence[float]) -> "ReadoutValues": ...
-
-
-@final
 class QPUResultData:
     """
     Encapsulates data returned from the QPU after executing a job.
@@ -102,7 +62,7 @@ class QPUResultData:
     across all shots.
     """
 
-    def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues], memory_values: Mapping[str, Optional[MemoryValues]]): ...
+    def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues]): ...
     @property
     def mappings(self) -> Dict[str, str]:
         """
@@ -115,19 +75,13 @@ class QPUResultData:
         Get the mappings of a readout values identifier (ie. "q0") to a set of ``ReadoutValues``
         """
         ...
-    @property
-    def memory_values(self) -> Dict[str, Optional[MemoryValues]]:
-        """
-        Get mapping of a memory region (ie. "ro") to the final contents of that memory region.
-        """
-        ...
     def to_raw_readout_data(
         self,
     ) -> RawQPUReadoutData:
         """
         Get a copy of this result data flattened into a ``RawQPUReadoutData``. This reduces
         the contained data down to primitive types, offering a simpler structure at the
-        cost of the type safety provided by ``ReadoutValues`` and ``MemoryValues``.
+        cost of the type safety provided by ``ReadoutValues``.
         """
         ...
 
@@ -149,12 +103,6 @@ class RawQPUReadoutData:
     def readout_values(self) -> Dict[str, Union[List[int], List[float], List[complex]]]:
         """
         Get the mappings of a readout values identifier (ie. "q0") to a list of those readout values
-        """
-        ...
-    @property
-    def memory_values(self) -> Dict[str, Optional[Union[List[int], List[float]]]]:
-        """
-        Get mapping of a memory region (ie. "ro") to the final contents of that memory region.
         """
         ...
 

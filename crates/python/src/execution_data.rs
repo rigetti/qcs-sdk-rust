@@ -21,7 +21,7 @@ py_wrap_union_enum! {
         qvm: Qvm => PyQvmResultData
     }
 }
-impl_repr!(PyResultData);
+impl_repr!(PyQpuResultData);
 
 wrap_error!(RustRegisterMatrixConversionError(
     qcs::RegisterMatrixConversionError

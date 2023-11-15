@@ -50,12 +50,11 @@ impl QpuResultData {
     pub fn from_mappings_and_values(
         mappings: HashMap<String, String>,
         readout_values: HashMap<String, ReadoutValues>,
-        memory_values: HashMap<String, Option<MemoryValues>>,
     ) -> Self {
         Self {
             mappings,
             readout_values,
-            memory_values,
+            memory_values: HashMap::new(),
         }
     }
 
@@ -136,11 +135,5 @@ impl QpuResultData {
     #[must_use]
     pub fn readout_values(&self) -> &HashMap<String, ReadoutValues> {
         &self.readout_values
-    }
-
-    /// Get mapping of a memory region (ie. "ro") to the final contents of that memory region.
-    #[must_use]
-    pub fn memory_values(&self) -> &HashMap<String, Option<MemoryValues>> {
-        &self.memory_values
     }
 }
