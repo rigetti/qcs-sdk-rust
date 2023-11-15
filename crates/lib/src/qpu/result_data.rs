@@ -6,7 +6,8 @@ use quil_rs::instruction::MemoryReference;
 use std::collections::HashMap;
 
 use qcs_api_client_grpc::models::controller::{
-    readout_values as controller_readout_values, ReadoutValues as ControllerReadoutValues,
+    self, data_value as controller_memory_value, readout_values as controller_readout_values,
+    DataValue as ControllerMemoryValues, ReadoutValues as ControllerReadoutValues,
 };
 
 /// A row of readout values from the QPU. Each row contains all the values emitted to a
@@ -21,12 +22,25 @@ pub enum ReadoutValues {
     Complex(Vec<Complex64>),
 }
 
+/// A row of data containing the contents of each memory region at the end of a job.
+#[derive(Debug, Clone, EnumAsInner, PartialEq)]
+pub enum MemoryValues {
+    /// Values that correspond to a memory region declared with the BIT or OCTET data type.
+    Binary(Vec<u8>),
+    /// Values that correspond to a memory region declared with the INTEGER data type.
+    Integer(Vec<i64>),
+    /// Values that correspond to a memory region declared with the REAL data type.
+    Real(Vec<f64>),
+}
+
 /// This struct encapsulates data returned from the QPU after executing a job.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq)]
 pub struct QpuResultData {
     pub(crate) mappings: HashMap<String, String>,
     pub(crate) readout_values: HashMap<String, ReadoutValues>,
+    /// The final contents of each memory region, keyed on region name.
+    pub(crate) memory_values: HashMap<String, Option<MemoryValues>>,
 }
 
 impl QpuResultData {
@@ -40,17 +54,19 @@ impl QpuResultData {
         Self {
             mappings,
             readout_values,
+            memory_values: HashMap::new(),
         }
     }
 
     /// Creates a new [`QpuResultData`] using data returned from controller service.
     pub(crate) fn from_controller_mappings_and_values(
         mappings: &HashMap<String, String>,
-        values: &HashMap<String, ControllerReadoutValues>,
+        readout_values: &HashMap<String, ControllerReadoutValues>,
+        memory_values: &HashMap<String, ControllerMemoryValues>,
     ) -> Self {
         Self {
             mappings: mappings.clone(),
-            readout_values: values
+            readout_values: readout_values
                 .iter()
                 .map(|(key, readout_values)| {
                     (
@@ -70,6 +86,26 @@ impl QpuResultData {
                                 )
                             }
                             None => ReadoutValues::Integer(Vec::new()),
+                        },
+                    )
+                })
+                .collect(),
+            memory_values: memory_values
+                .iter()
+                .map(|(key, memory_values)| {
+                    (
+                        key.clone(),
+                        match &memory_values.value {
+                            Some(controller_memory_value::Value::Binary(
+                                controller::BinaryDataValue { data: v },
+                            )) => Some(MemoryValues::Binary(v.to_vec())),
+                            Some(controller_memory_value::Value::Integer(
+                                controller::IntegerDataValue { data: v },
+                            )) => Some(MemoryValues::Integer(v.to_vec())),
+                            Some(controller_memory_value::Value::Real(
+                                controller::RealDataValue { data: v },
+                            )) => Some(MemoryValues::Real(v.to_vec())),
+                            None => None,
                         },
                     )
                 })
