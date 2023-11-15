@@ -76,16 +76,42 @@ impl crate::qvm::Client for Client {
                 .map_err(Error::LibquilSysQvm)?;
         let mut registers = HashMap::new();
         for (address, values) in result {
-            registers.insert(
-                address,
-                RegisterData::I8(
-                    values
-                        .iter()
-                        .map(|v| v.iter().map(|i| i8::try_from(*i)).collect::<Result<_, _>>())
-                        .collect::<Result<_, _>>()
-                        .map_err(Error::InvalidCast)?,
-                ),
-            );
+            match values {
+                libquil_sys::qvm::MultishotAddressData::Bit(values)
+                | libquil_sys::qvm::MultishotAddressData::Octet(values) => {
+                    registers.insert(
+                        address,
+                        RegisterData::I8(
+                            values
+                                .iter()
+                                .map(|v| {
+                                    v.iter().map(|i| i8::try_from(*i)).collect::<Result<_, _>>()
+                                })
+                                .collect::<Result<_, _>>()
+                                .map_err(Error::InvalidCast)?,
+                        ),
+                    );
+                }
+                libquil_sys::qvm::MultishotAddressData::Integer(values) => {
+                    registers.insert(
+                        address,
+                        RegisterData::I16(
+                            values
+                                .iter()
+                                .map(|v| {
+                                    v.iter()
+                                        .map(|i| i16::try_from(*i))
+                                        .collect::<Result<_, _>>()
+                                })
+                                .collect::<Result<_, _>>()
+                                .map_err(Error::InvalidCast)?,
+                        ),
+                    );
+                }
+                libquil_sys::qvm::MultishotAddressData::Real(values) => {
+                    registers.insert(address, RegisterData::F64(values));
+                }
+            }
         }
         Ok(http::MultishotResponse { registers })
     }
