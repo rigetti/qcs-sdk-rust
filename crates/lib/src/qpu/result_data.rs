@@ -99,13 +99,13 @@ impl QpuResultData {
                         match &memory_values.value {
                             Some(controller_memory_value::Value::Binary(
                                 controller::BinaryDataValue { data: v },
-                            )) => Some(MemoryValues::Binary(v.to_vec())),
+                            )) => Some(MemoryValues::Binary(v.clone())),
                             Some(controller_memory_value::Value::Integer(
                                 controller::IntegerDataValue { data: v },
-                            )) => Some(MemoryValues::Integer(v.to_vec())),
+                            )) => Some(MemoryValues::Integer(v.clone())),
                             Some(controller_memory_value::Value::Real(
                                 controller::RealDataValue { data: v },
-                            )) => Some(MemoryValues::Real(v.to_vec())),
+                            )) => Some(MemoryValues::Real(v.clone())),
                             None => None,
                         },
                     )
