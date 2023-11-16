@@ -129,20 +129,22 @@ impl quilc::Client for Client {
             .map(str::parse)
             .collect::<Result<Vec<_>, _>>()
             .map_err(Error::from)?;
+        let gateset = gateset.iter().collect();
         let interleaver = request
             .interleaver
             .map(|s| s.parse::<libquil_sys::quilc::Program>())
             .transpose()
             .map_err(Error::from)?;
+        let seed = request
+            .seed
+            .map(i32::try_from)
+            .transpose()
+            .map_err(Error::from)?;
         let result = libquil_sys::quilc::generate_rb_sequence(
             i32::try_from(request.depth).map_err(Error::from)?,
             i32::try_from(request.qubits).map_err(Error::from)?,
-            gateset.iter().collect(),
-            request
-                .seed
-                .map(i32::try_from)
-                .transpose()
-                .map_err(Error::from)?,
+            gateset,
+            seed,
             interleaver.as_ref(),
         )
         .map_err(Error::from)?;
