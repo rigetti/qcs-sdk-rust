@@ -841,7 +841,6 @@ mod describe_qpu_for_id {
             panic!("Expected an error!");
         };
         let result_string = format!("{err:?}");
-        println!("{result_string}");
         assert!(result_string.contains("refresh_token"));
     }
 
