@@ -71,9 +71,15 @@ impl crate::qvm::Client for Client {
                 AddressRequest::ExcludeAll => Err(Error::UnsupportedIndicesRequestType),
             })
             .collect::<Result<_, _>>()?;
-        let result =
-            libquil_sys::qvm::multishot(&program, addresses, i32::from(request.trials.get()))
-                .map_err(Error::LibquilSysQvm)?;
+        let result = libquil_sys::qvm::multishot(
+            &program,
+            addresses,
+            i32::from(request.trials.get()),
+            request.gate_noise,
+            request.measurement_noise,
+            request.rng_seed,
+        )
+        .map_err(Error::LibquilSysQvm)?;
         let mut registers = HashMap::new();
         for (address, values) in result {
             match values {
@@ -135,6 +141,7 @@ impl crate::qvm::Client for Client {
             &program,
             qubits.as_slice(),
             i32::from(request.trials.get()),
+            request.rng_seed,
         )
         .map_err(Error::LibquilSysQvm)?;
         let result = result
@@ -159,8 +166,8 @@ impl crate::qvm::Client for Client {
             .map(|s| s.parse().map_err(Error::LibquilSysQuilc))
             .collect::<Result<Vec<_>, _>>()?;
         let operators = operators.iter().collect();
-        let result =
-            libquil_sys::qvm::expectation(&program, operators).map_err(Error::LibquilSysQvm)?;
+        let result = libquil_sys::qvm::expectation(&program, operators, request.rng_seed)
+            .map_err(Error::LibquilSysQvm)?;
         Ok(result)
     }
 
@@ -173,7 +180,8 @@ impl crate::qvm::Client for Client {
             .compiled_quil
             .parse()
             .map_err(Error::LibquilSysQuilc)?;
-        let amplitudes = libquil_sys::qvm::wavefunction(&program).map_err(Error::LibquilSysQvm)?;
+        let amplitudes = libquil_sys::qvm::wavefunction(&program, request.rng_seed)
+            .map_err(Error::LibquilSysQvm)?;
         let amplitudes = amplitudes
             .into_iter()
             .flat_map(|c| vec![c.re, c.im])
