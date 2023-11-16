@@ -21,7 +21,7 @@ jobs:
         run: sudo apt install -y libffi\* libblas\* liblapack\*
       - name: Install libquil
         run: |
-          curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.1.1
+          curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0
 
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
