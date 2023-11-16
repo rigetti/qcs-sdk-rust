@@ -88,9 +88,9 @@ impl quilc::Client for Client {
     }
 
     fn get_version_info(&self) -> Result<String, quilc::Error> {
-        Ok(libquil_sys::quilc::get_version_info()
-            .map_err(Error::from)?
-            .version)
+        libquil_sys::quilc::get_version_info()
+            .map(|info| info.version)
+            .map_err(|e| Error::from(e).into())
     }
 
     fn conjugate_pauli_by_clifford(
