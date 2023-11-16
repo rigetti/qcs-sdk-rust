@@ -37,11 +37,7 @@ impl From<Error> for quilc::Error {
 impl From<libquil_sys::quilc::CompilationMetadata> for NativeQuilMetadata {
     fn from(value: libquil_sys::quilc::CompilationMetadata) -> Self {
         NativeQuilMetadata {
-            final_rewiring: value
-                .final_rewiring
-                .iter()
-                .map(|r| u64::from(*r))
-                .collect::<Vec<_>>(),
+            final_rewiring: value.final_rewiring.iter().map(|r| u64::from(*r)).collect(),
             gate_depth: value.gate_depth.map(u64::from),
             gate_volume: value.gate_volume.map(u64::from),
             multiqubit_gate_depth: value.multiqubit_gate_depth.map(u64::from),
@@ -102,7 +98,7 @@ impl quilc::Client for Client {
             .symbols
             .into_iter()
             .map(CString::new)
-            .collect::<Result<Vec<_>, _>>()
+            .collect::<Result<_, _>>()
             .map_err(Error::from)?;
         let result = libquil_sys::quilc::conjugate_pauli_by_clifford(
             request
