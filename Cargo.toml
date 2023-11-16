@@ -24,7 +24,7 @@ quil-rs = { version = "0.22.0", git = "https://github.com/rigetti/quil-rs", tag 
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.19"
-pyo3 = { version = "0.19.2", features = ["extension-module"] }
+pyo3 = { version = "0.19.2" }
 pyo3-asyncio = { version = "0.19", features = ["tokio-runtime"] }
 pyo3-build-config = "0.19.2"
 rigetti-pyo3 = { version = "0.2.0", features = ["complex"] }
