@@ -68,7 +68,7 @@ impl quilc::Client for Client {
         let isa = serde_json::to_string(&isa).map_err(Error::from)?;
         let chip = libquil_sys::quilc::Chip::from_str(&isa).map_err(Error::from)?;
 
-        let compilation_result = if options.protoquil.unwrap_or_default() {
+        let compilation_result = if options.protoquil.unwrap_or(false) {
             libquil_sys::quilc::compile_protoquil(&program, &chip)
         } else {
             libquil_sys::quilc::compile_program(&program, &chip)
