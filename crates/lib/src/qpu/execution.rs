@@ -282,7 +282,9 @@ impl<'a> Execution<'a> {
                 job_handle.readout_map(),
                 &response.readout_values,
             )),
-            duration: Some(response.execution_duration_microseconds).map(Duration::from_micros),
+            duration: Some(Duration::from_micros(
+                response.execution_duration_microseconds,
+            )),
         })
     }
 
