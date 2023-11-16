@@ -130,10 +130,7 @@ impl quilc::Client for Client {
                 program: Program::from_str(&response.quil).map_err(quilc::Error::Parse)?,
                 native_quil_metadata: response.metadata,
             }),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -146,10 +143,7 @@ impl quilc::Client for Client {
         let request = RPCRequest::new("get_version_info", &bindings);
         match self.run_request::<_, quilc::QuilcVersionResponse>(&request) {
             Ok(response) => Ok(response.quilc),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -164,10 +158,7 @@ impl quilc::Client for Client {
         let request = RPCRequest::new("conjugate_pauli_by_clifford", &request);
         match self.run_request::<_, quilc::ConjugatePauliByCliffordResponse>(&request) {
             Ok(response) => Ok(response),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -183,10 +174,7 @@ impl quilc::Client for Client {
         match self.run_request::<_, quilc::GenerateRandomizedBenchmarkingSequenceResponse>(&request)
         {
             Ok(response) => Ok(response),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 }
@@ -218,6 +206,17 @@ pub enum Error {
     /// Error occurred when trying to lock the ZMQ socket
     #[error("Could not lock RPCQ client: {0}")]
     ZmqSocketLock(String),
+}
+
+impl Error {
+    pub(crate) fn to_quilc_error(quilc_uri: String, source: Error) -> quilc::Error {
+        match source {
+            Error::Response(_) => {
+                quilc::Error::QuilcCompilation(quilc::CompilationError::Rpcq(source))
+            }
+            source => quilc::Error::QuilcConnection(quilc_uri, source),
+        }
+    }
 }
 
 /// A single request object according to the JSONRPC standard.

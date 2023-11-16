@@ -30,7 +30,7 @@ pub enum Error {
 
 impl From<Error> for quilc::Error {
     fn from(error: Error) -> Self {
-        quilc::Error::QuilcCompilation(error.to_string())
+        quilc::Error::QuilcCompilation(quilc::CompilationError::Libquil(error))
     }
 }
 

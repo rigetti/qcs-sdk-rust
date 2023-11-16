@@ -75,9 +75,11 @@ impl From<quilc::Error> for Error {
                 uri,
                 details: format!("{details:?}"),
             },
-            quilc::Error::QuilcCompilation(details) => Self::Compilation { details },
+            quilc::Error::QuilcCompilation(details) => Self::Compilation {
+                details: format!("{details:?}"),
+            },
             quilc::Error::Parse(details) => Self::Compilation {
-                details: details.to_string(),
+                details: format!("{details:?}"),
             },
         }
     }

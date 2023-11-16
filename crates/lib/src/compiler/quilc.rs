@@ -210,19 +210,22 @@ pub enum Error {
     QuilcConnection(String, #[source] rpcq::Error),
     /// An error when trying to compile using quilc.
     #[error("Problem compiling quil program: {0}")]
-    QuilcCompilation(String),
+    QuilcCompilation(CompilationError),
     /// An error when trying to parse the compiled program.
     #[error("Problem when trying to parse the compiled program: {0}")]
     Parse(ProgramError),
 }
 
-impl Error {
-    pub(crate) fn from_quilc_error(quilc_uri: String, source: rpcq::Error) -> Self {
-        match source {
-            rpcq::Error::Response(message) => Error::QuilcCompilation(message),
-            source => Error::QuilcConnection(quilc_uri, source),
-        }
-    }
+/// Errors during compilation with one of the supported clients
+#[derive(Debug, thiserror::Error)]
+pub enum CompilationError {
+    #[cfg(feature = "libquil")]
+    /// Errors during compilation when using libquil
+    #[error("compilation error from libquil: {0}")]
+    Libquil(crate::compiler::libquil::Error),
+    /// Errors during compilation when using RPCQ
+    #[error("compilation error from RPCQ: {0}")]
+    Rpcq(crate::compiler::rpcq::Error),
 }
 
 /// The response from quilc for a `quil_to_native_quil` request.
