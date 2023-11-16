@@ -86,7 +86,7 @@ impl crate::qvm::Client for Client {
             request.rng_seed,
         )
         .map_err(Error::LibquilSysQvm)?;
-        let mut registers = HashMap::new();
+        let mut registers = HashMap::with_capacity(result.len());
         for (address, values) in result {
             match values {
                 libquil_sys::qvm::MultishotAddressData::Bit(values)
