@@ -109,11 +109,7 @@ impl PyExecutable {
         quilc_client: Option<PyQuilcClient>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
-        let quilc_client = quilc_client.map(|c| match c.inner {
-            QuilcClient::Rpcq(c) => c,
-            #[cfg(feature = "libquil")]
-            QuilcClient::LibquilSys(_) => todo!(),
-        });
+        let quilc_client = quilc_client.map(|c| c.inner);
         let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);
 
         for reg in registers {

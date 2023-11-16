@@ -108,12 +108,42 @@ pub enum QuilcClient {
 }
 
 impl QuilcClient {
-    fn as_client(&self) -> &dyn qcs::compiler::quilc::Client {
+    pub(crate) fn as_client(&self) -> &dyn qcs::compiler::quilc::Client {
         match self {
             QuilcClient::Rpcq(client) => client,
             #[cfg(feature = "libquil")]
             QuilcClient::LibquilSys(client) => client,
         }
+    }
+}
+
+impl qcs::compiler::quilc::Client for QuilcClient {
+    fn compile_program(
+        &self,
+        quil: &str,
+        isa: TargetDevice,
+        options: CompilerOpts,
+    ) -> Result<qcs::compiler::quilc::CompilationResult, qcs::compiler::quilc::Error> {
+        self.as_client().compile_program(quil, isa, options)
+    }
+
+    fn get_version_info(&self) -> Result<String, qcs::compiler::quilc::Error> {
+        self.as_client().get_version_info()
+    }
+
+    fn conjugate_pauli_by_clifford(
+        &self,
+        request: ConjugateByCliffordRequest,
+    ) -> Result<ConjugatePauliByCliffordResponse, qcs::compiler::quilc::Error> {
+        self.as_client().conjugate_pauli_by_clifford(request)
+    }
+
+    fn generate_randomized_benchmarking_sequence(
+        &self,
+        request: RandomizedBenchmarkingRequest,
+    ) -> Result<GenerateRandomizedBenchmarkingSequenceResponse, qcs::compiler::quilc::Error> {
+        self.as_client()
+            .generate_randomized_benchmarking_sequence(request)
     }
 }
 
