@@ -62,7 +62,13 @@ impl crate::qvm::Client for Client {
             .map(|(address, indices)| match indices {
                 AddressRequest::Indices(indices) => Ok((
                     address.clone(),
-                    libquil_sys::qvm::MultishotAddressRequest::Indices(indices.clone()),
+                    libquil_sys::qvm::MultishotAddressRequest::Indices(
+                        indices
+                            .clone()
+                            .into_iter()
+                            .map(u32::try_from)
+                            .collect::<Result<_, _>>()?,
+                    ),
                 )),
                 AddressRequest::IncludeAll => Ok((
                     address.clone(),

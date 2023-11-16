@@ -74,7 +74,7 @@ impl PyAddressRequest {
     }
 
     #[staticmethod]
-    pub fn from_indices(indices: Vec<u32>) -> Self {
+    pub fn from_indices(indices: Vec<usize>) -> Self {
         Self(AddressRequest::Indices(indices))
     }
 }
