@@ -137,9 +137,10 @@ impl crate::qvm::Client for Client {
             .compiled_quil
             .parse()
             .map_err(Error::LibquilSysQuilc)?;
-        let qubits = request.qubits.clone();
-        let qubits = qubits
-            .into_iter()
+        let qubits = request
+            .qubits
+            .iter()
+            .copied()
             .map(i32::try_from)
             .collect::<Result<Vec<_>, _>>()
             .map_err(Error::InvalidCast)?;
