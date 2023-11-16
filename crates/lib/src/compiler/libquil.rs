@@ -273,7 +273,6 @@ MEASURE 1 ro[1]
         let version = rpcq_client
             .get_version_info()
             .expect("Should get version info from quilc");
-        dbg!(&version);
         let semver_re = Regex::new(r"^([0-9]+)\.([0-9]+)\.([0-9]+)$").unwrap();
         assert!(semver_re.is_match(&version));
     }
