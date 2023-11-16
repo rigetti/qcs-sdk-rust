@@ -1,5 +1,6 @@
 //! Uses [`libquil-sys`] as the client for Quilc
 
+use std::convert::TryInto;
 use std::ffi::NulError;
 use std::num::TryFromIntError;
 use std::str::FromStr;
@@ -141,8 +142,8 @@ impl quilc::Client for Client {
             .transpose()
             .map_err(Error::from)?;
         let result = libquil_sys::quilc::generate_rb_sequence(
-            i32::try_from(request.depth).map_err(Error::from)?,
-            i32::try_from(request.qubits).map_err(Error::from)?,
+            request.depth.try_into().map_err(Error::from)?,
+            request.qubits.try_into().map_err(Error::from)?,
             gateset,
             seed,
             interleaver.as_ref(),
