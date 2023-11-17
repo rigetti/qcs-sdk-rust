@@ -39,6 +39,14 @@ The best way to go about this is via `makers` or `cargo make` with no task. This
 
 Any tests which cannot be run in CI should be run with `makers manual`. These tests require configured QCS credentials with access to internal functions, as well as a connection to the Rigetti VPN.
 
+### `libquil`
+
+[`libquil`](https://github.com/rigetti/libquil) provides [quilc](https://github.com/quil-lang/quilc) and [QVM](https://github.com/quil-lang/qvm) as a shared library, which can be used by `qcs-sdk-rust` as an alternative client for those tools.
+
+To use `libquil`:
+* install the library (see [installation instructions](https://github.com/rigetti/libquil#automated-installation))
+* enable the feature with `--features libquil`
+
 ### Linting
 
 `makers lint` will lint run all static checks.
