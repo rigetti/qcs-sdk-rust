@@ -68,26 +68,6 @@ insta = "1.29.0"
 built = "0.6.1"
 
 [[example]]
-name = "delayed-job-retrieval"
-path = "examples/delayed_job_retrieval.rs"
-
-[[example]]
-name = "execute"
-path = "examples/execute.rs"
-
-[[example]]
-name = "local-compilation-and-execution"
-path = "examples/local.rs"
-
-[[example]]
-name = "parametric-compilation"
-path = "examples/parametric_compilation.rs"
-
-[[example]]
-name = "quil-t"
-path = "examples/quil_t.rs"
-
-[[example]]
 name = "compilation-and-simulation-with-libquil"
 path = "examples/libquil.rs"
 required-features = ["libquil"]
