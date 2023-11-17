@@ -283,7 +283,9 @@ impl<'a> Execution<'a> {
                 &response.readout_values,
                 &response.memory_values,
             )),
-            duration: Some(response.execution_duration_microseconds).map(Duration::from_micros),
+            duration: Some(Duration::from_micros(
+                response.execution_duration_microseconds,
+            )),
         })
     }
 
