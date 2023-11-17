@@ -11,11 +11,11 @@ class QVMClient:
 
     @staticmethod
     def new_http(endpoint: str) -> QVMClient:
-        """Construct a new client which uses HTTP to communicate with QVM"""
+        """Construct a new QVM client which uses HTTP to communicate with a QVM service"""
         ...
     @staticmethod
     def new_libquil() -> QVMClient:
-        """Construct a new client which uses libquil to communicate with QVM"""
+        """Construct a new QVM client which uses libquil"""
         ...
     @property
     def qvm_url(self) -> str:
