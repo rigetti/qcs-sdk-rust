@@ -218,6 +218,7 @@ pub enum Error {
 
 /// Errors during compilation with one of the supported clients
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum CompilationError {
     #[cfg(feature = "libquil")]
     /// Errors during compilation when using libquil
