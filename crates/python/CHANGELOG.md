@@ -1,3 +1,10 @@
+## 0.13.5
+
+### Features
+
+- Support Python 3.12 (#394)
+- Add memory_values to QPUResultData
+
 ## 0.13.5-rc.2
 
 ### Features
