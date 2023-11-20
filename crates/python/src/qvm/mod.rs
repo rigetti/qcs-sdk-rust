@@ -36,9 +36,15 @@ pub enum QvmClient {
     Libquil(qvm::libquil::Client),
 }
 
-impl QvmClient {
+#[pyclass(name = "QVMClient")]
+#[derive(Clone)]
+pub struct PyQvmClient {
+    inner: QvmClient,
+}
+
+impl PyQvmClient {
     pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
-        match self {
+        match &self.inner {
             QvmClient::Http(client) => client,
             #[cfg(feature = "libquil")]
             QvmClient::Libquil(client) => client,
@@ -46,55 +52,8 @@ impl QvmClient {
     }
 }
 
-#[pyclass(name = "QVMClient")]
-#[derive(Clone)]
-pub struct PyQvmClient {
-    pub inner: QvmClient,
-}
-
-#[pymethods]
-impl PyQvmClient {
-    #[new]
-    fn new() -> PyResult<Self> {
-        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http() and QVMClient.new_libquil()."))
-    }
-
-    #[staticmethod]
-    fn new_http(endpoint: &str) -> PyResult<Self> {
-        let http_client = qvm::http::HttpClient::new(endpoint.to_string());
-        Ok(Self {
-            inner: QvmClient::Http(http_client),
-        })
-    }
-
-    #[cfg(feature = "libquil")]
-    #[staticmethod]
-    fn new_libquil() -> PyResult<Self> {
-        Ok(Self {
-            inner: QvmClient::Libquil(qvm::libquil::Client {}),
-        })
-    }
-
-    #[cfg(not(feature = "libquil"))]
-    #[staticmethod]
-    fn new_libquil() -> PyResult<Self> {
-        Err(PyRuntimeError::new_err(
-            "Cannot create a libquil QVM client as feature is not enabled.",
-        ))
-    }
-
-    #[getter]
-    fn qvm_url(&self) -> PyResult<String> {
-        match &self.inner {
-            QvmClient::Http(client) => Ok(client.qvm_url.to_string()),
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(_) => Ok("".into()),
-        }
-    }
-}
-
 #[async_trait::async_trait]
-impl qvm::Client for QvmClient {
+impl qvm::Client for PyQvmClient {
     /// The QVM version string. Not guaranteed to comply to the semver spec.
     async fn get_version_info(&self, options: &QvmOptions) -> Result<String, qvm::Error> {
         self.as_client().get_version_info(options).await
@@ -256,7 +215,6 @@ py_function_sync_async! {
         rng_seed: Option<i64>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let client = client.inner.as_client();
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();
@@ -270,7 +228,7 @@ py_function_sync_async! {
                     measurement_noise,
                     gate_noise,
                     rng_seed,
-                    client,
+                    &client,
                     options.as_inner()
             )
             .await
