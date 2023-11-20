@@ -52,6 +52,47 @@ impl PyQvmClient {
     }
 }
 
+#[pymethods]
+impl PyQvmClient {
+    #[new]
+    fn new() -> PyResult<Self> {
+        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http() and QVMClient.new_libquil()."))
+    }
+
+    #[staticmethod]
+    fn new_http(endpoint: &str) -> PyResult<Self> {
+        let http_client = qvm::http::HttpClient::new(endpoint.to_string());
+        Ok(Self {
+            inner: QvmClient::Http(http_client),
+        })
+    }
+
+    #[cfg(feature = "libquil")]
+    #[staticmethod]
+    fn new_libquil() -> PyResult<Self> {
+        Ok(Self {
+            inner: QvmClient::Libquil(qvm::libquil::Client {}),
+        })
+    }
+
+    #[cfg(not(feature = "libquil"))]
+    #[staticmethod]
+    fn new_libquil() -> PyResult<Self> {
+        Err(PyRuntimeError::new_err(
+            "Cannot create a libquil QVM client as feature is not enabled.",
+        ))
+    }
+
+    #[getter]
+    fn qvm_url(&self) -> PyResult<String> {
+        match &self.inner {
+            QvmClient::Http(client) => Ok(client.qvm_url.to_string()),
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(_) => Ok("".into()),
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl qvm::Client for PyQvmClient {
     /// The QVM version string. Not guaranteed to comply to the semver spec.
