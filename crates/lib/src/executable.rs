@@ -899,7 +899,7 @@ mod describe_qpu_for_id {
         let mut exe = exe.with_qcs_client(Qcs::default());
         let result = exe.qpu_for_id("Aspen-8").await;
 
-        assert!(matches!(result, Err(_)));
-        assert!(matches!(exe.qpu, None));
+        assert!(result.is_err());
+        assert!(exe.qpu.is_none());
     }
 }
