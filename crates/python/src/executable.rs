@@ -10,11 +10,10 @@ use rigetti_pyo3::{
 use tokio::sync::Mutex;
 
 use crate::{
-    compiler::quilc::{PyCompilerOpts, PyQuilcClient, QuilcClient},
+    compiler::quilc::{PyCompilerOpts, PyQuilcClient},
     execution_data::PyExecutionData,
     py_sync::{py_async, py_sync},
     qpu::{api::PyExecutionOptions, translation::PyTranslationOptions},
-    qvm::QvmClient,
 };
 
 wrap_error!(RustExecutionError(Error));
@@ -110,9 +109,7 @@ impl PyExecutable {
         quilc_client: Option<PyQuilcClient>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
-        let quilc_client = quilc_client.map(|c| match c.inner {
-            QuilcClient::Rpcq(c) => c,
-        });
+        let quilc_client = quilc_client.map(|c| c.inner);
         let mut exe = Executable::from_quil(quil).with_quilc_client(quilc_client);
 
         for reg in registers {
@@ -139,7 +136,6 @@ impl PyExecutable {
         py: Python<'_>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<PyExecutionData> {
-        let QvmClient::Http(client) = client.inner;
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
@@ -148,7 +144,6 @@ impl PyExecutable {
         py: Python<'py>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<&PyAny> {
-        let QvmClient::Http(client) = client.inner;
         py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
@@ -161,7 +156,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<PyExecutionData> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -195,7 +190,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_async!(
                 py,
@@ -229,7 +224,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<PyJobHandle> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -263,7 +258,7 @@ impl PyExecutable {
         translation_options: Option<PyTranslationOptions>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<&PyAny> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone().into());
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => {
                 py_async!(

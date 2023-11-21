@@ -2,5 +2,7 @@
 //! execution on QCS quantum processors.
 
 mod isa;
+#[cfg(feature = "libquil")]
+pub mod libquil;
 pub mod quilc;
 pub mod rpcq;

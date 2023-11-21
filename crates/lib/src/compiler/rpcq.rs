@@ -18,6 +18,8 @@ pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 #[derive(Clone)]
 pub struct Client {
     pub(crate) endpoint: String,
+    send_timeout: Option<i32>,
+    receive_timeout: Option<i32>,
 }
 
 impl std::fmt::Debug for Client {
@@ -31,7 +33,31 @@ impl Client {
     pub fn new(endpoint: &str) -> Result<Self, Error> {
         Ok(Self {
             endpoint: endpoint.to_owned(),
+            send_timeout: None,
+            receive_timeout: None,
         })
+    }
+
+    /// Set the timeout used for both sending and receiving messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_timeout(&mut self, timeout: i32) {
+        self.set_send_timeout(timeout);
+        self.set_receive_timeout(timeout);
+    }
+
+    /// Set the timeout used when sending messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_send_timeout(&mut self, timeout: i32) {
+        self.send_timeout = Some(timeout);
+    }
+
+    /// Set the timeout used when receiving messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_receive_timeout(&mut self, timeout: i32) {
+        self.receive_timeout = Some(timeout);
     }
 
     /// Send an RPC request and immediately retrieve and decode the results.
@@ -72,10 +98,24 @@ impl Client {
     /// [`SocketType::ROUTER`]. These sockets are _not_ thread safe, even
     /// with a mutex, so a new socket should be created for each request,
     /// and the socket should not be shared between threads.
+    ///
+    /// If [`Self::set_send_timeout`] and/or [`Self::set_receive_timeout`]
+    /// have been used to set a timeout, it will be applied here to the
+    /// returned [`Socket`].
     fn create_socket(&self) -> Result<Socket, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
+        if let Some(send_timeout) = self.send_timeout {
+            socket
+                .set_sndtimeo(send_timeout)
+                .map_err(Error::Communication)?;
+        }
+        if let Some(receive_timeout) = self.receive_timeout {
+            socket
+                .set_rcvtimeo(receive_timeout)
+                .map_err(Error::Communication)?;
+        }
         socket
             .connect(&self.endpoint.clone())
             .map_err(Error::Communication)?;
@@ -130,10 +170,7 @@ impl quilc::Client for Client {
                 program: Program::from_str(&response.quil).map_err(quilc::Error::Parse)?,
                 native_quil_metadata: response.metadata,
             }),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -146,10 +183,7 @@ impl quilc::Client for Client {
         let request = RPCRequest::new("get_version_info", &bindings);
         match self.run_request::<_, quilc::QuilcVersionResponse>(&request) {
             Ok(response) => Ok(response.quilc),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -164,10 +198,7 @@ impl quilc::Client for Client {
         let request = RPCRequest::new("conjugate_pauli_by_clifford", &request);
         match self.run_request::<_, quilc::ConjugatePauliByCliffordResponse>(&request) {
             Ok(response) => Ok(response),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 
@@ -183,10 +214,7 @@ impl quilc::Client for Client {
         match self.run_request::<_, quilc::GenerateRandomizedBenchmarkingSequenceResponse>(&request)
         {
             Ok(response) => Ok(response),
-            Err(source) => Err(quilc::Error::from_quilc_error(
-                self.endpoint.clone(),
-                source,
-            )),
+            Err(source) => Err(Error::to_quilc_error(self.endpoint.clone(), source)),
         }
     }
 }
@@ -218,6 +246,17 @@ pub enum Error {
     /// Error occurred when trying to lock the ZMQ socket
     #[error("Could not lock RPCQ client: {0}")]
     ZmqSocketLock(String),
+}
+
+impl Error {
+    pub(crate) fn to_quilc_error(quilc_uri: String, source: Error) -> quilc::Error {
+        match source {
+            Error::Response(_) => {
+                quilc::Error::QuilcCompilation(quilc::CompilationError::Rpcq(source))
+            }
+            source => quilc::Error::QuilcConnection(quilc_uri, source),
+        }
+    }
 }
 
 /// A single request object according to the JSONRPC standard.
