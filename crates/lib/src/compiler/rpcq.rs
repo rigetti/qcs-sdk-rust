@@ -18,6 +18,8 @@ pub(crate) const DEFAULT_CLIENT_TIMEOUT: f64 = 30.0;
 #[derive(Clone)]
 pub struct Client {
     pub(crate) endpoint: String,
+    send_timeout: Option<i32>,
+    receive_timeout: Option<i32>,
 }
 
 impl std::fmt::Debug for Client {
@@ -31,7 +33,31 @@ impl Client {
     pub fn new(endpoint: &str) -> Result<Self, Error> {
         Ok(Self {
             endpoint: endpoint.to_owned(),
+            send_timeout: None,
+            receive_timeout: None,
         })
+    }
+
+    /// Set the timeout used for both sending and receiving messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_timeout(&mut self, timeout: i32) {
+        self.set_send_timeout(timeout);
+        self.set_receive_timeout(timeout);
+    }
+
+    /// Set the timeout used when sending messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_send_timeout(&mut self, timeout: i32) {
+        self.send_timeout = Some(timeout);
+    }
+
+    /// Set the timeout used when receiving messages
+    ///
+    /// Value is number of milliseconds. A value of `-1` means no timeout.
+    pub(crate) fn set_receive_timeout(&mut self, timeout: i32) {
+        self.receive_timeout = Some(timeout);
     }
 
     /// Send an RPC request and immediately retrieve and decode the results.
@@ -72,10 +98,24 @@ impl Client {
     /// [`SocketType::ROUTER`]. These sockets are _not_ thread safe, even
     /// with a mutex, so a new socket should be created for each request,
     /// and the socket should not be shared between threads.
+    ///
+    /// If [`Self::set_send_timeout`] and/or [`Self::set_receive_timeout`]
+    /// have been used to set a timeout, it will be applied here to the
+    /// returned [`Socket`].
     fn create_socket(&self) -> Result<Socket, Error> {
         let socket = Context::new()
             .socket(SocketType::DEALER)
             .map_err(Error::SocketCreation)?;
+        if let Some(send_timeout) = self.send_timeout {
+            socket
+                .set_sndtimeo(send_timeout)
+                .map_err(Error::Communication)?;
+        }
+        if let Some(receive_timeout) = self.receive_timeout {
+            socket
+                .set_rcvtimeo(receive_timeout)
+                .map_err(Error::Communication)?;
+        }
         socket
             .connect(&self.endpoint.clone())
             .map_err(Error::Communication)?;

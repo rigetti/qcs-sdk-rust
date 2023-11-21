@@ -44,7 +44,6 @@ impl Diagnostics {
             QvmDiagnostics::gather(&client),
         )
         .await;
-
         Self {
             version: build_info::PKG_VERSION.to_owned(),
             rust_version: build_info::RUSTC_VERSION.to_owned(),
@@ -163,7 +162,11 @@ impl QuilcDiagnostics {
     fn gather(client: &Qcs) -> Self {
         let address = client.get_config().quilc_url().to_string();
         match rpcq::Client::new(&address) {
-            Ok(client) => {
+            Ok(mut client) => {
+                // Set timeout in case the Quilc service is not available. Without
+                // this timeout, RPCQ would hang indefinitely when trying to create
+                // the ZMQ context.
+                client.set_timeout(1000);
                 let (version, available) = match client.get_version_info() {
                     Ok(version) => (Some(version), true),
                     Err(_) => (None, false),
