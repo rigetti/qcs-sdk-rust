@@ -26,12 +26,13 @@ async fn http_qvm_client() -> HttpClient {
     HttpClient::from(&qcs_client)
 }
 
+#[cfg(feature = "libquil")]
 fn libquil_qvm_client() -> qvm::libquil::Client {
     qvm::libquil::Client {}
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
 #[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
-#[test_case::test_case(libquil_qvm_client() ; "with libquil client")]
 #[tokio::test]
 async fn test_get_version_info<C: qvm::Client>(client: C) {
     let version = client
@@ -42,8 +43,8 @@ async fn test_get_version_info<C: qvm::Client>(client: C) {
     assert!(semver_re.is_match(&version))
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
 #[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
-#[test_case::test_case(libquil_qvm_client() ; "with libquil client")]
 #[tokio::test]
 async fn test_run<C: qvm::Client>(client: C) {
     let request = http::MultishotRequest::new(
@@ -67,8 +68,8 @@ async fn test_run<C: qvm::Client>(client: C) {
     assert_eq!(ro.into_i8().expect("A BIT register should be i8").len(), 2);
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
 #[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
-#[test_case::test_case(libquil_qvm_client() ; "with libquil client")]
 #[tokio::test]
 async fn test_run_and_measure<C: qvm::Client>(client: C) {
     let request = http::MultishotMeasureRequest::new(
@@ -87,8 +88,8 @@ async fn test_run_and_measure<C: qvm::Client>(client: C) {
     assert_eq!(qubits[0].len(), 2);
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
 #[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
-#[test_case::test_case(libquil_qvm_client() ; "with libquil client")]
 #[tokio::test]
 async fn test_measure_expectation<C: qvm::Client>(client: C) {
     let prep_program = r##"
@@ -107,8 +108,8 @@ Z 2
     assert_eq!(expectations.len(), operators.len());
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
 #[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
-#[test_case::test_case(libquil_qvm_client() ; "with libquil client")]
 #[tokio::test]
 async fn test_get_wavefunction<C: qvm::Client>(client: C) {
     let request = http::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
