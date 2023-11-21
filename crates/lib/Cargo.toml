@@ -14,6 +14,7 @@ manual-tests = []
 tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/tracing", "qcs-api-client-openapi/tracing"]
 tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
 otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-client-openapi/otel-tracing"]
+libquil = ["dep:libquil-sys"]
 
 [dependencies]
 cached = "0.44.0"
@@ -45,6 +46,7 @@ zmq = { version = "0.10.0" }
 itertools = "0.11.0"
 derive_builder = "0.12.0"
 async-trait = "0.1.73"
+libquil-sys = { version = "0.4.0", optional = true }
 
 [dev-dependencies]
 erased-serde = "0.3.23"
@@ -61,6 +63,12 @@ test-case = "3.1.0"
 tracing-subscriber = "0.3.17"
 rstest = "0.17.0"
 insta = "1.29.0"
+assert2 = "0.3.11"
 
 [build-dependencies]
 built = "0.6.1"
+
+[[example]]
+name = "compilation-and-simulation-with-libquil"
+path = "examples/libquil.rs"
+required-features = ["libquil"]
