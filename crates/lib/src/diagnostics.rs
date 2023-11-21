@@ -33,6 +33,7 @@ struct Diagnostics {
     qcs: QcsApiDiagnostics,
     quilc: QuilcDiagnostics,
     qvm: QvmDiagnostics,
+    libquil: LibquilDiagnostics,
 }
 
 impl Diagnostics {
@@ -51,6 +52,7 @@ impl Diagnostics {
             qcs,
             quilc: QuilcDiagnostics::gather(&client),
             qvm,
+            libquil: LibquilDiagnostics::gather().await,
         }
     }
 }
@@ -76,6 +78,18 @@ impl std::fmt::Display for Diagnostics {
         writeln!(f, "  address: {}", self.qvm.address)?;
         writeln!(f, "  version: {}", format_option(self.qvm.version.as_ref()))?;
         writeln!(f, "  available: {}", self.qvm.available)?;
+        writeln!(f, "libquil:")?;
+        writeln!(f, "  available: {}", self.libquil.available)?;
+        writeln!(
+            f,
+            "  quilc version: {}",
+            format_option(self.libquil.quilc_version.as_ref())
+        )?;
+        writeln!(
+            f,
+            "  qvm version: {}",
+            format_option(self.libquil.qvm_version.as_ref())
+        )?;
         Ok(())
     }
 }
@@ -209,6 +223,43 @@ impl QvmDiagnostics {
             address: qvm_client.qvm_url,
             version,
             available,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct LibquilDiagnostics {
+    available: bool,
+    qvm_version: Option<String>,
+    quilc_version: Option<String>,
+}
+
+impl LibquilDiagnostics {
+    #[cfg(not(feature = "libquil"))]
+    async fn gather() -> Self {
+        Self {
+            available: false,
+            qvm_version: None,
+            quilc_version: None,
+        }
+    }
+    #[cfg(feature = "libquil")]
+    async fn gather() -> Self {
+        let qvm_version = match (qvm::libquil::Client {})
+            .get_version_info(&QvmOptions::default())
+            .await
+        {
+            Ok(version) => Some(version),
+            Err(_) => None,
+        };
+        let quilc_version = match (crate::compiler::libquil::Client {}).get_version_info() {
+            Ok(version) => Some(version),
+            Err(_) => None,
+        };
+        Self {
+            available: true,
+            qvm_version,
+            quilc_version,
         }
     }
 }
