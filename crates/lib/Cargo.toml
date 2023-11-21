@@ -63,6 +63,7 @@ test-case = "3.1.0"
 tracing-subscriber = "0.3.17"
 rstest = "0.17.0"
 insta = "1.29.0"
+assert2 = "0.3.11"
 
 [build-dependencies]
 built = "0.6.1"
