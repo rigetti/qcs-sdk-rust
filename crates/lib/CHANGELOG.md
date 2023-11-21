@@ -1,3 +1,14 @@
+## 0.18.0
+
+### Breaking Changes
+
+- changes some error types and adds new bounds to some
+functions
+
+### Features
+
+- Add libquil support (#397)
+
 ## 0.18.0-rc.0
 
 ### Breaking Changes
