@@ -235,31 +235,34 @@ struct LibquilDiagnostics {
 }
 
 impl LibquilDiagnostics {
-    #[cfg(not(feature = "libquil"))]
+    #[allow(clippy::unused_async)]
     async fn gather() -> Self {
-        Self {
-            available: false,
-            qvm_version: None,
-            quilc_version: None,
-        }
-    }
-    #[cfg(feature = "libquil")]
-    async fn gather() -> Self {
-        let qvm_version = match (qvm::libquil::Client {})
-            .get_version_info(&QvmOptions::default())
-            .await
+        #[cfg(not(feature = "libquil"))]
         {
-            Ok(version) => Some(version),
-            Err(_) => None,
-        };
-        let quilc_version = match (crate::compiler::libquil::Client {}).get_version_info() {
-            Ok(version) => Some(version),
-            Err(_) => None,
-        };
-        Self {
-            available: true,
-            qvm_version,
-            quilc_version,
+            Self {
+                available: false,
+                qvm_version: None,
+                quilc_version: None,
+            }
+        }
+        #[cfg(feature = "libquil")]
+        {
+            let qvm_version = match (qvm::libquil::Client {})
+                .get_version_info(&QvmOptions::default())
+                .await
+            {
+                Ok(version) => Some(version),
+                Err(_) => None,
+            };
+            let quilc_version = match (crate::compiler::libquil::Client {}).get_version_info() {
+                Ok(version) => Some(version),
+                Err(_) => None,
+            };
+            Self {
+                available: true,
+                qvm_version,
+                quilc_version,
+            }
         }
     }
 }
