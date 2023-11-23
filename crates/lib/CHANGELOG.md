@@ -1,3 +1,9 @@
+## 0.18.1
+
+### Fixes
+
+- update quil-rs to get string serialization bugfix (#399)
+
 ## 0.18.1-rc.0
 
 ### Fixes
