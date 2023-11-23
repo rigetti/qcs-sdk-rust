@@ -26,6 +26,7 @@ jobs:
   macos:
     runs-on: macos-12
     needs: [is-python-release, should-publish-wheels]
+    if: false
     env:
       CXXFLAGS: "-std=c++11 -stdlib=libc++"
     strategy:
@@ -95,6 +96,7 @@ jobs:
         args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v3
+      if: false
       with:
         name: wheels
         path: dist
@@ -102,6 +104,7 @@ jobs:
   windows: 
     runs-on: windows-latest 
     needs: [is-python-release, should-publish-wheels]
+    if: false
     strategy: 
       matrix: 
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
@@ -137,6 +140,7 @@ jobs:
   sdist:
     runs-on: ubuntu-latest
     needs: is-python-release
+    if: false
     env:
       CXXFLAGS: "-std=c++11"
     steps:
@@ -176,7 +180,7 @@ jobs:
     # still make sure that at least a source distribution
     # can be published.
     needs: [ macos, linux, windows, sdist ]
-    if: always() && needs.sdist.result == 'success'
+    if: false && always() && needs.sdist.result == 'success'
     steps:
       - uses: actions/download-artifact@v3
       - name: Publish to PyPI
