@@ -20,7 +20,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Operating System :: OS Independent",
 ]
-dependencies = ["quil==0.6.1"]
+dependencies = ["quil==0.6.2"]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
 # We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
