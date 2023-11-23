@@ -1,3 +1,9 @@
+## 0.14.2-rc.0
+
+### Fixes
+
+- bump quil in pyproject.toml to match Cargo.toml (#403)
+
 ## 0.14.1
 
 ### Fixes
