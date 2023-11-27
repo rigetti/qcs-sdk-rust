@@ -58,7 +58,7 @@ def test_compile_program(
     quilc_rpcq_client: QuilcClient,
 ):
     """A simple program should compile successfully."""
-    result = compile_program(bell_program, target_device, client=quilc_rpcq_client)
+    result = compile_program(bell_program, target_device, client=quilc_rpcq_client, options=CompilerOpts(protoquil=True))
     assert result.program == snapshot
     assert result.native_quil_metadata == snapshot
 

@@ -52,7 +52,7 @@ impl Execution {
     /// ## Parameter Errors
     ///
     /// Missing parameters, extra parameters, or parameters of the wrong type will all cause errors.
-    pub(crate) async fn run<C: Client>(
+    pub(crate) async fn run<C: Client + ?Sized>(
         &self,
         shots: NonZeroU16,
         addresses: HashMap<String, AddressRequest>,

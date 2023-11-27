@@ -1,3 +1,49 @@
+## 0.14.2
+
+### Fixes
+
+- bump quil in pyproject.toml to match Cargo.toml (#403)
+
+## 0.14.2-rc.0
+
+### Fixes
+
+- bump quil in pyproject.toml to match Cargo.toml (#403)
+
+## 0.14.1
+
+### Fixes
+
+- update quil-rs to get string serialization bugfix (#399)
+
+## 0.14.1-rc.0
+
+### Fixes
+
+- update quil-rs to get string serialization bugfix (#399)
+
+## 0.14.0
+
+### Breaking Changes
+
+- changes some error types and adds new bounds to some
+functions
+
+### Features
+
+- Add libquil support (#397)
+
+## 0.14.0-rc.0
+
+### Breaking Changes
+
+- changes some error types and adds new bounds to some
+functions
+
+### Features
+
+- Add libquil support (#397)
+
 ## 0.13.5
 
 ### Features

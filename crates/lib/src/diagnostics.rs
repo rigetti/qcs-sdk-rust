@@ -33,6 +33,7 @@ struct Diagnostics {
     qcs: QcsApiDiagnostics,
     quilc: QuilcDiagnostics,
     qvm: QvmDiagnostics,
+    libquil: LibquilDiagnostics,
 }
 
 impl Diagnostics {
@@ -44,7 +45,6 @@ impl Diagnostics {
             QvmDiagnostics::gather(&client),
         )
         .await;
-
         Self {
             version: build_info::PKG_VERSION.to_owned(),
             rust_version: build_info::RUSTC_VERSION.to_owned(),
@@ -52,6 +52,7 @@ impl Diagnostics {
             qcs,
             quilc: QuilcDiagnostics::gather(&client),
             qvm,
+            libquil: LibquilDiagnostics::gather().await,
         }
     }
 }
@@ -77,6 +78,18 @@ impl std::fmt::Display for Diagnostics {
         writeln!(f, "  address: {}", self.qvm.address)?;
         writeln!(f, "  version: {}", format_option(self.qvm.version.as_ref()))?;
         writeln!(f, "  available: {}", self.qvm.available)?;
+        writeln!(f, "libquil:")?;
+        writeln!(f, "  available: {}", self.libquil.available)?;
+        writeln!(
+            f,
+            "  quilc version: {}",
+            format_option(self.libquil.quilc_version.as_ref())
+        )?;
+        writeln!(
+            f,
+            "  qvm version: {}",
+            format_option(self.libquil.qvm_version.as_ref())
+        )?;
         Ok(())
     }
 }
@@ -163,7 +176,11 @@ impl QuilcDiagnostics {
     fn gather(client: &Qcs) -> Self {
         let address = client.get_config().quilc_url().to_string();
         match rpcq::Client::new(&address) {
-            Ok(client) => {
+            Ok(mut client) => {
+                // Set timeout in case the Quilc service is not available. Without
+                // this timeout, RPCQ would hang indefinitely when trying to create
+                // the ZMQ context.
+                client.set_timeout(1000);
                 let (version, available) = match client.get_version_info() {
                     Ok(version) => (Some(version), true),
                     Err(_) => (None, false),
@@ -206,6 +223,46 @@ impl QvmDiagnostics {
             address: qvm_client.qvm_url,
             version,
             available,
+        }
+    }
+}
+
+#[derive(Debug)]
+struct LibquilDiagnostics {
+    available: bool,
+    qvm_version: Option<String>,
+    quilc_version: Option<String>,
+}
+
+impl LibquilDiagnostics {
+    #[allow(clippy::unused_async)]
+    async fn gather() -> Self {
+        #[cfg(not(feature = "libquil"))]
+        {
+            Self {
+                available: false,
+                qvm_version: None,
+                quilc_version: None,
+            }
+        }
+        #[cfg(feature = "libquil")]
+        {
+            let qvm_version = match (qvm::libquil::Client {})
+                .get_version_info(&QvmOptions::default())
+                .await
+            {
+                Ok(version) => Some(version),
+                Err(_) => None,
+            };
+            let quilc_version = match (crate::compiler::libquil::Client {}).get_version_info() {
+                Ok(version) => Some(version),
+                Err(_) => None,
+            };
+            Self {
+                available: true,
+                qvm_version,
+                quilc_version,
+            }
         }
     }
 }

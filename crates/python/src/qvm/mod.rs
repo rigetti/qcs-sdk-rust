@@ -1,6 +1,6 @@
 use pyo3::types::PyList;
 use qcs::{
-    qvm::{self, QvmOptions, QvmResultData},
+    qvm::{self, http, QvmOptions, QvmResultData},
     RegisterData,
 };
 use rigetti_pyo3::{
@@ -26,22 +26,37 @@ create_init_submodule! {
     ],
 }
 
+wrap_error!(RustQvmError(qcs::qvm::Error));
+py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
+
 #[derive(Clone)]
 pub enum QvmClient {
     Http(qvm::http::HttpClient),
+    #[cfg(feature = "libquil")]
+    Libquil(qvm::libquil::Client),
 }
 
 #[pyclass(name = "QVMClient")]
 #[derive(Clone)]
 pub struct PyQvmClient {
-    pub inner: QvmClient,
+    inner: QvmClient,
+}
+
+impl PyQvmClient {
+    pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
+        match &self.inner {
+            QvmClient::Http(client) => client,
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(client) => client,
+        }
+    }
 }
 
 #[pymethods]
 impl PyQvmClient {
     #[new]
     fn new() -> PyResult<Self> {
-        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http()."))
+        Err(PyRuntimeError::new_err("QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http() and QVMClient.new_libquil()."))
     }
 
     #[staticmethod]
@@ -52,15 +67,79 @@ impl PyQvmClient {
         })
     }
 
+    #[cfg(feature = "libquil")]
+    #[staticmethod]
+    fn new_libquil() -> PyResult<Self> {
+        Ok(Self {
+            inner: QvmClient::Libquil(qvm::libquil::Client {}),
+        })
+    }
+
+    #[cfg(not(feature = "libquil"))]
+    #[staticmethod]
+    fn new_libquil() -> PyResult<Self> {
+        Err(PyRuntimeError::new_err(
+            "Cannot create a libquil QVM client as feature is not enabled.",
+        ))
+    }
+
     #[getter]
     fn qvm_url(&self) -> PyResult<String> {
-        let QvmClient::Http(client) = &self.inner;
-        Ok(client.qvm_url.to_string())
+        match &self.inner {
+            QvmClient::Http(client) => Ok(client.qvm_url.to_string()),
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(_) => Ok("".into()),
+        }
     }
 }
 
-wrap_error!(RustQvmError(qcs::qvm::Error));
-py_wrap_error!(api, RustQvmError, QVMError, PyRuntimeError);
+#[async_trait::async_trait]
+impl qvm::Client for PyQvmClient {
+    /// The QVM version string. Not guaranteed to comply to the semver spec.
+    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, qvm::Error> {
+        self.as_client().get_version_info(options).await
+    }
+    /// Execute a program on the QVM.
+    async fn run(
+        &self,
+        request: &http::MultishotRequest,
+        options: &QvmOptions,
+    ) -> Result<http::MultishotResponse, qvm::Error> {
+        self.as_client().run(request, options).await
+    }
+    /// Execute a program on the QVM.
+    ///
+    /// The behavior of this method is different to that of [`Self::run`]
+    /// in that [`Self::run_and_measure`] will execute the program a single
+    /// time; the resulting wavefunction is then sampled some number of times
+    /// (specified in [`http::MultishotMeasureRequest`]).
+    ///
+    /// This can be useful if the program is expensive to execute and does
+    /// not change per "shot".
+    async fn run_and_measure(
+        &self,
+        request: &http::MultishotMeasureRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<Vec<i64>>, qvm::Error> {
+        self.as_client().run_and_measure(request, options).await
+    }
+    /// Measure the expectation value of a program
+    async fn measure_expectation(
+        &self,
+        request: &http::ExpectationRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<f64>, qvm::Error> {
+        self.as_client().measure_expectation(request, options).await
+    }
+    /// Get the wavefunction produced by a program
+    async fn get_wavefunction(
+        &self,
+        request: &http::WavefunctionRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<u8>, qvm::Error> {
+        self.as_client().get_wavefunction(request, options).await
+    }
+}
 
 py_wrap_type! {
     PyQvmResultData(QvmResultData) as "QVMResultData"
@@ -177,7 +256,6 @@ py_function_sync_async! {
         rng_seed: Option<i64>,
         options: Option<PyQvmOptions>,
     ) -> PyResult<PyQvmResultData> {
-        let QvmClient::Http(client) = client.inner;
         let params = params.into_iter().map(|(key, value)| (key.into_boxed_str(), value)).collect();
         let addresses = addresses.into_iter().map(|(address, request)| (address, request.as_inner().clone())).collect();
         let options = options.unwrap_or_default();

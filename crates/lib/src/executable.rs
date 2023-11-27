@@ -365,7 +365,7 @@ impl Executable<'_, '_> {
     /// # Errors
     ///
     /// See [`Error`].
-    pub async fn execute_on_qvm<V: qvm::Client>(&mut self, client: &V) -> ExecutionResult {
+    pub async fn execute_on_qvm<V: qvm::Client + ?Sized>(&mut self, client: &V) -> ExecutionResult {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots = %self.shots,
@@ -817,6 +817,7 @@ mod describe_get_config {
 #[cfg(test)]
 #[cfg(feature = "manual-tests")]
 mod describe_qpu_for_id {
+    use assert2::let_assert;
     use std::num::NonZeroU16;
 
     use crate::compiler::quilc::CompilerOpts;
@@ -899,7 +900,8 @@ mod describe_qpu_for_id {
         let mut exe = exe.with_qcs_client(Qcs::default());
         let result = exe.qpu_for_id("Aspen-8").await;
 
-        assert!(matches!(result, Err(_)));
-        assert!(matches!(exe.qpu, None));
+        let_assert!(Err(crate::executable::Error::Unexpected(err)) = result);
+        assert!(err.contains("NoRefreshToken"));
+        assert!(exe.qpu.is_none());
     }
 }

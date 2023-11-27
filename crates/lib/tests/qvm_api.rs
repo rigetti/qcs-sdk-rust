@@ -6,28 +6,35 @@ use std::{collections::HashMap, num::NonZeroU16};
 use qcs::{
     client::Qcs,
     qvm::{
+        self,
         http::{self, HttpClient},
-        Client, QvmOptions,
+        QvmOptions,
     },
 };
 use regex::Regex;
 
 const PROGRAM: &str = r##"
 DECLARE ro BIT[2]
-H 0
-CNOT 0 1
+I 0
+X 1
 MEASURE 0 ro[0]
 MEASURE 1 ro[1]
 "##;
 
-async fn qvm_client() -> HttpClient {
+async fn http_qvm_client() -> HttpClient {
     let qcs_client = Qcs::load().await;
     HttpClient::from(&qcs_client)
 }
 
+#[cfg(feature = "libquil")]
+fn libquil_qvm_client() -> qvm::libquil::Client {
+    qvm::libquil::Client {}
+}
+
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
+#[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
 #[tokio::test]
-async fn test_get_version_info() {
-    let client = qvm_client().await;
+async fn test_get_version_info<C: qvm::Client>(client: C) {
     let version = client
         .get_version_info(&QvmOptions::default())
         .await
@@ -36,9 +43,10 @@ async fn test_get_version_info() {
     assert!(semver_re.is_match(&version))
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
+#[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
 #[tokio::test]
-async fn test_run() {
-    let client = qvm_client().await;
+async fn test_run<C: qvm::Client>(client: C) {
     let request = http::MultishotRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(2).expect("value is non-zero"),
@@ -60,9 +68,10 @@ async fn test_run() {
     assert_eq!(ro.into_i8().expect("A BIT register should be i8").len(), 2);
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
+#[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
 #[tokio::test]
-async fn test_run_and_measure() {
-    let client = qvm_client().await;
+async fn test_run_and_measure<C: qvm::Client>(client: C) {
     let request = http::MultishotMeasureRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(5).expect("value is non-zero"),
@@ -79,9 +88,10 @@ async fn test_run_and_measure() {
     assert_eq!(qubits[0].len(), 2);
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
+#[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
 #[tokio::test]
-async fn test_measure_expectation() {
-    let client = qvm_client().await;
+async fn test_measure_expectation<C: qvm::Client>(client: C) {
     let prep_program = r##"
 CSWAP 0 1 2
 XY(-1.0) 0 1
@@ -98,9 +108,10 @@ Z 2
     assert_eq!(expectations.len(), operators.len());
 }
 
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_qvm_client() ; "with libquil client"))]
+#[test_case::test_case(http_qvm_client().await ; "with HTTP client")]
 #[tokio::test]
-async fn test_get_wavefunction() {
-    let client = qvm_client().await;
+async fn test_get_wavefunction<C: qvm::Client>(client: C) {
     let request = http::WavefunctionRequest::new(PROGRAM.to_string(), None, None, Some(0));
     client
         .get_wavefunction(&request, &QvmOptions::default())
