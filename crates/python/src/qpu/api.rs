@@ -9,10 +9,12 @@ use pyo3::{
     pyclass::CompareOp,
     pyfunction, pymethods,
     types::{PyComplex, PyInt},
-    IntoPy, Py, PyObject, PyResult, Python,
+    IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
 };
 use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
-use qcs_api_client_grpc::models::controller::{readout_values, ControllerJobExecutionResult};
+use qcs_api_client_grpc::models::controller::{
+    data_value, readout_values, ControllerJobExecutionResult,
+};
 use rigetti_pyo3::{
     create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
     py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
@@ -21,6 +23,8 @@ use rigetti_pyo3::{
 use crate::py_sync::py_function_sync_async;
 
 use crate::client::PyQcsClient;
+
+use super::result_data::PyMemoryValues;
 
 create_init_submodule! {
     classes: [
@@ -187,6 +191,8 @@ pub struct ExecutionResults {
     /// QPU execution duration.
     #[pyo3(get)]
     pub execution_duration_microseconds: Option<u64>,
+    #[pyo3(get)]
+    pub memory: HashMap<String, Option<PyMemoryValues>>,
 }
 
 #[pymethods]
@@ -194,27 +200,74 @@ impl ExecutionResults {
     #[new]
     fn new(
         buffers: HashMap<String, ExecutionResult>,
+        memory: HashMap<String, Option<PyMemoryValues>>,
         execution_duration_microseconds: Option<u64>,
     ) -> Self {
         Self {
             buffers,
             execution_duration_microseconds,
+            memory,
         }
     }
 }
 
-impl From<ControllerJobExecutionResult> for ExecutionResults {
-    fn from(value: ControllerJobExecutionResult) -> Self {
-        let buffers = value
+impl ExecutionResults {
+    fn from_controller_job_execution_result(
+        py: Python<'_>,
+        result: ControllerJobExecutionResult,
+    ) -> PyResult<Self> {
+        let buffers = result
             .readout_values
             .into_iter()
             .filter_map(|(key, val)| val.values.map(|values| (key, values.into())))
             .collect();
 
-        Self {
+        let memory = result.memory_values.iter().try_fold(
+            HashMap::with_capacity(result.memory_values.len()),
+            |mut acc, (key, value)| -> PyResult<HashMap<_, _>> {
+                acc.insert(
+                    key.clone(),
+                    match &value.value {
+                        Some(data_value::Value::Binary(value)) => {
+                            Some(PyMemoryValues::from_binary(
+                                py,
+                                value
+                                    .data
+                                    .iter()
+                                    .map(|v| v.to_object(py).extract(py))
+                                    .collect::<PyResult<Vec<_>>>()?,
+                            )?)
+                        }
+                        Some(data_value::Value::Integer(value)) => {
+                            Some(PyMemoryValues::from_integer(
+                                py,
+                                value
+                                    .data
+                                    .iter()
+                                    .map(|v| v.to_object(py).extract(py))
+                                    .collect::<PyResult<Vec<_>>>()?,
+                            )?)
+                        }
+                        Some(data_value::Value::Real(value)) => Some(PyMemoryValues::from_real(
+                            py,
+                            value
+                                .data
+                                .iter()
+                                .map(|v| v.to_object(py).extract(py))
+                                .collect::<PyResult<Vec<_>>>()?,
+                        )?),
+                        None => None,
+                    },
+                );
+                Ok(acc)
+            },
+        )?;
+
+        Ok(Self {
             buffers,
-            execution_duration_microseconds: Some(value.execution_duration_microseconds),
-        }
+            execution_duration_microseconds: Some(result.execution_duration_microseconds),
+            memory,
+        })
     }
 }
 
@@ -234,7 +287,9 @@ py_function_sync_async! {
             .map_err(RustRetrieveResultsError::from)
             .map_err(RustRetrieveResultsError::to_py_err)?;
 
-        Ok(results.into())
+        Python::with_gil(|py| {
+            ExecutionResults::from_controller_job_execution_result(py, results)
+        })
     }
 }
 

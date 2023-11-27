@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
 use pyo3::{
-    pyclass, pymethods,
+    exceptions::PyNotImplementedError,
+    pyclass,
+    pyclass::CompareOp,
+    pymethods,
     types::{PyComplex, PyFloat, PyInt, PyList},
     IntoPy, Py, PyResult, Python,
 };
@@ -17,10 +20,25 @@ py_wrap_union_enum! {
 }
 
 py_wrap_union_enum! {
+    #[derive(Debug, PartialEq)]
     PyMemoryValues(MemoryValues) as "MemoryValues" {
         binary: Binary => Vec<Py<PyInt>>,
         integer: Integer => Vec<Py<PyInt>>,
         real: Real => Vec<Py<PyFloat>>
+    }
+}
+impl_repr!(PyMemoryValues);
+
+#[pymethods]
+impl PyMemoryValues {
+    fn __richcmp__(&self, other: &PyMemoryValues, op: CompareOp) -> PyResult<bool> {
+        match op {
+            CompareOp::Eq => Ok(self == other),
+            CompareOp::Ne => Ok(self != other),
+            _ => Err(PyNotImplementedError::new_err(
+                "MemoryValues only supports equality comparisons",
+            )),
+        }
     }
 }
 
