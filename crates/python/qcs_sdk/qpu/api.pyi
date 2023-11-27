@@ -1,6 +1,7 @@
 from typing import Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
+from qcs_sdk.qpu import MemoryValues
 
 class SubmissionError(RuntimeError):
     """There was a problem submitting the program to QCS for execution."""
