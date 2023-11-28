@@ -192,7 +192,7 @@ pub struct ExecutionResults {
     #[pyo3(get)]
     pub execution_duration_microseconds: Option<u64>,
     #[pyo3(get)]
-    pub memory: HashMap<String, Option<PyMemoryValues>>,
+    pub memory: HashMap<String, PyMemoryValues>,
 }
 
 #[pymethods]
@@ -200,7 +200,7 @@ impl ExecutionResults {
     #[new]
     fn new(
         buffers: HashMap<String, ExecutionResult>,
-        memory: HashMap<String, Option<PyMemoryValues>>,
+        memory: HashMap<String, PyMemoryValues>,
         execution_duration_microseconds: Option<u64>,
     ) -> Self {
         Self {
@@ -225,40 +225,40 @@ impl ExecutionResults {
         let memory = result.memory_values.iter().try_fold(
             HashMap::with_capacity(result.memory_values.len()),
             |mut acc, (key, value)| -> PyResult<HashMap<_, _>> {
-                acc.insert(
-                    key.clone(),
-                    match &value.value {
-                        Some(data_value::Value::Binary(value)) => {
-                            Some(PyMemoryValues::from_binary(
+                if let Some(value) = &value.value {
+                    acc.insert(
+                        key.clone(),
+                        match value {
+                            data_value::Value::Binary(value) => PyMemoryValues::from_binary(
                                 py,
                                 value
                                     .data
                                     .iter()
                                     .map(|v| v.to_object(py).extract(py))
                                     .collect::<PyResult<Vec<_>>>()?,
-                            )?)
-                        }
-                        Some(data_value::Value::Integer(value)) => {
-                            Some(PyMemoryValues::from_integer(
+                            )?,
+                            data_value::Value::Integer(value) => PyMemoryValues::from_integer(
                                 py,
                                 value
                                     .data
                                     .iter()
                                     .map(|v| v.to_object(py).extract(py))
                                     .collect::<PyResult<Vec<_>>>()?,
-                            )?)
-                        }
-                        Some(data_value::Value::Real(value)) => Some(PyMemoryValues::from_real(
-                            py,
-                            value
-                                .data
-                                .iter()
-                                .map(|v| v.to_object(py).extract(py))
-                                .collect::<PyResult<Vec<_>>>()?,
-                        )?),
-                        None => None,
-                    },
-                );
+                            )?,
+                            data_value::Value::Real(value) => PyMemoryValues::from_real(
+                                py,
+                                value
+                                    .data
+                                    .iter()
+                                    .map(|v| v.to_object(py).extract(py))
+                                    .collect::<PyResult<Vec<_>>>()?,
+                            )?,
+                        },
+                    )
+                } else {
+                    None
+                };
+
                 Ok(acc)
             },
         )?;
