@@ -27,7 +27,7 @@ def test_readout_values():
 def test_qpu_result_data():
     mappings = {"a": "_q0"}
     readout_values = {"a": ReadoutValues.from_integer([0, 1])}
-    memory_values = { "a": MemoryValues.from_integer([2, 3]), "b": None }
+    memory_values = { "int": MemoryValues.from_integer([2, 3]), "real": MemoryValues.from_real([3.0, 4.0]), "binary": MemoryValues.from_binary([0, 1]) }
     result_data = QPUResultData(mappings, readout_values, memory_values)
 
     assert result_data.mappings == mappings
@@ -36,7 +36,7 @@ def test_qpu_result_data():
     raw_data = result_data.to_raw_readout_data()
     assert raw_data.mappings == {"a": "_q0"}
     assert raw_data.readout_values == {"a": [0, 1]}
-    assert raw_data.memory_values == {"a": [2, 3], "b": None}
+    assert raw_data.memory_values == {"int": [2, 3], "binary": [0, 1], "real": [3.0, 4.0]}
 
 
 @pytest.mark.qcs_session
