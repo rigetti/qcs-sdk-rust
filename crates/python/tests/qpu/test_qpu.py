@@ -32,7 +32,9 @@ def test_qpu_result_data():
 
     assert result_data.mappings == mappings
     assert result_data.readout_values["a"].as_integer() == readout_values["a"].as_integer()
-    assert result_data.memory_values["a"].as_integer() == memory_values["a"].as_integer()
+    assert result_data.memory_values["int"].as_integer() == memory_values["int"].as_integer()
+    assert result_data.memory_values["binary"].as_integer() == memory_values["binary"].as_integer()
+    assert result_data.memory_values["real"].as_integer() == memory_values["real"].as_integer()
     raw_data = result_data.to_raw_readout_data()
     assert raw_data.mappings == {"a": "_q0"}
     assert raw_data.readout_values == {"a": [0, 1]}
