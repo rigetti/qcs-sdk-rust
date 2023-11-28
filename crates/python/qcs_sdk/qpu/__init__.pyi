@@ -102,7 +102,7 @@ class QPUResultData:
     across all shots.
     """
 
-    def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues], memory_values: Mapping[str, Optional[MemoryValues]]): ...
+    def __new__(cls, mappings: Mapping[str, str], readout_values: Mapping[str, ReadoutValues], memory_values: Mapping[str, MemoryValues]): ...
     @property
     def mappings(self) -> Dict[str, str]:
         """
@@ -116,7 +116,7 @@ class QPUResultData:
         """
         ...
     @property
-    def memory_values(self) -> Dict[str, Optional[MemoryValues]]:
+    def memory_values(self) -> Dict[str, MemoryValues]:
         """
         Get mapping of a memory region (ie. "ro") to the final contents of that memory region.
         """
