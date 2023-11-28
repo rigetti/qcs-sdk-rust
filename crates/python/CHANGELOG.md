@@ -1,3 +1,9 @@
+## 0.14.3-rc.0
+
+### Features
+
+- Add memory_values to QPUResultData (#393)
+
 ## 0.14.2
 
 ### Fixes
