@@ -94,8 +94,8 @@ impl QpuResultData {
             memory_values: memory_values
                 .iter()
                 .filter_map(|(key, memory_values)| {
-                    if let Some(value) = &memory_values.value {
-                        Some((
+                    memory_values.value.as_ref().map(|value| {
+                        (
                             key.clone(),
                             match value {
                                 controller_memory_value::Value::Binary(
@@ -108,10 +108,8 @@ impl QpuResultData {
                                     controller::RealDataValue { data: v },
                                 ) => MemoryValues::Real(v.clone()),
                             },
-                        ))
-                    } else {
-                        None
-                    }
+                        )
+                    })
                 })
                 .collect(),
         }
