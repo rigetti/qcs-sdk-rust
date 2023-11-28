@@ -14,11 +14,14 @@ pub mod translation;
 use crate::client::PyQcsClient;
 use crate::py_sync::py_function_sync_async;
 
+use self::result_data::PyMemoryValues;
+
 create_init_submodule! {
     classes: [
         PyQpuResultData,
         RawQpuReadoutData,
-        PyReadoutValues
+        PyReadoutValues,
+        PyMemoryValues
     ],
     errors: [
         ListQuantumProcessorsError

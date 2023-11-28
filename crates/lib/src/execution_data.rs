@@ -352,17 +352,49 @@ mod describe_register_map {
     use maplit::hashmap;
     use ndarray::prelude::*;
 
+    use crate::qpu::result_data::MemoryValues;
     use crate::qpu::QpuResultData;
     use crate::qvm::QvmResultData;
 
     use super::{RegisterData, RegisterMap};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
-    use qcs_api_client_grpc::models::controller::{IntegerReadoutValues, ReadoutValues};
+    use qcs_api_client_grpc::models::controller::{
+        self, BinaryDataValue, DataValue as ControllerMemoryValue, IntegerDataValue,
+        IntegerReadoutValues, ReadoutValues, RealDataValue,
+    };
 
     fn dummy_readout_values(v: Vec<i32>) -> ReadoutValues {
         ReadoutValues {
             values: Some(Values::IntegerValues(IntegerReadoutValues { values: v })),
         }
+    }
+
+    fn dummy_memory_values(
+        binary: Vec<u8>,
+        int: Vec<i64>,
+        real: Vec<f64>,
+    ) -> (
+        ControllerMemoryValue,
+        ControllerMemoryValue,
+        ControllerMemoryValue,
+    ) {
+        (
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Binary(BinaryDataValue {
+                    data: binary,
+                })),
+            },
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Integer(IntegerDataValue {
+                    data: int,
+                })),
+            },
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Real(RealDataValue {
+                    data: real,
+                })),
+            },
+        )
     }
 
     #[test]
@@ -383,8 +415,19 @@ mod describe_register_map {
             String::from("qE") => dummy_readout_values(vec![2, 3]),
         };
 
-        let qpu_result_data =
-            QpuResultData::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+        let (binary_values, integer_values, real_values) =
+            dummy_memory_values(vec![0, 1, 2], vec![3, 4, 5], vec![6.0, 7.0, 8.0]);
+        let memory_values = hashmap! {
+            String::from("binary") => binary_values,
+            String::from("int") => integer_values,
+            String::from("real") => real_values,
+        };
+
+        let qpu_result_data = QpuResultData::from_controller_mappings_and_values(
+            &readout_mappings,
+            &readout_values,
+            &memory_values,
+        );
 
         let register_map = RegisterMap::from_qpu_result_data(&qpu_result_data)
             .expect("Should be able to create RegisterMap from rectangular QPU readout");
@@ -408,6 +451,13 @@ mod describe_register_map {
         let expected_bar = arr2(&[[2, 0], [3, 1]]);
 
         assert_eq!(bar, expected_bar);
+
+        let expected_memory_values = hashmap! {
+            String::from("binary") => MemoryValues::Binary(vec![0, 1, 2]),
+            String::from("int") => MemoryValues::Integer(vec![3, 4, 5]),
+            String::from("real") => MemoryValues::Real(vec![6.0, 7.0, 8.0]),
+        };
+        assert_eq!(qpu_result_data.memory_values, expected_memory_values);
     }
 
     #[test]
@@ -427,8 +477,11 @@ mod describe_register_map {
             String::from("qE") => dummy_readout_values(vec![44]),
         };
 
-        let qpu_result_data =
-            QpuResultData::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+        let qpu_result_data = QpuResultData::from_controller_mappings_and_values(
+            &readout_mappings,
+            &readout_values,
+            &hashmap! {},
+        );
 
         RegisterMap::from_qpu_result_data(&qpu_result_data)
             .expect_err("Should not be able to create RegisterMap from QPU readout with missing indices for a register");
@@ -448,8 +501,19 @@ mod describe_register_map {
             String::from("qC") => dummy_readout_values(vec![3]),
         };
 
-        let qpu_result_data =
-            QpuResultData::from_controller_mappings_and_values(&readout_mappings, &readout_values);
+        let (binary_values, integer_values, real_values) =
+            dummy_memory_values(vec![0, 1, 2], vec![3, 4, 5], vec![6.0, 7.0, 8.0]);
+        let memory_values = hashmap! {
+            String::from("binary") => binary_values,
+            String::from("int") => integer_values,
+            String::from("real") => real_values,
+        };
+
+        let qpu_result_data = QpuResultData::from_controller_mappings_and_values(
+            &readout_mappings,
+            &readout_values,
+            &memory_values,
+        );
 
         RegisterMap::from_qpu_result_data(&qpu_result_data)
             .expect_err("Should not be able to create RegisterMap from QPU readout with jagged data for a register");

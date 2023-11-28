@@ -283,6 +283,7 @@ impl<'a> Execution<'a> {
             result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
                 job_handle.readout_map(),
                 &response.readout_values,
+                &response.memory_values,
             )),
             duration: Some(Duration::from_micros(
                 response.execution_duration_microseconds,
