@@ -54,12 +54,12 @@ impl PyQpuResultData {
         py: Python<'_>,
         mappings: HashMap<String, String>,
         readout_values: HashMap<String, PyReadoutValues>,
-        memory_values: HashMap<String, Option<PyMemoryValues>>,
+        memory_values: HashMap<String, PyMemoryValues>,
     ) -> PyResult<Self> {
         Ok(Self(QpuResultData::from_mappings_and_values(
             mappings,
             HashMap::<String, ReadoutValues>::py_try_from(py, &readout_values)?,
-            HashMap::<String, Option<MemoryValues>>::py_try_from(py, &memory_values)?,
+            HashMap::<String, MemoryValues>::py_try_from(py, &memory_values)?,
         )))
     }
 
@@ -74,7 +74,7 @@ impl PyQpuResultData {
     }
 
     #[getter]
-    fn memory_values(&self, py: Python<'_>) -> PyResult<HashMap<String, Option<PyMemoryValues>>> {
+    fn memory_values(&self, py: Python<'_>) -> PyResult<HashMap<String, PyMemoryValues>> {
         self.as_inner().memory_values().to_python(py)
     }
 
@@ -100,24 +100,17 @@ impl PyQpuResultData {
                 .as_inner()
                 .memory_values()
                 .iter()
-                .map(|(register, values)| {
+                .map(|(register, memory_values)| {
                     (
                         register.to_string(),
-                        match values {
-                            Some(MemoryValues::Binary(values)) => {
-                                Some(PyList::new(py, values).into_py(py))
-                            }
-                            Some(MemoryValues::Integer(values)) => {
-                                Some(PyList::new(py, values).into_py(py))
-                            }
-                            Some(MemoryValues::Real(values)) => {
-                                Some(PyList::new(py, values).into_py(py))
-                            }
-                            None => None,
+                        match memory_values {
+                            MemoryValues::Binary(values) => PyList::new(py, values).into_py(py),
+                            MemoryValues::Integer(values) => PyList::new(py, values).into_py(py),
+                            MemoryValues::Real(values) => PyList::new(py, values).into_py(py),
                         },
                     )
                 })
-                .collect::<HashMap<String, Option<Py<PyList>>>>(),
+                .collect::<HashMap<String, Py<PyList>>>(),
         }
     }
 }
@@ -132,7 +125,7 @@ impl PyQpuResultData {
 pub struct RawQpuReadoutData {
     mappings: HashMap<String, String>,
     readout_values: HashMap<String, Py<PyList>>,
-    memory_values: HashMap<String, Option<Py<PyList>>>,
+    memory_values: HashMap<String, Py<PyList>>,
 }
 
 impl RawQpuReadoutData {

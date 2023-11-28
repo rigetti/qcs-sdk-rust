@@ -359,8 +359,8 @@ mod describe_register_map {
     use super::{RegisterData, RegisterMap};
     use qcs_api_client_grpc::models::controller::readout_values::Values;
     use qcs_api_client_grpc::models::controller::{
-        self, DataValue as ControllerMemoryValue, IntegerDataValue, IntegerReadoutValues,
-        ReadoutValues,
+        self, BinaryDataValue, DataValue as ControllerMemoryValue, IntegerDataValue,
+        IntegerReadoutValues, ReadoutValues, RealDataValue,
     };
 
     fn dummy_readout_values(v: Vec<i32>) -> ReadoutValues {
@@ -369,12 +369,32 @@ mod describe_register_map {
         }
     }
 
-    fn dummy_memory_values(v: Vec<i64>) -> ControllerMemoryValue {
-        ControllerMemoryValue {
-            value: Some(controller::data_value::Value::Integer(IntegerDataValue {
-                data: v,
-            })),
-        }
+    fn dummy_memory_values(
+        binary: Vec<u8>,
+        int: Vec<i64>,
+        real: Vec<f64>,
+    ) -> (
+        ControllerMemoryValue,
+        ControllerMemoryValue,
+        ControllerMemoryValue,
+    ) {
+        (
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Binary(BinaryDataValue {
+                    data: binary,
+                })),
+            },
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Integer(IntegerDataValue {
+                    data: int,
+                })),
+            },
+            ControllerMemoryValue {
+                value: Some(controller::data_value::Value::Real(RealDataValue {
+                    data: real,
+                })),
+            },
+        )
     }
 
     #[test]
@@ -395,9 +415,12 @@ mod describe_register_map {
             String::from("qE") => dummy_readout_values(vec![2, 3]),
         };
 
+        let (binary_values, integer_values, real_values) =
+            dummy_memory_values(vec![0, 1, 2], vec![3, 4, 5], vec![6.0, 7.0, 8.0]);
         let memory_values = hashmap! {
-            String::from("ro") => dummy_memory_values(vec![0, 1, 2]),
-            String::from("bar") => dummy_memory_values(vec![4, 5]),
+            String::from("binary") => binary_values,
+            String::from("int") => integer_values,
+            String::from("real") => real_values,
         };
 
         let qpu_result_data = QpuResultData::from_controller_mappings_and_values(
@@ -430,8 +453,9 @@ mod describe_register_map {
         assert_eq!(bar, expected_bar);
 
         let expected_memory_values = hashmap! {
-            String::from("ro") => Some(MemoryValues::Integer(vec![0, 1, 2])),
-            String::from("bar") => Some(MemoryValues::Integer(vec![4, 5])),
+            String::from("binary") => MemoryValues::Binary(vec![0, 1, 2]),
+            String::from("int") => MemoryValues::Integer(vec![3, 4, 5]),
+            String::from("real") => MemoryValues::Real(vec![6.0, 7.0, 8.0]),
         };
         assert_eq!(qpu_result_data.memory_values, expected_memory_values);
     }
@@ -477,8 +501,12 @@ mod describe_register_map {
             String::from("qC") => dummy_readout_values(vec![3]),
         };
 
+        let (binary_values, integer_values, real_values) =
+            dummy_memory_values(vec![0, 1, 2], vec![3, 4, 5], vec![6.0, 7.0, 8.0]);
         let memory_values = hashmap! {
-            String::from("ro") => dummy_memory_values(vec![0, 1, 2]),
+            String::from("binary") => binary_values,
+            String::from("int") => integer_values,
+            String::from("real") => real_values,
         };
 
         let qpu_result_data = QpuResultData::from_controller_mappings_and_values(

@@ -40,7 +40,7 @@ pub struct QpuResultData {
     pub(crate) mappings: HashMap<String, String>,
     pub(crate) readout_values: HashMap<String, ReadoutValues>,
     /// The final contents of each memory region, keyed on region name.
-    pub(crate) memory_values: HashMap<String, Option<MemoryValues>>,
+    pub(crate) memory_values: HashMap<String, MemoryValues>,
 }
 
 impl QpuResultData {
@@ -50,7 +50,7 @@ impl QpuResultData {
     pub fn from_mappings_and_values(
         mappings: HashMap<String, String>,
         readout_values: HashMap<String, ReadoutValues>,
-        memory_values: HashMap<String, Option<MemoryValues>>,
+        memory_values: HashMap<String, MemoryValues>,
     ) -> Self {
         Self {
             mappings,
@@ -93,22 +93,25 @@ impl QpuResultData {
                 .collect(),
             memory_values: memory_values
                 .iter()
-                .map(|(key, memory_values)| {
-                    (
-                        key.clone(),
-                        match &memory_values.value {
-                            Some(controller_memory_value::Value::Binary(
-                                controller::BinaryDataValue { data: v },
-                            )) => Some(MemoryValues::Binary(v.clone())),
-                            Some(controller_memory_value::Value::Integer(
-                                controller::IntegerDataValue { data: v },
-                            )) => Some(MemoryValues::Integer(v.clone())),
-                            Some(controller_memory_value::Value::Real(
-                                controller::RealDataValue { data: v },
-                            )) => Some(MemoryValues::Real(v.clone())),
-                            None => None,
-                        },
-                    )
+                .filter_map(|(key, memory_values)| {
+                    if let Some(value) = &memory_values.value {
+                        Some((
+                            key.clone(),
+                            match value {
+                                controller_memory_value::Value::Binary(
+                                    controller::BinaryDataValue { data: v },
+                                ) => MemoryValues::Binary(v.clone()),
+                                controller_memory_value::Value::Integer(
+                                    controller::IntegerDataValue { data: v },
+                                ) => MemoryValues::Integer(v.clone()),
+                                controller_memory_value::Value::Real(
+                                    controller::RealDataValue { data: v },
+                                ) => MemoryValues::Real(v.clone()),
+                            },
+                        ))
+                    } else {
+                        None
+                    }
                 })
                 .collect(),
         }
@@ -140,7 +143,7 @@ impl QpuResultData {
 
     /// Get mapping of a memory region (ie. "ro") to the final contents of that memory region.
     #[must_use]
-    pub fn memory_values(&self) -> &HashMap<String, Option<MemoryValues>> {
+    pub fn memory_values(&self) -> &HashMap<String, MemoryValues> {
         &self.memory_values
     }
 }
