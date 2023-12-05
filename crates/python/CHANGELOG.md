@@ -1,3 +1,9 @@
+## 0.15.0-rc.0
+
+### Breaking Changes
+
+- expose BackendV2 options through Python (#407)
+
 ## 0.14.3
 
 ### Features
