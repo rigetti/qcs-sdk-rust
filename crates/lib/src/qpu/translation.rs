@@ -130,33 +130,25 @@ pub enum TranslationBackendMismatch {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Debug, Default)]
 pub struct TranslationOptions {
-    inner: Option<ApiTranslationOptions>,
+    inner: ApiTranslationOptions,
 }
 
 impl TranslationOptions {
     /// Get the backend used for translation
     #[must_use]
     pub fn backend(&self) -> Option<&TranslationBackend> {
-        self.inner
-            .as_ref()
-            .and_then(|options| options.translation_backend.as_ref())
+        self.inner.translation_backend.as_ref()
     }
 
     /// Get a mutable reference to the backend used for translation.
     #[must_use]
     pub fn backend_mut(&mut self) -> Option<&mut TranslationBackend> {
-        self.inner
-            .as_mut()
-            .and_then(|options| options.translation_backend.as_mut())
-    }
-
-    fn inner_mut(&mut self) -> &mut ApiTranslationOptions {
-        self.inner.get_or_insert_with(Default::default)
+        self.inner.translation_backend.as_mut()
     }
 
     /// Use the first-generation translation backend available on QCS since 2018.
     pub fn with_backend_v1(&mut self) -> &mut BackendV1Options {
-        let backend = &mut self.inner_mut().translation_backend;
+        let backend = &mut self.inner.translation_backend;
         if let Some(TranslationBackend::V1(options)) = backend {
             return options;
         }
@@ -170,7 +162,7 @@ impl TranslationOptions {
 
     /// Use the second-generation translation backend available on QCS since 2023
     pub fn with_backend_v2(&mut self) -> &mut BackendV2Options {
-        let backend = &mut self.inner_mut().translation_backend;
+        let backend = &mut self.inner.translation_backend;
         if let Some(TranslationBackend::V2(options)) = backend {
             return options;
         }
@@ -256,6 +248,17 @@ impl TranslationOptions {
 
 impl From<TranslationOptions> for ApiTranslationOptions {
     fn from(options: TranslationOptions) -> Self {
-        options.inner.unwrap_or_default()
+        options.inner
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn creating_new_options_does_not_fail() {
+        let mut options = TranslationOptions::default();
+        options.v2_allow_frame_redefinition(true).unwrap();
     }
 }
