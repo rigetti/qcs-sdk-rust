@@ -161,16 +161,24 @@ impl PyTranslationOptions {
         let mut builder = TranslationOptions::default();
         builder.with_backend_v2();
         if let Some(prepend) = prepend_default_calibrations {
-            builder.v2_prepend_default_calibrations(prepend).expect("using the correct backend");
+            builder
+                .v2_prepend_default_calibrations(prepend)
+                .expect("using the correct backend");
         }
         if let Some(delay) = passive_reset_delay_seconds {
-            builder.v2_passive_reset_delay_seconds(delay).expect("using the correct backend");
+            builder
+                .v2_passive_reset_delay_seconds(delay)
+                .expect("using the correct backend");
         }
         if let Some(allow) = allow_unchecked_pointer_arithmetic {
-            builder.v2_allow_unchecked_pointer_arithmetic(allow).expect("using the correct backend");
+            builder
+                .v2_allow_unchecked_pointer_arithmetic(allow)
+                .expect("using the correct backend");
         }
         if let Some(allow) = allow_frame_redefinition {
-            builder.v2_allow_frame_redefinition(allow).expect("using the correct backend");
+            builder
+                .v2_allow_frame_redefinition(allow)
+                .expect("using the correct backend");
         }
         Self(builder)
     }

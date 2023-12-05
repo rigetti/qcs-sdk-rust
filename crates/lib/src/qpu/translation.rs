@@ -7,8 +7,8 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        translation_options::TranslationBackend, TranslateQuilToEncryptedControllerJobRequest,
-        TranslationOptions as ApiTranslationOptions, BackendV1Options, BackendV2Options,
+        translation_options::TranslationBackend, BackendV1Options, BackendV2Options,
+        TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
 };
 use qcs_api_client_openapi::{
@@ -137,13 +137,17 @@ impl TranslationOptions {
     /// Get the backend used for translation
     #[must_use]
     pub fn backend(&self) -> Option<&TranslationBackend> {
-        self.inner.as_ref().and_then(|options| options.translation_backend.as_ref())
+        self.inner
+            .as_ref()
+            .and_then(|options| options.translation_backend.as_ref())
     }
 
     /// Get a mutable reference to the backend used for translation.
     #[must_use]
     pub fn backend_mut(&mut self) -> Option<&mut TranslationBackend> {
-        self.inner.as_mut().and_then(|options| options.translation_backend.as_mut())
+        self.inner
+            .as_mut()
+            .and_then(|options| options.translation_backend.as_mut())
     }
 
     fn inner_mut(&mut self) -> &mut ApiTranslationOptions {
@@ -199,7 +203,10 @@ impl TranslationOptions {
     /// # Errors
     ///
     /// This will return an error if the translation backend is set to something other than V2.
-    pub fn v2_prepend_default_calibrations(&mut self, prepend: bool) -> Result<&mut Self, TranslationBackendMismatch> {
+    pub fn v2_prepend_default_calibrations(
+        &mut self,
+        prepend: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
         self.ensure_backend_v2()?.prepend_default_calibrations = Some(prepend);
         Ok(self)
     }
@@ -209,7 +216,10 @@ impl TranslationOptions {
     /// # Errors
     ///
     /// This will return an error if the translation backend is set to something other than V2.
-    pub fn v2_passive_reset_delay_seconds(&mut self, delay: f64) -> Result<&mut Self, TranslationBackendMismatch> {
+    pub fn v2_passive_reset_delay_seconds(
+        &mut self,
+        delay: f64,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
         self.ensure_backend_v2()?.passive_reset_delay_seconds = Some(delay);
         Ok(self)
     }
@@ -220,7 +230,10 @@ impl TranslationOptions {
     /// # Errors
     ///
     /// This will return an error if the translation backend is set to something other than V2.
-    pub fn v2_allow_unchecked_pointer_arithmetic(&mut self, allow: bool) -> Result<&mut Self, TranslationBackendMismatch> {
+    pub fn v2_allow_unchecked_pointer_arithmetic(
+        &mut self,
+        allow: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
         self.ensure_backend_v2()?.allow_unchecked_pointer_arithmetic = Some(allow);
         Ok(self)
     }
@@ -232,7 +245,10 @@ impl TranslationOptions {
     /// # Errors
     ///
     /// This will return an error if the translation backend is set to something other than V2.
-    pub fn v2_allow_frame_redefinition(&mut self, allow: bool) -> Result<&mut Self, TranslationBackendMismatch> {
+    pub fn v2_allow_frame_redefinition(
+        &mut self,
+        allow: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
         self.ensure_backend_v2()?.allow_frame_redefinition = Some(allow);
         Ok(self)
     }
