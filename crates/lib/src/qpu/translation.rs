@@ -6,9 +6,9 @@ use std::{collections::HashMap, time::Duration};
 use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
-        self, translate_quil_to_encrypted_controller_job_request::NumShots,
-        translation_options::TranslationBackend, TranslateQuilToEncryptedControllerJobRequest,
-        TranslationOptions as ApiTranslationOptions,
+        translate_quil_to_encrypted_controller_job_request::NumShots,
+        translation_options::TranslationBackend, BackendV1Options, BackendV2Options,
+        TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
 };
 use qcs_api_client_openapi::{
@@ -111,6 +111,18 @@ pub async fn get_quilt_calibrations(
     .await?
 }
 
+/// The error returned when a specific Translation backend is expected to be set, but it is not.
+#[allow(clippy::module_name_repetitions)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, thiserror::Error)]
+pub enum TranslationBackendMismatch {
+    /// Expected Translation backend V1 to be set, but got V2.
+    #[error("tried to set an option for Translation V1 using a different backend")]
+    V1,
+    /// Expected Translation backend V2 to be set, but got V1.
+    #[error("tried to set an option for Translation V2 using a different backend")]
+    V2,
+}
+
 /// Options available for Quil program translation.
 ///
 /// This wraps [`ApiTranslationOptions`] in order to improve the user experience,
@@ -128,21 +140,125 @@ impl TranslationOptions {
         self.inner.translation_backend.as_ref()
     }
 
+    /// Get a mutable reference to the backend used for translation.
+    #[must_use]
+    pub fn backend_mut(&mut self) -> Option<&mut TranslationBackend> {
+        self.inner.translation_backend.as_mut()
+    }
+
     /// Use the first-generation translation backend available on QCS since 2018.
-    pub fn use_backend_v1(&mut self) {
-        self.inner.translation_backend =
-            Some(TranslationBackend::V1(translation::BackendV1Options {}));
+    pub fn with_backend_v1(&mut self) -> &mut BackendV1Options {
+        let backend = &mut self.inner.translation_backend;
+        if let Some(TranslationBackend::V1(options)) = backend {
+            return options;
+        }
+
+        *backend = Some(TranslationBackend::V1(BackendV1Options::default()));
+        let Some(TranslationBackend::V1(options)) = backend.as_mut() else {
+            unreachable!("backend was just set to V1")
+        };
+        options
     }
 
     /// Use the second-generation translation backend available on QCS since 2023
-    pub fn use_backend_v2(&mut self) {
-        self.inner.translation_backend =
-            Some(TranslationBackend::V2(translation::BackendV2Options {}));
+    pub fn with_backend_v2(&mut self) -> &mut BackendV2Options {
+        let backend = &mut self.inner.translation_backend;
+        if let Some(TranslationBackend::V2(options)) = backend {
+            return options;
+        }
+
+        *backend = Some(TranslationBackend::V2(BackendV2Options::default()));
+        let Some(TranslationBackend::V2(options)) = backend.as_mut() else {
+            unreachable!("backend was just set to V2")
+        };
+        options
+    }
+
+    fn ensure_backend_v1(&mut self) -> Result<&mut BackendV1Options, TranslationBackendMismatch> {
+        if matches!(self.backend(), None | Some(TranslationBackend::V1(_))) {
+            Ok(self.with_backend_v1())
+        } else {
+            Err(TranslationBackendMismatch::V1)
+        }
+    }
+
+    fn ensure_backend_v2(&mut self) -> Result<&mut BackendV2Options, TranslationBackendMismatch> {
+        if matches!(self.backend(), None | Some(TranslationBackend::V2(_))) {
+            Ok(self.with_backend_v2())
+        } else {
+            Err(TranslationBackendMismatch::V2)
+        }
+    }
+
+    /// If `false`, default calibrations will not be prepended to the translated program.
+    ///
+    /// # Errors
+    ///
+    /// This will return an error if the translation backend is set to something other than V2.
+    pub fn v2_prepend_default_calibrations(
+        &mut self,
+        prepend: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
+        self.ensure_backend_v2()?.prepend_default_calibrations = Some(prepend);
+        Ok(self)
+    }
+
+    /// Set a passive reset delay in seconds.
+    ///
+    /// # Errors
+    ///
+    /// This will return an error if the translation backend is set to something other than V2.
+    pub fn v2_passive_reset_delay_seconds(
+        &mut self,
+        delay: f64,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
+        self.ensure_backend_v2()?.passive_reset_delay_seconds = Some(delay);
+        Ok(self)
+    }
+
+    /// Request that the translation backend does not insert runtime memory access checks. Only
+    /// available to certain users.
+    ///
+    /// # Errors
+    ///
+    /// This will return an error if the translation backend is set to something other than V2.
+    pub fn v2_allow_unchecked_pointer_arithmetic(
+        &mut self,
+        allow: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
+        self.ensure_backend_v2()?.allow_unchecked_pointer_arithmetic = Some(allow);
+        Ok(self)
+    }
+
+    /// Request that the translation backend allow `DEFFRAME`s differing from the Rigetti defaults.
+    /// Only available to certain users. If disallowed, only `INITIAL-FREQUENCY` and/or `CHANNEL-DELAY`
+    /// may differ.
+    ///
+    /// # Errors
+    ///
+    /// This will return an error if the translation backend is set to something other than V2.
+    pub fn v2_allow_frame_redefinition(
+        &mut self,
+        allow: bool,
+    ) -> Result<&mut Self, TranslationBackendMismatch> {
+        self.ensure_backend_v2()?.allow_frame_redefinition = Some(allow);
+        Ok(self)
     }
 }
 
 impl From<TranslationOptions> for ApiTranslationOptions {
     fn from(options: TranslationOptions) -> Self {
         options.inner
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn creating_new_options_does_not_fail() {
+        let mut options = TranslationOptions::default();
+        options.v2_allow_frame_redefinition(true).unwrap();
     }
 }

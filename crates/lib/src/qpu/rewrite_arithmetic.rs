@@ -412,22 +412,22 @@ mod describe_rewrite_arithmetic {
     #[test]
     fn it_allocates_for_multiple_expressions() {
         let program = Program::from_str(
-            r#"
+            r"
 DECLARE theta REAL
 DECLARE beta REAL
 RZ(3 * theta) 0
 RZ(beta+theta) 0
-"#,
+",
         )
         .unwrap();
         let expected = Program::from_str(
-            r#"
+            r"
 DECLARE __SUBST REAL[2]
 DECLARE theta REAL[1]
 DECLARE beta REAL[1]
 RZ(__SUBST[0]) 0
 RZ(__SUBST[1]) 0
-"#,
+",
         )
         .unwrap();
         let (actual, substitutions) = rewrite_arithmetic(program).unwrap();

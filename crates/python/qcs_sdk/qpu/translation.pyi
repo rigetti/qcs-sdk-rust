@@ -156,3 +156,29 @@ class TranslationOptions:
         """
         Use the v2 backend for translation, available on QCS since 2023.
         """
+
+    @staticmethod
+    def v1() -> "TranslationOptions":
+        """
+        Use the v1 backend for translation, available on QCS since 2018.
+        """
+
+    @staticmethod
+    def v2(
+        *,
+        prepend_default_calibrations: Optional[bool] = None,
+        passive_reset_delay_seconds: Optional[float] = None,
+        allow_unchecked_pointer_arithmetic: Optional[bool] = None,
+        allow_frame_redefinition: Optional[bool] = None,
+    ) -> "TranslationOptions":
+        """
+        Use the v2 backend for translation, available on QCS since 2023.
+
+        :param: prepend_default_calibrations: If False, do not prepend the default calibrations to the translated
+        program.
+        :param: passive_reset_delay_seconds: The delay between passive resets, in seconds.
+        :param: allow_unchecked_pointer_arithmetic: If True, disable runtime memory bounds checking. Only available to
+        certain users.
+        :param: allow_frame_redefinition: If True, allow defined frames to differ from Rigetti defaults. Only available to certain users.
+        Otherwise, only ``INITIAL-FREQUENCY`` and ``CHANNEL-DELAY`` may be modified.
+        """
