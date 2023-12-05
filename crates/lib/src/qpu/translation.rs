@@ -6,7 +6,7 @@ use std::{collections::HashMap, time::Duration};
 use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
-        self, translate_quil_to_encrypted_controller_job_request::NumShots,
+        translate_quil_to_encrypted_controller_job_request::NumShots,
         translation_options::TranslationBackend, TranslateQuilToEncryptedControllerJobRequest,
         TranslationOptions as ApiTranslationOptions, BackendV1Options, BackendV2Options,
     },
