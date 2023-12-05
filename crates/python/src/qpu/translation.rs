@@ -146,7 +146,7 @@ impl PyTranslationOptions {
 
     #[staticmethod]
     #[pyo3(signature = (
-        /,
+        *,
         prepend_default_calibrations=None,
         passive_reset_delay_seconds=None,
         allow_unchecked_pointer_arithmetic=None,

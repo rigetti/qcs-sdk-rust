@@ -157,18 +157,20 @@ class TranslationOptions:
         Use the v2 backend for translation, available on QCS since 2023.
         """
 
-    def v1() -> Self:
+    @staticmethod
+    def v1() -> "TranslationOptions":
         """
         Use the v1 backend for translation, available on QCS since 2018.
         """
 
+    @staticmethod
     def v2(
         *,
-        prepend_default_calibrations: Optional[bool],
-        passive_reset_delay_seconds: Option[float],
-        allow_unchecked_pointer_arithmetic: Optional[bool],
-        allow_frame_redefinition: Optional[bool],
-    ) -> Self:
+        prepend_default_calibrations: Optional[bool] = None,
+        passive_reset_delay_seconds: Optional[float] = None,
+        allow_unchecked_pointer_arithmetic: Optional[bool] = None,
+        allow_frame_redefinition: Optional[bool] = None,
+    ) -> "TranslationOptions":
         """
         Use the v2 backend for translation, available on QCS since 2023.
 
