@@ -175,7 +175,7 @@ impl TranslationOptions {
     }
 
     fn ensure_backend_v1(&mut self) -> Result<&mut BackendV1Options, TranslationBackendMismatch> {
-        if matches!(self.backend(), Some(TranslationBackend::V1(_))) {
+        if matches!(self.backend(), None | Some(TranslationBackend::V1(_))) {
             Ok(self.with_backend_v1())
         } else {
             Err(TranslationBackendMismatch::V1)
@@ -183,7 +183,7 @@ impl TranslationOptions {
     }
 
     fn ensure_backend_v2(&mut self) -> Result<&mut BackendV2Options, TranslationBackendMismatch> {
-        if matches!(self.backend(), Some(TranslationBackend::V2(_))) {
+        if matches!(self.backend(), None | Some(TranslationBackend::V2(_))) {
             Ok(self.with_backend_v2())
         } else {
             Err(TranslationBackendMismatch::V2)
