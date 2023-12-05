@@ -130,11 +130,49 @@ impl PyTranslationOptions {
     }
 
     fn use_backend_v1(&mut self) {
-        self.0.use_backend_v1()
+        self.0.with_backend_v1();
     }
 
     fn use_backend_v2(&mut self) {
-        self.0.use_backend_v2()
+        self.0.with_backend_v2();
+    }
+
+    #[staticmethod]
+    fn v1() -> Self {
+        let mut builder = TranslationOptions::default();
+        builder.with_backend_v1();
+        Self(builder)
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (
+        /,
+        prepend_default_calibrations=None,
+        passive_reset_delay_seconds=None,
+        allow_unchecked_pointer_arithmetic=None,
+        allow_frame_redefinition=None
+    ))]
+    fn v2(
+        prepend_default_calibrations: Option<bool>,
+        passive_reset_delay_seconds: Option<f64>,
+        allow_unchecked_pointer_arithmetic: Option<bool>,
+        allow_frame_redefinition: Option<bool>,
+    ) -> Self {
+        let mut builder = TranslationOptions::default();
+        builder.with_backend_v2();
+        if let Some(prepend) = prepend_default_calibrations {
+            builder.v2_prepend_default_calibrations(prepend).expect("using the correct backend");
+        }
+        if let Some(delay) = passive_reset_delay_seconds {
+            builder.v2_passive_reset_delay_seconds(delay).expect("using the correct backend");
+        }
+        if let Some(allow) = allow_unchecked_pointer_arithmetic {
+            builder.v2_allow_unchecked_pointer_arithmetic(allow).expect("using the correct backend");
+        }
+        if let Some(allow) = allow_frame_redefinition {
+            builder.v2_allow_frame_redefinition(allow).expect("using the correct backend");
+        }
+        Self(builder)
     }
 
     fn __repr__(&self) -> String {
