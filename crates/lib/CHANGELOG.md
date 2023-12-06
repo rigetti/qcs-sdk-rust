@@ -1,3 +1,9 @@
+## 0.20.0
+
+### Breaking Changes
+
+- upgrade manylinux version in CI to support updated dependencies (#408)
+
 ## 0.20.0-rc.0
 
 ### Breaking Changes
