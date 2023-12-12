@@ -26,9 +26,9 @@ class QCSClient:
         qvm_url: Optional[str] = None,
     ) -> "QCSClient":
         """
-        Manually construct a ``QCSClient``.
+        Manually construct a `QCSClient`.
 
-        Prefer to use ``QCSClient.load`` to construct an environment-based profile.
+        Prefer to use `QCSClient.load` to construct an environment-based profile.
         """
         ...
     @staticmethod
@@ -36,13 +36,14 @@ class QCSClient:
         profile_name: Optional[str] = None,
     ) -> "QCSClient":
         """
-        Create a ``QCSClient`` configuration using an environment-based configuration.
+        Create a `QCSClient` configuration using an environment-based configuration.
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
 
-        :raises LoadClientError: If there is an issue loading the profile defails from the environment.
+        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment.
 
-        See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
+        See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+        for more details.
         """
         ...
     @staticmethod
@@ -50,14 +51,15 @@ class QCSClient:
         profile_name: Optional[str] = None,
     ) -> "QCSClient":
         """
-        Create a ``QCSClient`` configuration using an environment-based configuration.
-        (async analog of ``QCSClient.load``)
+        Create a `QCSClient` configuration using an environment-based configuration.
+        (async analog of `QCSClient.load`)
 
-        :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+        :param profile_name: The QCS setting's profile name to use. If `None`, the default value configured in your environment is used.
 
-        :raises LoadClientError: If there is an issue loading the profile defails from the environment.
+        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment.
 
-        See for details: https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files
+        See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+        for more details.
         """
         ...
     @property
@@ -66,11 +68,11 @@ class QCSClient:
         ...
     @property
     def grpc_api_url(self) -> str:
-        """URL to access the gRPC API."""
+        """URL to access the QCS gRPC API."""
         ...
     @property
     def quilc_url(self) -> str:
-        """URL to access the `quilc` compiler."""
+        """URL to access the ``quilc`1 compiler."""
         ...
     @property
     def qvm_url(self) -> str:
@@ -85,8 +87,8 @@ class QCSClientAuthServer:
         """
         Manually define authentication server parameters.
 
-        :param client_id: The OAuth application client ID. If ``None``, a default value is used.
-        :param issuer: The OAuth token issuer url. If ``None``, a default value is used.
+        :param client_id: The OAuth application client ID. If `None`, a default value is used.
+        :param issuer: The OAuth token issuer url. If `None`, a default value is used.
         """
         ...
     @property

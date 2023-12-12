@@ -57,3 +57,9 @@ alias = "dev-flow"
 
 [tasks.ci-flow]
 dependencies = ["pytest-flow", "stubtest"]
+
+[tasks.docs]
+dependencies = ["poetry-install", "install-lib"]
+command = "poetry"
+args = ["run", "pdoc", "-o", "build/docs", "qcs_sdk", "!qcs_sdk.qcs_sdk", "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg"]
+

@@ -1,9 +1,15 @@
+"""
+The QVM module contains the API for interacting with the Quantum Virtual Machine (QVM).
+
+🔨 This page is under construction and the documentation for some submodules is missing.
+In the meantime, you can find documentation in the [the type hints](https://github.com/rigetti/qcs-sdk-rust/tree/main/crates/python/qcs_sdk/qvm).
+"""
 from typing import Dict, List, Mapping, Optional, Sequence, Tuple, Union, final
 
-from qcs_sdk import QCSClient, RegisterData
+from qcs_sdk import RegisterData
 
-from . import api as api
-from .api import AddressRequest
+from qcs_sdk.qvm import api as api
+from qcs_sdk.qvm.api import AddressRequest
 
 @final
 class QVMClient:
