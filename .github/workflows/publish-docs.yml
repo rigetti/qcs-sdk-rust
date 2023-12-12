@@ -31,7 +31,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: make
-          args: --cwd qcs-sdk-python --makefile Makefile.toml docs
+          args: --cwd crates/python --makefile Makefile.toml docs
       - name: Deploy preview
         if: ${{ github.event_name == 'pull_request' }}
         uses: rossjrw/pr-preview-action@v1
