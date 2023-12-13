@@ -210,8 +210,8 @@ class RegisterMatrix:
     Each variant corresponds to the possible data types a register can contain.
 
     ## Variants:
-    - ``integer``: Corresponds to the Quil `BIT`, `OCTET`, or `INTEGER` types.
-    - ``real``: Corresponds to the Quil `REAL` type.
+    - ``integer``: Corresponds to the Quil ``BIT``, ``OCTET``, or ``INTEGER`` types.
+    - ``real``: Corresponds to the Quil ``REAL`` type.
     - ``complex``: Registers containing complex numbers.
 
     ### Methods (each per variant):
@@ -376,9 +376,9 @@ class RegisterData:
     Values present in a register that are one of a set of variants.
 
     Variants:
-    - ``i8``: Corresponds to the Quil `BIT` or `OCTET` types.
-    - ``i16``: Corresponds to the Quil `INTEGER` type.
-    - ``f64``: Corresponds to the Quil `REAL` type.
+    - ``i8``: Corresponds to the Quil ``BIT`` or ``OCTET`` types.
+    - ``i16``: Corresponds to the Quil ``INTEGER`` type.
+    - ``f64``: Corresponds to the Quil ``REAL`` type.
     - ``complex32``: Results containing complex numbers.
 
     Methods (each per variant):
