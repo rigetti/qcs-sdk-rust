@@ -53,6 +53,7 @@ pytest-asyncio = "^0.19.0"
 black = "^22.8.0"
 syrupy = "^3.0.6"
 mypy = "^1.4.1"
+pdoc = "^14.1.0"
 
 [build-system]
 requires = ["maturin>=1.0.0,<2.0.0"]
