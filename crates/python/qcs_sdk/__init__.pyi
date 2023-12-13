@@ -269,7 +269,7 @@ class ResultData:
     ## Usage
 
     Your usage of `ResultData` will depend on the types of programs you are running and where.
-    The `ResultData.to_register_map()` method will attempt to build `RegisterMa` out of the data, where each
+    The `ResultData.to_register_map()` method will attempt to build `RegisterMap` out of the data, where each
     register name is mapped to a 2-dimensional rectangular `RegisterMatrix` where each row
     represents the final values in each register index for a particular shot. This is often the
     desired form of the data and it is <em>probably</em> what you want. This transformation isn't always
