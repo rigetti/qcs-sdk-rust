@@ -2213,8 +2213,8 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quil-rs"
-version = "0.22.2"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.6.2#434a2e9884d13b8e09fc85dc4fb4014812462e8d"
+version = "0.22.3"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.6.3#a58a14efd45c64d0f3de477e6ab84d927f6fd0c4"
 dependencies = [
  "approx",
  "indexmap 1.9.3",
