@@ -1,3 +1,9 @@
+## 0.20.1-rc.0
+
+### Features
+
+- Update quil-rs/py to 0.23.3/0.6.3 (#413)
+
 ## 0.20.0
 
 ### Breaking Changes
