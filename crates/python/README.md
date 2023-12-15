@@ -74,3 +74,38 @@ for handler in logging.root.handlers:
 ```
 
 This applies to all logs, so you may want to tune the `filter` method to include other logs you care about. See the caching section above for important information about the application of these filters.
+
+## OpenTelemetry Integration
+
+This package supports collection of [OpenTelemetry trace data](https://opentelemetry.io/docs/concepts/signals/traces/). Clients may configure any OpenTelemetry [collector](https://opentelemetry.io/docs/collector/) that supports the [OTLP Specification](https://opentelemetry.io/docs/specs/otlp/). _Rigetti will not have access to the OpenTelemetry data you collect_.
+
+To enable the integration, you should install the `qcs-sdk[tracing-opentelemetry]` extra; this installs [opentelemetry-api](https://pypi.org/project/opentelemetry-api/). By default, no tracing data is collected at runtime. Because the QCS-SDK is built as a pyo3 Rust extension-module, you will need to use [pyo3-tracing-subscriber](https://crates.io/crates/pyo3-tracing-subscriber) to configure collection of your client network requests. See `qcs_sdk._tracing_subscriber` module level documentation for more detail.
+
+```python
+import my_module
+from qcs_sdk._tracing_subscriber import (
+    GlobalTracingConfig,
+    SimpleConfig,
+    Tracing,
+    subscriber,
+)
+from qcs_sdk._tracing_subscriber.layers import otel_otlp
+
+
+def main():
+    tracing_configuration = GlobalTracingConfig(
+        export_process=SimpleConfig(
+            subscriber=subscriber.Config(
+                # By default this supports the standard OTLP environment variables.
+                # See https://opentelemetry.io/docs/specs/otel/protocol/exporter/
+                layer=otel_otlp.Config()
+            )
+        )
+    )
+    with Tracing(config=config):
+        result = my_module.example_function()
+        my_module.other_example_function(result)
+
+if __name__ == '__main__':
+    main()
+```

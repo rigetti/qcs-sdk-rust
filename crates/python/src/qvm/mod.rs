@@ -243,7 +243,9 @@ impl PyQvmOptions {
 }
 
 py_function_sync_async! {
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
+    #[tracing::instrument(skip_all)]
     async fn run(
         quil: String,
         #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]

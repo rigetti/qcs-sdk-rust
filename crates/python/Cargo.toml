@@ -18,7 +18,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 async-trait = "0.1.73"
-qcs = { path = "../lib", features = ["tracing"] }
+qcs = { path = "../lib", features = ["tracing-opentelemetry"] }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
@@ -32,8 +32,13 @@ thiserror.workspace = true
 numpy.workspace = true
 rigetti-pyo3.workspace = true
 paste = "1.0.11"
-pyo3-log = "0.8.2"
+pyo3-log = { workspace = true }
 once_cell = "1.18.0"
+pyo3-opentelemetry = { workspace = true } 
+opentelemetry = "0.20.0"
+tracing = "0.1.37"
+pyo3-tracing-subscriber = { workspace = true, features = ["layer-otel-otlp-file", "layer-otel-otlp"] }
 
 [build-dependencies]
 pyo3-build-config.workspace = true
+pyo3-tracing-subscriber = { workspace = true, features = ["layer-otel-otlp-file", "layer-otel-otlp", "stubs"]  }
