@@ -16,6 +16,7 @@ use qcs_api_client_openapi::{
     models::GetQuiltCalibrationsResponse,
 };
 use tokio::time::error::Elapsed;
+#[cfg(feature = "tracing")]
 use tracing::instrument;
 
 use crate::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
@@ -35,7 +36,7 @@ pub struct EncryptedTranslationResult {
 }
 
 /// Translate a program, returning an encrypted and translated program.
-#[instrument(skip_all)]
+#[cfg_attr(feature = "tracing", instrument(skip_all))]
 pub async fn translate<TO>(
     quantum_processor_id: &str,
     quil_program: &str,
