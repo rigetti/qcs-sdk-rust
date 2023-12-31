@@ -16,7 +16,6 @@ Most development tasks are automated with [cargo-make] (like make, but you can h
 
 In order to run all checks exactly the same way that CI does, use `makers ci-flow` from the project root (workspace).
 
-
 ### Commits
 
 Commits should follow the conventional commit syntax, with one of the following [scopes](scopes):
@@ -44,8 +43,9 @@ Any tests which cannot be run in CI should be run with `makers manual`. These te
 [`libquil`](https://github.com/rigetti/libquil) provides [quilc](https://github.com/quil-lang/quilc) and [QVM](https://github.com/quil-lang/qvm) as a shared library, which can be used by `qcs-sdk-rust` as an alternative client for those tools.
 
 To use `libquil`:
-* install the library (see [installation instructions](https://github.com/rigetti/libquil#automated-installation))
-* enable the feature with `--features libquil`
+
+- install the library (see [installation instructions](https://github.com/rigetti/libquil#automated-installation))
+- enable the feature with `--features libquil`
 
 ### Linting
 
@@ -73,3 +73,17 @@ This repository uses GitHub actions for its CI. If you are making changes to a w
 [rustdoc]: https://doc.rust-lang.org/rustdoc/index.html
 [docs.rs]: https://docs.rs/qcs
 [scopes]: https://www.conventionalcommits.org/en/v1.0.0/#commit-message-with-scope
+
+## To build extendend diagnostics
+
+### Build
+
+```
+cargo build --feature tracing
+```
+
+### Execute
+
+```
+RUST_LOG=debug target/debug/diagnostics
+```
