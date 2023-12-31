@@ -2,15 +2,31 @@
 //! in debugging and remote user support.
 
 use std::{borrow::Cow, time::Duration};
+use std::f64::consts::PI;
+//use qcs::Executable;
+//use qcs::qpu::api::ExecutionOptions;
+
 
 use qcs_api_client_openapi::models::User;
 
+use crate::compiler::quilc::CompilerOpts;
 use crate::{
     build_info,
     client::Qcs,
     compiler::{quilc::Client as _, rpcq},
     qvm::{self, Client as _, QvmOptions},
+    Executable,
+    qpu::api::ExecutionOptions,
 };
+
+const PROGRAM: &str = r#"
+DECLARE ro BIT[2]
+DECLARE theta REAL
+RX(theta) 0
+CNOT 0 1
+MEASURE 0 ro[0]
+MEASURE 1 ro[1]
+"#;
 
 /// Collect package diagnostics in string form
 pub async fn get_report() -> String {
@@ -34,6 +50,30 @@ struct Diagnostics {
     quilc: QuilcDiagnostics,
     qvm: QvmDiagnostics,
     libquil: LibquilDiagnostics,
+    send_program: bool,
+
+}
+
+async fn execute_simple_circuit() -> bool {
+    // Load qcs client
+    let qcs = Qcs::load().await;
+    let endpoint = qcs.get_config().quilc_url();
+    let quilc_client = crate::compiler::rpcq::Client::new(endpoint).unwrap();
+    let mut exe = Executable::from_quil(PROGRAM)
+        .with_quilc_client(Some(quilc_client))
+        .compiler_options(CompilerOpts{
+            timeout: Some(10.0),
+            protoquil: None,
+
+        });
+    tracing::info!("Executing");
+    let result = exe
+        .with_parameter("theta", 0, PI)
+        .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
+        .await
+        .expect("Program should execute successfully");
+    
+    return true;
 }
 
 impl Diagnostics {
@@ -45,6 +85,8 @@ impl Diagnostics {
             QvmDiagnostics::gather(&client),
         )
         .await;
+
+        let prg_execute = execute_simple_circuit();
         Self {
             version: build_info::PKG_VERSION.to_owned(),
             rust_version: build_info::RUSTC_VERSION.to_owned(),
@@ -53,6 +95,7 @@ impl Diagnostics {
             quilc: QuilcDiagnostics::gather(&client),
             qvm,
             libquil: LibquilDiagnostics::gather().await,
+            send_program: prg_execute.await,
         }
     }
 }
@@ -90,6 +133,7 @@ impl std::fmt::Display for Diagnostics {
             "  qvm version: {}",
             format_option(self.libquil.qvm_version.as_ref())
         )?;
+        writeln!(f, "  send program: {}", self.send_program)?;
         Ok(())
     }
 }
@@ -276,3 +320,5 @@ where
         None => "-".into(),
     }
 }
+
+

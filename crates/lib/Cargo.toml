@@ -17,6 +17,7 @@ otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-c
 libquil = ["dep:libquil-sys"]
 
 [dependencies]
+env_logger = "0.10"
 cached = "0.44.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
