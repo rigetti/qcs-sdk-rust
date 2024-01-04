@@ -17,7 +17,7 @@ use qcs_api_client_grpc::{
     services::controller::{
         controller_client::ControllerClient, execute_controller_job_request,
         get_controller_job_results_request, ExecuteControllerJobRequest,
-        GetControllerJobResultsRequest,
+        ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
@@ -104,6 +104,9 @@ pub async fn submit(
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
+        options: execution_options
+            .api_options()
+            .map(|options| options.to_owned().into()),
     };
 
     let mut controller_client = execution_options
@@ -202,6 +205,58 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
+    #[doc = "If `true` and the user is authorized, jobs will bypass change protection against managed settings."]
+    #[builder(default = "None")]
+    api_options: Option<ApiExecutionOptions>,
+}
+
+/// Options avaialable when executing a job on a QPU, particular to the execution service's API.
+///
+/// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
+/// to build a custom set of options.
+#[derive(Builder, Clone, Debug, Default)]
+pub struct ApiExecutionOptions {
+    /// the inner proto representation
+    inner: InnerApiExecutionOptions,
+}
+
+impl PartialEq for ApiExecutionOptions {
+    /// implement Eq
+    fn eq(&self, other: &Self) -> bool {
+        self.inner.bypass_settings_protection == other.inner.bypass_settings_protection
+    }
+}
+
+impl Eq for ApiExecutionOptions {}
+
+impl ApiExecutionOptions {
+    /// Get an [`ExecutionOptionsBuilder`] that can be used to build a custom [`ExecutionOptions`].
+    #[must_use]
+    pub fn builder() -> ApiExecutionOptionsBuilder {
+        ApiExecutionOptionsBuilder::default()
+    }
+
+    /// Get the configured `bypass_settings_protection` value.
+    #[must_use]
+    pub fn bypass_settings_protection(&self) -> bool {
+        self.inner.bypass_settings_protection
+    }
+}
+
+impl From<ApiExecutionOptions> for InnerApiExecutionOptions {
+    fn from(options: ApiExecutionOptions) -> Self {
+        options.inner
+    }
+}
+
+impl ApiExecutionOptionsBuilder {
+    /// Set the `bypass_settings_protection` value.
+    pub fn bypass_settings_protection(&mut self, bypass_settings_protection: bool) -> &mut Self {
+        self.inner
+            .get_or_insert(InnerApiExecutionOptions::default())
+            .bypass_settings_protection = bypass_settings_protection;
+        self
+    }
 }
 
 impl ExecutionOptions {
@@ -221,6 +276,12 @@ impl ExecutionOptions {
     #[must_use]
     pub fn timeout(&self) -> Option<Duration> {
         self.timeout
+    }
+
+    /// Get the [`ApiExecutionOptions`].
+    #[must_use]
+    pub fn api_options(&self) -> Option<&ApiExecutionOptions> {
+        self.api_options.as_ref()
     }
 }
 

@@ -193,6 +193,9 @@ class ExecutionOptions:
     @property
     def timeout_seconds(self) -> Optional[float]:
         """The time in seconds to wait before timing out a request, if any."""
+    @property
+    def api_options(self) -> bool:
+        """Execution options particular to the API call at the point of execution."""
 
 @final
 class ExecutionOptionsBuilder:
@@ -216,8 +219,43 @@ class ExecutionOptionsBuilder:
     @timeout_seconds.setter
     def timeout_seconds(self, timeout_seconds: Optional[float]):
         """Set the number of seconds to wait before timing out. If set to `None` there is no timeout."""
+    @property
+    def api_options(self) -> bool:
+        raise AttributeError("api_options is not readable")
+    @api_options.setter
+    def api_options(self, api_options: ApiExecutionOptions):
+        """Execution options particular to the API call at the point of execution."""
     def build(self) -> ExecutionOptions:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
+
+@final
+class ApiExecutionOptions:
+    @staticmethod
+    def default() -> ApiExecutionOptions:
+        """Return ApiExecutionOptions with a reasonable set of defaults."""
+        ...
+    @staticmethod
+    def builder() -> ApiExecutionOptionsBuilder:
+        """Get an ``ApiExecutionOptionsBuilder`` that can be used to build a custom set of ``ApiExecutionOptions``"""
+    @property
+    def bypass_settings_protection(self) -> bool:
+        """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+
+@final
+class ApiExecutionOptionsBuilder:
+    def __new__(cls) -> ApiExecutionOptionsBuilder: ...
+    @staticmethod
+    def default() -> ApiExecutionOptionsBuilder:
+        """Return a builder with the default values for ``ApiExecutionOptions``"""
+        ...
+    @property
+    def bypass_settings_protection(self) -> bool:
+        raise AttributeError("bypass_settings_protection is not readable")
+    @bypass_settings_protection.setter
+    def bypass_settings_protection(self, bypass_settings_protection: bool):
+        """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+    def build(self) -> ExecutionOptions:
+        """Build the ``ApiExecutionOptions`` using the options set in this builder."""
 
 @final
 class ConnectionStrategy:
