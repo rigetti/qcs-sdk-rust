@@ -254,7 +254,7 @@ class ApiExecutionOptionsBuilder:
     @bypass_settings_protection.setter
     def bypass_settings_protection(self, bypass_settings_protection: bool):
         """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
-    def build(self) -> ExecutionOptions:
+    def build(self) -> ApiExecutionOptions:
         """Build the ``ApiExecutionOptions`` using the options set in this builder."""
 
 @final
