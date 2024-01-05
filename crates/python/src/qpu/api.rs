@@ -36,7 +36,9 @@ create_init_submodule! {
         ExecutionResults,
         PyConnectionStrategy,
         PyExecutionOptions,
-        PyExecutionOptionsBuilder
+        PyExecutionOptionsBuilder,
+        PyApiExecutionOptions,
+        PyApiExecutionOptionsBuilder
     ],
     errors: [
         SubmissionError,
@@ -349,6 +351,24 @@ impl PyExecutionOptions {
     }
 }
 
+#[pymethods]
+impl PyApiExecutionOptions{
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ApiExecutionOptions::default())
+    }
+
+    #[staticmethod]
+    fn builder() -> PyApiExecutionOptionsBuilder {
+        PyApiExecutionOptionsBuilder::default()
+    }
+
+    #[getter]
+    fn bypass_settings_protection(&self) -> bool {
+        self.as_inner().bypass_settings_protection()
+    }
+}
+
 py_wrap_type! {
     PyExecutionOptionsBuilder(ExecutionOptionsBuilder) as "ExecutionOptionsBuilder"
 }
@@ -430,6 +450,14 @@ impl PyApiExecutionOptionsBuilder {
                 .bypass_settings_protection(bypass_settings_protection)
                 .clone(),
         );
+    }
+
+    fn build(&self) -> PyResult<PyApiExecutionOptions> {
+        Ok(PyApiExecutionOptions::from(
+            self.as_inner()
+                .build()
+                .map_err(|err| PyValueError::new_err(err.to_string()))?,
+        ))
     }
 }
 
