@@ -205,7 +205,7 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
-    #[doc = "If `true` and the user is authorized, jobs will bypass change protection against managed settings."]
+    #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
     api_options: Option<ApiExecutionOptions>,
 }
@@ -224,7 +224,10 @@ pub struct ApiExecutionOptions {
 impl PartialEq for ApiExecutionOptions {
     /// implement Eq
     fn eq(&self, other: &Self) -> bool {
-        self.inner.bypass_settings_protection == other.inner.bypass_settings_protection
+        let InnerApiExecutionOptions {
+            bypass_settings_protection,
+        } = self.inner;
+        bypass_settings_protection == other.inner.bypass_settings_protection
     }
 }
 

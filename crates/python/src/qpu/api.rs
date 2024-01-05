@@ -307,7 +307,7 @@ impl_as_mut_for_wrapper!(PyExecutionOptions);
 
 py_wrap_type! {
     #[derive(Debug, Default)]
-    PyApiExecutionOptions(ApiExecutionOptions) as "ApiExecutionOptions"
+    PyApiExecutionOptions(ApiExecutionOptions) as "APIExecutionOptions"
 }
 impl_repr!(PyApiExecutionOptions);
 impl_as_mut_for_wrapper!(PyApiExecutionOptions);
@@ -424,7 +424,7 @@ impl PyExecutionOptionsBuilder {
 }
 
 py_wrap_type! {
-    PyApiExecutionOptionsBuilder(ApiExecutionOptionsBuilder) as "ApiExecutionOptionsBuilder"
+    PyApiExecutionOptionsBuilder(ApiExecutionOptionsBuilder) as "APIExecutionOptionsBuilder"
 }
 
 #[pymethods]
