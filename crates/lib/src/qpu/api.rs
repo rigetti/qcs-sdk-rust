@@ -106,7 +106,7 @@ pub async fn submit(
         target: execution_options.get_job_target(quantum_processor_id),
         options: execution_options
             .api_options()
-            .map(|options| options.to_owned().into()),
+            .map(|options| options.clone().into()),
     };
 
     let mut controller_client = execution_options
@@ -215,6 +215,7 @@ pub struct ExecutionOptions {
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
 /// to build a custom set of options.
 #[derive(Builder, Clone, Debug, Default)]
+#[allow(clippy::module_name_repetitions)]
 pub struct ApiExecutionOptions {
     /// the inner proto representation
     inner: InnerApiExecutionOptions,
