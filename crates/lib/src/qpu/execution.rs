@@ -52,6 +52,7 @@ pub(crate) enum Error {
     #[error("Problem using QCS API: {0}")]
     QcsClient(#[from] GrpcClientError),
     #[error("Problem fetching ISA: {0}")]
+    #[allow(clippy::enum_variant_names)]
     IsaError(#[from] GetIsaError),
     #[error("Problem parsing memory readout: {0}")]
     ReadoutParse(#[from] MemoryReferenceParseError),
@@ -64,6 +65,7 @@ pub(crate) enum Error {
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
+    #[allow(clippy::enum_variant_names)]
     QpuApiError(#[from] super::api::QpuApiError),
 }
 
