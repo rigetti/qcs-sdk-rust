@@ -198,10 +198,9 @@ where
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`QpuConnectionOptionsBuilder`]
 /// to build a custom set of options.
 // These are aliases because the ExecutionOptions are actually generic over all QPU operations.
-pub type QpuConnectionOptions<T: Into<InnerApiExecutionOptions>> = ExecutionOptions<T>;
+pub type QpuConnectionOptions<T> = ExecutionOptions<T>;
 /// Builder for setting up [`QpuConnectionOptions`].
-pub type QpuConnectionOptionsBuilder<T: Into<InnerApiExecutionOptions>> =
-    ExecutionOptionsBuilder<T>;
+pub type QpuConnectionOptionsBuilder<T> = ExecutionOptionsBuilder<T>;
 
 /// Options avaialable when executing a job on a QPU.
 ///
