@@ -214,21 +214,11 @@ pub struct ExecutionOptions {
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default)]
+#[derive(Builder, Clone, Debug, Default, PartialEq)]
 #[allow(clippy::module_name_repetitions)]
 pub struct ApiExecutionOptions {
     /// the inner proto representation
     inner: InnerApiExecutionOptions,
-}
-
-impl PartialEq for ApiExecutionOptions {
-    /// implement Eq
-    fn eq(&self, other: &Self) -> bool {
-        let InnerApiExecutionOptions {
-            bypass_settings_protection,
-        } = self.inner;
-        bypass_settings_protection == other.inner.bypass_settings_protection
-    }
 }
 
 impl Eq for ApiExecutionOptions {}
