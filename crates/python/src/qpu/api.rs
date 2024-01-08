@@ -352,7 +352,7 @@ impl PyExecutionOptions {
 }
 
 #[pymethods]
-impl PyApiExecutionOptions{
+impl PyApiExecutionOptions {
     #[staticmethod]
     fn default() -> Self {
         Self::from(ApiExecutionOptions::default())
