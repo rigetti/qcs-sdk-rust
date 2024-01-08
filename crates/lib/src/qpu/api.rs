@@ -17,7 +17,7 @@ use qcs_api_client_grpc::{
     services::controller::{
         controller_client::ControllerClient, execute_controller_job_request,
         get_controller_job_results_request, ExecuteControllerJobRequest,
-        ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
+        ExecutionOptions as ApiExecutionOptions, GetControllerJobResultsRequest,
     },
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
@@ -104,9 +104,7 @@ pub async fn submit(
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
-        options: execution_options
-            .api_options()
-            .map(|options| options.clone().into()),
+        options: Some(execution_options.into()),
     };
 
     let mut controller_client = execution_options
@@ -205,61 +203,16 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
-    #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
-    #[builder(default = "None")]
-    api_options: Option<ApiExecutionOptions>,
+    #[doc = "If jobs contain settings that would cause managed settings to change values, that job will be rejected unless this field is set to true and the submitter has the appropriate authorization."]
+    #[builder(default = "false")]
+    bypass_settings_protection: bool,
 }
 
-/// Options avaialable when executing a job on a QPU, particular to the execution service's API.
-///
-/// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
-/// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default)]
-#[allow(clippy::module_name_repetitions)]
-pub struct ApiExecutionOptions {
-    /// the inner proto representation
-    inner: InnerApiExecutionOptions,
-}
-
-impl PartialEq for ApiExecutionOptions {
-    /// implement Eq
-    fn eq(&self, other: &Self) -> bool {
-        let InnerApiExecutionOptions {
-            bypass_settings_protection,
-        } = self.inner;
-        bypass_settings_protection == other.inner.bypass_settings_protection
-    }
-}
-
-impl Eq for ApiExecutionOptions {}
-
-impl ApiExecutionOptions {
-    /// Get an [`ExecutionOptionsBuilder`] that can be used to build a custom [`ExecutionOptions`].
-    #[must_use]
-    pub fn builder() -> ApiExecutionOptionsBuilder {
-        ApiExecutionOptionsBuilder::default()
-    }
-
-    /// Get the configured `bypass_settings_protection` value.
-    #[must_use]
-    pub fn bypass_settings_protection(&self) -> bool {
-        self.inner.bypass_settings_protection
-    }
-}
-
-impl From<ApiExecutionOptions> for InnerApiExecutionOptions {
-    fn from(options: ApiExecutionOptions) -> Self {
-        options.inner
-    }
-}
-
-impl ApiExecutionOptionsBuilder {
-    /// Set the `bypass_settings_protection` value.
-    pub fn bypass_settings_protection(&mut self, bypass_settings_protection: bool) -> &mut Self {
-        self.inner
-            .get_or_insert(InnerApiExecutionOptions::default())
-            .bypass_settings_protection = bypass_settings_protection;
-        self
+impl From<&ExecutionOptions> for ApiExecutionOptions {
+    fn from(options: &ExecutionOptions) -> Self {
+        ApiExecutionOptions {
+            bypass_settings_protection: options.bypass_settings_protection,
+        }
     }
 }
 
@@ -282,10 +235,10 @@ impl ExecutionOptions {
         self.timeout
     }
 
-    /// Get the [`ApiExecutionOptions`].
+    /// Get the value of [`bypass_settings_protection`].
     #[must_use]
-    pub fn api_options(&self) -> Option<&ApiExecutionOptions> {
-        self.api_options.as_ref()
+    pub fn bypass_settings_protection(&self) -> bool {
+        self.bypass_settings_protection
     }
 }
 
