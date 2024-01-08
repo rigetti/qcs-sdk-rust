@@ -195,7 +195,7 @@ class ExecutionOptions:
         """The time in seconds to wait before timing out a request, if any."""
     @property
     def bypass_settings_protection(self) -> bool:
-        """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+        """If jobs contain settings that would cause managed settings to change values, that job will be rejected unless this field is set to true and the submitter has the appropriate authorization."""
 
 @final
 class ExecutionOptionsBuilder:
@@ -224,7 +224,7 @@ class ExecutionOptionsBuilder:
         raise AttributeError("bypass_settings_protection is not readable")
     @bypass_settings_protection.setter
     def bypass_settings_protection(self, bypass_settings_protection: bool):
-        """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+        """If jobs contain settings that would cause managed settings to change values, that job will be rejected unless this field is set to true and the submitter has the appropriate authorization.."""
     def build(self) -> ExecutionOptions:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
 
