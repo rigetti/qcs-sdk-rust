@@ -30,7 +30,6 @@
     path_statements,
     patterns_in_fns_without_body,
     pointer_structural_match,
-    private_in_public,
     semicolon_in_expressions_from_macros,
     trivial_casts,
     trivial_numeric_casts,

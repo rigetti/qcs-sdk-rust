@@ -701,7 +701,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{inner:?}")),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::QcsClient(v) => Self::Unexpected(format!("{v:?}")),
-            ExecutionError::IsaError(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::Isa(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::ToQuil(e) => Self::ToQuil(e),
@@ -709,7 +709,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
             ExecutionError::RpcqClient(e) => Self::Unexpected(format!("{e:?}")),
             ExecutionError::Substitution(message) => Self::Substitution(message),
-            ExecutionError::QpuApiError(e) => Self::QpuApiError(e),
+            ExecutionError::QpuApi(e) => Self::QpuApiError(e),
         }
     }
 }
