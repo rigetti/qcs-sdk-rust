@@ -1,7 +1,7 @@
 use std::{num::NonZeroU16, sync::Arc};
 
 use pyo3::{pyclass, FromPyObject};
-use qcs::{Error, Executable, ExecutionData, JobHandle, Service, qpu::api::ApiExecutionOptions};
+use qcs::{qpu::api::ApiExecutionOptions, Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
@@ -192,19 +192,16 @@ impl PyExecutable {
     ) -> PyResult<&PyAny> {
         let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
-            Some(endpoint_id) => py_async!(
-                py,
-                {
-                    let x = py_executable_data!(
-                        self,
-                        execute_on_qpu_with_endpoint::<_, ApiExecutionOptions>,
-                        quantum_processor_id,
-                        endpoint_id,
-                        translation_options,
-                    );
-                    x
-                }
-            ),
+            Some(endpoint_id) => py_async!(py, {
+                let x = py_executable_data!(
+                    self,
+                    execute_on_qpu_with_endpoint::<_, ApiExecutionOptions>,
+                    quantum_processor_id,
+                    endpoint_id,
+                    translation_options,
+                );
+                x
+            }),
             None => py_async!(
                 py,
                 py_executable_data!(

@@ -9,7 +9,7 @@ use ndarray::arr2;
 use qcs::{
     client::Qcs,
     compiler::rpcq,
-    qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder, ApiExecutionOptions},
+    qpu::api::{ApiExecutionOptions, ConnectionStrategy, ExecutionOptionsBuilder},
     Executable,
 };
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};

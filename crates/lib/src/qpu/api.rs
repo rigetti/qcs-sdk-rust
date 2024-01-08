@@ -308,8 +308,8 @@ pub enum ConnectionStrategy {
 /// Methods that help select and configure a controller service client given a set of
 /// [`ExecutionOptions`] and QPU ID.
 impl<T> ExecutionOptions<T>
-    where T: Into<InnerApiExecutionOptions> + Clone + Debug,
-
+where
+    T: Into<InnerApiExecutionOptions> + Clone + Debug,
 {
     fn get_job_target(
         &self,
