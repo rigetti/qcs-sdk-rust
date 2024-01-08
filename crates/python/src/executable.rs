@@ -1,7 +1,7 @@
 use std::{num::NonZeroU16, sync::Arc};
 
 use pyo3::{pyclass, FromPyObject};
-use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
+use qcs::{Error, Executable, ExecutionData, JobHandle, Service, qpu::api::ApiExecutionOptions};
 use rigetti_pyo3::{
     impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
@@ -56,12 +56,12 @@ impl PyParameter {
 /// Invoke a PyExecutable's inner Executable::method with given arguments,
 /// then mapped to `Future<Output = Result<PyExecutionData, ExecutionError>>`
 macro_rules! py_executable_data {
-    ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
+    ($self: ident, $method: ident $(::<_, $api_type: ty>)? $(, $arg: expr)* $(,)?) => {{
         let arc = $self.as_inner().clone();
         async move {
             arc.lock()
                 .await
-                .$method($($arg),*)
+                .$method$(::<_, $api_type>)?($($arg),*)
                 .await
                 .map(ExecutionData::from)
                 .map(PyExecutionData::from)
@@ -162,7 +162,7 @@ impl PyExecutable {
                 py,
                 py_executable_data!(
                     self,
-                    execute_on_qpu_with_endpoint,
+                    execute_on_qpu_with_endpoint::<_, ApiExecutionOptions>,
                     quantum_processor_id,
                     endpoint_id,
                     translation_options,
@@ -194,13 +194,16 @@ impl PyExecutable {
         match endpoint_id {
             Some(endpoint_id) => py_async!(
                 py,
-                py_executable_data!(
-                    self,
-                    execute_on_qpu_with_endpoint,
-                    quantum_processor_id,
-                    endpoint_id,
-                    translation_options,
-                )
+                {
+                    let x = py_executable_data!(
+                        self,
+                        execute_on_qpu_with_endpoint::<_, ApiExecutionOptions>,
+                        quantum_processor_id,
+                        endpoint_id,
+                        translation_options,
+                    );
+                    x
+                }
             ),
             None => py_async!(
                 py,
@@ -318,7 +321,7 @@ py_wrap_simple_enum! {
 }
 
 py_wrap_type! {
-    PyJobHandle(JobHandle<'static>) as "JobHandle";
+    PyJobHandle(JobHandle<'static, ApiExecutionOptions>) as "JobHandle";
 }
 
 #[pymethods]

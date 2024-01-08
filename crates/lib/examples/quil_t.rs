@@ -2,7 +2,12 @@
 //!
 //! [pyquil]: https://pyquil-docs.rigetti.com/en/stable/quilt_getting_started.html#Another-example:-a-simple-T1-experiment
 
-use qcs::{client::Qcs, compiler::rpcq, qpu::api::ExecutionOptions, Executable};
+use qcs::{
+    client::Qcs,
+    compiler::rpcq,
+    qpu::api::{ApiExecutionOptions, ExecutionOptions},
+    Executable,
+};
 
 /// This program doesn't do much, the main point is that it will fail if quilc is invoked.
 const PROGRAM: &str = r#"
@@ -23,7 +28,11 @@ async fn main() {
     let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
 
     let result = exe
-        .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
+        .execute_on_qpu(
+            "Aspen-M-3",
+            None,
+            &ExecutionOptions::<ApiExecutionOptions>::default(),
+        )
         .await
         .expect("Program should execute successfully")
         .result_data

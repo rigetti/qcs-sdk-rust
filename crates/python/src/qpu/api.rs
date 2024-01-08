@@ -300,7 +300,7 @@ py_function_sync_async! {
 
 py_wrap_type! {
     #[derive(Debug, Default)]
-    PyExecutionOptions(ExecutionOptions) as "ExecutionOptions"
+    PyExecutionOptions(ExecutionOptions<ApiExecutionOptions>) as "ExecutionOptions"
 }
 impl_repr!(PyExecutionOptions);
 impl_as_mut_for_wrapper!(PyExecutionOptions);
@@ -370,7 +370,7 @@ impl PyApiExecutionOptions {
 }
 
 py_wrap_type! {
-    PyExecutionOptionsBuilder(ExecutionOptionsBuilder) as "ExecutionOptionsBuilder"
+    PyExecutionOptionsBuilder(ExecutionOptionsBuilder<ApiExecutionOptions>) as "ExecutionOptionsBuilder"
 }
 
 #[pymethods]

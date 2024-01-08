@@ -1,7 +1,10 @@
 //! This module provides bindings to for submitting jobs to and retrieving them from
 //! Rigetti QPUs using the QCS API.
 
-use std::{fmt, time::Duration};
+use std::{
+    fmt::{self, Debug},
+    time::Duration,
+};
 
 use cached::proc_macro::cached;
 use derive_builder::Builder;
@@ -86,13 +89,16 @@ impl From<String> for JobId {
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
-pub async fn submit(
+pub async fn submit<T>(
     quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
     patch_values: &Parameters,
     client: &Qcs,
-    execution_options: &ExecutionOptions,
-) -> Result<JobId, QpuApiError> {
+    execution_options: &ExecutionOptions<T>,
+) -> Result<JobId, QpuApiError>
+where
+    T: Into<InnerApiExecutionOptions> + Clone + Debug,
+{
     #[cfg(feature = "tracing")]
     tracing::debug!(
         "submitting job to {:?} using options {:?}",
@@ -138,12 +144,15 @@ pub async fn submit(
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
-pub async fn retrieve_results(
+pub async fn retrieve_results<T>(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
     client: &Qcs,
-    execution_options: &ExecutionOptions,
-) -> Result<ControllerJobExecutionResult, QpuApiError> {
+    execution_options: &ExecutionOptions<T>,
+) -> Result<ControllerJobExecutionResult, QpuApiError>
+where
+    T: Into<InnerApiExecutionOptions> + Clone + Debug,
+{
     #[cfg(feature = "tracing")]
     tracing::debug!(
         "retrieving job results for {} on {:?} using options {:?}",
@@ -189,16 +198,17 @@ pub async fn retrieve_results(
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`QpuConnectionOptionsBuilder`]
 /// to build a custom set of options.
 // These are aliases because the ExecutionOptions are actually generic over all QPU operations.
-pub type QpuConnectionOptions = ExecutionOptions;
+pub type QpuConnectionOptions<T: Into<InnerApiExecutionOptions>> = ExecutionOptions<T>;
 /// Builder for setting up [`QpuConnectionOptions`].
-pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
+pub type QpuConnectionOptionsBuilder<T: Into<InnerApiExecutionOptions>> =
+    ExecutionOptionsBuilder<T>;
 
 /// Options avaialable when executing a job on a QPU.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
 #[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
-pub struct ExecutionOptions {
+pub struct ExecutionOptions<T: Into<InnerApiExecutionOptions>> {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     #[builder(default)]
     connection_strategy: ConnectionStrategy,
@@ -207,7 +217,7 @@ pub struct ExecutionOptions {
     timeout: Option<Duration>,
     #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
-    api_options: Option<ApiExecutionOptions>,
+    api_options: Option<T>,
 }
 
 /// Options avaialable when executing a job on a QPU, particular to the execution service's API.
@@ -253,10 +263,13 @@ impl ApiExecutionOptionsBuilder {
     }
 }
 
-impl ExecutionOptions {
+impl<T> ExecutionOptions<T>
+where
+    T: Into<InnerApiExecutionOptions> + Clone + Debug,
+{
     /// Get an [`ExecutionOptionsBuilder`] that can be used to build a custom [`ExecutionOptions`].
     #[must_use]
-    pub fn builder() -> ExecutionOptionsBuilder {
+    pub fn builder() -> ExecutionOptionsBuilder<T> {
         ExecutionOptionsBuilder::default()
     }
 
@@ -274,7 +287,7 @@ impl ExecutionOptions {
 
     /// Get the [`ApiExecutionOptions`].
     #[must_use]
-    pub fn api_options(&self) -> Option<&ApiExecutionOptions> {
+    pub fn api_options(&self) -> Option<&T> {
         self.api_options.as_ref()
     }
 }
@@ -294,7 +307,10 @@ pub enum ConnectionStrategy {
 
 /// Methods that help select and configure a controller service client given a set of
 /// [`ExecutionOptions`] and QPU ID.
-impl ExecutionOptions {
+impl<T> ExecutionOptions<T>
+    where T: Into<InnerApiExecutionOptions> + Clone + Debug,
+
+{
     fn get_job_target(
         &self,
         quantum_processor_id: Option<&str>,

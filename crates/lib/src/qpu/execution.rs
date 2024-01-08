@@ -6,6 +6,7 @@ use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
+use qcs_api_client_grpc::services::controller::ExecutionOptions as InnerApiExecutionOptions;
 use quil_rs::program::ProgramError;
 use quil_rs::quil::ToQuilError;
 
@@ -182,12 +183,15 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on a real QPU and wait for the results.
-    pub(crate) async fn submit(
+    pub(crate) async fn submit<T>(
         &mut self,
         params: &Parameters,
         translation_options: Option<TranslationOptions>,
-        execution_options: &ExecutionOptions,
-    ) -> Result<JobHandle<'a>, Error> {
+        execution_options: &ExecutionOptions<T>,
+    ) -> Result<JobHandle<'a, T>, Error>
+    where
+        T: Into<InnerApiExecutionOptions> + Clone + core::fmt::Debug,
+    {
         #[cfg(feature = "tracing")]
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
@@ -201,14 +205,15 @@ impl<'a> Execution<'a> {
     }
 
     /// Run on specific QCS endpoint and wait for the results.
-    pub(crate) async fn submit_to_endpoint_id<S>(
+    pub(crate) async fn submit_to_endpoint_id<S, T>(
         &mut self,
         params: &Parameters,
         endpoint_id: S,
         translation_options: Option<TranslationOptions>,
-    ) -> Result<JobHandle<'a>, Error>
+    ) -> Result<JobHandle<'a, T>, Error>
     where
         S: Into<Cow<'a, str>>,
+        T: Into<InnerApiExecutionOptions> + Clone + core::fmt::Debug,
     {
         self.submit_to_target(
             params,
@@ -224,13 +229,16 @@ impl<'a> Execution<'a> {
         .await
     }
 
-    async fn submit_to_target(
+    async fn submit_to_target<T>(
         &mut self,
         params: &Parameters,
         quantum_processor_id: Option<&str>,
         translation_options: Option<TranslationOptions>,
-        execution_options: &ExecutionOptions,
-    ) -> Result<JobHandle<'a>, Error> {
+        execution_options: &ExecutionOptions<T>,
+    ) -> Result<JobHandle<'a, T>, Error>
+    where
+        T: Into<InnerApiExecutionOptions> + Clone + core::fmt::Debug,
+    {
         let EncryptedTranslationResult { job, readout_map } =
             self.translate(translation_options).await?;
 
@@ -261,10 +269,13 @@ impl<'a> Execution<'a> {
         ))
     }
 
-    pub(crate) async fn retrieve_results(
+    pub(crate) async fn retrieve_results<T>(
         &self,
-        job_handle: JobHandle<'a>,
-    ) -> Result<ExecutionData, Error> {
+        job_handle: JobHandle<'a, T>,
+    ) -> Result<ExecutionData, Error>
+    where
+        T: Into<InnerApiExecutionOptions> + Clone + core::fmt::Debug,
+    {
         #[cfg(feature = "tracing")]
         tracing::debug!(
             job_id=%job_handle.job_id(),

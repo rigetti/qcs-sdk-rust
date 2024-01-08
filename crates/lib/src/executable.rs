@@ -3,11 +3,13 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::fmt::Debug;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::LoadError;
+use qcs_api_client_grpc::services::controller::ExecutionOptions as InnerApiExecutionOptions;
 use quil_rs::quil::ToQuilError;
 
 use crate::client::Qcs;
@@ -448,7 +450,7 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu_with_endpoint<S>(
+    pub async fn execute_on_qpu_with_endpoint<S, T>(
         &mut self,
         quantum_processor_id: S,
         endpoint_id: S,
@@ -456,9 +458,14 @@ impl<'execution> Executable<'_, 'execution> {
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
+        T: Into<InnerApiExecutionOptions> + Clone + Debug,
     {
         let job_handle = self
-            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id, translation_options)
+            .submit_to_qpu_with_endpoint::<S, T>(
+                quantum_processor_id,
+                endpoint_id,
+                translation_options,
+            )
             .await?;
         self.retrieve_results(job_handle).await
     }
@@ -494,14 +501,15 @@ impl<'execution> Executable<'_, 'execution> {
     /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
     ///
     /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu<S>(
+    pub async fn execute_on_qpu<S, T>(
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
-        execution_options: &ExecutionOptions,
+        execution_options: &ExecutionOptions<T>,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
+        T: Into<InnerApiExecutionOptions> + Clone + Debug,
     {
         let quantum_processor_id = quantum_processor_id.into();
 
@@ -536,14 +544,15 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu<S>(
+    pub async fn submit_to_qpu<S, T>(
         &mut self,
         quantum_processor_id: S,
         translation_options: Option<TranslationOptions>,
-        execution_options: &ExecutionOptions,
-    ) -> Result<JobHandle<'execution>, Error>
+        execution_options: &ExecutionOptions<T>,
+    ) -> Result<JobHandle<'execution, T>, Error>
     where
         S: Into<Cow<'execution, str>>,
+        T: Into<InnerApiExecutionOptions> + Clone + Debug,
     {
         let quantum_processor_id = quantum_processor_id.into();
 
@@ -557,7 +566,7 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit(&self.params, translation_options, execution_options)
+            .submit::<T>(&self.params, translation_options, execution_options)
             .await?;
         Ok(job_handle)
     }
@@ -570,19 +579,20 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu_with_endpoint<S>(
+    pub async fn submit_to_qpu_with_endpoint<S, T>(
         &mut self,
         quantum_processor_id: S,
         endpoint_id: S,
         translation_options: Option<TranslationOptions>,
-    ) -> Result<JobHandle<'execution>, Error>
+    ) -> Result<JobHandle<'execution, T>, Error>
     where
         S: Into<Cow<'execution, str>>,
+        T: Into<InnerApiExecutionOptions> + Clone + Debug,
     {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit_to_endpoint_id(&self.params, endpoint_id.into(), translation_options)
+            .submit_to_endpoint_id::<S, T>(&self.params, endpoint_id, translation_options)
             .await?;
         Ok(job_handle)
     }
@@ -592,7 +602,13 @@ impl<'execution> Executable<'_, 'execution> {
     /// # Errors
     ///
     /// See [`Executable::execute_on_qpu`].
-    pub async fn retrieve_results(&mut self, job_handle: JobHandle<'execution>) -> ExecutionResult {
+    pub async fn retrieve_results<T>(
+        &mut self,
+        job_handle: JobHandle<'execution, T>,
+    ) -> ExecutionResult
+    where
+        T: Into<InnerApiExecutionOptions> + Clone + Debug,
+    {
         let quantum_processor_id = job_handle.quantum_processor_id.to_string();
         let qpu = self.qpu_for_id(quantum_processor_id).await?;
         qpu.retrieve_results(job_handle).await.map_err(Error::from)
@@ -733,22 +749,22 @@ impl From<qvm::Error> for Error {
 /// The result of calling [`Executable::submit_to_qpu`]. Represents a quantum program running on
 /// a QPU. Can be passed to [`Executable::retrieve_results`] to retrieve the results of the job.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct JobHandle<'executable> {
+pub struct JobHandle<'executable, T: Into<InnerApiExecutionOptions>> {
     job_id: JobId,
     quantum_processor_id: Cow<'executable, str>,
     endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
-    execution_options: ExecutionOptions,
+    execution_options: ExecutionOptions<T>,
 }
 
-impl<'a> JobHandle<'a> {
+impl<'a, T: Into<InnerApiExecutionOptions>> JobHandle<'a, T> {
     #[must_use]
     pub(crate) fn new<S>(
         job_id: JobId,
         quantum_processor_id: S,
         endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
-        execution_options: ExecutionOptions,
+        execution_options: ExecutionOptions<T>,
     ) -> Self
     where
         S: Into<Cow<'a, str>>,
@@ -783,7 +799,7 @@ impl<'a> JobHandle<'a> {
 
     /// The [`ExecutionOptions`] used to submit the job to the QPU.
     #[must_use]
-    pub fn execution_options(&self) -> &ExecutionOptions {
+    pub fn execution_options(&self) -> &ExecutionOptions<T> {
         &self.execution_options
     }
 }

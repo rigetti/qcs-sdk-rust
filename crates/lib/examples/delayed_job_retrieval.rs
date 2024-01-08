@@ -1,6 +1,11 @@
 //! Submit a program to a QPU but don't immediately wait for the result.
 
-use qcs::{client::Qcs, compiler::rpcq, qpu::api::ExecutionOptions, Executable};
+use qcs::{
+    client::Qcs,
+    compiler::rpcq,
+    qpu::api::{ApiExecutionOptions, ExecutionOptions},
+    Executable,
+};
 
 const PROGRAM: &str = r#"
 DECLARE ro BIT
@@ -20,7 +25,11 @@ async fn quilc_client() -> rpcq::Client {
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
     let job_handle = exe
-        .submit_to_qpu(QUANTUM_PROCESSOR_ID, None, &ExecutionOptions::default())
+        .submit_to_qpu(
+            QUANTUM_PROCESSOR_ID,
+            None,
+            &ExecutionOptions::<ApiExecutionOptions>::default(),
+        )
         .await
         .expect("Program should be successfully submitted for execution");
     // Do some other stuff

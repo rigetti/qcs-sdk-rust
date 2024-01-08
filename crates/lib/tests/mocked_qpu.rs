@@ -9,7 +9,7 @@ use ndarray::arr2;
 use qcs::{
     client::Qcs,
     compiler::rpcq,
-    qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
+    qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder, ApiExecutionOptions},
     Executable,
 };
 use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
@@ -70,7 +70,7 @@ async fn quilc_client() -> rpcq::Client {
 }
 
 async fn run_bell_state(connection_strategy: ConnectionStrategy) {
-    let execution_options_direct_access = ExecutionOptionsBuilder::default()
+    let execution_options_direct_access = ExecutionOptionsBuilder::<ApiExecutionOptions>::default()
         .connection_strategy(connection_strategy)
         .build()
         .expect("should be valid execution options");

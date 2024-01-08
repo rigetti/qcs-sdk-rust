@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use qcs::client::Qcs;
 use qcs::compiler::rpcq;
-use qcs::qpu::api::ExecutionOptions;
+use qcs::qpu::api::{ApiExecutionOptions, ExecutionOptions};
 use qcs::Executable;
 
 const PROGRAM: &str = r#"
@@ -37,7 +37,11 @@ async fn main() {
         let theta = step * f64::from(i);
         let data = exe
             .with_parameter("theta", 0, theta)
-            .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
+            .execute_on_qpu(
+                "Aspen-M-3",
+                None,
+                &ExecutionOptions::<ApiExecutionOptions>::default(),
+            )
             .await
             .expect("Executed program on QPU");
         total_execution_time += data
