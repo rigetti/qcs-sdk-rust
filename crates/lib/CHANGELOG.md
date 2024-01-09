@@ -1,3 +1,9 @@
+## 0.20.2
+
+### Fixes
+
+- make rpcq timeout functions public, since initializing Client is public (#398)
+
 ## 0.20.2-rc.0
 
 ### Fixes
