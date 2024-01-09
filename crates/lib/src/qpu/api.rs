@@ -202,6 +202,9 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
+    #[doc = "The timeout to use for the connection, defaults to `None`seconds. If set to `None`, then there is no timeout."]
+    #[builder(default = "Some(Duration::from_secs(30))")]
+    connection_timeout: Option<Duration>,
 }
 
 impl ExecutionOptions {
@@ -221,6 +224,11 @@ impl ExecutionOptions {
     #[must_use]
     pub fn timeout(&self) -> Option<Duration> {
         self.timeout
+    }
+    /// Get the connection timeout.
+    #[must_use]
+    pub fn connection_timeout(&self) -> Option<Duration> {
+        self.connection_timeout
     }
 }
 
@@ -319,7 +327,7 @@ impl ExecutionOptions {
         client: &Qcs,
     ) -> Result<GrpcConnection, QpuApiError> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
-        let channel = get_channel_with_timeout(uri, self.timeout())
+        let channel = get_channel_with_timeout(uri, self.timeout(), self.connection_timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
         Ok(wrap_channel_with(channel, client.get_config().clone()))
     }
