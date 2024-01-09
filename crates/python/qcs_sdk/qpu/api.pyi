@@ -1,7 +1,7 @@
-from enum import Enum
-from typing import Callable, Dict, List, Sequence, Mapping, Optional, Union, final
+from typing import Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
+from qcs_sdk.qpu import MemoryValues
 
 class SubmissionError(RuntimeError):
     """There was a problem submitting the program to QCS for execution."""
@@ -76,6 +76,11 @@ class ExecutionResults:
         See `TranslationResult.ro_sources` which provides the mapping from the filter node name to the name of the memory declaration in the source program.
         """
         ...
+    @property
+    def memory(self) -> Dict[str, MemoryValues]:
+        """
+        The final state of memory for parameters that were read from and written to during the exectuion of the program.
+        """
     @property
     def execution_duration_microseconds(self) -> Optional[int]:
         """The time spent executing the program."""

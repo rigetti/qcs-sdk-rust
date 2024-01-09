@@ -8,6 +8,10 @@ to compile and run Quil programs on Rigetti quantum processors. Internally, it i
 While this package can be used directly, [pyQuil](https://pypi.org/project/pyquil/) offers more functionality and a 
 higher-level interface for building and executing Quil programs. This package is still in early development and breaking changes should be expected between minor versions.
 
+# Documentation
+
+Documentation for the current release of `qcs_sdk` is published [here](https://rigetti.github.io/qcs-sdk-rust/qcs_sdk.html). Every version of `qcs_sdk` ships [with type stubs](https://github.com/rigetti/qcs-sdk-rust/tree/main/crates/python/qcs_sdk) that can provide type hints and documentation to Python tooling and editors.
+
 ## Troubleshooting
 
 ### Enabling Debug logging

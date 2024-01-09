@@ -1,4 +1,4 @@
-from qcs_sdk.qpu import ReadoutValues, QPUResultData
+from qcs_sdk.qpu import ReadoutValues, MemoryValues, QPUResultData
 from qcs_sdk.qvm import QVMResultData
 from qcs_sdk import ResultData, RegisterData, RegisterMatrix
 import numpy as np
@@ -13,12 +13,15 @@ class TestResultData:
             "ro[1]": "qB",
             "ro[2]": "qC",
         }
-        values = {
+        readout_values = {
             "qA": ReadoutValues.from_integer([0, 1]),
             "qB": ReadoutValues.from_integer([1, 2]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        result_data = ResultData.from_qpu(QPUResultData(mappings, values))
+        memory_values = {
+            "ro": MemoryValues.from_integer([1, 2, 3]),
+        }
+        result_data = ResultData.from_qpu(QPUResultData(mappings, readout_values, memory_values))
         register_map = result_data.to_register_map()
         ro = register_map.get_register_matrix("ro")
         assert ro is not None, "'ro' should exist in the register map"
@@ -39,7 +42,7 @@ class TestResultData:
             "qB": ReadoutValues.from_integer([1]),
             "qC": ReadoutValues.from_integer([2, 3]),
         }
-        result_data = ResultData.from_qpu(QPUResultData(mappings, values))
+        result_data = ResultData.from_qpu(QPUResultData(mappings, values, {}))
 
         with pytest.raises(ValueError):
             result_data.to_register_map()

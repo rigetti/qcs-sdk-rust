@@ -1,3 +1,75 @@
+## 0.16.1
+
+### Features
+
+- Update quil-rs/py to 0.23.3/0.6.3 (#413)
+
+## 0.16.1-rc.0
+
+### Features
+
+- Update quil-rs/py to 0.23.3/0.6.3 (#413)
+
+## 0.16.0
+
+### Breaking Changes
+
+- upgrade manylinux version in CI to support updated dependencies (#408)
+
+## 0.16.0-rc.0
+
+### Breaking Changes
+
+- upgrade manylinux version in CI to support updated dependencies (#408)
+
+## 0.15.0
+
+### Breaking Changes
+
+- expose BackendV2 options through Python (#407)
+
+## 0.15.0-rc.0
+
+### Breaking Changes
+
+- expose BackendV2 options through Python (#407)
+
+## 0.14.3
+
+### Features
+
+- Add memory_values to QPUResultData (#393)
+
+## 0.14.3-rc.0
+
+### Features
+
+- Add memory_values to QPUResultData (#393)
+
+## 0.14.2
+
+### Fixes
+
+- bump quil in pyproject.toml to match Cargo.toml (#403)
+
+## 0.14.2-rc.0
+
+### Fixes
+
+- bump quil in pyproject.toml to match Cargo.toml (#403)
+
+## 0.14.1
+
+### Fixes
+
+- update quil-rs to get string serialization bugfix (#399)
+
+## 0.14.1-rc.0
+
+### Fixes
+
+- update quil-rs to get string serialization bugfix (#399)
+
 ## 0.14.0
 
 ### Breaking Changes

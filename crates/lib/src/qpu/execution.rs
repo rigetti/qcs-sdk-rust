@@ -52,7 +52,7 @@ pub(crate) enum Error {
     #[error("Problem using QCS API: {0}")]
     QcsClient(#[from] GrpcClientError),
     #[error("Problem fetching ISA: {0}")]
-    IsaError(#[from] GetIsaError),
+    Isa(#[from] GetIsaError),
     #[error("Problem parsing memory readout: {0}")]
     ReadoutParse(#[from] MemoryReferenceParseError),
     #[error("Problem when compiling program: {details}")]
@@ -64,7 +64,7 @@ pub(crate) enum Error {
     #[error("Program when getting substitutions for program: {0}")]
     Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
-    QpuApiError(#[from] super::api::QpuApiError),
+    QpuApi(#[from] super::api::QpuApiError),
 }
 
 impl From<quilc::Error> for Error {
@@ -283,6 +283,7 @@ impl<'a> Execution<'a> {
             result_data: ResultData::Qpu(QpuResultData::from_controller_mappings_and_values(
                 job_handle.readout_map(),
                 &response.readout_values,
+                &response.memory_values,
             )),
             duration: Some(Duration::from_micros(
                 response.execution_duration_microseconds,

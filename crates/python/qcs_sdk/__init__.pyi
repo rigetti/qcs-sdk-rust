@@ -1,3 +1,10 @@
+"""
+The `qcs_sdk` package provides a Python interface to the Rigetti Quantum Cloud Services (QCS) platform.
+
+For more information about QCS, see [the QCS documentation](https://docs.rigetti.com/qcs/).
+
+⚠️ This package is still in early development and breaking changes should be expected between minor versions.
+"""
 import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union, final
@@ -12,10 +19,10 @@ from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
 
-from . import client as client
-from . import compiler as compiler
-from . import qpu as qpu
-from . import qvm as qvm
+from qcs_sdk import client as client
+from qcs_sdk import compiler as compiler
+from qcs_sdk import qpu as qpu
+from qcs_sdk import qvm as qvm
 
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""
@@ -42,7 +49,7 @@ class Executable:
         """
         Execute on a QVM which is accessible via the provided client.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     async def execute_on_qvm_async(self, client: QVMClient) -> ExecutionData:
@@ -50,7 +57,7 @@ class Executable:
         Execute on a QVM which is accessible via the provided client.
         (async analog of ``Executable.execute_on_qvm``.)
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     def execute_on_qpu(
@@ -66,7 +73,7 @@ class Executable:
         :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
         the default endpoint for the given quantum_processor_id is used.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     async def execute_on_qpu_async(
@@ -78,12 +85,12 @@ class Executable:
     ) -> ExecutionData:
         """
         Compile the program and execute it on a QPU, waiting for results.
-        (async analog of ``Executable.execute_on_qpu``)
+        (async analog of `Executable.execute_on_qpu`)
 
         :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
         the default endpoint for the given quantum_processor_id is used.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     def submit_to_qpu(
@@ -99,7 +106,7 @@ class Executable:
         :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
         the default endpoint for the given quantum_processor_id is used.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     async def submit_to_qpu_async(
@@ -111,27 +118,27 @@ class Executable:
     ) -> JobHandle:
         """
         Compile the program and execute it on a QPU, without waiting for results.
-        (async analog of ``Executable.execute_on_qpu``)
+        (async analog of `Executable.execute_on_qpu`)
 
         :param endpoint_id: execute the compiled program against an explicitly provided endpoint. If `None`,
         the default endpoint for the given quantum_processor_id is used.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
         """
         Wait for the results of a job to complete.
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
     async def retrieve_results_async(self, job_handle: JobHandle) -> ExecutionData:
         """
         Wait for the results of a job to complete.
-        (async analog of ``Executable.retrieve_results``)
+        (async analog of `Executable.retrieve_results`)
 
-        :raises ExecutionError: If the job fails to execute.
+        :raises `ExecutionError`: If the job fails to execute.
         """
         ...
 
@@ -152,7 +159,8 @@ class JobHandle:
     @property
     def readout_map(self) -> Dict[str, str]:
         """
-        The readout map from source readout memory locations to the filter pipeline node which publishes the data.
+        The readout map from source readout memory locations to the filter pipeline node
+        which publishes the data.
         """
         ...
 
@@ -191,7 +199,7 @@ class Service(Enum):
     QPU = "QPU"
 
 class RegisterMatrixConversionError(ValueError):
-    """Error that may occur when building a ``RegisterMatrix`` from execution data."""
+    """Error that may occur when building a `RegisterMatrix` from execution data."""
 
     ...
 
@@ -201,16 +209,16 @@ class RegisterMatrix:
     Values in a 2-dimensional ``ndarray`` representing the final shot value in each memory reference across all shots.
     Each variant corresponds to the possible data types a register can contain.
 
-    Variants:
-        ``integer``: Corresponds to the Quil `BIT`, `OCTET`, or `INTEGER` types.
-        ``real``: Corresponds to the Quil `REAL` type.
-        ``complex``: Registers containing complex numbers.
+    ## Variants:
+    - ``integer``: Corresponds to the Quil ``BIT``, ``OCTET``, or ``INTEGER`` types.
+    - ``real``: Corresponds to the Quil ``REAL`` type.
+    - ``complex``: Registers containing complex numbers.
 
-    Methods (each per variant):
-        - ``is_*``: if the underlying values are that type.
-        - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-        - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
-        - ``from_*``: wrap underlying values as this enum type.
+    ### Methods (each per variant):
+    - ``is_*``: if the underlying values are that type.
+    - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+    - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
+    - ``from_*``: wrap underlying values as this enum type.
 
     """
 
@@ -238,7 +246,7 @@ class RegisterMatrix:
 
 @final
 class RegisterMap:
-    """A map of register names (ie. "ro") to a ``RegisterMatrix`` containing the values of the register."""
+    """A map of register names (ie. "ro") to a `RegisterMatrix` containing the values of the register."""
 
     def get_register_matrix(self, register_name: str) -> Optional[RegisterMatrix]:
         """Get the ``RegisterMatrix`` for the given register. Returns `None` if the register doesn't exist."""
@@ -258,14 +266,13 @@ class ResultData:
     Represents the two possible types of data returned from either the QVM or a real QPU.
     Each variant contains the original data returned from its respective executor.
 
-    Usage
-    -----
+    ## Usage
 
-    Your usage of ``ResultData`` will depend on the types of programs you are running and where.
-    The `to_register_map()` method will attempt to build ``RegisterMap`` out of the data, where each
-    register name is mapped to a 2-dimensional rectangular ``RegisterMatrix`` where each row
+    Your usage of `ResultData` will depend on the types of programs you are running and where.
+    The `ResultData.to_register_map()` method will attempt to build `RegisterMap` out of the data, where each
+    register name is mapped to a 2-dimensional rectangular `RegisterMatrix` where each row
     represents the final values in each register index for a particular shot. This is often the
-    desired form of the data and it is _probably_ what you want. This transformation isn't always
+    desired form of the data and it is <em>probably</em> what you want. This transformation isn't always
     possible, in which case `to_register_map()` will return an error.
 
     To understand why this transformation can fail, we need to understand a bit about how readout data is
@@ -275,8 +282,8 @@ class ResultData:
     as one might expect it to. It is zero-initalized, and subsequent writes to the same region
     overwrite the previous value. The QVM returns memory at the end of every shot. This means
     we get the last value in every memory reference for each shot, which is exactly the
-    representation we want for a ``RegisterMatrix``. For this reason, `to_register_map()` should
-    always succeed for ``ResultData::Qvm``.
+    representation we want for a `RegisterMatrix`. For this reason, `to_register_map()` should
+    always succeed for `ResultData::Qvm`.
 
     The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
     (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
@@ -288,15 +295,18 @@ class ResultData:
     ``RegisterMatrix`` you need from the inner ``QPUResultData`` data using the knowledge of your
     program to choose the correct readout values for each shot.
 
-    Variants:
-        - ``qvm``: Data returned from the QVM, stored as ``QVMResultData``
-        - ``qpu``: Data returned from the QPU, stored as ``QPUResultData``
+    For more information on QPU readout data, refer to the
+    [QCS Documentation](https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data).
 
-    Methods (each per variant):
-        - ``is_*``: if the underlying values are that type.
-        - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-        - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
-        - ``from_*``: wrap underlying values as this enum type.
+    ### Variants:
+    - ``qvm``: Data returned from the QVM, stored as ``QVMResultData``
+    - ``qpu``: Data returned from the QPU, stored as ``QPUResultData``
+
+    ### Methods (each per variant):
+    - ``is_*``: if the underlying values are that type.
+    - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+    - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
+    - ``from_*``: wrap underlying values as this enum type.
     """
 
     def __new__(cls, inner: Union[QPUResultData, QVMResultData]) -> "ResultData":
@@ -306,28 +316,27 @@ class ResultData:
         ...
     def to_register_map(self) -> RegisterMap:
         """
-        Convert ``ResultData`` from its inner representation as ``QVMResultData`` or
-        ``QPUResultData`` into a ``RegisterMap``. The ``RegisterMatrix`` for each register will be
+        Convert `ResultData` from its inner representation as `QVMResultData` or
+        `QPUResultData` into a `RegisterMap`. The `RegisterMatrix` for each register will be
         constructed such that each row contains all the final values in the register for a single shot.
 
-        Errors
-        ------
+        ## Errors
 
-        Raises a ``RegisterMatrixConversionError`` if the inner execution data for any of the
-        registers would result in a jagged matrix. ``QPUResultData`` data is captured per measure,
+        Raises a `RegisterMatrixConversionError` if the inner execution data for any of the
+        registers would result in a jagged matrix. `QPUResultData` data is captured per measure,
         meaning a value is returned for every measure to a memory reference, not just once per shot.
         This is often the case in programs that use mid-circuit measurement or dynamic control flow,
         where measurements to the same memory reference might occur multiple times in a shot, or be
-        skipped conditionally. In these cases, building a rectangular ``RegisterMatrix`` would
+        skipped conditionally. In these cases, building a rectangular `RegisterMatrix` would
         necessitate making assumptions about the data that could skew the data in undesirable ways.
-        Instead, it's recommended to manually build a matrix from ``QPUResultData`` that accurately
+        Instead, it's recommended to manually build a matrix from `QPUResultData` that accurately
         selects the last value per-shot based on the program that was run.
         """
         ...
     def to_raw_readout_data(self) -> Union[RawQPUReadoutData, RawQVMReadoutData]:
         """
-        Get the raw data returned from the QVM or QPU. See ``RawQPUReadoutData`` and
-        ``RawQVMReadoutData`` for more information.
+        Get the raw data returned from the QVM or QPU. See `RawQPUReadoutData` and
+        `RawQVMReadoutData` for more information.
         """
     def inner(
         self,
@@ -347,6 +356,10 @@ class ResultData:
 
 @final
 class ExecutionData:
+    """
+    Contains the `ResultData` and the duration of the execution.
+    """
+
     def __new__(cls, result_data: ResultData, duration: Optional[datetime.timedelta] = None): ...
     @property
     def result_data(self) -> ResultData: ...
@@ -363,17 +376,16 @@ class RegisterData:
     Values present in a register that are one of a set of variants.
 
     Variants:
-        - ``i8``: Corresponds to the Quil `BIT` or `OCTET` types.
-        - ``i16``: Corresponds to the Quil `INTEGER` type.
-        - ``f64``: Corresponds to the Quil `REAL` type.
-        - ``complex32``: Results containing complex numbers.
+    - ``i8``: Corresponds to the Quil ``BIT`` or ``OCTET`` types.
+    - ``i16``: Corresponds to the Quil ``INTEGER`` type.
+    - ``f64``: Corresponds to the Quil ``REAL`` type.
+    - ``complex32``: Results containing complex numbers.
 
     Methods (each per variant):
-        - ``is_*``: if the underlying values are that type.
-        - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-        - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
-        - ``from_*``: wrap underlying values as this enum type.
-
+    - ``is_*``: if the underlying values are that type.
+    - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+    - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
+    - ``from_*``: wrap underlying values as this enum type.
     """
 
     def __new__(cls, inner: Union[List[List[int]], List[List[float]], List[List[complex]]]) -> "RegisterData": ...

@@ -4,18 +4,18 @@ resolver = "2"
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.7.2"
-qcs-api-client-grpc = "0.7.2"
-qcs-api-client-openapi = "0.8.2"
+qcs-api-client-common = "0.7.7"
+qcs-api-client-grpc = "0.7.7"
+qcs-api-client-openapi = "0.8.7"
 serde_json = "1.0.86"
 thiserror = "1.0.37"
-tokio = "1.24.2"
+tokio = "1.34.0"
 # We specify quil-rs as a git and versioned dependency so that we can keep the version of
 # quil-rs used in both the Rust and Python packages in sync. The tag used should always
 # be a `quil-py` tag and should match the version used in `crates/python/pyproject.toml`
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.22.0", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.6.1" }
+quil-rs = { version = "0.22.3", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.6.3" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
@@ -27,7 +27,7 @@ numpy = "0.20.0"
 pyo3 = "0.20.0"
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-build-config = "0.20.0"
-rigetti-pyo3 = { version = "0.3.0", features = ["complex"] }
+rigetti-pyo3 = { version = "0.3.1", features = ["complex"] }
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.
