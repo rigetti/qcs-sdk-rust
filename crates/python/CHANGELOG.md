@@ -1,3 +1,9 @@
+## 0.16.2-rc.1
+
+### Features
+
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
 ## 0.16.2-rc.0
 
 ### Features
