@@ -104,9 +104,7 @@ pub async fn submit(
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
-        options: execution_options
-            .api_options()
-            .map(|options| options.clone().into()),
+        options: execution_options.api_options().cloned(),
     };
 
     let mut controller_client = execution_options
