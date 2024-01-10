@@ -1,3 +1,9 @@
+## 0.20.3-rc.0
+
+### Features
+
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
 ## 0.20.2
 
 ### Fixes
