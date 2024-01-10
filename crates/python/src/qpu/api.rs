@@ -403,7 +403,7 @@ impl PyExecutionOptionsBuilder {
         *self = Self::from(
             self.as_inner()
                 .clone()
-                .api_options(api_options.map(|x| x.into_inner()))
+                .api_options(api_options.map(|x| x.into_inner().into()))
                 .clone(),
         );
     }

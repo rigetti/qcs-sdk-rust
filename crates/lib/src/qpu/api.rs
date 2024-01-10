@@ -197,7 +197,7 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Builder, Clone, Debug, Default, PartialEq)]
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     #[builder(default)]
@@ -207,10 +207,13 @@ pub struct ExecutionOptions {
     timeout: Option<Duration>,
     #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
-    api_options: Option<ApiExecutionOptions>,
+    api_options: Option<InnerApiExecutionOptions>,
 }
 
+impl Eq for ExecutionOptions {}
+
 /// Options avaialable when executing a job on a QPU, particular to the execution service's API.
+/// This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
 /// to build a custom set of options.
@@ -240,6 +243,12 @@ impl ApiExecutionOptions {
 impl From<ApiExecutionOptions> for InnerApiExecutionOptions {
     fn from(options: ApiExecutionOptions) -> Self {
         options.inner
+    }
+}
+
+impl From<InnerApiExecutionOptions> for ApiExecutionOptions {
+    fn from(inner: InnerApiExecutionOptions) -> Self {
+        Self { inner }
     }
 }
 
@@ -274,7 +283,7 @@ impl ExecutionOptions {
 
     /// Get the [`ApiExecutionOptions`].
     #[must_use]
-    pub fn api_options(&self) -> Option<&ApiExecutionOptions> {
+    pub fn api_options(&self) -> Option<&InnerApiExecutionOptions> {
         self.api_options.as_ref()
     }
 }
