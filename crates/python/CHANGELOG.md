@@ -1,3 +1,10 @@
+## 0.16.2
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.4/0.6.4 (#423)
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
 ## 0.16.2-rc.2
 
 ### Features
