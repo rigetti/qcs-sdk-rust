@@ -27,6 +27,9 @@ numpy = "0.20.0"
 pyo3 = "0.20.0"
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-build-config = "0.20.0"
+pyo3-log = "0.8.2"
+pyo3-opentelemetry = "0.3.1"
+pyo3-tracing-subscriber = "0.1.1"
 rigetti-pyo3 = { version = "0.3.1", features = ["complex"] }
 
 # The primary intent of these options is to reduce the binary size for Python wheels

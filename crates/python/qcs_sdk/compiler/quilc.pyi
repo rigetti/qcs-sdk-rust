@@ -17,17 +17,16 @@ class QuilcError(RuntimeError):
 
     ...
 
-
 @final
 class QuilcClient:
     """
-    Client used to communicate with Quilc 
+    Client used to communicate with Quilc
     """
+
     @staticmethod
     def new_rpcq(endpoint: str) -> QuilcClient:
         """Construct a QuilcClient that uses RPCQ to communicate with Quilc"""
         ...
-
 
 @final
 class CompilerOpts:
@@ -273,7 +272,6 @@ class NativeQuilMetadata:
     def qpu_runtime_estimation(self) -> Optional[float]:
         """The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for protoquil compliant programs."""
         ...
-
 
 def get_version_info(
     client: QuilcClient,

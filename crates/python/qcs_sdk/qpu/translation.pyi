@@ -45,7 +45,6 @@ class TranslationResult:
         """A mapping from the program's memory references to the key used to index the results map."""
         ...
 
-
 @final
 class TranslationBackend(Enum):
     V1 = auto()
@@ -146,12 +145,10 @@ class TranslationOptions:
         """
         Get the selected translation backend
         """
-
     def use_backend_v1(self) -> None:
         """
         Use the v1 backend for translation, available on QCS since 2018.
         """
-
     def use_backend_v2(self) -> None:
         """
         Use the v2 backend for translation, available on QCS since 2023.
