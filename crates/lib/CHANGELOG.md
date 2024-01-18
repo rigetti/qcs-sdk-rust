@@ -1,3 +1,15 @@
+## 0.20.4
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.5/0.6.5 (#424)
+
+## 0.20.4-rc.0
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.5/0.6.5 (#424)
+
 ## 0.20.3
 
 ### Features
