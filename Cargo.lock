@@ -2180,8 +2180,7 @@ dependencies = [
 [[package]]
 name = "pyo3-opentelemetry"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf2b1a031c703f4e997fbe05bb0c49376c314512484df86635c126008c9696d0"
+source = "git+https://github.com/rigetti/pyo3-opentelemetry/?branch=use-extension-module#3102cccba35b06f7cbdb72cf9852c4d04b56d56e"
 dependencies = [
  "opentelemetry",
  "opentelemetry_api",
@@ -2193,8 +2192,7 @@ dependencies = [
 [[package]]
 name = "pyo3-opentelemetry-macros"
 version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ad3bca7939e20c248b63fa56ce8c1cd5012417dde877e75082c91b83df48c58"
+source = "git+https://github.com/rigetti/pyo3-opentelemetry/?branch=use-extension-module#3102cccba35b06f7cbdb72cf9852c4d04b56d56e"
 dependencies = [
  "proc-macro2",
  "quote",
