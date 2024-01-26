@@ -700,7 +700,7 @@ impl From<ExecutionError> for Error {
         match err {
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{inner:?}")),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
-            ExecutionError::QcsClient(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::Translation(e) => Self::Translation(e),
             ExecutionError::Isa(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),

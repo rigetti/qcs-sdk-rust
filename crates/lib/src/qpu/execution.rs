@@ -49,8 +49,8 @@ pub(crate) enum Error {
     Unexpected(#[from] Unexpected),
     #[error("Problem communicating with quilc at {uri}: {details}")]
     Quilc { uri: String, details: String },
-    #[error("Problem using QCS API: {0}")]
-    QcsClient(#[from] GrpcClientError),
+    #[error("Problem translating using QCS API: {0}")]
+    Translation(#[from] GrpcClientError),
     #[error("Problem fetching ISA: {0}")]
     Isa(#[from] GetIsaError),
     #[error("Problem parsing memory readout: {0}")]
