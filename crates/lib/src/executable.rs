@@ -6,8 +6,6 @@ use std::collections::HashMap;
 use std::num::NonZeroU16;
 use std::sync::Arc;
 
-
-
 use quil_rs::quil::ToQuilError;
 
 use crate::client::{GrpcClientError, Qcs};
