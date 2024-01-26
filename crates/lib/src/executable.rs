@@ -603,29 +603,9 @@ impl<'execution> Executable<'_, 'execution> {
 /// [`Executable::execute_on_qvm`]..
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// Communicating with QCS requires appropriate settings and secrets files. By default, these
-    /// should be `$HOME/.qcs/settings.toml` and `$HOME/.qcs/secrets.toml`, though those files can
-    /// be overridden by setting the `QCS_SETTINGS_FILE_PATH` and `QCS_SECRETS_FILE_PATH`
-    /// environment variables.
-    ///
-    /// This error can occur when one of those files is required but missing or there is a problem
-    /// with the contents of those files.
-    #[error("There was a problem related to your QCS settings: {0}")]
-    Settings(String),
-    /// This error occurs when the SDK was unable to authenticate a request to QCS. This could mean
-    /// that your credentials are invalid or expired, or that you do not have access to the requested
-    /// QPU.
-    #[error("Could not authenticate a request to QCS for the requested QPU.")]
-    Authentication,
     /// An API error occurred while connecting to the QPU.
     #[error("An API error occurred while connecting to the QPU: {0}")]
     QpuApiError(#[from] qpu::api::QpuApiError),
-    /// This happens when the QPU is down for maintenance and not accepting new jobs. If you receive
-    /// this error, internal compilation caches will have been cleared as programs should be recompiled
-    /// with new settings after a maintenance window. If you are mid-experiment, you might want to
-    /// start over.
-    #[error("QPU currently unavailable, retry after {} seconds", .0.as_secs())]
-    QpuUnavailable(Duration),
     /// Indicates a problem connecting to an external service. Check your network connection and
     /// ensure that any required local services (e.g., `qvm` or `quilc`) are running.
     #[error("Error connecting to service {0:?}")]
@@ -650,22 +630,11 @@ pub enum Error {
     /// There was a problem when substituting parameters in the Quil program.
     #[error("There was a problem substituting parameters in the Quil program: {0}")]
     Substitution(String),
-    /// The Quil program is missing readout sources.
-    #[error("The Quil program is missing readout sources")]
-    MissingRoSources,
     /// This error returns when a runtime check that _should_ always pass fails. This most likely
     /// indicates a bug in the SDK and should be reported to
     /// [GitHub](https://github.com/rigetti/qcs-sdk-rust/issues),
     #[error("An unexpected error occurred, please open an issue on GitHub: {0:?}")]
     Unexpected(String),
-    /// Occurs when [`Executable::retrieve_results`] is called with an invalid [`JobHandle`].
-    /// Calling functions on [`Executable`] between [`Executable::submit_to_qpu`] and
-    /// [`Executable::retrieve_results`] can invalidate the handle.
-    #[error("The job handle was not valid")]
-    InvalidJobHandle,
-    /// Occurs when failing to construct a [`Qcs`] client.
-    #[error("The QCS client configuration failed to load")]
-    QcsConfigLoadFailure(#[from] LoadError),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
