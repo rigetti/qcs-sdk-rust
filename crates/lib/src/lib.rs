@@ -56,6 +56,9 @@ pub use execution_data::{
 };
 pub use register_data::RegisterData;
 
+// Re-export tonic for consumers to use.
+pub use tonic;
+
 pub mod client;
 pub mod compiler;
 pub mod diagnostics;

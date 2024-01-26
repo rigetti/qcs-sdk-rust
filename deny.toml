@@ -28,6 +28,9 @@ ignore = [
     "RUSTSEC-2023-0052",  # Introduced by transitive dependency `webpki`.
                           # `hyper-proxy`, then `qcs-api-client-rust` need to update in order to remove
                           # `webpki`.
+    "RUSTSEC-2024-0006"   # Introduced by transitive dependency `shlex`.
+                          # `bindgen`, then `libquil-sys` need to update in order to get a version
+                          # of `shlex` >= 1.3.0.
 ]
 
 # This section is considered when running `cargo deny check licenses`

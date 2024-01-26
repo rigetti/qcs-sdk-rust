@@ -367,6 +367,8 @@ impl RewrittenProgram {
     }
 }
 
+pub(crate) type Substitutions = IndexSet<Expression>;
+
 #[cfg(test)]
 mod describe_rewrite_arithmetic {
     use std::str::FromStr;
@@ -559,5 +561,3 @@ SHIFT-PHASE 0 "rf" __SUBST[0]
         insta::assert_snapshot!(substitutions[0].to_quil_or_debug());
     }
 }
-
-pub(crate) type Substitutions = IndexSet<Expression>;

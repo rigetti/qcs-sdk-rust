@@ -202,14 +202,14 @@ mod test {
         assert_eq!(output.program.to_quil_or_debug(), EXPECTED_H0_OUTPUT);
     }
 
-    const BELL_STATE: &str = r##"DECLARE ro BIT[2]
+    const BELL_STATE: &str = r"DECLARE ro BIT[2]
 
 H 0
 CNOT 0 1
 
 MEASURE 0 ro[0]
 MEASURE 1 ro[1]
-"##;
+";
 
     #[tokio::test]
     async fn test_print_isa() {
