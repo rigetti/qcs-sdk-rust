@@ -1,3 +1,9 @@
+## 0.20.5-rc.1
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
 ## 0.20.5-rc.0
 
 ### Features
