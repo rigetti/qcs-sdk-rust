@@ -48,7 +48,7 @@ use crate::{
 /// knowing the intent of the program that was run. Instead, it's recommended to build the
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
-#[derive(Debug, Clone, PartialEq, EnumAsInner)]
+#[derive(Debug, Clone, PartialEq, EnumAsInner, Deserialize, Serialize)]
 pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmResultData`]
     Qvm(QvmResultData),
@@ -57,7 +57,7 @@ pub enum ResultData {
 }
 
 /// The result of executing an [`Executable`](crate::Executable)
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct ExecutionData {
     /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
     pub result_data: ResultData,

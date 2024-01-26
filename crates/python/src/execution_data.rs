@@ -1,10 +1,12 @@
 use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
-use pyo3::exceptions::PyKeyError;
+use pyo3::exceptions::{PyKeyError, PyRuntimeError};
 use pyo3::{
-    exceptions::PyValueError, pyclass, pymethods, types::PyDelta, IntoPy, Py, PyObject, PyRef,
-    PyRefMut, PyResult, Python, ToPyObject,
+    exceptions::PyValueError,
+    pyclass, pymethods,
+    types::{PyBytes, PyDelta},
+    IntoPy, Py, PyObject, PyRef, PyRefMut, PyResult, Python, ToPyObject,
 };
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use rigetti_pyo3::{
@@ -16,6 +18,7 @@ use crate::qpu::PyQpuResultData;
 use crate::qvm::PyQvmResultData;
 
 py_wrap_union_enum! {
+    #[pyo3(module = "qcs_sdk.execution_data")]
     PyResultData(ResultData) as "ResultData" {
         qpu: Qpu => PyQpuResultData,
         qvm: Qvm => PyQvmResultData
@@ -56,6 +59,7 @@ impl PyResultData {
 }
 
 py_wrap_data_struct! {
+    #[pyo3(module = "qcs_sdk.execution_data")]
     PyExecutionData(ExecutionData) as "ExecutionData" {
         result_data: ResultData => PyResultData,
         duration: Option<Duration> => Option<Py<PyDelta>>
@@ -83,6 +87,21 @@ impl PyExecutionData {
                 })
                 .transpose()?,
         }))
+    }
+
+    pub fn __getstate__<'a>(&self, py: Python<'a>) -> PyResult<&'a PyBytes> {
+        Ok(PyBytes::new(
+            py,
+            &serde_json::to_vec(self.as_inner())
+                .map_err(|e| PyRuntimeError::new_err(format!("failed to serialize: {e}")))?,
+        ))
+    }
+
+    pub fn __setstate__(&mut self, state: &PyBytes) -> PyResult<()> {
+        let execution_data: ExecutionData = serde_json::from_slice(state.as_bytes())
+            .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
+        *self = Self(execution_data);
+        Ok(())
     }
 }
 

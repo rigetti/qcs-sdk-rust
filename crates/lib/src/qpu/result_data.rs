@@ -3,6 +3,7 @@
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use quil_rs::instruction::MemoryReference;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
 use qcs_api_client_grpc::models::controller::{
@@ -12,7 +13,7 @@ use qcs_api_client_grpc::models::controller::{
 
 /// A row of readout values from the QPU. Each row contains all the values emitted to a
 /// memory reference across all shots.
-#[derive(Debug, Clone, EnumAsInner, PartialEq)]
+#[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 pub enum ReadoutValues {
     /// Integer readout values
     Integer(Vec<i64>),
@@ -23,7 +24,7 @@ pub enum ReadoutValues {
 }
 
 /// A row of data containing the contents of each memory region at the end of a job.
-#[derive(Debug, Clone, EnumAsInner, PartialEq)]
+#[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 pub enum MemoryValues {
     /// Values that correspond to a memory region declared with the BIT or OCTET data type.
     Binary(Vec<u8>),
@@ -35,7 +36,7 @@ pub enum MemoryValues {
 
 /// This struct encapsulates data returned from the QPU after executing a job.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct QpuResultData {
     pub(crate) mappings: HashMap<String, String>,
     pub(crate) readout_values: HashMap<String, ReadoutValues>,
