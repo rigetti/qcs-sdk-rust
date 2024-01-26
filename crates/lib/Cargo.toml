@@ -15,7 +15,6 @@ tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/
 tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
 otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-client-openapi/otel-tracing"]
 libquil = ["dep:libquil-sys"]
-tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
 
 [dependencies]
 cached = "0.44.0"
@@ -25,7 +24,6 @@ indexmap = "1.9.1"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
-opentelemetry_api = "0.20.0"
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
@@ -41,7 +39,7 @@ serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 toml = "0.7.3"
-tracing = { version = "0.1.37", optional = true, features = ["log"] }
+tracing = { version = "0.1", optional = true, features = ["log"] }
 uuid = { version = "1.2.1", features = ["v4"] }
 tonic = { version = "0.9.2", features = ["tls", "tls-roots"] }
 zmq = { version = "0.10.0" }

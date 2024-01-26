@@ -19,12 +19,10 @@ from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
 
-from qcs_sdk import _tracing_subscriber as _tracing_subscriber
 from qcs_sdk import client as client
 from qcs_sdk import compiler as compiler
 from qcs_sdk import qpu as qpu
 from qcs_sdk import qvm as qvm
-
 
 class ExecutionError(RuntimeError):
     """Error encountered when executing a program."""

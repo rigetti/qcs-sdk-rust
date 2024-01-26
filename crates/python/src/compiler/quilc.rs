@@ -193,10 +193,8 @@ impl PyQuilcClient {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
-    #[tracing::instrument(skip_all)]
     async fn compile_program(
         quil: String,
         target: PyTargetDevice,

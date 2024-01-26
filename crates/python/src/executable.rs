@@ -1,6 +1,5 @@
 use std::{num::NonZeroU16, sync::Arc};
 
-use opentelemetry::trace::FutureExt;
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
@@ -9,7 +8,6 @@ use rigetti_pyo3::{
     wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
-use tracing::instrument;
 
 use crate::{
     compiler::quilc::{PyCompilerOpts, PyQuilcClient},
@@ -91,7 +89,6 @@ macro_rules! py_job_handle {
     }};
 }
 
-#[pyo3_opentelemetry::pypropagate(exclude(new))]
 #[pymethods]
 impl PyExecutable {
     #[new]
@@ -134,28 +131,20 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
-    #[instrument(skip_all)]
     pub fn execute_on_qvm(
         &self,
         py: Python<'_>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<PyExecutionData> {
-        py_sync!(
-            py,
-            py_executable_data!(self, execute_on_qvm, &client).with_current_context()
-        )
+        py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
-    #[instrument(skip_all)]
     pub fn execute_on_qvm_async<'py>(
         &'py self,
         py: Python<'py>,
         client: crate::qvm::PyQvmClient,
     ) -> PyResult<&PyAny> {
-        py_async!(
-            py,
-            py_executable_data!(self, execute_on_qvm, &client).with_current_context()
-        )
+        py_async!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -178,7 +167,6 @@ impl PyExecutable {
                     endpoint_id,
                     translation_options,
                 )
-                .with_current_context()
             ),
             None => py_sync!(
                 py,
@@ -189,7 +177,6 @@ impl PyExecutable {
                     translation_options,
                     execution_options.unwrap_or_default().as_inner(),
                 )
-                .with_current_context()
             ),
         }
     }
@@ -214,7 +201,6 @@ impl PyExecutable {
                     endpoint_id,
                     translation_options,
                 )
-                .with_current_context()
             ),
             None => py_async!(
                 py,
@@ -225,7 +211,6 @@ impl PyExecutable {
                     translation_options,
                     execution_options.unwrap_or_default().as_inner(),
                 )
-                .with_current_context()
             ),
         }
     }
@@ -250,7 +235,6 @@ impl PyExecutable {
                     endpoint_id,
                     translation_options,
                 )
-                .with_current_context()
             ),
             None => py_sync!(
                 py,
@@ -261,7 +245,6 @@ impl PyExecutable {
                     translation_options,
                     execution_options.unwrap_or_default().as_inner(),
                 )
-                .with_current_context()
             ),
         }
     }
@@ -287,7 +270,6 @@ impl PyExecutable {
                         endpoint_id,
                         translation_options,
                     )
-                    .with_current_context()
                 )
             }
             None => py_async!(
@@ -299,7 +281,6 @@ impl PyExecutable {
                     translation_options,
                     execution_options.unwrap_or_default().as_inner(),
                 )
-                .with_current_context()
             ),
         }
     }
@@ -311,7 +292,7 @@ impl PyExecutable {
     ) -> PyResult<PyExecutionData> {
         py_sync!(
             py,
-            py_executable_data!(self, retrieve_results, job_handle.into()).with_current_context()
+            py_executable_data!(self, retrieve_results, job_handle.into())
         )
     }
 
@@ -322,7 +303,7 @@ impl PyExecutable {
     ) -> PyResult<&PyAny> {
         py_async!(
             py,
-            py_executable_data!(self, retrieve_results, job_handle.into()).with_current_context()
+            py_executable_data!(self, retrieve_results, job_handle.into())
         )
     }
 }

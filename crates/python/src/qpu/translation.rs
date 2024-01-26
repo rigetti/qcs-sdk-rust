@@ -56,7 +56,6 @@ py_wrap_error!(
 py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
-    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
     async fn get_quilt_calibrations(
@@ -209,7 +208,6 @@ py_function_sync_async! {
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
-    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     async fn translate(
