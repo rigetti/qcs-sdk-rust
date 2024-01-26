@@ -10,7 +10,7 @@ use std::time::Duration;
 use qcs_api_client_common::configuration::LoadError;
 use quil_rs::quil::ToQuilError;
 
-use crate::client::Qcs;
+use crate::client::{GrpcClientError, Qcs};
 use crate::compiler::quilc::{self, CompilerOpts};
 use crate::execution_data::{self, ResultData};
 use crate::qpu::api::{ExecutionOptions, JobId};
@@ -643,7 +643,7 @@ pub enum Error {
     Compilation(String),
     /// There was a problem when translating the Quil program.
     #[error("There was a problem translating the Quil program: {0}")]
-    Translation(String),
+    Translation(GrpcClientError),
     /// There was a problem when rewriting parameter arithmetic in the Quil program.
     #[error("There was a problem rewriting parameter arithmetic in the Quil program: {0}")]
     RewriteArithmetic(#[from] rewrite_arithmetic::Error),
