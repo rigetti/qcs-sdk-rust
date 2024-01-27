@@ -114,7 +114,7 @@ class TestRegisterMap:
 
 
 class TestExecutionData:
-    def test_pickle():
+    def test_pickle(self):
         """Test that ExecutionData can be pickled and unpickled."""
         qpu_result_data = QPUResultData(
             mappings={"q0": "ro"},
