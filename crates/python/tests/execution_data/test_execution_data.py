@@ -124,8 +124,8 @@ class TestExecutionData:
         qvm_result_data = QVMResultData.from_memory_map({"ro": RegisterData([[0, 1]])})
 
         for execution_data in [
-            ExecutionData(result_data=qpu_result_data, duration=1.0),
-            ExecutionData(result_data=qvm_result_data, duration=None),
+            ExecutionData(result_data=ResultData(qpu_result_data), duration=1.0),
+            ExecutionData(result_data=ResultData(qvm_result_data), duration=None),
         ]:
             pickled = pickle.dumps(execution_data)
             unpickled = pickle.loads(pickled)
