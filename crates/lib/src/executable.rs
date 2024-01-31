@@ -453,12 +453,18 @@ impl<'execution> Executable<'_, 'execution> {
         quantum_processor_id: S,
         endpoint_id: S,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> ExecutionResult
     where
         S: Into<Cow<'execution, str>>,
     {
         let job_handle = self
-            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id, translation_options)
+            .submit_to_qpu_with_endpoint(
+                quantum_processor_id,
+                endpoint_id,
+                translation_options,
+                execution_options,
+            )
             .await?;
         self.retrieve_results(job_handle).await
     }
@@ -575,6 +581,7 @@ impl<'execution> Executable<'_, 'execution> {
         quantum_processor_id: S,
         endpoint_id: S,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'execution>, Error>
     where
         S: Into<Cow<'execution, str>>,
@@ -582,7 +589,12 @@ impl<'execution> Executable<'_, 'execution> {
         let job_handle = self
             .qpu_for_id(quantum_processor_id)
             .await?
-            .submit_to_endpoint_id(&self.params, endpoint_id.into(), translation_options)
+            .submit_to_endpoint_id(
+                &self.params,
+                endpoint_id.into(),
+                translation_options,
+                execution_options,
+            )
             .await?;
         Ok(job_handle)
     }

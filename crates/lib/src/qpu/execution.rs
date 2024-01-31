@@ -204,6 +204,7 @@ impl<'a> Execution<'a> {
         params: &Parameters,
         endpoint_id: S,
         translation_options: Option<TranslationOptions>,
+        execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'a>, Error>
     where
         S: Into<Cow<'a, str>>,
@@ -216,6 +217,8 @@ impl<'a> Execution<'a> {
                 .connection_strategy(ConnectionStrategy::EndpointId(
                     endpoint_id.into().to_string(),
                 ))
+                .api_options(execution_options.api_options().cloned())
+                .timeout(execution_options.timeout())
                 .build()
                 .expect("valid execution options"),
         )
