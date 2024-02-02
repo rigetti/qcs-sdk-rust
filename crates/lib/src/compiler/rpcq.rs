@@ -41,7 +41,7 @@ impl Client {
     /// Set the timeout used for both sending and receiving messages
     ///
     /// Value is number of milliseconds. A value of `-1` means no timeout.
-    pub(crate) fn set_timeout(&mut self, timeout: i32) {
+    pub fn set_timeout(&mut self, timeout: i32) {
         self.set_send_timeout(timeout);
         self.set_receive_timeout(timeout);
     }
@@ -49,14 +49,14 @@ impl Client {
     /// Set the timeout used when sending messages
     ///
     /// Value is number of milliseconds. A value of `-1` means no timeout.
-    pub(crate) fn set_send_timeout(&mut self, timeout: i32) {
+    pub fn set_send_timeout(&mut self, timeout: i32) {
         self.send_timeout = Some(timeout);
     }
 
     /// Set the timeout used when receiving messages
     ///
     /// Value is number of milliseconds. A value of `-1` means no timeout.
-    pub(crate) fn set_receive_timeout(&mut self, timeout: i32) {
+    pub fn set_receive_timeout(&mut self, timeout: i32) {
         self.receive_timeout = Some(timeout);
     }
 

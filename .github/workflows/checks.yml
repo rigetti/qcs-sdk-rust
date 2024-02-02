@@ -1,5 +1,9 @@
 name: Run Checks
-on: [push]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   checks:

@@ -17,7 +17,7 @@ use qcs_api_client_grpc::{
     services::controller::{
         controller_client::ControllerClient, execute_controller_job_request,
         get_controller_job_results_request, ExecuteControllerJobRequest,
-        GetControllerJobResultsRequest,
+        ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
@@ -104,6 +104,7 @@ pub async fn submit(
         execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
+        options: execution_options.api_options().cloned(),
     };
 
     let mut controller_client = execution_options
@@ -194,7 +195,7 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Builder, Clone, Debug, Default, PartialEq)]
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     #[builder(default)]
@@ -205,6 +206,61 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the connection, defaults to `None`seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     connection_timeout: Option<Duration>,
+    #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
+    #[builder(default = "None")]
+    api_options: Option<InnerApiExecutionOptions>,
+}
+
+impl Eq for ExecutionOptions {}
+
+/// Options avaialable when executing a job on a QPU, particular to the execution service's API.
+/// This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
+///
+/// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
+/// to build a custom set of options.
+#[derive(Builder, Clone, Debug, Default, PartialEq)]
+#[allow(clippy::module_name_repetitions)]
+pub struct ApiExecutionOptions {
+    /// the inner proto representation
+    inner: InnerApiExecutionOptions,
+}
+
+impl Eq for ApiExecutionOptions {}
+
+impl ApiExecutionOptions {
+    /// Get an [`ExecutionOptionsBuilder`] that can be used to build a custom [`ExecutionOptions`].
+    #[must_use]
+    pub fn builder() -> ApiExecutionOptionsBuilder {
+        ApiExecutionOptionsBuilder::default()
+    }
+
+    /// Get the configured `bypass_settings_protection` value.
+    #[must_use]
+    pub fn bypass_settings_protection(&self) -> bool {
+        self.inner.bypass_settings_protection
+    }
+}
+
+impl From<ApiExecutionOptions> for InnerApiExecutionOptions {
+    fn from(options: ApiExecutionOptions) -> Self {
+        options.inner
+    }
+}
+
+impl From<InnerApiExecutionOptions> for ApiExecutionOptions {
+    fn from(inner: InnerApiExecutionOptions) -> Self {
+        Self { inner }
+    }
+}
+
+impl ApiExecutionOptionsBuilder {
+    /// Set the `bypass_settings_protection` value.
+    pub fn bypass_settings_protection(&mut self, bypass_settings_protection: bool) -> &mut Self {
+        self.inner
+            .get_or_insert(InnerApiExecutionOptions::default())
+            .bypass_settings_protection = bypass_settings_protection;
+        self
+    }
 }
 
 impl ExecutionOptions {
@@ -229,6 +285,11 @@ impl ExecutionOptions {
     #[must_use]
     pub fn connection_timeout(&self) -> Option<Duration> {
         self.connection_timeout
+    }
+    /// Get the [`ApiExecutionOptions`].
+    #[must_use]
+    pub fn api_options(&self) -> Option<&InnerApiExecutionOptions> {
+        self.api_options.as_ref()
     }
 }
 
