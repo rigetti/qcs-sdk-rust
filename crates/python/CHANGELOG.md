@@ -1,3 +1,13 @@
+## 0.16.4-rc.2
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
+### Fixes
+
+- bump quil-rs versions (#435)
+
 ## 0.16.4-rc.1
 
 ### Features
