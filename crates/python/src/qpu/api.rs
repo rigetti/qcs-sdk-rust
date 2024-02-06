@@ -11,7 +11,10 @@ use pyo3::{
     types::{PyComplex, PyInt},
     IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
 };
-use qcs::qpu::api::{ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder};
+use qcs::qpu::api::{
+    ApiExecutionOptions, ApiExecutionOptionsBuilder, ConnectionStrategy, ExecutionOptions,
+    ExecutionOptionsBuilder,
+};
 use qcs_api_client_grpc::models::controller::{
     data_value, readout_values, ControllerJobExecutionResult,
 };
@@ -33,7 +36,9 @@ create_init_submodule! {
         ExecutionResults,
         PyConnectionStrategy,
         PyExecutionOptions,
-        PyExecutionOptionsBuilder
+        PyExecutionOptionsBuilder,
+        PyApiExecutionOptions,
+        PyApiExecutionOptionsBuilder
     ],
     errors: [
         SubmissionError,
@@ -300,6 +305,13 @@ py_wrap_type! {
 impl_repr!(PyExecutionOptions);
 impl_as_mut_for_wrapper!(PyExecutionOptions);
 
+py_wrap_type! {
+    #[derive(Debug, Default)]
+    PyApiExecutionOptions(ApiExecutionOptions) as "APIExecutionOptions"
+}
+impl_repr!(PyApiExecutionOptions);
+impl_as_mut_for_wrapper!(PyApiExecutionOptions);
+
 #[pymethods]
 impl PyExecutionOptions {
     #[staticmethod]
@@ -324,11 +336,36 @@ impl PyExecutionOptions {
             .map(|timeout| timeout.as_secs_f64())
     }
 
+    #[getter]
+    fn api_options(&self) -> Option<PyApiExecutionOptions> {
+        self.as_inner()
+            .api_options()
+            .map(|x| PyApiExecutionOptions(x.clone().into()))
+    }
+
     fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {
         match op {
             CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+}
+
+#[pymethods]
+impl PyApiExecutionOptions {
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ApiExecutionOptions::default())
+    }
+
+    #[staticmethod]
+    fn builder() -> PyApiExecutionOptionsBuilder {
+        PyApiExecutionOptionsBuilder::default()
+    }
+
+    #[getter]
+    fn bypass_settings_protection(&self) -> bool {
+        self.as_inner().bypass_settings_protection()
     }
 }
 
@@ -362,6 +399,16 @@ impl PyExecutionOptionsBuilder {
     }
 
     #[setter]
+    fn api_options(&mut self, api_options: Option<PyApiExecutionOptions>) {
+        *self = Self::from(
+            self.as_inner()
+                .clone()
+                .api_options(api_options.map(|x| x.into_inner().into()))
+                .clone(),
+        );
+    }
+
+    #[setter]
     fn timeout_seconds(&mut self, timeout_seconds: Option<f64>) {
         let timeout = timeout_seconds.map(Duration::from_secs_f64);
         *self = Self::from(self.as_inner().clone().timeout(timeout).clone());
@@ -369,6 +416,44 @@ impl PyExecutionOptionsBuilder {
 
     fn build(&self) -> PyResult<PyExecutionOptions> {
         Ok(PyExecutionOptions::from(
+            self.as_inner()
+                .build()
+                .map_err(|err| PyValueError::new_err(err.to_string()))?,
+        ))
+    }
+}
+
+py_wrap_type! {
+    PyApiExecutionOptionsBuilder(ApiExecutionOptionsBuilder) as "APIExecutionOptionsBuilder"
+}
+
+#[pymethods]
+impl PyApiExecutionOptionsBuilder {
+    #[new]
+    fn new() -> Self {
+        Self::default()
+    }
+
+    #[staticmethod]
+    fn default() -> Self {
+        Self::from(ApiExecutionOptionsBuilder::default())
+    }
+
+    #[setter]
+    fn bypass_settings_protection(&mut self, bypass_settings_protection: bool) {
+        // `derive_builder::Builder` doesn't implement AsMut, meaning we can't use `PyWrapperMut`,
+        // which forces us into this awkward clone.
+
+        *self = Self::from(
+            self.as_inner()
+                .clone()
+                .bypass_settings_protection(bypass_settings_protection)
+                .clone(),
+        );
+    }
+
+    fn build(&self) -> PyResult<PyApiExecutionOptions> {
+        Ok(PyApiExecutionOptions::from(
             self.as_inner()
                 .build()
                 .map_err(|err| PyValueError::new_err(err.to_string()))?,

@@ -880,9 +880,9 @@ checksum = "d2fabcfbdc87f4758337ca535fb41a6d701b65693ce38287d856d1674551ec9b"
 
 [[package]]
 name = "h2"
-version = "0.3.22"
+version = "0.3.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d6250322ef6e60f93f9a2162799302cd6f68f79f6e5d85c8c16f14d1d958178"
+checksum = "bb2c4422095b67ee78da96fbb51a4cc413b3b25883c7717ff7ca1ab31022c9c9"
 dependencies = [
  "bytes",
  "fnv",
@@ -2054,7 +2054,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.20.2"
+version = "0.20.5-rc.1"
 dependencies = [
  "assert2",
  "async-trait",
@@ -2114,9 +2114,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.7.7"
+version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dad78be261af4de4d54bfb03019ae5c564c5e966d4ca64f883cef25ed07d218d"
+checksum = "cc3356caa74bb697c4271c950a3040e8dbb9448a9bd0124411b9b43155b8e192"
 dependencies = [
  "async-trait",
  "futures",
@@ -2135,9 +2135,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.7.7"
+version = "0.7.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53e298dc6ce58bca734eed37f7934cc82e3d34463ac3e067bd4ad57fa903b55b"
+checksum = "37bd1842ca3485e8c0abf36be4cbcee1ea12e97da15ac731ce9dae20f7f58f41"
 dependencies = [
  "http",
  "http-body",
@@ -2164,9 +2164,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.8.7"
+version = "0.8.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e970a25b7a98e040ca03badddae6d23b5a5f58189bd0e112770b7a9126b05296"
+checksum = "c605c4bdf887f487dbe7c0055f303728a992a6d508eedc55d7efa41b36adba07"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
@@ -2183,7 +2183,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.16.1"
+version = "0.16.4-rc.1"
 dependencies = [
  "async-trait",
  "numpy",

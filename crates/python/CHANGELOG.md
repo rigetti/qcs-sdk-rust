@@ -1,3 +1,53 @@
+## 0.16.4-rc.1
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
+## 0.16.4-rc.0
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
+## 0.16.3
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.5/0.6.5 (#424)
+
+## 0.16.3-rc.0
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.5/0.6.5 (#424)
+
+## 0.16.2
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.4/0.6.4 (#423)
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
+## 0.16.2-rc.2
+
+### Features
+
+- Update quil-rs/quil-py to 0.23.4/0.6.4 (#423)
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
+## 0.16.2-rc.1
+
+### Features
+
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
+## 0.16.2-rc.0
+
+### Features
+
+- provide ExecutionOptions configurability as ApiExecutionOptions (#415)
+
 ## 0.16.1
 
 ### Features
