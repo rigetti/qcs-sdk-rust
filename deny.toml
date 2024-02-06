@@ -28,6 +28,8 @@ ignore = [
     "RUSTSEC-2023-0052",  # Introduced by transitive dependency `webpki`.
                           # `hyper-proxy`, then `qcs-api-client-rust` need to update in order to remove
                           # `webpki`.
+    "RUSTSEC-2023-0055",  # there isn't a newer version of lexical with a fix
+    "RUSTSEC-2024-0006",
 ]
 
 # This section is considered when running `cargo deny check licenses`
