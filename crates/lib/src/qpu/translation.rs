@@ -70,7 +70,7 @@ where
 
     let response = client
         .get_translation_client()
-        .map_err(|e| Error::Grpc(e.into()))?
+        .map_err(GrpcClientError::from)?
         .translate_quil_to_encrypted_controller_job(request)
         .await
         .map_err(GrpcClientError::from)?
