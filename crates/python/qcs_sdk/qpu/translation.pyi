@@ -4,7 +4,7 @@ from enum import Enum, auto
 from qcs_sdk.client import QCSClient
 
 class TranslationError(RuntimeError):
-    """An error occured while translating a program."""
+    """Errors that can occur while using the translation module."""
 
     ...
 
