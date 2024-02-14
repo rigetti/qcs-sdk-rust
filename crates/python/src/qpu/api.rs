@@ -47,6 +47,10 @@ create_init_submodule! {
     funcs: [
         py_submit,
         py_submit_async,
+        py_cancel_job,
+        py_cancel_job_async,
+        py_cancel_jobs,
+        py_cancel_jobs_async,
         py_retrieve_results,
         py_retrieve_results_async
     ],
