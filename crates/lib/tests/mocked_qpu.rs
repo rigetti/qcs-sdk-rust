@@ -281,7 +281,9 @@ mod translation {
             _request: Request<GetQuantumProcessorQuilCalibrationProgramRequest>,
         ) -> Result<Response<QuantumProcessorQuilCalibrationProgram>, Status> {
             Ok(Response::new(QuantumProcessorQuilCalibrationProgram {
-                quil_calibration_program: "H 0\nCNOT 0 1\n".to_string(),
+                quil_calibration_program:
+                    "DEFCAL X 0:\nPULSE 0 \"xy\" gaussian(duration: 1, fwhm: 2, t0: 3)\n"
+                        .to_string(),
             }))
         }
     }
