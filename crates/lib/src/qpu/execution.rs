@@ -260,7 +260,7 @@ impl<'a> Execution<'a> {
     }
 
     pub(crate) async fn cancel_job(&self, job_handle: JobHandle<'a>) -> Result<(), Error> {
-        crate::qpu::api::cancel_job(
+        crate::qpu::api::request_job_cancellation(
             job_handle.job_id(),
             Some(job_handle.quantum_processor_id()),
             self.client.as_ref(),

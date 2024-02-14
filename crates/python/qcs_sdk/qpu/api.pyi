@@ -133,7 +133,7 @@ async def submit_async(
     """
     ...
 
-def cancel_job(
+def request_job_cancellation(
     job_id: str,
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
@@ -159,14 +159,14 @@ def cancel_job(
     """
     ...
 
-async def cancel_job_async(
+async def request_job_cancellation_async(
     job_id: str,
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ):
     """
-    Cancel a job that has yet to begin executing (async analog of `cancel_job`).
+    Cancel a job that has yet to begin executing (async analog of `request_job_canellation`).
 
     This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
     job can be cancelled only if it has not yet started executing.
@@ -185,7 +185,7 @@ async def cancel_job_async(
     """
     ...
 
-def cancel_jobs(
+def request_job_cancellations(
     job_ids: List[str],
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
@@ -211,14 +211,14 @@ def cancel_jobs(
     """
     ...
 
-async def cancel_jobs_async(
+async def request_job_cancellations_async(
     job_ids: List[str],
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
 ):
     """
-    Cancel all given jobs that have yet to begin executing (async analog of `cancel_jobs`).
+    Cancel all given jobs that have yet to begin executing (async analog of `request_job_canellations`).
 
     Success response indicates only that the request was received. Cancellation is not guaranteed,
     as it is based on job state at the time of cancellation, and is completed on a best effort
