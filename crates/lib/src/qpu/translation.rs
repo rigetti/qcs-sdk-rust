@@ -174,6 +174,7 @@ impl TranslationOptions {
         options
     }
 
+    #[allow(dead_code)]
     fn ensure_backend_v1(&mut self) -> Result<&mut BackendV1Options, TranslationBackendMismatch> {
         if matches!(self.backend(), None | Some(TranslationBackend::V1(_))) {
             Ok(self.with_backend_v1())

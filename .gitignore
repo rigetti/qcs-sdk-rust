@@ -6,6 +6,7 @@ __pycache__/
 
 # Local config
 .env
+.envrc
 venv/
 .venv
 

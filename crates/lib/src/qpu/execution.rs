@@ -259,6 +259,17 @@ impl<'a> Execution<'a> {
         ))
     }
 
+    pub(crate) async fn cancel_job(&self, job_handle: JobHandle<'a>) -> Result<(), Error> {
+        crate::qpu::api::cancel_job(
+            job_handle.job_id(),
+            Some(job_handle.quantum_processor_id()),
+            self.client.as_ref(),
+            job_handle.execution_options(),
+        )
+        .await
+        .map_err(Error::from)
+    }
+
     pub(crate) async fn retrieve_results(
         &self,
         job_handle: JobHandle<'a>,
