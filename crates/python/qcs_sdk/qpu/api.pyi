@@ -186,7 +186,7 @@ async def cancel_job_async(
     ...
 
 def cancel_jobs(
-    job_kds: List[str],
+    job_ids: List[str],
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
@@ -212,7 +212,7 @@ def cancel_jobs(
     ...
 
 async def cancel_jobs_async(
-    job_kds: List[str],
+    job_ids: List[str],
     quantum_processor_id: Optional[str] = None,
     client: Optional[QCSClient] = None,
     execution_options: Optional[ExecutionOptions] = None,
