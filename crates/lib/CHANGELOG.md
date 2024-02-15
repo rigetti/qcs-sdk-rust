@@ -1,3 +1,9 @@
+## 0.20.6-rc.0
+
+### Features
+
+- Jobs that have yet to begin executing can be cancelled. (#438)
+
 ## 0.20.5
 
 ### Features
