@@ -47,10 +47,10 @@ create_init_submodule! {
     funcs: [
         py_submit,
         py_submit_async,
-        py_request_job_cancellation,
-        py_request_job_cancellation_async,
-        py_request_job_cancellations,
-        py_request_job_cancellations_async,
+        py_cancel_job,
+        py_cancel_job_async,
+        py_cancel_jobs,
+        py_cancel_jobs_async,
         py_retrieve_results,
         py_retrieve_results_async
     ],
@@ -278,7 +278,7 @@ impl ExecutionResults {
 py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
-    async fn request_job_cancellations(
+    async fn cancel_jobs(
         job_ids: Vec<String>,
         quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
@@ -286,7 +286,7 @@ py_function_sync_async! {
     ) -> PyResult<()> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
-        qcs::qpu::api::request_job_cancellations(
+        qcs::qpu::api::cancel_jobs(
             job_ids.into_iter().map(|id| id.into()).collect(),
             quantum_processor_id.as_deref(),
             &client,
@@ -302,7 +302,7 @@ py_function_sync_async! {
 py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
-    async fn request_job_cancellation(
+    async fn cancel_job(
         job_id: String,
         quantum_processor_id: Option<String>,
         client: Option<PyQcsClient>,
@@ -310,7 +310,7 @@ py_function_sync_async! {
     ) -> PyResult<()> {
         let client = PyQcsClient::get_or_create_client(client).await;
 
-        qcs::qpu::api::request_job_cancellation(
+        qcs::qpu::api::cancel_job(
             job_id.into(),
             quantum_processor_id.as_deref(),
             &client,

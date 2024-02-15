@@ -144,7 +144,7 @@ pub async fn submit(
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
-pub async fn request_job_cancellations(
+pub async fn cancel_jobs(
     job_ids: Vec<JobId>,
     quantum_processor_id: Option<&str>,
     client: &Qcs,
@@ -184,13 +184,13 @@ pub async fn request_job_cancellations(
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used is
 ///      [`ConnectionStrategy::EndpointId`] then direct access to that endpoint overrides the
 ///      `quantum_processor_id` parameter.
-pub async fn request_job_cancellation(
+pub async fn cancel_job(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<(), QpuApiError> {
-    request_job_cancellations(
+    cancel_jobs(
         vec![job_id],
         quantum_processor_id,
         client,
