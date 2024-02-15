@@ -8,8 +8,8 @@ class SubmissionError(RuntimeError):
 
     ...
 
-class RetrieveResultsError(RuntimeError):
-    """There was a problem retrieving program execution results from QCS."""
+class QpuApiError(RuntimeError):
+    """An error occured while interacting with the QPU API."""
 
     ...
 
@@ -133,6 +133,107 @@ async def submit_async(
     """
     ...
 
+def cancel_job(
+    job_id: str,
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+):
+    """
+    Cancel a job that has yet to begin executing.
+
+    This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    job can be cancelled only if it has not yet started executing.
+
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+
+    :param job_id: The job ID to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is
+         required unless using the `ConnectionStrategy.endpoint_id()` execution option.
+    :client: - The `QCSClient` to use.
+    :execution_options: The `ExecutionOptions` to use. If the connection strategy used is
+         ConnectionStrategy.endpoint_id() then direct access to that endpoint overrides the
+         `quantum_processor_id` parameter.
+    """
+    ...
+
+async def cancel_job_async(
+    job_id: str,
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+):
+    """
+    Cancel a job that has yet to begin executing (async analog of `cancel_job`).
+
+    This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    job can be cancelled only if it has not yet started executing.
+
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+
+    :param job_id: The job ID to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is
+         required unless using the `ConnectionStrategy.endpoint_id()` execution option.
+    :client: - The `QCSClient` to use.
+    :execution_options: The `ExecutionOptions` to use. If the connection strategy used is
+         ConnectionStrategy.endpoint_id() then direct access to that endpoint overrides the
+         `quantum_processor_id` parameter.
+    """
+    ...
+
+def cancel_jobs(
+    job_ids: List[str],
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+):
+    """
+    Cancel all given jobs that have yet to begin executing.
+
+    This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
+    cancelled. A job can be cancelled only if it has not yet started executing.
+
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is
+         required unless using the `ConnectionStrategy.endpoint_id()` execution option.
+    :param job_ids: The job IDs to cancel.
+    :client: - The `QCSClient` to use.
+    :execution_options: The `ExecutionOptions` to use. If the connection strategy used is
+         ConnectionStrategy.endpoint_id() then direct access to that endpoint overrides the
+         `quantum_processor_id` parameter.
+    """
+    ...
+
+async def cancel_jobs_async(
+    job_ids: List[str],
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+):
+    """
+    Cancel all given jobs that have yet to begin executing (async analog of `cancel_jobs`).
+
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is
+         required unless using the `ConnectionStrategy.endpoint_id()` execution option.
+    :param job_ids: The job IDs to cancel.
+    :client: - The `QCSClient` to use.
+    :execution_options: The `ExecutionOptions` to use. If the connection strategy used is
+         ConnectionStrategy.endpoint_id() then direct access to that endpoint overrides the
+         `quantum_processor_id` parameter.
+    """
+    ...
+
 def retrieve_results(
     job_id: str,
     quantum_processor_id: Optional[str] = None,
@@ -151,7 +252,7 @@ def retrieve_results(
     :returns: results from execution.
 
     :raises LoadClientError: If there is an issue loading the QCS Client configuration.
-    :raises SubmissionError: If there was a problem during program execution.
+    :raises QpuApiError: If there was a problem retrieving the results.
     """
     ...
 
@@ -174,7 +275,7 @@ async def retrieve_results_async(
     :returns: results from execution.
 
     :raises LoadClientError: If there is an issue loading the QCS Client configuration.
-    :raises SubmissionError: If there was a problem during program execution.
+    :raises QpuApiError: If there was a problem retrieving the results.
     """
     ...
 
