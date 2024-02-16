@@ -1,3 +1,17 @@
+## 0.21.0-rc.0
+
+### Breaking Changes
+
+- The calibration program is now from
+`get_quilt_calibrations` as a string. The error variants have also been
+slightly modified.
+
+* simplify error map
+
+* cleanup test
+
+* put calibration in mock calibration program
+
 ## 0.20.6
 
 ### Features
