@@ -1,3 +1,21 @@
+## 0.17.0
+
+### Breaking Changes
+
+- The calibration program is now from
+`get_quilt_calibrations` as a string. The error variants have also been
+slightly modified.
+
+* simplify error map
+
+* cleanup test
+
+* put calibration in mock calibration program
+
+### Features
+
+- Automatically retry requests that fail due to transient network errors, fgequests to cancel job no longer error due to missing target. (#443)
+
 ## 0.17.0-rc.1
 
 ### Breaking Changes
