@@ -42,11 +42,15 @@ create_init_submodule! {
     ],
     errors: [
         SubmissionError,
-        RetrieveResultsError
+        QpuApiError
     ],
     funcs: [
         py_submit,
         py_submit_async,
+        py_cancel_job,
+        py_cancel_job_async,
+        py_cancel_jobs,
+        py_cancel_jobs_async,
         py_retrieve_results,
         py_retrieve_results_async
     ],
@@ -107,13 +111,8 @@ py_function_sync_async! {
     }
 }
 
-wrap_error!(RustRetrieveResultsError(qcs::qpu::api::QpuApiError));
-py_wrap_error!(
-    runner,
-    RustRetrieveResultsError,
-    RetrieveResultsError,
-    PyRuntimeError
-);
+wrap_error!(RustQpuApiError(qcs::qpu::api::QpuApiError));
+py_wrap_error!(runner, RustQpuApiError, QpuApiError, PyRuntimeError);
 
 /// Variants of data vectors within a single ExecutionResult.
 #[derive(Clone, Debug)]
@@ -278,6 +277,54 @@ impl ExecutionResults {
 
 py_function_sync_async! {
     #[pyfunction]
+    #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
+    async fn cancel_jobs(
+        job_ids: Vec<String>,
+        quantum_processor_id: Option<String>,
+        client: Option<PyQcsClient>,
+        execution_options: Option<PyExecutionOptions>,
+    ) -> PyResult<()> {
+        let client = PyQcsClient::get_or_create_client(client).await;
+
+        qcs::qpu::api::cancel_jobs(
+            job_ids.into_iter().map(|id| id.into()).collect(),
+            quantum_processor_id.as_deref(),
+            &client,
+            execution_options.unwrap_or_default().as_inner()
+        )
+        .await
+        .map_err(RustQpuApiError::from).map_err(RustQpuApiError::to_py_err)?;
+
+        Ok(())
+    }
+}
+
+py_function_sync_async! {
+    #[pyfunction]
+    #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
+    async fn cancel_job(
+        job_id: String,
+        quantum_processor_id: Option<String>,
+        client: Option<PyQcsClient>,
+        execution_options: Option<PyExecutionOptions>,
+    ) -> PyResult<()> {
+        let client = PyQcsClient::get_or_create_client(client).await;
+
+        qcs::qpu::api::cancel_job(
+            job_id.into(),
+            quantum_processor_id.as_deref(),
+            &client,
+            execution_options.unwrap_or_default().as_inner()
+        )
+        .await
+        .map_err(RustQpuApiError::from).map_err(RustQpuApiError::to_py_err)?;
+
+        Ok(())
+    }
+}
+
+py_function_sync_async! {
+    #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn retrieve_results(
         job_id: String,
@@ -289,8 +336,8 @@ py_function_sync_async! {
 
         let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id.as_deref(), &client, execution_options.unwrap_or_default().as_inner())
             .await
-            .map_err(RustRetrieveResultsError::from)
-            .map_err(RustRetrieveResultsError::to_py_err)?;
+            .map_err(RustQpuApiError::from)
+            .map_err(RustQpuApiError::to_py_err)?;
 
         Python::with_gil(|py| {
             ExecutionResults::from_controller_job_execution_result(py, results)

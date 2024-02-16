@@ -587,6 +587,20 @@ impl<'execution> Executable<'_, 'execution> {
         Ok(job_handle)
     }
 
+    /// Cancel a job that has yet to begin executing.
+    ///
+    /// This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    /// job can be cancelled only if it has not yet started executing.
+    ///
+    /// Success response indicates only that the request was received. Cancellation is not guaranteed,
+    /// as it is based on job state at the time of cancellation, and is completed on a best effort
+    /// basis.
+    pub async fn cancel_qpu_job(&mut self, job_handle: JobHandle<'execution>) -> Result<(), Error> {
+        let quantum_processor_id = job_handle.quantum_processor_id.to_string();
+        let qpu = self.qpu_for_id(quantum_processor_id).await?;
+        Ok(qpu.cancel_job(job_handle).await?)
+    }
+
     /// Wait for the results of a job submitted via [`Executable::submit_to_qpu`] to complete.
     ///
     /// # Errors
