@@ -143,6 +143,10 @@ pub async fn submit(
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
 ///       overrides the `quantum_processor_id` parameter.
+///
+/// # Errors
+/// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if any of
+///     the jobs could not be cancelled.
 pub async fn cancel_jobs(
     job_ids: Vec<JobId>,
     quantum_processor_id: Option<&str>,
@@ -183,6 +187,10 @@ pub async fn cancel_jobs(
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used is
 ///      [`ConnectionStrategy::EndpointId`] then direct access to that endpoint overrides the
 ///      `quantum_processor_id` parameter.
+///
+/// # Errors
+/// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if the
+///     job could not be cancelled.
 pub async fn cancel_job(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
