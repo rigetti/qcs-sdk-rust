@@ -20,12 +20,36 @@ async fn quilc_client() -> rpcq::Client {
 #[tokio::main]
 async fn main() {
     let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
+    let execution_options = ExecutionOptions::default();
 
+    // You can submit a job to QPU retrieve results in a single step.
     let result = exe
         .with_parameter("theta", 0, PI)
-        .execute_on_qpu("Aspen-M-3", None, &ExecutionOptions::default())
+        .execute_on_qpu("Ankaa-2", None, &execution_options)
         .await
         .expect("Program should execute successfully");
 
+    dbg!(&result);
+
+    // Or you can submit a job, and retrieve results later.
+    let handle = exe
+        .with_parameter("theta", 0, PI / 2.0)
+        .submit_to_qpu("Ankaa-2", None, &execution_options)
+        .await
+        .expect("Program should be sumbitted successfully.");
+
+    // You can use the job handle to attempt job cancellation. This will only succeed if the job
+    // has not begun executing.
+    let cancelled = exe.cancel_qpu_job(handle.clone()).await.is_ok();
+
+    // Retrieving results will return an error if the job was successfully cancelled.
+    let result = exe.retrieve_results(handle.clone()).await;
+    if !cancelled {
+        println!("Job was not cancelled");
+        assert!(result.is_ok());
+    } else {
+        println!("Job was cancelled");
+        assert!(result.is_err());
+    }
     dbg!(&result);
 }

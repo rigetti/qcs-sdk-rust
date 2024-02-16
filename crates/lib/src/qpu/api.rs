@@ -15,10 +15,10 @@ use qcs_api_client_grpc::{
         DataValue, EncryptedControllerJob, JobExecutionConfiguration, RealDataValue,
     },
     services::controller::{
-        controller_client::ControllerClient, execute_controller_job_request,
-        get_controller_job_results_request, CancelControllerJobsRequest,
-        ExecuteControllerJobRequest, ExecutionOptions as InnerApiExecutionOptions,
-        GetControllerJobResultsRequest,
+        cancel_controller_jobs_request, controller_client::ControllerClient,
+        execute_controller_job_request, get_controller_job_results_request,
+        CancelControllerJobsRequest, ExecuteControllerJobRequest,
+        ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
@@ -131,9 +131,8 @@ pub async fn submit(
 /// This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
 /// cancelled. A job can be cancelled only if it has not yet started executing.
 ///
-/// Success response indicates only that the request was received. Cancellation is not guaranteed,
-/// as it is based on job state at the time of cancellation, and is completed on a best effort
-/// basis.
+/// Cancellation is not guaranteed, as it is based on job state at the time of cancellation, and is
+/// completed on a best effort basis.
 ///
 /// # Arguments
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
@@ -150,13 +149,14 @@ pub async fn cancel_jobs(
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<(), QpuApiError> {
-    let request = CancelControllerJobsRequest {
-        job_ids: job_ids.into_iter().map(|id| id.0).collect(),
-    };
-
     let mut controller_client = execution_options
         .get_controller_client(client, quantum_processor_id)
         .await?;
+
+    let request = CancelControllerJobsRequest {
+        job_ids: job_ids.into_iter().map(|id| id.0).collect(),
+        target: execution_options.get_cancel_target(quantum_processor_id),
+    };
 
     controller_client
         .cancel_controller_jobs(request)
@@ -171,9 +171,8 @@ pub async fn cancel_jobs(
 /// This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
 /// job can be cancelled only if it has not yet started executing.
 ///
-/// Success response indicates only that the request was received. Cancellation is not guaranteed,
-/// as it is based on job state at the time of cancellation, and is completed on a best effort
-/// basis.
+/// Cancellation is not guaranteed, as it is based on job state at the time of cancellation, and is
+/// completed on a best effort basis.
 ///
 /// # Arguments
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter is
@@ -401,6 +400,20 @@ impl ExecutionOptions {
             ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
                 .map(String::from)
                 .map(get_controller_job_results_request::Target::QuantumProcessorId),
+        }
+    }
+
+    fn get_cancel_target(
+        &self,
+        quantum_processor_id: Option<&str>,
+    ) -> Option<cancel_controller_jobs_request::Target> {
+        match self.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
+                cancel_controller_jobs_request::Target::EndpointId(endpoint_id.to_string()),
+            ),
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(cancel_controller_jobs_request::Target::QuantumProcessorId),
         }
     }
 
