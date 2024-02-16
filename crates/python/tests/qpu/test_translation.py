@@ -1,7 +1,6 @@
 import pytest
 
 from qcs_sdk.qpu.translation import (
-    GetQuiltCalibrationsError,
     TranslationError,
     translate,
     translate_async,
@@ -47,7 +46,7 @@ def test_get_quilt_calibrations(
 
 @pytest.mark.qcs_session
 def test_get_quilt_calibrations_error():
-    with pytest.raises(GetQuiltCalibrationsError):
+    with pytest.raises(TranslationError):
         get_quilt_calibrations("--")
 
 
@@ -62,6 +61,7 @@ async def test_get_quilt_calibrations(
 
 def test_translation_backend():
     from qcs_sdk.qpu.translation import TranslationBackend, TranslationOptions
+
     opts = TranslationOptions()
     assert opts.backend is None
     opts.use_backend_v1()

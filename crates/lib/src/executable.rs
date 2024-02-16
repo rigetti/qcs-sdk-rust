@@ -715,6 +715,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Unexpected(inner) => Self::Unexpected(format!("{inner:?}")),
             ExecutionError::Quilc { .. } => Self::Connection(Service::Quilc),
             ExecutionError::QcsClient(v) => Self::Unexpected(format!("{v:?}")),
+            ExecutionError::Translation(v) => Self::Translation(v.to_string()),
             ExecutionError::Isa(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::ReadoutParse(v) => Self::Unexpected(format!("{v:?}")),
             ExecutionError::Quil(e) => Self::Quil(e),
