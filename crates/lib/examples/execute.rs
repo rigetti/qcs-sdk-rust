@@ -22,10 +22,10 @@ async fn main() {
     let mut exe = Executable::from_quil(PROGRAM).with_quilc_client(Some(quilc_client().await));
     let execution_options = ExecutionOptions::default();
 
-    // You can submit a job to QPU and retrieve results in a single step.
+    // You can submit a job to a QPU and retrieve results in a single step.
     let result = exe
         .with_parameter("theta", 0, PI)
-        .execute_on_qpu("Ankaa-9Q-1", None, &execution_options)
+        .execute_on_qpu("Ankaa-2", None, &execution_options)
         .await
         .expect("Program should execute successfully");
 
@@ -34,13 +34,15 @@ async fn main() {
     // Or you can submit a job, then retrieve results later.
     let handle = exe
         .with_parameter("theta", 0, PI / 2.0)
-        .submit_to_qpu("Ankaa-9Q-1", None, &execution_options)
+        .submit_to_qpu("Ankaa-2", None, &execution_options)
         .await
         .expect("Program should be sumbitted successfully.");
 
     // You can use the job handle to attempt job cancellation. This will only succeed if the job
     // has not begun executing.
-    let cancelled = exe.cancel_qpu_job(handle.clone()).await.is_ok();
+    let cancelled_result = exe.cancel_qpu_job(handle.clone()).await;
+    dbg!(&cancelled_result);
+    let cancelled = cancelled_result.is_ok();
 
     // Retrieving results will return an error if the job was successfully cancelled.
     let result = exe.retrieve_results(handle.clone()).await;
