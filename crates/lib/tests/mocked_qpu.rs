@@ -244,7 +244,9 @@ mod translation {
         Translation, TranslationServer,
     };
     use qcs_api_client_grpc::services::translation::{
-        TranslateQuilToEncryptedControllerJobRequest, TranslateQuilToEncryptedControllerJobResponse,
+        GetQuantumProcessorQuilCalibrationProgramRequest, QuantumProcessorQuilCalibrationProgram,
+        TranslateQuilToEncryptedControllerJobRequest,
+        TranslateQuilToEncryptedControllerJobResponse,
     };
     use tonic::{transport::Server, Request};
     use tonic::{Response, Status};
@@ -272,6 +274,17 @@ mod translation {
                     }),
                 },
             ))
+        }
+
+        async fn get_quantum_processor_quil_calibration_program(
+            &self,
+            _request: Request<GetQuantumProcessorQuilCalibrationProgramRequest>,
+        ) -> Result<Response<QuantumProcessorQuilCalibrationProgram>, Status> {
+            Ok(Response::new(QuantumProcessorQuilCalibrationProgram {
+                quil_calibration_program:
+                    "DEFCAL X 0:\nPULSE 0 \"xy\" gaussian(duration: 1, fwhm: 2, t0: 3)\n"
+                        .to_string(),
+            }))
         }
     }
 

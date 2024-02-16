@@ -381,6 +381,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "chrono"
+version = "0.4.34"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bc015644b92d5890fab7489e49d21f879d5c990186827d42ec511919404f38b"
+dependencies = [
+ "num-traits",
+]
+
+[[package]]
 name = "clang-sys"
 version = "0.29.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1818,6 +1827,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pbjson-types"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a88c8d87f99a4ac14325e7a4c24af190fca261956e3b82dd7ed67e77e6c7043"
+dependencies = [
+ "bytes",
+ "chrono",
+ "pbjson",
+ "pbjson-build",
+ "prost",
+ "prost-build",
+ "serde",
+]
+
+[[package]]
 name = "peeking_take_while"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2135,9 +2159,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.7.9"
+version = "0.7.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37bd1842ca3485e8c0abf36be4cbcee1ea12e97da15ac731ce9dae20f7f58f41"
+checksum = "5639253e10f82014f416fdcc91c0aec0f4e276d81ebd8fdaca1b7277ba2269ad"
 dependencies = [
  "http",
  "http-body",
@@ -2149,6 +2173,7 @@ dependencies = [
  "opentelemetry_api",
  "pbjson",
  "pbjson-build",
+ "pbjson-types",
  "prost",
  "prost-build",
  "qcs-api-client-common",
@@ -2164,9 +2189,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.8.9"
+version = "0.8.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c605c4bdf887f487dbe7c0055f303728a992a6d508eedc55d7efa41b36adba07"
+checksum = "a4e51ee4c7359a1226ea601d3f080d4664d141a9b28dd7d2a3abb548ff100e44"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
