@@ -203,7 +203,9 @@ pub struct GenerateRandomizedBenchmarkingSequenceResponse {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// An ISA-related error.
-    #[error("Problem converting ISA to quilc format. This is a bug in this library or in QCS.")]
+    #[error(
+        "Problem converting ISA to quilc format. This is a bug in this library or in QCS: {0}"
+    )]
     Isa(#[from] isa::Error),
     /// An error when trying to connect to quilc.
     #[error("Problem connecting to quilc at {0}: {1}")]

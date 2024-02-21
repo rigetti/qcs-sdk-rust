@@ -223,19 +223,19 @@ impl quilc::Client for Client {
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// The ZMQ socket could not be created
-    #[error("Could not create a socket.")]
+    #[error("Could not create a socket: {0}")]
     SocketCreation(#[source] zmq::Error),
     /// Failed to set up auth for ZMQ
     #[error("Failed while trying to set up auth. This is likely a bug in this library.")]
     AuthSetup(#[source] zmq::Error),
     /// Encountered error when communicating with server
-    #[error("Trouble communicating with the ZMQ server")]
+    #[error("Trouble communicating with the ZMQ server: {0}")]
     Communication(#[source] zmq::Error),
     /// Failed to serialize request
-    #[error("Could not serialize request as MessagePack. This is a bug in this library.")]
+    #[error("Could not serialize request as MessagePack. This is a bug in this library: {0}")]
     Serialization(#[from] rmp_serde::encode::Error),
     /// Failed to deserialize response
-    #[error("Could not decode ZMQ server's response. This is likely a bug in this library.")]
+    #[error("Could not decode ZMQ server's response. This is likely a bug in this library: {0}")]
     Deserialization(#[from] rmp_serde::decode::Error),
     /// Response ID did not match request ID
     #[error("Response ID did not match request ID")]
