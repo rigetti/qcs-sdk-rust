@@ -82,7 +82,8 @@ impl From<String> for JobId {
 ///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
 ///      to target a specific endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
-/// * `patch_values` - The parameters to use for the execution.
+/// * `patch_values` - The parameters to use for the execution. See [`submit_with_parameter_batch`]
+///      if you need to execute with multiple sets of parameters.
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
@@ -94,6 +95,53 @@ pub async fn submit(
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<JobId, QpuApiError> {
+    submit_with_parameter_batch(
+        quantum_processor_id,
+        program,
+        std::iter::once(patch_values),
+        client,
+        execution_options,
+    )
+    .await?
+    .pop()
+    .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution ID".into()))
+    .map_err(QpuApiError::from)
+}
+
+/// Execute a compiled program on a QPU with multiple sets of `patch_values`.
+///
+/// This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+/// function will return a vector of [`JobId`] where the length and order correspond to the
+/// `patch_values` given. However, note that execution in the order of given patch values is not
+/// guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+///
+/// # Arguments
+/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
+///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///      to target a specific endpoint ID.
+/// * `program` - The compiled program as an [`EncryptedControllerJob`]
+/// * `patch_values` - The parameters to use for the execution. The job will be run once for each
+///     given set of patch_values.
+/// * `client` - The [`Qcs`] client to use.
+/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
+///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+///       overrides the `quantum_processor_id` parameter.
+///
+/// # Errors
+///
+/// * Returns a [`QpuApiError`] if:
+///     * Any of the jobs fail to be queued.
+///     * The provided `patch_values` iterator is empty.
+pub async fn submit_with_parameter_batch<'a, I>(
+    quantum_processor_id: Option<&str>,
+    program: EncryptedControllerJob,
+    patch_values: I,
+    client: &Qcs,
+    execution_options: &ExecutionOptions,
+) -> Result<Vec<JobId>, QpuApiError>
+where
+    I: IntoIterator<Item = &'a Parameters>,
+{
     #[cfg(feature = "tracing")]
     tracing::debug!(
         "submitting job to {:?} using options {:?}",
@@ -101,8 +149,15 @@ pub async fn submit(
         execution_options
     );
 
+    let mut patch_values = patch_values.into_iter().peekable();
+    if patch_values.peek().is_none() {
+        return Err(QpuApiError::EmptyPatchValues);
+    }
+
     let request = ExecuteControllerJobRequest {
-        execution_configurations: vec![params_into_job_execution_configuration(patch_values)],
+        execution_configurations: patch_values
+            .map(|params| params_into_job_execution_configuration(params))
+            .collect(),
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
         options: execution_options.api_options().cloned(),
@@ -112,18 +167,15 @@ pub async fn submit(
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
-    // we expect exactly one job ID since we only submit one execution configuration
-    let job_execution_id = controller_client
+    Ok(controller_client
         .execute_controller_job(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
         .into_inner()
         .job_execution_ids
-        .pop();
-
-    Ok(job_execution_id
+        .into_iter()
         .map(JobId)
-        .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution ID".into()))?)
+        .collect())
 }
 
 /// Cancel all given jobs that have yet to begin executing.
@@ -621,6 +673,10 @@ pub enum QpuApiError {
     /// Error due to missing quantum processor ID and endpoint ID.
     #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId")]
     MissingQpuId,
+
+    /// Error due to user not providing patch values
+    #[error("Submitting a job requires at least one set of patch values")]
+    EmptyPatchValues,
 
     /// Error that can occur when controller service fails to execute a job
     #[error("The submitted job failed with status: {status}. {message}")]

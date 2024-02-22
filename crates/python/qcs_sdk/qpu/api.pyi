@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import Dict, List, Sequence, Mapping, Optional, Union, final
 
 from qcs_sdk.client import QCSClient
@@ -130,6 +131,71 @@ async def submit_async(
 
     :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     :raises SubmissionError: If there was a problem submitting the program for execution.
+    """
+    ...
+
+def submit_with_parameter_batch(
+    program: str,
+    patch_values: Iterable[Mapping[str, Sequence[float]]],
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+) -> List[str]:
+    """
+    Execute a compiled program on a QPU with multiple sets of `patch_values`.
+
+    This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+    function will return a list of strings where the length and order correspond to the
+    `patch_values` given. However, note that execution in the order of given patch values is not
+    guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+
+    Submits an executable `program` to be run on the specified QPU.
+
+    :param program: An executable program (see `translate`).
+    :param patch_values: An iterable containing one ore more mapping of symbols to their desired values
+        (see `build_patch_values`).
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
+    :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
+
+    :returns: The ID of the submitted job which can be used to fetch results
+
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no
+        `patch_values` are given.
+    """
+    ...
+
+def submit_with_parameter_batch_async(
+    program: str,
+    patch_values: Iterable[Mapping[str, Sequence[float]]],
+    quantum_processor_id: Optional[str] = None,
+    client: Optional[QCSClient] = None,
+    execution_options: Optional[ExecutionOptions] = None,
+) -> List[str]:
+    """
+    Execute a compiled program on a QPU with multiple sets of `patch_values`.
+    (async analog of `submit_with_paramater_batch`)
+
+    This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+    function will return a list of strings where the length and order correspond to the
+    `patch_values` given. However, note that execution in the order of given patch values is not
+    guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+
+    Submits an executable `program` to be run on the specified QPU.
+
+    :param program: An executable program (see `translate`).
+    :param patch_values: An iterable containing one ore more mapping of symbols to their desired values
+        (see `build_patch_values`).
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the `ConnectionStrategy.endpoint_id()` execution option.
+    :param client: The ``QCSClient`` to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is `ConnectionStrategy.endpoint_id("endpoint_id")`, then direct access to "endpoint_id" overrides the `quantum_processor_id` parameter.
+
+    :returns: The ID of the submitted job which can be used to fetch results
+
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no
+        `patch_values` are given.
     """
     ...
 
