@@ -121,7 +121,7 @@ pub async fn submit(
 ///      to target a specific endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution. The job will be run once for each
-///     given set of patch_values.
+///     given set of [`Parameters`].
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
 ///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
@@ -156,7 +156,7 @@ where
 
     let request = ExecuteControllerJobRequest {
         execution_configurations: patch_values
-            .map(|params| params_into_job_execution_configuration(params))
+            .map(params_into_job_execution_configuration)
             .collect(),
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
