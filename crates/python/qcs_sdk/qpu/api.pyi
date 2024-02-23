@@ -166,7 +166,7 @@ def submit_with_parameter_batch(
     """
     ...
 
-def submit_with_parameter_batch_async(
+async def submit_with_parameter_batch_async(
     program: str,
     patch_values: Iterable[Mapping[str, Sequence[float]]],
     quantum_processor_id: Optional[str] = None,
