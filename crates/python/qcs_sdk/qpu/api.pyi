@@ -175,7 +175,7 @@ def submit_with_parameter_batch_async(
 ) -> List[str]:
     """
     Execute a compiled program on a QPU with multiple sets of `patch_values`.
-    (async analog of `submit_with_paramater_batch`)
+    (async analog of `submit_with_parameter_batch`)
 
     This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
     function will return a list of strings where the length and order correspond to the
