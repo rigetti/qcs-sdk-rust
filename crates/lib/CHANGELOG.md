@@ -1,3 +1,9 @@
+## 0.21.1-rc.0
+
+### Features
+
+- Improve error messages returned by the RPCQ quilc client (#444)
+
 ## 0.21.0
 
 ### Breaking Changes
