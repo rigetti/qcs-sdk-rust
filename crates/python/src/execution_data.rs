@@ -1,13 +1,16 @@
+use std::collections::HashMap;
 use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
 use pyo3::exceptions::{PyKeyError, PyRuntimeError};
+use pyo3::pyclass::CompareOp;
 use pyo3::{
     exceptions::PyValueError,
     pyclass, pymethods,
     types::{PyBytes, PyDelta},
     IntoPy, Py, PyObject, PyRef, PyRefMut, PyResult, Python, ToPyObject,
 };
+use qcs::qvm::QvmResultData;
 use qcs::{ExecutionData, RegisterMap, RegisterMatrix, ResultData};
 use rigetti_pyo3::{
     impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error,
@@ -18,13 +21,21 @@ use crate::qpu::PyQpuResultData;
 use crate::qvm::PyQvmResultData;
 
 py_wrap_union_enum! {
-    #[pyo3(module = "qcs_sdk.execution_data")]
+    #[pyo3(module = "qcs_sdk")]
     PyResultData(ResultData) as "ResultData" {
         qpu: Qpu => PyQpuResultData,
         qvm: Qvm => PyQvmResultData
     }
 }
 impl_repr!(PyResultData);
+
+impl Default for PyResultData {
+    fn default() -> Self {
+        PyResultData(ResultData::Qvm(QvmResultData::from_memory_map(
+            HashMap::new(),
+        )))
+    }
+}
 
 wrap_error!(RustRegisterMatrixConversionError(
     qcs::RegisterMatrixConversionError
@@ -59,7 +70,8 @@ impl PyResultData {
 }
 
 py_wrap_data_struct! {
-    #[pyo3(module = "qcs_sdk.execution_data")]
+    #[pyo3(module = "qcs_sdk")]
+    #[derive(Debug, PartialEq)]
     PyExecutionData(ExecutionData) as "ExecutionData" {
         result_data: ResultData => PyResultData,
         duration: Option<Duration> => Option<Py<PyDelta>>
@@ -72,11 +84,11 @@ impl PyExecutionData {
     #[new]
     fn __new__(
         py: Python<'_>,
-        result_data: PyResultData,
+        result_data: Option<PyResultData>,
         duration: Option<Py<PyDelta>>,
     ) -> PyResult<Self> {
         Ok(Self(ExecutionData {
-            result_data: ResultData::py_try_from(py, &result_data)?,
+            result_data: ResultData::py_try_from(py, &result_data.unwrap_or_default())?,
             duration: duration
                 .map(|delta| {
                     delta
@@ -97,11 +109,19 @@ impl PyExecutionData {
         ))
     }
 
-    pub fn __setstate__(&mut self, state: &PyBytes) -> PyResult<()> {
+    pub fn __setstate__<'a>(&mut self, state: &PyBytes) -> PyResult<()> {
         let execution_data: ExecutionData = serde_json::from_slice(state.as_bytes())
             .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
-        *self = Self(execution_data);
+        *self = PyExecutionData(execution_data);
         Ok(())
+    }
+
+    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
+        match op {
+            CompareOp::Eq => (self == other).into_py(py),
+            CompareOp::Ne => (self != other).into_py(py),
+            _ => py.NotImplemented(),
+        }
     }
 }
 

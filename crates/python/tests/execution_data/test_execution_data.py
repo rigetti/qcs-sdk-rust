@@ -1,3 +1,4 @@
+from datetime import timedelta
 import pickle
 
 import pytest
@@ -124,9 +125,10 @@ class TestExecutionData:
         qvm_result_data = QVMResultData.from_memory_map({"ro": RegisterData([[0, 1]])})
 
         for execution_data in [
-            ExecutionData(result_data=ResultData(qpu_result_data), duration=1.0),
+            ExecutionData(result_data=ResultData(qpu_result_data), duration=timedelta(seconds=1)),
             ExecutionData(result_data=ResultData(qvm_result_data), duration=None),
         ]:
+            print(execution_data.result_data)
             pickled = pickle.dumps(execution_data)
             unpickled = pickle.loads(pickled)
             assert execution_data == unpickled
