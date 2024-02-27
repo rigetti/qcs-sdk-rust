@@ -6,7 +6,10 @@ use std::time::Duration;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 use qcs_api_client_grpc::{
-    channel::{get_channel, parse_uri, wrap_channel_with, RefreshService},
+    channel::{
+        get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, RefreshService,
+        RetryService,
+    },
     services::translation::translation_client::TranslationClient,
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
@@ -21,7 +24,7 @@ pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
-pub type GrpcConnection = RefreshService<Channel, ClientConfiguration>;
+pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfiguration>>;
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
@@ -88,7 +91,8 @@ impl Qcs {
     ) -> Result<TranslationClient<GrpcConnection>, GrpcError<RefreshError>> {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
-        let service = wrap_channel_with(channel, self.get_config().clone());
+        let service =
+            wrap_channel_with_retry(wrap_channel_with(channel, self.get_config().clone()));
         Ok(TranslationClient::new(service))
     }
 }

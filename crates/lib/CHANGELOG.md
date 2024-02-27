@@ -1,3 +1,89 @@
+## 0.21.1-rc.0
+
+### Features
+
+- Improve error messages returned by the RPCQ quilc client (#444)
+
+## 0.21.0
+
+### Breaking Changes
+
+- The calibration program is now returned from `get_quilt_calibrations` as a string. The error variants have also been slightly modified.
+
+### Features
+
+- Automatically retry requests that fail due to transient network errors. (#443)
+
+### Fixes
+
+- Requests to cancel job no longer error due to missing target. (#443)
+
+## 0.21.0-rc.1
+
+### Breaking Changes
+
+- The calibration program is now returned from `get_quilt_calibrations` as a string. The error variants have also been slightly modified.
+
+### Features
+
+- Automatically retry requests that fail due to transient network errors. (#443)
+
+### Fixes
+
+- Requests to cancel job no longer error due to missing target. (#443)
+
+## 0.21.0-rc.0
+
+### Breaking Changes
+
+- The calibration program is now from
+`get_quilt_calibrations` as a string. The error variants have also been
+slightly modified.
+
+* simplify error map
+
+* cleanup test
+
+* put calibration in mock calibration program
+
+## 0.20.6
+
+### Features
+
+- Jobs that have yet to begin executing can be cancelled. (#438)
+
+## 0.20.6-rc.0
+
+### Features
+
+- Jobs that have yet to begin executing can be cancelled. (#438)
+
+## 0.20.5
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
+### Fixes
+
+- bump quil-rs versions (#435)
+
+## 0.20.5-rc.2
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
+### Fixes
+
+- bump quil-rs versions (#435)
+
+## 0.20.5-rc.1
+
+### Features
+
+- instrument pyo3-opentelemetry (#391)
+
 ## 0.20.5-rc.0
 
 ### Features

@@ -1,17 +1,10 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
-use pyo3::{
-    exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, types::PyString, Py, PyResult,
-};
-use qcs::client::GrpcClientError;
+use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, PyResult};
 use qcs::qpu::translation::TranslationOptions;
 use qcs_api_client_grpc::services::translation::translation_options::TranslationBackend as ApiTranslationBackend;
-use qcs_api_client_openapi::models::GetQuiltCalibrationsResponse;
-use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_simple_enum, wrap_error,
-    ToPythonError,
-};
+use rigetti_pyo3::{create_init_submodule, py_wrap_error, py_wrap_simple_enum, ToPythonError};
 
 use crate::py_sync::py_function_sync_async;
 
@@ -19,13 +12,11 @@ use crate::client::PyQcsClient;
 
 create_init_submodule! {
     classes: [
-        PyQuiltCalibrations,
         PyTranslationOptions,
         PyTranslationResult,
         PyTranslationBackend
     ],
     errors: [
-        GetQuiltCalibrationsError,
         TranslationError
     ],
     funcs: [
@@ -36,53 +27,29 @@ create_init_submodule! {
     ],
 }
 
-py_wrap_data_struct! {
-    PyQuiltCalibrations(GetQuiltCalibrationsResponse) as "QuiltCalibrations" {
-        quilt: String => Py<PyString>,
-        settings_timestamp: Option<String> => Option<Py<PyString>>
-    }
-}
-
-wrap_error!(RustGetQuiltCalibrationsError(
-    qcs::qpu::translation::GetQuiltCalibrationsError
-));
-py_wrap_error!(
-    translation,
-    RustGetQuiltCalibrationsError,
-    GetQuiltCalibrationsError,
-    PyRuntimeError
-);
-
 py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
-    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
     async fn get_quilt_calibrations(
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
-    ) -> PyResult<PyQuiltCalibrations> {
+    ) -> PyResult<String> {
         let client = PyQcsClient::get_or_create_client(client).await;
         let timeout = timeout.map(Duration::from_secs_f64);
-        qcs::qpu::translation::get_quilt_calibrations(&quantum_processor_id, &client, timeout)
-            .await
-            .map(PyQuiltCalibrations::from)
-            .map_err(RustGetQuiltCalibrationsError::from)
-            .map_err(RustGetQuiltCalibrationsError::to_py_err)
+        qcs::qpu::translation::get_quilt_calibrations(quantum_processor_id, &client, timeout)
+            .await.map_err(RustTranslationError::from).map_err(RustTranslationError::to_py_err)
     }
 }
 
-/// Errors that can happen during translation
 #[derive(Debug, thiserror::Error)]
 pub enum RustTranslationError {
-    /// The program could not be translated
-    #[error("Could not translate quil: {0}")]
-    Translate(#[from] GrpcClientError),
-    /// The result of translation could not be deserialized
-    #[error("Could not serialize translation result: {0}")]
-    Serialize(#[from] serde_json::Error),
+    #[error(transparent)]
+    Translation(#[from] qcs::qpu::translation::Error),
+    #[error("Failed to serialize translation result: {0}")]
+    Serialization(#[from] serde_json::Error),
 }
 
 py_wrap_error!(
@@ -209,7 +176,6 @@ py_function_sync_async! {
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
-    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     async fn translate(

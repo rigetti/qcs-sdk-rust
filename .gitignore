@@ -6,14 +6,12 @@ __pycache__/
 
 # Local config
 .env
+.envrc
 venv/
 .venv
 
 # JetBrains
 .idea
-
-.vscode/
-pyrightconfig.json
 
 # Clang debug / memory detection / test artifacts
 *.dSYM
@@ -32,7 +30,3 @@ qcs-api/docs
 crates/python/.hypothesis
 crates/python/qcs_sdk/*.so
 crates/python/build
-crates/python/tests/_fixtures/traces/*.json
-
-# unversioned developer notes
-scratch/

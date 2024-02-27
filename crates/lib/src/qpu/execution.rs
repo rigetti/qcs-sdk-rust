@@ -51,6 +51,8 @@ pub(crate) enum Error {
     Quilc { uri: String, details: String },
     #[error("Problem using QCS API: {0}")]
     QcsClient(#[from] GrpcClientError),
+    #[error(transparent)]
+    Translation(#[from] super::translation::Error),
     #[error("Problem fetching ISA: {0}")]
     Isa(#[from] GetIsaError),
     #[error("Problem parsing memory readout: {0}")]
@@ -257,6 +259,17 @@ impl<'a> Execution<'a> {
             readout_map,
             execution_options.clone(),
         ))
+    }
+
+    pub(crate) async fn cancel_job(&self, job_handle: JobHandle<'a>) -> Result<(), Error> {
+        crate::qpu::api::cancel_job(
+            job_handle.job_id(),
+            Some(job_handle.quantum_processor_id()),
+            self.client.as_ref(),
+            job_handle.execution_options(),
+        )
+        .await
+        .map_err(Error::from)
     }
 
     pub(crate) async fn retrieve_results(

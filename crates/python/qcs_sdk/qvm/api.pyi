@@ -5,7 +5,9 @@ from qcs_sdk import RegisterData
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qvm import QVMOptions, QVMClient
 
-def get_version_info(client: QVMClient, options: Optional[QVMOptions] = None) -> str:
+def get_version_info(
+    client: QVMClient, options: Optional[QVMOptions] = None
+) -> str:
     """
     Gets version information from the running QVM server.
 
@@ -18,7 +20,9 @@ def get_version_info(client: QVMClient, options: Optional[QVMOptions] = None) ->
     """
     ...
 
-async def get_version_info_async(client: QVMClient, options: Optional[QVMOptions] = None) -> str:
+async def get_version_info_async(
+    client: QVMClient, options: Optional[QVMOptions] = None
+) -> str:
     """
     Asynchronously gets version information from the running QVM server.
 
@@ -187,7 +191,9 @@ def run_and_measure_async(
 class ExpectationRequest:
     """The request body needed for a ``measure_expectation`` request to the QVM."""
 
-    def __new__(cls, state_preparation: str, operators: Sequence, rng_seed: Optional[int] = None) -> Self: ...
+    def __new__(
+        cls, state_preparation: str, operators: Sequence, rng_seed: Optional[int] = None
+    ) -> Self: ...
     @property
     def state_preparation(self) -> str: ...
     @state_preparation.setter

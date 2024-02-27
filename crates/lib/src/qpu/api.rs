@@ -8,15 +8,16 @@ use derive_builder::Builder;
 use qcs_api_client_common::configuration::RefreshError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with},
+    channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
         DataValue, EncryptedControllerJob, JobExecutionConfiguration, RealDataValue,
     },
     services::controller::{
-        controller_client::ControllerClient, execute_controller_job_request,
-        get_controller_job_results_request, ExecuteControllerJobRequest,
+        cancel_controller_jobs_request, controller_client::ControllerClient,
+        execute_controller_job_request, get_controller_job_results_request,
+        CancelControllerJobsRequest, ExecuteControllerJobRequest,
         ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
 };
@@ -123,6 +124,86 @@ pub async fn submit(
     Ok(job_execution_id
         .map(JobId)
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution ID".into()))?)
+}
+
+/// Cancel all given jobs that have yet to begin executing.
+///
+/// This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
+/// cancelled. A job can be cancelled only if it has not yet started executing.
+///
+/// Cancellation is not guaranteed, as it is based on job state at the time of cancellation, and is
+/// completed on a best effort basis.
+///
+/// # Arguments
+/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
+///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///      to target a specific endpoint ID.
+/// * `job_ids` - The [`JobId`]s to cancel.
+/// * `client` - The [`Qcs`] client to use.
+/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
+///       is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+///       overrides the `quantum_processor_id` parameter.
+///
+/// # Errors
+/// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if any of
+///     the jobs could not be cancelled.
+pub async fn cancel_jobs(
+    job_ids: Vec<JobId>,
+    quantum_processor_id: Option<&str>,
+    client: &Qcs,
+    execution_options: &ExecutionOptions,
+) -> Result<(), QpuApiError> {
+    let mut controller_client = execution_options
+        .get_controller_client(client, quantum_processor_id)
+        .await?;
+
+    let request = CancelControllerJobsRequest {
+        job_ids: job_ids.into_iter().map(|id| id.0).collect(),
+        target: execution_options.get_cancel_target(quantum_processor_id),
+    };
+
+    controller_client
+        .cancel_controller_jobs(request)
+        .await
+        .map_err(GrpcClientError::RequestFailed)?;
+
+    Ok(())
+}
+
+/// Cancel a job that has yet to begin executing.
+///
+/// This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+/// job can be cancelled only if it has not yet started executing.
+///
+/// Cancellation is not guaranteed, as it is based on job state at the time of cancellation, and is
+/// completed on a best effort basis.
+///
+/// # Arguments
+/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter is
+///      required unless using [`ConnectionStrategy::EndpointId`] in `execution_options` to target
+///      a specific endpoint ID.
+/// * `job_ids` - The [`JobId`]s to cancel.
+/// * `client` - The [`Qcs`] client to use.
+/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used is
+///      [`ConnectionStrategy::EndpointId`] then direct access to that endpoint overrides the
+///      `quantum_processor_id` parameter.
+///
+/// # Errors
+/// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if the
+///     job could not be cancelled.
+pub async fn cancel_job(
+    job_id: JobId,
+    quantum_processor_id: Option<&str>,
+    client: &Qcs,
+    execution_options: &ExecutionOptions,
+) -> Result<(), QpuApiError> {
+    cancel_jobs(
+        vec![job_id],
+        quantum_processor_id,
+        client,
+        execution_options,
+    )
+    .await
 }
 
 /// Fetch results from QPU job execution.
@@ -330,6 +411,20 @@ impl ExecutionOptions {
         }
     }
 
+    fn get_cancel_target(
+        &self,
+        quantum_processor_id: Option<&str>,
+    ) -> Option<cancel_controller_jobs_request::Target> {
+        match self.connection_strategy() {
+            ConnectionStrategy::EndpointId(endpoint_id) => Some(
+                cancel_controller_jobs_request::Target::EndpointId(endpoint_id.to_string()),
+            ),
+            ConnectionStrategy::Gateway | ConnectionStrategy::DirectAccess => quantum_processor_id
+                .map(String::from)
+                .map(cancel_controller_jobs_request::Target::QuantumProcessorId),
+        }
+    }
+
     /// Get a controller client for the given QPU ID.
     pub async fn get_controller_client(
         &self,
@@ -383,7 +478,10 @@ impl ExecutionOptions {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        Ok(wrap_channel_with(channel, client.get_config().clone()))
+        Ok(wrap_channel_with_retry(wrap_channel_with(
+            channel,
+            client.get_config().clone(),
+        )))
     }
 
     async fn get_gateway_address(

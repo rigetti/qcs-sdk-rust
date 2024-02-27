@@ -1,7 +1,7 @@
 # This is the metadata Maturin uploads to PyPI on publish
 [project]
 name = "qcs-sdk-python"
-version = "0.16.4-rc.0"
+version = "0.17.1-rc.0"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -20,16 +20,13 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Operating System :: OS Independent",
 ]
-dependencies = ["quil==0.6.5"]
-
-[project.optional-dependencies]
-tracing-opentelemetry = ["opentelemetry-api ~= 1.20.0"]
+dependencies = ["quil==0.6.6"]
 
 # PEP 621 specifies the [project] table as the source for project metadata. However, Poetry only supports [tool.poetry]
 # We can remove this table once this issue is resolved: https://github.com/python-poetry/poetry/issues/3332
 [tool.poetry]
 name = "qcs-sdk-python"
-version = "0.16.4-rc.0"
+version = "0.17.1-rc.0"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 authors = [
@@ -47,7 +44,6 @@ sdist-include = ["README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-opentelemetry-api = { version = "^1.20.0", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 numpy = "^1.24.1"
@@ -58,10 +54,6 @@ black = "^22.8.0"
 syrupy = "^3.0.6"
 mypy = "^1.4.1"
 pdoc = "^14.1.0"
-opentelemetry-sdk = "^1.20.0"
-
-[tool.poetry.extras]
-tracing-opentelemetry = ["opentelemetry-api"]
 
 [build-system]
 requires = ["maturin>=1.0.0,<2.0.0"]
