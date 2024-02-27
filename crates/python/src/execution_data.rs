@@ -84,6 +84,8 @@ impl PyExecutionData {
     #[new]
     fn __new__(
         py: Python<'_>,
+        // result_data is optional here because pickling an object requires calling __new__ without
+        // any arguments.
         result_data: Option<PyResultData>,
         duration: Option<Py<PyDelta>>,
     ) -> PyResult<Self> {
