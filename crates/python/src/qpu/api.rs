@@ -47,6 +47,8 @@ create_init_submodule! {
     funcs: [
         py_submit,
         py_submit_async,
+        py_submit_with_parameter_batch,
+        py_submit_with_parameter_batch_async,
         py_cancel_job,
         py_cancel_job_async,
         py_cancel_jobs,
@@ -108,6 +110,36 @@ py_function_sync_async! {
             .map_err(RustSubmissionError::to_py_err)?;
 
         Ok(job_id.to_string())
+    }
+}
+
+py_function_sync_async! {
+    #[pyfunction]
+    #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
+    async fn submit_with_parameter_batch(
+        program: String,
+        patch_values: Vec<HashMap<String, Vec<f64>>>,
+        quantum_processor_id: Option<String>,
+        client: Option<PyQcsClient>,
+        execution_options: Option<PyExecutionOptions>,
+    ) -> PyResult<Vec<String>> {
+        let client = PyQcsClient::get_or_create_client(client).await;
+
+        let patch_values: Vec<HashMap<Box<str>, Vec<f64>>> = patch_values
+            .into_iter()
+            .map(|m| m.into_iter().map(|(k, v)| (k.into_boxed_str(), v)).collect())
+            .collect();
+
+        let job = serde_json::from_str(&program)
+            .map_err(RustSubmissionError::from)
+            .map_err(RustSubmissionError::to_py_err)?;
+
+        Ok(qcs::qpu::api::submit_with_parameter_batch(quantum_processor_id.as_deref(), job, &patch_values, &client, execution_options.unwrap_or_default().as_inner()).await
+            .map_err(RustSubmissionError::from)
+            .map_err(RustSubmissionError::to_py_err)?
+            .into_iter()
+            .map(|id| id.to_string())
+            .collect())
     }
 }
 
