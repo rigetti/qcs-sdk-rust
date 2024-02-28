@@ -77,6 +77,8 @@ impl From<String> for JobId {
 
 /// Execute compiled program on a QPU.
 ///
+/// See [`ExecuteControllerJobRequest`] for more details.
+///
 /// # Arguments
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
 ///      is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
@@ -110,10 +112,7 @@ pub async fn submit(
 
 /// Execute a compiled program on a QPU with multiple sets of `patch_values`.
 ///
-/// This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
-/// function will return a vector of [`JobId`] where the length and order correspond to the
-/// `patch_values` given. However, note that execution in the order of given patch values is not
-/// guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+/// See [`ExecuteControllerJobRequest`] for more details.
 ///
 /// # Arguments
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
