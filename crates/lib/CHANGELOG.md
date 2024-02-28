@@ -1,3 +1,17 @@
+## 0.21.1
+
+### Features
+
+- Support running a program with multiple sets of patch values in a single request. (#445)
+- Improve error messages returned by the RPCQ quilc client (#444)
+
+## 0.21.1-rc.1
+
+### Features
+
+- Support running a program with multiple sets of patch values in a single request. (#445)
+- Improve error messages returned by the RPCQ quilc client (#444)
+
 ## 0.21.1-rc.0
 
 ### Features
