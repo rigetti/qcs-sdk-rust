@@ -25,6 +25,7 @@ use serde::{Deserialize, Serialize};
 /// convert any variant type to its inner data.
 #[derive(Clone, Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
 #[serde(untagged)]
+#[serde(tag = "type", content = "content")]
 pub enum RegisterData {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
     I8(Vec<Vec<i8>>),
