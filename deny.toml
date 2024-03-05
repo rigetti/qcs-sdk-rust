@@ -115,7 +115,7 @@ unknown-registry = "deny"
 # Lint level for what to happen when a crate from a git repository that is not
 # in the allow list is encountered
 unknown-git = "deny"
-allow-git = ["https://github.com/rigetti/quil-rs"]
+allow-git = ["https://github.com/rigetti/quil-rs", "https://github.com/rigetti/qcs-sdk-rust"]
 # List of URLs for allowed crate registries. Defaults to the crates.io index
 # if not specified. If it is specified but empty, no registries are allowed.
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
