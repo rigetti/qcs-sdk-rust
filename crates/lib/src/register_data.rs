@@ -24,6 +24,7 @@ use serde::{Deserialize, Serialize};
 /// have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
 /// convert any variant type to its inner data.
 #[derive(Clone, Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
+#[serde(untagged)]
 #[serde(tag = "type", content = "content")]
 pub enum RegisterData {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
