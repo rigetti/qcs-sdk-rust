@@ -14,7 +14,6 @@ use qcs_api_client_grpc::models::controller::{
 /// A row of readout values from the QPU. Each row contains all the values emitted to a
 /// memory reference across all shots.
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "type", content = "content")]
 pub enum ReadoutValues {
     /// Integer readout values
     Integer(Vec<i64>),
@@ -26,7 +25,6 @@ pub enum ReadoutValues {
 
 /// A row of data containing the contents of each memory region at the end of a job.
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
-#[serde(tag = "type", content = "content")]
 pub enum MemoryValues {
     /// Values that correspond to a memory region declared with the BIT or OCTET data type.
     Binary(Vec<u8>),

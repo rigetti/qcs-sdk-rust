@@ -49,7 +49,6 @@ use crate::{
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner, Deserialize, Serialize)]
-#[serde(tag = "type", content = "content")]
 pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmResultData`]
     Qvm(QvmResultData),
@@ -71,7 +70,6 @@ pub struct ExecutionData {
 
 /// An enum representing every possible register type as a 2 dimensional matrix.
 #[derive(Clone, Debug, EnumAsInner, PartialEq, Serialize, Deserialize)]
-#[serde(tag = "type", content = "content")]
 pub enum RegisterMatrix {
     /// Integer register
     Integer(Array2<i64>),
