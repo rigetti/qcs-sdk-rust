@@ -4,9 +4,9 @@ resolver = "2"
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.7.10"
-qcs-api-client-grpc = "0.7.13"
-qcs-api-client-openapi = "0.8.11"
+qcs-api-client-common = { git = "https://github.com/rigetti/qcs-api-client-rust", branch = "grpc-web" }
+qcs-api-client-grpc = { git = "https://github.com/rigetti/qcs-api-client-rust", branch = "grpc-web", features = ["grpc-web"] }
+qcs-api-client-openapi = { git = "https://github.com/rigetti/qcs-api-client-rust", branch = "grpc-web" }
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
