@@ -3,7 +3,7 @@ name: Build Linux Wheel
 on:
   push:
     branches:
-      - 'grpc-web'
+      - 'grpc-web-rc'
 
 jobs:
   linux:
