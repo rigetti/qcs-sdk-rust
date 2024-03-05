@@ -9,7 +9,7 @@ use quil_rs::{
     quil::{Quil, ToQuilError},
     Program,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 pub(crate) use execution::Execution;
 
@@ -105,7 +105,7 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 
 /// Encapsulates data returned after running a program on the QVM
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 pub struct QvmResultData {
     pub(crate) memory: HashMap<String, RegisterData>,
 }

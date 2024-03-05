@@ -255,6 +255,7 @@ impl PyNativeQuilMetadata {
             qpu_runtime_estimation,
         })
     }
+
     pub fn __getstate__<'a>(&self, py: Python<'a>) -> PyResult<&'a PyBytes> {
         Ok(PyBytes::new(
             py,

@@ -1,9 +1,13 @@
-from qcs_sdk.qpu import ReadoutValues, MemoryValues, QPUResultData
-from qcs_sdk.qvm import QVMResultData
-from qcs_sdk import ResultData, RegisterData, RegisterMatrix
+from datetime import timedelta
+import pickle
+
+import pytest
 import numpy as np
 from numpy.testing import assert_array_equal
-import pytest
+
+from qcs_sdk.qpu import ReadoutValues, MemoryValues, QPUResultData
+from qcs_sdk.qvm import QVMResultData
+from qcs_sdk import ResultData, RegisterData, RegisterMatrix, ExecutionData
 
 
 class TestResultData:
@@ -108,3 +112,23 @@ class TestRegisterMap:
             assert np.all(matrix.to_ndarray() == np.matrix([[0, 1, 2], [1, 2, 3]]))
 
         assert expected_keys == actual_keys == set(register_map.keys())
+
+
+class TestExecutionData:
+    def test_pickle(self):
+        """Test that ExecutionData can be pickled and unpickled."""
+        qpu_result_data = QPUResultData(
+            mappings={"q0": "ro"},
+            readout_values={"q0": ReadoutValues([0, 1])},
+            memory_values={"m": MemoryValues([0, 1])},
+        )
+        qvm_result_data = QVMResultData.from_memory_map({"ro": RegisterData([[0, 1]])})
+
+        for execution_data in [
+            ExecutionData(result_data=ResultData(qpu_result_data), duration=timedelta(seconds=1)),
+            ExecutionData(result_data=ResultData(qvm_result_data), duration=None),
+        ]:
+            print(execution_data.result_data)
+            pickled = pickle.dumps(execution_data)
+            unpickled = pickle.loads(pickled)
+            assert execution_data == unpickled
