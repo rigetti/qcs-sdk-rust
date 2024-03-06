@@ -1,3 +1,9 @@
+## 0.21.2
+
+### Features
+
+- ExecutionData is now serializable. (#430)
+
 ## 0.21.2-rc.0
 
 ### Features
