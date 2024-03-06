@@ -6,9 +6,11 @@ use std::{fmt, time::Duration};
 use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::RefreshError;
+#[cfg(feature = "grpc-web")]
+use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with, wrap_channel_with_grpc_web, wrap_channel_with_retry},
+    channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
@@ -529,10 +531,11 @@ impl ExecutionOptions {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        Ok(wrap_channel_with_grpc_web(wrap_channel_with_retry(wrap_channel_with(
-            channel,
-            client.get_config().clone(),
-        ))))
+        let channel =
+            wrap_channel_with_retry(wrap_channel_with(channel, client.get_config().clone()));
+        #[cfg(feature = "grpc-web")]
+        let channel = wrap_channel_with_grpc_web(channel);
+        Ok(channel)
     }
 
     async fn get_gateway_address(

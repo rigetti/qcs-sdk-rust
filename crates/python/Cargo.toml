@@ -18,7 +18,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 async-trait = "0.1.73"
-qcs = { path = "../lib", features = ["tracing"] }
+qcs = { path = "../lib", features = ["tracing", "grpc-web"] }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
