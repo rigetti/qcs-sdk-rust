@@ -28,7 +28,7 @@ num = { version = "0.4.0", features = ["serde"] }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
-qcs-api-client-grpc = { workspace = true, optional = true }
+qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
 reqwest = { version = "0.11.20", default-features = false, features = [
   "rustls-tls",
