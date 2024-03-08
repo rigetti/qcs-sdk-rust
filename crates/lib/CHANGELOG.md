@@ -1,3 +1,9 @@
+## 0.21.3
+
+### Fixes
+
+- Update quil-rs, fixing a regression in DELAY parsing (#450)
+
 ## 0.21.3-rc.0
 
 ### Fixes
