@@ -8,14 +8,14 @@ qcs-api-client-common = "0.7.10"
 qcs-api-client-grpc = "0.7.13"
 qcs-api-client-openapi = "0.8.11"
 serde_json = "1.0.86"
-thiserror = "1.0.37"
+thiserror = "1.0.57"
 tokio = "1.36.0"
 # We specify quil-rs as a git and versioned dependency so that we can keep the version of
 # quil-rs used in both the Rust and Python packages in sync. The tag used should always
 # be a `quil-py` tag and should match the version used in `crates/python/pyproject.toml`
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.22.6", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.6.6" }
+quil-rs = { version = "0.23.0", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.7.0" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
