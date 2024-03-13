@@ -104,7 +104,7 @@ jobs:
       uses: messense/maturin-action@v1
       with:
         target: ${{ matrix.target }}
-        manylinux: '2_28'
+        manylinux: auto
         args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --features grpc-web --out dist
     - name: Upload wheels
       uses: actions/upload-artifact@v3
