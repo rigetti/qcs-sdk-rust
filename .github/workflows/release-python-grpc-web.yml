@@ -73,7 +73,6 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    container: docker://messense/manylinux_2_28-cross:x86_64-arm64
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
@@ -82,16 +81,16 @@ jobs:
         target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
-    # - name: Install dependencies
-    #   if: matrix.target == 'aarch64'
-    #   run: |
-    #     sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
-    #     gcc --version
-    #     export CC=gcc-aarch64-linux-gnu
-    # - uses: actions/setup-python@v4
-    #   with:
-    #     python-version: 3.12
-    #     architecture: x64
+    - name: Install dependencies
+      if: matrix.target == 'aarch64'
+      run: |
+        sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+        gcc --version
+        export CC=gcc-aarch64-linux-gnu
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+        architecture: x64
     - name: Install protoc
       uses: arduino/setup-protoc@v1
       with:
