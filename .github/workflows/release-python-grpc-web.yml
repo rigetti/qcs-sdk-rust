@@ -82,6 +82,10 @@ jobs:
         target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
+    - name: Install dependencies
+      if: matrix.target == aarch64
+      run:
+        sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
