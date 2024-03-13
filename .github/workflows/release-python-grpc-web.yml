@@ -55,7 +55,7 @@ jobs:
         working-directory: ./crates/python
         run: |
           pip install toml
-          python crates/python/scripts/patch_package_name.py
+          python scripts/patch_package_name.py
       - name: Build wheels - universal2
         # universal2 supports both x86_64 and aarch64
         uses: messense/maturin-action@v1
@@ -99,7 +99,7 @@ jobs:
       working-directory: ./crates/python
       run: |
         pip install toml
-        python crates/python/scripts/patch_package_name.py
+        python scripts/patch_package_name.py
     - name: Build wheels
       uses: messense/maturin-action@v1
       with:
@@ -136,7 +136,7 @@ jobs:
       working-directory: ./crates/python
       run: |
         pip install toml
-        python crates/python/scripts/patch_package_name.py
+        python scripts/patch_package_name.py
     - name: Build sdist
       uses: messense/maturin-action@v1
       with:
@@ -167,7 +167,7 @@ jobs:
         working-directory: ./crates/python
         run: |
           pip install toml
-          python crates/python/scripts/patch_package_name.py
+          python scripts/patch_package_name.py
       # - name: Publish to PyPI
       #   uses: messense/maturin-action@v1
       #   with:
