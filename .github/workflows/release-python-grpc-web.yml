@@ -73,6 +73,7 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
+    container: ghcr.io/pyo3/maturin
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
@@ -85,6 +86,8 @@ jobs:
       if: matrix.target == 'aarch64'
       run: |
         sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+        gcc --version
+        export CC=gcc-aarch64-linux-gnu
     - uses: actions/setup-python@v4
       with:
         python-version: 3.12
