@@ -41,10 +41,10 @@
                                 <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
+                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
+                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
                         </li>
                 </ul>
 
@@ -250,19 +250,6 @@ cost of the type safety provided by <code><a href="#ReadoutValues">ReadoutValues
 
 
                             </div>
-                            <div id="QPUResultData.memory_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory_values</span><span class="annotation">: Dict[str, <a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.memory_values"></a>
-    
-            <div class="docstring"><p>Get mapping of a memory region (ie. "ro") to the final contents of that memory region.</p>
-</div>
-
-
-                            </div>
                             <div id="QPUResultData.mappings" class="classattr">
                                 <div class="attr variable">
             <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
@@ -272,6 +259,19 @@ cost of the type safety provided by <code><a href="#ReadoutValues">ReadoutValues
     <a class="headerlink" href="#QPUResultData.mappings"></a>
     
             <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in <code><a href="#QPUResultData.readout_values">QPUResultData.readout_values</a></code></p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.memory_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory_values</span><span class="annotation">: Dict[str, <a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.memory_values"></a>
+    
+            <div class="docstring"><p>Get mapping of a memory region (ie. "ro") to the final contents of that memory region.</p>
 </div>
 
 
