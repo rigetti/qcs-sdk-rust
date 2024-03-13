@@ -78,23 +78,17 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        profile: minimal
-        default: true
     - name: Install dependencies
       if: matrix.target == 'aarch64'
       run: |
         sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
     - uses: actions/setup-python@v4
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.12
+        architecture: x64
     - name: Install protoc
       uses: arduino/setup-protoc@v1
       with:
@@ -110,7 +104,7 @@ jobs:
       with:
         target: ${{ matrix.target }}
         manylinux: auto
-        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --features grpc-web --out dist
+        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --features grpc-web --out dist -i 3.8 3.9 3.10 3.11 3.12 
     - name: Upload wheels
       uses: actions/upload-artifact@v3
       with:
