@@ -11,6 +11,7 @@ readme = "./README.md"
 
 [features]
 libquil = ["qcs/libquil"]
+grpc-web = ["qcs/grpc-web"]
 
 [lib]
 name = "qcs_sdk"
