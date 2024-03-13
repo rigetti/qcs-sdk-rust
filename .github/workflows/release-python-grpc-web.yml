@@ -52,6 +52,7 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '3.20.1'
       - name: Patch package metadata for grpc-web
+        working-directory: ./crates/python
         run: |
           pip install toml
           python crates/python/scripts/patch_package_name.py
@@ -95,6 +96,7 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
     - name: Patch package metadata for grpc-web
+      working-directory: ./crates/python
       run: |
         pip install toml
         python crates/python/scripts/patch_package_name.py
@@ -131,6 +133,7 @@ jobs:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
     - name: Patch package metadata for grpc-web
+      working-directory: ./crates/python
       run: |
         pip install toml
         python crates/python/scripts/patch_package_name.py
@@ -161,6 +164,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
       - name: Patch package metadata for grpc-web
+        working-directory: ./crates/python
         run: |
           pip install toml
           python crates/python/scripts/patch_package_name.py
