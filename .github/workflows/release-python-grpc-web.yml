@@ -60,7 +60,7 @@ jobs:
         # universal2 supports both x86_64 and aarch64
         uses: messense/maturin-action@v1
         with:
-          args: -i python --release --target universal2-apple-darwin --manifest-path crates/python/Cargo.toml --features grpc-web --interpreter {matrix.python_version} --out dist
+          args: -i python --release --target universal2-apple-darwin --manifest-path crates/python/Cargo.toml --features grpc-web --out dist
           docker-options: -e CI
       - name: Install wheel
         run: |
@@ -73,7 +73,6 @@ jobs:
 
   linux:
     runs-on: ubuntu-latest
-    container: ghcr.io/pyo3/maturin
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
