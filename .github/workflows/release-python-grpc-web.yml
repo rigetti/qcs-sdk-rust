@@ -102,6 +102,8 @@ jobs:
         pip install toml
         python scripts/patch_package_name.py
     - name: Build wheels
+      env:
+        CC: gcc-aarch64-linux-gnu
       uses: messense/maturin-action@v1
       with:
         target: ${{ matrix.target }}
