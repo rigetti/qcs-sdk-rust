@@ -1,3 +1,21 @@
+## 0.17.3
+
+### Fixes
+
+- Update quil-rs, fixing a regression in DELAY parsing (#450)
+
+## 0.17.3-rc.0
+
+### Fixes
+
+- Update quil-rs, fixing a regression in DELAY parsing (#450)
+
+## 0.17.2
+
+### Features
+
+- ExecutionData is now serializable. (#430)
+
 ## 0.17.2-rc.0
 
 ### Features
