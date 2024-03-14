@@ -103,7 +103,7 @@ jobs:
         python scripts/patch_package_name.py
     - name: Build wheels
       env:
-        CC: gcc-${{matrix.target}}-linux-gnu
+        CC: ${{ (matrix.target == 'aarch64') && 'gcc-aarch64-linux-gnu' || 'gcc' }}
       uses: messense/maturin-action@v1
       with:
         target: ${{ matrix.target }}
