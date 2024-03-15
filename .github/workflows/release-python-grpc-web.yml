@@ -68,11 +68,6 @@ jobs:
         target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      if: matrix.target == 'aarch64'
-      run: |
-        sudo apt-get install qemu-user gcc-aarch64-linux-gnu libc6-dev-arm64-cross
-        gcc --version
     - uses: actions/setup-python@v4
       with:
         python-version: 3.12
@@ -88,8 +83,6 @@ jobs:
         pip install toml
         python scripts/patch_package_name.py
     - name: Build wheels
-      env:
-        CC: ${{ (matrix.target == 'aarch64') && 'gcc-aarch64-linux-gnu' || 'gcc' }}
       uses: messense/maturin-action@v1
       with:
         target: ${{ matrix.target }}
