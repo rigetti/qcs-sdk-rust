@@ -3,6 +3,9 @@ name: Release Python with grpc-web clients
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - 'grpc-web-rc'
   workflow_dispatch:
     description: "Manually publish release"
     inputs:
@@ -145,8 +148,8 @@ jobs:
       id-token: write
     steps:
       - uses: actions/download-artifact@v3
-      - name: Publish to PyPI
-        uses: messense/maturin-action@v1
-        with:
-          command: upload
-          args: --skip-existing wheels-grpc-web/*
+      # - name: Publish to PyPI
+      #   uses: messense/maturin-action@v1
+      #   with:
+      #     command: upload 
+      #     args: --skip-existing wheels-grpc-web/*
