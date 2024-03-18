@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::channel::{wrap_channel_with_grpc_web, GrpcWebType};
+use qcs_api_client_grpc::grpc_web::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
 use qcs_api_client_grpc::{
     channel::{
         get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, RefreshService,
@@ -33,7 +33,8 @@ pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfigurati
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
-pub type GrpcConnection = GrpcWebType<RetryService<RefreshService<Channel, ClientConfiguration>>>;
+pub type GrpcConnection =
+    GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
