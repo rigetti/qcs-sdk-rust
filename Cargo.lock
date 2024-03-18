@@ -4241,3 +4241,8 @@ dependencies = [
  "system-deps",
  "zeromq-src",
 ]
+
+[[patch.unused]]
+name = "hyper-proxy"
+version = "0.9.0"
+source = "git+https://github.com/hoodie/hyper-proxy?rev=49325f3#49325f36ef4b4bf4a8c8a82a9a7ab249606bf866"
