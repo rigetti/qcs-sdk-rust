@@ -2,9 +2,6 @@
 members = ["crates/*"]
 resolver = "2"
 
-[patch.crates-io]
-hyper-proxy = { git = "https://github.com/hoodie/hyper-proxy", rev = "49325f3" }
-
 [workspace.dependencies]
 qcs-api = "0.2.1"
 qcs-api-client-common = { git = "https://github.com/rigetti/qcs-api-client-rust", branch = "grpc-web-hyper" }
