@@ -11,8 +11,7 @@ with open("Cargo.toml", "r+") as f:
     data["patch"] = {
         "crates-io": {
             "hyper-proxy": {
-                "git": "https://github.com/hoodie/hyper-proxy",
-                "rev": "49325f3"
+                "git": "https://github.com/rigetti/hyper-proxy"
             }
         }
     }
