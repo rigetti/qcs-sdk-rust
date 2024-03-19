@@ -6,7 +6,7 @@ use std::time::Duration;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::grpc_web::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
+use qcs_api_client_grpc::channel::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
 use qcs_api_client_grpc::{
     channel::{
         get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, RefreshService,

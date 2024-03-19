@@ -8,7 +8,7 @@ use derive_builder::Builder;
 use qcs_api_client_common::configuration::RefreshError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::grpc_web::wrap_channel_with_grpc_web;
+use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
 use qcs_api_client_grpc::{
     channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
