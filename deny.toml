@@ -98,11 +98,7 @@ multiple-versions = "warn"
 # wildcards = "deny"
 wildcards = "allow"
 highlight = "all"
-# allow-wildcard-paths = true
 skip-tree = [
-  # { name = "qcs-api-client-common", depth = 20 },
-  # { name = "qcs-api-client-grpc", depth = 20 },
-  # { name = "qcs-api-client-openapi", depth = 20 },
   { name = "toml", version = "*", depth = 20 },
   { name = "warp", version = "*", depth = 20 },              # Only used for development
   { name = "hermit-abi", version = "*", depth = 20 },        # Only used for development
