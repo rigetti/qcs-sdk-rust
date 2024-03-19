@@ -89,6 +89,7 @@ jobs:
         python scripts/patch_package_name.py
         cd ../..
         python crates/python/scripts/patch_hyper_proxy.py
+        cargo update
     - name: Build wheels
       uses: messense/maturin-action@v1
       with:
