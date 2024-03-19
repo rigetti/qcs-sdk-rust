@@ -35,6 +35,9 @@ jobs:
           args: --debug cargo-make
       - name: Install poetry
         uses: snok/install-poetry@v1
+      # may protect against linking failure: no space left on device
+      - name: Delete huge unnecessary tools folder
+        run: rm -rf /opt/hostedtoolcache
       - name: Run Rust CI
         uses: actions-rs/cargo@v1
         env:
