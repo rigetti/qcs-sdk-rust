@@ -26,42 +26,42 @@ jobs:
     steps:
       - run: echo "Publishing wheels"
 
-  macos:
-    runs-on: macos-12
-    needs: [is-python-release, should-publish-wheels]
-    env:
-      CXXFLAGS: "-std=c++11 -stdlib=libc++"
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: '3.20.1'
-      - name: Patch package metadata for grpc-web
-        working-directory: ./crates/python
-        run: |
-          pip install toml
-          python scripts/patch_package_name.py
-          cd ../..
-          python crates/python/scripts/patch_hyper_proxy.py
-      - name: Build wheels - universal2
-        # universal2 supports both x86_64 and aarch64
-        uses: messense/maturin-action@v1
-        with:
-          args: -i 3.8 3.9 3.10 3.11 3.12 --release --target universal2-apple-darwin --manifest-path crates/python/Cargo.toml --features grpc-web --out dist
-          docker-options: -e CI
-      - name: Install wheel
-        run: |
-          pip install qcs-sdk-python --find-links dist --force-reinstall
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels-grpc-web
-          path: dist
+  # macos:
+  #   runs-on: macos-12
+  #   needs: [is-python-release, should-publish-wheels]
+  #   env:
+  #     CXXFLAGS: "-std=c++11 -stdlib=libc++"
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-python@v4
+  #       with:
+  #         python-version: ${{ matrix.python-version }}
+  #     - name: Install protoc
+  #       uses: arduino/setup-protoc@v1
+  #       with:
+  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
+  #         version: '3.20.1'
+  #     - name: Patch package metadata for grpc-web
+  #       working-directory: ./crates/python
+  #       run: |
+  #         pip install toml
+  #         python scripts/patch_package_name.py
+  #         cd ../..
+  #         python crates/python/scripts/patch_hyper_proxy.py
+  #     - name: Build wheels - universal2
+  #       # universal2 supports both x86_64 and aarch64
+  #       uses: messense/maturin-action@v1
+  #       with:
+  #         args: -i 3.8 3.9 3.10 3.11 3.12 --release --target universal2-apple-darwin --manifest-path crates/python/Cargo.toml --features grpc-web --out dist
+  #         docker-options: -e CI
+  #     - name: Install wheel
+  #       run: |
+  #         pip install qcs-sdk-python --find-links dist --force-reinstall
+  #     - name: Upload wheels
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: wheels-grpc-web
+  #         path: dist
 
   linux:
     runs-on: ubuntu-latest
