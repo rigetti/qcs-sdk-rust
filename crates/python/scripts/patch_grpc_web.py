@@ -1,13 +1,12 @@
 """
 Appends grpc-web to the project name of both Cargo.toml and pyproject.toml,
-and patches the `hyper-proxy` dependency.
+and patches the `hyper-proxy` dependency to allow ppc64le wheel builds.
 
-This is used in CI to update the package metadata before publishing the alternate
-package with the grpc-web feature enabled.
+This is used in CI to prepare grpc-web-specific python artifacts for publishing.
 """
 
 from io import TextIOWrapper
-from os.path import dirname, realpath, relpath, join
+from os.path import dirname, realpath, join
 import toml
 
 pycrate_path = dirname(dirname(realpath(__file__)))
