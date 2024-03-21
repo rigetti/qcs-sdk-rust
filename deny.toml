@@ -95,8 +95,7 @@ ignore = false
 # https://embarkstudios.github.io/cargo-deny/checks/bans/cfg.html
 [bans]
 multiple-versions = "warn"
-# wildcards = "deny"
-wildcards = "allow"
+wildcards = "deny"
 highlight = "all"
 skip-tree = [
   { name = "toml", version = "*", depth = 20 },

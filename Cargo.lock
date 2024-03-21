@@ -2184,8 +2184,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.7.12-rc.0"
-source = "git+https://github.com/rigetti/qcs-api-client-rust?branch=grpc-web-hyper#e594d61f498c6f3e4d5cc5d60d3833f87b185a2e"
+version = "0.7.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e96a94ca1f4ac3e094d51d90deb5d158dddfd0723cca1b50d302acfd2e4e78ef"
 dependencies = [
  "async-trait",
  "backoff",
@@ -2206,8 +2207,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.7.14-rc.0"
-source = "git+https://github.com/rigetti/qcs-api-client-rust?branch=grpc-web-hyper#e594d61f498c6f3e4d5cc5d60d3833f87b185a2e"
+version = "0.7.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b82196be0676c8dc24749a830e886ffda6e34b3130c6a7078354c24dec07933a"
 dependencies = [
  "backoff",
  "http",
@@ -2238,8 +2240,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.8.13-rc.0"
-source = "git+https://github.com/rigetti/qcs-api-client-rust?branch=grpc-web-hyper#e594d61f498c6f3e4d5cc5d60d3833f87b185a2e"
+version = "0.8.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0e318c4bffb689688d4f95afb2b5a52a70e12a191da402e0dded093102fcb1e9"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
