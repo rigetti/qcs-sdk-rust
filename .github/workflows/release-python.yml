@@ -184,5 +184,5 @@ jobs:
       - name: Publish to PyPI
         uses: messense/maturin-action@v1
         with:
-          command: upload 
+          command: upload
           args: --skip-existing wheels/*
