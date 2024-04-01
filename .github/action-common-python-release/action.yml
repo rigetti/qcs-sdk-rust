@@ -18,6 +18,8 @@ inputs:
     description: "Maturin command used, `build` or `sdist`"
   maturin-args:
     description: "Rust architecture used for compilation"
+  maturin-target:
+    description: "Rust architecture used for compilation"
 
 
 runs:
@@ -48,8 +50,8 @@ runs:
     uses: messense/maturin-action@v1
     with:
       command: ${{ inputs.maturin-command }}
-      target: ${{ inputs.rust-target }}
-      args: ${{ inputs.matirun-args }} --manifest-path crates/python/Cargo.toml --out dist
+      target: ${{ inputs.maturin-target }}
+      args: ${{ inputs.maturin-args }} --manifest-path crates/python/Cargo.toml --out dist
       docker-options: -e CI
   - name: Install wheel
     shell: bash

@@ -43,7 +43,7 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
-        rust-target: universal2-apple-darwin
+        maturin-target: universal2-apple-darwin
         maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   linux:
