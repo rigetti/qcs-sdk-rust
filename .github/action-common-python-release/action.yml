@@ -36,6 +36,7 @@ runs:
       profile: minimal 
       default: true 
   - name: Patch package metadata for grpc-web
+    shell: bash
     if: matrix.package-name == 'qcs-sdk-python-grpc-web'
     run: |
       pip install toml
@@ -49,6 +50,7 @@ runs:
       args: ${{ inputs.matirun-args }} --manifest-path crates/python/Cargo.toml --out dist
       docker-options: -e CI
   - name: Install wheel
+    shell: bash
     run: |
       pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
   - name: Upload wheels 
