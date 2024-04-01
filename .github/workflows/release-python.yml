@@ -34,6 +34,7 @@ jobs:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
+    - uses: actions/checkout@v2
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
@@ -50,6 +51,7 @@ jobs:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         target: [x86_64, aarch64, ppc64le]
     steps:
+    - uses: actions/checkout@v2
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
@@ -61,7 +63,8 @@ jobs:
     strategy: 
       matrix: 
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-    steps: 
+    steps:
+    - uses: actions/checkout@v2
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
@@ -78,6 +81,7 @@ jobs:
       matrix: 
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
+    - uses: actions/checkout@v2
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
