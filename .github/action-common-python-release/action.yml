@@ -26,11 +26,6 @@ runs:
     with:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }} 
-  - name: Install protoc
-    uses: arduino/setup-protoc@v1
-    with:
-      repo-token: ${{ secrets.GITHUB_TOKEN }}
-      version: '3.20.1'
   - name: Update rustup 
     run: rustup self update 
   - name: Install Rust toolchain 
