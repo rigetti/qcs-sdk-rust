@@ -1,24 +1,26 @@
-name: Release Python
+name: Release Python standard and grpc-web clients
 
 on:
   release:
     types: [published]
+  push:
+    branches: [grpc-web-rc]
   workflow_dispatch:
     description: "Manually publish release"
     inputs:
-        publishWheels:
-          description: "Build and publish wheels to PyPI"
-          type: boolean
-          default: false
+      publishWheels:
+        description: "Build and publish both qcs-sdk-python and qcs-sdk-python-grpc-web wheels to PyPI"
+        type: boolean
+        default: false
 
 jobs:
   is-python-release:
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
+    if: true || github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
     runs-on: ubuntu-latest
     steps:
       - run: echo "Release tag starts with python/v, proceeding with release"
   should-publish-wheels:
-    if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
+    if: true || (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
     runs-on: ubuntu-latest
     steps:
       - run: echo "Publishing wheels"
@@ -30,37 +32,13 @@ jobs:
       CXXFLAGS: "-std=c++11 -stdlib=libc++"
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: aarch64-apple-darwin
-          profile: minimal
-          default: true
-      - name: Install protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: '3.20.1'
-      - name: Build wheels - universal2
-        # universal2 supports both x86_64 and aarch64
-        uses: messense/maturin-action@v1
-        with:
-          args: -i python --release --target universal2-apple-darwin --manifest-path crates/python/Cargo.toml --out dist
-      - name: Install wheel
-        run: |
-          pip install qcs-sdk-python --find-links dist --force-reinstall
-      - name: Upload wheels
-        uses: actions/upload-artifact@v3
-        with:
-          name: wheels
-          path: dist
+    - uses: ./.github/action-common-python-release
+      with:
+        package-name: ${{ matrix.package-name }}
+        rust-target: universal2-apple-darwin
+        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   linux:
     runs-on: ubuntu-latest
@@ -69,102 +47,41 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
-        target: [x86_64, aarch64]
+        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        target: [x86_64, aarch64, ppc64le]
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
+    - uses: ./.github/action-common-python-release
       with:
-        toolchain: stable
-        profile: minimal
-        default: true
-    - uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        version: '3.20.1'
-    - name: Build wheels
-      uses: messense/maturin-action@v1
-      with:
-        target: ${{ matrix.target }}
-        manylinux: '2_28'
-        args: -i ${{ matrix.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist
-    - name: Upload wheels
-      uses: actions/upload-artifact@v3
-      with:
-        name: wheels
-        path: dist
+        package-name: ${{ matrix.package-name }}
+        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   windows: 
     runs-on: windows-latest 
     needs: [is-python-release, should-publish-wheels]
     strategy: 
       matrix: 
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
-        target: [x64] 
+        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps: 
-      - uses: actions/checkout@v2 
-      - uses: actions/setup-python@v2 
-        with: 
-          python-version: ${{ matrix.python-version }} 
-          architecture: ${{ matrix.target }} 
-      - name: Update rustup 
-        run: rustup self update 
-      - name: Install Rust toolchain 
-        uses: actions-rs/toolchain@v1 
-        with: 
-          toolchain: stable 
-          target: x86_64-pc-windows-msvc 
-          profile: minimal 
-          default: true 
-      - name: Build wheels 
-        uses: messense/maturin-action@v1 
-        with: 
-          target: ${{ matrix.target }} 
-          args: -i python --release --manifest-path crates/python/Cargo.toml --out dist 
-      - name: Install built wheel 
-        run: | 
-          pip install qcs-sdk-python --find-links dist --force-reinstall --no-deps --no-index
-      - name: Upload wheels 
-        uses: actions/upload-artifact@v2 
-        with: 
-          name: wheels 
-          path: dist 
+    - uses: ./.github/action-common-python-release
+      with:
+        package-name: ${{ matrix.package-name }}
+        python-architectire: x64
+        rust-target: x86_64-pc-windows-msvc
+        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
+
   sdist:
     runs-on: ubuntu-latest
     needs: is-python-release
     env:
       CXXFLAGS: "-std=c++11"
+    strategy: 
+      matrix: 
+        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-    - uses: actions/checkout@v2
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
+    - uses: ./.github/action-common-python-release
       with:
-        toolchain: stable
-        profile: minimal
-        default: true
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
-    - name: Install protoc
-      uses: arduino/setup-protoc@v1
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        version: '3.20.1'
-    - name: Build sdist
-      uses: messense/maturin-action@v1
-      with:
-        command: sdist
-        args: --manifest-path crates/python/Cargo.toml --out dist
-    - name: Upload sdist
-      uses: actions/upload-artifact@v3
-      with:
-        name: wheels
-        path: dist
+        package-name: ${{ matrix.package-name }}
+        maturin-command: sdist
 
   publish:
     runs-on: ubuntu-latest
@@ -179,10 +96,13 @@ jobs:
     if: always() && needs.sdist.result == 'success'
     permissions:
       id-token: write
+    strategy: 
+      matrix: 
+        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
       - uses: actions/download-artifact@v3
-      - name: Publish to PyPI
-        uses: messense/maturin-action@v1
-        with:
-          command: upload
-          args: --skip-existing wheels/*
+      # - name: Publish to PyPI
+      #   uses: messense/maturin-action@v1
+      #   with:
+      #     command: upload
+      #     args: --skip-existing wheels_${{ matrix.package-name }}/*

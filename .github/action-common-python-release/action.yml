@@ -1,0 +1,64 @@
+name: "Base Python Release"
+description: "Common tasks required to release python wheels on any platform"
+
+inputs:
+  package-name:
+    required: true
+    description: "Either 'qcs-sdk-python' or 'qcs-sdk-python-grpc-web'"
+
+  python-version:
+    default: "3.12"
+    description: "Python version used for compilation"
+  python-architecture:
+    description: "Python architecture used for compilation"
+  rust-target:
+    description: "Rust architecture used for compilation"
+  maturin-command:
+    description: "Maturin command used, `build` or `sdist`"
+  maturin-args:
+    description: "Rust architecture used for compilation"
+
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/checkout@v2
+  - uses: actions/setup-python@v4
+    with:
+      python-version: ${{ inputs.python-version }}
+      architecture: ${{ inputs.python-architecture }} 
+  - name: Install protoc
+    uses: arduino/setup-protoc@v1
+    with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
+      version: '3.20.1'
+  - name: Update rustup 
+    run: rustup self update 
+  - name: Install Rust toolchain 
+    uses: actions-rs/toolchain@v1 
+    with: 
+      toolchain: stable 
+      target: ${{ inputs.rust-target }}
+      profile: minimal 
+      default: true 
+  - name: Patch package metadata for grpc-web
+    if: matrix.package-name == 'qcs-sdk-python-grpc-web'
+    run: |
+      pip install toml
+      python crates/python/scripts/patch_grpc_web.py
+      cargo update
+  - name: Maturin build
+    uses: messense/maturin-action@v1
+    with:
+      command: ${{ inputs.maturin-command }}
+      target: ${{ inputs.rust-target }}
+      args: ${{ inputs.matirun-args }} --manifest-path crates/python/Cargo.toml --out dist
+      docker-options: -e CI
+  - name: Install wheel
+    run: |
+      pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
+  - name: Upload wheels 
+    uses: actions/upload-artifact@v2 
+    with: 
+      name: wheels_${{ inputs.package-name }}
+      path: dist 
