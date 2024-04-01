@@ -27,6 +27,7 @@ runs:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }} 
   - name: Update rustup 
+    shell: bash
     run: rustup self update 
   - name: Install Rust toolchain 
     uses: actions-rs/toolchain@v1 
