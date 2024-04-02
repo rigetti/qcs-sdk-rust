@@ -1,4 +1,4 @@
-name: Release Python standard and grpc-web clients
+name: Release Python
 
 on:
   release:
