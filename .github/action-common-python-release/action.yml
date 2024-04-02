@@ -48,7 +48,7 @@ runs:
     with:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
-      args: ${{ inputs.maturin-args }} --manifest-path crates/python/Cargo.toml --out dist
+      args: ${{ inputs.maturin-args }} --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
       docker-options: -e CI
   - name: Install wheel
     shell: bash
