@@ -125,8 +125,8 @@ jobs:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
     - uses: actions/download-artifact@v3
-    - name: Publish to PyPI
-      uses: messense/maturin-action@v1
-      with:
-        command: upload
-        args: --skip-existing wheels_${{ matrix.package-name }}/*
+    # - name: Publish to PyPI
+    #   uses: messense/maturin-action@v1
+    #   with:
+    #     command: upload
+    #     args: --skip-existing wheels_${{ matrix.package-name }}/*
