@@ -4,22 +4,22 @@ description: "Common tasks required to release python wheels on any platform"
 inputs:
   package-name:
     required: true
-    description: "Either 'qcs-sdk-python' or 'qcs-sdk-python-grpc-web'"
+    description: "Either `qcs-sdk-python` or `qcs-sdk-python-grpc-web`"
 
   python-version:
     default: "3.12"
-    description: "Python version used for compilation"
+    description: "Python version used for script steps"
   python-architecture:
-    description: "Python architecture used for compilation"
+    description: "Python architecture used for script steps"
   rust-target:
-    description: "Rust architecture used for compilation"
+    description: "Rust target used for script steps"
   maturin-command:
     default: build
     description: "Maturin command used, `build` or `sdist`"
   maturin-args:
-    description: "Rust architecture used for compilation"
+    description: "Additional maturin command arguments"
   maturin-target:
-    description: "Rust architecture used for compilation"
+    description: "Rust target used for maturin compilation"
 
 
 runs:
@@ -29,9 +29,6 @@ runs:
     with:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }} 
-  # - name: Update rustup 
-  #   shell: bash
-  #   run: rustup self update 
   - name: Install Rust toolchain 
     uses: actions-rs/toolchain@v1 
     with: 

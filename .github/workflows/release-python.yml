@@ -3,8 +3,6 @@ name: Release Python standard and grpc-web clients
 on:
   release:
     types: [published]
-  push:
-    branches: [grpc-web-rc]
   workflow_dispatch:
     description: "Manually publish release"
     inputs:
@@ -15,15 +13,15 @@ on:
 
 jobs:
   is-python-release:
-    if: true || github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Release tag starts with python/v, proceeding with release"
+    - run: echo "Release tag starts with python/v, proceeding with release"
   should-publish-wheels:
-    if: true || (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
+    if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Publishing wheels"
+    - run: echo "Publishing wheels"
 
   macos:
     runs-on: macos-12
@@ -124,9 +122,9 @@ jobs:
       matrix: 
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-      - uses: actions/download-artifact@v3
-      # - name: Publish to PyPI
-      #   uses: messense/maturin-action@v1
-      #   with:
-      #     command: upload
-      #     args: --skip-existing wheels_${{ matrix.package-name }}/*
+    - uses: actions/download-artifact@v3
+    - name: Publish to PyPI
+      uses: messense/maturin-action@v1
+      with:
+        command: upload
+        args: --skip-existing wheels_${{ matrix.package-name }}/*
