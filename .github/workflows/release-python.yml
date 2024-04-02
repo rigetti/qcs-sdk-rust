@@ -44,7 +44,6 @@ jobs:
       with:
         package-name: ${{ matrix.package-name }}
         maturin-target: universal2-apple-darwin
-        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   linux:
     runs-on: ubuntu-latest
@@ -65,7 +64,6 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
-        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   windows: 
     runs-on: windows-latest 
@@ -85,7 +83,6 @@ jobs:
         package-name: ${{ matrix.package-name }}
         python-architectire: x64
         rust-target: x86_64-pc-windows-msvc
-        maturin-args: -i 3.8 3.9 3.10 3.11 3.12 --release
 
   sdist:
     runs-on: ubuntu-latest
