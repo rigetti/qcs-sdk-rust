@@ -22,17 +22,18 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+/// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
+/// It is public so that users can create gRPC clients with different APIs using a "raw" connection
+/// initialized by this library. This ensures that the exact Tonic version used for such clients
+/// matches what this library uses.
 #[cfg(not(feature = "grpc-web"))]
-/// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
-/// It is public so that users can create gRPC clients with different APIs using a "raw" connection
-/// initialized by this library. This ensures that the exact Tonic version used for such clients
-/// matches what this library uses.
 pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfiguration>>;
-#[cfg(feature = "grpc-web")]
+
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
+#[cfg(feature = "grpc-web")]
 pub type GrpcConnection =
     GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
 
