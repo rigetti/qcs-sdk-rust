@@ -52,8 +52,7 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        target: [x86_64, aarch64, ppc64le]
+        target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v2
     - name: Install protoc
@@ -63,7 +62,27 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
-        package-name: ${{ matrix.package-name }}
+        package-name: qcs-sdk-python
+        maturin-target: ${{ matrix.target }}
+
+  linux-grpc-web:
+    runs-on: ubuntu-latest
+    needs: [is-python-release, should-publish-wheels]
+    env:
+      CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        target: [x86_64, ppc64le]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
+    - uses: ./.github/action-common-python-release
+      with:
+        package-name: qcs-sdk-python-grpc-web
         maturin-target: ${{ matrix.target }}
 
   windows: 
@@ -114,7 +133,7 @@ jobs:
     # finish, regardless of their outcome. In this case, we
     # still make sure that at least a source distribution
     # can be published.
-    needs: [ macos, linux, windows, sdist ]
+    needs: [ macos, linux, linux-grpc-web, windows, sdist ]
     if: always() && needs.sdist.result == 'success'
     permissions:
       id-token: write
