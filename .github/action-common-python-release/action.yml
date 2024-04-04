@@ -63,7 +63,9 @@ runs:
       target: ${{ inputs.maturin-target }}
       args: --manifest-path crates/python/Cargo.toml --out dist
 
-  - name: Install wheel
+  # host will not produce an installable wheel in this case
+  - if: inputs.maturin-target != 'ppc64le'
+    name: Install wheel
     shell: bash
     run: |
       pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
