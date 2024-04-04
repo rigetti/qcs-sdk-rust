@@ -1,3 +1,9 @@
+## 0.17.4-rc.0
+
+### Fixes
+
+- update h2, see RUSTSEC-2024-0332 (#453)
+
 ## 0.17.3
 
 ### Fixes
