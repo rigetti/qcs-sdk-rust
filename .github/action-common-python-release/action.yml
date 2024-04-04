@@ -1,0 +1,73 @@
+name: "Base Python Release"
+description: "Common tasks required to release python wheels on any platform"
+
+inputs:
+  package-name:
+    required: true
+    description: "Either `qcs-sdk-python` or `qcs-sdk-python-grpc-web`"
+
+  python-architecture:
+    description: "Python architecture used for script steps"
+  rust-target:
+    description: "Rust target used for script steps"
+  maturin-command:
+    default: build
+    description: "Maturin command used, `build` or `sdist`"
+  maturin-args:
+    description: "Additional maturin command arguments"
+  maturin-target:
+    description: "Rust target used for maturin compilation"
+
+
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/setup-python@v4
+    with:
+      python-version: "3.12"
+      architecture: ${{ inputs.python-architecture }} 
+  - name: Install Rust toolchain 
+    uses: actions-rs/toolchain@v1 
+    with: 
+      toolchain: stable 
+      target: ${{ inputs.rust-target }}
+      profile: minimal 
+      default: true 
+  - name: Patch package metadata for grpc-web
+    shell: bash
+    if: inputs.package-name == 'qcs-sdk-python-grpc-web'
+    run: |
+      pip install toml
+      python crates/python/scripts/patch_grpc_web.py
+      cargo update hyper-proxy
+
+  # must be build or sdist
+  - if: inputs.maturin-command == 'build'
+    name: Maturin - Build
+    uses: messense/maturin-action@v1
+    with:
+      manylinux: '2_28'
+      command: ${{ inputs.maturin-command }}
+      target: ${{ inputs.maturin-target }}
+      args: -i 3.8 3.9 3.10 3.11 3.12 --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      docker-options: -e CI
+  - if: inputs.maturin-command == 'sdist'
+    name: Maturin - Source Distribution
+    uses: messense/maturin-action@v1
+    with:
+      manylinux: '2_28'
+      command: ${{ inputs.maturin-command }}
+      target: ${{ inputs.maturin-target }}
+      args: --manifest-path crates/python/Cargo.toml --out dist
+
+  # host will not be able to install wheel in this case
+  - if: inputs.maturin-target != 'ppc64le'
+    name: Install wheel
+    shell: bash
+    run: |
+      pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
+  - name: Upload wheels 
+    uses: actions/upload-artifact@v2 
+    with: 
+      name: wheels_${{ inputs.package-name }}
+      path: dist 

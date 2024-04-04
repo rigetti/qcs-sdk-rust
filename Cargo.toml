@@ -4,9 +4,9 @@ resolver = "2"
 
 [workspace.dependencies]
 qcs-api = "0.2.1"
-qcs-api-client-common = "0.7.10"
-qcs-api-client-grpc = "0.7.13"
-qcs-api-client-openapi = "0.8.11"
+qcs-api-client-common = "0.7.12"
+qcs-api-client-grpc = "0.7.14"
+qcs-api-client-openapi = "0.8.13"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -24,7 +24,7 @@ quil-rs = { version = "0.23.0", git = "https://github.com/rigetti/quil-rs", tag 
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.20.0"
-pyo3 = "0.20.0"
+pyo3 = { version = "0.20.0", features = ["extension-module"] }
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.3.1", default-features = false, features = ["complex"] }
