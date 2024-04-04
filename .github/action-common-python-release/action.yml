@@ -60,7 +60,7 @@ runs:
       target: ${{ inputs.maturin-target }}
       args: --manifest-path crates/python/Cargo.toml --out dist
 
-  # host will not produce an installable wheel in this case
+  # host will not be able to install wheel in this case
   - if: inputs.maturin-target != 'ppc64le'
     name: Install wheel
     shell: bash
