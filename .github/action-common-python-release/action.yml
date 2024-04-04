@@ -6,9 +6,6 @@ inputs:
     required: true
     description: "Either `qcs-sdk-python` or `qcs-sdk-python-grpc-web`"
 
-  python-version:
-    default: "3.12"
-    description: "Python version used for script steps"
   python-architecture:
     description: "Python architecture used for script steps"
   rust-target:
@@ -27,7 +24,7 @@ runs:
   steps:
   - uses: actions/setup-python@v4
     with:
-      python-version: ${{ inputs.python-version }}
+      python-version: "3.12"
       architecture: ${{ inputs.python-architecture }} 
   - name: Install Rust toolchain 
     uses: actions-rs/toolchain@v1 
