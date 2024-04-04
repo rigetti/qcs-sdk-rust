@@ -1,3 +1,13 @@
+## 0.21.4
+
+### Features
+
+- gRPC web support (#449)
+
+### Fixes
+
+- update h2, see RUSTSEC-2024-0332 (#453)
+
 ## 0.21.4-rc.1
 
 ### Features
