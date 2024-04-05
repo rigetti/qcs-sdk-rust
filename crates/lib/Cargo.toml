@@ -21,7 +21,7 @@ grpc-web = ["qcs-api-client-grpc/grpc-web"]
 cached = "0.44.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
-indexmap = "1.9.1"
+indexmap = "1.9.1, ||, ^2"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
