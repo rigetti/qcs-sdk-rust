@@ -1,3 +1,9 @@
+## 0.21.5-rc.0
+
+### Features
+
+- Update quil (#459)
+
 ## 0.21.4
 
 ### Features
