@@ -2124,7 +2124,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.21.5-rc.0"
+version = "0.21.5"
 dependencies = [
  "assert2",
  "async-trait",
@@ -2260,7 +2260,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.17.5-rc.0"
+version = "0.17.5"
 dependencies = [
  "async-trait",
  "numpy",
