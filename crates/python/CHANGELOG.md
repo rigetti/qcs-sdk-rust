@@ -1,3 +1,9 @@
+## 0.17.7-rc.0
+
+### Features
+
+- Update quil
+
 ## 0.17.6
 
 ### Features
