@@ -1,3 +1,9 @@
+## 0.21.6
+
+### Features
+
+- Update the quil-package, pulling in bug fixes and deterministic serialization (#461)
+
 ## 0.21.6-rc.0
 
 ### Features
