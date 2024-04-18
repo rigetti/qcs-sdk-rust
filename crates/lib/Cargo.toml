@@ -1,7 +1,7 @@
 [package]
 name = "qcs"
 description = "High level interface for running Quil on a QPU"
-version = "0.21.3"
+version = "0.21.7"
 edition = "2018"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
@@ -15,12 +15,13 @@ tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/
 tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
 otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-client-openapi/otel-tracing"]
 libquil = ["dep:libquil-sys"]
+grpc-web = ["qcs-api-client-grpc/grpc-web"]
 
 [dependencies]
 cached = "0.44.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
-indexmap = "1.9.1"
+indexmap = "2.2.6"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }

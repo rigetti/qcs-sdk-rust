@@ -8,6 +8,8 @@ use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::RefreshError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
+#[cfg(feature = "grpc-web")]
+use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
 use qcs_api_client_grpc::{
     channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
@@ -544,10 +546,11 @@ pub trait ExecutionTarget<'a> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        Ok(wrap_channel_with_retry(wrap_channel_with(
-            channel,
-            client.get_config().clone(),
-        )))
+        let channel =
+            wrap_channel_with_retry(wrap_channel_with(channel, client.get_config().clone()));
+        #[cfg(feature = "grpc-web")]
+        let channel = wrap_channel_with_grpc_web(channel);
+        Ok(channel)
     }
 
     /// Get the gateway address for the given quantum processor ID.

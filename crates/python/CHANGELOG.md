@@ -1,3 +1,65 @@
+## 0.17.7
+
+### Features
+
+- Update quil
+
+## 0.17.7-rc.0
+
+### Features
+
+- Update quil
+
+## 0.17.6
+
+### Features
+
+- Update the quil-package, pulling in bug fixes and deterministic serialization (#461)
+
+## 0.17.6-rc.0
+
+### Features
+
+- Update the quil-package, pulling in bug fixes and deterministic serialization (#461)
+
+## 0.17.5
+
+### Features
+
+- Update quil (#459)
+
+## 0.17.5-rc.0
+
+### Features
+
+- Update quil (#459)
+
+## 0.17.4
+
+### Features
+
+- gRPC web support (#449)
+
+### Fixes
+
+- update h2, see RUSTSEC-2024-0332 (#453)
+
+## 0.17.4-rc.1
+
+### Features
+
+- gRPC web support (#449)
+
+### Fixes
+
+- update h2, see RUSTSEC-2024-0332 (#453)
+
+## 0.17.4-rc.0
+
+### Fixes
+
+- update h2, see RUSTSEC-2024-0332 (#453)
+
 ## 0.17.3
 
 ### Fixes
