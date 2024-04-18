@@ -541,7 +541,7 @@ impl PyApiExecutionOptionsBuilder {
 }
 
 py_wrap_type! {
-    #[derive(Default)]
+    #[derive(Debug, Default)]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
 }
 impl_repr!(PyConnectionStrategy);
