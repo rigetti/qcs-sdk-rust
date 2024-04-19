@@ -95,7 +95,7 @@ py_wrap_type! {
 }
 
 impl PyQcsClient {
-    pub(crate) async fn get_or_create_client(client: Option<Self>) -> Qcs {
+    pub async fn get_or_create_client(client: Option<Self>) -> Qcs {
         match client {
             Some(client) => client.into(),
             None => Qcs::load().await,
