@@ -1,3 +1,9 @@
+## 0.17.8-rc.0
+
+### Features
+
+- Update quil-rs (#464)
+
 ## 0.17.7
 
 ### Features
