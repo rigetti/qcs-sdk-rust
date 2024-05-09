@@ -22,6 +22,9 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::channel::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+const DEFAULT_MAX_MESSAGE_ENCODING_SIZE: usize = 50 * 1024 * 1024;
+const DEFAULT_MAX_MESSAGE_DECODING_SIZE: usize = 50 * 1024 * 1024;
+
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
@@ -106,7 +109,9 @@ impl Qcs {
             wrap_channel_with_retry(wrap_channel_with(channel, self.get_config().clone()));
         #[cfg(feature = "grpc-web")]
         let service = wrap_channel_with_grpc_web(service);
-        Ok(TranslationClient::new(service))
+        Ok(TranslationClient::new(service)
+            .max_encoding_message_size(DEFAULT_MAX_MESSAGE_ENCODING_SIZE)
+            .max_decoding_message_size(DEFAULT_MAX_MESSAGE_DECODING_SIZE))
     }
 }
 
