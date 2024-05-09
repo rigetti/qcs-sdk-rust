@@ -1,1 +1,1 @@
-doc-valid-idents = ["gRPC", ".."]
+doc-valid-idents = ["gRPC", "..", "JupyterLab"]
