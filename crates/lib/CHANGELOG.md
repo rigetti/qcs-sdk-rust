@@ -1,3 +1,9 @@
+## 0.21.9-rc.0
+
+### Fixes
+
+- Refresh JWT only when expired, not before every request (#470)
+
 ## 0.21.8
 
 ### Features
