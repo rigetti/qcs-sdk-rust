@@ -228,7 +228,7 @@ pub enum CompilationError {
     Libquil(crate::compiler::libquil::Error),
     /// Errors during compilation when using RPCQ
     #[error("compilation error from RPCQ: {0}")]
-    Rpcq(crate::compiler::rpcq::Error),
+    Rpcq(rpcq::Error),
 }
 
 /// The response from quilc for a `quil_to_native_quil` request.

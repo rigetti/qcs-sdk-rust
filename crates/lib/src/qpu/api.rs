@@ -6,9 +6,9 @@ use std::{fmt, time::Duration};
 use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::RefreshError;
-pub use qcs_api_client_grpc::channel::Error as GrpcError;
 #[cfg(feature = "grpc-web")]
 use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
+pub use qcs_api_client_grpc::channel::Error as GrpcError;
 use qcs_api_client_grpc::{
     channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
@@ -598,7 +598,7 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
             acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
         });
 
-        next_page_token = accessors.next_page_token.clone();
+        next_page_token.clone_from(&accessors.next_page_token);
         if next_page_token.is_none() {
             break;
         }
