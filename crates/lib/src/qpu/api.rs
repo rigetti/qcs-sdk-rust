@@ -1,7 +1,7 @@
 //! This module provides bindings to for submitting jobs to and retrieving them from
 //! Rigetti QPUs using the QCS API.
 
-use std::{fmt, time::Duration};
+use std::{convert::TryFrom, fmt, time::Duration};
 
 use cached::proc_macro::cached;
 use derive_builder::Builder;
@@ -302,15 +302,17 @@ pub async fn retrieve_results(
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
         .map_err(QpuApiError::from)
         .and_then(
-            |result| match controller_job_execution_result::Status::from_i32(result.status) {
-                Some(controller_job_execution_result::Status::Success) => Ok(result),
-                status => Err(QpuApiError::JobExecutionFailed {
-                    status: status
-                        .map_or("UNDEFINED", |status| status.as_str_name())
-                        .to_string(),
+            |result| match controller_job_execution_result::Status::try_from(result.status) {
+                Ok(controller_job_execution_result::Status::Success) => Ok(result),
+                Ok(status) => Err(QpuApiError::JobExecutionFailed {
+                    status: status.as_str_name().to_string(),
                     message: result
                         .status_message
                         .unwrap_or("No message provided.".to_string()),
+                }),
+                Err(s) => Err(QpuApiError::InvalidJobStatus {
+                    status: result.status,
+                    message: s.to_string(),
                 }),
             },
         )
@@ -686,6 +688,17 @@ pub enum QpuApiError {
         /// The status of the failed job.
         status: String,
         /// The message associated with the failed job.
+        message: String,
+    },
+
+    /// Error that can occur if a numeric status identifier cannot be converted
+    /// into a known status type.
+    #[error("The request returned an invalid status: {status}. {message}")]
+    InvalidJobStatus {
+        /// The numeric status identifier.
+        status: i32,
+        /// The message describing the failure to convert the numeric status
+        /// identifier into a known status type.
         message: String,
     },
 }

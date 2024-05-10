@@ -12,7 +12,7 @@ use super::quilc::{self, NativeQuilMetadata};
 /// The errors that can arise when using libquil as a QVM client
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
-    /// Error when calling libquil_sys::quilc
+    /// Error when calling [`libquil_sys::quilc`]
     #[error("error when calling libquil_sys: {0}")]
     Quilc(#[from] libquil_sys::quilc::Error),
     /// Error when serializing a program
@@ -24,7 +24,7 @@ pub enum Error {
     /// Error when casting u64 to u32
     #[error("error when casting u64 to u32: {0}")]
     U64Truncation(#[from] TryFromIntError),
-    /// Error when creating a CString
+    /// Error when creating a [`CString`]
     #[error("error when creating CString: {0}")]
     CString(#[from] NulError),
 }
@@ -202,14 +202,14 @@ mod test {
         assert_eq!(output.program.to_quil_or_debug(), EXPECTED_H0_OUTPUT);
     }
 
-    const BELL_STATE: &str = r##"DECLARE ro BIT[2]
+    const BELL_STATE: &str = r"DECLARE ro BIT[2]
 
 H 0
 CNOT 0 1
 
 MEASURE 0 ro[0]
 MEASURE 1 ro[1]
-"##;
+";
 
     #[tokio::test]
     async fn test_print_isa() {
@@ -228,7 +228,7 @@ MEASURE 1 ro[1]
                 CompilerOpts::default(),
             )
             .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.program.to_quil_or_debug())
+        let mut results = qvm::Execution::new(&output.program.to_quil_or_debug())
             .unwrap()
             .run(
                 NonZeroU16::new(10).expect("value is non-zero"),

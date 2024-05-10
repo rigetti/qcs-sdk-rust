@@ -398,7 +398,7 @@ MEASURE 1 ro[1]
                 CompilerOpts::default(),
             )
             .expect("Could not compile");
-        let mut results = crate::qvm::Execution::new(&output.program.to_quil_or_debug())
+        let mut results = qvm::Execution::new(&output.program.to_quil_or_debug())
             .unwrap()
             .run(
                 NonZeroU16::new(10).expect("value is non-zero"),
