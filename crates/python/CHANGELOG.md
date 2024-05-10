@@ -1,3 +1,9 @@
+## 0.17.10-rc.0
+
+### Features
+
+- increase gRPC max message size from 4MB to 50MB (#468)
+
 ## 0.17.9
 
 ### Fixes
