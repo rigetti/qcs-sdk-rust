@@ -1,3 +1,15 @@
+## 0.17.9
+
+### Fixes
+
+- Refresh JWT only when expired, not before every request (#470)
+
+## 0.17.9-rc.0
+
+### Fixes
+
+- Refresh JWT only when expired, not before every request (#470)
+
 ## 0.17.8
 
 ### Features
