@@ -1,3 +1,9 @@
+## 0.17.11-rc.0
+
+### Features
+
+- support opentelemetry tracing (#474)
+
 ## 0.17.10
 
 ### Features

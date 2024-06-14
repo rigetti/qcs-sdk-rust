@@ -1,3 +1,9 @@
+## 0.21.11-rc.0
+
+### Features
+
+- support opentelemetry tracing (#474)
+
 ## 0.21.10
 
 ### Features
