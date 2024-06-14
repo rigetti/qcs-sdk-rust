@@ -61,7 +61,7 @@ def _read_fixture(relpath: str) -> str:
 
 @pytest.fixture
 def quantum_processor_id() -> str:
-    return "Aspen-M-3"
+    return os.getenv("TEST_LIVE_QUANTUM_PROCESSOR_ID", "Aspen-M-3") 
 
 
 @pytest.fixture
@@ -102,3 +102,12 @@ def qvm_http_client() -> QVMClient:
 @pytest.fixture
 def quilc_rpcq_client() -> QuilcClient:
     return QuilcClient.new_rpcq(QCSClient.load().quilc_url)
+
+
+@pytest.fixture(scope="session")
+def live_qpu_access(request: pytest.FixtureRequest) -> bool:
+    return (
+        request.config.getoption("--with-qcs-execution") is not None
+        and request.config.getoption("--with-qcs-execution") is not False
+    )
+

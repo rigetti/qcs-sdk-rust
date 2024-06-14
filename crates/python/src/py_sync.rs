@@ -113,14 +113,16 @@ macro_rules! py_function_sync_async {
         #[allow(clippy::too_many_arguments)]
         #[pyo3(name = $name "")]
         pub fn [< py_ $name >](py: ::pyo3::Python<'_> $(, $(#[$arg_meta])*$arg: $kind)*) $(-> $ret)? {
-            $crate::py_sync::py_sync!(py, $name($($arg),*))
+            use opentelemetry::trace::FutureExt;
+            $crate::py_sync::py_sync!(py, $name($($arg),*).with_current_context())
         }
 
         $(#[$meta])+
         #[pyo3(name = $name "_async")]
         #[allow(clippy::too_many_arguments)]
         pub fn [< py_ $name _async >](py: ::pyo3::Python<'_> $(, $(#[$arg_meta])*$arg: $kind)*) -> ::pyo3::PyResult<&::pyo3::PyAny> {
-            $crate::py_sync::py_async!(py, $name($($arg),*))
+            use opentelemetry::trace::FutureExt;
+            $crate::py_sync::py_async!(py, $name($($arg),*).with_current_context())
         }
         }
     };
