@@ -16,6 +16,7 @@ tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-cl
 otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-client-openapi/otel-tracing"]
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
+tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
 
 [dependencies]
 cached = "0.44.0"
@@ -25,6 +26,8 @@ indexmap = "2.2.6"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
+opentelemetry = { version = "0.23.0" }
+opentelemetry_sdk = { version = "0.23.0" }
 qcs-api.workspace = true
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true

@@ -81,6 +81,7 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit(
@@ -114,6 +115,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit_with_parameter_batch(
@@ -356,6 +358,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn retrieve_results(

@@ -13,6 +13,10 @@ args = ["install"]
 command = "poetry"
 args = ["run", "maturin", "develop"]
 
+[tasks.format-tracing-subscriber]
+command = "poetry"
+args = ["run", "black", "qcs_sdk/_tracing_subscriber"]
+
 [tasks.post-test]
 command = "docker-compose"
 args = ["down"]
@@ -34,18 +38,28 @@ dependencies = [
     "pre-test-docker-up",
     "poetry-install",
     "install-lib",
+    "format-tracing-subscriber",
     "test",
     "post-test",
 ]
 
 [tasks.stubtest]
 command = "poetry"
-args = ["run", "stubtest", "--allowlist", ".stubtest-allowlist", "qcs_sdk"]
+args = [
+    "run",
+    "stubtest",
+    "--allowlist", 
+    ".stubtest-allowlist",
+    "--allowlist", 
+    "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
+    "qcs_sdk"
+]
 
 [tasks.stubtest-flow]
 dependencies = [
     "poetry-install",
     "install-lib",
+    "fomat-tracing-subscriber",
     "stubtest",
 ]
 

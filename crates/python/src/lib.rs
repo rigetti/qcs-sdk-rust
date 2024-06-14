@@ -58,6 +58,7 @@ fn qcs_sdk(py: Python<'_>, m: &PyModule) -> PyResult<()> {
         Err(e) => eprintln!("Failed to initialize the qcs_sdk logger: {e}"),
     }
     init_submodule("qcs_sdk", py, m)?;
+    pyo3_tracing_subscriber::add_submodule("qcs_sdk", "_tracing_subscriber", py, m)?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))
 }
 

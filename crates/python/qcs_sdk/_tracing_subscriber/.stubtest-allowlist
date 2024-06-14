@@ -1,0 +1,7 @@
+# The following are all type aliases.
+qcs_sdk._tracing_subscriber.ExportConfig
+qcs_sdk._tracing_subscriber.TracingConfig
+qcs_sdk._tracing_subscriber.layers.Config
+qcs_sdk._tracing_subscriber.layers.otel_otlp.ResourceValue
+qcs_sdk._tracing_subscriber.layers.otel_otlp.ResourceValueArray
+qcs_sdk._tracing_subscriber.layers.otel_otlp.Sampler
