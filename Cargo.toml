@@ -28,7 +28,7 @@ numpy = "0.20.0"
 pyo3 = { version = "0.20.0", features = ["extension-module"] }
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-build-config = "0.20.0"
-rigetti-pyo3 = { version = "0.3.1", default-features = false, features = ["complex"] }
+rigetti-pyo3 = { version = "0.3.1", default-features = false, features = ["time", "complex"] }
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.
