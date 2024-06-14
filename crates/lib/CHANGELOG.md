@@ -1,3 +1,13 @@
+## 0.21.10
+
+### Features
+
+- increase gRPC max message size from 4MB to 50MB (#468)
+
+### Fixes
+
+- add explicit dependency on rigetti-pyo3's "time" feature (#476)
+
 ## 0.21.10-rc.1
 
 ### Features
