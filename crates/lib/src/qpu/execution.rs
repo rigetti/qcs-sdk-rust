@@ -61,8 +61,6 @@ pub(crate) enum Error {
     Compilation { details: String },
     #[error("Problem when getting RPCQ client: {0}")]
     RpcqClient(#[from] rpcq::Error),
-    #[error("Program when getting substitutions for program: {0}")]
-    Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
     QpuApi(#[from] super::api::QpuApiError),
 }
@@ -156,8 +154,8 @@ impl<'a> Execution<'a> {
         Ok(Self {
             program,
             quantum_processor_id,
-            client,
             shots,
+            client,
         })
     }
 
@@ -233,7 +231,7 @@ impl<'a> Execution<'a> {
         let job_id = submit(
             quantum_processor_id,
             job,
-            &params,
+            params,
             self.client.as_ref(),
             execution_options,
         )
