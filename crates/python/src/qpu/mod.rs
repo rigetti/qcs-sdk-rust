@@ -8,7 +8,6 @@ pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 pub mod api;
 pub mod isa;
 mod result_data;
-pub mod rewrite_arithmetic;
 pub mod translation;
 
 use crate::client::PyQcsClient;
@@ -33,7 +32,6 @@ create_init_submodule! {
     submodules: [
         "api": api::init_submodule,
         "isa": isa::init_submodule,
-        "rewrite_arithmetic": rewrite_arithmetic::init_submodule,
         "translation": translation::init_submodule
     ],
 }

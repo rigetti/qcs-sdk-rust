@@ -17,7 +17,6 @@ use tokio::time::error::Elapsed;
 pub mod api;
 mod execution;
 pub mod result_data;
-pub mod rewrite_arithmetic;
 pub mod translation;
 
 pub(crate) use execution::{Error as ExecutionError, Execution};
