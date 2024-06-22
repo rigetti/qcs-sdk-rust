@@ -718,7 +718,6 @@ impl From<ExecutionError> for Error {
             ExecutionError::ToQuil(e) => Self::ToQuil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
             ExecutionError::RpcqClient(e) => Self::Unexpected(format!("{e:?}")),
-            ExecutionError::Substitution(message) => Self::Substitution(message),
             ExecutionError::QpuApi(e) => Self::QpuApiError(e),
         }
     }
