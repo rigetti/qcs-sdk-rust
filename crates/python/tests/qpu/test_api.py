@@ -1,9 +1,5 @@
 import pytest
 
-from qcs_sdk.qpu.rewrite_arithmetic import (
-    rewrite_arithmetic,
-    build_patch_values,
-)
 from qcs_sdk.qpu.translation import (
     translate,
 )
@@ -45,8 +41,6 @@ def test_submit_retrieve(
     memory = { "theta": [0.5] }
 
     translated = translate(program, 1, quantum_processor_id)
-    rewritten = rewrite_arithmetic(translated.program)
-    patch_values = build_patch_values(rewritten.recalculation_table, memory)
 
-    job_id = submit(rewritten.program, patch_values, quantum_processor_id)
+    job_id = submit(program, memory, quantum_processor_id)
     results = retrieve_results(job_id)
