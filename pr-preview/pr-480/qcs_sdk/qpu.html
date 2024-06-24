@@ -38,13 +38,13 @@
                                 <a class="function" href="#QPUResultData.to_raw_readout_data">to_raw_readout_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
                         </li>
                 </ul>
 
@@ -56,10 +56,10 @@
                                 <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
+                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
+                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
                         </li>
                 </ul>
 
@@ -67,6 +67,9 @@
             <li>
                     <a class="class" href="#ReadoutValues">ReadoutValues</a>
                             <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ReadoutValues.__init__">ReadoutValues</a>
+                        </li>
                         <li>
                                 <a class="function" href="#ReadoutValues.from_integer">from_integer</a>
                         </li>
@@ -112,6 +115,9 @@
             <li>
                     <a class="class" href="#MemoryValues">MemoryValues</a>
                             <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#MemoryValues.__init__">MemoryValues</a>
+                        </li>
                         <li>
                                 <a class="function" href="#MemoryValues.from_binary">from_binary</a>
                         </li>
@@ -182,7 +188,12 @@
                     <h1 class="modulename">
 <a href="./../qcs_sdk.html">qcs_sdk</a><wbr>.qpu    </h1>
 
-                
+                        <div class="docstring"><p>The QPU module contains the API for interacting with Rigetti Quantum Processing Units (QPUs).</p>
+
+<p>🔨 This page is under construction and the documentation for some submodules is missing.
+In the meantime, you can find documentation in the <a href="https://github.com/rigetti/qcs-sdk-rust/tree/main/crates/python/qcs_sdk/qpu">the type hints</a>.</p>
+</div>
+
                 
                 
                 
@@ -197,52 +208,72 @@
     </div>
     <a class="headerlink" href="#QPUResultData"></a>
     
-    
+            <div class="docstring"><p>Encapsulates data returned from the QPU after executing a job.</p>
+
+<p><code><a href="#QPUResultData">QPUResultData</a></code> contains "mappings", which map declared memory regions
+in a program (ie. "ro[0]") to that regions readout key in <code><a href="#QPUResultData.readout_values">QPUResultData.readout_values</a></code>.
+<code><a href="#QPUResultData.readout_values">readout_values</a></code> maps those readout keys to the values emitted for that region
+across all shots.</p>
+
+<p>Read more about QPU readout data in the
+<a href="https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data">QCS Documentation</a></p>
+</div>
+
 
                             <div id="QPUResultData.to_raw_readout_data" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_raw_readout_data</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_raw_readout_data</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n"><a href="#RawQPUReadoutData">qcs_sdk.qpu.RawQPUReadoutData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#QPUResultData.to_raw_readout_data"></a>
     
-    
+            <div class="docstring"><p>Get a copy of this result data flattened into a <code><a href="#RawQPUReadoutData">RawQPUReadoutData</a></code>. This reduces
+the contained data down to primitive types, offering a simpler structure at the
+cost of the type safety provided by <code><a href="#ReadoutValues">ReadoutValues</a></code> and <code><a href="#MemoryValues">MemoryValues</a></code>.</p>
+</div>
 
-                            </div>
-                            <div id="QPUResultData.mappings" class="classattr">
-                                <div class="attr variable">
-            <span class="name">mappings</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.mappings"></a>
-    
-    
 
                             </div>
                             <div id="QPUResultData.readout_values" class="classattr">
                                 <div class="attr variable">
-            <span class="name">readout_values</span>
+            <span class="name">readout_values</span><span class="annotation">: Dict[str, <a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a>]</span>
 
         
     </div>
     <a class="headerlink" href="#QPUResultData.readout_values"></a>
     
-    
+            <div class="docstring"><p>Get the mappings of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code></p>
+</div>
+
 
                             </div>
                             <div id="QPUResultData.memory_values" class="classattr">
                                 <div class="attr variable">
-            <span class="name">memory_values</span>
+            <span class="name">memory_values</span><span class="annotation">: Dict[str, <a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a>]</span>
 
         
     </div>
     <a class="headerlink" href="#QPUResultData.memory_values"></a>
     
+            <div class="docstring"><p>Get mapping of a memory region (ie. "ro") to the final contents of that memory region.</p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.mappings" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.mappings"></a>
     
+            <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in <code><a href="#QPUResultData.readout_values">QPUResultData.readout_values</a></code></p>
+</div>
+
 
                             </div>
                 </section>
@@ -256,44 +287,49 @@
     </div>
     <a class="headerlink" href="#RawQPUReadoutData"></a>
     
-            <div class="docstring"><p>A wrapper type for data returned by the QPU in a more flat structure than
-[<code>PyQpuResultData</code>] offers. This makes it more convenient to work with
-the data if you don't care what type of number the readout values for
-each register contains.</p>
+            <div class="docstring"><p>Encapsulates data returned from the QPU after executing a job. Compared to
+<code><a href="#QPUResultData.readout_values">QPUResultData.readout_values</a></code>, the readout values in this class are returned as lists
+of numbers instead of values wrapped by the <code><a href="#ReadoutValues">ReadoutValues</a></code> class.</p>
 </div>
 
 
                             <div id="RawQPUReadoutData.readout_values" class="classattr">
                                 <div class="attr variable">
-            <span class="name">readout_values</span>
+            <span class="name">readout_values</span><span class="annotation">: Dict[str, Union[List[int], List[float], List[complex]]]</span>
 
         
     </div>
     <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
     
-    
+            <div class="docstring"><p>Get the mappings of a readout values identifier (ie. "q0") to a list of those readout values</p>
+</div>
 
-                            </div>
-                            <div id="RawQPUReadoutData.memory_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory_values</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RawQPUReadoutData.memory_values"></a>
-    
-    
 
                             </div>
                             <div id="RawQPUReadoutData.mappings" class="classattr">
                                 <div class="attr variable">
-            <span class="name">mappings</span>
+            <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
 
         
     </div>
     <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
     
+            <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values</p>
+</div>
+
+
+                            </div>
+                            <div id="RawQPUReadoutData.memory_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory_values</span><span class="annotation">: Dict[str, Union[List[int], List[float], NoneType]]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RawQPUReadoutData.memory_values"></a>
     
+            <div class="docstring"><p>Get mapping of a memory region (ie. "ro") to the final contents of that memory region.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -307,13 +343,47 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues"></a>
     
-    
+            <div class="docstring"><p>A row of readout values from the QPU. Each row contains all the values emitted
+to a memory reference across all shots. There is a variant for each possible type
+the list of readout values could be.</p>
 
+<h2 id="variants">Variants:</h2>
+
+<ul>
+<li><code>integer</code>: Corresponds to the Quil <code>BIT</code>, <code>OCTET</code>, or <code>INTEGER</code> types.</li>
+<li><code>real</code>: Corresponds to the Quil <code>REAL</code> type.</li>
+<li><code>complex</code>: Corresponds to readout values containing complex numbers</li>
+</ul>
+
+<h2 id="methods-each-per-variant">Methods (each per variant):</h2>
+
+<pre><code>- ``is_*``: if the underlying values are that type.
+- ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+- ``to_*``: the underlying values as that type, raises `ValueError` if they are not.
+- ``from_*``: wrap underlying values as this enum type.
+</code></pre>
+</div>
+
+
+                            <div id="ReadoutValues.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">ReadoutValues</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ReadoutValues.__init__"></a>
+    
+            <div class="docstring"><p>Construct a new <code><a href="#ReadoutValues">ReadoutValues</a></code> from a list of values.</p>
+</div>
+
+
+                            </div>
                             <div id="ReadoutValues.from_integer" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -326,7 +396,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -339,7 +409,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -352,20 +422,22 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#ReadoutValues.inner"></a>
     
-    
+            <div class="docstring"><p>Return the inner list of readout values.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.is_integer" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -378,7 +450,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -391,7 +463,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -404,7 +476,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -417,7 +489,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -430,7 +502,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -443,7 +515,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -456,7 +528,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -469,7 +541,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -489,13 +561,47 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#MemoryValues"></a>
     
-    
+            <div class="docstring"><p>A row of data containing the contents of a memory region at the end of a job. There
+is a variant for each possible type the memory region could be.</p>
 
+<h2 id="variants">Variants:</h2>
+
+<ul>
+<li><code>binary</code>: Corresponds to the Quil <code>BIT</code> and <code>OCTET</code> types.</li>
+<li><code>integer</code>: Corresponds to the Quil <code>INTEGER</code> types.</li>
+<li><code>real</code>: Corresponds to the Quil <code>RE</code>AL`` type.</li>
+</ul>
+
+<p>Methods (each per variant):</p>
+
+<ul>
+<li><code>is_*</code>: if the underlying values are that type.</li>
+<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
+<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
+<li><code>from_*</code>: wrap underlying values as this enum type.</li>
+</ul>
+</div>
+
+
+                            <div id="MemoryValues.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">MemoryValues</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">values</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.__init__"></a>
+    
+            <div class="docstring"><p>Construct a new <code><a href="#ReadoutValues">ReadoutValues</a></code> from a list of values.</p>
+</div>
+
+
+                            </div>
                             <div id="MemoryValues.from_binary" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -508,7 +614,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -521,7 +627,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>:</span></span>
 
         
     </div>
@@ -534,20 +640,22 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#MemoryValues.inner"></a>
     
-    
+            <div class="docstring"><p>Return the inner list of readout values.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.is_binary" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -560,7 +668,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -573,7 +681,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -586,7 +694,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -599,7 +707,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -612,7 +720,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -625,7 +733,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -638,7 +746,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -651,7 +759,7 @@ each register contains.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -671,7 +779,7 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#ListQuantumProcessorsError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>A request to list available Quantum Processors failed.</p>
 </div>
 
 
@@ -695,26 +803,57 @@ each register contains.</p>
                     <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">list_quantum_processors</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">list_quantum_processors</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">client</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QCSClient</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#list_quantum_processors"></a>
     
-    
+            <div class="docstring"><p>Returns all available Quantum Processor (QPU) IDs.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client: The <code><a href="client.html#QCSClient">qcs_sdk.client.QCSClient</a></code> to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>timeout</strong>:  Maximum duration to wait for API calls to complete, in seconds.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ListQuantumProcessorsError</strong>:  If the request to list available QPU IDs failed.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="list_quantum_processors_async">
                     <div class="attr function">
             
-        <span class="def">def</span>
-        <span class="name">list_quantum_processors_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="def">async def</span>
+        <span class="name">list_quantum_processors_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">client</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">QCSClient</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#list_quantum_processors_async"></a>
     
-    
+            <div class="docstring"><p>Returns all available Quantum Processor IDs.
+(async analog of <code><a href="#list_quantum_processors">list_quantum_processors</a></code>)</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client: The <code><a href="client.html#QCSClient">qcs_sdk.client.QCSClient</a></code> to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>timeout</strong>:  Maximum duration to wait for API calls to complete, in seconds.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ListQuantumProcessorsError</strong>:  If the request to list available QPU IDs failed.</li>
+</ul>
+</div>
+
 
                 </section>
     </main>
