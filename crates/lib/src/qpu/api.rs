@@ -522,10 +522,12 @@ impl ExecutionOptions {
                 .await?
             }
         };
-        self.grpc_address_to_channel(&address, client)
+        self.get_grpc_connection_from_url(&address, client)
     }
 
-    fn grpc_address_to_channel(
+    /// Get a GRPC connection to any QCS service, without specifying the API to
+    /// use, from a given URL.
+    pub fn get_grpc_connection_from_url(
         &self,
         address: &str,
         client: &Qcs,
