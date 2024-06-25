@@ -1,3 +1,13 @@
+## 0.18.0-rc.0
+
+### Breaking Changes
+
+- remove all code related to arithmetic rewriting (#480)
+
+### Features
+
+- support opentelemetry tracing (#474)
+
 ## 0.17.11-rc.0
 
 ### Features
