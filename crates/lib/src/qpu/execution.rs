@@ -7,21 +7,21 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use quil_rs::program::ProgramError;
-use quil_rs::quil::ToQuilError;
+use quil_rs::quil::{Quil, ToQuilError};
 
+use quil_rs::Program;
 #[cfg(feature = "tracing")]
 use tracing::trace;
 
 use crate::compiler::rpcq;
 use crate::executable::Parameters;
 use crate::execution_data::{MemoryReferenceParseError, ResultData};
-use crate::qpu::{rewrite_arithmetic, translation::translate};
+use crate::qpu::translation::translate;
 use crate::{ExecutionData, JobHandle};
 
 use super::api::{
     retrieve_results, submit, ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
 };
-use super::rewrite_arithmetic::RewrittenProgram;
 use super::translation::{EncryptedTranslationResult, TranslationOptions};
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
@@ -33,7 +33,7 @@ use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
 /// same number of shots.
 #[derive(Debug, Clone)]
 pub(crate) struct Execution<'a> {
-    program: RewrittenProgram,
+    program: Program,
     pub(crate) quantum_processor_id: Cow<'a, str>,
     pub(crate) shots: NonZeroU16,
     client: Arc<Qcs>,
@@ -59,12 +59,8 @@ pub(crate) enum Error {
     ReadoutParse(#[from] MemoryReferenceParseError),
     #[error("Problem when compiling program: {details}")]
     Compilation { details: String },
-    #[error("Program when translating the program: {0}")]
-    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
     #[error("Problem when getting RPCQ client: {0}")]
     RpcqClient(#[from] rpcq::Error),
-    #[error("Program when getting substitutions for program: {0}")]
-    Substitution(String),
     #[error("Problem making a request to the QPU: {0}")]
     QpuApi(#[from] super::api::QpuApiError),
 }
@@ -155,13 +151,11 @@ impl<'a> Execution<'a> {
             quil.parse().map_err(Error::Quil)?
         };
 
-        let rewritten = RewrittenProgram::try_from(program).map_err(Error::RewriteArithmetic)?;
-
         Ok(Self {
-            program: rewritten,
+            program,
             quantum_processor_id,
-            client,
             shots,
+            client,
         })
     }
 
@@ -172,7 +166,7 @@ impl<'a> Execution<'a> {
     ) -> Result<EncryptedTranslationResult, Error> {
         let encrpyted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
-            &self.program.to_string()?.0,
+            &self.program.to_quil()?,
             self.shots.get().into(),
             self.client.as_ref(),
             options,
@@ -234,14 +228,10 @@ impl<'a> Execution<'a> {
         let EncryptedTranslationResult { job, readout_map } =
             self.translate(translation_options).await?;
 
-        let patch_values = self
-            .get_substitutions(params)
-            .map_err(Error::Substitution)?;
-
         let job_id = submit(
             quantum_processor_id,
             job,
-            &patch_values,
+            params,
             self.client.as_ref(),
             execution_options,
         )
@@ -302,38 +292,5 @@ impl<'a> Execution<'a> {
                 response.execution_duration_microseconds,
             )),
         })
-    }
-
-    /// Take the user-provided map of [`Parameters`] and produce the map of substitutions which
-    /// should be given to QCS with the executable.
-    ///
-    /// # Example
-    ///
-    /// If there was a Quil program:
-    ///
-    /// ```quil
-    /// DECLARE theta REAL
-    ///
-    /// RX(theta) 0
-    /// RX(theta + 1) 0
-    /// RX(theta + 2) 0
-    /// ```
-    ///
-    /// It would be converted  (in [`Execution::new`]) to something like:
-    ///
-    /// ```quil
-    /// DECLARE __SUBST REAL[2]
-    /// DECLARE theta REAL[1]
-    ///
-    /// RX(theta) 0
-    /// RX(__SUBST[0]) 0
-    /// RX(__SUBST[1]) 0
-    /// ```
-    ///
-    /// Because QPUs do not evaluate expressions themselves. This function creates the values for
-    /// `__SUBST` by calculating the original expressions given the user-provided params (in this
-    /// case just `theta`).
-    fn get_substitutions(&self, params: &Parameters) -> Result<Parameters, String> {
-        rewrite_arithmetic::get_substitutions(&self.program.substitutions, params)
     }
 }

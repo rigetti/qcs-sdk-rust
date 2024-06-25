@@ -14,7 +14,6 @@ use crate::client::Qcs;
 use crate::compiler::quilc::{self, CompilerOpts};
 use crate::execution_data::{self, ResultData};
 use crate::qpu::api::{ExecutionOptions, JobId};
-use crate::qpu::rewrite_arithmetic;
 use crate::qpu::translation::TranslationOptions;
 use crate::qpu::ExecutionError;
 use crate::qvm::http::AddressRequest;
@@ -658,9 +657,6 @@ pub enum Error {
     /// There was a problem when translating the Quil program.
     #[error("There was a problem translating the Quil program: {0}")]
     Translation(String),
-    /// There was a problem when rewriting parameter arithmetic in the Quil program.
-    #[error("There was a problem rewriting parameter arithmetic in the Quil program: {0}")]
-    RewriteArithmetic(#[from] rewrite_arithmetic::Error),
     /// There was a problem when substituting parameters in the Quil program.
     #[error("There was a problem substituting parameters in the Quil program: {0}")]
     Substitution(String),
@@ -721,9 +717,7 @@ impl From<ExecutionError> for Error {
             ExecutionError::Quil(e) => Self::Quil(e),
             ExecutionError::ToQuil(e) => Self::ToQuil(e),
             ExecutionError::Compilation { details } => Self::Compilation(details),
-            ExecutionError::RewriteArithmetic(e) => Self::RewriteArithmetic(e),
             ExecutionError::RpcqClient(e) => Self::Unexpected(format!("{e:?}")),
-            ExecutionError::Substitution(message) => Self::Substitution(message),
             ExecutionError::QpuApi(e) => Self::QpuApiError(e),
         }
     }
