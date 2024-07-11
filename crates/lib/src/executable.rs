@@ -301,7 +301,7 @@ impl<'executable> Executable<'executable, '_> {
     /// Get a reference to the [`Qcs`] client used by the executable.
     ///
     /// If one has not been set, a default client is loaded, set, and returned.
-    pub async fn qcs_client(&mut self) -> Arc<Qcs> {
+    pub fn qcs_client(&mut self) -> Arc<Qcs> {
         if let Some(client) = &self.qcs_client {
             client.clone()
         } else {
@@ -413,7 +413,7 @@ impl<'execution> Executable<'_, 'execution> {
             self.quil.clone(),
             self.shots,
             id,
-            self.qcs_client().await,
+            self.qcs_client(),
             self.quilc_client.clone(),
             self.compiler_options,
         )
@@ -864,7 +864,7 @@ mod describe_qpu_for_id {
                 "".into(),
                 shots,
                 "Aspen-M-3".into(),
-                exe.qcs_client().await,
+                exe.qcs_client(),
                 exe.quilc_client.clone(),
                 CompilerOpts::default(),
             )

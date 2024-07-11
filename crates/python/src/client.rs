@@ -5,14 +5,12 @@ use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
         conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods,
-        types::PyString, Py, PyAny, PyObject, PyResult, Python,
+        types::PyString, Py, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
 };
 
 use qcs::client::{self, Qcs};
-
-use crate::py_sync::{py_async, py_sync};
 
 create_init_submodule! {
     classes: [
@@ -116,10 +114,9 @@ impl PyQcsClient {
         }
     }
 
-    async fn load(profile_name: Option<String>) -> PyResult<Self> {
+    fn load(profile_name: Option<String>) -> PyResult<Self> {
         Ok(match profile_name {
             Some(profile_name) => Qcs::with_profile(profile_name)
-                .await
                 .map(PyQcsClient)
                 .map_err(RustLoadClientError)
                 .map_err(RustLoadClientError::to_py_err)?,
@@ -185,15 +182,8 @@ impl PyQcsClient {
     #[staticmethod]
     #[pyo3(signature = (/, profile_name = None))]
     #[pyo3(name = "load")]
-    pub fn py_load(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
-        py_sync!(py, Self::load(profile_name))
-    }
-
-    #[staticmethod]
-    #[pyo3(signature = (/, profile_name = None))]
-    #[pyo3(name = "load_async")]
-    pub fn py_load_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
-        py_async!(py, Self::load(profile_name))
+    pub fn py_load(_: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
+        Self::load(profile_name)
     }
 
     #[getter]
