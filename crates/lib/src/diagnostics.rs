@@ -38,7 +38,7 @@ struct Diagnostics {
 
 impl Diagnostics {
     async fn gather() -> Self {
-        let client = Qcs::load().await;
+        let client = Qcs::load();
 
         let (qcs, qvm) = futures::future::join(
             QcsApiDiagnostics::gather(&client),

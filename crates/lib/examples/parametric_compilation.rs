@@ -20,7 +20,7 @@ RX(-pi / 2) 0
 MEASURE 0 ro[0]
 "#;
 async fn quilc_client() -> rpcq::Client {
-    let qcs = Qcs::load().await;
+    let qcs = Qcs::load();
     let endpoint = qcs.get_config().quilc_url();
     rpcq::Client::new(endpoint).unwrap()
 }

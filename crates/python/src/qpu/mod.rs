@@ -53,7 +53,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<Vec<String>> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::list_quantum_processors(&client, timeout)
             .await

@@ -44,7 +44,7 @@ use quil_rs::program::ProgramError;
 /// async fn main() {
 ///     use std::num::NonZeroU16;
 ///     use qcs::qvm;
-///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
+///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load());
 ///     let mut result = Executable::from_quil(PROGRAM).with_qcs_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm(&qvm_client).await.unwrap();
 ///     // "ro" is the only source read from by default if you don't specify a .read_from()
 ///
@@ -158,7 +158,7 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
+    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load());
     ///     let mut result = Executable::from_quil(PROGRAM)
     ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("first")
@@ -228,7 +228,7 @@ impl<'executable> Executable<'executable, '_> {
     ///
     /// #[tokio::main]
     /// async fn main() {
-    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load().await);
+    ///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load());
     ///     let mut exe = Executable::from_quil(PROGRAM)
     ///         .with_qcs_client(Qcs::default()) // Unnecessary if you have ~/.qcs/settings.toml
     ///         .read_from("theta");
@@ -301,11 +301,11 @@ impl<'executable> Executable<'executable, '_> {
     /// Get a reference to the [`Qcs`] client used by the executable.
     ///
     /// If one has not been set, a default client is loaded, set, and returned.
-    pub async fn qcs_client(&mut self) -> Arc<Qcs> {
+    pub fn qcs_client(&mut self) -> Arc<Qcs> {
         if let Some(client) = &self.qcs_client {
             client.clone()
         } else {
-            let client = Arc::new(Qcs::load().await);
+            let client = Arc::new(Qcs::load());
             self.qcs_client = Some(client.clone());
             client
         }
@@ -413,7 +413,7 @@ impl<'execution> Executable<'_, 'execution> {
             self.quil.clone(),
             self.shots,
             id,
-            self.qcs_client().await,
+            self.qcs_client(),
             self.quilc_client.clone(),
             self.compiler_options,
         )
@@ -804,7 +804,7 @@ mod describe_get_config {
     use crate::{compiler::rpcq, Executable};
 
     async fn quilc_client() -> rpcq::Client {
-        let qcs = Qcs::load().await;
+        let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
     }
@@ -835,7 +835,7 @@ mod describe_qpu_for_id {
     use crate::{client::Qcs, Executable};
 
     async fn quilc_client() -> rpcq::Client {
-        let qcs = Qcs::load().await;
+        let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
     }
@@ -844,7 +844,7 @@ mod describe_qpu_for_id {
     async fn it_refreshes_auth_token() {
         // Default config has no auth, so it should try to refresh
         let mut exe = Executable::from_quil("")
-            .with_qcs_client(Qcs::default())
+            .with_qcs_client(Qcs::load())
             .with_quilc_client(Some(quilc_client().await));
         let result = exe.qpu_for_id("blah").await;
         let Err(err) = result else {
@@ -864,7 +864,7 @@ mod describe_qpu_for_id {
                 "".into(),
                 shots,
                 "Aspen-M-3".into(),
-                exe.qcs_client().await,
+                exe.qcs_client(),
                 exe.quilc_client.clone(),
                 CompilerOpts::default(),
             )
