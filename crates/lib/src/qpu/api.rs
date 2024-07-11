@@ -5,12 +5,11 @@ use std::{convert::TryFrom, fmt, time::Duration};
 
 use cached::proc_macro::cached;
 use derive_builder::Builder;
-use qcs_api_client_common::configuration::RefreshError;
+use qcs_api_client_common::configuration::TokenError;
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
-pub use qcs_api_client_grpc::channel::Error as GrpcError;
+use qcs_api_client_grpc::tonic::wrap_channel_with_grpc_web;
+pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
@@ -22,6 +21,7 @@ use qcs_api_client_grpc::{
         CancelControllerJobsRequest, ExecuteControllerJobRequest,
         ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
+    tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{
@@ -644,7 +644,7 @@ async fn get_default_endpoint(
 pub enum QpuApiError {
     /// Error due to a bad gRPC configuration
     #[error("Error configuring gRPC request: {0}")]
-    GrpcError(#[from] GrpcError<RefreshError>),
+    GrpcError(#[from] GrpcError<TokenError>),
 
     /// Error due to missing gRPC endpoint for endpoint ID
     #[error("Missing gRPC endpoint for endpoint ID: {0}")]

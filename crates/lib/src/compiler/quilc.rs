@@ -358,7 +358,7 @@ mod tests {
     }
 
     async fn rpcq_client() -> rpcq::Client {
-        let qcs = Qcs::load().await;
+        let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
     }
@@ -387,7 +387,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn run_compiled_bell_state_on_qvm() {
-        let client = Qcs::load().await;
+        let client = Qcs::load();
         let client = qvm::http::HttpClient::from(&client);
         let output = rpcq_client()
             .await

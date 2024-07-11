@@ -22,7 +22,7 @@ MEASURE 1 ro[1]
 "##;
 
 async fn http_qvm_client() -> HttpClient {
-    let qcs_client = Qcs::load().await;
+    let qcs_client = Qcs::load();
     HttpClient::from(&qcs_client)
 }
 
