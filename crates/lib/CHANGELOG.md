@@ -1,3 +1,9 @@
+## 0.23.0-rc.0
+
+### Breaking Changes
+
+- update qcs-api deps to use a >=9 version of jsonwebtoken (#483)
+
 ## 0.22.0
 
 ### Breaking Changes
