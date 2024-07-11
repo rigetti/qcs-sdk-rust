@@ -46,22 +46,6 @@ class QCSClient:
         for more details.
         """
         ...
-    @staticmethod
-    async def load_async(
-        profile_name: Optional[str] = None,
-    ) -> "QCSClient":
-        """
-        Create a `QCSClient` configuration using an environment-based configuration.
-        (async analog of `QCSClient.load`)
-
-        :param profile_name: The QCS setting's profile name to use. If `None`, the default value configured in your environment is used.
-
-        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment.
-
-        See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
-        for more details.
-        """
-        ...
     @property
     def api_url(self) -> str:
         """URL to access the QCS API."""
@@ -108,12 +92,14 @@ class QCSClientTokens:
         cls,
         bearer_access_token: str,
         refresh_token: str,
+        auth_server: Optional[QCSClientAuthServer] = None,
     ) -> "QCSClientTokens":
         """
         Manually define authentication session tokens.
 
         :param bearer_access_token: The session token from an OAuth issuer.
         :param refresh_token: A credential to refresh the bearer_access_token when it expires.
+        :param auth_server: The OAuth server configuration. If `None`, default values are loaded.
         """
         ...
     @property
@@ -124,3 +110,7 @@ class QCSClientTokens:
     def refresh_token(self) -> Optional[str]: ...
     @refresh_token.setter
     def refresh_token(self, value: Optional[str]): ...
+    @property
+    def auth_server(self) -> Optional[QCSClientAuthServer]: ...
+    @auth_server.setter
+    def auth_server(self, value: Optional[QCSClientAuthServer]): ...
