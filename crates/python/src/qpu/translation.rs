@@ -38,7 +38,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::translation::get_quilt_calibrations(quantum_processor_id, &client, timeout)
             .await.map_err(RustTranslationError::from).map_err(RustTranslationError::to_py_err)
@@ -187,7 +187,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         let result =
             qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options)

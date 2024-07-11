@@ -107,21 +107,11 @@ py_wrap_type! {
 }
 
 impl PyQcsClient {
-    pub(crate) async fn get_or_create_client(client: Option<Self>) -> Qcs {
+    pub(crate) fn get_or_create_client(client: Option<Self>) -> Qcs {
         match client {
             Some(client) => client.into(),
             None => Qcs::load(),
         }
-    }
-
-    fn load(profile_name: Option<String>) -> PyResult<Self> {
-        Ok(match profile_name {
-            Some(profile_name) => Qcs::with_profile(profile_name)
-                .map(PyQcsClient)
-                .map_err(RustLoadClientError)
-                .map_err(RustLoadClientError::to_py_err)?,
-            None => Self(Qcs::load()),
-        })
     }
 }
 
@@ -181,9 +171,14 @@ impl PyQcsClient {
 
     #[staticmethod]
     #[pyo3(signature = (/, profile_name = None))]
-    #[pyo3(name = "load")]
-    pub fn py_load(_: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
-        Self::load(profile_name)
+    fn load(profile_name: Option<String>) -> PyResult<Self> {
+        Ok(match profile_name {
+            Some(profile_name) => Qcs::with_profile(profile_name)
+                .map(PyQcsClient)
+                .map_err(RustLoadClientError)
+                .map_err(RustLoadClientError::to_py_err)?,
+            None => Self(Qcs::load()),
+        })
     }
 
     #[getter]
