@@ -52,23 +52,17 @@ pub struct Qcs {
 
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
-    ///
-    /// # Panics
-    /// - if the default configuration cannot be loaded
     #[must_use]
     pub fn load() -> Self {
-        let config = if let Ok(config) = ClientConfiguration::load_default() {
-            config
+        if let Ok(config) = ClientConfiguration::load_default() {
+            Self::with_config(config)
         } else {
             #[cfg(feature = "tracing")]
             tracing::info!(
                 "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
             );
-            ClientConfiguration::builder()
-                .build()
-                .expect("builder should be valid with all defaults")
-        };
-        Self::with_config(config)
+            Self::default()
+        }
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
