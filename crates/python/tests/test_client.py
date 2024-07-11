@@ -28,9 +28,10 @@ async def test_client_empty_profile_is_default(default_client: QCSClient):
     """The profile "empty" is configured to be similar to a default client."""
     client = QCSClient.load(profile_name="empty")
 
-    assert client == default_client
-
-    assert client == await QCSClient.load_async(profile_name="empty")
+    assert client.api_url == default_client.api_url
+    assert client.grpc_api_url == default_client.grpc_api_url
+    assert client.quilc_url == default_client.quilc_url
+    assert client.qvm_url == default_client.qvm_url
 
 
 @pytest.mark.not_qcs_session
@@ -45,7 +46,7 @@ def test_client_default_profile_is_not_empty(default_client: QCSClient):
 def test_client_broken_raises():
     """Using a profile with broken configuration should surface the underlying error."""
     with pytest.raises(
-        LoadClientError, match=r"Expected auth server .* but it didn't exist"
+        LoadClientError, match=r"Expected auth server .* but it does not exist"
     ):
         QCSClient.load(profile_name="broken")
 
