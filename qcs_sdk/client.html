@@ -41,19 +41,16 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="function" href="#QCSClient.load_async">load_async</a>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -84,6 +81,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClientTokens.bearer_access_token">bearer_access_token</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClientTokens.auth_server">auth_server</a>
                         </li>
                 </ul>
 
@@ -181,33 +181,28 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.load_async" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">async def</span>
-        <span class="name">load_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#QCSClient">qcs_sdk.client.QCSClient</a></span>:</span></span>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span><span class="annotation">: str</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.load_async"></a>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
-            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.
-(async analog of <code><a href="#QCSClient.load">QCSClient.load</a></code>)</p>
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
+</div>
 
-<h6 id="parameters">Parameters</h6>
 
-<ul>
-<li><strong>profile_name</strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
-</ul>
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span><span class="annotation">: str</span>
 
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong><code><a href="#LoadClientError">LoadClientError</a></code></strong>:  If there is an issue loading the profile defails from the environment.</li>
-</ul>
-
-<p>See the <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files">QCS documentation</a>
-for more details.</p>
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
 </div>
 
 
@@ -234,32 +229,6 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.quilc_url"></a>
     
             <div class="docstring"><p>URL to access the `<code>quilc</code>1 compiler.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">grpc_api_url</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-            <div class="docstring"><p>URL to access the QVM.</p>
 </div>
 
 
@@ -340,7 +309,7 @@ for more details.</p>
                             <div id="QCSClientTokens.__init__" class="classattr">
                                 <div class="attr function">
             
-        <span class="name">QCSClientTokens</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">bearer_access_token</span><span class="p">:</span> <span class="nb">str</span>, </span><span class="param"><span class="n">refresh_token</span><span class="p">:</span> <span class="nb">str</span></span>)</span>
+        <span class="name">QCSClientTokens</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">bearer_access_token</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">refresh_token</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">auth_server</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#QCSClientAuthServer">qcs_sdk.client.QCSClientAuthServer</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
 
         
     </div>
@@ -353,6 +322,7 @@ for more details.</p>
 <ul>
 <li><strong>bearer_access_token</strong>:  The session token from an OAuth issuer.</li>
 <li><strong>refresh_token</strong>:  A credential to refresh the bearer_access_token when it expires.</li>
+<li><strong>auth_server</strong>:  The OAuth server configuration. If <code>None</code>, default values are loaded.</li>
 </ul>
 </div>
 
@@ -376,6 +346,17 @@ for more details.</p>
         
     </div>
     <a class="headerlink" href="#QCSClientTokens.bearer_access_token"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClientTokens.auth_server" class="classattr">
+                                <div class="attr variable">
+            <span class="name">auth_server</span><span class="annotation">: Optional[<a href="#QCSClientAuthServer">qcs_sdk.client.QCSClientAuthServer</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClientTokens.auth_server"></a>
     
     
 
