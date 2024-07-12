@@ -73,7 +73,7 @@ py_wrap_simple_enum! {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone, Default, Debug)]
 #[pyclass(name = "TranslationOptions")]
 pub struct PyTranslationOptions(TranslationOptions);
 
