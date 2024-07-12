@@ -30,6 +30,7 @@ create_init_submodule! {
 py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
     async fn get_quilt_calibrations(
@@ -37,7 +38,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::translation::get_quilt_calibrations(quantum_processor_id, &client, timeout)
             .await.map_err(RustTranslationError::from).map_err(RustTranslationError::to_py_err)
@@ -176,6 +177,7 @@ py_function_sync_async! {
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     async fn translate(
@@ -185,7 +187,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         let result =
             qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options)

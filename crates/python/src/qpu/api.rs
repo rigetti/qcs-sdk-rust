@@ -81,6 +81,7 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit(
@@ -90,7 +91,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<String> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         // Is there a better way to map these patch_values keys? This
         // negates the whole purpose of [`submit`] using `Box<str>`,
@@ -114,6 +115,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit_with_parameter_batch(
@@ -123,7 +125,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<Vec<String>> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         let patch_values: Vec<HashMap<Box<str>, Vec<f64>>> = patch_values
             .into_iter()
@@ -316,7 +318,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<()> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         qcs::qpu::api::cancel_jobs(
             job_ids.into_iter().map(|id| id.into()).collect(),
@@ -340,7 +342,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>,
     ) -> PyResult<()> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         qcs::qpu::api::cancel_job(
             job_id.into(),
@@ -356,6 +358,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    #[pyo3_opentelemetry::pypropagate]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn retrieve_results(
@@ -364,7 +367,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         execution_options: Option<PyExecutionOptions>
     ) -> PyResult<ExecutionResults> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         let results = qcs::qpu::api::retrieve_results(job_id.into(), quantum_processor_id.as_deref(), &client, execution_options.unwrap_or_default().as_inner())
             .await

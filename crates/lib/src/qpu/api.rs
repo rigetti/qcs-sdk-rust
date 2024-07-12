@@ -6,12 +6,11 @@ use std::{convert::TryFrom, fmt, time::Duration};
 use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
-use qcs_api_client_common::configuration::RefreshError;
-pub use qcs_api_client_grpc::channel::Error as GrpcError;
+use qcs_api_client_common::configuration::TokenError;
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::channel::wrap_channel_with_grpc_web;
+use qcs_api_client_grpc::tonic::wrap_channel_with_grpc_web;
+pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 use qcs_api_client_grpc::{
-    channel::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
     get_channel_with_timeout,
     models::controller::{
         controller_job_execution_result, data_value::Value, ControllerJobExecutionResult,
@@ -23,6 +22,7 @@ use qcs_api_client_grpc::{
         CancelControllerJobsRequest, ExecuteControllerJobRequest,
         ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
+    tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{
@@ -303,19 +303,21 @@ pub async fn retrieve_results(
         .result
         .ok_or_else(|| GrpcClientError::ResponseEmpty("Job Execution Results".into()))
         .map_err(QpuApiError::from)
-        .and_then(|result| {
-            match controller_job_execution_result::Status::try_from(result.status)
-                .map_err(|e| QpuApiError::StatusCodeDecode(e.to_string()))?
-            {
-                controller_job_execution_result::Status::Success => Ok(result),
-                status => Err(QpuApiError::JobExecutionFailed {
+        .and_then(
+            |result| match controller_job_execution_result::Status::try_from(result.status) {
+                Ok(controller_job_execution_result::Status::Success) => Ok(result),
+                Ok(status) => Err(QpuApiError::JobExecutionFailed {
                     status: status.as_str_name().to_string(),
                     message: result
                         .status_message
                         .unwrap_or("No message provided.".to_string()),
                 }),
-            }
-        })
+                Err(s) => Err(QpuApiError::InvalidJobStatus {
+                    status: result.status,
+                    message: s.to_string(),
+                }),
+            },
+        )
 }
 
 /// Options available when connecting to a QPU.
@@ -628,7 +630,7 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
             acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
         });
 
-        next_page_token = accessors.next_page_token.clone();
+        next_page_token.clone_from(&accessors.next_page_token);
         if next_page_token.is_none() {
             break;
         }
@@ -672,7 +674,7 @@ async fn get_default_endpoint(
 pub enum QpuApiError {
     /// Error due to a bad gRPC configuration
     #[error("Error configuring gRPC request: {0}")]
-    GrpcError(#[from] GrpcError<RefreshError>),
+    GrpcError(#[from] GrpcError<TokenError>),
 
     /// Error due to missing gRPC endpoint for endpoint ID
     #[error("Missing gRPC endpoint for endpoint ID: {0}")]
@@ -718,9 +720,18 @@ pub enum QpuApiError {
         /// The message associated with the failed job.
         message: String,
     },
-
     /// Error that can occur when the gRPC status code could not be decoded.
     #[error("The status code could not be decoded: {0}")]
     StatusCodeDecode(String), // TODO: This error is in prost. Should we really use that as a dep
-                              // just for the error type?
+    // just for the error type?
+    /// Error that can occur if a numeric status identifier cannot be converted
+    /// into a known status type.
+    #[error("The request returned an invalid status: {status}. {message}")]
+    InvalidJobStatus {
+        /// The numeric status identifier.
+        status: i32,
+        /// The message describing the failure to convert the numeric status
+        /// identifier into a known status type.
+        message: String,
+    },
 }

@@ -1,18 +1,16 @@
 use qcs_api_client_common::configuration::{
-    AuthServer, BuildError, ClientConfigurationBuilder, Tokens,
+    AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, Tokens,
 };
 use rigetti_pyo3::{
     create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
     pyo3::{
-        conversion::IntoPy, exceptions::PyRuntimeError, pyclass, pyclass::CompareOp, pymethods,
-        types::PyString, FromPyObject, Py, PyAny, PyObject, PyResult, Python,
+        conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods,
+        types::PyString, Py, PyObject, PyResult, Python,
     },
     wrap_error, ToPythonError,
 };
 
 use qcs::client::{self, Qcs};
-
-use crate::py_sync::{py_async, py_sync};
 
 create_init_submodule! {
     classes: [
@@ -29,7 +27,7 @@ create_init_submodule! {
 wrap_error!(RustLoadClientError(client::LoadError));
 py_wrap_error!(client, RustLoadClientError, LoadClientError, PyRuntimeError);
 
-wrap_error!(RustBuildClientError(BuildError));
+wrap_error!(RustBuildClientError(ClientConfigurationBuilderError));
 
 py_wrap_error!(
     client,
@@ -38,54 +36,68 @@ py_wrap_error!(
     PyRuntimeError
 );
 
-/// The fields on qcs_api_client_common::client::AuthServer are not public.
-#[pyclass]
-#[pyo3(name = "QCSClientAuthServer")]
-#[derive(FromPyObject)]
-pub struct PyQcsClientAuthServer {
-    #[pyo3(get, set)]
-    pub client_id: Option<String>,
-    #[pyo3(get, set)]
-    pub issuer: Option<String>,
-}
-
-impl From<PyQcsClientAuthServer> for AuthServer {
-    fn from(value: PyQcsClientAuthServer) -> Self {
-        let mut auth_server = AuthServer::default();
-        if let Some(client_id) = value.client_id {
-            auth_server = auth_server.set_client_id(client_id);
-        }
-        if let Some(issuer) = value.issuer {
-            auth_server = auth_server.set_issuer(issuer);
-        }
-        auth_server
-    }
-}
+// The fields on qcs_api_client_common::client::AuthServer are not public.
+py_wrap_type!(
+    PyQcsClientAuthServer(AuthServer) as "QCSClientAuthServer"
+);
 
 #[pymethods]
 impl PyQcsClientAuthServer {
     #[new]
     #[pyo3(signature = (client_id = None, issuer = None))]
     pub fn new(client_id: Option<String>, issuer: Option<String>) -> Self {
-        Self { client_id, issuer }
+        let mut auth_server = AuthServer::default();
+        if let Some(client_id) = client_id {
+            auth_server.set_client_id(client_id);
+        }
+        if let Some(issuer) = issuer {
+            auth_server.set_issuer(issuer);
+        }
+        Self(auth_server)
+    }
+
+    #[getter(client_id)]
+    fn get_client_id(&self) -> String {
+        self.0.client_id().to_string()
+    }
+
+    #[setter(client_id)]
+    fn set_client_id(&mut self, value: String) {
+        self.0.set_client_id(value);
+    }
+
+    #[getter(issuer)]
+    fn get_issuer(&self) -> String {
+        self.0.issuer().to_string()
+    }
+
+    #[setter(issuer)]
+    fn set_issuer(&mut self, value: String) {
+        self.0.set_issuer(value);
     }
 }
 
 py_wrap_data_struct! {
     PyQcsClientTokens(Tokens) as "QCSClientTokens" {
-        bearer_access_token: Option<String> => Option<Py<PyString>>,
-        refresh_token: Option<String> => Option<Py<PyString>>
+        bearer_access_token: String => Py<PyString>,
+        refresh_token: String => Py<PyString>,
+        auth_server: AuthServer => PyQcsClientAuthServer
     }
 }
 
 #[pymethods]
 impl PyQcsClientTokens {
     #[new]
-    #[pyo3(signature = (bearer_access_token = None, refresh_token = None))]
-    pub fn new(bearer_access_token: Option<String>, refresh_token: Option<String>) -> Self {
+    #[pyo3(signature = (bearer_access_token, refresh_token, auth_server = None))]
+    pub fn new(
+        bearer_access_token: String,
+        refresh_token: String,
+        auth_server: Option<PyQcsClientAuthServer>,
+    ) -> Self {
         Self(Tokens {
             bearer_access_token,
             refresh_token,
+            auth_server: auth_server.map(Into::into).unwrap_or_default(),
         })
     }
 }
@@ -95,22 +107,11 @@ py_wrap_type! {
 }
 
 impl PyQcsClient {
-    pub async fn get_or_create_client(client: Option<Self>) -> Qcs {
+    pub fn get_or_create_client(client: Option<Self>) -> Qcs {
         match client {
             Some(client) => client.into(),
-            None => Qcs::load().await,
+            None => Qcs::load(),
         }
-    }
-
-    async fn load(profile_name: Option<String>) -> PyResult<Self> {
-        Ok(match profile_name {
-            Some(profile_name) => Qcs::with_profile(profile_name)
-                .await
-                .map(PyQcsClient)
-                .map_err(RustLoadClientError)
-                .map_err(RustLoadClientError::to_py_err)?,
-            None => Self(Qcs::load().await),
-        })
     }
 }
 
@@ -142,22 +143,22 @@ impl PyQcsClient {
     ) -> PyResult<Self> {
         let mut builder = ClientConfigurationBuilder::default();
         if let Some(tokens) = tokens {
-            builder = builder.set_tokens(tokens.into());
+            builder.tokens(Some(tokens.into()));
         }
         if let Some(api_url) = api_url {
-            builder = builder.set_api_url(api_url);
+            builder.api_url(api_url);
         }
         if let Some(auth_server) = auth_server {
-            builder = builder.set_auth_server(auth_server.into());
+            builder.auth_server(auth_server.into());
         }
         if let Some(grpc_api_url) = grpc_api_url {
-            builder = builder.set_grpc_api_url(grpc_api_url);
+            builder.grpc_api_url(grpc_api_url);
         }
         if let Some(quilc_url) = quilc_url {
-            builder = builder.set_quilc_url(quilc_url);
+            builder.quilc_url(quilc_url);
         }
         if let Some(qvm_url) = qvm_url {
-            builder = builder.set_qvm_url(qvm_url);
+            builder.qvm_url(qvm_url);
         }
         let client = builder
             .build()
@@ -170,16 +171,14 @@ impl PyQcsClient {
 
     #[staticmethod]
     #[pyo3(signature = (/, profile_name = None))]
-    #[pyo3(name = "load")]
-    pub fn py_load(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
-        py_sync!(py, Self::load(profile_name))
-    }
-
-    #[staticmethod]
-    #[pyo3(signature = (/, profile_name = None))]
-    #[pyo3(name = "load_async")]
-    pub fn py_load_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
-        py_async!(py, Self::load(profile_name))
+    fn load(profile_name: Option<String>) -> PyResult<Self> {
+        Ok(match profile_name {
+            Some(profile_name) => Qcs::with_profile(profile_name)
+                .map(PyQcsClient)
+                .map_err(RustLoadClientError)
+                .map_err(RustLoadClientError::to_py_err)?,
+            None => Self(Qcs::load()),
+        })
     }
 
     #[getter]

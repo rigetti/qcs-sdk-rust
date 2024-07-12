@@ -1,3 +1,91 @@
+## 0.23.0
+
+### Breaking Changes
+
+- update qcs-api deps to use a >=9 version of jsonwebtoken (#483)
+
+## 0.23.0-rc.0
+
+### Breaking Changes
+
+- update qcs-api deps to use a >=9 version of jsonwebtoken (#483)
+
+## 0.22.0
+
+### Breaking Changes
+
+- remove all code related to arithmetic rewriting (#480)
+
+### Features
+
+- support opentelemetry tracing (#474)
+
+## 0.22.0-rc.0
+
+### Breaking Changes
+
+- remove all code related to arithmetic rewriting (#480)
+
+### Features
+
+- support opentelemetry tracing (#474)
+
+## 0.21.11-rc.0
+
+### Features
+
+- support opentelemetry tracing (#474)
+
+## 0.21.10
+
+### Features
+
+- increase gRPC max message size from 4MB to 50MB (#468)
+
+### Fixes
+
+- add explicit dependency on rigetti-pyo3's "time" feature (#476)
+
+## 0.21.10-rc.1
+
+### Features
+
+- increase gRPC max message size from 4MB to 50MB (#468)
+
+### Fixes
+
+- add explicit dependency on rigetti-pyo3's "time" feature (#476)
+
+## 0.21.10-rc.0
+
+### Features
+
+- increase gRPC max message size from 4MB to 50MB (#468)
+
+## 0.21.9
+
+### Fixes
+
+- Refresh JWT only when expired, not before every request (#470)
+
+## 0.21.9-rc.0
+
+### Fixes
+
+- Refresh JWT only when expired, not before every request (#470)
+
+## 0.21.8
+
+### Features
+
+- Update quil-rs (#464)
+
+## 0.21.8-rc.0
+
+### Features
+
+- Update quil-rs (#464)
+
 ## 0.21.7
 
 ### Features

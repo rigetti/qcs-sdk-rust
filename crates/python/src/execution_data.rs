@@ -111,7 +111,7 @@ impl PyExecutionData {
         ))
     }
 
-    pub fn __setstate__<'a>(&mut self, state: &PyBytes) -> PyResult<()> {
+    pub fn __setstate__(&mut self, state: &PyBytes) -> PyResult<()> {
         let execution_data: ExecutionData = serde_json::from_slice(state.as_bytes())
             .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
         *self = PyExecutionData(execution_data);

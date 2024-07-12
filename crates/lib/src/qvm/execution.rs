@@ -82,7 +82,7 @@ mod describe_execution {
     use crate::{client::Qcs, qvm};
 
     async fn qvm_client() -> qvm::http::HttpClient {
-        let qcs = Qcs::load().await;
+        let qcs = Qcs::load();
         qvm::http::HttpClient::from(&qcs)
     }
 

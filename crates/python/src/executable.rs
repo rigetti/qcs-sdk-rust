@@ -1,5 +1,6 @@
 use std::{num::NonZeroU16, sync::Arc};
 
+use opentelemetry::trace::FutureExt;
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
@@ -8,6 +9,7 @@ use rigetti_pyo3::{
     wrap_error, PyWrapper, ToPython, ToPythonError,
 };
 use tokio::sync::Mutex;
+use tracing::instrument;
 
 use crate::{
     compiler::quilc::{PyCompilerOpts, PyQuilcClient},
@@ -67,7 +69,7 @@ macro_rules! py_executable_data {
                 .map(PyExecutionData::from)
                 .map_err(RustExecutionError::from)
                 .map_err(RustExecutionError::to_py_err)
-        }
+        }.with_current_context()
     }};
 }
 
@@ -86,9 +88,11 @@ macro_rules! py_job_handle {
                 .map_err(RustExecutionError::from)
                 .map_err(RustExecutionError::to_py_err)
         }
+        .with_current_context()
     }};
 }
 
+#[pyo3_opentelemetry::pypropagate(exclude(new))]
 #[pymethods]
 impl PyExecutable {
     #[new]
@@ -131,6 +135,7 @@ impl PyExecutable {
         Self::from(Arc::new(Mutex::new(exe)))
     }
 
+    #[instrument(skip_all)]
     pub fn execute_on_qvm(
         &self,
         py: Python<'_>,
@@ -139,6 +144,7 @@ impl PyExecutable {
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
+    #[instrument(skip_all)]
     pub fn execute_on_qvm_async<'py>(
         &'py self,
         py: Python<'py>,

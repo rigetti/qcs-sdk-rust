@@ -28,8 +28,9 @@ ignore = [
     "RUSTSEC-2023-0052",  # Introduced by transitive dependency `webpki`.
                           # `hyper-proxy`, then `qcs-api-client-rust` need to update in order to remove
                           # `webpki`.
-    "RUSTSEC-2024-0006",   # Introduced by bindgen/shlex with no valid upgrade path.
+    "RUSTSEC-2024-0006",  # Introduced by bindgen/shlex with no valid upgrade path.
     "RUSTSEC-2023-0055",  # there isn't a newer version of lexical with a fix
+    "RUSTSEC-2024-0336",  # needs to be address in qcs-api-client-rust.
 ]
 
 # This section is considered when running `cargo deny check licenses`
@@ -46,6 +47,7 @@ allow = [
   "BSD-2-Clause",
   "BSD-3-Clause",
   "Unicode-DFS-2016",
+  "Unicode-3.0",
 ]
 # List of explictly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses

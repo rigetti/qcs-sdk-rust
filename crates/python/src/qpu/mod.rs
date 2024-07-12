@@ -8,7 +8,6 @@ pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 pub mod api;
 pub mod isa;
 mod result_data;
-pub mod rewrite_arithmetic;
 pub mod translation;
 
 use crate::client::PyQcsClient;
@@ -33,7 +32,6 @@ create_init_submodule! {
     submodules: [
         "api": api::init_submodule,
         "isa": isa::init_submodule,
-        "rewrite_arithmetic": rewrite_arithmetic::init_submodule,
         "translation": translation::init_submodule
     ],
 }
@@ -55,7 +53,7 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         timeout: Option<f64>,
     ) -> PyResult<Vec<String>> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
         let timeout = timeout.map(Duration::from_secs_f64);
         qcs::qpu::list_quantum_processors(&client, timeout)
             .await

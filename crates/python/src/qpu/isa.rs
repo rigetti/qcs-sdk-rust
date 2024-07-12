@@ -149,7 +149,7 @@ py_function_sync_async! {
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
     ) -> PyResult<PyInstructionSetArchitecture> {
-        let client = PyQcsClient::get_or_create_client(client).await;
+        let client = PyQcsClient::get_or_create_client(client);
 
         get_isa(&quantum_processor_id, &client)
             .await

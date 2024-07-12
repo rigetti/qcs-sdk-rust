@@ -12,6 +12,8 @@ venv/
 
 # JetBrains
 .idea
+.vscode/
+pyrightconfig.json
 
 # Clang debug / memory detection / test artifacts
 *.dSYM
@@ -30,3 +32,8 @@ qcs-api/docs
 crates/python/.hypothesis
 crates/python/qcs_sdk/*.so
 crates/python/build
+
+crates/python/tests/__output__/
+
+# unversioned developer notes
+scratch/

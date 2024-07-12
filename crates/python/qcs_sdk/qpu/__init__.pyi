@@ -11,7 +11,6 @@ from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu import (
     api as api,
     isa as isa,
-    rewrite_arithmetic as rewrite_arithmetic,
     translation as translation,
 )
 

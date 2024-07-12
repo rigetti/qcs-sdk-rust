@@ -4,23 +4,26 @@
 
 use std::time::Duration;
 
-use qcs_api_client_common::configuration::{ClientConfiguration, RefreshError};
+use qcs_api_client_common::configuration::{ClientConfiguration, TokenError};
 #[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::channel::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
+use qcs_api_client_grpc::tonic::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
 use qcs_api_client_grpc::{
-    channel::{
+    services::translation::translation_client::TranslationClient,
+    tonic::{
         get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, RefreshService,
         RetryService,
     },
-    services::translation::translation_client::TranslationClient,
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
 use tonic::transport::Channel;
 use tonic::Status;
 
 pub use qcs_api_client_common::configuration::LoadError;
-pub use qcs_api_client_grpc::channel::Error as GrpcError;
+pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
+
+const DEFAULT_MAX_MESSAGE_ENCODING_SIZE: usize = 50 * 1024 * 1024;
+const DEFAULT_MAX_MESSAGE_DECODING_SIZE: usize = 50 * 1024 * 1024;
 
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
@@ -42,24 +45,24 @@ pub type GrpcConnection =
 pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// A client providing helper functionality for accessing QCS APIs
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone)]
 pub struct Qcs {
     config: ClientConfiguration,
 }
 
 impl Qcs {
     /// Create a [`Qcs`] and initialize it with the user's default [`ClientConfiguration`]
-    pub async fn load() -> Self {
-        let config = if let Ok(config) = ClientConfiguration::load_default().await {
-            config
+    #[must_use]
+    pub fn load() -> Self {
+        if let Ok(config) = ClientConfiguration::load_default() {
+            Self::with_config(config)
         } else {
             #[cfg(feature = "tracing")]
             tracing::info!(
                 "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
             );
-            ClientConfiguration::default()
-        };
-        Self::with_config(config)
+            Self::default()
+        }
     }
 
     /// Create a [`Qcs`] and initialize it with the given [`ClientConfiguration`]
@@ -74,10 +77,8 @@ impl Qcs {
     ///
     /// A [`LoadError`] will be returned if QCS credentials are
     /// not correctly configured or the given profile is not defined.
-    pub async fn with_profile(profile: String) -> Result<Qcs, LoadError> {
-        ClientConfiguration::load_profile(profile)
-            .await
-            .map(Self::with_config)
+    pub fn with_profile(profile: String) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_profile(profile).map(Self::with_config)
     }
 
     /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.
@@ -92,21 +93,33 @@ impl Qcs {
 
     pub(crate) fn get_translation_client(
         &self,
-    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<RefreshError>> {
+    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<TokenError>> {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,
-    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<RefreshError>> {
+    ) -> Result<TranslationClient<GrpcConnection>, GrpcError<TokenError>> {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
         let service =
             wrap_channel_with_retry(wrap_channel_with(channel, self.get_config().clone()));
         #[cfg(feature = "grpc-web")]
         let service = wrap_channel_with_grpc_web(service);
-        Ok(TranslationClient::new(service))
+        Ok(TranslationClient::new(service)
+            .max_encoding_message_size(DEFAULT_MAX_MESSAGE_ENCODING_SIZE)
+            .max_decoding_message_size(DEFAULT_MAX_MESSAGE_DECODING_SIZE))
+    }
+}
+
+impl Default for Qcs {
+    fn default() -> Self {
+        Self::with_config(
+            ClientConfiguration::builder()
+                .build()
+                .expect("builder should be valid with all defaults"),
+        )
     }
 }
 
@@ -123,7 +136,7 @@ pub enum GrpcClientError {
 
     /// Error due to `gRPC` error
     #[error("gRPC error: {0}")]
-    GrpcError(#[from] GrpcError<RefreshError>),
+    GrpcError(#[from] GrpcError<TokenError>),
 }
 
 /// Errors that may occur while trying to use an `OpenAPI` client
