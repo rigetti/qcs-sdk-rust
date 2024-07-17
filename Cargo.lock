@@ -2515,7 +2515,7 @@ dependencies = [
  "num-complex",
  "parking_lot",
  "portable-atomic",
- "pyo3-build-config",
+ "pyo3-build-config 0.20.3",
  "pyo3-ffi",
  "pyo3-macros",
  "unindent",
@@ -2545,13 +2545,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pyo3-build-config"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7879eb018ac754bba32cb0eec7526391c02c14a093121857ed09fbf1d1057d41"
+dependencies = [
+ "once_cell",
+ "target-lexicon",
+]
+
+[[package]]
 name = "pyo3-ffi"
 version = "0.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "62b42531d03e08d4ef1f6e85a2ed422eb678b8cd62b762e53891c05faf0d4afa"
 dependencies = [
  "libc",
- "pyo3-build-config",
+ "pyo3-build-config 0.20.3",
 ]
 
 [[package]]
@@ -2585,7 +2595,7 @@ checksum = "7c7e9b68bb9c3149c5b0cade5d07f953d6d125eb4337723c4ccdb665f1f96185"
 dependencies = [
  "heck 0.4.1",
  "proc-macro2",
- "pyo3-build-config",
+ "pyo3-build-config 0.20.3",
  "quote",
  "syn 2.0.66",
 ]
@@ -2700,9 +2710,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.8.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "040552f233992abe94376304cf17dab2d79ff62d4a9ee986d75efe3d19337f57"
+version = "0.8.12"
 dependencies = [
  "async-trait",
  "backoff",
@@ -2712,7 +2720,12 @@ dependencies = [
  "home",
  "http",
  "jsonwebtoken",
+ "paste",
+ "pyo3",
+ "pyo3-asyncio",
+ "pyo3-build-config 0.22.1",
  "reqwest",
+ "rigetti-pyo3",
  "serde",
  "shellexpand",
  "thiserror",
@@ -2726,9 +2739,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.8.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb755cd59b1b3ce99abe52ff6898ad74ca26463e94300c103cafaac4f345c4f3"
+version = "0.8.6"
 dependencies = [
  "backoff",
  "http",
@@ -2759,9 +2770,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.9.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "008d06c4051dd4b3e7d5b6c1f31457c68384f8f36b05b304de6059bbd81c6128"
+version = "0.9.6"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
@@ -2787,9 +2796,10 @@ dependencies = [
  "opentelemetry 0.23.0",
  "opentelemetry_sdk 0.23.0",
  "paste",
+ "prost",
  "pyo3",
  "pyo3-asyncio",
- "pyo3-build-config",
+ "pyo3-build-config 0.20.3",
  "pyo3-log",
  "pyo3-opentelemetry",
  "pyo3-tracing-subscriber",

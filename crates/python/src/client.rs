@@ -201,6 +201,16 @@ impl PyQcsClient {
         self.as_ref().get_config().qvm_url().to_string()
     }
 
+    #[getter]
+    pub fn auth_server(&self) -> AuthServer {
+        self.as_ref().get_config().auth_server().clone()
+    }
+
+    #[getter]
+    pub fn tokens(&self, py: Python<'_>) -> PyResult<Tokens> {
+        self.as_ref().get_config().get_tokens(py)
+    }
+
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
         match op {
             CompareOp::Eq => (self == other).into_py(py),

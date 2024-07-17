@@ -1,9 +1,15 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
+use prost::Message;
+use pyo3::types::PyBytes;
+use pyo3::Python;
 use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, PyResult};
 use qcs::qpu::translation::TranslationOptions;
-use qcs_api_client_grpc::services::translation::translation_options::TranslationBackend as ApiTranslationBackend;
+use qcs_api_client_grpc::services::translation::{
+    translation_options::TranslationBackend as ApiTranslationBackend,
+    TranslationOptions as ApiTranslationOptions,
+};
 use rigetti_pyo3::{create_init_submodule, py_wrap_error, py_wrap_simple_enum, ToPythonError};
 
 use crate::py_sync::py_function_sync_async;
@@ -150,6 +156,11 @@ impl PyTranslationOptions {
                 .expect("using the correct backend");
         }
         Self(builder)
+    }
+
+    fn encode_as_protobuf<'a>(&'a self, py: Python<'a>) -> &'a PyBytes {
+        let options: ApiTranslationOptions = self.0.clone().into();
+        PyBytes::new(py, options.encode_to_vec().as_slice())
     }
 
     fn __repr__(&self) -> String {
