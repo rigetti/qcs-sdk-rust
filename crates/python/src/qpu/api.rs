@@ -562,14 +562,35 @@ impl PyConnectionStrategy {
         Self(ConnectionStrategy::Gateway)
     }
 
+    fn is_gateway(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::Gateway)
+    }
+
     #[staticmethod]
     fn direct_access() -> Self {
         Self(ConnectionStrategy::DirectAccess)
     }
 
+    fn is_direct_access(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::DirectAccess)
+    }
+
     #[staticmethod]
     fn endpoint_id(endpoint_id: String) -> PyResult<Self> {
         Ok(Self(ConnectionStrategy::EndpointId(endpoint_id)))
+    }
+
+    fn is_endpoint_id(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::EndpointId(_))
+    }
+
+    fn get_endpoint_id(&self) -> PyResult<String> {
+        match self.as_inner() {
+            ConnectionStrategy::EndpointId(id) => Ok(id.clone()),
+            _ => Err(PyValueError::new_err(
+                "ConnectionStrategy is not an EndpointId",
+            )),
+        }
     }
 
     fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {
