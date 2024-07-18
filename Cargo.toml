@@ -32,7 +32,7 @@ pyo3-opentelemetry = { version = "=0.3.2-dev.1" }
 pyo3-tracing-subscriber = { version = "=0.1.2-dev.1", default-features = true }
 
 pyo3-build-config = "0.20.0"
-rigetti-pyo3 = { version = "0.3.2", default-features = false, features = ["complex", "time"] }
+rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.
