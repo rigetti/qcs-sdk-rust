@@ -41,19 +41,19 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.tokens">tokens</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.auth_server">auth_server</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.tokens">tokens</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
@@ -86,10 +86,10 @@
                                 <a class="variable" href="#QCSClientTokens.auth_server">auth_server</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClientTokens.bearer_access_token">bearer_access_token</a>
+                                <a class="variable" href="#QCSClientTokens.refresh_token">refresh_token</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClientTokens.refresh_token">refresh_token</a>
+                                <a class="variable" href="#QCSClientTokens.bearer_access_token">bearer_access_token</a>
                         </li>
                 </ul>
 
@@ -187,30 +187,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-            <div class="docstring"><p>URL to access the QVM.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.tokens" class="classattr">
-                                <div class="attr variable">
-            <span class="name">tokens</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.tokens"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_url</span><span class="annotation">: str</span>
@@ -237,6 +213,19 @@ for more details.</p>
 
 
                             </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
+</div>
+
+
+                            </div>
                             <div id="QCSClient.auth_server" class="classattr">
                                 <div class="attr variable">
             <span class="name">auth_server</span>
@@ -244,6 +233,17 @@ for more details.</p>
         
     </div>
     <a class="headerlink" href="#QCSClient.auth_server"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.tokens" class="classattr">
+                                <div class="attr variable">
+            <span class="name">tokens</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.tokens"></a>
     
     
 
@@ -364,18 +364,9 @@ for more details.</p>
     </div>
     <a class="headerlink" href="#QCSClientTokens.auth_server"></a>
     
-    
+            <div class="docstring"><p>Get the auth_server field from Python.  Annotated with <code>@property</code>.</p>
+</div>
 
-                            </div>
-                            <div id="QCSClientTokens.bearer_access_token" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bearer_access_token</span><span class="annotation">: Optional[str]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClientTokens.bearer_access_token"></a>
-    
-    
 
                             </div>
                             <div id="QCSClientTokens.refresh_token" class="classattr">
@@ -386,7 +377,22 @@ for more details.</p>
     </div>
     <a class="headerlink" href="#QCSClientTokens.refresh_token"></a>
     
+            <div class="docstring"><p>Get the refresh_token field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClientTokens.bearer_access_token" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bearer_access_token</span><span class="annotation">: Optional[str]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClientTokens.bearer_access_token"></a>
     
+            <div class="docstring"><p>Get the bearer_access_token field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
 
                             </div>
                 </section>

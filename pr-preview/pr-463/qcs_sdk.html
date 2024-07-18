@@ -38,10 +38,10 @@
                     <a class="class" href="#ExecutionData">ExecutionData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionData.duration">duration</a>
+                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
+                                <a class="variable" href="#ExecutionData.duration">duration</a>
                         </li>
                 </ul>
 
@@ -188,13 +188,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExeParameter.index">index</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExeParameter.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.value">value</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.index">index</a>
                         </li>
                 </ul>
 
@@ -203,10 +203,10 @@
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
                         </li>
                 </ul>
 
@@ -296,19 +296,19 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.tokens">tokens</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.auth_server">auth_server</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.tokens">tokens</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
@@ -390,17 +390,6 @@ qcs_sdk    </h1>
 </div>
 
 
-                            <div id="ExecutionData.duration" class="classattr">
-                                <div class="attr variable">
-            <span class="name">duration</span><span class="annotation">: Optional[datetime.timedelta]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData.duration"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionData.result_data" class="classattr">
                                 <div class="attr variable">
             <span class="name">result_data</span><span class="annotation">: <a href="#ResultData">ResultData</a></span>
@@ -409,7 +398,22 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ExecutionData.result_data"></a>
     
+            <div class="docstring"><p>Get the result_data field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionData.duration" class="classattr">
+                                <div class="attr variable">
+            <span class="name">duration</span><span class="annotation">: Optional[datetime.timedelta]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData.duration"></a>
     
+            <div class="docstring"><p>Get the duration field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -500,7 +504,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.from_qpu"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qpu</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.from_qvm" class="classattr">
@@ -513,7 +519,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.from_qvm"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qvm</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.inner" class="classattr">
@@ -541,7 +549,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.is_qpu"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyResultData</code>] wraps a [<code>ResultData::qpu</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.as_qpu" class="classattr">
@@ -554,7 +564,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.as_qpu"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qpu</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.to_qpu" class="classattr">
@@ -567,7 +579,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.to_qpu"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qpu</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.is_qvm" class="classattr">
@@ -580,7 +594,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.is_qvm"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyResultData</code>] wraps a [<code>ResultData::qvm</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.as_qvm" class="classattr">
@@ -593,7 +609,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.as_qvm"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qvm</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.to_qvm" class="classattr">
@@ -606,7 +624,9 @@ program to choose the correct readout values for each shot.</p>
     </div>
     <a class="headerlink" href="#ResultData.to_qvm"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qvm</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.to_register_map" class="classattr">
@@ -1172,6 +1192,17 @@ the default endpoint for the given quantum_processor_id is used.</li>
 </div>
 
 
+                            <div id="ExeParameter.index" class="classattr">
+                                <div class="attr variable">
+            <span class="name">index</span><span class="annotation">: int</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.index"></a>
+    
+    
+
+                            </div>
                             <div id="ExeParameter.name" class="classattr">
                                 <div class="attr variable">
             <span class="name">name</span><span class="annotation">: str</span>
@@ -1194,17 +1225,6 @@ the default endpoint for the given quantum_processor_id is used.</li>
     
 
                             </div>
-                            <div id="ExeParameter.index" class="classattr">
-                                <div class="attr variable">
-            <span class="name">index</span><span class="annotation">: int</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.index"></a>
-    
-    
-
-                            </div>
                 </section>
                 <section id="JobHandle">
                     <div class="attr class">
@@ -1222,6 +1242,19 @@ the default endpoint for the given quantum_processor_id is used.</li>
 </div>
 
 
+                            <div id="JobHandle.job_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">job_id</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.job_id"></a>
+    
+            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
+</div>
+
+
+                            </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_map</span><span class="annotation">: Dict[str, str]</span>
@@ -1232,19 +1265,6 @@ the default endpoint for the given quantum_processor_id is used.</li>
     
             <div class="docstring"><p>The readout map from source readout memory locations to the filter pipeline node
 which publishes the data.</p>
-</div>
-
-
-                            </div>
-                            <div id="JobHandle.job_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">job_id</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.job_id"></a>
-    
-            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
 </div>
 
 
@@ -1414,7 +1434,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.from_i8"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I8</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.from_f64" class="classattr">
@@ -1427,7 +1449,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.from_f64"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::F64</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.from_i16" class="classattr">
@@ -1440,7 +1464,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.from_i16"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I16</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.from_complex32" class="classattr">
@@ -1453,7 +1479,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.from_complex32"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::Complex32</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.inner" class="classattr">
@@ -1481,7 +1509,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.is_i8"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::i8</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.as_i8" class="classattr">
@@ -1494,7 +1524,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.as_i8"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i8</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.to_i8" class="classattr">
@@ -1507,7 +1539,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.to_i8"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i8</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.is_f64" class="classattr">
@@ -1520,7 +1554,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.is_f64"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::f64</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.as_f64" class="classattr">
@@ -1533,7 +1569,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.as_f64"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::f64</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.to_f64" class="classattr">
@@ -1546,7 +1584,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.to_f64"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::f64</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.is_i16" class="classattr">
@@ -1559,7 +1599,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.is_i16"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::i16</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.as_i16" class="classattr">
@@ -1572,7 +1614,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.as_i16"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i16</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.to_i16" class="classattr">
@@ -1585,7 +1629,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.to_i16"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i16</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.is_complex32" class="classattr">
@@ -1598,7 +1644,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.is_complex32"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::complex32</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.as_complex32" class="classattr">
@@ -1611,7 +1659,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.as_complex32"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::complex32</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.to_complex32" class="classattr">
@@ -1624,7 +1674,9 @@ attributes -- see the documentation for details.</p>
     </div>
     <a class="headerlink" href="#RegisterData.to_complex32"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::complex32</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterData.as_ndarray" class="classattr">
@@ -1668,28 +1720,6 @@ attributes -- see the documentation for details.</p>
     
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.tokens" class="classattr">
-                                <div class="attr variable">
-            <span class="name">tokens</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.tokens"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_url</span>
@@ -1712,6 +1742,17 @@ attributes -- see the documentation for details.</p>
     
 
                             </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+    
+
+                            </div>
                             <div id="QCSClient.auth_server" class="classattr">
                                 <div class="attr variable">
             <span class="name">auth_server</span>
@@ -1719,6 +1760,17 @@ attributes -- see the documentation for details.</p>
         
     </div>
     <a class="headerlink" href="#QCSClient.auth_server"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.tokens" class="classattr">
+                                <div class="attr variable">
+            <span class="name">tokens</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.tokens"></a>
     
     
 

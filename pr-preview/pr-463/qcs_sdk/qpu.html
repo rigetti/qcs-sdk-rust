@@ -38,10 +38,10 @@
                                 <a class="function" href="#QPUResultData.to_raw_readout_data">to_raw_readout_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
+                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
+                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
@@ -53,10 +53,10 @@
                     <a class="class" href="#RawQPUReadoutData">RawQPUReadoutData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
+                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
+                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
@@ -237,19 +237,6 @@ cost of the type safety provided by <code><a href="#ReadoutValues">ReadoutValues
 
 
                             </div>
-                            <div id="QPUResultData.readout_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">readout_values</span><span class="annotation">: Dict[str, <a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.readout_values"></a>
-    
-            <div class="docstring"><p>Get the mappings of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code></p>
-</div>
-
-
-                            </div>
                             <div id="QPUResultData.mappings" class="classattr">
                                 <div class="attr variable">
             <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
@@ -259,6 +246,19 @@ cost of the type safety provided by <code><a href="#ReadoutValues">ReadoutValues
     <a class="headerlink" href="#QPUResultData.mappings"></a>
     
             <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in <code><a href="#QPUResultData.readout_values">QPUResultData.readout_values</a></code></p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.readout_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">readout_values</span><span class="annotation">: Dict[str, <a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.readout_values"></a>
+    
+            <div class="docstring"><p>Get the mappings of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code></p>
 </div>
 
 
@@ -293,19 +293,6 @@ of numbers instead of values wrapped by the <code><a href="#ReadoutValues">Reado
 </div>
 
 
-                            <div id="RawQPUReadoutData.mappings" class="classattr">
-                                <div class="attr variable">
-            <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
-    
-            <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values</p>
-</div>
-
-
-                            </div>
                             <div id="RawQPUReadoutData.readout_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_values</span><span class="annotation">: Dict[str, Union[List[int], List[float], List[complex]]]</span>
@@ -315,6 +302,19 @@ of numbers instead of values wrapped by the <code><a href="#ReadoutValues">Reado
     <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
     
             <div class="docstring"><p>Get the mappings of a readout values identifier (ie. "q0") to a list of those readout values</p>
+</div>
+
+
+                            </div>
+                            <div id="RawQPUReadoutData.mappings" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mappings</span><span class="annotation">: Dict[str, str]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
+    
+            <div class="docstring"><p>Get the mappings of a memory region (ie. "ro[0]") to it's key name in readout_values</p>
 </div>
 
 
@@ -389,7 +389,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.from_integer"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Integer</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.from_real" class="classattr">
@@ -402,7 +404,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.from_real"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Real</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.from_complex" class="classattr">
@@ -415,7 +419,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.from_complex"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Complex</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.inner" class="classattr">
@@ -443,7 +449,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.is_integer"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::integer</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.as_integer" class="classattr">
@@ -456,7 +464,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.as_integer"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::integer</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.to_integer" class="classattr">
@@ -469,7 +479,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.to_integer"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::integer</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.is_real" class="classattr">
@@ -482,7 +494,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.is_real"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::real</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.as_real" class="classattr">
@@ -495,7 +509,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.as_real"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::real</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.to_real" class="classattr">
@@ -508,7 +524,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.to_real"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::real</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.is_complex" class="classattr">
@@ -521,7 +539,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.is_complex"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::complex</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.as_complex" class="classattr">
@@ -534,7 +554,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.as_complex"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::complex</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="ReadoutValues.to_complex" class="classattr">
@@ -547,7 +569,9 @@ the list of readout values could be.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.to_complex"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::complex</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -607,7 +631,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.from_binary"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Binary</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.from_integer" class="classattr">
@@ -620,7 +646,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.from_integer"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Integer</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.from_real" class="classattr">
@@ -633,7 +661,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.from_real"></a>
     
-    
+            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Real</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.inner" class="classattr">
@@ -661,7 +691,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.is_binary"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::binary</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.as_binary" class="classattr">
@@ -674,7 +706,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.as_binary"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::binary</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.to_binary" class="classattr">
@@ -687,7 +721,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.to_binary"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::binary</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.is_integer" class="classattr">
@@ -700,7 +736,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.is_integer"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::integer</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.as_integer" class="classattr">
@@ -713,7 +751,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.as_integer"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::integer</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.to_integer" class="classattr">
@@ -726,7 +766,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.to_integer"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::integer</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.is_real" class="classattr">
@@ -739,7 +781,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.is_real"></a>
     
-    
+            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::real</code>] value</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.as_real" class="classattr">
@@ -752,7 +796,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.as_real"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::real</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
+</div>
+
 
                             </div>
                             <div id="MemoryValues.to_real" class="classattr">
@@ -765,7 +811,9 @@ is a variant for each possible type the memory region could be.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.to_real"></a>
     
-    
+            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::real</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
 
                             </div>
                 </section>
