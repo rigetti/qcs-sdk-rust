@@ -339,6 +339,9 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
+    #[doc = "The timeout to use for the connection, defaults to `None`seconds. If set to `None`, then there is no timeout."]
+    #[builder(default = "Some(Duration::from_secs(30))")]
+    connection_timeout: Option<Duration>,
     #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
     api_options: Option<InnerApiExecutionOptions>,
@@ -414,7 +417,11 @@ impl ExecutionOptions {
     pub fn timeout(&self) -> Option<Duration> {
         self.timeout
     }
-
+    /// Get the connection timeout.
+    #[must_use]
+    pub fn connection_timeout(&self) -> Option<Duration> {
+        self.connection_timeout
+    }
     /// Get the [`ApiExecutionOptions`].
     #[must_use]
     pub fn api_options(&self) -> Option<&InnerApiExecutionOptions> {
@@ -531,7 +538,7 @@ impl ExecutionOptions {
         client: &Qcs,
     ) -> Result<GrpcConnection, QpuApiError> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
-        let channel = get_channel_with_timeout(uri, self.timeout())
+        let channel = get_channel_with_timeout(uri, self.timeout(), self.connection_timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
         let channel =
             wrap_channel_with_retry(wrap_channel_with(channel, client.get_config().clone()));
