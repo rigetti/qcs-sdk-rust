@@ -1,3 +1,9 @@
+## 0.19.1
+
+### Features
+
+- ExecutionOptions supports the pickle module. (#485)
+
 ## 0.19.1-rc.0
 
 ### Features
