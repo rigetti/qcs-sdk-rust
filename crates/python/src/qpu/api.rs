@@ -5,7 +5,8 @@ use std::time::Duration;
 use numpy::Complex32;
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
-    pyclass::{self, CompareOp},
+    pyclass,
+    pyclass::CompareOp,
     pyfunction, pymethods,
     types::{PyComplex, PyDict, PyInt},
     IntoPy, Py, PyAny, PyObject, PyResult, Python, ToPyObject,
@@ -431,12 +432,12 @@ impl PyExecutionOptions {
         }
     }
 
-    fn __getstate__<'py>(&self, py: Python<'py>) -> Py<PyAny> {
+    fn __getstate__(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let dict = PyDict::new(py);
-        dict.set_item("connection_strategy", self.connection_strategy());
-        dict.set_item("timeout_seconds", self.timeout_seconds());
-        dict.set_item("api_options", self.api_options());
-        dict.into()
+        dict.set_item("connection_strategy", self.connection_strategy())?;
+        dict.set_item("timeout_seconds", self.timeout_seconds())?;
+        dict.set_item("api_options", self.api_options())?;
+        Ok(dict.into())
     }
 
     fn __setstate__(&mut self, py: Python<'_>, state: Py<PyAny>) -> PyResult<()> {
