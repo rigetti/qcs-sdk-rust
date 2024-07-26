@@ -8,8 +8,8 @@ use pyo3::{
     pyclass,
     pyclass::CompareOp,
     pyfunction, pymethods,
-    types::{PyComplex, PyInt},
-    IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
+    types::{PyComplex, PyDict, PyInt},
+    IntoPy, Py, PyAny, PyObject, PyResult, Python, ToPyObject,
 };
 use qcs::qpu::api::{
     ApiExecutionOptions, ApiExecutionOptionsBuilder, ConnectionStrategy, ExecutionOptions,
@@ -430,6 +430,36 @@ impl PyExecutionOptions {
             CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+
+    fn __getstate__(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let dict = PyDict::new(py);
+        dict.set_item("connection_strategy", self.connection_strategy())?;
+        dict.set_item("timeout_seconds", self.timeout_seconds())?;
+        dict.set_item("api_options", self.api_options())?;
+        Ok(dict.into())
+    }
+
+    fn __setstate__(&mut self, py: Python<'_>, state: Py<PyAny>) -> PyResult<()> {
+        *self = Self::_from_parts(
+            state.getattr(py, "connection_strategy")?.extract(py)?,
+            state.getattr(py, "timeout_seconds")?.extract(py)?,
+            state.getattr(py, "api_options")?.extract(py)?,
+        )?;
+        Ok(())
+    }
+
+    #[staticmethod]
+    fn _from_parts(
+        connection_strategy: PyConnectionStrategy,
+        timeout_seconds: Option<f64>,
+        api_options: Option<PyApiExecutionOptions>,
+    ) -> PyResult<Self> {
+        let mut builder = Self::builder();
+        builder.connection_strategy(connection_strategy);
+        builder.timeout_seconds(timeout_seconds);
+        builder.api_options(api_options);
+        builder.build()
     }
 }
 

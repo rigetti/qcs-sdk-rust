@@ -470,7 +470,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
-    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
     ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
     ///       overrides the `quantum_processor_id` parameter.
     ///
@@ -528,7 +528,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
-    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
     ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
     ///       overrides the `quantum_processor_id` parameter.
     ///
