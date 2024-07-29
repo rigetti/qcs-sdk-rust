@@ -38,10 +38,10 @@
                     <a class="class" href="#ExecutionData">ExecutionData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
+                                <a class="variable" href="#ExecutionData.duration">duration</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionData.duration">duration</a>
+                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
                         </li>
                 </ul>
 
@@ -203,10 +203,10 @@
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                 </ul>
 
@@ -296,13 +296,13 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
@@ -384,17 +384,6 @@ qcs_sdk    </h1>
 </div>
 
 
-                            <div id="ExecutionData.result_data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">result_data</span><span class="annotation">: <a href="#ResultData">ResultData</a></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData.result_data"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionData.duration" class="classattr">
                                 <div class="attr variable">
             <span class="name">duration</span><span class="annotation">: Optional[datetime.timedelta]</span>
@@ -402,6 +391,17 @@ qcs_sdk    </h1>
         
     </div>
     <a class="headerlink" href="#ExecutionData.duration"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionData.result_data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">result_data</span><span class="annotation">: <a href="#ResultData">ResultData</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData.result_data"></a>
     
     
 
@@ -1216,19 +1216,6 @@ the default endpoint for the given quantum_processor_id is used.</li>
 </div>
 
 
-                            <div id="JobHandle.job_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">job_id</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.job_id"></a>
-    
-            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
-</div>
-
-
-                            </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_map</span><span class="annotation">: Dict[str, str]</span>
@@ -1239,6 +1226,19 @@ the default endpoint for the given quantum_processor_id is used.</li>
     
             <div class="docstring"><p>The readout map from source readout memory locations to the filter pipeline node
 which publishes the data.</p>
+</div>
+
+
+                            </div>
+                            <div id="JobHandle.job_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">job_id</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.job_id"></a>
+    
+            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
 </div>
 
 
@@ -1662,17 +1662,6 @@ attributes -- see the documentation for details.</p>
     
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.quilc_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">quilc_url</span>
@@ -1691,6 +1680,17 @@ attributes -- see the documentation for details.</p>
         
     </div>
     <a class="headerlink" href="#QCSClient.api_url"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
     
     
 
