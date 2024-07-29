@@ -1,3 +1,9 @@
+## 0.19.2-rc.0
+
+### Features
+
+- ConnectionStrategy supports the pickle module (#486)
+
 ## 0.19.1
 
 ### Features
