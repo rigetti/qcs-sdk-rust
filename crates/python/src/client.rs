@@ -107,7 +107,7 @@ py_wrap_type! {
 }
 
 impl PyQcsClient {
-    pub(crate) fn get_or_create_client(client: Option<Self>) -> Qcs {
+    pub fn get_or_create_client(client: Option<Self>) -> Qcs {
         match client {
             Some(client) => client.into(),
             None => Qcs::load(),
@@ -199,6 +199,16 @@ impl PyQcsClient {
     #[getter]
     pub fn qvm_url(&self) -> String {
         self.as_ref().get_config().qvm_url().to_string()
+    }
+
+    #[getter]
+    pub fn auth_server(&self) -> AuthServer {
+        self.as_ref().get_config().auth_server().clone()
+    }
+
+    #[getter]
+    pub fn tokens(&self, py: Python<'_>) -> PyResult<Tokens> {
+        self.as_ref().get_config().get_tokens(py)
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {

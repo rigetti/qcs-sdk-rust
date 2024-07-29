@@ -155,3 +155,7 @@ class TranslationOptions:
         :param: allow_frame_redefinition: If True, allow defined frames to differ from Rigetti defaults. Only available to certain users.
         Otherwise, only ``INITIAL-FREQUENCY`` and ``CHANNEL-DELAY`` may be modified.
         """
+    def encode_as_protobuf(self) -> bytes:
+        """
+        Serialize these translation options into the Protocol Buffer format.
+        """
