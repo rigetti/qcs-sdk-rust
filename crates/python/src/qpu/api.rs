@@ -8,8 +8,8 @@ use pyo3::{
     pyclass,
     pyclass::CompareOp,
     pyfunction, pymethods,
-    types::{PyComplex, PyDict, PyInt},
-    IntoPy, Py, PyAny, PyObject, PyResult, Python, ToPyObject,
+    types::{PyComplex, PyInt, PyTuple},
+    IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
 };
 use qcs::qpu::api::{
     ApiExecutionOptions, ApiExecutionOptionsBuilder, ConnectionStrategy, ExecutionOptions,
@@ -382,6 +382,7 @@ py_function_sync_async! {
 
 py_wrap_type! {
     #[derive(Debug, Default)]
+    #[pyo3(module = "qcs_sdk.qpu.api")]
     PyExecutionOptions(ExecutionOptions) as "ExecutionOptions"
 }
 impl_repr!(PyExecutionOptions);
@@ -432,21 +433,22 @@ impl PyExecutionOptions {
         }
     }
 
-    fn __getstate__(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
-        let dict = PyDict::new(py);
-        dict.set_item("connection_strategy", self.connection_strategy())?;
-        dict.set_item("timeout_seconds", self.timeout_seconds())?;
-        dict.set_item("api_options", self.api_options())?;
-        Ok(dict.into())
-    }
-
-    fn __setstate__(&mut self, py: Python<'_>, state: Py<PyAny>) -> PyResult<()> {
-        *self = Self::_from_parts(
-            state.getattr(py, "connection_strategy")?.extract(py)?,
-            state.getattr(py, "timeout_seconds")?.extract(py)?,
-            state.getattr(py, "api_options")?.extract(py)?,
-        )?;
-        Ok(())
+    fn __reduce__<'py>(&mut self, py: Python<'py>) -> PyResult<&'py PyTuple> {
+        let callable = py.get_type::<Self>().getattr("_from_parts")?;
+        Ok(PyTuple::new(
+            py,
+            [
+                callable,
+                PyTuple::new(
+                    py,
+                    &[
+                        self.connection_strategy().into_py(py),
+                        self.timeout_seconds().into_py(py),
+                        self.api_options().into_py(py),
+                    ],
+                ),
+            ],
+        ))
     }
 
     #[staticmethod]
@@ -575,6 +577,7 @@ impl PyApiExecutionOptionsBuilder {
 
 py_wrap_type! {
     #[derive(Default)]
+    #[pyo3(module = "qcs_sdk.qpu.api")]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
 }
 impl_repr!(PyConnectionStrategy);
@@ -607,5 +610,42 @@ impl PyConnectionStrategy {
             CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+
+    // // Implementing this method is required for the pickle module to recognize the class as
+    // // pickleable, but __reduce__ is self sufficient, so we can just return an empty dictionary here.
+    // fn __getstate__<'py>(&'py self, py: Python<'py>) -> &'py PyDict {
+    //     PyDict::new(py)
+    // }
+    //
+    fn __reduce__(&self, py: Python<'_>) -> PyResult<PyObject> {
+        Ok(match self.as_inner() {
+            ConnectionStrategy::Gateway => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>().getattr("gateway")?.to_object(py),
+                    PyTuple::empty(py).to_object(py),
+                ],
+            )
+            .to_object(py),
+            ConnectionStrategy::DirectAccess => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>()
+                        .getattr("direct_access")?
+                        .to_object(py),
+                    PyTuple::empty(py).to_object(py),
+                ],
+            )
+            .to_object(py),
+            ConnectionStrategy::EndpointId(endpoint_id) => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>().getattr("endpoint_id")?.to_object(py),
+                    PyTuple::new(py, [endpoint_id]).to_object(py),
+                ],
+            )
+            .to_object(py),
+        })
     }
 }

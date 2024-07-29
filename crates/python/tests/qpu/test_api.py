@@ -1,3 +1,4 @@
+import pickle
 import pytest
 
 from qcs_sdk.qpu.translation import (
@@ -5,6 +6,8 @@ from qcs_sdk.qpu.translation import (
 )
 
 from qcs_sdk.qpu.api import (
+    ConnectionStrategy,
+    ExecutionOptions,
     Register,
     retrieve_results,
     submit,
@@ -44,3 +47,15 @@ def test_submit_retrieve(
 
     job_id = submit(program, memory, quantum_processor_id)
     results = retrieve_results(job_id)
+
+class TestPickle():
+    @pytest.mark.parametrize("strategy", [ConnectionStrategy.gateway(), ConnectionStrategy.direct_access(), ConnectionStrategy.endpoint_id("endpoint_id")])
+    def test_connection_strategy(self, strategy: ConnectionStrategy):
+        pickled = pickle.dumps(strategy)
+        unpickled = pickle.loads(pickled)
+
+    def test_execution_options(self):
+        options = ExecutionOptions.default()
+        pickled = pickle.dumps(options)
+        unpickled = pickle.loads(pickled)
+        assert unpickled == options
