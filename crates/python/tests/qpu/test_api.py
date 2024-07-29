@@ -53,6 +53,7 @@ class TestPickle():
     def test_connection_strategy(self, strategy: ConnectionStrategy):
         pickled = pickle.dumps(strategy)
         unpickled = pickle.loads(pickled)
+        assert unpickled == strategy
 
     def test_execution_options(self):
         options = ExecutionOptions.default()

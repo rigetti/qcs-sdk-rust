@@ -612,12 +612,6 @@ impl PyConnectionStrategy {
         }
     }
 
-    // // Implementing this method is required for the pickle module to recognize the class as
-    // // pickleable, but __reduce__ is self sufficient, so we can just return an empty dictionary here.
-    // fn __getstate__<'py>(&'py self, py: Python<'py>) -> &'py PyDict {
-    //     PyDict::new(py)
-    // }
-    //
     fn __reduce__(&self, py: Python<'_>) -> PyResult<PyObject> {
         Ok(match self.as_inner() {
             ConnectionStrategy::Gateway => PyTuple::new(
