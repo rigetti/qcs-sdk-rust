@@ -89,6 +89,8 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+    env:
+      CARGO_HOME: 'C:\cargo'
     steps:
     - name: Enable long path support
       run: |
@@ -102,7 +104,7 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
-        python-architectire: x64
+        python-architecture: x64
         rust-target: x86_64-pc-windows-msvc
 
   sdist:
