@@ -193,7 +193,7 @@ impl PyQuilcClient {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
     #[tracing::instrument(skip_all)]
