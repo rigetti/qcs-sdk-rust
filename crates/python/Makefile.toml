@@ -2,8 +2,8 @@
 RUST_BACKTRACE = 0
 
 [tasks.pre-test-docker-up]
-command = "docker-compose"
-args = ["up", "-d"]
+command = "docker"
+args = ["compose", "up", "-d"]
 
 [tasks.poetry-install]
 command = "poetry"
@@ -18,8 +18,8 @@ command = "poetry"
 args = ["run", "black", "qcs_sdk/_tracing_subscriber"]
 
 [tasks.post-test]
-command = "docker-compose"
-args = ["down"]
+command = "docker"
+args = ["compose", "down"]
 
 [tasks.test]
 command = "poetry"
@@ -48,9 +48,9 @@ command = "poetry"
 args = [
     "run",
     "stubtest",
-    "--allowlist", 
+    "--allowlist",
     ".stubtest-allowlist",
-    "--allowlist", 
+    "--allowlist",
     "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
     "qcs_sdk"
 ]
