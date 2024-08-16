@@ -1,3 +1,9 @@
+## 0.19.3-rc.0
+
+### Fixes
+
+- ignore context extraction failure (#493)
+
 ## 0.19.2
 
 ### Features
