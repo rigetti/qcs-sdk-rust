@@ -3,12 +3,12 @@ RUST_BACKTRACE = 0
 CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features otel-tracing,libquil"  # Disable --all-features to avoid manual tests in CI for now
 
 [tasks.pre-test]
-command = "docker-compose"
-args = ["up", "-d"]
+command = "docker"
+args = ["compose", "up", "-d"]
 
 [tasks.post-test]
-command = "docker-compose"
-args = ["down"]
+command = "docker"
+args = ["compose", "down"]
 
 [tasks.serve-docs]
 command = "cargo"
