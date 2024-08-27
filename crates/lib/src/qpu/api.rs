@@ -41,7 +41,7 @@ use crate::executable::Parameters;
 use crate::client::{GrpcClientError, GrpcConnection, Qcs};
 
 /// The maximum size of a gRPC response, in bytes.
-pub const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
+const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
 
 pub(crate) fn params_into_job_execution_configuration(
     params: &Parameters,
