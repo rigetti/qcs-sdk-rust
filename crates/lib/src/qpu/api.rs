@@ -722,7 +722,7 @@ pub enum QpuApiError {
     },
     /// Error that can occur when the gRPC status code cannot be decoded.
     #[error("The status code could not be decoded: {0}")]
-    StatusCodeDecode(String), // TODO: This error is in prost. Should we really use that as a dep
+    StatusCodeDecode(String),
     // just for the error type?
     /// Error that can occur if a numeric status identifier cannot be converted
     /// into a known status type.
