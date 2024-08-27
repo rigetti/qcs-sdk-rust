@@ -19,11 +19,9 @@ use qcs_api_client_grpc::models::controller::{
     data_value, readout_values, ControllerJobExecutionResult,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
-    py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_function_sync_async,
+    py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
-
-use crate::py_sync::py_function_sync_async;
 
 use crate::client::PyQcsClient;
 

@@ -45,3 +45,7 @@ prost = "0.12.6"
 [build-dependencies]
 pyo3-build-config.workspace = true
 pyo3-tracing-subscriber = { version = "=0.1.2-dev.1", features = ["layer-otel-otlp-file", "layer-otel-otlp", "stubs"], default-features = false }
+
+[lints.clippy]
+too_many_arguments = "allow"
+

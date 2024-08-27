@@ -1,7 +1,7 @@
 use std::sync::Mutex;
 
 use pyo3::prelude::*;
-use rigetti_pyo3::create_init_submodule;
+use rigetti_pyo3::{create_init_submodule, py_sync};
 
 use executable::ExecutionError;
 use execution_data::RegisterMatrixConversionError;
@@ -16,7 +16,6 @@ pub mod qvm;
 pub mod register_data;
 
 pub(crate) mod from_py;
-pub(crate) mod py_sync;
 
 create_init_submodule! {
     classes: [
@@ -74,5 +73,5 @@ fn reset_logging() {
 #[pyfunction]
 #[pyo3(name = "_gather_diagnostics")]
 fn gather_diagnostics(py: Python<'_>) -> PyResult<String> {
-    py_sync::py_sync!(py, async { Ok(qcs::diagnostics::get_report().await) })
+    py_sync!(py, async { Ok(qcs::diagnostics::get_report().await) })
 }

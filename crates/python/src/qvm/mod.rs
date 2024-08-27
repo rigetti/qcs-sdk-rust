@@ -4,14 +4,15 @@ use qcs::{
     RegisterData,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, py_wrap_error, py_wrap_type,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, py_function_sync_async,
+    py_wrap_error, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, prelude::*, Python},
     wrap_error, PyTryFrom, PyWrapper, PyWrapperMut, ToPython, ToPythonError,
 };
 use std::num::NonZeroU16;
 use std::{collections::HashMap, time::Duration};
 
-use crate::{py_sync::py_function_sync_async, register_data::PyRegisterData};
+use crate::register_data::PyRegisterData;
 
 mod api;
 

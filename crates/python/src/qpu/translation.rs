@@ -10,9 +10,10 @@ use qcs_api_client_grpc::services::translation::{
     translation_options::TranslationBackend as ApiTranslationBackend,
     TranslationOptions as ApiTranslationOptions,
 };
-use rigetti_pyo3::{create_init_submodule, py_wrap_error, py_wrap_simple_enum, ToPythonError};
-
-use crate::py_sync::py_function_sync_async;
+use rigetti_pyo3::{
+    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_simple_enum,
+    ToPythonError,
+};
 
 use crate::client::PyQcsClient;
 
