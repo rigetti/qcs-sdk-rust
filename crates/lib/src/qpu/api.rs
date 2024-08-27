@@ -437,7 +437,7 @@ pub enum ConnectionStrategy {
     EndpointId(String),
 }
 
-/// An ExecutionTarget provides methods for provided the appropriate connection to the execution
+/// An ExecutionTarget provides methods to establish the appropriate connection to the execution
 /// service.
 ///
 /// Implementors provide a [`ConnectionStrategy`] and timeout, the trait provides default
@@ -720,7 +720,7 @@ pub enum QpuApiError {
         /// The message associated with the failed job.
         message: String,
     },
-    /// Error that can occur when the gRPC status code could not be decoded.
+    /// Error that can occur when the gRPC status code cannot be decoded.
     #[error("The status code could not be decoded: {0}")]
     StatusCodeDecode(String), // TODO: This error is in prost. Should we really use that as a dep
     // just for the error type?
