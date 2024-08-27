@@ -2,13 +2,13 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
-use numpy::Complex32;
+use numpy::{ndarray::Array2, Complex32, PyArray2};
 use pyo3::{
     exceptions::{PyRuntimeError, PyValueError},
     pyclass,
     pyclass::CompareOp,
     pyfunction, pymethods,
-    types::{PyComplex, PyInt, PyTuple},
+    types::{PyComplex, PyDict, PyInt, PyTuple},
     IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
 };
 use qcs::qpu::api::{
@@ -160,6 +160,117 @@ py_wrap_union_enum! {
     PyRegister(Register) as "Register" {
         i32: I32 => Vec<Py<PyInt>>,
         complex32: Complex32 => Vec<Py<PyComplex>>
+    }
+}
+
+/// TODO: Remove new
+#[pyclass]
+#[derive(Clone, Debug)]
+pub struct ExecutionResultNew {
+    raw_job_result: ControllerJobExecutionResult,
+    #[pyo3(get, set)]
+    pub readout_mappings: HashMap<String, String>,
+}
+
+impl From<ControllerJobExecutionResult> for ExecutionResultNew {
+    fn from(raw_job_result: ControllerJobExecutionResult) -> Self {
+        Self {
+            raw_job_result,
+            readout_mappings: HashMap::new(),
+        }
+    }
+}
+
+#[pymethods]
+impl ExecutionResultNew {
+    #[new]
+    fn new() -> Self {
+        Self {
+            raw_job_result: ControllerJobExecutionResult::default(),
+            readout_mappings: HashMap::new(),
+        }
+    }
+
+    fn get_readout_values(
+        &self,
+        py: Python<'_>,
+        readout_mappings: Option<HashMap<String, String>>,
+    ) -> PyResult<(Py<PyArray2<f64>>, Py<PyDict>)> {
+        let mappings = match &readout_mappings {
+            Some(mappings) => mappings,
+            None => &self.readout_mappings,
+        };
+
+        let job = &self.raw_job_result;
+        let mut all_values = Vec::new();
+        let mut views = HashMap::new();
+        let mut current_index = 0;
+
+        for (key, readout) in &job.readout_values {
+            let mapped_key = mappings.get(key).unwrap_or(key).to_string();
+            let (view_start, view_length) = match &readout.values {
+                Some(readout_values::Values::IntegerValues(values)) => {
+                    all_values.extend(values.values.iter().map(|&v| v as f64));
+                    let start = current_index;
+                    let length = values.values.len();
+                    current_index += length;
+                    (start, length)
+                }
+                Some(readout_values::Values::ComplexValues(values)) => {
+                    all_values.extend(
+                        values
+                            .values
+                            .iter()
+                            .flat_map(|c| vec![c.real as f64, c.imaginary as f64]),
+                    );
+                    let start = current_index;
+                    let length = values.values.len();
+                    current_index += length;
+                    (start, length)
+                }
+                None => continue,
+            };
+
+            // Store slice info for later view creation
+            views.insert(mapped_key, (view_start, view_length));
+        }
+
+        // Create the ndarray array
+        let num_rows = all_values.len();
+        let array_shape = (num_rows, 2); // Assuming 2 columns for f64 data
+        let ndarray_array = Array2::from_shape_vec(array_shape, all_values)
+            .map_err(|_| PyValueError::new_err("boom"))?;
+
+        // Convert ndarray to PyArray2
+        let py_array = PyArray2::from_array(py, &ndarray_array);
+
+        // Execute Python code to create views
+        let py_views = PyDict::new(py);
+
+        for (key, (start, length)) in views {
+            let view_code = format!(
+                "import numpy as np; array = np.asarray(array); array[{}:{}]",
+                start,
+                start + length
+            );
+            let view: PyObject = py
+                .eval(
+                    &view_code,
+                    Some(PyDict::new(py)),
+                    Some(PyDict::from_sequence(
+                        py,
+                        [("array", py_array)].to_object(py),
+                    )?),
+                )?
+                .into();
+            py_views.set_item(key, view)?;
+        }
+
+        Ok((py_array.into(), py_views.into()))
+    }
+
+    fn get_memory_values(&self) -> PyResult<PyArray2<PyObject>> {
+        todo!()
     }
 }
 
@@ -640,6 +751,104 @@ impl PyConnectionStrategy {
                 ],
             )
             .to_object(py),
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use numpy::PyArray2;
+    use pyo3::types::PyDict;
+    use qcs_api_client_grpc::models::controller::Complex64;
+    use qcs_api_client_grpc::models::controller::Complex64ReadoutValues;
+    use qcs_api_client_grpc::models::controller::IntegerReadoutValues;
+    use qcs_api_client_grpc::models::controller::ReadoutValues;
+
+    #[test]
+    fn test_get_readout_values() {
+        // Sample data
+        let integer_values = IntegerReadoutValues {
+            values: vec![1, 2, 3, 4],
+        };
+
+        let complex_values = Complex64ReadoutValues {
+            values: vec![
+                Complex64 {
+                    real: 1.0,
+                    imaginary: 2.0,
+                },
+                Complex64 {
+                    real: 3.0,
+                    imaginary: 4.0,
+                },
+            ],
+        };
+
+        let mut readout_values = HashMap::new();
+        readout_values.insert(
+            "int_data".to_string(),
+            ReadoutValues {
+                values: Some(readout_values::Values::IntegerValues(integer_values)),
+            },
+        );
+        readout_values.insert(
+            "complex_data".to_string(),
+            ReadoutValues {
+                values: Some(readout_values::Values::ComplexValues(complex_values)),
+            },
+        );
+
+        let job_result = ControllerJobExecutionResult {
+            readout_values,
+            memory_values: HashMap::new(),
+            status: 1,
+            status_message: None,
+            execution_duration_microseconds: 123456,
+        };
+
+        let execution_results = ExecutionResultNew {
+            raw_job_result: job_result,
+            readout_mappings: HashMap::new(), // No mappings for simplicity
+        };
+
+        Python::with_gil(|py| {
+            let (py_array, py_views) = execution_results.get_readout_values(py, None).unwrap();
+
+            // Convert PyArray2 to numpy array and verify its contents
+            let py_array: &PyArray2<f64> = py_array.as_ref(py);
+            let array_data = py_array.readonly().to_owned_array();
+
+            // Expected array data
+            let expected_data: Vec<f64> = vec![
+                1.0, 0.0, // Integer values
+                2.0, 0.0, 3.0, 0.0, 4.0, 0.0, 1.0, 2.0, // Complex values (real, imaginary)
+                3.0, 4.0,
+            ];
+
+            assert_eq!(array_data.as_slice().unwrap(), &expected_data);
+
+            // Verify views
+            let py_views: &PyDict = py_views.as_ref(py);
+            let int_view = py_views.get_item("int_data").unwrap().unwrap();
+            let complex_view = py_views.get_item("complex_data").unwrap().unwrap();
+
+            // Convert the views to numpy arrays and verify their contents
+            let int_view_array: &PyArray2<f64> = int_view.extract().unwrap();
+            let complex_view_array: &PyArray2<f64> = complex_view.extract().unwrap();
+
+            let int_view_data = int_view_array.readonly().to_owned_array();
+            let complex_view_data = complex_view_array.readonly().to_owned_array();
+
+            // Expected view data
+            let expected_int_data: Vec<f64> = vec![1.0, 2.0, 3.0, 4.0];
+            let expected_complex_data: Vec<f64> = vec![1.0, 2.0, 3.0, 4.0];
+
+            assert_eq!(int_view_data.as_slice().unwrap(), &expected_int_data);
+            assert_eq!(
+                complex_view_data.as_slice().unwrap(),
+                &expected_complex_data
+            );
         })
     }
 }
