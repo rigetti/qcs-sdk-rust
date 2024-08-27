@@ -81,7 +81,7 @@ mod describe_execution {
     use super::{Execution, Parameters};
     use crate::{client::Qcs, qvm};
 
-    async fn qvm_client() -> qvm::http::HttpClient {
+    fn qvm_client() -> qvm::http::HttpClient {
         let qcs = Qcs::load();
         qvm::http::HttpClient::from(&qcs)
     }
@@ -98,7 +98,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &qvm_client().await,
+                &qvm_client(),
             )
             .await;
         if let Err(e) = result {
@@ -120,7 +120,7 @@ mod describe_execution {
                 NonZeroU16::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
-                &qvm_client().await,
+                &qvm_client(),
             )
             .await;
         if let Err(e) = result {

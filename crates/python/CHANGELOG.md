@@ -1,3 +1,39 @@
+## 0.19.3
+
+### Fixes
+
+- ignore context extraction failure (#493)
+
+## 0.19.3-rc.0
+
+### Fixes
+
+- ignore context extraction failure (#493)
+
+## 0.19.2
+
+### Features
+
+- ConnectionStrategy supports the pickle module (#486)
+
+## 0.19.2-rc.0
+
+### Features
+
+- ConnectionStrategy supports the pickle module (#486)
+
+## 0.19.1
+
+### Features
+
+- ExecutionOptions supports the pickle module. (#485)
+
+## 0.19.1-rc.0
+
+### Features
+
+- ExecutionOptions supports the pickle module. (#485)
+
 ## 0.19.0
 
 ### Breaking Changes

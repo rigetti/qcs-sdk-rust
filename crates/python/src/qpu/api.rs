@@ -8,7 +8,7 @@ use pyo3::{
     pyclass,
     pyclass::CompareOp,
     pyfunction, pymethods,
-    types::{PyComplex, PyInt},
+    types::{PyComplex, PyInt, PyTuple},
     IntoPy, Py, PyObject, PyResult, Python, ToPyObject,
 };
 use qcs::qpu::api::{
@@ -81,7 +81,7 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit(
@@ -115,7 +115,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     async fn submit_with_parameter_batch(
@@ -358,7 +358,7 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn retrieve_results(
@@ -382,6 +382,7 @@ py_function_sync_async! {
 
 py_wrap_type! {
     #[derive(Debug, Default)]
+    #[pyo3(module = "qcs_sdk.qpu.api")]
     PyExecutionOptions(ExecutionOptions) as "ExecutionOptions"
 }
 impl_repr!(PyExecutionOptions);
@@ -430,6 +431,37 @@ impl PyExecutionOptions {
             CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+
+    fn __reduce__<'py>(&mut self, py: Python<'py>) -> PyResult<&'py PyTuple> {
+        let callable = py.get_type::<Self>().getattr("_from_parts")?;
+        Ok(PyTuple::new(
+            py,
+            [
+                callable,
+                PyTuple::new(
+                    py,
+                    &[
+                        self.connection_strategy().into_py(py),
+                        self.timeout_seconds().into_py(py),
+                        self.api_options().into_py(py),
+                    ],
+                ),
+            ],
+        ))
+    }
+
+    #[staticmethod]
+    fn _from_parts(
+        connection_strategy: PyConnectionStrategy,
+        timeout_seconds: Option<f64>,
+        api_options: Option<PyApiExecutionOptions>,
+    ) -> PyResult<Self> {
+        let mut builder = Self::builder();
+        builder.connection_strategy(connection_strategy);
+        builder.timeout_seconds(timeout_seconds);
+        builder.api_options(api_options);
+        builder.build()
     }
 }
 
@@ -545,6 +577,7 @@ impl PyApiExecutionOptionsBuilder {
 
 py_wrap_type! {
     #[derive(Debug, Default)]
+    #[pyo3(module = "qcs_sdk.qpu.api")]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
 }
 impl_repr!(PyConnectionStrategy);
@@ -598,5 +631,36 @@ impl PyConnectionStrategy {
             CompareOp::Eq => (self.as_inner() == other.as_inner()).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+
+    fn __reduce__(&self, py: Python<'_>) -> PyResult<PyObject> {
+        Ok(match self.as_inner() {
+            ConnectionStrategy::Gateway => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>().getattr("gateway")?.to_object(py),
+                    PyTuple::empty(py).to_object(py),
+                ],
+            )
+            .to_object(py),
+            ConnectionStrategy::DirectAccess => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>()
+                        .getattr("direct_access")?
+                        .to_object(py),
+                    PyTuple::empty(py).to_object(py),
+                ],
+            )
+            .to_object(py),
+            ConnectionStrategy::EndpointId(endpoint_id) => PyTuple::new(
+                py,
+                &[
+                    py.get_type::<Self>().getattr("endpoint_id")?.to_object(py),
+                    PyTuple::new(py, [endpoint_id]).to_object(py),
+                ],
+            )
+            .to_object(py),
+        })
     }
 }

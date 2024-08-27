@@ -1,3 +1,27 @@
+## 0.23.2
+
+### Fixes
+
+- ignore context extraction failure (#493)
+
+## 0.23.2-rc.0
+
+### Fixes
+
+- ignore context extraction failure (#493)
+
+## 0.23.1
+
+### Features
+
+- ExecutionOptions supports the pickle module. (#485)
+
+## 0.23.1-rc.0
+
+### Features
+
+- ExecutionOptions supports the pickle module. (#485)
+
 ## 0.23.0
 
 ### Breaking Changes

@@ -329,7 +329,7 @@ pub type QpuConnectionOptions = ExecutionOptions;
 /// Builder for setting up [`QpuConnectionOptions`].
 pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 
-/// Options avaialable when executing a job on a QPU.
+/// Options available when executing a job on a QPU.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
@@ -341,14 +341,14 @@ pub struct ExecutionOptions {
     #[doc = "The timeout to use for the request, defaults to 30 seconds. If set to `None`, then there is no timeout."]
     #[builder(default = "Some(Duration::from_secs(30))")]
     timeout: Option<Duration>,
-    #[doc = "Options avaialable when executing a job on a QPU, particular to the execution service's API."]
+    #[doc = "Options available when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
     api_options: Option<InnerApiExecutionOptions>,
 }
 
 impl Eq for ExecutionOptions {}
 
-/// Options avaialable when executing a job on a QPU, particular to the execution service's API.
+/// Options available when executing a job on a QPU, particular to the execution service's API.
 /// This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]

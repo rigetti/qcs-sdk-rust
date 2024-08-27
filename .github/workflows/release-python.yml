@@ -83,13 +83,17 @@ jobs:
         package-name: qcs-sdk-python-grpc-web
         maturin-target: ${{ matrix.target }}
 
-  windows: 
-    runs-on: windows-latest 
+  windows:
+    runs-on: windows-latest
     needs: [is-python-release, should-publish-wheels]
-    strategy: 
-      matrix: 
+    strategy:
+      matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
+    - name: Enable long path support
+      run: |
+        reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
+        git config --system core.longpaths true
     - uses: actions/checkout@v2
     - name: Install protoc
       uses: arduino/setup-protoc@v1
@@ -99,7 +103,7 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         package-name: ${{ matrix.package-name }}
-        python-architectire: x64
+        python-architecture: x64
         rust-target: x86_64-pc-windows-msvc
 
   sdist:
@@ -107,8 +111,8 @@ jobs:
     needs: is-python-release
     env:
       CXXFLAGS: "-std=c++11"
-    strategy: 
-      matrix: 
+    strategy:
+      matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
     - uses: actions/checkout@v2
@@ -135,8 +139,8 @@ jobs:
     if: always() && needs.sdist.result == 'success'
     permissions:
       id-token: write
-    strategy: 
-      matrix: 
+    strategy:
+      matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
     - uses: actions/download-artifact@v3

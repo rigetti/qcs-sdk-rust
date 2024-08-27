@@ -92,7 +92,7 @@ macro_rules! py_job_handle {
     }};
 }
 
-#[pyo3_opentelemetry::pypropagate(exclude(new))]
+#[pyo3_opentelemetry::pypropagate(exclude(new), on_context_extraction_failure = "ignore")]
 #[pymethods]
 impl PyExecutable {
     #[new]

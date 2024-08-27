@@ -470,7 +470,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
-    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
     ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
     ///       overrides the `quantum_processor_id` parameter.
     ///
@@ -528,7 +528,7 @@ impl<'execution> Executable<'_, 'execution> {
     ///     The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
-    /// 3 `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
+    /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
     ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
     ///       overrides the `quantum_processor_id` parameter.
     ///
@@ -803,7 +803,7 @@ mod describe_get_config {
     use crate::client::Qcs;
     use crate::{compiler::rpcq, Executable};
 
-    async fn quilc_client() -> rpcq::Client {
+    fn quilc_client() -> rpcq::Client {
         let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
@@ -811,7 +811,7 @@ mod describe_get_config {
 
     #[tokio::test]
     async fn it_resizes_params_dynamically() {
-        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client()));
 
         exe.with_parameter("foo", 0, 0.0);
         let params = exe.params.get("foo").unwrap().len();
@@ -834,7 +834,7 @@ mod describe_qpu_for_id {
     use crate::qpu;
     use crate::{client::Qcs, Executable};
 
-    async fn quilc_client() -> rpcq::Client {
+    fn quilc_client() -> rpcq::Client {
         let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
@@ -845,7 +845,7 @@ mod describe_qpu_for_id {
         // Default config has no auth, so it should try to refresh
         let mut exe = Executable::from_quil("")
             .with_qcs_client(Qcs::load())
-            .with_quilc_client(Some(quilc_client().await));
+            .with_quilc_client(Some(quilc_client()));
         let result = exe.qpu_for_id("blah").await;
         let Err(err) = result else {
             panic!("Expected an error!");
@@ -856,7 +856,7 @@ mod describe_qpu_for_id {
 
     #[tokio::test]
     async fn it_loads_cached_version() {
-        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client()));
         let shots = NonZeroU16::new(17).expect("value is non-zero");
         exe.shots = shots;
         exe.qpu = Some(
@@ -881,7 +881,7 @@ mod describe_qpu_for_id {
     async fn it_creates_new_after_shot_change() {
         let original_shots = NonZeroU16::new(23).expect("value is non-zero");
         let mut exe = Executable::from_quil("")
-            .with_quilc_client(Some(quilc_client().await))
+            .with_quilc_client(Some(quilc_client()))
             .with_shots(original_shots);
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
@@ -898,7 +898,7 @@ mod describe_qpu_for_id {
 
     #[tokio::test]
     async fn it_creates_new_for_new_qpu_id() {
-        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client().await));
+        let mut exe = Executable::from_quil("").with_quilc_client(Some(quilc_client()));
         let qpu = exe.qpu_for_id("Aspen-9").await.unwrap();
 
         assert_eq!(qpu.quantum_processor_id, "Aspen-9");

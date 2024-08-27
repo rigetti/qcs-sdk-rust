@@ -138,7 +138,7 @@ py_wrap_data_struct! {
 impl_repr!(PyMultishotResponse);
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
@@ -202,7 +202,7 @@ impl PyMultishotMeasureRequest {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
@@ -236,7 +236,7 @@ impl PyExpectationRequest {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
@@ -277,7 +277,7 @@ impl PyWavefunctionRequest {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]

@@ -29,7 +29,6 @@
     overflowing_literals,
     path_statements,
     patterns_in_fns_without_body,
-    pointer_structural_match,
     semicolon_in_expressions_from_macros,
     trivial_casts,
     trivial_numeric_casts,

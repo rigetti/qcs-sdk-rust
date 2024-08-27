@@ -243,7 +243,7 @@ impl PyQvmOptions {
 }
 
 py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[tracing::instrument(skip_all)]
     async fn run(
