@@ -2746,7 +2746,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.8.12"
+version = "0.8.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43621cfb969b563276e015ca3247a6e3dc3b5cc5ba9ffd6bc58adc51a02a467f"
 dependencies = [
  "async-trait",
  "backoff",
@@ -2761,7 +2763,7 @@ dependencies = [
  "pyo3-asyncio",
  "pyo3-build-config 0.22.1",
  "reqwest",
- "rigetti-pyo3",
+ "rigetti-pyo3 0.3.6",
  "serde",
  "shellexpand",
  "thiserror",
@@ -2775,7 +2777,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.8.6"
+version = "0.8.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b461aabc128adcb54d644aa4517b243d366a9ffe88a75f3fd3a5bb887f6b1e75"
 dependencies = [
  "backoff",
  "http",
@@ -2806,7 +2810,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.9.6"
+version = "0.9.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec7af3429e00bd96faed7e32c8643b74ad86a072714b304475b15c8be7529d85"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
@@ -2845,7 +2851,7 @@ dependencies = [
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
  "quil-rs",
- "rigetti-pyo3",
+ "rigetti-pyo3 0.4.1",
  "serde_json",
  "thiserror",
  "tokio",
@@ -3101,6 +3107,19 @@ name = "rigetti-pyo3"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c59068763670399bb3e895a17cc631d9214c3172b64fc74d3ab63dac7371c340"
+dependencies = [
+ "num-complex",
+ "num-traits",
+ "paste",
+ "pyo3",
+ "time",
+]
+
+[[package]]
+name = "rigetti-pyo3"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f924032d36104a859f936762576a9e6fc0811b37a1f4a8144c0b9b25ee89607b"
 dependencies = [
  "num-complex",
  "num-traits",
