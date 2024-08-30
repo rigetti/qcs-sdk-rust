@@ -20,21 +20,21 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '3.20.1'
-
       - name: Install libquil dependencies
         run: sudo apt install -y libffi\* libblas\* liblapack\*
       - name: Install libquil
         run: |
           curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0
-
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
         uses: actions-rs/cargo@v1
         with:
           command: install
           args: --debug cargo-make
-      - name: Install poetry
-        uses: snok/install-poetry@v1
+      - name: Activate virtual environment
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
