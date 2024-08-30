@@ -22,7 +22,7 @@ jobs:
       - name: Create virtual environment
         run: python -m venv venv
       - name: Activate virtual environment
-        run: echo "source venv/bin/activate" >> $GITHUB_ENV
+        run: cat venv/bin/activate >> $GITHUB_ENV
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
         uses: actions-rs/cargo@v1
