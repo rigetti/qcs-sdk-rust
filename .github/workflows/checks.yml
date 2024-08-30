@@ -31,11 +31,8 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      - name: Create virtual environment
-        run: python -m venv venv
-      - name: Activate virtual environment
-        run: cat venv/bin/activate >> $GITHUB_ENV
       # may protect against linking failure: no space left on device
+      - uses: syphar/restore-virtualenv@v1
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
       - name: Run Rust CI
