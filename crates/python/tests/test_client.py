@@ -4,8 +4,9 @@ from urllib.parse import urlparse
 from qcs_sdk.client import (
     QCSClient,
     LoadClientError,
-    QCSClientAuthServer,
-    QCSClientTokens,
+    OAuthSession,
+    RefreshToken,
+    AuthServer,
 )
 
 
@@ -51,18 +52,13 @@ def test_client_broken_raises():
         QCSClient.load(profile_name="broken")
 
 
-def test_client_auth_server_can_be_manually_defined():
+def test_client_oauth_session_can_be_manually_defined():
     """Ensures that pyo3 usage is correct."""
-    auth_server = QCSClientAuthServer(client_id="foo", issuer="bar")
-    assert auth_server.client_id == "foo"
-    assert auth_server.issuer == "bar"
-
-
-def test_client_tokens_can_be_manually_defined():
-    """Ensures that pyo3 usage is correct."""
-    auth_server = QCSClientTokens(bearer_access_token="foo", refresh_token="bar")
-    assert auth_server.bearer_access_token == "foo"
-    assert auth_server.refresh_token == "bar"
+    auth_server = AuthServer("url", "issuer")
+    session = OAuthSession(RefreshToken("refresh"), auth_server, "access")
+    assert session.payload.refresh_token == "refresh"
+    assert session.access_token == "access"
+    assert session.auth_server == auth_server
 
 
 def test_client_constructor():

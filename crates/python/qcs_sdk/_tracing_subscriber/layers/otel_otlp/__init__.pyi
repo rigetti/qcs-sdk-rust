@@ -47,8 +47,6 @@ class Resource:
         schema_url: Optional[str] = None,
     ) -> "Resource": ...
 
-
-
 @final
 class Config:
     """
@@ -98,14 +96,14 @@ class Config:
         ...
 
 if TYPE_CHECKING:
-    from typing import List, Union 
+    from typing import List, Union
 
     ResourceValueArray = Union[List[bool], List[int], List[float], List[str]]
     """
     An array of `ResourceValue`s. This array is homogenous, so all values must be of the same type.
     """
 
-    ResourceValue= Union[bool, int, float, str, ResourceValueArray]
+    ResourceValue = Union[bool, int, float, str, ResourceValueArray]
     """
     A value that can be added to a `Resource`.
     """

@@ -2746,12 +2746,13 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.8.14"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43621cfb969b563276e015ca3247a6e3dc3b5cc5ba9ffd6bc58adc51a02a467f"
+checksum = "371aab7842d63b891a5cba071555a1e7973cd29359514e1df6d6ccd341e7e598"
 dependencies = [
  "async-trait",
  "backoff",
+ "base64 0.22.1",
  "derive_builder 0.20.0",
  "figment",
  "futures",
@@ -2777,9 +2778,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.8.8"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b461aabc128adcb54d644aa4517b243d366a9ffe88a75f3fd3a5bb887f6b1e75"
+checksum = "6beda6c7ff777bdcd83cbb6b4201f144c3c7aa10cf632cb0fba36f7d41c4b4e8"
 dependencies = [
  "backoff",
  "http",
@@ -2810,9 +2811,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.9.7"
+version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec7af3429e00bd96faed7e32c8643b74ad86a072714b304475b15c8be7529d85"
+checksum = "5aeaca135891229a76bc3fc03747b9b8e8622fb570594e3458679496f3cd45be"
 dependencies = [
  "anyhow",
  "qcs-api-client-common",
