@@ -31,10 +31,10 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
+      - name: Create virtual environment
+        run: python -m venv venv
       - name: Activate virtual environment
-        run: |
-          python -m venv .venv
-          source .venv/bin/activate
+        run: source venv/bin/activate
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
