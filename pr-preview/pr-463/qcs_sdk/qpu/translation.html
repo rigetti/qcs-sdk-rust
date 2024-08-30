@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="pdoc 14.6.1"/>
-    <title>qcs_sdk.diagnostics API documentation</title>
+    <title>qcs_sdk.qpu.translation API documentation</title>
 
     <style>/*! * Bootstrap Reboot v5.0.0 (https://getbootstrap.com/) * Copyright 2011-2021 The Bootstrap Authors * Copyright 2011-2021 Twitter, Inc. * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE) * Forked from Normalize.css, licensed MIT (https://github.com/necolas/normalize.css/blob/master/LICENSE.md) */*,::after,::before{box-sizing:border-box}@media (prefers-reduced-motion:no-preference){:root{scroll-behavior:smooth}}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";font-size:1rem;font-weight:400;line-height:1.5;color:#212529;background-color:#fff;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}hr{margin:1rem 0;color:inherit;background-color:currentColor;border:0;opacity:.25}hr:not([size]){height:1px}h1,h2,h3,h4,h5,h6{margin-top:0;margin-bottom:.5rem;font-weight:500;line-height:1.2}h1{font-size:calc(1.375rem + 1.5vw)}@media (min-width:1200px){h1{font-size:2.5rem}}h2{font-size:calc(1.325rem + .9vw)}@media (min-width:1200px){h2{font-size:2rem}}h3{font-size:calc(1.3rem + .6vw)}@media (min-width:1200px){h3{font-size:1.75rem}}h4{font-size:calc(1.275rem + .3vw)}@media (min-width:1200px){h4{font-size:1.5rem}}h5{font-size:1.25rem}h6{font-size:1rem}p{margin-top:0;margin-bottom:1rem}abbr[data-bs-original-title],abbr[title]{-webkit-text-decoration:underline dotted;text-decoration:underline dotted;cursor:help;-webkit-text-decoration-skip-ink:none;text-decoration-skip-ink:none}address{margin-bottom:1rem;font-style:normal;line-height:inherit}ol,ul{padding-left:2rem}dl,ol,ul{margin-top:0;margin-bottom:1rem}ol ol,ol ul,ul ol,ul ul{margin-bottom:0}dt{font-weight:700}dd{margin-bottom:.5rem;margin-left:0}blockquote{margin:0 0 1rem}b,strong{font-weight:bolder}small{font-size:.875em}mark{padding:.2em;background-color:#fcf8e3}sub,sup{position:relative;font-size:.75em;line-height:0;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}a{color:#0d6efd;text-decoration:underline}a:hover{color:#0a58ca}a:not([href]):not([class]),a:not([href]):not([class]):hover{color:inherit;text-decoration:none}code,kbd,pre,samp{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:1em;direction:ltr;unicode-bidi:bidi-override}pre{display:block;margin-top:0;margin-bottom:1rem;overflow:auto;font-size:.875em}pre code{font-size:inherit;color:inherit;word-break:normal}code{font-size:.875em;color:#d63384;word-wrap:break-word}a>code{color:inherit}kbd{padding:.2rem .4rem;font-size:.875em;color:#fff;background-color:#212529;border-radius:.2rem}kbd kbd{padding:0;font-size:1em;font-weight:700}figure{margin:0 0 1rem}img,svg{vertical-align:middle}table{caption-side:bottom;border-collapse:collapse}caption{padding-top:.5rem;padding-bottom:.5rem;color:#6c757d;text-align:left}th{text-align:inherit;text-align:-webkit-match-parent}tbody,td,tfoot,th,thead,tr{border-color:inherit;border-style:solid;border-width:0}label{display:inline-block}button{border-radius:0}button:focus:not(:focus-visible){outline:0}button,input,optgroup,select,textarea{margin:0;font-family:inherit;font-size:inherit;line-height:inherit}button,select{text-transform:none}[role=button]{cursor:pointer}select{word-wrap:normal}select:disabled{opacity:1}[list]::-webkit-calendar-picker-indicator{display:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]:not(:disabled),[type=reset]:not(:disabled),[type=submit]:not(:disabled),button:not(:disabled){cursor:pointer}::-moz-focus-inner{padding:0;border-style:none}textarea{resize:vertical}fieldset{min-width:0;padding:0;margin:0;border:0}legend{float:left;width:100%;padding:0;margin-bottom:.5rem;font-size:calc(1.275rem + .3vw);line-height:inherit}@media (min-width:1200px){legend{font-size:1.5rem}}legend+*{clear:left}::-webkit-datetime-edit-day-field,::-webkit-datetime-edit-fields-wrapper,::-webkit-datetime-edit-hour-field,::-webkit-datetime-edit-minute,::-webkit-datetime-edit-month-field,::-webkit-datetime-edit-text,::-webkit-datetime-edit-year-field{padding:0}::-webkit-inner-spin-button{height:auto}[type=search]{outline-offset:-2px;-webkit-appearance:textfield}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-color-swatch-wrapper{padding:0}::file-selector-button{font:inherit}::-webkit-file-upload-button{font:inherit;-webkit-appearance:button}output{display:inline-block}iframe{border:0}summary{display:list-item;cursor:pointer}progress{vertical-align:baseline}[hidden]{display:none!important}</style>
     <style>/*! syntax-highlighting.css */pre{line-height:125%;}span.linenos{color:inherit; background-color:transparent; padding-left:5px; padding-right:20px;}.pdoc-code .hll{background-color:#ffffcc}.pdoc-code{background:#f8f8f8;}.pdoc-code .c{color:#3D7B7B; font-style:italic}.pdoc-code .err{border:1px solid #FF0000}.pdoc-code .k{color:#008000; font-weight:bold}.pdoc-code .o{color:#666666}.pdoc-code .ch{color:#3D7B7B; font-style:italic}.pdoc-code .cm{color:#3D7B7B; font-style:italic}.pdoc-code .cp{color:#9C6500}.pdoc-code .cpf{color:#3D7B7B; font-style:italic}.pdoc-code .c1{color:#3D7B7B; font-style:italic}.pdoc-code .cs{color:#3D7B7B; font-style:italic}.pdoc-code .gd{color:#A00000}.pdoc-code .ge{font-style:italic}.pdoc-code .gr{color:#E40000}.pdoc-code .gh{color:#000080; font-weight:bold}.pdoc-code .gi{color:#008400}.pdoc-code .go{color:#717171}.pdoc-code .gp{color:#000080; font-weight:bold}.pdoc-code .gs{font-weight:bold}.pdoc-code .gu{color:#800080; font-weight:bold}.pdoc-code .gt{color:#0044DD}.pdoc-code .kc{color:#008000; font-weight:bold}.pdoc-code .kd{color:#008000; font-weight:bold}.pdoc-code .kn{color:#008000; font-weight:bold}.pdoc-code .kp{color:#008000}.pdoc-code .kr{color:#008000; font-weight:bold}.pdoc-code .kt{color:#B00040}.pdoc-code .m{color:#666666}.pdoc-code .s{color:#BA2121}.pdoc-code .na{color:#687822}.pdoc-code .nb{color:#008000}.pdoc-code .nc{color:#0000FF; font-weight:bold}.pdoc-code .no{color:#880000}.pdoc-code .nd{color:#AA22FF}.pdoc-code .ni{color:#717171; font-weight:bold}.pdoc-code .ne{color:#CB3F38; font-weight:bold}.pdoc-code .nf{color:#0000FF}.pdoc-code .nl{color:#767600}.pdoc-code .nn{color:#0000FF; font-weight:bold}.pdoc-code .nt{color:#008000; font-weight:bold}.pdoc-code .nv{color:#19177C}.pdoc-code .ow{color:#AA22FF; font-weight:bold}.pdoc-code .w{color:#bbbbbb}.pdoc-code .mb{color:#666666}.pdoc-code .mf{color:#666666}.pdoc-code .mh{color:#666666}.pdoc-code .mi{color:#666666}.pdoc-code .mo{color:#666666}.pdoc-code .sa{color:#BA2121}.pdoc-code .sb{color:#BA2121}.pdoc-code .sc{color:#BA2121}.pdoc-code .dl{color:#BA2121}.pdoc-code .sd{color:#BA2121; font-style:italic}.pdoc-code .s2{color:#BA2121}.pdoc-code .se{color:#AA5D1F; font-weight:bold}.pdoc-code .sh{color:#BA2121}.pdoc-code .si{color:#A45A77; font-weight:bold}.pdoc-code .sx{color:#008000}.pdoc-code .sr{color:#A45A77}.pdoc-code .s1{color:#BA2121}.pdoc-code .ss{color:#19177C}.pdoc-code .bp{color:#008000}.pdoc-code .fm{color:#0000FF}.pdoc-code .vc{color:#19177C}.pdoc-code .vg{color:#19177C}.pdoc-code .vi{color:#19177C}.pdoc-code .vm{color:#19177C}.pdoc-code .il{color:#666666}</style>
@@ -16,11 +16,11 @@
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>            <a class="pdoc-button module-list-button" href="../qcs_sdk.html">
+        <div>            <a class="pdoc-button module-list-button" href="../qpu.html">
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
   <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
   <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
-</svg>                &nbsp;qcs_sdk</a>
+</svg>                &nbsp;qcs_sdk.qpu</a>
 
             <img src="https://qcs.rigetti.com/static/img/rigetti-logo.svg" class="logo" alt="project logo"/>
 
@@ -32,7 +32,70 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="function" href="#get_report">get_report</a>
+                    <a class="class" href="#TranslationOptions">TranslationOptions</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TranslationOptions.use_backend_v1">use_backend_v1</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TranslationOptions.use_backend_v2">use_backend_v2</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TranslationOptions.v1">v1</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TranslationOptions.v2">v2</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TranslationOptions.encode_as_protobuf">encode_as_protobuf</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#TranslationOptions.backend">backend</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TranslationResult">TranslationResult</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#TranslationResult.program">program</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#TranslationResult.ro_sources">ro_sources</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TranslationBackend">TranslationBackend</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#TranslationBackend.V1">V1</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#TranslationBackend.V2">V2</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TranslationError">TranslationError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="function" href="#get_quilt_calibrations">get_quilt_calibrations</a>
+            </li>
+            <li>
+                    <a class="function" href="#get_quilt_calibrations_async">get_quilt_calibrations_async</a>
+            </li>
+            <li>
+                    <a class="function" href="#translate">translate</a>
+            </li>
+            <li>
+                    <a class="function" href="#translate_async">translate_async</a>
             </li>
     </ul>
 
@@ -48,71 +111,277 @@
     <main class="pdoc">
             <section class="module-info">
                     <h1 class="modulename">
-<a href="./../qcs_sdk.html">qcs_sdk</a><wbr>.diagnostics    </h1>
+<a href="./../../qcs_sdk.html">qcs_sdk</a><wbr>.<a href="./../qpu.html">qpu</a><wbr>.translation    </h1>
 
                 
-                        <input id="mod-diagnostics-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-
-                        <label class="view-source-button" for="mod-diagnostics-view-source"><span>View Source</span></label>
-
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">import</span> <span class="nn">sys</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">from</span> <span class="nn">.qcs_sdk</span> <span class="kn">import</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">_gather_diagnostics</span>  <span class="c1"># type: ignore</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="k">def</span> <span class="nf">get_report</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">    Return a string describing the package and its environment for use in bug reporting and diagnosis.</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">    Note: this format is not stable and its content may change between versions.</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;qcs-sdk-python version: </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="s2">Python version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="si">}</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="s2">Python implementation: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="s2">Python implementation version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="s2">Python C API version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">api_version</span><span class="si">}</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="s2">Python executable: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="si">}</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="s2">venv prefix: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="s2">platform: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="si">{</span><span class="n">_gather_diagnostics</span><span class="p">()</span><span class="si">}</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="s2">   &quot;&quot;&quot;</span>
-</span></pre></div>
-
-
+                
+                
+                
             </section>
-                <section id="get_report">
-                            <input id="get_report-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
+                <section id="TranslationOptions">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TranslationOptions</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions"></a>
+    
+    
+
+                            <div id="TranslationOptions.use_backend_v1" class="classattr">
+                                <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_report</span><span class="signature pdoc-code condensed">(<span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">use_backend_v1</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
 
-                <label class="view-source-button" for="get_report-view-source"><span>View Source</span></label>
-
+        
     </div>
-    <a class="headerlink" href="#get_report"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="get_report-7"><a href="#get_report-7"><span class="linenos"> 7</span></a><span class="k">def</span> <span class="nf">get_report</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-</span><span id="get_report-8"><a href="#get_report-8"><span class="linenos"> 8</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="get_report-9"><a href="#get_report-9"><span class="linenos"> 9</span></a><span class="sd">    Return a string describing the package and its environment for use in bug reporting and diagnosis.</span>
-</span><span id="get_report-10"><a href="#get_report-10"><span class="linenos">10</span></a>
-</span><span id="get_report-11"><a href="#get_report-11"><span class="linenos">11</span></a><span class="sd">    Note: this format is not stable and its content may change between versions.</span>
-</span><span id="get_report-12"><a href="#get_report-12"><span class="linenos">12</span></a><span class="sd">    &quot;&quot;&quot;</span>
-</span><span id="get_report-13"><a href="#get_report-13"><span class="linenos">13</span></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;qcs-sdk-python version: </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span>
-</span><span id="get_report-14"><a href="#get_report-14"><span class="linenos">14</span></a><span class="s2">Python version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version</span><span class="si">}</span>
-</span><span id="get_report-15"><a href="#get_report-15"><span class="linenos">15</span></a><span class="s2">Python implementation: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">name</span><span class="si">}</span>
-</span><span id="get_report-16"><a href="#get_report-16"><span class="linenos">16</span></a><span class="s2">Python implementation version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">implementation</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">micro</span><span class="si">}</span>
-</span><span id="get_report-17"><a href="#get_report-17"><span class="linenos">17</span></a><span class="s2">Python C API version: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">api_version</span><span class="si">}</span>
-</span><span id="get_report-18"><a href="#get_report-18"><span class="linenos">18</span></a><span class="s2">Python executable: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="si">}</span>
-</span><span id="get_report-19"><a href="#get_report-19"><span class="linenos">19</span></a><span class="s2">venv prefix: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">prefix</span><span class="si">}</span>
-</span><span id="get_report-20"><a href="#get_report-20"><span class="linenos">20</span></a><span class="s2">platform: </span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span>
-</span><span id="get_report-21"><a href="#get_report-21"><span class="linenos">21</span></a><span class="si">{</span><span class="n">_gather_diagnostics</span><span class="p">()</span><span class="si">}</span>
-</span><span id="get_report-22"><a href="#get_report-22"><span class="linenos">22</span></a><span class="s2">   &quot;&quot;&quot;</span>
-</span></pre></div>
+    <a class="headerlink" href="#TranslationOptions.use_backend_v1"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationOptions.use_backend_v2" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">use_backend_v2</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions.use_backend_v2"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationOptions.v1" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">v1</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions.v1"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationOptions.v2" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">v2</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="o">*</span>,</span><span class="param">	<span class="n">prepend_default_calibrations</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">passive_reset_delay_seconds</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">allow_unchecked_pointer_arithmetic</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">allow_frame_redefinition</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions.v2"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationOptions.encode_as_protobuf" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">encode_as_protobuf</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions.encode_as_protobuf"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationOptions.backend" class="classattr">
+                                <div class="attr variable">
+            <span class="name">backend</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationOptions.backend"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="TranslationResult">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TranslationResult</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationResult"></a>
+    
+            <div class="docstring"><p>The result of a call to [<code><a href="#translate">translate</a></code>] which provides information about the
+translated program.</p>
+</div>
 
 
-            <div class="docstring"><p>Return a string describing the package and its environment for use in bug reporting and diagnosis.</p>
+                            <div id="TranslationResult.program" class="classattr">
+                                <div class="attr variable">
+            <span class="name">program</span>
 
-<p>Note: this format is not stable and its content may change between versions.</p>
+        
+    </div>
+    <a class="headerlink" href="#TranslationResult.program"></a>
+    
+            <div class="docstring"><p>The translated program.</p>
+</div>
+
+
+                            </div>
+                            <div id="TranslationResult.ro_sources" class="classattr">
+                                <div class="attr variable">
+            <span class="name">ro_sources</span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationResult.ro_sources"></a>
+    
+            <div class="docstring"><p>The memory locations used for readout.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="TranslationBackend">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TranslationBackend</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationBackend"></a>
+    
+    
+
+                            <div id="TranslationBackend.V1" class="classattr">
+                                <div class="attr variable">
+            <span class="name">V1</span>        =
+<span class="default_value"><a href="#TranslationBackend.V1">TranslationBackend.V1</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationBackend.V1"></a>
+    
+    
+
+                            </div>
+                            <div id="TranslationBackend.V2" class="classattr">
+                                <div class="attr variable">
+            <span class="name">V2</span>        =
+<span class="default_value"><a href="#TranslationBackend.V2">TranslationBackend.V2</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationBackend.V2"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="TranslationError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TranslationError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#TranslationError"></a>
+    
+            <div class="docstring"><p>Unspecified run-time error.</p>
+</div>
+
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt>builtins.RuntimeError</dt>
+                                <dd id="TranslationError.__init__" class="function">RuntimeError</dd>
+
+            </div>
+            <div><dt>builtins.BaseException</dt>
+                                <dd id="TranslationError.with_traceback" class="function">with_traceback</dd>
+                <dd id="TranslationError.add_note" class="function">add_note</dd>
+                <dd id="TranslationError.args" class="variable">args</dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="get_quilt_calibrations">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_quilt_calibrations</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">quantum_processor_id</span>, </span><span class="param"><span class="n">client</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#get_quilt_calibrations"></a>
+    
+            <div class="docstring"><p>Query the QCS API for Quil-T calibrations.
+If <code>None</code>, the default <code>timeout</code> used is 10 seconds.</p>
+</div>
+
+
+                </section>
+                <section id="get_quilt_calibrations_async">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_quilt_calibrations_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">quantum_processor_id</span>, </span><span class="param"><span class="n">client</span><span class="o">=</span><span class="kc">None</span>, </span><span class="param"><span class="n">timeout</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#get_quilt_calibrations_async"></a>
+    
+            <div class="docstring"><p>Query the QCS API for Quil-T calibrations.
+If <code>None</code>, the default <code>timeout</code> used is 10 seconds.</p>
+</div>
+
+
+                </section>
+                <section id="translate">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">translate</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">native_quil</span>,</span><span class="param">	<span class="n">num_shots</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#translate"></a>
+    
+            <div class="docstring"><p>Translates a native Quil program into an executable</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#TranslationError">TranslationError</a></code>] if translation fails.</p>
+</div>
+
+
+                </section>
+                <section id="translate_async">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">translate_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">native_quil</span>,</span><span class="param">	<span class="n">num_shots</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#translate_async"></a>
+    
+            <div class="docstring"><p>Translates a native Quil program into an executable</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#TranslationError">TranslationError</a></code>] if translation fails.</p>
 </div>
 
 
@@ -170,7 +439,7 @@
                 script.async = true;
                 script.onload = () => resolve(window.pdocSearch);
                 script.onerror = (e) => reject(e);
-                script.src = "../search.js";
+                script.src = "../../search.js";
                 document.getElementsByTagName("head")[0].appendChild(script);
             });
         } catch (e) {
@@ -212,7 +481,7 @@
             }
             for (let result of results.slice(0, 10)) {
                 let doc = result.doc;
-                let url = `../${doc.modulename.replaceAll(".", "/")}.html`;
+                let url = `../../${doc.modulename.replaceAll(".", "/")}.html`;
                 if (doc.qualname) {
                     url += `#${doc.qualname}`;
                 }
