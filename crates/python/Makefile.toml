@@ -106,5 +106,5 @@ dependencies = ["pytest-flow", "stubtest"]
 [tasks.docs]
 dependencies = ["install-python-package"]
 command = "pdoc"
-args = ["pdoc", "-o", "build/docs", "qcs_sdk", "!qcs_sdk.qcs_sdk", "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg"]
+args = ["-o", "build/docs", "qcs_sdk", "!qcs_sdk.qcs_sdk", "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg"]
 
