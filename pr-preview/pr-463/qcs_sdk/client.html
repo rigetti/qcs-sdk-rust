@@ -38,9 +38,6 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                         <li>
@@ -51,6 +48,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -68,13 +68,13 @@
                                 <a class="function" href="#OAuthSession.request_access_token_async">request_access_token_async</a>
                         </li>
                         <li>
+                                <a class="variable" href="#OAuthSession.access_token">access_token</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#OAuthSession.payload">payload</a>
                         </li>
                         <li>
                                 <a class="variable" href="#OAuthSession.auth_server">auth_server</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#OAuthSession.access_token">access_token</a>
                         </li>
                 </ul>
 
@@ -86,10 +86,10 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.client_id">client_id</a>
+                                <a class="variable" href="#AuthServer.issuer">issuer</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.issuer">issuer</a>
+                                <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                 </ul>
 
@@ -100,6 +100,24 @@
                         <li>
                                 <a class="variable" href="#RefreshToken.refresh_token">refresh_token</a>
                         </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ClientCredentials">ClientCredentials</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ClientCredentials.client_secret">client_secret</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ClientCredentials.client_id">client_id</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ExternallyManaged">ExternallyManaged</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -161,17 +179,6 @@
     
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -212,6 +219,17 @@
         
     </div>
     <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
     
     
 
@@ -282,6 +300,17 @@ credentials or payload data.</p>
     
 
                             </div>
+                            <div id="OAuthSession.access_token" class="classattr">
+                                <div class="attr variable">
+            <span class="name">access_token</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OAuthSession.access_token"></a>
+    
+    
+
+                            </div>
                             <div id="OAuthSession.payload" class="classattr">
                                 <div class="attr variable">
             <span class="name">payload</span>
@@ -300,17 +329,6 @@ credentials or payload data.</p>
         
     </div>
     <a class="headerlink" href="#OAuthSession.auth_server"></a>
-    
-    
-
-                            </div>
-                            <div id="OAuthSession.access_token" class="classattr">
-                                <div class="attr variable">
-            <span class="name">access_token</span>
-
-        
-    </div>
-    <a class="headerlink" href="#OAuthSession.access_token"></a>
     
     
 
@@ -343,19 +361,6 @@ credentials or payload data.</p>
     
 
                             </div>
-                            <div id="AuthServer.client_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">client_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.client_id"></a>
-    
-            <div class="docstring"><p>Get the configured Okta client id.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.issuer" class="classattr">
                                 <div class="attr variable">
             <span class="name">issuer</span>
@@ -365,6 +370,19 @@ credentials or payload data.</p>
     <a class="headerlink" href="#AuthServer.issuer"></a>
     
             <div class="docstring"><p>Get the Okta issuer URL.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.client_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.client_id"></a>
+    
+            <div class="docstring"><p>Get the configured Okta client id.</p>
 </div>
 
 
@@ -395,6 +413,61 @@ credentials or payload data.</p>
     
 
                             </div>
+                </section>
+                <section id="ClientCredentials">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ClientCredentials</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ClientCredentials"></a>
+    
+            <div class="docstring"><p>A pair of Client ID and Client Secret, used to request an OAuth Client Credentials Grant</p>
+</div>
+
+
+                            <div id="ClientCredentials.client_secret" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_secret</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClientCredentials.client_secret"></a>
+    
+    
+
+                            </div>
+                            <div id="ClientCredentials.client_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClientCredentials.client_id"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="ExternallyManaged">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExternallyManaged</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ExternallyManaged"></a>
+    
+            <div class="docstring"><p>A struct that manages access tokens by utilizing a user-provided refresh function.</p>
+
+<p>The [<code><a href="#ExternallyManaged">ExternallyManaged</a></code>] struct allows users to define custom logic for
+fetching or refreshing access tokens.</p>
+</div>
+
+
                 </section>
                 <section id="LoadClientError">
                     <div class="attr class">
