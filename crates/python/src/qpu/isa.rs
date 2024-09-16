@@ -48,11 +48,11 @@ py_wrap_error!(isa, RustGetIsaError, GetISAError, PyRuntimeError);
 
 py_wrap_union_enum! {
     PyFamily(Family) as "Family" {
-        NONE: None,
-        Full: Full,
-        Aspen: Aspen,
-        Ankaa: Ankaa,
-        Unknown: Unknown => String
+        none: None,
+        full: Full,
+        aspen: Aspen,
+        ankaa: Ankaa,
+        unknown: Unknown => String
     }
 }
 

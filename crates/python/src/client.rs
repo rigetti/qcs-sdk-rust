@@ -1,7 +1,7 @@
 use pyo3::{exceptions::PyValueError, pyfunction};
 use qcs_api_client_common::configuration::{
-    AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, OAuthSession,
-    RefreshToken,
+    AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, ClientCredentials,
+    ExternallyManaged, OAuthSession, RefreshToken,
 };
 use rigetti_pyo3::{
     create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_type,
@@ -19,7 +19,9 @@ create_init_submodule! {
         PyQcsClient,
         OAuthSession,
         AuthServer,
-        RefreshToken
+        RefreshToken,
+        ClientCredentials,
+        ExternallyManaged
     ],
     errors: [
         LoadClientError,

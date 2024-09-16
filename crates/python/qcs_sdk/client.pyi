@@ -1,4 +1,4 @@
-from typing import Optional, final
+from typing import Callable, Optional, final
 
 class LoadClientError(RuntimeError):
     """Error encountered while loading the QCS API client configuration from the environment configuration."""
@@ -69,7 +69,7 @@ class QCSClient:
 class OAuthSession:
     def __new__(
         cls,
-        grant_payload: RefreshToken,
+        grant_payload: RefreshToken | ClientCredentials | ExternallyManaged,
         auth_server: AuthServer,
         access_token: str | None = None,
     ) -> OAuthSession: ...
@@ -82,11 +82,17 @@ class OAuthSession:
 
     @property
     def auth_server(self) -> AuthServer:
-        """The refresh token."""
+        """The auth server."""
 
     @property
-    def payload(self) -> RefreshToken:
+    def payload(self) -> RefreshToken | ClientCredentials:
         """Get the payload used to request an access token."""
+
+    def request_access_token(self) -> str:
+        """Request a new access token."""
+
+    async def request_access_token_async(self) -> str:
+        """Request a new access token."""
 
     def validate(self) -> str:
         """Validate the current access token, returning it if it is valid.
@@ -118,3 +124,32 @@ class RefreshToken:
     @refresh_token.setter
     def refresh_token(self, refresh_token: str):
         """Set the refresh token."""
+
+@final
+class ClientCredentials:
+    def __new__(cls, client_id: str, client_secret: str) -> ClientCredentials: ...
+    @property
+    def client_id(self) -> str:
+        """The client ID."""
+    @property
+    def client_secret(self) -> str:
+        """The client secret."""
+
+@final
+class ExternallyManaged:
+    def __new__(
+        cls, refresh_function: Callable[[AuthServer], str]
+    ) -> ExternallyManaged:
+        """Manages access tokens by utilizing a user-provided refresh function.
+
+        The refresh function should return a valid access token, or raise an exception if it cannot.
+
+        .. testcode::
+            from qcs_apiclient_common.configuration import AuthServer, ExternallyManaged, OAuthSession
+
+            def refresh_function(auth_server: AuthServer) -> str:
+                return "my_access_token"
+
+            externally_managed = ExternallyManaged(refresh_function)
+            session = OAuthSession(externally_managed, AuthServer.default())
+        """
