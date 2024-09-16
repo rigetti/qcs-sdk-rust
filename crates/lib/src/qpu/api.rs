@@ -333,7 +333,7 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default, PartialEq)]
+#[derive(Builder, Clone, Debug, PartialEq)]
 pub struct ExecutionOptions {
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
     #[builder(default)]
@@ -344,6 +344,14 @@ pub struct ExecutionOptions {
     #[doc = "Options available when executing a job on a QPU, particular to the execution service's API."]
     #[builder(default = "None")]
     api_options: Option<InnerApiExecutionOptions>,
+}
+
+impl Default for ExecutionOptions {
+    fn default() -> Self {
+        ExecutionOptionsBuilder::default().build().expect(
+            "Should be able to derive a default set of the ExecutionOptions from the builder.",
+        )
+    }
 }
 
 impl Eq for ExecutionOptions {}
@@ -734,4 +742,19 @@ pub enum QpuApiError {
         /// identifier into a known status type.
         message: String,
     },
+}
+
+#[cfg(test)]
+mod test {
+    use crate::qpu::api::ExecutionOptions;
+
+    use super::ExecutionOptionsBuilder;
+
+    #[test]
+    fn test_default_execution_options() {
+        assert_eq!(
+            ExecutionOptions::default(),
+            ExecutionOptionsBuilder::default().build().unwrap(),
+        );
+    }
 }

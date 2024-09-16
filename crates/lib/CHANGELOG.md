@@ -1,3 +1,9 @@
+## 0.23.3-rc.0
+
+### Fixes
+
+- ExecutionOptions::default() now respects defaults used in ExecutionOptionsBuilder::default() (#499)
+
 ## 0.23.2
 
 ### Fixes
