@@ -31,8 +31,8 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      # may protect against linking failure: no space left on device
       - uses: syphar/restore-virtualenv@v1
+      # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
       - name: Run Rust CI

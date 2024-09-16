@@ -4,7 +4,7 @@ use qcs_api_client_openapi::models::{
 };
 use rigetti_pyo3::{
     create_init_submodule, py_function_sync_async, py_wrap_data_struct, py_wrap_error,
-    py_wrap_simple_enum,
+    py_wrap_union_enum,
     pyo3::{
         exceptions::{PyRuntimeError, PyValueError},
         prelude::*,
@@ -46,12 +46,13 @@ py_wrap_error!(isa, RustSerializeIsaError, SerializeISAError, PyValueError);
 wrap_error!(RustGetIsaError(qcs::qpu::GetIsaError));
 py_wrap_error!(isa, RustGetIsaError, GetISAError, PyRuntimeError);
 
-py_wrap_simple_enum! {
+py_wrap_union_enum! {
     PyFamily(Family) as "Family" {
-        None as NONE,
-        Full as Full,
-        Aspen as Aspen,
-        Ankaa as Ankaa
+        NONE: None,
+        Full: Full,
+        Aspen: Aspen,
+        Ankaa: Ankaa,
+        Unknown: Unknown => String
     }
 }
 
