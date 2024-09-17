@@ -1,7 +1,9 @@
 use std::time::Duration;
 
 use pyo3::{exceptions::PyRuntimeError, pyfunction, PyResult};
-use rigetti_pyo3::{create_init_submodule, py_wrap_error, wrap_error, ToPythonError};
+use rigetti_pyo3::{
+    create_init_submodule, py_function_sync_async, py_wrap_error, wrap_error, ToPythonError,
+};
 
 pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 
@@ -11,7 +13,6 @@ mod result_data;
 pub mod translation;
 
 use crate::client::PyQcsClient;
-use crate::py_sync::py_function_sync_async;
 
 use self::result_data::PyMemoryValues;
 

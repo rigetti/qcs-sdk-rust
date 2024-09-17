@@ -1,7 +1,8 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
+use crate::register_data::PyRegisterData;
+
 use super::{PyQvmOptions, RustQvmError};
-use crate::{py_sync::py_function_sync_async, register_data::PyRegisterData};
 
 use pyo3::{
     pymethods,
@@ -19,7 +20,7 @@ use qcs::{
     RegisterData,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_type,
+    create_init_submodule, impl_repr, py_function_sync_async, py_wrap_data_struct, py_wrap_type,
     pyo3::{pyfunction, PyResult},
     PyTryFrom, PyWrapper, PyWrapperMut, ToPythonError,
 };

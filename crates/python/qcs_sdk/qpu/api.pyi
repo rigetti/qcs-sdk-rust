@@ -434,10 +434,21 @@ class ConnectionStrategy:
     @staticmethod
     def gateway() -> ConnectionStrategy:
         """Connect through the publicly accessbile gateway."""
+    def is_gateway(self) -> bool:
+        """True if the ConnectionStrategy is to connect to the QCS gateway."""
     @staticmethod
     def direct_access() -> ConnectionStrategy:
         """Connect directly to the default endpoint, bypassing the gateway. Should only be used when you have
         direct network access and an active reservation."""
+    def is_direct_access(self) -> bool:
+        """True if the ConnectionStrategy is to use direct access."""
     @staticmethod
     def endpoint_id(endpoint_id: str) -> ConnectionStrategy:
         """Connect directly to a specific endpoint using its ID."""
+    def is_endpoint_id(self) -> bool:
+        """True if the ConnectionStrategy is to connect to a particular endpoint ID."""
+    def get_endpoint_id(self) -> str:
+        """Get the endpoint ID used by the ConnectionStrategy.
+
+        Raises an error if this ConnectionStrategy doesn't use a specific endpoint ID.
+        """

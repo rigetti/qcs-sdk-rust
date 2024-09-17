@@ -357,7 +357,7 @@ mod tests {
         serde_json::from_reader(File::open("tests/qvm_isa.json").unwrap()).unwrap()
     }
 
-    async fn rpcq_client() -> rpcq::Client {
+    fn rpcq_client() -> rpcq::Client {
         let qcs = Qcs::load();
         let endpoint = qcs.get_config().quilc_url();
         rpcq::Client::new(endpoint).unwrap()
@@ -366,7 +366,6 @@ mod tests {
     #[tokio::test]
     async fn compare_native_quil_to_expected_output() {
         let output = rpcq_client()
-            .await
             .compile_program(
                 "MEASURE 0",
                 TargetDevice::try_from(qvm_isa()).expect("Couldn't build target device from ISA"),
@@ -390,7 +389,6 @@ MEASURE 1 ro[1]
         let client = Qcs::load();
         let client = qvm::http::HttpClient::from(&client);
         let output = rpcq_client()
-            .await
             .compile_program(
                 BELL_STATE,
                 TargetDevice::try_from(aspen_9_isa())
@@ -426,7 +424,6 @@ MEASURE 1 ro[1]
     #[tokio::test]
     async fn test_compile_declare_only() {
         let output = rpcq_client()
-            .await
             .compile_program(
                 "DECLARE ro BIT[1]\n",
                 TargetDevice::try_from(aspen_9_isa())
@@ -440,7 +437,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn get_version_info_from_quilc() {
-        let rpcq_client = rpcq_client().await;
+        let rpcq_client = rpcq_client();
         let version = rpcq_client
             .get_version_info()
             .expect("Should get version info from quilc");
@@ -450,7 +447,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_conjugate_pauli_by_clifford() {
-        let rpcq_client = rpcq_client().await;
+        let rpcq_client = rpcq_client();
         let request = ConjugateByCliffordRequest {
             pauli: PauliTerm {
                 indices: vec![0],
@@ -473,7 +470,7 @@ MEASURE 1 ro[1]
 
     #[tokio::test]
     async fn test_generate_randomized_benchmark_sequence() {
-        let rpcq_client = rpcq_client().await;
+        let rpcq_client = rpcq_client();
         let request = RandomizedBenchmarkingRequest {
             depth: 2,
             qubits: 1,

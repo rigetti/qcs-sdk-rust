@@ -1,13 +1,15 @@
+use pyo3::{exceptions::PyValueError, pyfunction};
 use qcs_api_client_common::configuration::{
-    AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, Tokens,
+    AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, ClientCredentials,
+    ExternallyManaged, OAuthSession, RefreshToken,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_wrap_data_struct, py_wrap_error, py_wrap_type,
+    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_type,
     pyo3::{
-        conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods,
-        types::PyString, Py, PyObject, PyResult, Python,
+        conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods, PyObject,
+        PyResult, Python,
     },
-    wrap_error, ToPythonError,
+    wrap_error, PyWrapper, ToPythonError,
 };
 
 use qcs::client::{self, Qcs};
@@ -15,8 +17,11 @@ use qcs::client::{self, Qcs};
 create_init_submodule! {
     classes: [
         PyQcsClient,
-        PyQcsClientAuthServer,
-        PyQcsClientTokens
+        OAuthSession,
+        AuthServer,
+        RefreshToken,
+        ClientCredentials,
+        ExternallyManaged
     ],
     errors: [
         LoadClientError,
@@ -36,78 +41,12 @@ py_wrap_error!(
     PyRuntimeError
 );
 
-// The fields on qcs_api_client_common::client::AuthServer are not public.
-py_wrap_type!(
-    PyQcsClientAuthServer(AuthServer) as "QCSClientAuthServer"
-);
-
-#[pymethods]
-impl PyQcsClientAuthServer {
-    #[new]
-    #[pyo3(signature = (client_id = None, issuer = None))]
-    pub fn new(client_id: Option<String>, issuer: Option<String>) -> Self {
-        let mut auth_server = AuthServer::default();
-        if let Some(client_id) = client_id {
-            auth_server.set_client_id(client_id);
-        }
-        if let Some(issuer) = issuer {
-            auth_server.set_issuer(issuer);
-        }
-        Self(auth_server)
-    }
-
-    #[getter(client_id)]
-    fn get_client_id(&self) -> String {
-        self.0.client_id().to_string()
-    }
-
-    #[setter(client_id)]
-    fn set_client_id(&mut self, value: String) {
-        self.0.set_client_id(value);
-    }
-
-    #[getter(issuer)]
-    fn get_issuer(&self) -> String {
-        self.0.issuer().to_string()
-    }
-
-    #[setter(issuer)]
-    fn set_issuer(&mut self, value: String) {
-        self.0.set_issuer(value);
-    }
-}
-
-py_wrap_data_struct! {
-    PyQcsClientTokens(Tokens) as "QCSClientTokens" {
-        bearer_access_token: String => Py<PyString>,
-        refresh_token: String => Py<PyString>,
-        auth_server: AuthServer => PyQcsClientAuthServer
-    }
-}
-
-#[pymethods]
-impl PyQcsClientTokens {
-    #[new]
-    #[pyo3(signature = (bearer_access_token, refresh_token, auth_server = None))]
-    pub fn new(
-        bearer_access_token: String,
-        refresh_token: String,
-        auth_server: Option<PyQcsClientAuthServer>,
-    ) -> Self {
-        Self(Tokens {
-            bearer_access_token,
-            refresh_token,
-            auth_server: auth_server.map(Into::into).unwrap_or_default(),
-        })
-    }
-}
-
 py_wrap_type! {
     PyQcsClient(Qcs) as "QCSClient";
 }
 
 impl PyQcsClient {
-    pub(crate) fn get_or_create_client(client: Option<Self>) -> Qcs {
+    pub fn get_or_create_client(client: Option<Self>) -> Qcs {
         match client {
             Some(client) => client.into(),
             None => Qcs::load(),
@@ -126,30 +65,25 @@ impl PyQcsClient {
     #[new]
     #[pyo3(signature = (
         /,
-        tokens = None,
+        oauth_session = None,
         api_url = None,
-        auth_server = None,
         grpc_api_url = None,
         quilc_url = None,
         qvm_url = None
     ))]
     pub fn new(
-        tokens: Option<PyQcsClientTokens>,
+        oauth_session: Option<OAuthSession>,
         api_url: Option<String>,
-        auth_server: Option<PyQcsClientAuthServer>,
         grpc_api_url: Option<String>,
         quilc_url: Option<String>,
         qvm_url: Option<String>,
     ) -> PyResult<Self> {
         let mut builder = ClientConfigurationBuilder::default();
-        if let Some(tokens) = tokens {
-            builder.tokens(Some(tokens.into()));
+        if let Some(session) = oauth_session {
+            builder.oauth_session(Some(session));
         }
         if let Some(api_url) = api_url {
             builder.api_url(api_url);
-        }
-        if let Some(auth_server) = auth_server {
-            builder.auth_server(auth_server.into());
         }
         if let Some(grpc_api_url) = grpc_api_url {
             builder.grpc_api_url(grpc_api_url);
@@ -201,11 +135,24 @@ impl PyQcsClient {
         self.as_ref().get_config().qvm_url().to_string()
     }
 
+    #[getter]
+    pub fn oauth_session(&self, py: Python<'_>) -> PyResult<OAuthSession> {
+        py_get_oauth_session(py, self.clone())
+    }
+
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
         match op {
             CompareOp::Eq => (self == other).into_py(py),
             CompareOp::Ne => (self != other).into_py(py),
             _ => py.NotImplemented(),
         }
+    }
+}
+
+py_function_sync_async! {
+    #[pyfunction]
+    async fn get_oauth_session(client: PyQcsClient) -> PyResult<OAuthSession> {
+        client.as_inner().get_config().oauth_session().await.map_err(|e| PyValueError::new_err(e.to_string()))
+
     }
 }

@@ -19,11 +19,9 @@ use qcs_api_client_grpc::models::controller::{
     data_value, readout_values, ControllerJobExecutionResult,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
-    py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_function_sync_async,
+    py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
-
-use crate::py_sync::py_function_sync_async;
 
 use crate::client::PyQcsClient;
 
@@ -576,7 +574,7 @@ impl PyApiExecutionOptionsBuilder {
 }
 
 py_wrap_type! {
-    #[derive(Default)]
+    #[derive(Debug, Default)]
     #[pyo3(module = "qcs_sdk.qpu.api")]
     PyConnectionStrategy(ConnectionStrategy) as "ConnectionStrategy"
 }
@@ -595,14 +593,35 @@ impl PyConnectionStrategy {
         Self(ConnectionStrategy::Gateway)
     }
 
+    fn is_gateway(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::Gateway)
+    }
+
     #[staticmethod]
     fn direct_access() -> Self {
         Self(ConnectionStrategy::DirectAccess)
     }
 
+    fn is_direct_access(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::DirectAccess)
+    }
+
     #[staticmethod]
     fn endpoint_id(endpoint_id: String) -> PyResult<Self> {
         Ok(Self(ConnectionStrategy::EndpointId(endpoint_id)))
+    }
+
+    fn is_endpoint_id(&self) -> bool {
+        matches!(self.as_inner(), ConnectionStrategy::EndpointId(_))
+    }
+
+    fn get_endpoint_id(&self) -> PyResult<String> {
+        match self.as_inner() {
+            ConnectionStrategy::EndpointId(id) => Ok(id.clone()),
+            _ => Err(PyValueError::new_err(
+                "ConnectionStrategy is not an EndpointId",
+            )),
+        }
     }
 
     fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {

@@ -4,7 +4,7 @@ use opentelemetry::trace::FutureExt;
 use pyo3::{pyclass, FromPyObject};
 use qcs::{Error, Executable, ExecutionData, JobHandle, Service};
 use rigetti_pyo3::{
-    impl_as_mut_for_wrapper, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
+    impl_as_mut_for_wrapper, py_async, py_sync, py_wrap_error, py_wrap_simple_enum, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, pymethods, types::PyDict, Py, PyAny, PyResult, Python},
     wrap_error, PyWrapper, ToPython, ToPythonError,
 };
@@ -14,7 +14,6 @@ use tracing::instrument;
 use crate::{
     compiler::quilc::{PyCompilerOpts, PyQuilcClient},
     execution_data::PyExecutionData,
-    py_sync::{py_async, py_sync},
     qpu::{api::PyExecutionOptions, translation::PyTranslationOptions},
 };
 

@@ -3,6 +3,7 @@
 
 use std::{convert::TryFrom, fmt, time::Duration};
 
+use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::TokenError;
@@ -39,6 +40,7 @@ use crate::executable::Parameters;
 
 use crate::client::{GrpcClientError, GrpcConnection, Qcs};
 
+/// The maximum size of a gRPC response, in bytes.
 const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
 
 pub(crate) fn params_into_job_execution_configuration(
@@ -443,11 +445,21 @@ pub enum ConnectionStrategy {
     EndpointId(String),
 }
 
-/// Methods that help select and configure a controller service client given a set of
-/// [`ExecutionOptions`] and QPU ID.
-impl ExecutionOptions {
+/// An ExecutionTarget provides methods to establish the appropriate connection to the execution
+/// service.
+///
+/// Implementors provide a [`ConnectionStrategy`] and timeout, the trait provides default
+/// implementation for getting connections and execution targets.
+#[async_trait]
+pub trait ExecutionTarget<'a> {
+    /// The [`ConnectionStrategy`] to use to determine the connection target.
+    fn connection_strategy(&'a self) -> &'a ConnectionStrategy;
+    /// The timeout to use for requests to the target.
+    fn timeout(&self) -> Option<Duration>;
+
+    /// Get the [`execute_controller_job_request::Target`] for the given quantum processor ID.
     fn get_job_target(
-        &self,
+        &'a self,
         quantum_processor_id: Option<&str>,
     ) -> Option<execute_controller_job_request::Target> {
         match self.connection_strategy() {
@@ -460,8 +472,9 @@ impl ExecutionOptions {
         }
     }
 
+    /// Get the [`get_controller_job_results_request::Target`] for the given quantum processor ID.
     fn get_results_target(
-        &self,
+        &'a self,
         quantum_processor_id: Option<&str>,
     ) -> Option<get_controller_job_results_request::Target> {
         match self.connection_strategy() {
@@ -474,8 +487,9 @@ impl ExecutionOptions {
         }
     }
 
+    /// Get the [`cancel_controller_jobs_request::Target`] for the given quantum processor ID.
     fn get_cancel_target(
-        &self,
+        &'a self,
         quantum_processor_id: Option<&str>,
     ) -> Option<cancel_controller_jobs_request::Target> {
         match self.connection_strategy() {
@@ -488,9 +502,9 @@ impl ExecutionOptions {
         }
     }
 
-    /// Get a controller client for the given QPU ID.
-    pub async fn get_controller_client(
-        &self,
+    /// Get a controller client for the given quantum processor ID.
+    async fn get_controller_client(
+        &'a self,
         client: &Qcs,
         quantum_processor_id: Option<&str>,
     ) -> Result<ControllerClient<GrpcConnection>, QpuApiError> {
@@ -502,8 +516,8 @@ impl ExecutionOptions {
     }
 
     /// Get a GRPC connection to a QPU, without specifying the API to use.
-    pub async fn get_qpu_grpc_connection(
-        &self,
+    async fn get_qpu_grpc_connection(
+        &'a self,
         client: &Qcs,
         quantum_processor_id: Option<&str>,
     ) -> Result<GrpcConnection, QpuApiError> {
@@ -533,6 +547,7 @@ impl ExecutionOptions {
         self.grpc_address_to_channel(&address, client)
     }
 
+    /// Get a channel from the given gRPC address.
     fn grpc_address_to_channel(
         &self,
         address: &str,
@@ -548,6 +563,7 @@ impl ExecutionOptions {
         Ok(channel)
     }
 
+    /// Get the gateway address for the given quantum processor ID.
     async fn get_gateway_address(
         &self,
         quantum_processor_id: &str,
@@ -556,12 +572,26 @@ impl ExecutionOptions {
         get_accessor_with_cache(quantum_processor_id, client).await
     }
 
+    /// Get the default endpoint address for the given quantum processor ID.
     async fn get_default_endpoint_address(
         &self,
         quantum_processor_id: &str,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
         get_default_endpoint_with_cache(quantum_processor_id, client).await
+    }
+}
+
+/// Methods that help select and configure a controller service client given a set of
+/// [`ExecutionOptions`] and QPU ID.
+#[async_trait]
+impl<'a> ExecutionTarget<'a> for ExecutionOptions {
+    fn connection_strategy(&'a self) -> &'a ConnectionStrategy {
+        self.connection_strategy()
+    }
+
+    fn timeout(&self) -> Option<Duration> {
+        self.timeout()
     }
 }
 
@@ -698,7 +728,10 @@ pub enum QpuApiError {
         /// The message associated with the failed job.
         message: String,
     },
-
+    /// Error that can occur when the gRPC status code cannot be decoded.
+    #[error("The status code could not be decoded: {0}")]
+    StatusCodeDecode(String),
+    // just for the error type?
     /// Error that can occur if a numeric status identifier cannot be converted
     /// into a known status type.
     #[error("The request returned an invalid status: {status}. {message}")]

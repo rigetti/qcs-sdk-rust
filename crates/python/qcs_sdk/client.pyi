@@ -1,4 +1,4 @@
-from typing import Optional, final
+from typing import Callable, Optional, final
 
 class LoadClientError(RuntimeError):
     """Error encountered while loading the QCS API client configuration from the environment configuration."""
@@ -18,9 +18,8 @@ class QCSClient:
 
     def __new__(
         cls,
-        tokens: Optional[QCSClientTokens] = None,
+        oauth_session: Optional[OAuthSession] = None,
         api_url: Optional[str] = None,
-        auth_server: Optional[QCSClientAuthServer] = None,
         grpc_api_url: Optional[str] = None,
         quilc_url: Optional[str] = None,
         qvm_url: Optional[str] = None,
@@ -62,55 +61,95 @@ class QCSClient:
     def qvm_url(self) -> str:
         """URL to access the QVM."""
         ...
+    @property
+    def oauth_session(self) -> OAuthSession:
+        """Get a copy of the OAuth session."""
 
 @final
-class QCSClientAuthServer:
-    """Authentication server configuration for the QCS API."""
-
-    def __new__(cls, client_id: str, issuer: str) -> "QCSClientAuthServer":
-        """
-        Manually define authentication server parameters.
-
-        :param client_id: The OAuth application client ID. If `None`, a default value is used.
-        :param issuer: The OAuth token issuer url. If `None`, a default value is used.
-        """
-        ...
-    @property
-    def client_id(self) -> str: ...
-    @client_id.setter
-    def client_id(self, value: str): ...
-    @property
-    def issuer(self) -> str: ...
-    @issuer.setter
-    def issuer(self, value: str): ...
-
-@final
-class QCSClientTokens:
-    """Authentication tokens for the QCS API."""
-
+class OAuthSession:
     def __new__(
         cls,
-        bearer_access_token: str,
-        refresh_token: str,
-        auth_server: Optional[QCSClientAuthServer] = None,
-    ) -> "QCSClientTokens":
-        """
-        Manually define authentication session tokens.
+        grant_payload: RefreshToken | ClientCredentials | ExternallyManaged,
+        auth_server: AuthServer,
+        access_token: str | None = None,
+    ) -> OAuthSession: ...
+    @property
+    def access_token(self) -> str:
+        """Get the current access token.
 
-        :param bearer_access_token: The session token from an OAuth issuer.
-        :param refresh_token: A credential to refresh the bearer_access_token when it expires.
-        :param auth_server: The OAuth server configuration. If `None`, default values are loaded.
+        This is an unvalidated copy of the access token. Meaning it can become stale, or may already be stale. See the `validate` `request_access_token` and methods.
         """
-        ...
+
     @property
-    def bearer_access_token(self) -> Optional[str]: ...
-    @bearer_access_token.setter
-    def bearer_access_token(self, value: Optional[str]): ...
+    def auth_server(self) -> AuthServer:
+        """The auth server."""
+
     @property
-    def refresh_token(self) -> Optional[str]: ...
+    def payload(self) -> RefreshToken | ClientCredentials:
+        """Get the payload used to request an access token."""
+
+    def request_access_token(self) -> str:
+        """Request a new access token."""
+
+    async def request_access_token_async(self) -> str:
+        """Request a new access token."""
+
+    def validate(self) -> str:
+        """Validate the current access token, returning it if it is valid.
+
+        If the token is invalid, a `ValueError` will be raised with a description of why the token failed validation.
+        """
+
+@final
+class AuthServer:
+    def __new__(cls, client_id: str, issuer: str) -> AuthServer: ...
+    @staticmethod
+    def default() -> AuthServer:
+        """Get the default Okta auth server."""
+
+    @property
+    def client_id(self) -> str:
+        """The client's Okta ID."""
+
+    @property
+    def issuer(self) -> str:
+        """The Okta issuer URL."""
+
+@final
+class RefreshToken:
+    def __new__(cls, refresh_token: str) -> RefreshToken: ...
+    @property
+    def refresh_token(self) -> str:
+        """The refresh token."""
     @refresh_token.setter
-    def refresh_token(self, value: Optional[str]): ...
+    def refresh_token(self, refresh_token: str):
+        """Set the refresh token."""
+
+@final
+class ClientCredentials:
+    def __new__(cls, client_id: str, client_secret: str) -> ClientCredentials: ...
     @property
-    def auth_server(self) -> Optional[QCSClientAuthServer]: ...
-    @auth_server.setter
-    def auth_server(self, value: Optional[QCSClientAuthServer]): ...
+    def client_id(self) -> str:
+        """The client ID."""
+    @property
+    def client_secret(self) -> str:
+        """The client secret."""
+
+@final
+class ExternallyManaged:
+    def __new__(
+        cls, refresh_function: Callable[[AuthServer], str]
+    ) -> ExternallyManaged:
+        """Manages access tokens by utilizing a user-provided refresh function.
+
+        The refresh function should return a valid access token, or raise an exception if it cannot.
+
+        .. testcode::
+            from qcs_apiclient_common.configuration import AuthServer, ExternallyManaged, OAuthSession
+
+            def refresh_function(auth_server: AuthServer) -> str:
+                return "my_access_token"
+
+            externally_managed = ExternallyManaged(refresh_function)
+            session = OAuthSession(externally_managed, AuthServer.default())
+        """

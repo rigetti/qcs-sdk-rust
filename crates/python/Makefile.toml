@@ -1,53 +1,85 @@
 [env]
+PYTHONPATH = { script = [ "python -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())'" ] }
 RUST_BACKTRACE = 0
 
+[tasks.check-venv]
+description = "Check if a virtual environment is activated"
+script = [
+    '''
+    if [ -z "$VIRTUAL_ENV" ]; then
+        echo "No virtual environment activated. Please activate one."
+        exit 1
+    else
+        echo "Virtual environment is active."
+    fi
+    '''
+]
+
+[tasks.install-uv]
+dependencies = ["check-venv"]
+description = "Install dependencies using uv"
+command = "pip"
+args = ["install", "uv"]
+
+[tasks.install-deps]
+dependencies = ["install-uv"]
+description = "Install project dependencies using uv."
+script = [
+    '''
+    uv pip compile pyproject.toml --all-extras > requirements-dev.txt
+    uv pip install -r requirements-dev.txt
+    rm requirements-dev.txt
+    '''
+]
+
+[tasks.install-python-package]
+dependencies = ["check-venv", "install-deps"]
+description = "Build the python package and install to the active virtual environment."
+command = "maturin"
+args = ["develop"]
+
 [tasks.pre-test-docker-up]
-command = "docker"
-args = ["compose", "up", "-d"]
-
-[tasks.poetry-install]
-command = "poetry"
-args = ["install"]
-
-[tasks.install-lib]
-command = "poetry"
-args = ["run", "maturin", "develop"]
+script = [
+    '''
+    docker compose up -d || { echo 'Warning: `docker compose up` failed. Assuming QVM and quilc are running already.'; true; }
+    '''
+]
 
 [tasks.format-tracing-subscriber]
-command = "poetry"
-args = ["run", "black", "qcs_sdk/_tracing_subscriber"]
+command = "black"
+args = ["qcs_sdk/_tracing_subscriber"]
 
 [tasks.post-test]
-command = "docker"
-args = ["compose", "down"]
+script = [
+    '''
+    docker compose down || true
+    '''
+]
 
 [tasks.test]
-command = "poetry"
-args = ["run", "pytest", "tests"]
+command = "pytest"
+args = ["tests"]
 
 [tasks.test-session]
-command = "poetry"
-args = ["run", "pytest", "tests", "--with-qcs-session"]
+command = "pytest"
+args = ["tests", "--with-qcs-session"]
 
 [tasks.test-execution]
-command = "poetry"
-args = ["run", "pytest", "tests", "--with-qcs-session", "--with-qcs-execution"]
+command = "pytest"
+args = ["tests", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.pytest-flow]
 dependencies = [
     "pre-test-docker-up",
-    "poetry-install",
-    "install-lib",
+    "install-python-package",
     "format-tracing-subscriber",
     "test",
     "post-test",
 ]
 
 [tasks.stubtest]
-command = "poetry"
+command = "stubtest"
 args = [
-    "run",
-    "stubtest",
     "--allowlist",
     ".stubtest-allowlist",
     "--allowlist",
@@ -57,9 +89,8 @@ args = [
 
 [tasks.stubtest-flow]
 dependencies = [
-    "poetry-install",
-    "install-lib",
-    "fomat-tracing-subscriber",
+    "install-python-package",
+    "format-tracing-subscriber",
     "stubtest",
 ]
 
@@ -73,7 +104,7 @@ alias = "dev-flow"
 dependencies = ["pytest-flow", "stubtest"]
 
 [tasks.docs]
-dependencies = ["poetry-install", "install-lib"]
-command = "poetry"
-args = ["run", "pdoc", "-o", "build/docs", "qcs_sdk", "!qcs_sdk.qcs_sdk", "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg"]
+dependencies = ["install-python-package"]
+command = "pdoc"
+args = ["-o", "build/docs", "qcs_sdk", "!qcs_sdk.qcs_sdk", "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg"]
 
