@@ -1,3 +1,9 @@
+## 0.20.1-rc.0
+
+### Fixes
+
+- Bump qcs-api-client-rust versions (#500)
+
 ## 0.20.0
 
 ### Breaking Changes
