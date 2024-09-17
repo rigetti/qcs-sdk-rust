@@ -25,14 +25,14 @@ runs:
   - uses: actions/setup-python@v4
     with:
       python-version: "3.12"
-      architecture: ${{ inputs.python-architecture }} 
-  - name: Install Rust toolchain 
-    uses: actions-rs/toolchain@v1 
-    with: 
-      toolchain: stable 
+      architecture: ${{ inputs.python-architecture }}
+  - name: Install Rust toolchain
+    uses: actions-rs/toolchain@v1
+    with:
+      toolchain: stable
       target: ${{ inputs.rust-target }}
-      profile: minimal 
-      default: true 
+      profile: minimal
+      default: true
   - name: Patch package metadata for grpc-web
     shell: bash
     if: inputs.package-name == 'qcs-sdk-python-grpc-web'
@@ -66,8 +66,8 @@ runs:
     shell: bash
     run: |
       pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
-  - name: Upload wheels 
-    uses: actions/upload-artifact@v2 
-    with: 
+  - name: Upload wheels
+    uses: actions/upload-artifact@v3
+    with:
       name: wheels_${{ inputs.package-name }}
-      path: dist 
+      path: dist
