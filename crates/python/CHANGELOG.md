@@ -1,3 +1,13 @@
+## 0.20.0-rc.0
+
+### Breaking Changes
+
+- Make Python bindings public (#463)
+
+### Fixes
+
+- ExecutionOptions::default() now respects defaults used in ExecutionOptionsBuilder::default() (#499)
+
 ## 0.19.4-rc.0
 
 ### Fixes
