@@ -101,10 +101,10 @@
                                 <a class="variable" href="#Architecture.family">family</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Architecture.edges">edges</a>
+                                <a class="variable" href="#Architecture.nodes">nodes</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Architecture.nodes">nodes</a>
+                                <a class="variable" href="#Architecture.edges">edges</a>
                         </li>
                 </ul>
 
@@ -158,19 +158,19 @@
                     <a class="class" href="#Operation">Operation</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#Operation.parameters">parameters</a>
+                                <a class="variable" href="#Operation.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Operation.characteristics">characteristics</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Operation.name">name</a>
+                                <a class="variable" href="#Operation.node_count">node_count</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Operation.parameters">parameters</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Operation.sites">sites</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Operation.node_count">node_count</a>
                         </li>
                 </ul>
 
@@ -188,13 +188,13 @@
                                 <a class="variable" href="#InstructionSetArchitecture.name">name</a>
                         </li>
                         <li>
+                                <a class="variable" href="#InstructionSetArchitecture.benchmarks">benchmarks</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#InstructionSetArchitecture.architecture">architecture</a>
                         </li>
                         <li>
                                 <a class="variable" href="#InstructionSetArchitecture.instructions">instructions</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#InstructionSetArchitecture.benchmarks">benchmarks</a>
                         </li>
                 </ul>
 
@@ -571,19 +571,6 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Architecture.edges" class="classattr">
-                                <div class="attr variable">
-            <span class="name">edges</span><span class="annotation">: List[<a href="#Edge">Edge</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Architecture.edges"></a>
-    
-            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
-</div>
-
-
-                            </div>
                             <div id="Architecture.nodes" class="classattr">
                                 <div class="attr variable">
             <span class="name">nodes</span><span class="annotation">: List[<a href="#Node">Node</a>]</span>
@@ -593,6 +580,19 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
     <a class="headerlink" href="#Architecture.nodes"></a>
     
             <div class="docstring"><p>A list of all computational nodes in the instruction set architecture.</p>
+</div>
+
+
+                            </div>
+                            <div id="Architecture.edges" class="classattr">
+                                <div class="attr variable">
+            <span class="name">edges</span><span class="annotation">: List[<a href="#Edge">Edge</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Architecture.edges"></a>
+    
+            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
 </div>
 
 
@@ -780,15 +780,15 @@ obey the definition of node symmetry from the enclosing operation.</p>
 </div>
 
 
-                            <div id="Operation.parameters" class="classattr">
+                            <div id="Operation.name" class="classattr">
                                 <div class="attr variable">
-            <span class="name">parameters</span><span class="annotation">: List[<a href="#Parameter">Parameter</a>]</span>
+            <span class="name">name</span><span class="annotation">: str</span>
 
         
     </div>
-    <a class="headerlink" href="#Operation.parameters"></a>
+    <a class="headerlink" href="#Operation.name"></a>
     
-            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
+            <div class="docstring"><p>The name of the operation.</p>
 </div>
 
 
@@ -806,15 +806,28 @@ obey the definition of node symmetry from the enclosing operation.</p>
 
 
                             </div>
-                            <div id="Operation.name" class="classattr">
+                            <div id="Operation.node_count" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span><span class="annotation">: str</span>
+            <span class="name">node_count</span><span class="annotation">: Optional[int]</span>
 
         
     </div>
-    <a class="headerlink" href="#Operation.name"></a>
+    <a class="headerlink" href="#Operation.node_count"></a>
     
-            <div class="docstring"><p>The name of the operation.</p>
+            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
+</div>
+
+
+                            </div>
+                            <div id="Operation.parameters" class="classattr">
+                                <div class="attr variable">
+            <span class="name">parameters</span><span class="annotation">: List[<a href="#Parameter">Parameter</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Operation.parameters"></a>
+    
+            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
 </div>
 
 
@@ -829,19 +842,6 @@ obey the definition of node symmetry from the enclosing operation.</p>
     
             <div class="docstring"><p>The list of sites at which this operation can be applied,
 together with its site-dependent characteristics.</p>
-</div>
-
-
-                            </div>
-                            <div id="Operation.node_count" class="classattr">
-                                <div class="attr variable">
-            <span class="name">node_count</span><span class="annotation">: Optional[int]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Operation.node_count"></a>
-    
-            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
 </div>
 
 
@@ -935,6 +935,19 @@ the best native QUIL program for a desired task, and so are provided as part of 
 
 
                             </div>
+                            <div id="InstructionSetArchitecture.benchmarks" class="classattr">
+                                <div class="attr variable">
+            <span class="name">benchmarks</span><span class="annotation">: List[<a href="#Operation">Operation</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#InstructionSetArchitecture.benchmarks"></a>
+    
+            <div class="docstring"><p>The list of benchmarks that have characterized the quantum processor.</p>
+</div>
+
+
+                            </div>
                             <div id="InstructionSetArchitecture.architecture" class="classattr">
                                 <div class="attr variable">
             <span class="name">architecture</span><span class="annotation">: <a href="#Architecture">Architecture</a></span>
@@ -957,19 +970,6 @@ the best native QUIL program for a desired task, and so are provided as part of 
     <a class="headerlink" href="#InstructionSetArchitecture.instructions"></a>
     
             <div class="docstring"><p>The list of native QUIL instructions supported by the quantum processor.</p>
-</div>
-
-
-                            </div>
-                            <div id="InstructionSetArchitecture.benchmarks" class="classattr">
-                                <div class="attr variable">
-            <span class="name">benchmarks</span><span class="annotation">: List[<a href="#Operation">Operation</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#InstructionSetArchitecture.benchmarks"></a>
-    
-            <div class="docstring"><p>The list of benchmarks that have characterized the quantum processor.</p>
 </div>
 
 
