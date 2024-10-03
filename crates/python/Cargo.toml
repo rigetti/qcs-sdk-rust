@@ -20,7 +20,6 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 async-trait = "0.1.73"
 qcs = { path = "../lib", features = ["tracing-opentelemetry"] }
-qcs-api.workspace = true
 qcs-api-client-common = { workspace = true, features = ["python"] }
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true

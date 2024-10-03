@@ -3,7 +3,6 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api = "0.2.1"
 # XXX use release once available
 qcs-api-client-common = "0.11.0-rc.0"
 qcs-api-client-grpc = "0.11.0-rc.0"
