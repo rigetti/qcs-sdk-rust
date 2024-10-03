@@ -33,10 +33,7 @@ qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
-reqwest = { version = "0.11.20", default-features = false, features = [
-  "rustls-tls",
-  "json",
-] }
+reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_json.workspace = true
@@ -45,7 +42,7 @@ tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 toml = "0.7.3"
 tracing = { version = "0.1", optional = true, features = ["log"] }
 uuid = { version = "1.2.1", features = ["v4"] }
-tonic = { version = "0.11.0", features = ["tls", "tls-roots"] }
+tonic = { version = "0.12.3", features = ["tls", "tls-roots"] }
 zmq = { version = "0.10.0" }
 itertools = "0.11.0"
 derive_builder = "0.12.0"
