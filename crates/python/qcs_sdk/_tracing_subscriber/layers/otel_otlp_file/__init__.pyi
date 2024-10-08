@@ -32,3 +32,4 @@ class Config:
             and then `RUST_LOG` environment variable. If all of these values are empty, no spans will be exported.
         """
         ...
+

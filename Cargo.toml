@@ -3,10 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api = "0.2.1"
-qcs-api-client-common = "0.10.1"
-qcs-api-client-grpc = "0.10.1"
-qcs-api-client-openapi = "0.11.1"
+qcs-api-client-common = "0.11.1"
+qcs-api-client-grpc = "0.11.1"
+qcs-api-client-openapi = "0.12.1"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -25,11 +24,11 @@ quil-rs = { version = "0.28.1", git = "https://github.com/rigetti/quil-rs", tag 
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.20.0"
-pyo3 = { version = "0.20.0", features = ["extension-module"] }
-pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
+pyo3 = { version = "0.21.0", features = ["extension-module"] }
+pyo3-asyncio-0-21 = { version = "0.21", features = ["tokio-runtime"] }
 pyo3-log = { version = "0.8.2" }
-pyo3-opentelemetry = { version = "=0.3.2-dev.1" }
-pyo3-tracing-subscriber = { version = "=0.1.2-dev.1", default-features = true }
+pyo3-opentelemetry = { version = "0.3.4" }
+pyo3-tracing-subscriber = { version = "0.1.4", default-features = true }
 
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
@@ -42,3 +41,7 @@ rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["compl
 strip = true
 lto = true
 codegen-units = 1
+
+[patch.crates-io]
+# XXX TEMP
+rigetti-pyo3 = { git = "https://github.com/rigetti/rigetti-pyo3", branch = "update-pyo3" }
