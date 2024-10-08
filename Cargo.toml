@@ -27,8 +27,8 @@ numpy = "0.20.0"
 pyo3 = { version = "0.20.0", features = ["extension-module"] }
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-log = { version = "0.8.2" }
-pyo3-opentelemetry = { version = "=0.3.2-dev.1" }
-pyo3-tracing-subscriber = { version = "=0.1.2-dev.1", default-features = true }
+pyo3-opentelemetry = { version = "0.3" }
+pyo3-tracing-subscriber = { version = "0.1.4", default-features = true }
 
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
