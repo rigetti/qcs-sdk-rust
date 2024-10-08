@@ -42,6 +42,7 @@ tracing = { version = "0.1.37" }
 prost = "0.13.3"
 
 [build-dependencies]
+pyo3 = { workspace = true, features = ["multiple-pymethods"] }
 pyo3-build-config.workspace = true
 pyo3-tracing-subscriber = { workspace = true, features = ["layer-otel-otlp-file", "layer-otel-otlp", "stubs"], default-features = false }
 
