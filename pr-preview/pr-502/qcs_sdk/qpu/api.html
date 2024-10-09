@@ -71,10 +71,10 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.shape">shape</a>
@@ -137,13 +137,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -158,10 +158,10 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
@@ -437,19 +437,6 @@
     
 
                             </div>
-                            <div id="ExecutionResult.data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">data</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.data"></a>
-    
-            <div class="docstring"><p>Register data for this result.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.dtype" class="classattr">
                                 <div class="attr variable">
             <span class="name">dtype</span>
@@ -459,6 +446,19 @@
     <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
             <div class="docstring"><p>Name of the data type.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">data</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.data"></a>
+    
+            <div class="docstring"><p>Register data for this result.</p>
 </div>
 
 
@@ -682,6 +682,17 @@
     
 
                             </div>
+                            <div id="ExecutionOptions.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptions.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -700,17 +711,6 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptions.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
     
     
 
@@ -754,17 +754,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -772,6 +761,17 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
     
     
 
