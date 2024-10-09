@@ -39,3 +39,4 @@ class Config:
         :param json: Whether or not to format the output as JSON. Defaults to `True`.
         """
         ...
+
