@@ -1,3 +1,9 @@
+## 0.21.0
+
+### Breaking Changes
+
+- upgrade to http=1 (#502)
+
 ## 0.21.0-rc.0
 
 ### Breaking Changes

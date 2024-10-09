@@ -1,7 +1,7 @@
 [package]
 name = "qcs-sdk-python"
 description = "Python bindings to qcs-sdk-rust"
-version = "0.21.0-rc.0"
+version = "0.21.0"
 edition = "2021"
 license = "Apache-2.0"
 repository = "https://github.com/rigetti/qcs-sdk-rust"
