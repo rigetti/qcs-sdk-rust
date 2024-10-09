@@ -2250,7 +2250,7 @@ dependencies = [
  "opentelemetry 0.25.0",
  "opentelemetry-proto",
  "opentelemetry_sdk 0.25.0",
- "prost 0.13.3",
+ "prost",
  "thiserror",
  "tokio",
  "tonic",
@@ -2265,7 +2265,7 @@ dependencies = [
  "hex",
  "opentelemetry 0.25.0",
  "opentelemetry_sdk 0.25.0",
- "prost 0.13.3",
+ "prost",
  "serde",
  "tonic",
 ]
@@ -2386,26 +2386,14 @@ dependencies = [
 
 [[package]]
 name = "pbjson-build"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2580e33f2292d34be285c5bc3dba5259542b083cfad6037b6d70345f24dcb735"
-dependencies = [
- "heck 0.4.1",
- "itertools 0.11.0",
- "prost 0.12.6",
- "prost-types 0.12.6",
-]
-
-[[package]]
-name = "pbjson-build"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6eea3058763d6e656105d1403cb04e0a41b7bbac6362d413e7c33be0c32279c9"
 dependencies = [
  "heck 0.5.0",
  "itertools 0.13.0",
- "prost 0.13.3",
- "prost-types 0.13.3",
+ "prost",
+ "prost-types",
 ]
 
 [[package]]
@@ -2417,9 +2405,9 @@ dependencies = [
  "bytes",
  "chrono",
  "pbjson",
- "pbjson-build 0.7.0",
- "prost 0.13.3",
- "prost-build 0.13.3",
+ "pbjson-build",
+ "prost",
+ "prost-build",
  "serde",
 ]
 
@@ -2613,43 +2601,12 @@ dependencies = [
 
 [[package]]
 name = "prost"
-version = "0.12.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "deb1435c188b76130da55f17a466d252ff7b1418b2ad3e037d127b94e3411f29"
-dependencies = [
- "bytes",
- "prost-derive 0.12.6",
-]
-
-[[package]]
-name = "prost"
 version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7b0487d90e047de87f984913713b85c601c05609aad5b0df4b4573fbf69aa13f"
 dependencies = [
  "bytes",
- "prost-derive 0.13.3",
-]
-
-[[package]]
-name = "prost-build"
-version = "0.12.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
-dependencies = [
- "bytes",
- "heck 0.5.0",
- "itertools 0.12.1",
- "log",
- "multimap",
- "once_cell",
- "petgraph",
- "prettyplease",
- "prost 0.12.6",
- "prost-types 0.12.6",
- "regex",
- "syn 2.0.66",
- "tempfile",
+ "prost-derive",
 ]
 
 [[package]]
@@ -2666,24 +2623,11 @@ dependencies = [
  "once_cell",
  "petgraph",
  "prettyplease",
- "prost 0.13.3",
- "prost-types 0.13.3",
+ "prost",
+ "prost-types",
  "regex",
  "syn 2.0.66",
  "tempfile",
-]
-
-[[package]]
-name = "prost-derive"
-version = "0.12.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81bddcdb20abf9501610992b6759a4c888aef7d1a7247ef75e2404275ac24af1"
-dependencies = [
- "anyhow",
- "itertools 0.12.1",
- "proc-macro2",
- "quote",
- "syn 2.0.66",
 ]
 
 [[package]]
@@ -2701,20 +2645,11 @@ dependencies = [
 
 [[package]]
 name = "prost-types"
-version = "0.12.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9091c90b0a32608e984ff2fa4091273cbdd755d54935c51d520887f4a1dbd5b0"
-dependencies = [
- "prost 0.12.6",
-]
-
-[[package]]
-name = "prost-types"
 version = "0.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4759aa0d3a6232fb8dbdb97b61de2c20047c68aca932c7ed76da9d788508d670"
 dependencies = [
- "prost 0.13.3",
+ "prost",
 ]
 
 [[package]]
@@ -2913,9 +2848,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49c355ac12ecda97ae264f082bad03fff35acbef59c1d0859530994ab57b7212"
+checksum = "19ef35a894a327744208a8cf7a63b20bfa65d568ecdbbc81ed970ca2cc4f4e58"
 dependencies = [
  "async-trait",
  "backoff",
@@ -2945,9 +2880,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6666cdac3ff3fe9e0e5e0d91b785d9d4215421e5450ae473a5b415c3bd2673c3"
+checksum = "16dbb79a3ad6b08ed995c682c7ede40d7ccf3169357f4ddf049b1c721775d9d7"
 dependencies = [
  "backoff",
  "futures-util",
@@ -2962,10 +2897,10 @@ dependencies = [
  "opentelemetry-http",
  "opentelemetry_sdk 0.24.1",
  "pbjson",
- "pbjson-build 0.6.2",
+ "pbjson-build",
  "pbjson-types",
- "prost 0.13.3",
- "prost-build 0.12.6",
+ "prost",
+ "prost-build",
  "qcs-api-client-common",
  "serde",
  "thiserror",
@@ -2984,9 +2919,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.12.1"
+version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfbd1d3e9709df779914f5513943d129a2b2278cc238c51e26610c8223ae2cba"
+checksum = "88eb6968cb54255917725ddb818f737fe9582082b60510b4a5af0daf295a56b7"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -3013,7 +2948,7 @@ dependencies = [
  "opentelemetry 0.23.0",
  "opentelemetry_sdk 0.23.0",
  "paste",
- "prost 0.13.3",
+ "prost",
  "pyo3",
  "pyo3-asyncio",
  "pyo3-build-config 0.20.3",
@@ -4237,7 +4172,7 @@ dependencies = [
  "hyper-util",
  "percent-encoding",
  "pin-project",
- "prost 0.13.3",
+ "prost",
  "rustls-native-certs 0.8.0",
  "rustls-pemfile",
  "socket2",
@@ -4252,13 +4187,14 @@ dependencies = [
 
 [[package]]
 name = "tonic-build"
-version = "0.11.0"
+version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be4ef6dd70a610078cb4e338a0f79d06bc759ff1b22d2120c2ff02ae264ba9c2"
+checksum = "9557ce109ea773b399c9b9e5dca39294110b74f1f342cb347a80d1fce8c26a11"
 dependencies = [
  "prettyplease",
  "proc-macro2",
- "prost-build 0.12.6",
+ "prost-build",
+ "prost-types",
  "quote",
  "syn 2.0.66",
 ]
