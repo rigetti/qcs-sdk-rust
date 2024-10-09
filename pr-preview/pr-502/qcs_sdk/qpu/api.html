@@ -86,13 +86,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                 </ul>
 
@@ -140,10 +140,10 @@
                                 <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -161,10 +161,10 @@
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -489,15 +489,15 @@
     
     
 
-                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
+                            <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
-            <span class="name">execution_duration_microseconds</span>
+            <span class="name">buffers</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
+    <a class="headerlink" href="#ExecutionResults.buffers"></a>
     
-            <div class="docstring"><p>QPU execution duration.</p>
+            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
 </div>
 
 
@@ -513,15 +513,15 @@
     
 
                             </div>
-                            <div id="ExecutionResults.buffers" class="classattr">
+                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
                                 <div class="attr variable">
-            <span class="name">buffers</span>
+            <span class="name">execution_duration_microseconds</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.buffers"></a>
+    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
     
-            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
+            <div class="docstring"><p>QPU execution duration.</p>
 </div>
 
 
@@ -693,17 +693,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptions.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -711,6 +700,17 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
     
     
 
@@ -765,17 +765,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -783,6 +772,17 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
