@@ -33,3 +33,4 @@ jobs:
           toolchain: stable
           override: true
       - run: cargo publish --manifest-path=crates/lib/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+      - run: cargo publish --manifest-path=crates/python/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
