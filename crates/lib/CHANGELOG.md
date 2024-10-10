@@ -1,3 +1,9 @@
+## 0.25.1
+
+### Fixes
+
+- publish Python library to crates.io (#505)
+
 ## 0.25.1-rc.0
 
 ### Fixes
