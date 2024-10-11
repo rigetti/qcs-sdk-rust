@@ -8,6 +8,8 @@ on:
 jobs:
   release-dry-run:
     runs-on: ubuntu-latest
+    env:
+      CXXFLAGS: "-std=c++11"
     steps:
       - uses: actions/checkout@v3
         with:
@@ -21,3 +23,14 @@ jobs:
         run: knope release --dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
+      - name: Install protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: '3.20.1'
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+      - run: cargo publish --dry-run --manifest-path=crates/lib/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+      - run: cargo publish --dry-run --manifest-path=crates/python/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
