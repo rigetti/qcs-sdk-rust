@@ -49,6 +49,10 @@
 //! crate allows you to run Quil programs against real QPUs or a QVM
 //! using [`Executable`].
 
+// Re-export quil_rs so that all downstream crates can ensure that they are
+// using the same version.
+pub use quil_rs;
+
 pub use executable::{Error, Executable, ExecutionResult, JobHandle, Service};
 pub use execution_data::{
     ExecutionData, RegisterMap, RegisterMatrix, RegisterMatrixConversionError, ResultData,
