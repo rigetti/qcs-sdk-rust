@@ -1,3 +1,9 @@
+## 0.21.2
+
+### Fixes
+
+- re-export quil-rs so that downstream crates can avoid version conflicts (#508)
+
 ## 0.21.2-rc.0
 
 ### Fixes
