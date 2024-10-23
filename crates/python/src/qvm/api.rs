@@ -117,15 +117,15 @@ impl PyMultishotRequest {
     }
 
     #[getter]
-    pub fn trials(&self) -> u16 {
+    pub fn trials(&self) -> u32 {
         self.as_inner().trials.get()
     }
 
     #[setter]
-    pub fn set_trials(&mut self, trials: u16) -> PyResult<()> {
+    pub fn set_trials(&mut self, trials: u32) -> PyResult<()> {
         // `NonZeroU32` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
         // as a method argument, even when combined with a `from_py_with` attribute.
-        self.as_inner_mut().trials = crate::from_py::try_from_u16_to_non_zero_u16(trials)?;
+        self.as_inner_mut().trials = crate::from_py::try_from_u32_to_non_zero_u32(trials)?;
         Ok(())
     }
 }
@@ -189,7 +189,7 @@ impl PyMultishotMeasureRequest {
     }
 
     #[getter]
-    pub fn trials(&self) -> u16 {
+    pub fn trials(&self) -> u32 {
         self.as_inner().trials.get()
     }
 
