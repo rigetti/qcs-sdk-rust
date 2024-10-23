@@ -164,15 +164,15 @@ impl<'a> Execution<'a> {
         &mut self,
         options: Option<TranslationOptions>,
     ) -> Result<EncryptedTranslationResult, Error> {
-        let encrpyted_translation_result = translate(
+        let encrypted_translation_result = translate(
             self.quantum_processor_id.as_ref(),
             &self.program.to_quil()?,
-            self.shots.get().into(),
+            self.shots.get(),
             self.client.as_ref(),
             options,
         )
         .await?;
-        Ok(encrpyted_translation_result)
+        Ok(encrypted_translation_result)
     }
 
     /// Run on a real QPU and wait for the results.
