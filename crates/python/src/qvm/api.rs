@@ -1,4 +1,4 @@
-use std::{collections::HashMap, num::NonZeroU16};
+use std::{collections::HashMap, num::NonZeroU32};
 
 use crate::register_data::PyRegisterData;
 
@@ -100,7 +100,7 @@ impl PyMultishotRequest {
     pub fn new(
         py: Python<'_>,
         program: String,
-        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")] shots: NonZeroU16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u32")] shots: NonZeroU32,
         addresses: HashMap<String, PyAddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -123,7 +123,7 @@ impl PyMultishotRequest {
 
     #[setter]
     pub fn set_trials(&mut self, trials: u16) -> PyResult<()> {
-        // `NonZeroU16` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
+        // `NonZeroU32` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
         // as a method argument, even when combined with a `from_py_with` attribute.
         self.as_inner_mut().trials = crate::from_py::try_from_u16_to_non_zero_u16(trials)?;
         Ok(())
@@ -172,7 +172,7 @@ impl PyMultishotMeasureRequest {
     #[new]
     pub fn new(
         program: String,
-        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")] shots: NonZeroU16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u32")] shots: NonZeroU32,
         qubits: Vec<u64>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -194,10 +194,10 @@ impl PyMultishotMeasureRequest {
     }
 
     #[setter]
-    pub fn set_trials(&mut self, trials: u16) -> PyResult<()> {
-        // `NonZeroU16` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
+    pub fn set_trials(&mut self, trials: u32) -> PyResult<()> {
+        // `NonZeroU32` doesn't implement `PyClass`, so `pyo3` doesn't allow it to be used
         // as a method argument, even when combined with a `from_py_with` attribute.
-        self.as_inner_mut().trials = crate::from_py::try_from_u16_to_non_zero_u16(trials)?;
+        self.as_inner_mut().trials = crate::from_py::try_from_u32_to_non_zero_u32(trials)?;
         Ok(())
     }
 }

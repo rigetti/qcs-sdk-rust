@@ -174,7 +174,7 @@ mod test {
     use qcs_api_client_openapi::models::InstructionSetArchitecture;
     use quil_rs::quil::Quil;
     use regex::Regex;
-    use std::{collections::HashMap, fs::File, num::NonZeroU16};
+    use std::{collections::HashMap, fs::File, num::NonZeroU32};
 
     const EXPECTED_H0_OUTPUT: &str = "MEASURE 0\n";
 
@@ -231,7 +231,7 @@ MEASURE 1 ro[1]
         let mut results = qvm::Execution::new(&output.program.to_quil_or_debug())
             .unwrap()
             .run(
-                NonZeroU16::new(10).expect("value is non-zero"),
+                NonZeroU32::new(10).expect("value is non-zero"),
                 [("ro".to_string(), AddressRequest::IncludeAll)]
                     .iter()
                     .cloned()

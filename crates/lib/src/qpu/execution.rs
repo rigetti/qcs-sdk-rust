@@ -2,7 +2,7 @@
 
 use std::borrow::Cow;
 use std::convert::TryFrom;
-use std::num::NonZeroU16;
+use std::num::NonZeroU32;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -35,7 +35,7 @@ use crate::compiler::quilc::{self, CompilerOpts, TargetDevice};
 pub(crate) struct Execution<'a> {
     program: Program,
     pub(crate) quantum_processor_id: Cow<'a, str>,
-    pub(crate) shots: NonZeroU16,
+    pub(crate) shots: NonZeroU32,
     client: Arc<Qcs>,
 }
 
@@ -119,7 +119,7 @@ impl<'a> Execution<'a> {
     ///     for the QPU or that there is a bug in this library.
     pub(crate) async fn new(
         quil: Arc<str>,
-        shots: NonZeroU16,
+        shots: NonZeroU32,
         quantum_processor_id: Cow<'a, str>,
         client: Arc<Qcs>,
         quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
