@@ -12,6 +12,7 @@
 
 from __future__ import annotations
 from typing import Dict, Optional, TYPE_CHECKING, final
+from qcs_sdk._tracing_subscriber.common import InstrumentationLibrary
 
 @final
 class SpanLimits:
@@ -47,6 +48,8 @@ class Resource:
         schema_url: Optional[str] = None,
     ) -> "Resource": ...
 
+
+
 @final
 class Config:
     """
@@ -68,6 +71,7 @@ class Config:
         timeout_millis: Optional[int] = None,
         pre_shutdown_timeout_millis: Optional[int] = 2000,
         filter: Optional[str] = None,
+        instrumentation_library: Optional[InstrumentationLibrary] = None,
     ) -> "Config":
         """
         Initializes a new `Config`.
@@ -92,18 +96,19 @@ class Config:
 
             If not specified, this will first check the `PYO3_TRACING_SUBSCRIBER_ENV_FILTER` environment variable
             and then `RUST_LOG` environment variable. If all of these values are empty, no spans will be exported.
+        :param instrumentation_library: Information about the library providing the tracing instrumentation.
         """
         ...
 
 if TYPE_CHECKING:
-    from typing import List, Union
+    from typing import List, Union 
 
     ResourceValueArray = Union[List[bool], List[int], List[float], List[str]]
     """
     An array of `ResourceValue`s. This array is homogenous, so all values must be of the same type.
     """
 
-    ResourceValue = Union[bool, int, float, str, ResourceValueArray]
+    ResourceValue= Union[bool, int, float, str, ResourceValueArray]
     """
     A value that can be added to a `Resource`.
     """

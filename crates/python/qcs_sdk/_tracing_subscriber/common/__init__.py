@@ -10,16 +10,9 @@
 # * next time the code is generated.                                          *
 # *****************************************************************************
 
-from typing import final
+from qcs_sdk._tracing_subscriber import common
 
-from .. import layers
 
-@final
-class Config:
-    """
-    Configuration for the tracing subscriber. Currently, this only requires a single layer to be
-    set on the `tracing_subscriber::Registry`.
-    """
-
-    def __new__(cls, *, layer: layers.Config) -> "Config": ...
+__doc__ = common.__doc__
+__all__ = getattr(common, "__all__", [])
 

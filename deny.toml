@@ -64,14 +64,12 @@ feature-depth = 1
 # https://embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2023-0052", reason = "Introduced by transitive dependency `webpki`. `hyper-proxy`, then `qcs-api-client-rust` need to update in order to remove" },
-    # { id = "RUSTSEC-2024-0320", reason = "yaml-rust is an unmaintained crate introduced by dev-dependency insta" },
-    { id = "RUSTSEC-2024-0336", reason = "introduced by hyper, a transitive dependency of qcs-api-client-grpc" },
-    { id = "RUSTSEC-2023-0055", reason = "introduced by lexical, a transitive dependency of quil-rs" },
     { id = "RUSTSEC-2021-0145", reason = "introduced by atty, a transitive dependency of multiple dependencies, with no upgrade path" },
+    { id = "RUSTSEC-2024-0375", reason = "introduced by atty, a transitive dependency of multiple dependencies, with no upgrade path" },
     { id = "RUSTSEC-2024-0006", reason = "introduced by shlex, a transitive dependency of bindgen with no upgrade path" },
     { id = "RUSTSEC-2021-0139", reason = "ansi_term is unmaintained, but used by clap" },
 ]
+yanked = "deny"
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
 # If this is false, then it uses a built-in git library.
 # Setting this to true can be helpful if you have special authentication requirements that cargo-deny does not support.
@@ -174,29 +172,6 @@ deny = [
     #{ crate = "ansi_term@0.11.0", wrappers = ["this-crate-directly-depends-on-ansi_term"] },
 ]
 
-# List of features to allow/deny
-# Each entry the name of a crate and a version range. If version is
-# not specified, all versions will be matched.
-#[[bans.features]]
-#crate = "reqwest"
-# Features to not allow
-#deny = ["json"]
-# Features to allow
-#allow = [
-#    "rustls",
-#    "__rustls",
-#    "__tls",
-#    "hyper-rustls",
-#    "rustls",
-#    "rustls-pemfile",
-#    "rustls-tls-webpki-roots",
-#    "tokio-rustls",
-#    "webpki-roots",
-#]
-# If true, the allowed features must exactly match the enabled feature set. If
-# this is set there is no point setting `deny`
-#exact = true
-
 # Certain crates/versions that will be skipped when doing duplicate detection.
 skip = [
     #"ansi_term@0.11.0",
@@ -212,7 +187,6 @@ skip-tree = [
     { crate = "toml", depth = 20 },
     { crate = "warp", depth = 20 },              # Only used for development
     { crate = "hermit-abi", depth = 20 },        # Only used for development
-    { crate = "hyper-rustls", depth = 20 },      # `hyper-proxy` relies on an older version than `reqwest`
     { crate = "itertools", depth = 20 },         # `quil-rs` and various transitive dependencies depend on different versions
     { crate = "hashbrown", depth = 20 },         # `indexmap` and `cached` depend on different versions
 ]

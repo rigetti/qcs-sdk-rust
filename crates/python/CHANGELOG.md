@@ -1,3 +1,51 @@
+## 0.21.2
+
+### Fixes
+
+- re-export quil-rs so that downstream crates can avoid version conflicts (#508)
+
+## 0.21.2-rc.0
+
+### Fixes
+
+- re-export quil-rs so that downstream crates can avoid version conflicts (#508)
+
+## 0.21.1
+
+### Fixes
+
+- publish Python library to crates.io (#505)
+
+## 0.21.1-rc.0
+
+### Fixes
+
+- publish Python library to crates.io (#505)
+
+## 0.21.0
+
+### Breaking Changes
+
+- upgrade to http=1 (#502)
+
+## 0.21.0-rc.0
+
+### Breaking Changes
+
+- upgrade to http=1 (#502)
+
+## 0.20.1
+
+### Fixes
+
+- Bump qcs-api-client-rust versions (#500)
+
+## 0.20.1-rc.0
+
+### Fixes
+
+- Bump qcs-api-client-rust versions (#500)
+
 ## 0.20.0
 
 ### Breaking Changes
