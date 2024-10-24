@@ -80,7 +80,7 @@ impl crate::qvm::Client for Client {
         let result = libquil_sys::qvm::multishot(
             &program,
             addresses,
-            i32::from(request.trials.get()),
+            request.trials.get(),
             request.gate_noise,
             request.measurement_noise,
             request.rng_seed,
@@ -147,7 +147,7 @@ impl crate::qvm::Client for Client {
         let result = libquil_sys::qvm::multishot_measure(
             &program,
             qubits.as_slice(),
-            i32::from(request.trials.get()),
+            request.trials.get(),
             request.rng_seed,
         )
         .map_err(Error::LibquilSysQvm)?;
