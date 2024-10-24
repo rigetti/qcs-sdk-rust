@@ -9,7 +9,7 @@ use rigetti_pyo3::{
     pyo3::{exceptions::PyRuntimeError, prelude::*, Python},
     wrap_error, PyTryFrom, PyWrapper, PyWrapperMut, ToPython, ToPythonError,
 };
-use std::num::NonZeroU16;
+use std::num::NonZeroU32;
 use std::{collections::HashMap, time::Duration};
 
 use crate::register_data::PyRegisterData;
@@ -249,8 +249,8 @@ py_function_sync_async! {
     #[tracing::instrument(skip_all)]
     async fn run(
         quil: String,
-        #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]
-        shots: NonZeroU16,
+        #[pyo3(from_py_with = "crate::from_py::non_zero_u32")]
+        shots: NonZeroU32,
         addresses: HashMap<String, PyAddressRequest>,
         params: HashMap<String, Vec<f64>>,
         client: PyQvmClient,

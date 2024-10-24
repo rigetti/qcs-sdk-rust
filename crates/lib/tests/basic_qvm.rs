@@ -1,7 +1,7 @@
 //! These are the integration tests for [`qcs::Executable::execute_on_qvm`].
 //! In order to run them, QVM's web server must be running at localhost:5000.
 
-use std::num::NonZeroU16;
+use std::num::NonZeroU32;
 
 use qcs::{client::Qcs, compiler::rpcq, qvm, Executable};
 
@@ -29,7 +29,7 @@ async fn qvm_client() -> qvm::http::HttpClient {
 
 #[tokio::test]
 async fn test_bell_state() {
-    let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
+    let shots: NonZeroU32 = NonZeroU32::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
         .with_quilc_client(Some(quilc_client().await))
