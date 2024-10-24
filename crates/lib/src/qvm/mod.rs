@@ -1,7 +1,13 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{collections::HashMap, num::NonZeroU32, str::FromStr, sync::Arc, time::Duration};
+use std::{
+    collections::HashMap,
+    num::{NonZeroU32, TryFromIntError},
+    str::FromStr,
+    sync::Arc,
+    time::Duration,
+};
 
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
@@ -275,6 +281,8 @@ pub enum Error {
     ToQuil(#[from] ToQuilError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
+    #[error("Requested shot count exceeds QVM limit.")]
+    ShotCountOverflow(#[from] TryFromIntError),
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
     RegionSizeMismatch {
         name: String,

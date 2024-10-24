@@ -732,6 +732,7 @@ impl From<qvm::Error> for Error {
             qvm::Error::ToQuil(q) => Self::ToQuil(q),
             qvm::Error::Parsing(_)
             | qvm::Error::ShotsMustBePositive
+            | qvm::Error::ShotCountOverflow(_)
             | qvm::Error::RegionSizeMismatch { .. }
             | qvm::Error::RegionNotFound { .. }
             | qvm::Error::Qvm { .. } => Self::Compilation(format!("{err}")),
