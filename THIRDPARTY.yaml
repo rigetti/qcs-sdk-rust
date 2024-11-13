@@ -7969,6 +7969,8 @@ third_party_libraries:
       LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
       OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
       SOFTWARE.
+  - license: Apache-2.0
+    text: NOT FOUND
 - package_name: idna
   package_version: 1.0.0
   repository: https://github.com/servo/rust-url/

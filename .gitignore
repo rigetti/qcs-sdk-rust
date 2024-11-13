@@ -37,3 +37,6 @@ crates/python/tests/__output__/
 
 # unversioned developer notes
 scratch/
+
+# un-consolidated updates to THIRDPARTY license data
+/THIRDPARTY-update.yaml
