@@ -1,5 +1,20 @@
-# TO BE RESOLVED MANUALLY
+# Open questions
 
+## license file links to license text but doesn't include it
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MPL-2.0 license in webpki-roots:0.26.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-roots-0.26.3/Cargo.toml
+```
+
+# Resolved:
+
+## Manually-checked licenses that were already correct
+
+### Apache-2.0
+
+In some cases, MIT/Apache licenses were combined into a single `LICENSE` file.
+
+```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in anyhow:1.0.86 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/anyhow-1.0.86/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in async-trait:0.1.80 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-trait-0.1.80/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in chrono:0.4.38 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.38/Cargo.toml
@@ -36,56 +51,43 @@
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in uncased:0.9.10 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/uncased-0.9.10/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in unicode-ident:1.0.12 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unicode-ident-1.0.12/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for Apache-2.0 license in unindent:0.2.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unindent-0.2.3/Cargo.toml
+```
+
+### ISC
+
+```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for ISC license in untrusted:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/untrusted-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for ISC license in rustls-webpki:0.102.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-webpki-0.102.4/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for License specified in file ($CARGO_HOME/registry/src/index.crates.io-6f17d22bba15001f/webpki-0.22.4/LICENSE) license in webpki:0.22.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-0.22.4/Cargo.toml
+```
+
+For `webpki`, the license type was not automatically detected.
+
+### MIT
+
+One common cause of issues with MIT was the use of multiple separate Copyright
+lines. (TODO: open a bundle-licenses issue for this.) Another reason was two
+copies of the _entire license text_ (including the copyright), as seen for
+`async-stream`.
+
+
+```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in matrixmultiply:0.3.8 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/matrixmultiply-0.3.8/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in nu-ansi-term:0.46.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/nu-ansi-term-0.46.0/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in sha1:0.10.6 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/sha1-0.10.6/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in strsim:0.10.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strsim-0.10.0/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in strsim:0.11.1 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/strsim-0.11.1/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level SEMI for MIT license in uuid:1.10.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/uuid-1.10.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for Apache-2.0 license in ident_case:1.0.1 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ident_case-1.0.1/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for BSD-3-Clause license in matchit:0.7.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/matchit-0.7.3/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for BSD-3-Clause license in matchit:0.8.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/matchit-0.8.4/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for ISC license in rustls-webpki:0.102.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/rustls-webpki-0.102.4/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MIT license in async-stream-impl:0.3.5 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-stream-impl-0.3.5/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MIT license in async-stream:0.3.5 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-stream-0.3.5/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MIT license in chrono:0.4.38 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/chrono-0.4.38/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MPL-2.0 license in webpki-roots:0.26.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-roots-0.26.3/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pear:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear-0.2.9/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pear_codegen:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear_codegen-0.2.9/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-opentelemetry-macros:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-macros-0.3.4/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-opentelemetry:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-0.3.4/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-tracing-subscriber:0.1.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-tracing-subscriber-0.1.4/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in qcs-api-client-common:0.11.2 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/qcs-api-client-common-0.11.2/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in qcs-api-client-grpc:0.11.2 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/qcs-api-client-grpc-0.11.2/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-char-property:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-property-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-char-range:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-range-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-common:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-common-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-ucd-ident:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-ident-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-ucd-version:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-version-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in wide:0.7.26 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.26/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in winapi-i686-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-i686-pc-windows-gnu-0.4.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in winapi-x86_64-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-x86_64-pc-windows-gnu-0.4.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in zmq-sys:0.12.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-sys-0.12.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in cached_proc_macro:0.17.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cached_proc_macro-0.17.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in convert_case:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/convert_case-0.4.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pbjson-types:0.7.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pbjson-types-0.7.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pbjson:0.7.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pbjson-0.7.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pear:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear-0.2.9/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pear_codegen:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear_codegen-0.2.9/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pyo3-opentelemetry-macros:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-macros-0.3.4/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in unic-char-property:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-property-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in unic-char-range:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-range-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in unic-common:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-common-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in unic-ucd-ident:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-ident-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in unic-ucd-version:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-version-0.9.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in valuable:0.1.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/valuable-0.1.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in wide:0.7.26 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.26/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in winapi-i686-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-i686-pc-windows-gnu-0.4.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in winapi-x86_64-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-x86_64-pc-windows-gnu-0.4.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in zmq-sys:0.12.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-sys-0.12.0/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for License specified in file ($CARGO_HOME/registry/src/index.crates.io-6f17d22bba15001f/ring-0.17.8/LICENSE) license in ring:0.17.8 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ring-0.17.8/Cargo.toml
-[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for License specified in file ($CARGO_HOME/registry/src/index.crates.io-6f17d22bba15001f/webpki-0.22.4/LICENSE) license in webpki:0.22.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-0.22.4/Cargo.toml
+```
+
+### Unicode-3
+
+Apparently `bundle-licenses` doesn't have a template for Unicode-3. TODO: open an issue.
+
+```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in icu_collections:1.5.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/icu_collections-1.5.0/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in icu_locid:1.5.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/icu_locid-1.5.0/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in icu_locid_transform:1.5.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/icu_locid_transform-1.5.0/Cargo.toml
@@ -105,13 +107,20 @@
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in zerofrom:0.1.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerofrom-0.1.4/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in zerovec-derive:0.10.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerovec-derive-0.10.3/Cargo.toml
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No template for Unicode-3.0 license in zerovec:0.10.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zerovec-0.10.4/Cargo.toml
+```
 
+## Manually-added license text
 
+### BSD-3-clause
 
----
-# Resolved:
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for BSD-3-Clause license in matchit:0.7.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/matchit-0.7.3/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for BSD-3-Clause license in matchit:0.8.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/matchit-0.8.4/Cargo.toml
+```
 
-## nalgebra
+BSD text was in a file called `LICENSE.httprouter`. (TODO: open bundle-licenses issue for this; repo: https://github.com/ibraheemdev/matchit)
+
+### nalgebra
 
 ```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for BSD-3-Clause license in nalgebra:0.29.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/nalgebra-0.29.0/Cargo.toml
@@ -121,4 +130,81 @@
 License changes in this version weren't "finished" (project adopted Apache-2.0
 but left some incorrect entries in Cargo files), and a symlink was incorrectly
 treated as license text:
+
+### Licenses in repo but not in cargo src download
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pear:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear-0.2.9/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pear:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear-0.2.9/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pear_codegen:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear_codegen-0.2.9/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pear_codegen:0.2.9 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pear_codegen-0.2.9/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-opentelemetry:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-0.3.4/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-char-property:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-property-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-char-range:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-char-range-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-common:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-common-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-ucd-ident:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-ident-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in unic-ucd-version:0.9.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/unic-ucd-version-0.9.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in convert_case:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/convert_case-0.4.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pbjson-types:0.7.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pbjson-types-0.7.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pbjson:0.7.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pbjson-0.7.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in valuable:0.1.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/valuable-0.1.0/Cargo.toml
+```
+
+### QCS libraries
+
+I'm not sure why some of our public packages have license text and others don't.
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in qcs-api-client-common:0.11.2 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/qcs-api-client-common-0.11.2/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in qcs-api-client-grpc:0.11.2 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/qcs-api-client-grpc-0.11.2/Cargo.toml
+```
+
+## Multiple licenses with some texts missing
+
+These are cases where `Cargo.toml` declares multiple licenses, but only one license file is present in the source.
+
+### MIT/Apache-2, Apache-2 text missing
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for Apache-2.0 license in ident_case:1.0.1 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ident_case-1.0.1/Cargo.toml
+```
+
+Removed the entry for Apache-2.0.
+
+### Triple-licensed, all but one text missing
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in wide:0.7.26 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.26/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in wide:0.7.26 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/wide-0.7.26/Cargo.toml
+```
+
+Removed entries for Apache-2.0 and MIT, leaving zlib.
+
+## Parent licensing unambiguous, children ambiguous or missing text
+
+### Parent had all license texts
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in winapi-i686-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-i686-pc-windows-gnu-0.4.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in winapi-x86_64-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-x86_64-pc-windows-gnu-0.4.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in winapi-i686-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-i686-pc-windows-gnu-0.4.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in winapi-x86_64-pc-windows-gnu:0.4.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/winapi-x86_64-pc-windows-gnu-0.4.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in zmq-sys:0.12.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-sys-0.12.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in zmq-sys:0.12.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/zmq-sys-0.12.0/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in cached_proc_macro:0.17.0 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cached_proc_macro-0.17.0/Cargo.toml
+```
+
+Copied license entries from parent
+
+### PyO3-Opentelemetry
+
+```
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-opentelemetry-macros:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-macros-0.3.4/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for Apache-2.0 license in pyo3-tracing-subscriber:0.1.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-tracing-subscriber-0.1.4/Cargo.toml
+[2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] No license found for MIT license in pyo3-opentelemetry-macros:0.3.4 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pyo3-opentelemetry-macros-0.3.4/Cargo.toml
+```
+
+The parent, `pyo3-opentelemetry`, is only licensed under Apache-2, and the
+`macros` repository has no license files of its own, so I copied the license
+text for the parent.
 
