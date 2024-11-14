@@ -1,3 +1,10 @@
+## 0.25.3-rc.4
+
+### Fixes
+
+- hyper-proxy has been removed
+- try adding THIRDPARTY to maturin 'include' and 'sdist-include'
+
 ## 0.25.3-rc.3
 
 ### Fixes
