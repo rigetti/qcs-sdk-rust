@@ -1,6 +1,5 @@
 """
-Appends grpc-web to the project name of both Cargo.toml and pyproject.toml,
-and patches the `hyper-proxy` dependency to allow ppc64le wheel builds.
+Appends grpc-web to the project name of both Cargo.toml and pyproject.toml.
 
 This is used in CI to prepare grpc-web-specific python artifacts for publishing.
 """
@@ -29,11 +28,4 @@ with open(join(pycrate_path, "pyproject.toml"), "r+") as f:
 with open(join(pycrate_path, "Cargo.toml"), "r+") as f:
     data = toml.load(f)
     data["package"]["name"] = "qcs-sdk-python-grpc-web"
-    write(f, data)
-
-# Patch the `hyper-proxy` dependency
-
-with open(join(workspace_path, "Cargo.toml"), "r+") as f:
-    data = toml.load(f)
-    data["patch"] = {"crates-io": {"hyper-proxy": {"git": "https://github.com/rigetti/hyper-proxy"}}}
     write(f, data)
