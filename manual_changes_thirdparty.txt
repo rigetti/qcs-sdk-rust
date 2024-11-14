@@ -1,14 +1,49 @@
-# Open questions
+# Resolved:
 
-## license file links to license text but doesn't include it
+## Apache-2 "NOTICE" files
+
+See https://github.com/sstadick/cargo-bundle-licenses/issues/23. The Apache-2
+license permits the licenser to include a `NOTICE` file that must be included
+with any redistributions. Unfortunately, `bundle-licenses` does not yet have a
+way to check for this.
+
+I manually verified that none of the current dependencies have a `NOTICE` file,
+but the method I used would not be very easy to automate. We should instead
+consider patching `bundle-licenses` to handle this case.
+
+## Manually checking for `NOTICE` files
+
+I searched for all `NOTICE` files in my Cargo source registry (which is what
+`bundle-licenses` uses as its source of truth). There was only one package
+(`aws-sigv4-1.2.1`) with such a file, but it is not a dependency of
+QCS-SDK-Rust.
+
+I then used `yq` to query the `THIRDPARTY` file for a complete list of all
+packages with Apache-2.0 licensing and their versions. I could not generate
+this data in exactly the format I needed, so I used Vim to edit these. For each
+repository, in addition to a line containing the version number, I added a line
+using `main` and one using `master`. I then wrote a Bash loop to use the `gh`
+CLI tool to check for a `NOTICE` file in each repository at each branch or tag:
+
+```bash
+while read dirpath; do echo $dirpath; gh api $dirpath -q '.tree[]|.path|select(test("NOTICE.*"))' | grep NOTICE ; done <filename
+```
+
+This prints each directory name, an error if the specific tag or branch was not
+found, and the names of any files found in the root of the directory starting
+with `NOTICE`. I manually reviewed the output to ensure there are no `NOTICE`
+files.
+
+## Manually-checked licenses that were already correct
+
+### MPL-2.0: license file links to license text but doesn't include it
 
 ```
 [2024-11-08T18:48:36Z WARN  bundle_licenses_lib::found_license] Confidence level UNSURE for MPL-2.0 license in webpki-roots:0.26.3 - /Users/kstrand/.cargo/registry/src/index.crates.io-6f17d22bba15001f/webpki-roots-0.26.3/Cargo.toml
 ```
 
-# Resolved:
-
-## Manually-checked licenses that were already correct
+Luke confirmed that the text in the `THIRDPARTY` file is standard, and it is
+not necesary to include the entire MPL-2.0 license text.
 
 ### Apache-2.0
 
