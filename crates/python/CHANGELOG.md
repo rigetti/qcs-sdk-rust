@@ -1,3 +1,10 @@
+## 0.21.3-rc.1
+
+### Fixes
+
+- hyper-proxy has been removed
+- try adding THIRDPARTY to maturin sdist
+
 ## 0.21.2
 
 ### Fixes
