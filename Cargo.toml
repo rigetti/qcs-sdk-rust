@@ -3,9 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.11.2"
-qcs-api-client-grpc = "0.11.2"
-qcs-api-client-openapi = "0.12.2"
+qcs-api-client-common = "0.11.5"
+qcs-api-client-grpc = "0.11.5"
+qcs-api-client-openapi = "0.12.5"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -15,7 +15,7 @@ tokio = "1.36.0"
 # `crates/python/pyproject.toml`.
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.28.1", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.12.1" }
+quil-rs = { version = "0.29.2", git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.13.2" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
