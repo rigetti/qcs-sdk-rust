@@ -10,7 +10,7 @@ categories = ["api-bindings", "compilers", "science", "emulators"]
 readme = "./README.md"
 
 [features]
-libquil = ["qcs/libquil"]
+# libquil = ["qcs/libquil"]
 grpc-web = ["qcs/grpc-web"]
 
 [lib]
