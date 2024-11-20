@@ -1,7 +1,7 @@
 # This is the metadata Maturin uploads to PyPI on publish
 [project]
 name = "qcs-sdk-python"
-version = "0.21.2"
+version = "0.21.3-rc.4"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
@@ -27,7 +27,8 @@ dependencies = ["quil>=0.11.2", "qcs-api-client-common>=0.10.0"]
 features = ["pyo3/extension-module"]
 bindings = "pyo3"
 compatibility = "linux"
-sdist-include = ["README.md"]
+include = ["THIRDPARTY.yaml"]
+sdist-include = ["README.md", "THIRDPARTY.yaml"]
 
 [project.optional-dependencies]
 pyquil = [
