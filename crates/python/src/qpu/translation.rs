@@ -117,7 +117,7 @@ impl PyTranslationOptions {
 
     #[pyo3(signature = (q_ctrl = PyQCtrl::default(), /))]
     fn use_q_ctrl(&mut self, q_ctrl: PyQCtrl) {
-        self.0.q_ctrl(q_ctrl.as_inner().clone());
+        self.0.q_ctrl(*q_ctrl.as_inner());
     }
 
     #[staticmethod]
