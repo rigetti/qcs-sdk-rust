@@ -6,6 +6,7 @@ use pyo3::types::PyBytes;
 use pyo3::Python;
 use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, PyResult};
 use qcs::qpu::translation::TranslationOptions;
+use qcs_api_client_grpc::services::translation::translation_options;
 use qcs_api_client_grpc::services::translation::{
     translation_options::TranslationBackend as ApiTranslationBackend,
     TranslationOptions as ApiTranslationOptions,
@@ -21,7 +22,8 @@ create_init_submodule! {
     classes: [
         PyTranslationOptions,
         PyTranslationResult,
-        PyTranslationBackend
+        PyTranslationBackend,
+        PyQCtrl
     ],
     errors: [
         TranslationError
@@ -113,6 +115,11 @@ impl PyTranslationOptions {
         self.0.with_backend_v2();
     }
 
+    #[pyo3(signature = (q_ctrl = PyQCtrl::default(), /))]
+    fn use_q_ctrl(&mut self, q_ctrl: PyQCtrl) {
+        self.0.q_ctrl(q_ctrl.as_inner().clone());
+    }
+
     #[staticmethod]
     fn v1() -> Self {
         let mut builder = TranslationOptions::default();
@@ -166,6 +173,23 @@ impl PyTranslationOptions {
 
     fn __repr__(&self) -> String {
         format!("{:?}", self.0)
+    }
+}
+
+#[derive(Clone, Default, Debug)]
+#[pyclass(name = "QCtrl")]
+pub struct PyQCtrl(translation_options::QCtrl);
+
+#[pymethods]
+impl PyQCtrl {
+    #[new]
+    #[pyo3(signature = (/, fixed_layout = None))]
+    fn __new__(fixed_layout: Option<bool>) -> PyResult<Self> {
+        Ok(Self(translation_options::QCtrl { fixed_layout }))
+    }
+
+    fn as_inner(&self) -> &translation_options::QCtrl {
+        &self.0
     }
 }
 
