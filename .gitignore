@@ -10,9 +10,10 @@ __pycache__/
 venv/
 .venv
 
-# JetBrains
+# IDEs
 .idea
 .vscode/
+.nlsp-settings/
 pyrightconfig.json
 
 # Clang debug / memory detection / test artifacts
