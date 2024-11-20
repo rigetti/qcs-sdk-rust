@@ -187,7 +187,9 @@ impl PyQCtrl {
     fn __new__(fixed_layout: Option<bool>) -> PyResult<Self> {
         Ok(Self(translation_options::QCtrl { fixed_layout }))
     }
+}
 
+impl PyQCtrl {
     fn as_inner(&self) -> &translation_options::QCtrl {
         &self.0
     }
