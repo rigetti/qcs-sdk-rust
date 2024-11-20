@@ -68,6 +68,7 @@ ignore = [
     { id = "RUSTSEC-2024-0375", reason = "introduced by atty, a transitive dependency of multiple dependencies, with no upgrade path" },
     { id = "RUSTSEC-2024-0006", reason = "introduced by shlex, a transitive dependency of bindgen with no upgrade path" },
     { id = "RUSTSEC-2021-0139", reason = "ansi_term is unmaintained, but used by clap" },
+    { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
 ]
 yanked = "deny"
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
