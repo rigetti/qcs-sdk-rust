@@ -7,8 +7,8 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        translation_options::TranslationBackend, BackendV1Options, BackendV2Options,
-        GetQuantumProcessorQuilCalibrationProgramRequest,
+        translation_options::{self, TranslationBackend},
+        BackendV1Options, BackendV2Options, GetQuantumProcessorQuilCalibrationProgramRequest,
         TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
 };
@@ -254,6 +254,15 @@ impl TranslationOptions {
     ) -> Result<&mut Self, TranslationBackendMismatch> {
         self.ensure_backend_v2()?.allow_frame_redefinition = Some(allow);
         Ok(self)
+    }
+
+    /// Set the Q-CTRL option for compiling the program through Q-CTRL's API prior to translation.
+    ///
+    /// Generally, the client should set this option to `QCtrl::default()`, as options are
+    /// specially authorized and not generally available to the client.
+    pub fn q_ctrl(&mut self, q_ctrl: translation_options::QCtrl) -> &mut Self {
+        self.inner.q_ctrl = Some(q_ctrl);
+        self
     }
 }
 

@@ -1,4 +1,5 @@
 from typing import Dict, Optional, final
+from typing_extensions import Self
 from enum import Enum, auto
 
 from qcs_sdk.client import QCSClient
@@ -113,6 +114,15 @@ async def translate_async(
     ...
 
 @final
+class QCtrl:
+    """
+    Options for compiling programs through the Q-CTRL API. Options here are specially authorized
+    and are not generally available to the client.
+    """
+
+    def __new__(cls, /, fixed_layout: Optional[bool] = ...) -> Self: ...
+
+@final
 class TranslationOptions:
     """
     Options for translating via the QCS API.
@@ -130,6 +140,12 @@ class TranslationOptions:
     def use_backend_v2(self) -> None:
         """
         Use the v2 backend for translation, available on QCS since 2023.
+        """
+    def use_q_ctrl(self, q_ctrl: QCtrl = ..., /) -> None:
+        """
+        Compile the program through Q-CTRL's API prior to translation. The client
+        should generally leave the `q_ctrl` compile options unset as it is
+        specially authorized and not generally available.
         """
     @staticmethod
     def v1() -> "TranslationOptions":

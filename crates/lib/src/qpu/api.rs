@@ -163,7 +163,7 @@ where
             .collect(),
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
-        options: execution_options.api_options().cloned(),
+        options: execution_options.api_options().copied(),
     };
 
     let mut controller_client = execution_options

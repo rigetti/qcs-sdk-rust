@@ -2848,9 +2848,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.11.2"
+version = "0.11.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "19ef35a894a327744208a8cf7a63b20bfa65d568ecdbbc81ed970ca2cc4f4e58"
+checksum = "6d644a6f79c9a1405fa49b5ab5010e5e5ab56241400b947497cc9a7fcd1d8845"
 dependencies = [
  "async-trait",
  "backoff",
@@ -2880,9 +2880,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.11.2"
+version = "0.11.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16dbb79a3ad6b08ed995c682c7ede40d7ccf3169357f4ddf049b1c721775d9d7"
+checksum = "058b263256ee7420d28cef9175ab8de7bf41676e0d75071d39c0a1ab145c8cad"
 dependencies = [
  "backoff",
  "futures-util",
@@ -2919,9 +2919,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.12.2"
+version = "0.12.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88eb6968cb54255917725ddb818f737fe9582082b60510b4a5af0daf295a56b7"
+checksum = "d423a8a5acf80ff2dbae5b4d00cfb5ce9526160767fa24ea733000767d97db4f"
 dependencies = [
  "anyhow",
  "http 1.1.0",
@@ -2975,8 +2975,8 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 
 [[package]]
 name = "quil-rs"
-version = "0.28.1"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.12.1#a0f2776893d3ce33eb9f29449f3b4b0e9ed24174"
+version = "0.29.2"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-py/v0.13.2#f725e9f67ae3a3137cd9033d0f98143e8644b610"
 dependencies = [
  "approx",
  "indexmap 2.2.6",
