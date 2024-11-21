@@ -1,3 +1,9 @@
+## 0.21.5-rc.0
+
+### Features
+
+- Update QCS API clients, add Q-Ctrl translation option (#513)
+
 ## 0.21.4
 
 ### Fixes
