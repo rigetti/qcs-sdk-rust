@@ -1,3 +1,9 @@
+## 0.25.4
+
+### Fixes
+
+- no longer need to patch metadata for grpc-web (#514)
+
 ## 0.25.4-rc.0
 
 ### Fixes
