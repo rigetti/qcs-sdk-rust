@@ -1,3 +1,9 @@
+## 0.25.3
+
+### Fixes
+
+- #510: third-party licenses (#511)
+
 ## 0.25.3-rc.5
 
 ### Fixes
