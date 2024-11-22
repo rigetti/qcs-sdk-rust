@@ -19,7 +19,7 @@ grpc-web = ["qcs-api-client-grpc/grpc-web"]
 tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
 
 [dependencies]
-cached = "0.44.0"
+cached = "0.44.0, ||, ^0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
 indexmap = "2.2.6"
