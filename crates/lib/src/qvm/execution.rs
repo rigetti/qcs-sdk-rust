@@ -1,5 +1,5 @@
 use std::str::FromStr;
-use std::{collections::HashMap, num::NonZeroU16};
+use std::{collections::HashMap, num::NonZeroU32};
 
 use quil_rs::Program;
 
@@ -54,7 +54,7 @@ impl Execution {
     /// Missing parameters, extra parameters, or parameters of the wrong type will all cause errors.
     pub(crate) async fn run<C: Client + ?Sized>(
         &self,
-        shots: NonZeroU16,
+        shots: NonZeroU32,
         addresses: HashMap<String, AddressRequest>,
         params: &Parameters,
         client: &C,
@@ -76,7 +76,7 @@ impl Execution {
 
 #[cfg(test)]
 mod describe_execution {
-    use std::{collections::HashMap, num::NonZeroU16};
+    use std::{collections::HashMap, num::NonZeroU32};
 
     use super::{Execution, Parameters};
     use crate::{client::Qcs, qvm};
@@ -95,7 +95,7 @@ mod describe_execution {
 
         let result = exe
             .run(
-                NonZeroU16::new(1).expect("value is non-zero"),
+                NonZeroU32::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
                 &qvm_client(),
@@ -117,7 +117,7 @@ mod describe_execution {
 
         let result = exe
             .run(
-                NonZeroU16::new(1).expect("value is non-zero"),
+                NonZeroU32::new(1).expect("value is non-zero"),
                 HashMap::new(),
                 &params,
                 &qvm_client(),

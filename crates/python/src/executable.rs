@@ -1,4 +1,4 @@
-use std::{num::NonZeroU16, sync::Arc};
+use std::{num::NonZeroU32, sync::Arc};
 
 use opentelemetry::trace::FutureExt;
 use pyo3::{pyclass, FromPyObject};
@@ -108,7 +108,7 @@ impl PyExecutable {
         quil: String,
         registers: Vec<String>,
         parameters: Vec<PyParameter>,
-        #[pyo3(from_py_with = "crate::from_py::optional_non_zero_u16")] shots: Option<NonZeroU16>,
+        #[pyo3(from_py_with = "crate::from_py::optional_non_zero_u32")] shots: Option<NonZeroU32>,
         quilc_client: Option<PyQuilcClient>,
         compiler_options: Option<PyCompilerOpts>,
     ) -> Self {
