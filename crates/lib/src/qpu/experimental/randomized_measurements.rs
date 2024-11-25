@@ -15,7 +15,7 @@ use quil_rs::{
 
 use crate::executable::Parameters;
 
-use super::extern_call::{ExternedCall, PrngSeedValue};
+use super::random::{ExternedCall, PrngSeedValue};
 
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {

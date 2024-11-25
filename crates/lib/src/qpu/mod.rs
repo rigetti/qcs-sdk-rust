@@ -16,8 +16,7 @@ use tokio::time::error::Elapsed;
 
 pub mod api;
 mod execution;
-pub mod extern_call;
-pub mod randomized_measurements;
+pub mod experimental;
 pub mod result_data;
 pub mod translation;
 
