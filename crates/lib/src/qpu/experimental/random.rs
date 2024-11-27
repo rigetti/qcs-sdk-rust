@@ -1,62 +1,103 @@
-use std::ops::BitXor;
+//! This module supports low-level primitives for randomization on Rigetti's QPUs.
+use std::{convert::TryFrom, ops::BitXor};
 
-use num::ToPrimitive;
-use quil_rs::instruction::ExternError;
+use num::{complex::Complex64, ToPrimitive};
+use quil_rs::instruction::{Call, CallError, ExternError, UnresolvedCallArgument};
+
+use crate::qpu::externed_call::ExternedCall;
 
 /// An error that may occur when simulating control system extern
 /// function calls.
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
+    /// An invalid seed value was provided.
     #[error(
-        "seed values must be in range [0, {MAX_SEQUENCER_VALUE}) and losslessly convertible to f64, found {0}"
+        "seed values must be in range [1, {MAX_SEQUENCER_VALUE}) and losslessly convertible to f64, found {0}"
     )]
     InvalidSeed(u64),
+    /// An error occurred while converting to Quil.
     #[error("error converting to Quil: {0}")]
     ToQuilError(String),
+    /// An error occurred while constructing an extern signature.
     #[error("error constructing extern signature: {0}")]
     ExternSignatureError(#[from] ExternError),
+}
+
+impl From<quil_rs::quil::ToQuilError> for Error {
+    fn from(e: quil_rs::quil::ToQuilError) -> Self {
+        Self::ToQuilError(e.to_string())
+    }
 }
 
 /// A specialized `Result` type for hardware extern function calls.
 pub type Result<T> = std::result::Result<T, Error>;
 
-/// A trait for supporting `PRAGMA EXTERN` and [`quil_rs::instruction::Call`] instructions.
-pub trait ExternedCall {
-    /// The name of the externed function.
-    const NAME: &'static str;
+/// An [`ExternedCall`] that may be used to select one or more random
+/// sub-regions from a source array of real values to a destination array.
+#[derive(Debug, Clone)]
+pub struct ChooseRandomRealSubRegions {
+    destination: String,
+    source: String,
+    sub_region_size: Complex64,
+    seed: String,
+}
 
-    /// Build the signature for the externed function. The Magneto service
-    /// may use this function to check whether user submitted signatures match
-    /// the expected signature.
-    fn build_signature() -> Result<quil_rs::instruction::ExternSignature>;
-
-    /// instruction in tests.
-    fn pragma_extern() -> Result<quil_rs::instruction::Pragma> {
-        use quil_rs::quil::Quil;
-
-        Ok(quil_rs::instruction::Pragma::new(
-            quil_rs::instruction::RESERVED_PRAGMA_EXTERN.to_string(),
-            vec![quil_rs::instruction::PragmaArgument::Identifier(
-                Self::NAME.to_string(),
-            )],
-            Some(
-                Self::build_signature()?
-                    .to_quil()
-                    .map_err(|e| Error::ToQuilError(e.to_string()))?,
-            ),
-        ))
+impl ChooseRandomRealSubRegions {
+    /// Create a new instance of [`ChooseRandomRealSubRegions`].
+    ///
+    /// # Parameters
+    ///
+    /// * `destination` - The name of the destination array.
+    /// * `source` - The identifier of the source array.
+    /// * `sub_region_size` - The size of the sub-regions to select from
+    ///   the source array. Note, `len(source) % sub_region_size` and
+    ///   `len(destination)` must be zero.
+    /// * `seed` - The name of the seed value.
+    ///
+    /// The values provided for `destination`, `source`, and `seed` must
+    /// be declared within the Quil program where the call is made.
+    pub fn new<T: Into<f64>>(
+        destination: String,
+        source: String,
+        sub_region_size: T,
+        seed: String,
+    ) -> Self {
+        Self {
+            destination,
+            source,
+            sub_region_size: Complex64 {
+                re: sub_region_size.into(),
+                im: 0.0,
+            },
+            seed,
+        }
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct ChooseRandomRealSubRegions;
+impl TryFrom<ChooseRandomRealSubRegions> for Call {
+    type Error = CallError;
+
+    fn try_from(value: ChooseRandomRealSubRegions) -> std::result::Result<Self, Self::Error> {
+        Self::try_new(
+            ChooseRandomRealSubRegions::NAME.to_string(),
+            vec![
+                UnresolvedCallArgument::Identifier(value.destination.clone()),
+                UnresolvedCallArgument::Identifier(value.source.to_string()),
+                UnresolvedCallArgument::Immediate(value.sub_region_size),
+                UnresolvedCallArgument::Identifier(value.seed.clone()),
+            ],
+        )
+    }
+}
 
 impl ExternedCall for ChooseRandomRealSubRegions {
+    type Error = Error;
+
     const NAME: &str = "choose_random_real_sub_regions";
 
     #[allow(clippy::doc_markdown)]
-    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
-    /// The signature is:
+    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions`
+    /// instruction. The signature is:
     ///
     /// rust ignore
     ///     "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
@@ -99,6 +140,9 @@ const MAX_SEQUENCER_VALUE: u64 = 0xFFFF_FFFF_FFFF;
 /// the PRNG value.
 const MAX_UNSIGNED_MULTIPLIER: u64 = 0x0000_0000_FFFF;
 
+/// A valid seed value that may be used to initialize the PRNG. Such
+/// values are in the range `[1, MAX_SEQUENCER_VALUE]` and are losslessly
+/// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
 pub struct PrngSeedValue {
     as_u64: u64,
@@ -106,6 +150,9 @@ pub struct PrngSeedValue {
 }
 
 impl PrngSeedValue {
+    /// Attempt to create a new instance of `PrngSeedValue` from a `u64`.
+    /// The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
+    /// losslessly convertible to `f64`.
     pub fn try_new(value: u64) -> Result<Self> {
         if !(1..=MAX_SEQUENCER_VALUE).contains(&value) {
             return Err(Error::InvalidSeed(value));

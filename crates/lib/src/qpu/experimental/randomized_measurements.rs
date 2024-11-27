@@ -1,4 +1,23 @@
-use std::collections::HashMap;
+//! This module contains generalized support for adding randomized measurements
+//! to a Quil program. It builds off of the primitives defined in [`super::random`].
+//!
+//! There are three critical components to correctly adding randomized measurements
+//! to a program:
+//!
+//! 1. Program construction - adding the classical randomization calls to the
+//!     prologue of the program (i.e. before the pulse program begins) and referencing
+//!     those randomized values within a unitary decomposition prior to measurement.
+//! 2. Parameter construction - building a map of [`Parameters`] with seeds for
+//!     each qubit.
+//! 3. PRNG reconstruction - backing out the random indices that played on each
+//!     qubit during program execution.
+//!
+//! Recall this is not QIS (quantum information science) library, but rather an
+//! SDK for collecting data from Rigetti QPUs. As such, defining the proper
+//! unitary set and using randomized measurement data is unsupported by this
+//! library.
+
+use std::{collections::HashMap, convert::TryFrom};
 
 use itertools::Itertools;
 use ndarray::{Array2, Order};
@@ -7,38 +26,55 @@ use quil_rs::{
     expression::Expression,
     instruction::{
         Call, CallError, Declaration, Delay, Fence, Gate, Instruction, Measurement,
-        MemoryReference, Qubit, ScalarType, UnresolvedCallArgument, Vector,
+        MemoryReference, Qubit, ScalarType, Vector,
     },
     quil::Quil,
     Program,
 };
 
+use super::random::PrngSeedValue;
 use crate::executable::Parameters;
+use crate::qpu::externed_call::ExternedCall;
 
-use super::random::{ExternedCall, PrngSeedValue};
-
+/// An error that may occur when constructing randomized measurements.
 #[derive(Debug, Clone, thiserror::Error)]
 pub enum Error {
+    /// Received measurement on non-fixed qubits.
     #[error("only measurements on fixed qubits are supported, found {0:?}")]
     UnsupportedMeasurementQubit(Qubit),
-    #[error("error declaring external function: {0}")]
-    Pragma(#[from] super::extern_call::Error),
+    /// An error occurred while constructing `PRAGMA EXTERN` instruction.
+    #[error("error declaring extern function: {0}")]
+    Pragma(#[from] super::random::Error),
+    /// An error occurred while constructing a call instruction.
     #[error("error initializing call instruction: {0}")]
     Call(#[from] CallError),
+    /// A seed value was not provided for a qubit.
     #[error("seed not provided for qubit {}", .0.to_quil_or_debug())]
     MissingSeed(Qubit),
+    /// An error occur while flattening an [`ndarray::Array`].
     #[error("shape error occurred during parameter conversion: {0}")]
     UnitariesShape(#[from] ndarray::ShapeError),
-    #[error("invalid unitary set; expected {expected} unitaries, found {found}")]
-    InvalidUnitarySet { expected: usize, found: usize },
+    /// A unitary set was specified with an incorrect number of columns.
+    #[error("invalid unitary set; expected unitaries of length {expected}, found {found}")]
+    InvalidUnitarySet {
+        /// The expected number of columns
+        expected: usize,
+        /// The number of columns
+        found: usize,
+    },
     #[error("the number of parameters per unitary must be convertible to f64, found {0}")]
+    /// The number of parameters per unitary could not be expressed losslessly as
+    /// an f64.
     ParametersPerUnitaryF64Conversion(usize),
     #[error("the seed value must be convertible to f64, found {0}")]
+    /// A seed value could not be expressed losslessly as an f64.
     SeedValueF64Conversion(usize),
+    /// The implicit unitary count could not be expressed as a u8.
     #[error("the unitary count must be convertible to u8, found {0}")]
     UnitaryCountU8Conversion(usize),
 }
 
+/// A specialized `Result` type for randomized measurements.
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Clone)]
@@ -49,6 +85,16 @@ struct QubitRandomization {
 }
 
 impl QubitRandomization {
+    fn into_instruction(self, parameters_per_unitary: f64) -> Result<Instruction> {
+        let externed_call = super::random::ChooseRandomRealSubRegions::new(
+            self.destination_declaration.name,
+            RANDOMIZED_MEASUREMENT_SOURCE.to_string(),
+            parameters_per_unitary,
+            self.seed_declaration.name,
+        );
+        Ok(Instruction::Call(Call::try_from(externed_call)?))
+    }
+
     fn destination_reference(&self, index: u64) -> MemoryReference {
         MemoryReference::new(self.destination_declaration.name.clone(), index)
     }
@@ -58,6 +104,7 @@ const RANDOMIZED_MEASUREMENT_SOURCE: &str = "randomized_measurement_source";
 const RANDOMIZED_MEASUREMENT_DESTINATION: &str = "randomized_measurement_destination";
 const RANDOMIZED_MEASUREMENT_SEED: &str = "randomized_measurement_seed";
 
+/// Configuration for adding randomized measurements to a Quil program.
 #[derive(Debug, Clone)]
 pub struct RandomizedMeasurements {
     leading_delay: Expression,
@@ -67,6 +114,16 @@ pub struct RandomizedMeasurements {
 }
 
 impl RandomizedMeasurements {
+    /// Initialize a new instance of [`RandomizedMeasurements`].
+    ///
+    /// # Parameters
+    ///
+    /// * `measurements` - A vector of measurements to randomize. Note, these
+    ///     measurements should not be added to a program a priori.
+    /// * `unitary_set` - The set of unitaries to apply to each qubit before
+    ///    measurement.
+    /// * `leading_delay` - The delay to prepend to the program before the
+    ///   randomized measurements begin. Typically, this will be 1e-6s to 1e-5s.
     pub fn try_new(
         measurements: Vec<Measurement>,
         unitary_set: UnitarySet,
@@ -115,6 +172,8 @@ impl RandomizedMeasurements {
 }
 
 impl RandomizedMeasurements {
+    /// Append the randomized measurements to a Quil program. The provided program
+    /// should not contain any preexisting measurements.
     pub fn append_to_program(&self, target_program: Program) -> Result<Program> {
         let mut program = target_program.clone_without_body_instructions();
 
@@ -149,7 +208,7 @@ impl RandomizedMeasurements {
 
         // declare "choose_random_real_sub_regions" as an external function
         program.add_instruction(Instruction::Pragma(
-            super::extern_call::ChooseRandomRealSubRegions::pragma_extern()?,
+            super::random::ChooseRandomRealSubRegions::pragma_extern()?,
         ));
 
         let parameters_per_unitary = self
@@ -163,28 +222,8 @@ impl RandomizedMeasurements {
         let calls: Vec<_> = self
             .qubit_randomizations
             .iter()
-            .map(|qubit_randomization| {
-                Call::try_new(
-                    super::extern_call::ChooseRandomRealSubRegions::NAME.to_string(),
-                    vec![
-                        UnresolvedCallArgument::Identifier(
-                            qubit_randomization.destination_declaration.name.clone(),
-                        ),
-                        UnresolvedCallArgument::Identifier(
-                            RANDOMIZED_MEASUREMENT_SOURCE.to_string(),
-                        ),
-                        UnresolvedCallArgument::Immediate(Complex64 {
-                            re: parameters_per_unitary,
-                            im: 0.0,
-                        }),
-                        UnresolvedCallArgument::Identifier(
-                            qubit_randomization.seed_declaration.name.clone(),
-                        ),
-                    ],
-                )
-                .map_err(Error::from)
-            })
-            .map_ok(Instruction::Call)
+            .cloned()
+            .map(|qubit_randomization| qubit_randomization.into_instruction(parameters_per_unitary))
             .collect::<Result<Vec<Instruction>>>()?;
         program.add_instructions(calls);
 
@@ -207,6 +246,8 @@ impl RandomizedMeasurements {
         Ok(program)
     }
 
+    /// Given a map of qubits to seed values, construct the parameters required
+    /// to randomize measurements accordingly.
     pub fn to_parameters(&self, seed_values: &HashMap<Qubit, PrngSeedValue>) -> Result<Parameters> {
         let mut parameters = HashMap::new();
         parameters.insert(
@@ -241,6 +282,8 @@ impl RandomizedMeasurements {
         Ok(parameters)
     }
 
+    /// Given a map of qubits to seed values, return the random indices that
+    /// were played on each qubit during program execution.
     #[must_use]
     pub fn get_random_indices(
         &self,
@@ -252,7 +295,7 @@ impl RandomizedMeasurements {
             .map(|(qubit, seed_value)| {
                 (
                     qubit.clone(),
-                    super::extern_call::choose_random_real_sub_region_indices(
+                    super::random::choose_random_real_sub_region_indices(
                         *seed_value,
                         0,
                         shot_count,
@@ -264,12 +307,23 @@ impl RandomizedMeasurements {
     }
 }
 
+/// A set of unitaries, each of which may be expressed as a set of Quil
+/// instructions.
 #[derive(Debug, Clone)]
 pub enum UnitarySet {
+    /// A set of unitaries expressed as a sequence of the following gate
+    /// operations:
+    ///
+    /// RZ(angle_0)-RX(pi/2)-RZ(angle_1)-RX(pi/2)-RZ(angle_2).
+    ///
+    /// The unitaries are stored in a 2D array where each row represents
+    /// a single unitary expressed as the three RZ angles.
     Zxzxz(Array2<f64>),
 }
 
 impl UnitarySet {
+    /// Attempt to create a new instance of [`UnitarySet`] from a 2D array
+    /// of unitaries. The array must have three columns.
     pub fn try_new_zxzxz(unitaries: Array2<f64>) -> Result<UnitarySet> {
         if unitaries.ncols() != 3 {
             return Err(Error::InvalidUnitarySet {
@@ -505,12 +559,6 @@ MEASURE 2 ro[2]
         let expected_program = Program::from_str(BASE_QUIL_PROGRAM_WITH_MEASUREMENTS)
             .expect("must be valid Quil program");
 
-        println!(
-            "randomized_program: {}",
-            randomized_program.to_quil().unwrap()
-        );
-
-        println!("{}", expected_program.to_quil().unwrap());
         assert_eq!(randomized_program, expected_program);
     }
 

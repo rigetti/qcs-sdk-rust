@@ -8,6 +8,7 @@ use rigetti_pyo3::{
 pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 
 pub mod api;
+pub mod experimental;
 pub mod isa;
 mod result_data;
 pub mod translation;
