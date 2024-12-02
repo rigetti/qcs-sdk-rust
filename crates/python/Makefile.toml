@@ -73,7 +73,6 @@ dependencies = [
     "pre-test-docker-up",
     "install-python-package",
     "format-tracing-subscriber",
-    "doctest",
     "test",
     "post-test",
 ]
