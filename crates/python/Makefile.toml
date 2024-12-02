@@ -60,6 +60,10 @@ script = [
 command = "pytest"
 args = ["tests"]
 
+[tasks.doctest]
+command = "pytest"
+args = ["qcs_sdk/qpu/experimental.pyi", "--doctest-modules"]
+
 [tasks.test-session]
 command = "pytest"
 args = ["tests", "--with-qcs-session"]
@@ -73,6 +77,7 @@ dependencies = [
     "pre-test-docker-up",
     "install-python-package",
     "format-tracing-subscriber",
+    "doctest",
     "test",
     "post-test",
 ]

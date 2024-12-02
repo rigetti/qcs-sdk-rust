@@ -3,21 +3,20 @@ from typing import Dict, List, Optional, Self, Tuple, final
 import numpy as np
 from numpy.typing import NDArray
 
-
 @final
 class RandomError(ValueError):
     """
     An error that may occur while initializing a seed value or
     generating a QPU PRNG sequence.
     """
+
     ...
 
 @final
 class PrngSeedValue:
     """A seed value for the Rigetti QPU PRNG."""
 
-    def __new__(cls, value: int) -> Self: ... 
-
+    def __new__(cls, value: int) -> Self: ...
 
 @final
 class ChooseRandomRealSubRegions:
@@ -81,18 +80,16 @@ class ChooseRandomRealSubRegions:
         """Build the Quil signature of the `PRAGMA EXTERN` instruction."""
         ...
 
-
 def lfsr_v1_next(seed_value: PrngSeedValue) -> PrngSeedValue:
     """Given a seed value, return the next value in the LFSR v1 PRNG sequence."""
     ...
-
 
 def choose_random_real_sub_region_indices(
     seed: PrngSeedValue,
     start_index: int,
     series_length: int,
     sub_region_count: int,
-) -> List[int]: 
+) -> List[int]:
     """
     Given a seed value, the starting index and length of a pseudo-random series, and the number of
     sub-regions from which to choose, return a list of the sub-region indices that were chosen.
@@ -101,14 +98,13 @@ def choose_random_real_sub_region_indices(
     """
     ...
 
-
 @final
-class RandomizedMeasurementsError(ValueError): 
+class RandomizedMeasurementsError(ValueError):
     """
     An error that can occur when adding randomized measurements to a program.
     """
-    ...
 
+    ...
 
 @final
 class UnitarySet:
@@ -133,19 +129,18 @@ class UnitarySet:
         """
         ...
 
-
 @final
 class RandomizedMeasurement:
     # TODO: should we make this signature more infallible?
     def __new__(cls, qubit: int, target: Optional[Tuple[str, int]]) -> Self: ...
 
-
 @final
 class RandomizedMeasurements:
     """A class that supports the addition of randomized measurements to a Quil program."""
 
-    def __new__(cls, measurements: List[RandomizedMeasurement], unitary_set: UnitarySet, leading_delay: float = ...) -> Self: ...
-
+    def __new__(
+        cls, measurements: List[RandomizedMeasurement], unitary_set: UnitarySet, leading_delay: float = ...
+    ) -> Self: ...
     def append_to_program(self, target_program: str) -> str:
         """
         Given a target Quil program, this routine will add the necessary declarations, `PRAGMA EXTERN`, `CALL`, and
