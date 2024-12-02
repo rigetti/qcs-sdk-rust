@@ -136,11 +136,14 @@ struct PyRandomizedMeasurement {
 #[pymethods]
 impl PyRandomizedMeasurement {
     #[new]
-    fn new(qubit: u64, target: Option<(String, u64)>) -> Self {
+    fn new(qubit: u64, target: (String, u64)) -> Self {
         Self {
             inner: Measurement {
                 qubit: Qubit::Fixed(qubit),
-                target: target.map(|(name, index)| MemoryReference { name, index }),
+                target: Some(MemoryReference {
+                    name: target.0,
+                    index: target.1,
+                }),
             },
         }
     }

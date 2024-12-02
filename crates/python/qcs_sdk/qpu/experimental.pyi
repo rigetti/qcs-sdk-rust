@@ -131,8 +131,7 @@ class UnitarySet:
 
 @final
 class RandomizedMeasurement:
-    # TODO: should we make this signature more infallible?
-    def __new__(cls, qubit: int, target: Optional[Tuple[str, int]]) -> Self: ...
+    def __new__(cls, qubit: int, target: Tuple[str, int]) -> Self: ...
 
 @final
 class RandomizedMeasurements:
