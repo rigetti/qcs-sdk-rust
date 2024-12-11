@@ -18,7 +18,7 @@ pub trait ExternedCall: Sized + TryInto<quil_rs::instruction::Call> {
     /// The name of the externed function.
     const NAME: &'static str;
 
-    /// Build the signature for the externed function. The Magneto service
+    /// Build the signature for the externed function. The translation service
     /// may use this function to check whether user submitted signatures match
     /// the expected signature.
     fn build_signature(

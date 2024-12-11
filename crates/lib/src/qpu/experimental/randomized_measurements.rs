@@ -12,9 +12,9 @@
 //! 3. PRNG reconstruction - backing out the random indices that played on each
 //!     qubit during program execution.
 //!
-//! Recall this is not QIS (quantum information science) library, but rather an
+//! Recall this is not a QIS (quantum information science) library, but rather an
 //! SDK for collecting data from Rigetti QPUs. As such, defining the proper
-//! unitary set and using randomized measurement data is unsupported by this
+//! unitary set and using randomized measurement data is beyond the scope of this
 //! library.
 
 use std::{collections::HashMap, convert::TryFrom};
@@ -37,17 +37,17 @@ use crate::executable::Parameters;
 use crate::qpu::externed_call::ExternedCall;
 
 /// An error that may occur when constructing randomized measurements.
-#[derive(Debug, Clone, thiserror::Error)]
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// Received measurement on non-fixed qubits.
     #[error("only measurements on fixed qubits are supported, found {0:?}")]
     UnsupportedMeasurementQubit(Qubit),
     /// An error occurred while constructing `PRAGMA EXTERN` instruction.
     #[error("error declaring extern function: {0}")]
-    Pragma(#[from] super::random::Error),
+    BuildPragma(#[from] super::random::Error),
     /// An error occurred while constructing a call instruction.
     #[error("error initializing call instruction: {0}")]
-    Call(#[from] CallError),
+    BuildCall(#[from] CallError),
     /// A seed value was not provided for a qubit.
     #[error("seed not provided for qubit {}", .0.to_quil_or_debug())]
     MissingSeed(Qubit),
@@ -62,15 +62,17 @@ pub enum Error {
         /// The number of columns
         found: usize,
     },
-    #[error("the number of parameters per unitary must be convertible to f64, found {0}")]
     /// The number of parameters per unitary could not be expressed losslessly as
     /// an f64.
+    #[error(
+        "the number of parameters per unitary must be within range [0, {}], found {0}", 2_u64.pow(f64::MANTISSA_DIGITS) - 1
+    )]
     ParametersPerUnitaryF64Conversion(usize),
-    #[error("the seed value must be convertible to f64, found {0}")]
     /// A seed value could not be expressed losslessly as an f64.
+    #[error("the seed value must be within range [0, {}], found {0}", 2_u64.pow(f64::MANTISSA_DIGITS) - 1)]
     SeedValueF64Conversion(usize),
     /// The implicit unitary count could not be expressed as a u8.
-    #[error("the unitary count must be convertible to u8, found {0}")]
+    #[error("the unitary count must be within range [0, {}], found {0}", u8::MAX)]
     UnitaryCountU8Conversion(usize),
 }
 
@@ -85,13 +87,21 @@ struct QubitRandomization {
 }
 
 impl QubitRandomization {
-    fn into_instruction(self, parameters_per_unitary: f64) -> Result<Instruction> {
-        let externed_call = super::random::ChooseRandomRealSubRegions::new(
-            self.destination_declaration.name,
-            RANDOMIZED_MEASUREMENT_SOURCE.to_string(),
+    fn into_instruction(
+        self,
+        parameters_per_unitary: f64,
+        source_declaration: &Declaration,
+    ) -> Result<Instruction> {
+        let externed_call = super::random::ChooseRandomRealSubRegions::try_new(
+            &self.destination_declaration,
+            source_declaration,
             parameters_per_unitary,
-            self.seed_declaration.name,
-        );
+            &MemoryReference {
+                name: self.seed_declaration.name.clone(),
+                index: 0,
+            },
+        )
+        .unwrap();
         Ok(Instruction::Call(Call::try_from(externed_call)?))
     }
 
@@ -111,6 +121,7 @@ pub struct RandomizedMeasurements {
     unitary_set: UnitarySet,
     unitary_count_as_u8: u8,
     qubit_randomizations: Vec<QubitRandomization>,
+    source_declaration: Declaration,
 }
 
 impl RandomizedMeasurements {
@@ -129,6 +140,14 @@ impl RandomizedMeasurements {
         unitary_set: UnitarySet,
         leading_delay: Expression,
     ) -> Result<RandomizedMeasurements> {
+        let source_declaration = Declaration {
+            name: RANDOMIZED_MEASUREMENT_SOURCE.to_string(),
+            size: Vector::new(
+                ScalarType::Real,
+                (unitary_set.parameters_per_unitary() * unitary_set.unitary_count()) as u64,
+            ),
+            sharing: None,
+        };
         let qubit_randomizations: Vec<QubitRandomization> = measurements
             .into_iter()
             .map(|measurement| {
@@ -167,6 +186,7 @@ impl RandomizedMeasurements {
             unitary_set,
             unitary_count_as_u8,
             qubit_randomizations,
+            source_declaration,
         })
     }
 }
@@ -177,15 +197,7 @@ impl RandomizedMeasurements {
     pub fn append_to_program(&self, target_program: Program) -> Result<Program> {
         let mut program = target_program.clone_without_body_instructions();
 
-        program.add_instruction(Instruction::Declaration(Declaration {
-            name: RANDOMIZED_MEASUREMENT_SOURCE.to_string(),
-            size: Vector::new(
-                ScalarType::Real,
-                (self.unitary_set.parameters_per_unitary() * self.unitary_set.unitary_count())
-                    as u64,
-            ),
-            sharing: None,
-        }));
+        program.add_instruction(Instruction::Declaration(self.source_declaration.clone()));
 
         for qubit_randomization in &self.qubit_randomizations {
             program.add_instruction(Instruction::Declaration(
@@ -223,7 +235,10 @@ impl RandomizedMeasurements {
             .qubit_randomizations
             .iter()
             .cloned()
-            .map(|qubit_randomization| qubit_randomization.into_instruction(parameters_per_unitary))
+            .map(|qubit_randomization| {
+                qubit_randomization
+                    .into_instruction(parameters_per_unitary, &self.source_declaration)
+            })
             .collect::<Result<Vec<Instruction>>>()?;
         program.add_instructions(calls);
 
@@ -563,6 +578,8 @@ MEASURE 2 ro[2]
     }
 
     #[fixture]
+    /// Returns a list of valid seed values. These values are valid and correspond to test expectations,
+    /// but are otherwise indeed random.
     fn seeds() -> Vec<u64> {
         vec![463_692_700, 733_101_278, 925_742_198]
     }

@@ -1,14 +1,16 @@
 //! This module supports low-level primitives for randomization on Rigetti's QPUs.
 use std::{convert::TryFrom, ops::BitXor};
 
-use num::{complex::Complex64, ToPrimitive};
-use quil_rs::instruction::{Call, CallError, ExternError, UnresolvedCallArgument};
-
 use crate::qpu::externed_call::ExternedCall;
+use num::{complex::Complex64, ToPrimitive};
+use quil_rs::{
+    instruction::{Call, CallError, ExternError, UnresolvedCallArgument},
+    quil::ToQuilError,
+};
 
-/// An error that may occur when simulating control system extern
-/// function calls.
-#[derive(Debug, Clone, thiserror::Error)]
+/// An error that may occur using the randomization primitives defined
+/// in this module.
+#[derive(Debug, thiserror::Error)]
 pub enum Error {
     /// An invalid seed value was provided.
     #[error(
@@ -17,16 +19,42 @@ pub enum Error {
     InvalidSeed(u64),
     /// An error occurred while converting to Quil.
     #[error("error converting to Quil: {0}")]
-    ToQuilError(String),
+    ToQuilError(#[from] ToQuilError),
     /// An error occurred while constructing an extern signature.
     #[error("error constructing extern signature: {0}")]
     ExternSignatureError(#[from] ExternError),
-}
-
-impl From<quil_rs::quil::ToQuilError> for Error {
-    fn from(e: quil_rs::quil::ToQuilError) -> Self {
-        Self::ToQuilError(e.to_string())
-    }
+    /// The destination must be a real array.
+    #[error("destination must be a real array, found {destination_type:?}")]
+    InvalidDestinationType {
+        /// The type on the destination declaration.
+        destination_type: quil_rs::instruction::ScalarType,
+    },
+    /// The source must be a real array.
+    #[error("source must be a real array, found {source_type:?}")]
+    InvalidSourceType {
+        /// The type on the source declaration.
+        source_type: quil_rs::instruction::ScalarType,
+    },
+    /// The destination length must be divisible by the sub-region size.
+    #[error(
+        "destination length must be in range [0, {}] and divisible by the sub-region size, found {destination_length} % {sub_region_size}", 2u64.pow(f64::MANTISSA_DIGITS) - 1
+    )]
+    InvalidDestinationLength {
+        /// The length of the destination declaration.
+        destination_length: u64,
+        /// The size of each sub-region in source and destination memory arrays.
+        sub_region_size: f64,
+    },
+    /// The source length must be divisible by the sub-region size.
+    #[error(
+        "source length must be in range [0, {}] and divisible by the sub-region size, found {source_length} % {sub_region_size}", 2u64.pow(f64::MANTISSA_DIGITS) - 1
+    )]
+    InvalidSourceLength {
+        /// The length of the source declaration.
+        source_length: u64,
+        /// The size of each sub-region in source and destination memory arrays.
+        sub_region_size: f64,
+    },
 }
 
 /// A specialized `Result` type for hardware extern function calls.
@@ -36,10 +64,10 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// sub-regions from a source array of real values to a destination array.
 #[derive(Debug, Clone)]
 pub struct ChooseRandomRealSubRegions {
-    destination: String,
-    source: String,
-    sub_region_size: Complex64,
-    seed: String,
+    destination_memory_region_name: String,
+    source_memory_region_name: String,
+    sub_region_size: f64,
+    seed_memory_region_name: String,
 }
 
 impl ChooseRandomRealSubRegions {
@@ -51,26 +79,62 @@ impl ChooseRandomRealSubRegions {
     /// * `source` - The identifier of the source array.
     /// * `sub_region_size` - The size of the sub-regions to select from
     ///   the source array. Note, `len(source) % sub_region_size` and
-    ///   `len(destination)` must be zero.
+    ///   `len(destination) % sub_region_size` must be zero.
     /// * `seed` - The name of the seed value.
     ///
     /// The values provided for `destination`, `source`, and `seed` must
     /// be declared within the Quil program where the call is made.
-    pub fn new<T: Into<f64>>(
-        destination: String,
-        source: String,
+    pub fn try_new<T: Into<f64> + Copy>(
+        destination: &quil_rs::instruction::Declaration,
+        source: &quil_rs::instruction::Declaration,
         sub_region_size: T,
-        seed: String,
-    ) -> Self {
-        Self {
-            destination,
-            source,
-            sub_region_size: Complex64 {
-                re: sub_region_size.into(),
-                im: 0.0,
-            },
-            seed,
+        seed: &quil_rs::instruction::MemoryReference,
+    ) -> Result<Self> {
+        if !matches!(
+            destination.size.data_type,
+            quil_rs::instruction::ScalarType::Real
+        ) {
+            return Err(Error::InvalidDestinationType {
+                destination_type: destination.size.data_type,
+            });
         }
+        if !matches!(
+            source.size.data_type,
+            quil_rs::instruction::ScalarType::Real
+        ) {
+            return Err(Error::InvalidSourceType {
+                source_type: source.size.data_type,
+            });
+        }
+        if destination
+            .size
+            .length
+            .to_f64()
+            .map_or(true, |destination_length| {
+                destination_length % sub_region_size.into() != 0f64
+            })
+        {
+            return Err(Error::InvalidDestinationLength {
+                destination_length: destination.size.length,
+                sub_region_size: sub_region_size.into(),
+            });
+        }
+
+        if source.size.length.to_f64().map_or(true, |source_length| {
+            source_length % sub_region_size.into() != 0f64
+        }) {
+            return Err(Error::InvalidSourceLength {
+                source_length: source.size.length,
+                sub_region_size: sub_region_size.into(),
+            });
+        }
+
+        Ok(Self {
+            destination_memory_region_name: destination.name.clone(),
+            source_memory_region_name: source.name.clone(),
+            sub_region_size: sub_region_size.into(),
+            seed_memory_region_name: seed.name.clone(),
+        })
     }
 }
 
@@ -81,10 +145,13 @@ impl TryFrom<ChooseRandomRealSubRegions> for Call {
         Self::try_new(
             ChooseRandomRealSubRegions::NAME.to_string(),
             vec![
-                UnresolvedCallArgument::Identifier(value.destination.clone()),
-                UnresolvedCallArgument::Identifier(value.source.to_string()),
-                UnresolvedCallArgument::Immediate(value.sub_region_size),
-                UnresolvedCallArgument::Identifier(value.seed.clone()),
+                UnresolvedCallArgument::Identifier(value.destination_memory_region_name),
+                UnresolvedCallArgument::Identifier(value.source_memory_region_name),
+                UnresolvedCallArgument::Immediate(Complex64 {
+                    re: value.sub_region_size,
+                    im: 0.0,
+                }),
+                UnresolvedCallArgument::Identifier(value.seed_memory_region_name),
             ],
         )
     }
@@ -99,8 +166,9 @@ impl ExternedCall for ChooseRandomRealSubRegions {
     /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions`
     /// instruction. The signature is:
     ///
-    /// rust ignore
+    /// ```text
     ///     "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
+    /// ```
     fn build_signature() -> Result<quil_rs::instruction::ExternSignature> {
         use quil_rs::instruction::{ExternParameter, ExternParameterType};
 
@@ -205,27 +273,29 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 }
 
 /// Given a seed, start index, series length, and sub-region count, this function
-/// will generate the sequence of pseudo-randomly chosen indices Rigetti control
-/// systems.
+/// will generate and return the sequence of pseudo-randomly chosen indices on
+/// the Rigetti control systems.
 ///
 /// For instance, if the following Quil program is run for 100 shots:
 ///
 /// ```quil
 /// # presumed sub-region size is 3.
 /// DECLARE destination REAL[6] # prng invocations per shot = (6 / sub_region_size)  = 2
-/// DELCARE source REAL[12]     # implicit sub-region count = (12 / sub_region_size) = 4
+/// DECLARE source REAL[12]     # implicit sub-region count = (12 / sub_region_size) = 4
 /// DECLARE seed INTEGER[1]
 /// DECLARE ro BIT[1]
 ///
 /// DELAY 0 1e-6
 ///
-// PRAGMA EXTERN choose_random_real_sub_regions "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
-// CALL choose_random_real_sub_regions destination source 3 seed
+/// PRAGMA EXTERN choose_random_real_sub_regions "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
+/// CALL choose_random_real_sub_regions destination source 3 seed
 /// ```
 ///
 /// with a seed of 639523, you could backout the randomly chosen sub-regions with the following:
 ///
 /// ```rust
+/// use super::choose_random_real_sub_regions;
+///
 /// let seed = 639523;
 /// let start_index = 0;
 /// let prng_invocations_per_shot = 2;
@@ -251,8 +321,16 @@ pub fn choose_random_real_sub_region_indices(
 mod tests {
     use std::{collections::HashMap, fs::File};
 
+    /// These are values that have been validated as final memory read off Rigetti QPUs.
     fn prng_sequences() -> HashMap<u32, Vec<(u64, u64)>> {
-        serde_json::de::from_reader(File::open("tests/prng_test_cases.json").unwrap()).unwrap()
+        serde_json::de::from_reader(
+            File::open(concat!(
+                env!("CARGO_MANIFEST_DIR"),
+                "/tests/prng_test_cases.json"
+            ))
+            .unwrap(),
+        )
+        .unwrap()
     }
 
     #[test]
