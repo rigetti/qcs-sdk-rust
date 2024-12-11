@@ -113,12 +113,12 @@ impl PyUnitarySet {
         Self(UnitarySet::Zxzxz(inner.to_owned_array()))
     }
 
-    fn to_zxzxz<'a>(&self, py: Python<'a>) -> PyResult<&'a PyArray2<f64>> {
+    fn to_zxzxz<'py>(&self, py: Python<'py>) -> PyResult<&'py PyArray2<f64>> {
         let UnitarySet::Zxzxz(matrix) = self.as_inner();
         Ok(PyArray2::from_array(py, matrix))
     }
 
-    fn as_zxzxz<'a>(&self, py: Python<'a>) -> Option<&'a PyArray2<f64>> {
+    fn as_zxzxz<'py>(&self, py: Python<'py>) -> Option<&'py PyArray2<f64>> {
         self.to_zxzxz(py).ok()
     }
 
