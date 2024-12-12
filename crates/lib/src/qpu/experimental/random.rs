@@ -294,7 +294,7 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 /// with a seed of 639523, you could backout the randomly chosen sub-regions with the following:
 ///
 /// ```rust
-/// use crate::qpu::experimental::random::choose_random_real_sub_regions;
+/// use qcs::qpu::experimental::random::choose_random_real_sub_regions;
 ///
 /// let seed = 639523;
 /// let start_index = 0;
