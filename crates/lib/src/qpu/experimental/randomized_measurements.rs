@@ -200,10 +200,10 @@ impl RandomizedMeasurements {
     pub fn append_to_program(&self, target_program: Program) -> Result<Program> {
         let measured_qubits = target_program
             .to_instructions()
-            .iter()
+            .into_iter()
             .filter_map(|instruction| {
                 if let Instruction::Measurement(measurement) = instruction {
-                    Some(measurement.qubit.clone())
+                    Some(measurement.qubit)
                 } else {
                     None
                 }
@@ -213,11 +213,14 @@ impl RandomizedMeasurements {
             .qubit_randomizations
             .iter()
             .filter(|randomization| measured_qubits.contains(&randomization.measurement.qubit))
-            .map(|randomization| randomization.measurement.qubit.clone())
+            .map(|randomization| &randomization.measurement.qubit)
             .collect::<HashSet<_>>();
         if !qubits_with_redundant_measurements.is_empty() {
             return Err(Error::ProgramContainsPreexistingMeasurements(
-                qubits_with_redundant_measurements,
+                qubits_with_redundant_measurements
+                    .into_iter()
+                    .cloned()
+                    .collect(),
             ));
         }
         let mut program = target_program.clone_without_body_instructions();
@@ -399,7 +402,7 @@ impl UnitarySet {
     /// Return the unitaries underlying a ZXZXZ decomposition. If the
     /// [`UnitarySet`] is not a ZXZXZ decomposition, return `None`.
     #[must_use]
-    pub fn to_zxzxz(&self) -> Option<&Array2<f64>> {
+    pub fn as_zxzxz(&self) -> Option<&Array2<f64>> {
         match &self.0 {
             UnitarySetInner::Zxzxz(unitaries) => Some(unitaries),
         }

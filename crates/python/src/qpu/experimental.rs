@@ -109,14 +109,17 @@ rigetti_pyo3::impl_repr!(PyUnitarySet);
 #[pymethods]
 impl PyUnitarySet {
     #[staticmethod]
-    fn from_zxzxz(inner: &PyArray2<f64>) -> PyUnitarySet {
-        Self(UnitarySet::try_new_zxzxz(inner.to_owned_array()).unwrap())
+    fn from_zxzxz(inner: &PyArray2<f64>) -> PyResult<PyUnitarySet> {
+        UnitarySet::try_new_zxzxz(inner.to_owned_array())
+            .map(Self)
+            .map_err(RustRandomizedMeasurementsError::from)
+            .map_err(RustRandomizedMeasurementsError::to_py_err)
     }
 
     fn to_zxzxz<'py>(&self, py: Python<'py>) -> PyResult<&'py PyArray2<f64>> {
         let matrix = self
             .as_inner()
-            .to_zxzxz()
+            .as_zxzxz()
             .ok_or_else(|| PyValueError::new_err("unitary set is not ZXZXZ"))?;
         Ok(PyArray2::from_array(py, matrix))
     }
