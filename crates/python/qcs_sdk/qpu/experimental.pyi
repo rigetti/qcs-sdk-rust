@@ -1,4 +1,5 @@
-from typing import Dict, List, Optional, Self, Tuple, final
+from typing import Dict, List, Optional, Tuple, final
+from typing_extensions import Self
 
 import numpy as np
 from numpy.typing import NDArray
