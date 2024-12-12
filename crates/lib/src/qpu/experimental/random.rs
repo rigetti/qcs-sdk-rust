@@ -3,10 +3,21 @@ use std::{convert::TryFrom, ops::BitXor};
 
 use crate::qpu::externed_call::ExternedCall;
 use num::{complex::Complex64, ToPrimitive};
+use quil_rs::instruction::{ExternParameter, ExternParameterType, ExternSignature};
 use quil_rs::{
     instruction::{Call, CallError, ExternError, UnresolvedCallArgument},
     quil::ToQuilError,
 };
+
+/// Hardware values are 48 bits long.
+const MAX_SEQUENCER_VALUE: u64 = 0x0000_FFFF_FFFF_FFFF;
+
+/// Hardware multiplication currently uses the lower 16 bits of
+/// the PRNG value.
+const MAX_UNSIGNED_MULTIPLIER: u64 = 0x0000_0000_0000_FFFF;
+
+/// The taps for the LFSR used on Rigetti control systems.
+const V1_TAPS: [u32; 4] = [47, 46, 20, 19];
 
 /// An error that may occur using the randomization primitives defined
 /// in this module.
@@ -14,7 +25,7 @@ use quil_rs::{
 pub enum Error {
     /// An invalid seed value was provided.
     #[error(
-        "seed values must be in range [1, {MAX_SEQUENCER_VALUE}) and losslessly convertible to f64, found {0}"
+        "seed values must be in range [1, {MAX_SEQUENCER_VALUE}] and losslessly convertible to f64, found {0}"
     )]
     InvalidSeed(u64),
     /// An error occurred while converting to Quil.
@@ -169,10 +180,8 @@ impl ExternedCall for ChooseRandomRealSubRegions {
     /// ```text
     ///     "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
     /// ```
-    fn build_signature() -> Result<quil_rs::instruction::ExternSignature> {
-        use quil_rs::instruction::{ExternParameter, ExternParameterType};
-
-        let parameters = vec![
+    fn build_signature() -> Result<ExternSignature> {
+        vec![
             ExternParameter::try_new(
                 "destination".to_string(),
                 true,
@@ -196,25 +205,18 @@ impl ExternedCall for ChooseRandomRealSubRegions {
         ]
         .into_iter()
         .map(|r| r.map_err(Error::from))
-        .collect::<Result<Vec<ExternParameter>>>()?;
-        Ok(quil_rs::instruction::ExternSignature::new(None, parameters))
+        .collect::<Result<Vec<ExternParameter>>>()
+        .map(|parameters| ExternSignature::new(None, parameters))
     }
 }
-
-/// Hardware values are 48 bits long.
-const MAX_SEQUENCER_VALUE: u64 = 0xFFFF_FFFF_FFFF;
-
-/// Hardware multiplication currently uses the lower 16 bits of
-/// the PRNG value.
-const MAX_UNSIGNED_MULTIPLIER: u64 = 0x0000_0000_FFFF;
 
 /// A valid seed value that may be used to initialize the PRNG. Such
 /// values are in the range `[1, MAX_SEQUENCER_VALUE]` and are losslessly
 /// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
 pub struct PrngSeedValue {
-    as_u64: u64,
-    pub(super) as_f64: f64,
+    u64_value: u64,
+    f64_value: f64,
 }
 
 impl PrngSeedValue {
@@ -227,29 +229,33 @@ impl PrngSeedValue {
         }
         if let Some(f64_value) = value.to_f64() {
             Ok(Self {
-                as_u64: value,
-                as_f64: f64_value,
+                u64_value: value,
+                f64_value,
             })
         } else {
             Err(Error::InvalidSeed(value))
         }
     }
+
+    pub(super) fn as_f64(&self) -> f64 {
+        self.f64_value
+    }
 }
 
 fn lfsr_next(seed: u64, taps: &[u32]) -> u64 {
     let feedback_value = taps.iter().fold(0, |acc, tap| {
-        let base = 2u64.pow(*tap - 1);
+        let base = 2u64.pow(*tap);
         let bit = u64::from((seed & base) != 0);
         acc.bitxor(bit)
     });
-    (seed << 1) & MAX_SEQUENCER_VALUE | feedback_value
+    ((seed << 1) & MAX_SEQUENCER_VALUE) | feedback_value
 }
 
 /// This represents the LFSR currently implemented on Rigetti control systems. Specifically,
-/// it implements a 48-bit LFSR with taps at indices 48, 47, 21, and 20.
+/// it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
 #[must_use]
 pub fn lfsr_v1_next(seed: PrngSeedValue) -> u64 {
-    lfsr_next(seed.as_u64, &[48, 47, 21, 20])
+    lfsr_next(seed.u64_value, &V1_TAPS)
 }
 
 fn generate_lfsr_v1_sequence(seed: u64, start_index: u32, series_length: u32) -> Vec<u64> {
@@ -258,7 +264,7 @@ fn generate_lfsr_v1_sequence(seed: u64, start_index: u32, series_length: u32) ->
     let range = start_index..(start_index + series_length);
     let mut collection = vec![];
     for i in 0..(start_index + series_length) {
-        lfsr = lfsr_next(lfsr, &[48, 47, 21, 20]);
+        lfsr = lfsr_next(lfsr, &V1_TAPS);
         if range.contains(&i) {
             collection.push(lfsr);
         }
@@ -311,7 +317,7 @@ pub fn choose_random_real_sub_region_indices(
     series_length: u32,
     sub_region_count: u8,
 ) -> Vec<u8> {
-    generate_lfsr_v1_sequence(seed.as_u64, start_index, series_length)
+    generate_lfsr_v1_sequence(seed.u64_value, start_index, series_length)
         .iter()
         .map(|&value| prng_value_to_sub_region_index(value, sub_region_count))
         .collect()

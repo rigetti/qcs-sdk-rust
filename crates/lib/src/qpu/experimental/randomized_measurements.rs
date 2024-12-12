@@ -39,6 +39,10 @@ use super::random::{ChooseRandomRealSubRegions, PrngSeedValue};
 use crate::executable::Parameters;
 use crate::qpu::externed_call::ExternedCall;
 
+const RANDOMIZED_MEASUREMENT_SOURCE: &str = "randomized_measurement_source";
+const RANDOMIZED_MEASUREMENT_DESTINATION: &str = "randomized_measurement_destination";
+const RANDOMIZED_MEASUREMENT_SEED: &str = "randomized_measurement_seed";
+
 /// An error that may occur when constructing randomized measurements.
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
@@ -115,10 +119,6 @@ impl QubitRandomization {
         MemoryReference::new(self.destination_declaration.name.clone(), index)
     }
 }
-
-const RANDOMIZED_MEASUREMENT_SOURCE: &str = "randomized_measurement_source";
-const RANDOMIZED_MEASUREMENT_DESTINATION: &str = "randomized_measurement_destination";
-const RANDOMIZED_MEASUREMENT_SEED: &str = "randomized_measurement_seed";
 
 /// Configuration for adding randomized measurements to a Quil program.
 #[derive(Debug, Clone)]
@@ -305,7 +305,7 @@ impl RandomizedMeasurements {
                     .name
                     .clone()
                     .into_boxed_str(),
-                vec![seed_value.as_f64],
+                vec![seed_value.as_f64()],
             );
             parameters.insert(
                 qubit_randomization
