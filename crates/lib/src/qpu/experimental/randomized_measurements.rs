@@ -213,14 +213,11 @@ impl RandomizedMeasurements {
             .qubit_randomizations
             .iter()
             .filter(|randomization| measured_qubits.contains(&randomization.measurement.qubit))
-            .map(|randomization| &randomization.measurement.qubit)
+            .map(|randomization| randomization.measurement.qubit.clone())
             .collect::<HashSet<_>>();
         if !qubits_with_redundant_measurements.is_empty() {
             return Err(Error::ProgramContainsPreexistingMeasurements(
-                qubits_with_redundant_measurements
-                    .into_iter()
-                    .cloned()
-                    .collect(),
+                qubits_with_redundant_measurements,
             ));
         }
         let mut program = target_program.clone_without_body_instructions();
