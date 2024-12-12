@@ -17,7 +17,10 @@
 //! unitary set and using randomized measurement data is beyond the scope of this
 //! library.
 
-use std::{collections::HashMap, convert::TryFrom};
+use std::{
+    collections::{HashMap, HashSet},
+    convert::TryFrom,
+};
 
 use itertools::Itertools;
 use ndarray::{Array2, Order};
@@ -32,7 +35,7 @@ use quil_rs::{
     Program,
 };
 
-use super::random::PrngSeedValue;
+use super::random::{ChooseRandomRealSubRegions, PrngSeedValue};
 use crate::executable::Parameters;
 use crate::qpu::externed_call::ExternedCall;
 
@@ -68,6 +71,9 @@ pub enum Error {
         "the number of parameters per unitary must be within range [0, {}], found {0}", 2_u64.pow(f64::MANTISSA_DIGITS) - 1
     )]
     ParametersPerUnitaryF64Conversion(usize),
+    /// The program already contains measurements.
+    #[error("program contains preexisting measurements on qubits: {0:?}")]
+    ProgramContainsPreexistingMeasurements(HashSet<Qubit>),
     /// A seed value could not be expressed losslessly as an f64.
     #[error("the seed value must be within range [0, {}], found {0}", 2_u64.pow(f64::MANTISSA_DIGITS) - 1)]
     SeedValueF64Conversion(usize),
@@ -92,7 +98,7 @@ impl QubitRandomization {
         parameters_per_unitary: f64,
         source_declaration: &Declaration,
     ) -> Result<Instruction> {
-        let externed_call = super::random::ChooseRandomRealSubRegions::try_new(
+        let externed_call = ChooseRandomRealSubRegions::try_new(
             &self.destination_declaration,
             source_declaration,
             parameters_per_unitary,
@@ -159,15 +165,12 @@ impl RandomizedMeasurements {
             })
             .map_ok(|(measurement, qubit_name)| QubitRandomization {
                 seed_declaration: Declaration {
-                    name: format!("{RANDOMIZED_MEASUREMENT_SEED}_{}", qubit_name.clone()),
+                    name: format!("{RANDOMIZED_MEASUREMENT_SEED}_{qubit_name}"),
                     size: Vector::new(ScalarType::Integer, 1),
                     sharing: None,
                 },
                 destination_declaration: Declaration {
-                    name: format!(
-                        "{RANDOMIZED_MEASUREMENT_DESTINATION}_{}",
-                        qubit_name.clone()
-                    ),
+                    name: format!("{RANDOMIZED_MEASUREMENT_DESTINATION}_{qubit_name}"),
                     size: Vector::new(
                         ScalarType::Real,
                         unitary_set.parameters_per_unitary() as u64,
@@ -193,8 +196,30 @@ impl RandomizedMeasurements {
 
 impl RandomizedMeasurements {
     /// Append the randomized measurements to a Quil program. The provided program
-    /// should not contain any preexisting measurements.
+    /// must not contain any preexisting measurements.
     pub fn append_to_program(&self, target_program: Program) -> Result<Program> {
+        let measured_qubits = target_program
+            .to_instructions()
+            .iter()
+            .filter_map(|instruction| {
+                if let Instruction::Measurement(measurement) = instruction {
+                    Some(measurement.qubit.clone())
+                } else {
+                    None
+                }
+            })
+            .collect::<HashSet<_>>();
+        let qubits_with_redundant_measurements = self
+            .qubit_randomizations
+            .iter()
+            .filter(|randomization| measured_qubits.contains(&randomization.measurement.qubit))
+            .map(|randomization| randomization.measurement.qubit.clone())
+            .collect::<HashSet<_>>();
+        if !qubits_with_redundant_measurements.is_empty() {
+            return Err(Error::ProgramContainsPreexistingMeasurements(
+                qubits_with_redundant_measurements,
+            ));
+        }
         let mut program = target_program.clone_without_body_instructions();
 
         program.add_instruction(Instruction::Declaration(self.source_declaration.clone()));
@@ -220,7 +245,7 @@ impl RandomizedMeasurements {
 
         // declare "choose_random_real_sub_regions" as an external function
         program.add_instruction(Instruction::Pragma(
-            super::random::ChooseRandomRealSubRegions::pragma_extern()?,
+            ChooseRandomRealSubRegions::pragma_extern()?,
         ));
 
         let parameters_per_unitary = self
@@ -288,9 +313,7 @@ impl RandomizedMeasurements {
                     .name
                     .clone()
                     .into_boxed_str(),
-                std::iter::repeat(0.0)
-                    .take(self.unitary_set.parameters_per_unitary())
-                    .collect(),
+                vec![0.0; self.unitary_set.parameters_per_unitary()],
             );
         }
 
@@ -325,45 +348,47 @@ impl RandomizedMeasurements {
 /// A set of unitaries, each of which may be expressed as a set of Quil
 /// instructions.
 #[derive(Debug, Clone)]
-pub enum UnitarySet {
-    /// A set of unitaries expressed as a sequence of the following gate
+pub struct UnitarySet(UnitarySetInner);
+
+#[derive(Debug, Clone)]
+enum UnitarySetInner {
+    Zxzxz(Array2<f64>),
+}
+
+impl UnitarySet {
+    /// Initialize a set of unitaries expressed as a sequence of the following gate
     /// operations:
     ///
     /// RZ(angle_0)-RX(pi/2)-RZ(angle_1)-RX(pi/2)-RZ(angle_2).
     ///
     /// The unitaries are stored in a 2D array where each row represents
-    /// a single unitary expressed as the three RZ angles.
-    Zxzxz(Array2<f64>),
-}
-
-impl UnitarySet {
-    /// Attempt to create a new instance of [`UnitarySet`] from a 2D array
-    /// of unitaries. The array must have three columns.
-    pub fn try_new_zxzxz(unitaries: Array2<f64>) -> Result<UnitarySet> {
+    /// a single unitary expressed as the three RZ angles. The array must have
+    /// three columns.
+    pub fn try_new_zxzxz(unitaries: Array2<f64>) -> Result<Self> {
         if unitaries.ncols() != 3 {
             return Err(Error::InvalidUnitarySet {
                 expected: 3,
                 found: unitaries.ncols(),
             });
         }
-        Ok(UnitarySet::Zxzxz(unitaries))
+        Ok(UnitarySet(UnitarySetInner::Zxzxz(unitaries)))
     }
 
     fn unitary_count(&self) -> usize {
-        match self {
-            UnitarySet::Zxzxz(unitaries) => unitaries.nrows(),
+        match &self.0 {
+            UnitarySetInner::Zxzxz(unitaries) => unitaries.nrows(),
         }
     }
 
     const fn parameters_per_unitary(&self) -> usize {
-        match self {
-            UnitarySet::Zxzxz(_) => 3,
+        match self.0 {
+            UnitarySetInner::Zxzxz(_) => 3,
         }
     }
 
     fn to_parameters(&self) -> Result<Vec<f64>> {
-        match self {
-            UnitarySet::Zxzxz(unitaries) => Ok(unitaries
+        match &self.0 {
+            UnitarySetInner::Zxzxz(unitaries) => Ok(unitaries
                 .to_shape((unitaries.len(), Order::RowMajor))?
                 .iter()
                 .copied()
@@ -371,9 +396,24 @@ impl UnitarySet {
         }
     }
 
+    /// Return the unitaries underlying a ZXZXZ decomposition. If the
+    /// [`UnitarySet`] is not a ZXZXZ decomposition, return `None`.
+    #[must_use]
+    pub fn to_zxzxz(&self) -> Option<&Array2<f64>> {
+        match &self.0 {
+            UnitarySetInner::Zxzxz(unitaries) => Some(unitaries),
+        }
+    }
+
+    /// Indicates whether the [`UnitarySet`] is a ZXZXZ decomposition.
+    #[must_use]
+    pub fn is_zxzxz(&self) -> bool {
+        matches!(self.0, UnitarySetInner::Zxzxz(_))
+    }
+
     fn to_instructions(&self, qubit_randomizations: &[QubitRandomization]) -> Vec<Instruction> {
-        match self {
-            Self::Zxzxz(_) => Self::to_zxzxz_instructions(qubit_randomizations),
+        match self.0 {
+            UnitarySetInner::Zxzxz(_) => Self::to_zxzxz_instructions(qubit_randomizations),
         }
     }
 
@@ -385,7 +425,7 @@ impl UnitarySet {
                     qubit_randomization.measurement.qubit.clone(),
                     qubit_randomization.destination_reference(0),
                 ),
-                rx_pi_on_2(qubit_randomization.measurement.qubit.clone()),
+                rx_pi_over_2(qubit_randomization.measurement.qubit.clone()),
                 rz(
                     qubit_randomization.measurement.qubit.clone(),
                     qubit_randomization.destination_reference(1),
@@ -395,7 +435,7 @@ impl UnitarySet {
         instructions.push(Instruction::Fence(Fence { qubits: Vec::new() }));
         for qubit_randomization in qubit_randomizations {
             instructions.extend(vec![
-                rx_pi_on_2(qubit_randomization.measurement.qubit.clone()),
+                rx_pi_over_2(qubit_randomization.measurement.qubit.clone()),
                 rz(
                     qubit_randomization.measurement.qubit.clone(),
                     qubit_randomization.destination_reference(2),
@@ -406,7 +446,7 @@ impl UnitarySet {
     }
 }
 
-fn rx_pi_on_2(qubit: Qubit) -> Instruction {
+fn rx_pi_over_2(qubit: Qubit) -> Instruction {
     Instruction::Gate(Gate {
         name: "RX".to_string(),
         parameters: vec![
@@ -446,7 +486,7 @@ H 1
 H 2
 ";
 
-    const BASE_QUIL_PROGRAM_WITH_MEASUREMENTS: &str = r#"
+    const BASE_QUIL_PROGRAM_WITH_RANDOMIZED_MEASUREMENTS: &str = r#"
 DECLARE ro BIT[3]
 DECLARE randomized_measurement_source REAL[36]
 DECLARE randomized_measurement_destination_q0 REAL[3]
@@ -556,7 +596,7 @@ MEASURE 2 ro[2]
         let unitary_set = UnitarySet::try_new_zxzxz(
             Array2::from_shape_vec((12, 3), unitary_set).expect("must be valid unitary array"),
         )
-        .expect("valid unitary set");
+        .expect("must be a valid unitary set");
         let leading_delay = Expression::Number(Complex64 { re: 1e-6, im: 0.0 });
 
         RandomizedMeasurements::try_new(measurements, unitary_set, leading_delay)
@@ -571,7 +611,7 @@ MEASURE 2 ro[2]
             )
             .expect("must append to program");
 
-        let expected_program = Program::from_str(BASE_QUIL_PROGRAM_WITH_MEASUREMENTS)
+        let expected_program = Program::from_str(BASE_QUIL_PROGRAM_WITH_RANDOMIZED_MEASUREMENTS)
             .expect("must be valid Quil program");
 
         assert_eq!(randomized_program, expected_program);

@@ -110,11 +110,14 @@ rigetti_pyo3::impl_repr!(PyUnitarySet);
 impl PyUnitarySet {
     #[staticmethod]
     fn from_zxzxz(inner: &PyArray2<f64>) -> PyUnitarySet {
-        Self(UnitarySet::Zxzxz(inner.to_owned_array()))
+        Self(UnitarySet::try_new_zxzxz(inner.to_owned_array()).unwrap())
     }
 
     fn to_zxzxz<'py>(&self, py: Python<'py>) -> PyResult<&'py PyArray2<f64>> {
-        let UnitarySet::Zxzxz(matrix) = self.as_inner();
+        let matrix = self
+            .as_inner()
+            .to_zxzxz()
+            .ok_or_else(|| PyValueError::new_err("unitary set is not ZXZXZ"))?;
         Ok(PyArray2::from_array(py, matrix))
     }
 
@@ -123,7 +126,7 @@ impl PyUnitarySet {
     }
 
     fn is_zxzxz(&self) -> bool {
-        matches!(self.as_inner(), UnitarySet::Zxzxz(_))
+        self.as_inner().is_zxzxz()
     }
 }
 
