@@ -3,6 +3,8 @@
 
 use std::{convert::TryFrom, fmt, time::Duration};
 
+#[deny(clippy::module_name_repetitions)]
+pub use ::pbjson_types::Duration as QpuApiDuration;
 use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
@@ -356,26 +358,6 @@ impl Default for ExecutionOptions {
 
 impl Eq for ExecutionOptions {}
 
-fn try_std_duration_from_pbjson_types_duration(
-    duration: ::pbjson_types::Duration,
-) -> Result<Duration, QpuApiError> {
-    let seconds = u64::try_from(duration.seconds)
-        .map_err(|error| QpuApiError::StdFromProtoDurationConversion { error, duration })?;
-    let nanos = u32::try_from(duration.nanos)
-        .map_err(|error| QpuApiError::StdFromProtoDurationConversion { error, duration })?;
-    Ok(Duration::new(seconds, nanos))
-}
-
-fn try_pbjson_types_duration_from_std_duration(
-    duration: Duration,
-) -> Result<::pbjson_types::Duration, QpuApiError> {
-    let seconds = i64::try_from(duration.as_secs())
-        .map_err(|error| QpuApiError::ProtoFromStdDurationConversion { duration, error })?;
-    let nanos = i32::try_from(duration.subsec_nanos())
-        .map_err(|error| QpuApiError::ProtoFromStdDurationConversion { duration, error })?;
-    Ok(::pbjson_types::Duration { seconds, nanos })
-}
-
 /// Options available when executing a job on a QPU, particular to the execution service's API.
 /// This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
 ///
@@ -414,10 +396,8 @@ impl ApiExecutionOptions {
     ///
     /// The service may also enforce a maximum value for this field.
     #[must_use]
-    pub fn timeout(&self) -> Option<Duration> {
-        self.inner
-            .timeout
-            .and_then(|duration| try_std_duration_from_pbjson_types_duration(duration).ok())
+    pub fn timeout(&self) -> Option<::pbjson_types::Duration> {
+        self.inner.timeout
     }
 }
 
@@ -443,12 +423,13 @@ impl ApiExecutionOptionsBuilder {
     }
 
     /// Set the `timeout` value. See [`ApiExecutionOptions::timeout`] for more information.
-    pub fn timeout(&mut self, timeout: Option<Duration>) -> Result<&mut Self, QpuApiError> {
+    pub fn timeout(
+        &mut self,
+        timeout: Option<::pbjson_types::Duration>,
+    ) -> Result<&mut Self, QpuApiError> {
         self.inner
             .get_or_insert(InnerApiExecutionOptions::default())
-            .timeout = timeout
-            .map(try_pbjson_types_duration_from_std_duration)
-            .transpose()?;
+            .timeout = timeout;
         Ok(self)
     }
 }
@@ -788,28 +769,6 @@ pub enum QpuApiError {
         /// The message describing the failure to convert the numeric status
         /// identifier into a known status type.
         message: String,
-    },
-
-    /// Error converting [`Duration`] from [`pbjson_types::Duration`]
-    #[error(
-        "timeout duration must be losslessly convertible to proto duration: {duration:?}: {error}"
-    )]
-    ProtoFromStdDurationConversion {
-        /// The error that occurred while converting the duration.
-        error: std::num::TryFromIntError,
-        /// The duration that could not be converted.
-        duration: Duration,
-    },
-
-    /// Error converting [`pbjson_types::Duration`] from [`Duration`]
-    #[error(
-        "timeout duration must be losslessly convertible to std::time::Duration: {duration:?}: {error}"
-    )]
-    StdFromProtoDurationConversion {
-        /// The error that occurred while converting the duration.
-        error: std::num::TryFromIntError,
-        /// The duration that could not be converted.
-        duration: ::pbjson_types::Duration,
     },
 }
 

@@ -13,7 +13,7 @@ use pyo3::{
 };
 use qcs::qpu::api::{
     ApiExecutionOptions, ApiExecutionOptionsBuilder, ConnectionStrategy, ExecutionOptions,
-    ExecutionOptionsBuilder,
+    ExecutionOptionsBuilder, QpuApiDuration,
 };
 use qcs_api_client_grpc::models::controller::{
     data_value, readout_values, ControllerJobExecutionResult,
@@ -36,7 +36,8 @@ create_init_submodule! {
         PyExecutionOptions,
         PyExecutionOptionsBuilder,
         PyApiExecutionOptions,
-        PyApiExecutionOptionsBuilder
+        PyApiExecutionOptionsBuilder,
+        PyQpuApiDuration
     ],
     errors: [
         SubmissionError,
@@ -479,6 +480,13 @@ impl PyApiExecutionOptions {
     fn bypass_settings_protection(&self) -> bool {
         self.as_inner().bypass_settings_protection()
     }
+
+    #[getter]
+    fn timeout(&self) -> Option<PyQpuApiDuration> {
+        self.as_inner()
+            .timeout()
+            .map(|inner| PyQpuApiDuration { inner })
+    }
 }
 
 py_wrap_type! {
@@ -539,29 +547,29 @@ py_wrap_type! {
     PyApiExecutionOptionsBuilder(ApiExecutionOptionsBuilder) as "APIExecutionOptionsBuilder"
 }
 
-#[pyclass(name = "Duration")]
+#[pyclass(name = "QpuApiDuration")]
 #[derive(Debug, Clone)]
-pub struct PyDuration {
-    inner: Duration,
+pub struct PyQpuApiDuration {
+    inner: QpuApiDuration,
 }
 
 #[pymethods]
-impl PyDuration {
+impl PyQpuApiDuration {
     #[new]
-    fn new(seconds: u64, nanos: u32) -> Self {
+    fn new(seconds: i64, nanos: i32) -> Self {
         Self {
-            inner: Duration::new(seconds, nanos),
+            inner: QpuApiDuration { seconds, nanos },
         }
     }
 
     #[getter]
-    fn seconds(&self) -> u64 {
-        self.inner.as_secs()
+    fn seconds(&self) -> i64 {
+        self.inner.seconds
     }
 
     #[getter]
-    fn nanos(&self) -> u32 {
-        self.inner.subsec_nanos()
+    fn nanos(&self) -> i32 {
+        self.inner.nanos
     }
 }
 
@@ -591,7 +599,7 @@ impl PyApiExecutionOptionsBuilder {
     }
 
     #[setter]
-    fn timeout(&mut self, timeout: Option<PyDuration>) -> PyResult<()> {
+    fn timeout(&mut self, timeout: Option<PyQpuApiDuration>) -> PyResult<()> {
         *self = Self::from(
             self.as_inner()
                 .clone()
