@@ -12,6 +12,7 @@ readme = "./README.md"
 [features]
 libquil = ["qcs/libquil"]
 grpc-web = ["qcs/grpc-web"]
+pyo3-tracing-subscriber-build = []
 
 [lib]
 name = "qcs_sdk"
