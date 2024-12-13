@@ -604,7 +604,6 @@ impl PyApiExecutionOptionsBuilder {
             self.as_inner()
                 .clone()
                 .timeout(timeout.map(|timeout| timeout.inner))
-                .map_err(|err| PyValueError::new_err(err.to_string()))?
                 .clone(),
         );
         Ok(())

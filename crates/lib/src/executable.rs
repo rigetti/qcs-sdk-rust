@@ -344,10 +344,9 @@ impl Executable<'_, '_> {
     }
 
     fn get_readouts(&self) -> &[Cow<'_, str>] {
-        return self
-            .readout_memory_region_names
+        self.readout_memory_region_names
             .as_ref()
-            .map_or(&[Cow::Borrowed("ro")], Vec::as_slice);
+            .map_or(&[Cow::Borrowed("ro")], Vec::as_slice)
     }
 
     /// Execute on a QVM which must be available at the configured URL (default <http://localhost:5000>).

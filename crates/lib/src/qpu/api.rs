@@ -423,14 +423,11 @@ impl ApiExecutionOptionsBuilder {
     }
 
     /// Set the `timeout` value. See [`ApiExecutionOptions::timeout`] for more information.
-    pub fn timeout(
-        &mut self,
-        timeout: Option<::pbjson_types::Duration>,
-    ) -> Result<&mut Self, QpuApiError> {
+    pub fn timeout(&mut self, timeout: Option<::pbjson_types::Duration>) -> &mut Self {
         self.inner
             .get_or_insert(InnerApiExecutionOptions::default())
             .timeout = timeout;
-        Ok(self)
+        self
     }
 }
 
