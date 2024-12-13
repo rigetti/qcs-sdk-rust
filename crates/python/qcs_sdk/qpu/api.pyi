@@ -395,6 +395,26 @@ class ExecutionOptionsBuilder:
     def build(self) -> ExecutionOptions:
         """Build the ``ExecutionOptions`` using the options set in this builder."""
 
+
+@final
+class QpuApiDuration:
+    def __new__(cls, seconds: int, nanos: int) -> "QpuApiDuration":
+        """
+        Create a new QpuApiDuration with the given number of seconds and nanoseconds.
+        """
+        ... 
+
+    @property
+    def seconds(self) -> int:
+        """The number of seconds in the duration."""
+        ...
+
+    @property
+    def nanos(self) -> int:
+        """The number of nanoseconds in the duration."""
+        ...
+
+
 @final
 class APIExecutionOptions:
     @staticmethod
@@ -407,6 +427,23 @@ class APIExecutionOptions:
     @property
     def bypass_settings_protection(self) -> bool:
         """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+
+    @property
+    def timeout(self) -> QpuApiDuration:
+        """
+        The job timeout.
+
+        Note, this is the timeout while running a job; the job will be evicted from
+        the hardware once this time has elapsed.
+    
+        If unset, the job's estimated duration will be used;
+        if the job does not have an estimated duration, the default
+        timeout is selected by the service.
+
+        The service may also enforce a maximum value for this field
+        The time in seconds to wait before timing out a request, if any.
+        """
+        ...
 
 @final
 class APIExecutionOptionsBuilder:
@@ -421,6 +458,13 @@ class APIExecutionOptionsBuilder:
     @bypass_settings_protection.setter
     def bypass_settings_protection(self, bypass_settings_protection: bool):
         """Whether or not to force managed settings to change, if applicable. Subject to additional authorization requirements."""
+    @property
+    def timeout(self) -> QpuApiDuration:
+        raise AttributeError("timeout is not readable")
+    @timeout.setter
+    def timeout(self, timeout: QpuApiDuration):
+        """Set the job timeout. See ``APIExecutionOptions.timeout`` for details."""
+
     def build(self) -> APIExecutionOptions:
         """Build the ``APIExecutionOptions`` using the options set in this builder."""
 

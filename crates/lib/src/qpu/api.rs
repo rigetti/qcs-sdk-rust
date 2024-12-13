@@ -3,6 +3,8 @@
 
 use std::{convert::TryFrom, fmt, time::Duration};
 
+#[deny(clippy::module_name_repetitions)]
+pub use ::pbjson_types::Duration as QpuApiDuration;
 use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
@@ -382,6 +384,21 @@ impl ApiExecutionOptions {
     pub fn bypass_settings_protection(&self) -> bool {
         self.inner.bypass_settings_protection
     }
+
+    /// Get the configured `timeout` value.
+    ///
+    /// Note, this is the timeout while running a job; the job will be evicted from
+    /// the hardware once this time has elapsed.
+    ///
+    /// If unset, the job's estimated duration will be used;
+    /// if the job does not have an estimated duration, the default
+    /// timeout is selected by the service.
+    ///
+    /// The service may also enforce a maximum value for this field.
+    #[must_use]
+    pub fn timeout(&self) -> Option<::pbjson_types::Duration> {
+        self.inner.timeout
+    }
 }
 
 impl From<ApiExecutionOptions> for InnerApiExecutionOptions {
@@ -402,6 +419,14 @@ impl ApiExecutionOptionsBuilder {
         self.inner
             .get_or_insert(InnerApiExecutionOptions::default())
             .bypass_settings_protection = bypass_settings_protection;
+        self
+    }
+
+    /// Set the `timeout` value. See [`ApiExecutionOptions::timeout`] for more information.
+    pub fn timeout(&mut self, timeout: Option<::pbjson_types::Duration>) -> &mut Self {
+        self.inner
+            .get_or_insert(InnerApiExecutionOptions::default())
+            .timeout = timeout;
         self
     }
 }
