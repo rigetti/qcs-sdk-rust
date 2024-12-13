@@ -1,3 +1,10 @@
+## 0.21.5
+
+### Features
+
+- expose API execution options timeout (#516)
+- Update QCS API clients, add Q-Ctrl translation option (#513)
+
 ## 0.21.5-rc.1
 
 ### Features
