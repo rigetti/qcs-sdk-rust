@@ -421,7 +421,7 @@ impl PyExecutionOptions {
     fn api_options(&self) -> Option<PyApiExecutionOptions> {
         self.as_inner()
             .api_options()
-            .map(|x| PyApiExecutionOptions(x.clone().into()))
+            .map(|x| PyApiExecutionOptions((*x).into()))
     }
 
     fn __richcmp__(&self, py: Python<'_>, other: &Self, op: CompareOp) -> PyObject {
@@ -539,6 +539,32 @@ py_wrap_type! {
     PyApiExecutionOptionsBuilder(ApiExecutionOptionsBuilder) as "APIExecutionOptionsBuilder"
 }
 
+#[pyclass(name = "Duration")]
+#[derive(Debug, Clone)]
+pub struct PyDuration {
+    inner: Duration,
+}
+
+#[pymethods]
+impl PyDuration {
+    #[new]
+    fn new(seconds: u64, nanos: u32) -> Self {
+        Self {
+            inner: Duration::new(seconds, nanos),
+        }
+    }
+
+    #[getter]
+    fn seconds(&self) -> u64 {
+        self.inner.as_secs()
+    }
+
+    #[getter]
+    fn nanos(&self) -> u32 {
+        self.inner.subsec_nanos()
+    }
+}
+
 #[pymethods]
 impl PyApiExecutionOptionsBuilder {
     #[new]
@@ -562,6 +588,18 @@ impl PyApiExecutionOptionsBuilder {
                 .bypass_settings_protection(bypass_settings_protection)
                 .clone(),
         );
+    }
+
+    #[setter]
+    fn timeout(&mut self, timeout: Option<PyDuration>) -> PyResult<()> {
+        *self = Self::from(
+            self.as_inner()
+                .clone()
+                .timeout(timeout.map(|timeout| timeout.inner))
+                .map_err(|err| PyValueError::new_err(err.to_string()))?
+                .clone(),
+        );
+        Ok(())
     }
 
     fn build(&self) -> PyResult<PyApiExecutionOptions> {
