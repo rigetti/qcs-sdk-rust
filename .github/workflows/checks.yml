@@ -31,12 +31,10 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      - name: Install poetry
-        run: pipx install poetry
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: poetry
+          cache: pip
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
