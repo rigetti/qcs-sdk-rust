@@ -21,7 +21,12 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '3.20.1'
       - name: Install libquil dependencies
-        run: sudo apt install -y libffi\* libblas\* liblapack\*
+        run: |
+          sudo apt update
+          sudo apt install -y libffi\* libblas\* liblapack\* curl
+          curl -O https://mirrors.edge.kernel.org/ubuntu/pool/main/libf/libffi/libffi7_3.3-4_amd64.deb
+          sudo apt install -y ./libffi7_3.3-4_amd64.deb
+          sudo apt install -y libffi-dev
       - name: Install libquil
         run: |
           curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0
