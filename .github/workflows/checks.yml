@@ -31,10 +31,7 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
+      - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache

@@ -26,6 +26,7 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
+      - uses: syphar/restore-virtualenv@v1
       - name: Build qcs-sdk-python documentation
         uses: actions-rs/cargo@v1
         with:
