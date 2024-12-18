@@ -24,7 +24,7 @@ jobs:
     - run: echo "Publishing wheels"
 
   macos:
-    runs-on: macos-12
+    runs-on: macos-latest
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11 -stdlib=libc++"
@@ -32,9 +32,9 @@ jobs:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
@@ -52,9 +52,9 @@ jobs:
       matrix:
         target: [x86_64, aarch64]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
@@ -72,9 +72,9 @@ jobs:
       matrix:
         target: [x86_64, ppc64le]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
@@ -94,9 +94,9 @@ jobs:
       run: |
         reg add "HKLM\SYSTEM\CurrentControlSet\Control\FileSystem" /v LongPathsEnabled /t REG_DWORD /d 1 /f
         git config --system core.longpaths true
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
@@ -115,9 +115,9 @@ jobs:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install protoc
-      uses: arduino/setup-protoc@v1
+      uses: arduino/setup-protoc@v3
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'

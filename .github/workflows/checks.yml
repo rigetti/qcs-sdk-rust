@@ -10,13 +10,13 @@ jobs:
     name: Run Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
           toolchain: stable
       - name: Install protoc
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '3.20.1'
@@ -31,7 +31,9 @@ jobs:
         with:
           command: install
           args: --debug cargo-make
-      - uses: syphar/restore-virtualenv@v1
+      - uses: actions/setup-python@v5
+        with:
+          cache: poetry
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
