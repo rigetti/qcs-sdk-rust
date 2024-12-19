@@ -1,3 +1,9 @@
+## 0.21.6-rc.0
+
+### Fixes
+
+- update rust and ci dependencies (#519)
+
 ## 0.21.5
 
 ### Features
