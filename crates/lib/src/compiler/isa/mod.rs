@@ -64,8 +64,13 @@ impl TryFrom<InstructionSetArchitecture> for Compiler {
         let qubits = qubits
             .into_iter()
             .map(|(k, v)| (k.to_string(), v))
+            .filter(|(_, q)| q.has_valid_operations())
             .collect();
-        let edges = edges.into_iter().map(|(k, v)| (k.to_string(), v)).collect();
+        let edges = edges
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .filter(|(_, e)| e.has_valid_operations())
+            .collect();
         Ok(Self { qubits, edges })
     }
 }
@@ -93,7 +98,7 @@ mod describe_compiler_isa {
     use std::{convert::TryFrom, fs::read_to_string};
 
     use float_cmp::{approx_eq, F64Margin};
-    use qcs_api_client_openapi::models::InstructionSetArchitecture;
+    use qcs_api_client_openapi::models::{InstructionSetArchitecture, Node};
     use serde_json::Value;
 
     use super::Compiler;
@@ -186,22 +191,44 @@ mod describe_compiler_isa {
     fn compiler_excludes_qubits_with_no_operations() {
         let input = read_to_string("tests/qcs-isa-with-dead-qubits.json")
             .expect("Could not read ISA with dead qubits");
-        let expected_json = read_to_string("tests/compiler-isa-with-dead-qubits.json")
-            .expect("Could not read expected output with dead qubits");
         let qcs_isa: InstructionSetArchitecture =
             serde_json::from_str(&input).expect("Could not deserialize ISA with dead qubits");
-        let expected: Value = serde_json::from_str(&expected_json)
-            .expect("Could not deserialize expected output with dead qubits");
 
-        let compiler_isa =
-            Compiler::try_from(qcs_isa).expect("Could not convert ISA with dead qubits to CompilerIsa");
+        assert!(
+            qcs_isa.architecture.nodes.contains(&Node::new(31)),
+            "Qubit 31 is in the source ISA"
+        );
+        assert!(
+            qcs_isa.architecture.edges.iter().any(|e| e.node_ids.contains(&31)),
+            "edge with Qubit 31 is in the source ISA"
+        );
 
-        assert!(!compiler_isa.qubits.contains_key("31"), "Qubit 31 should not be in the CompilerIsa");
+        let compiler_isa = Compiler::try_from(qcs_isa)
+            .expect("Could not convert ISA with dead qubits to CompilerIsa");
 
-        let serialized = serde_json::to_value(compiler_isa)
-            .expect("Unable to serialize CompilerIsa with dead qubits");
+        assert!(
+            !compiler_isa.qubits.contains_key("31"),
+            "Qubit 31 should not be in the CompilerIsa"
+        );
+        assert!(
+            !compiler_isa.edges.contains_key("31-32"),
+            "edge with Qubit 31 should not be in the CompilerIsa"
+        );
 
-        let result = json_is_equivalent(&serialized, &expected);
+        let input_without_dead = read_to_string("tests/qcs-isa-excluding-dead-qubits.json")
+            .expect("Could not read ISA that excludes dead qubits");
+        let isa_without_dead: InstructionSetArchitecture =
+            serde_json::from_str(&input_without_dead)
+                .expect("Could not read ISA that excludes dead qubits");
+        let compiler_isa_excluding_dead = Compiler::try_from(isa_without_dead)
+            .expect("Could not convert ISA with manually excluded dead qubits to CompilerIsa");
+
+        let serialized =
+            serde_json::to_value(compiler_isa).expect("Unable to serialize CompilerIsa");
+        let serialized_without_dead = serde_json::to_value(compiler_isa_excluding_dead)
+            .expect("Unable to serialize CompilerIsa");
+
+        let result = json_is_equivalent(&serialized, &serialized_without_dead);
         result.expect("JSON was not equivalent");
     }
 }

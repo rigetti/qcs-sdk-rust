@@ -58,6 +58,10 @@ impl Edge {
 
         Ok(())
     }
+
+    pub(crate) fn has_valid_operations(&self) -> bool {
+        !self.dead
+    }
 }
 
 /// All the error which can occur from within this module.
