@@ -62,6 +62,10 @@ impl Edge {
     pub(crate) fn has_valid_operations(&self) -> bool {
         !self.dead
     }
+
+    pub(crate) fn qubits(&self) -> impl Iterator<Item = &i64> + '_ {
+        self.id.0.iter()
+    }
 }
 
 /// All the error which can occur from within this module.
