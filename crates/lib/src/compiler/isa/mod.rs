@@ -181,4 +181,27 @@ mod describe_compiler_isa {
         let result = json_is_equivalent(&serialized, &expected);
         result.expect("JSON was not equivalent");
     }
+
+    #[test]
+    fn compiler_excludes_qubits_with_no_operations() {
+        let input = read_to_string("tests/qcs-isa-with-dead-qubits.json")
+            .expect("Could not read ISA with dead qubits");
+        let expected_json = read_to_string("tests/compiler-isa-with-dead-qubits.json")
+            .expect("Could not read expected output with dead qubits");
+        let qcs_isa: InstructionSetArchitecture =
+            serde_json::from_str(&input).expect("Could not deserialize ISA with dead qubits");
+        let expected: Value = serde_json::from_str(&expected_json)
+            .expect("Could not deserialize expected output with dead qubits");
+
+        let compiler_isa =
+            Compiler::try_from(qcs_isa).expect("Could not convert ISA with dead qubits to CompilerIsa");
+
+        assert!(!compiler_isa.qubits.contains_key("31"), "Qubit 31 should not be in the CompilerIsa");
+
+        let serialized = serde_json::to_value(compiler_isa)
+            .expect("Unable to serialize CompilerIsa with dead qubits");
+
+        let result = json_is_equivalent(&serialized, &expected);
+        result.expect("JSON was not equivalent");
+    }
 }
