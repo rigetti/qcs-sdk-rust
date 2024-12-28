@@ -100,7 +100,7 @@ pub enum Error {
 
 #[cfg(test)]
 mod describe_compiler_isa {
-    use std::{convert::TryFrom, fs::read_to_string};
+    use std::{convert::TryFrom, fs::{self, read_to_string}};
 
     use float_cmp::{approx_eq, F64Margin};
     use qcs_api_client_openapi::models::{InstructionSetArchitecture, Node};
@@ -111,65 +111,61 @@ mod describe_compiler_isa {
     /// Compare two JSON values and make sure they are equivalent while allowing for some precision
     /// loss in numbers.
     ///
-    /// Return Ok if equivalent, or tuple containing the differing elements.
-    fn json_is_equivalent<'a>(
-        first: &'a Value,
-        second: &'a Value,
-    ) -> Result<(), (&'a Value, &'a Value)> {
-        let equal = match (first, second) {
-            (Value::Number(first_num), Value::Number(second_num)) => {
-                if !first_num.is_f64() || !second_num.is_f64() {
-                    first_num == second_num
+    /// Panics if there is any inequality.
+    fn assert_json_is_equivalent<'a>(
+        expected: &'a Value,
+        actual: &'a Value,
+    ) {
+        assert_json_is_equivalent_inner(expected, actual, "");
+    }
+
+    fn assert_json_is_equivalent_inner<'a>(
+        expected: &'a Value,
+        actual: &'a Value,
+        path: &str,
+    ) {
+        match (expected, actual) {
+            (Value::Number(expected_num), Value::Number(actual_num)) => {
+                if !expected_num.is_f64() || !actual_num.is_f64() {
+                    assert_eq!(expected_num, actual_num, "path '{}': non-f64 numeric inequality: expected: {}, actual: {}", path, expected_num, actual_num);
                 } else {
-                    let first_f64 = first_num.as_f64().unwrap();
-                    let second_f64 = second_num.as_f64().unwrap();
-                    approx_eq!(
+                    let expected_f64 = expected_num.as_f64().unwrap();
+                    let actual_f64 = actual_num.as_f64().unwrap();
+                    assert!(approx_eq!(
                         f64,
-                        first_f64,
-                        second_f64,
+                        expected_f64,
+                        actual_f64,
                         F64Margin {
                             ulps: 1,
                             epsilon: 0.000_000_1
                         }
-                    )
+                    ), "path '{}': numeric inequality out of range: expected: {}, actual: {}", path, expected_f64, actual_f64);
                 }
             }
-            (Value::Object(first_map), Value::Object(second_map)) => {
-                let mut found_missing = false;
-                for (key, first_value) in first_map {
-                    let second_value = second_map.get(key);
-                    if second_value.is_none() {
-                        found_missing = true;
+            (Value::Object(expected_map), Value::Object(actual_map)) => {
+                
+                let mut expected_key_missing_from_actual = None;
+                for (key, expected_value) in expected_map {
+                    let actual_value = actual_map.get(key);
+                    if actual_value.is_none() {
+                        expected_key_missing_from_actual = Some(key);
                         break;
                     }
-                    let cmp = json_is_equivalent(first_value, second_value.unwrap());
-                    cmp?;
+                    assert_json_is_equivalent_inner(expected_value, actual_value.unwrap(), &(format!("{}.{}", path, key)));
                 }
-                !found_missing
-            }
-            (Value::Array(first_array), Value::Array(second_array))
-                if first_array.len() != second_array.len() =>
-            {
-                false
-            }
-            (Value::Array(first_array), Value::Array(second_array)) => {
-                let error = first_array.iter().zip(second_array).find(
-                    |(first_value, second_value)| -> bool {
-                        json_is_equivalent(first_value, second_value).is_err()
-                    },
-                );
-                if let Some(values) = error {
-                    return Err(values);
+                assert!(expected_key_missing_from_actual.is_none(), "path '{}': expected map has key not in actual map: {}", path, expected_key_missing_from_actual.unwrap());
+                for (key, _) in actual_map {
+                    assert!(expected_map.contains_key(key), "path '{}': actual map has key not in expected map: {}", path, key);
                 }
-                true
             }
-            (first, second) => first == second,
+            (Value::Array(expected_array), Value::Array(actual_array)) => {
+                assert!(expected_array.len() == actual_array.len(), "expected array has more elements than actual array");
+                for (index, (expected_value, actual_value)) in expected_array.iter().zip(actual_array).enumerate() {
+                    assert_json_is_equivalent_inner(expected_value, actual_value, &(format!("{}[{}]", path, index)));
+                }
+            }
+            (expected, actual) => assert_eq!(expected, actual, "path '{}': inequality: expected: {:?}, actual: {:?}", path, expected, actual),
         };
-        if equal {
-            Ok(())
-        } else {
-            Err((first, second))
-        }
     }
 
     #[test]
@@ -197,8 +193,8 @@ mod describe_compiler_isa {
 
         let serialized =
             serde_json::to_value(compiler_isa).expect("Unable to serialize CompilerIsa");
-        let result = json_is_equivalent(&serialized, &expected);
-        result.expect("JSON was not equivalent");
+
+        assert_json_is_equivalent(&expected, &serialized);
     }
 
     #[test]
@@ -242,7 +238,6 @@ mod describe_compiler_isa {
         let serialized_without_dead = serde_json::to_value(compiler_isa_excluding_dead)
             .expect("Unable to serialize CompilerIsa");
 
-        let result = json_is_equivalent(&serialized, &serialized_without_dead);
-        result.expect("JSON was not equivalent");
+        assert_json_is_equivalent(&serialized, &serialized_without_dead);
     }
 }
