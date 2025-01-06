@@ -10,6 +10,7 @@ from qcs_sdk.client import QCSClient
 
 from qcs_sdk.qpu import (
     api as api,
+    experimental as experimental,
     isa as isa,
     translation as translation,
 )

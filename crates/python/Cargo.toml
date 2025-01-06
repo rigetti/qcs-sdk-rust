@@ -12,6 +12,7 @@ readme = "./README.md"
 [features]
 libquil = ["qcs/libquil"]
 grpc-web = ["qcs/grpc-web"]
+pyo3-tracing-subscriber-build = []
 
 [lib]
 name = "qcs_sdk"
@@ -19,7 +20,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 async-trait = "0.1.73"
-qcs = { path = "../lib", features = ["tracing-opentelemetry"] }
+qcs = { path = "../lib", features = ["tracing-opentelemetry", "experimental"] }
 qcs-api-client-common = { workspace = true, features = ["python"] }
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true
