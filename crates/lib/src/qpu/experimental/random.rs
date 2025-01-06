@@ -17,7 +17,9 @@ const MAX_SEQUENCER_VALUE: u64 = 0x0000_FFFF_FFFF_FFFF;
 /// the PRNG value.
 const MAX_UNSIGNED_MULTIPLIER: u64 = 0x0000_0000_0000_FFFF;
 
-/// The taps for the LFSR used on Rigetti control systems.
+/// The taps for the LFSR used on Rigetti control systems. These taps
+/// have been shown to produce maximal sequence lengths for 48-bit
+/// strings.
 const V1_TAPS: [u32; 4] = [47, 46, 20, 19];
 
 /// An error that may occur using the randomization primitives defined
@@ -155,7 +157,7 @@ impl ChooseRandomRealSubRegions {
 
     #[allow(clippy::doc_markdown)]
     /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions`
-    /// instruction. The signature is:
+    /// instruction. The signature expressed in Quil is as follows:
     ///
     /// ```text
     /// "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
@@ -263,8 +265,11 @@ fn lfsr_next(seed: u64, taps: &[u32]) -> u64 {
     ((seed << 1) & MAX_SEQUENCER_VALUE) | feedback_value
 }
 
-/// This represents the LFSR currently implemented on Rigetti control systems. Specifically,
+/// This represents the [linear feedback shift
+/// register](https://en.wikipedia.org/wiki/Linear-feedback_shift_register)
+/// currently implemented on Rigetti control systems. Specifically,
 /// it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
+/// The taps have been shown to produce maximal sequence lengths for 48-bit strings.
 #[must_use]
 pub fn lfsr_v1_next(seed: PrngSeedValue) -> u64 {
     lfsr_next(seed.u64_value, &V1_TAPS)
@@ -309,7 +314,7 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 /// CALL choose_random_real_sub_regions destination source 3 seed
 /// ```
 ///
-/// with a seed of 639,523, you could backout the randomly chosen sub-regions with the following:
+/// with a seed of 639,523, the following will provide the random sequence of sub-region indices:
 ///
 /// ```rust
 /// use qcs::qpu::experimental::random::{choose_random_real_sub_region_indices, PrngSeedValue};

@@ -10,6 +10,12 @@ from types import ModuleType
 
 
 def _monkey_patch(module: ModuleType, attribute: Type):
+    """
+    Python source modules cannot be directly included within a PyO3 module, except
+    at the top level. As such, in order to add Python source files, we need to
+    directly set the attribute on the submodule. This is useful for any code
+    that PyO3 cannot build itself (such as abstract interfaces).
+    """
     setattr(module, attribute.__name__, attribute)
     if hasattr(module, "__all__"):
         module.__all__.append(attribute.__name__)

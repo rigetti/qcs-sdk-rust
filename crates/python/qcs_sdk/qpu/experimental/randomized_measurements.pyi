@@ -15,11 +15,11 @@ correctly add randomized measurements to a Rigetti QCS Quil program:
     those randomized values within a unitary decomposition prior to measurement.
 2. Parameter construction - building a map of [`Parameters`] with seeds for
     each qubit.
-3. PRNG reconstruction - backing out the random indices that played on each
+3. PRNG reconstruction - backing out the random indices that were drawn on each
     qubit during program execution.
 
 This is not a QIS (quantum information science) library, but rather an
-SDK for collecting data from Rigetti QPUs. As such, defining the proper
+SDK for collecting data from Rigetti QPUs. As such, defining a proper
 unitary set and using randomized measurement data is beyond the scope of this
 library.
 
@@ -76,8 +76,8 @@ class RandomizedMeasurement:
 @final
 class UnitaryParameterDeclaration:
     """
-    A Quil declaration for a unitary parameter. The memory region is implicitly `REAL`. Such
-    declaration may represent the `UnitarySet` source or the destination of a
+    A Quil declaration for a unitary parameter. The memory region is implicitly `REAL`. These
+    declarations may represent the `UnitarySet` source or the destination of a
     `ChooseRandomRealSubRegions` call.
     """
 
@@ -90,7 +90,8 @@ class UnitaryParameterDeclaration:
 class QubitRandomization:
     """
     The declarations and measurements required to randomize a single qubit. This is passed to
-    `RandomizedMeasurements.append_to_program` to add the necessary instructions to a Quil program.
+    `UnitarySet.to_instructions` to add the necessary instructions for each qubit to a
+    Quil program.
 
     The qubit may be accessed by the `measurement.qubit` property.
     """

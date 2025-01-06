@@ -59,6 +59,8 @@ enum ZxzxzError {
 struct ZxzxzUnitarySet(Array2<f64>);
 
 impl ZxzxzUnitarySet {
+    /// Create a new unitary set with angles representing the
+    /// [tetrahedral unitary ensemble](https://en.wikipedia.org/wiki/Tetrahedral_symmetry).
     fn tetrahedral() -> Result<Self, ZxzxzError> {
         Ok(Self(Array2::from_shape_vec(
             (12, 3),

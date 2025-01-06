@@ -154,7 +154,7 @@ def unitary_set() -> Zxzxz:
 def randomized_measurements(unitary_set: UnitarySet) -> RandomizedMeasurements:
     """
     Returns an initialized instance of RandomizedMeasurements, where three qubits are measured
-    and the unitary set is of length 12 and zero-initialized.
+    and the unitary set is of length 12 and drawn uniformly at random from [0, 2 pi).
     """
     measurements = [RandomizedMeasurement(qubit, "ro", qubit) for qubit in range(3)]
     return RandomizedMeasurements(measurements, unitary_set, 1e-6)

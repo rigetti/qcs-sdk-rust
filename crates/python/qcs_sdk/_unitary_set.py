@@ -9,9 +9,9 @@ if TYPE_CHECKING:
 
 class UnitarySet(ABC):
     """
-    A trait that defines a set of unitaries for randomized measurements. This interface includes
-    both the concrete set of unitaries from which to draw, as well as the Quil representation for
-    realizing the unitaries.
+    An abstract class that defines a set of unitaries for randomized measurements. This interface
+    includes both the concrete set of unitaries from which to draw, as well as the Quil
+    representation for realizing the unitaries within a quantum program.
 
     See module level documentation for an example implementation.
     """
@@ -33,9 +33,9 @@ class UnitarySet(ABC):
     def to_parameters(self) -> List[float]:
         """
         Convert the unitary set to a vector of parameters. Each unitary should be represented
-        as a contiguous subregion of the vector of length `parameters_per_unitary`.
+        as a contiguous subregion of the list of length `parameters_per_unitary`.
 
-        The length of the vector should be equal to `unitary_count` * `parameters_per_unitary`.
+        The length of the list should be equal to `unitary_count` * `parameters_per_unitary`.
         See `ChooseRandomRealSubRegions` for additional detail.
         """
         ...

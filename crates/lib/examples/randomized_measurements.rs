@@ -1,3 +1,7 @@
+//! This example demonstrates how to construct and then execute a program with
+//! randomized measurements. Specifically, we will use a ZXZXZ unitary
+//! decomposition to randomly draw from a
+//! [tetrahedral unitary ensemble](https://en.wikipedia.org/wiki/Tetrahedral_symmetry).
 use std::num::NonZeroU16;
 use std::str::FromStr;
 

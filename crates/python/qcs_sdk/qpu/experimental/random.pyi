@@ -31,7 +31,7 @@ class ChooseRandomRealSubRegions:
     * `destination` - The destination memory region to copy the pseudo-randomly chosen
         sub-region to.
     * `source` - The source memory region to choose sub-regions from.
-    * `sub_region_size` - The size of each sub-region to choose.
+    * `sub_region_size` - The size of each sub-region.
     * `seed` - A memory reference to an integer value that will be used to seed the PRNG.
         This value will be mutated to the next element in the PRNG sequence, so you may
         use it to generate subsequent pseudo-random values.

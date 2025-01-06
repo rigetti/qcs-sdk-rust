@@ -21,7 +21,7 @@
 //!     qubit during program execution.
 //!
 //! This is not a QIS (quantum information science) library, but rather an
-//! SDK for collecting data from Rigetti QPUs. As such, defining the proper
+//! SDK for collecting data from Rigetti QPUs. As such, defining a proper
 //! unitary set and using randomized measurement data is beyond the scope of this
 //! library.
 
@@ -177,10 +177,10 @@ where
     ///
     /// * `measurements` - A vector of measurements to randomize. Note, these
     ///     measurements should not be added to a program a priori.
-    /// * `unitary_set` - The set of unitaries to apply to each qubit before
-    ///    measurement.
+    /// * `unitary_set` - The [`UnitarySet`] from which to draw and represent
+    ///     randomly selected unitaries.
     /// * `leading_delay` - The delay to prepend to the program before the
-    ///   randomized measurements begin.
+    ///     pulse program begins.
     pub fn try_new(
         measurements: Vec<Measurement>,
         unitary_set: U,
@@ -381,7 +381,7 @@ where
     }
 
     /// Given a map of qubits to seed values, return the random indices that
-    /// were played on each qubit during program execution.
+    /// were drawn for each qubit during program execution.
     #[must_use]
     pub fn get_random_indices(
         &self,
@@ -418,13 +418,15 @@ pub trait UnitarySet {
     /// The number of unitaries in the set.
     fn unitary_count(&self) -> usize;
 
-    /// The number of parameters required to represent the unitary within a set of Quil
+    /// The number of parameters required to represent a unitary within a set of Quil
     /// instructions.
     fn parameters_per_unitary(&self) -> usize;
 
     /// Convert the unitary set to a vector of parameters. Each unitary should be represented
-    /// as a contiguous subregion of the vector of length [`Self::parameters_per_unitary`].
-    /// The length of the vector should be equal to [`Self::unitary_count` * [`Self::parameters_per_unitary`].
+    /// as a contiguous subregion within the vector of length [`Self::parameters_per_unitary`].
+    /// The length of the entire vector should be equal to
+    /// [`Self::unitary_count`] * [`Self::parameters_per_unitary`].
+    ///
     /// See [`ChooseRandomRealSubRegions`] for additional detail.
     fn to_parameters(&self) -> Result<Vec<f64>, Self::Error>;
 
