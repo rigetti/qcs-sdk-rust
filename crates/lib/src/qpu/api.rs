@@ -37,6 +37,7 @@ use qcs_api_client_openapi::apis::{
     },
 };
 use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
+use tonic::codec::CompressionEncoding;
 
 use crate::executable::Parameters;
 
@@ -173,6 +174,7 @@ where
         .await?;
 
     Ok(controller_client
+        .send_compressed(CompressionEncoding::Gzip)
         .execute_controller_job(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
