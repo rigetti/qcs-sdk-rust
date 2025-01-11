@@ -1,6 +1,8 @@
 //! This module provides access to the QCS QPU API
 use std::{convert::TryFrom, fmt, time::Duration};
 
+use tonic::codec::CompressionEncoding;
+
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
@@ -183,11 +185,13 @@ where
         options: execution_options.api_options().copied(),
     };
 
-    let mut controller_client = execution_options
+    let controller_client = execution_options
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
     Ok(controller_client
+        .send_compressed(CompressionEncoding::Gzip)
+        .accept_compressed(CompressionEncoding::Gzip)
         .execute_controller_job(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
