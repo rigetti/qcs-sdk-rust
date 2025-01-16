@@ -5,6 +5,7 @@ For more information about QCS, see [the QCS documentation](https://docs.rigetti
 
 ⚠️ This package is still in early development and breaking changes should be expected between minor versions.
 """
+from __future__ import annotations
 import datetime
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple, Union, final
