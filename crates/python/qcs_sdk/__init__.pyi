@@ -18,12 +18,14 @@ from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
+from qcs_sdk.diagnostics import _gather_diagnostics
 
 from qcs_sdk import _tracing_subscriber as _tracing_subscriber
 from qcs_sdk import client as client
 from qcs_sdk import compiler as compiler
 from qcs_sdk import qpu as qpu
 from qcs_sdk import qvm as qvm
+from qcs_sdk import diagnostics as diagnostics
 
 
 __all__ = [
@@ -44,8 +46,14 @@ __all__ = [
     'compiler',
     'qpu',
     'qvm',
-    'reset_logging'
+    'reset_logging',
+    '__version__',
+    '_gather_diagnostics',
+    'diagnostics',
 ]
+
+
+__version__: str = ...
 
 
 class ExecutionError(RuntimeError):
