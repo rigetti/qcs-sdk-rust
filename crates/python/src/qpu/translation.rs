@@ -1,6 +1,8 @@
 //! Translating programs.
 use std::{collections::HashMap, time::Duration};
 
+use futures_util::TryFutureExt;
+use opentelemetry::trace::FutureExt;
 use prost::Message;
 use pyo3::types::PyBytes;
 use pyo3::Python;
@@ -12,7 +14,7 @@ use qcs_api_client_grpc::services::translation::{
     TranslationOptions as ApiTranslationOptions,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_simple_enum,
+    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_simple_enum, py_sync,
     ToPythonError,
 };
 
@@ -215,7 +217,7 @@ py_function_sync_async! {
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="py_error")]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     async fn translate(
@@ -225,20 +227,20 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
+        let current_span = tracing::Span::current();
+        println!("translation.rs:translate shim current_span.id {:?}", current_span.id());
         let client = PyQcsClient::get_or_create_client(client);
         let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-        let result =
-            qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options)
-                .await
+        let result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
                 .map_err(RustTranslationError::from)
-                .map_err(RustTranslationError::to_py_err)?;
+                .map_err(RustTranslationError::to_py_err).await?;
 
         let program = serde_json::to_string(&result.job)
             .map_err(RustTranslationError::from)
             .map_err(RustTranslationError::to_py_err)?;
 
         Ok(PyTranslationResult {
-            program,
+            program, 
             ro_sources: Some(result.readout_map),
         })
     }

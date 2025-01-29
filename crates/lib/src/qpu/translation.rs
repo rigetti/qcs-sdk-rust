@@ -12,6 +12,7 @@ use qcs_api_client_grpc::{
         TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
 };
+use pyo3::{PyErr, exceptions::PyValueError};
 use tokio::time::error::Elapsed;
 #[cfg(feature = "tracing")]
 use tracing::instrument;
@@ -29,6 +30,16 @@ pub enum Error {
     ClientTimeout(#[from] Elapsed),
 }
 
+impl From<Error> for PyErr {
+    fn from(value: Error) -> Self {
+        let message = value.to_string();
+        match value {
+            Error::Grpc(_) => PyValueError::new_err(message),
+            Error::ClientTimeout(_) => PyValueError::new_err(message),
+        }
+    }
+}
+
 /// An encrypted and translated program, along with `readout_map`
 /// to map job `readout_data` back to program-declared variables.
 #[derive(Debug)]
@@ -44,7 +55,7 @@ pub struct EncryptedTranslationResult {
 }
 
 /// Translate a program, returning an encrypted and translated program.
-#[cfg_attr(feature = "tracing", instrument(skip_all))]
+#[cfg_attr(feature = "tracing", instrument(skip(quil_program, translation_options)))]
 pub async fn translate<TO>(
     quantum_processor_id: &str,
     quil_program: &str,
@@ -55,12 +66,8 @@ pub async fn translate<TO>(
 where
     TO: Into<ApiTranslationOptions>,
 {
-    #[cfg(feature = "tracing")]
-    tracing::debug!(
-        %num_shots,
-        "translating program for {}",
-        quantum_processor_id,
-    );
+    let current_span = tracing::Span::current();
+    println!("translate.rs:translate current_span.id {:?}", current_span.id());
 
     let options = translation_options.map(Into::into);
 

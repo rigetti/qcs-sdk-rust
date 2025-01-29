@@ -8,7 +8,7 @@ RX(pi) 0
 MEASURE 0 ro[0]
 "#;
 
-const QUANTUM_PROCESSOR_ID: &str = "Aspen-M-3";
+const QUANTUM_PROCESSOR_ID: &str = "Ankaa-3";
 
 async fn quilc_client() -> rpcq::Client {
     let qcs = Qcs::load();
