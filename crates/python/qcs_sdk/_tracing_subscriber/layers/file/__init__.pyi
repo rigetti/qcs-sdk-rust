@@ -12,11 +12,9 @@
 
 from typing import Optional, final
 
-
 __all__ = [
-    'Config',
+    "Config",
 ]
-
 
 @final
 class Config:
@@ -45,4 +43,3 @@ class Config:
         :param json: Whether or not to format the output as JSON. Defaults to `True`.
         """
         ...
-

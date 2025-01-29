@@ -12,20 +12,18 @@
 
 from typing import Dict, Optional, final
 
-
 __all__ = [
-    'InstrumentationLibrary',
+    "InstrumentationLibrary",
 ]
-
 
 @final
 class InstrumentationLibrary:
     """
     Information about a library or crate providing instrumentation.
-    
+
     An instrumentation library should be named to follow any naming conventions
     of the instrumented library (e.g. 'middleware' for a web framework).
-    
+
     See the `instrumentation libraries <https://github.com/open-telemetry/opentelemetry-specification/blob/v1.9.0/specification/overview.md#instrumentation-libraries>`_
     spec for more information.
     """
@@ -47,4 +45,3 @@ class InstrumentationLibrary:
         :param attributes: The attributes of the instrumentation library.
         """
         ...
-

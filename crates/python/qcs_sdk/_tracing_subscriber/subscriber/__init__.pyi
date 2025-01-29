@@ -14,11 +14,9 @@ from typing import final
 
 from .. import layers
 
-
 __all__ = [
-    'Config',
+    "Config",
 ]
-
 
 @final
 class Config:
@@ -28,4 +26,3 @@ class Config:
     """
 
     def __new__(cls, *, layer: layers.Config) -> "Config": ...
-
