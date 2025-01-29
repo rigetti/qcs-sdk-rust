@@ -1,1 +1,4 @@
 qcs_sdk.qcs_sdk
+
+# maturin always regenerates these, but with errors - they're missing __all__ exports.
+qcs_sdk._tracing_subscriber.*

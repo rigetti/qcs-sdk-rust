@@ -12,10 +12,6 @@
 
 from typing import Optional, final
 
-__all__ = [
-    "Config",
-]
-
 @final
 class Config:
     """

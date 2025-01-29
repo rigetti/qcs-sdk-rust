@@ -14,12 +14,6 @@ from __future__ import annotations
 from typing import Dict, Optional, TYPE_CHECKING, final
 from qcs_sdk._tracing_subscriber.common import InstrumentationLibrary
 
-__all__ = [
-    "Config",
-    "Resource",
-    "SpanLimits",
-]
-
 @final
 class SpanLimits:
     def __new__(
