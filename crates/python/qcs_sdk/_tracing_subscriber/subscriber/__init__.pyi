@@ -14,6 +14,12 @@ from typing import final
 
 from .. import layers
 
+
+__all__ = [
+    'Config',
+]
+
+
 @final
 class Config:
     """

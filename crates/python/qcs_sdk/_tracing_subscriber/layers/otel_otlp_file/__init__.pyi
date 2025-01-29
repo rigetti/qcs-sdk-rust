@@ -14,6 +14,11 @@ from typing import Optional, final
 from qcs_sdk._tracing_subscriber.common import InstrumentationLibrary
 
 
+__all__ = [
+    'Config',
+]
+
+
 @final
 class Config:
     """

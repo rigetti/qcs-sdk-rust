@@ -13,6 +13,11 @@
 from typing import Dict, Optional, final
 
 
+__all__ = [
+    'InstrumentationLibrary',
+]
+
+
 @final
 class InstrumentationLibrary:
     """
