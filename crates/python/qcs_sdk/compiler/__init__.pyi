@@ -5,4 +5,7 @@ Module for interacting with the Quil Compiler (quilc).
 in the [the type hints](https://github.com/rigetti/qcs-sdk-rust/blob/main/crates/python/qcs_sdk/compiler/quilc.pyi).
 """
 
+__all__ = ['quilc']
+
+
 from qcs_sdk.compiler import quilc

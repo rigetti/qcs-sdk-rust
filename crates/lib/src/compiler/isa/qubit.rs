@@ -156,9 +156,10 @@ impl FrbSim1q {
         self.0
             .iter()
             .find(|characteristic| {
-                characteristic.node_ids.as_ref().map_or(false, |node_ids| {
-                    node_ids.len() == 1 && node_ids[0] == qubit
-                })
+                characteristic
+                    .node_ids
+                    .as_ref()
+                    .is_some_and(|node_ids| node_ids.len() == 1 && node_ids[0] == qubit)
             })
             .map(|characteristic| characteristic.value)
             .ok_or(Error::MissingBenchmarkForQubit(qubit))

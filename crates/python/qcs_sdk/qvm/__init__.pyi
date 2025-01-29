@@ -11,6 +11,18 @@ from qcs_sdk import RegisterData
 from qcs_sdk.qvm import api as api
 from qcs_sdk.qvm.api import AddressRequest
 
+
+__all__ = [
+    'QVMClient',
+    'QVMError',
+    'QVMOptions',
+    'QVMResultData',
+    'RawQVMReadoutData',
+    'api',
+    'run',
+    'run_async',
+]
+
 @final
 class QVMClient:
     """Client used to communicate with QVM"""
