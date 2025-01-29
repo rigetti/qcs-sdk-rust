@@ -3,6 +3,31 @@ from typing import List, Sequence, Optional, final
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.client import QCSClient
 
+
+__all__ = [
+    'CompilationResult',
+    'CompilerOpts',
+    'ConjugateByCliffordRequest',
+    'ConjugatePauliByCliffordResponse',
+    'DEFAULT_COMPILER_TIMEOUT',
+    'GenerateRandomizedBenchmarkingSequenceResponse',
+    'NativeQuilMetadata',
+    'PauliTerm',
+    'QuilcClient',
+    'QuilcError',
+    'RandomizedBenchmarkingRequest',
+    'TargetDevice',
+    'compile_program',
+    'compile_program_async',
+    'conjugate_pauli_by_clifford',
+    'conjugate_pauli_by_clifford_async',
+    'generate_randomized_benchmarking_sequence',
+    'generate_randomized_benchmarking_sequence_async',
+    'get_version_info',
+    'get_version_info_async',
+]
+
+
 DEFAULT_COMPILER_TIMEOUT: float
 """Number of seconds to wait before timing out."""
 

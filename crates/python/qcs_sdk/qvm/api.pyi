@@ -5,6 +5,27 @@ from qcs_sdk import RegisterData
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qvm import QVMOptions, QVMClient
 
+
+__all__ = [
+    'AddressRequest',
+    'ExpectationRequest',
+    'MultishotMeasureRequest',
+    'MultishotRequest',
+    'MultishotResponse',
+    'WavefunctionRequest',
+    'get_version_info',
+    'get_version_info_async',
+    'get_wavefunction',
+    'get_wavefunction_async',
+    'measure_expectation',
+    'measure_expectation_async',
+    'run',
+    'run_and_measure',
+    'run_and_measure_async',
+    'run_async',
+]
+
+
 def get_version_info(
     client: QVMClient, options: Optional[QVMOptions] = None
 ) -> str:

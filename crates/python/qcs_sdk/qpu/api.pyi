@@ -4,6 +4,32 @@ from typing import Dict, List, Sequence, Mapping, Optional, Union, final
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu import MemoryValues
 
+
+__all__ = [
+    'APIExecutionOptions',
+    'APIExecutionOptionsBuilder',
+    'ConnectionStrategy',
+    'ExecutionOptions',
+    'ExecutionOptionsBuilder',
+    'ExecutionResult',
+    'ExecutionResults',
+    'QpuApiDuration',
+    'QpuApiError',
+    'Register',
+    'SubmissionError',
+    'cancel_job',
+    'cancel_job_async',
+    'cancel_jobs',
+    'cancel_jobs_async',
+    'retrieve_results',
+    'retrieve_results_async',
+    'submit',
+    'submit_async',
+    'submit_with_parameter_batch',
+    'submit_with_parameter_batch_async',
+]
+
+
 class SubmissionError(RuntimeError):
     """There was a problem submitting the program to QCS for execution."""
 

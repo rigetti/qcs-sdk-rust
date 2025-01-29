@@ -4,6 +4,19 @@ from enum import Enum, auto
 
 from qcs_sdk.client import QCSClient
 
+
+__all__ = [
+    'QCtrl',
+    'TranslationBackend',
+    'TranslationError',
+    'TranslationOptions',
+    'TranslationResult',
+    'get_quilt_calibrations',
+    'get_quilt_calibrations_async',
+    'translate',
+    'translate_async',
+]
+
 class TranslationError(RuntimeError):
     """Errors that can occur while using the translation module."""
 
