@@ -1,3 +1,9 @@
+## 0.21.7
+
+### Fixes
+
+- bump qcs-api-client versions to allow get_instruction_set_architecture without authentication (#529)
+
 ## 0.21.7-rc.1
 
 ### Fixes
