@@ -44,13 +44,13 @@
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                 </ul>
 
@@ -86,10 +86,10 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.issuer">issuer</a>
+                                <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.client_id">client_id</a>
+                                <a class="variable" href="#AuthServer.issuer">issuer</a>
                         </li>
                 </ul>
 
@@ -201,6 +201,17 @@
     
 
                             </div>
+                            <div id="QCSClient.quilc_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quilc_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    
+    
+
+                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -219,17 +230,6 @@
         
     </div>
     <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.quilc_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">quilc_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.quilc_url"></a>
     
     
 
@@ -361,19 +361,6 @@ credentials or payload data.</p>
     
 
                             </div>
-                            <div id="AuthServer.issuer" class="classattr">
-                                <div class="attr variable">
-            <span class="name">issuer</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.issuer"></a>
-    
-            <div class="docstring"><p>Get the Okta issuer URL.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.client_id" class="classattr">
                                 <div class="attr variable">
             <span class="name">client_id</span>
@@ -383,6 +370,19 @@ credentials or payload data.</p>
     <a class="headerlink" href="#AuthServer.client_id"></a>
     
             <div class="docstring"><p>Get the configured Okta client id.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.issuer" class="classattr">
+                                <div class="attr variable">
+            <span class="name">issuer</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.issuer"></a>
+    
+            <div class="docstring"><p>Get the Okta issuer URL.</p>
 </div>
 
 
