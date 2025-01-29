@@ -1,5 +1,6 @@
 import pytest
 
+from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.isa import (
     SerializeISAError,
     GetISAError,
@@ -31,3 +32,10 @@ def test_get_instruction_set_architecture_error():
 def test_instruction_set_architecture_serialization_error():
     with pytest.raises(SerializeISAError):
         InstructionSetArchitecture.from_raw('{ "fail": true }')
+
+
+def test_get_instruction_set_actitecture_public(quantum_processor_id: str):
+    """Successfully get a known public ISA without authentication."""
+    isa = get_instruction_set_architecture(quantum_processor_id, client=QCSClient())
+    assert type(isa) is InstructionSetArchitecture
+
