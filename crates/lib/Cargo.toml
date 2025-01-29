@@ -13,7 +13,6 @@ readme = "./README.md"
 manual-tests = []
 tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/tracing", "qcs-api-client-openapi/tracing"]
 tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
-otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-client-openapi/otel-tracing"]
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
 tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
@@ -27,15 +26,15 @@ indexmap = "2.2.6"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
-opentelemetry = { version = "0.23.0" }
-opentelemetry_sdk = { version = "0.23.0" }
+opentelemetry = { workspace = true }
+opentelemetry_sdk = { workspace = true }
 pbjson-types = "0.7.0"
+pyo3 = { workspace = true }
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
 reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
-rmp-serde = "1.1.1"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_json.workspace = true
 thiserror.workspace = true

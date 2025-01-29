@@ -45,7 +45,7 @@ def test_submit_retrieve(
 
     translated = translate(program, 1, quantum_processor_id)
 
-    job_id = submit(program, memory, quantum_processor_id)
+    job_id = submit(translated.program, memory, quantum_processor_id)
     results = retrieve_results(job_id)
 
 class TestPickle():

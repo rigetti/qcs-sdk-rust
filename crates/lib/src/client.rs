@@ -10,10 +10,11 @@ use qcs_api_client_grpc::tonic::{wrap_channel_with_grpc_web, GrpcWebWrapperLayer
 use qcs_api_client_grpc::{
     services::translation::translation_client::TranslationClient,
     tonic::{
-        get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, RefreshService,
-        RetryService,
+        get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, wrap_channel_with_tracing, RefreshService, RetryService
     },
 };
+#[cfg(feature = "tracing")]
+use qcs_api_client_grpc::tonic::CustomTraceService;
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
 use tonic::transport::Channel;
 use tonic::Status;
@@ -29,16 +30,20 @@ const DEFAULT_MAX_MESSAGE_DECODING_SIZE: usize = 50 * 1024 * 1024;
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
-#[cfg(not(feature = "grpc-web"))]
+#[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
 pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfiguration>>;
 
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
-#[cfg(feature = "grpc-web")]
+#[cfg(all(feature = "grpc-web", not(feature = "tracing")))]
 pub type GrpcConnection =
     GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
+
+
+#[cfg(all(not(feature = "grpc-web"), feature = "tracing"))]
+pub type GrpcConnection = RetryService<RefreshService<CustomTraceService, ClientConfiguration>>;
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
@@ -103,11 +108,23 @@ impl Qcs {
     ) -> Result<TranslationClient<GrpcConnection>, GrpcError<TokenError>> {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
-        let service =
-            wrap_channel_with_retry(wrap_channel_with(channel, self.get_config().clone()));
+
+        // First add tracing if enabled
+        #[cfg(feature = "tracing")]
+        let channel = wrap_channel_with_tracing(
+            channel,
+            translation_grpc_endpoint.to_string(),
+            self.get_config().tracing_configuration().cloned().unwrap_or_default()
+        );
+
+        // Then wrap with refresh and retry
+        let channel =
+            wrap_channel_with(channel, self.get_config().clone());
+        let channel = wrap_channel_with_retry(channel);
+
         #[cfg(feature = "grpc-web")]
-        let service = wrap_channel_with_grpc_web(service);
-        Ok(TranslationClient::new(service)
+        let channel = wrap_channel_with_grpc_web(service);
+        Ok(TranslationClient::new(channel)
             .max_encoding_message_size(DEFAULT_MAX_MESSAGE_ENCODING_SIZE)
             .max_decoding_message_size(DEFAULT_MAX_MESSAGE_DECODING_SIZE))
     }
