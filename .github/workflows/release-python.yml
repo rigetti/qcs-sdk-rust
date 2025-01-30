@@ -40,6 +40,7 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
+        artifact-key: macos
         package-name: ${{ matrix.package-name }}
         maturin-target: universal2-apple-darwin
 
@@ -60,6 +61,7 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
+        artifact-key: linux-${{ matrix.target }}
         package-name: qcs-sdk-python
         maturin-target: ${{ matrix.target }}
 
@@ -80,6 +82,7 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
+        artifact-key: linux-${{ matrix.target }}
         package-name: qcs-sdk-python-grpc-web
         maturin-target: ${{ matrix.target }}
 
@@ -102,6 +105,7 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
+        artifact-key: windows
         package-name: ${{ matrix.package-name }}
         python-architecture: x64
         rust-target: x86_64-pc-windows-msvc
@@ -123,6 +127,7 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
+        artifact-key: sdist
         package-name: ${{ matrix.package-name }}
         maturin-command: sdist
 
@@ -143,9 +148,15 @@ jobs:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@v4
+      with:
+        path: wheels
+        pattern: wheels_${{ matrix.package-name }}-*
+        merge-multiple: true
+    - name: List wheels to upload
+      run: ls -R wheels
     - name: Publish to PyPI
       uses: messense/maturin-action@v1
       with:
         command: upload
-        args: --skip-existing wheels_${{ matrix.package-name }}/*
+        args: --skip-existing wheels/*

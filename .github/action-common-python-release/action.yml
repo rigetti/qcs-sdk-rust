@@ -6,6 +6,8 @@ inputs:
     required: true
     description: "Either `qcs-sdk-python` or `qcs-sdk-python-grpc-web`"
 
+  artifact-key:
+    description: "Unique upload-artifact key. Example: 'macos' or 'linux-x86_64'"
   python-architecture:
     description: "Python architecture used for script steps"
   rust-target:
@@ -17,7 +19,6 @@ inputs:
     description: "Additional maturin command arguments"
   maturin-target:
     description: "Rust target used for maturin compilation"
-
 
 runs:
   using: "composite"
@@ -60,7 +61,7 @@ runs:
     run: |
       pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
   - name: Upload wheels
-    uses: actions/upload-artifact@v3
+    uses: actions/upload-artifact@v4
     with:
-      name: wheels_${{ inputs.package-name }}
-      path: dist
+      name: wheels_${{ inputs.package-name }}-${{ inputs.artifact-key }}
+      path: dist/
