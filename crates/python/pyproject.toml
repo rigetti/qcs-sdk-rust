@@ -1,7 +1,7 @@
 # This is the metadata Maturin uploads to PyPI on publish
 [project]
 name = "qcs-sdk-python"
-version = "0.21.8-rc.0"
+version = "0.21.8"
 description = "Python interface for the QCS Rust SDK"
 readme = "README.md"
 license = { text = "Apache-2.0" }
