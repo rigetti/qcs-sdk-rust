@@ -159,4 +159,4 @@ jobs:
       uses: messense/maturin-action@v1
       with:
         command: upload
-        args: --skip-existing wheels_${{ matrix.package-name }}/*
+        args: --skip-existing wheels/*
