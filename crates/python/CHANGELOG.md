@@ -1,3 +1,9 @@
+## 0.21.8-rc.0
+
+### Fixes
+
+- update workflow action version for download/upload artifact (#530)
+
 ## 0.21.7
 
 ### Fixes
