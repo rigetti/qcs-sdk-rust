@@ -83,7 +83,7 @@ jobs:
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         version: '3.20.1'
-    - uses: ./.github/action-common-python-release
+    - uses: ./.github/action-common-python-release-test
       with:
         package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
