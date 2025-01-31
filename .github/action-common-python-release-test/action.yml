@@ -40,7 +40,7 @@ runs:
       manylinux: '2_28'
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
-      args: -i ${{ input.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
       docker-options: -e CI
 
   # host will not be able to install wheel in this case
