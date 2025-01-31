@@ -37,7 +37,7 @@ runs:
   - name: Maturin Build
     uses: messense/maturin-action@v1
     with:
-      manylinux: '2_28'
+      manylinux: '2_34'
       command: build
       target: ${{ inputs.maturin-target }}
       args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
