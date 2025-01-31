@@ -116,7 +116,10 @@
                                 <a class="variable" href="#Characteristic.timestamp">timestamp</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.value">value</a>
+                                <a class="variable" href="#Characteristic.error">error</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Characteristic.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Characteristic.node_ids">node_ids</a>
@@ -125,10 +128,7 @@
                                 <a class="variable" href="#Characteristic.parameter_values">parameter_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.error">error</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Characteristic.name">name</a>
+                                <a class="variable" href="#Characteristic.value">value</a>
                         </li>
                 </ul>
 
@@ -161,16 +161,16 @@
                                 <a class="variable" href="#Operation.characteristics">characteristics</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Operation.name">name</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#Operation.node_count">node_count</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Operation.sites">sites</a>
+                                <a class="variable" href="#Operation.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Operation.parameters">parameters</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Operation.sites">sites</a>
                         </li>
                 </ul>
 
@@ -188,10 +188,10 @@
                                 <a class="variable" href="#InstructionSetArchitecture.architecture">architecture</a>
                         </li>
                         <li>
-                                <a class="variable" href="#InstructionSetArchitecture.instructions">instructions</a>
+                                <a class="variable" href="#InstructionSetArchitecture.name">name</a>
                         </li>
                         <li>
-                                <a class="variable" href="#InstructionSetArchitecture.name">name</a>
+                                <a class="variable" href="#InstructionSetArchitecture.instructions">instructions</a>
                         </li>
                         <li>
                                 <a class="variable" href="#InstructionSetArchitecture.benchmarks">benchmarks</a>
@@ -625,15 +625,28 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Characteristic.value" class="classattr">
+                            <div id="Characteristic.error" class="classattr">
                                 <div class="attr variable">
-            <span class="name">value</span><span class="annotation">: float</span>
+            <span class="name">error</span><span class="annotation">: Optional[float]</span>
 
         
     </div>
-    <a class="headerlink" href="#Characteristic.value"></a>
+    <a class="headerlink" href="#Characteristic.error"></a>
     
-            <div class="docstring"><p>The characteristic value measured.</p>
+            <div class="docstring"><p>The error in the characteristic value, or None if otherwise.</p>
+</div>
+
+
+                            </div>
+                            <div id="Characteristic.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Characteristic.name"></a>
+    
+            <div class="docstring"><p>The name of the characteristic</p>
 </div>
 
 
@@ -669,28 +682,15 @@ these two lists must match.</p>
 
 
                             </div>
-                            <div id="Characteristic.error" class="classattr">
+                            <div id="Characteristic.value" class="classattr">
                                 <div class="attr variable">
-            <span class="name">error</span><span class="annotation">: Optional[float]</span>
+            <span class="name">value</span><span class="annotation">: float</span>
 
         
     </div>
-    <a class="headerlink" href="#Characteristic.error"></a>
+    <a class="headerlink" href="#Characteristic.value"></a>
     
-            <div class="docstring"><p>The error in the characteristic value, or None if otherwise.</p>
-</div>
-
-
-                            </div>
-                            <div id="Characteristic.name" class="classattr">
-                                <div class="attr variable">
-            <span class="name">name</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Characteristic.name"></a>
-    
-            <div class="docstring"><p>The name of the characteristic</p>
+            <div class="docstring"><p>The characteristic value measured.</p>
 </div>
 
 
@@ -793,6 +793,19 @@ obey the definition of node symmetry from the enclosing operation.</p>
 
 
                             </div>
+                            <div id="Operation.node_count" class="classattr">
+                                <div class="attr variable">
+            <span class="name">node_count</span><span class="annotation">: Optional[int]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Operation.node_count"></a>
+    
+            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
+</div>
+
+
+                            </div>
                             <div id="Operation.name" class="classattr">
                                 <div class="attr variable">
             <span class="name">name</span><span class="annotation">: str</span>
@@ -806,15 +819,15 @@ obey the definition of node symmetry from the enclosing operation.</p>
 
 
                             </div>
-                            <div id="Operation.node_count" class="classattr">
+                            <div id="Operation.parameters" class="classattr">
                                 <div class="attr variable">
-            <span class="name">node_count</span><span class="annotation">: Optional[int]</span>
+            <span class="name">parameters</span><span class="annotation">: List[<a href="#Parameter">Parameter</a>]</span>
 
         
     </div>
-    <a class="headerlink" href="#Operation.node_count"></a>
+    <a class="headerlink" href="#Operation.parameters"></a>
     
-            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
+            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
 </div>
 
 
@@ -829,19 +842,6 @@ obey the definition of node symmetry from the enclosing operation.</p>
     
             <div class="docstring"><p>The list of sites at which this operation can be applied,
 together with its site-dependent characteristics.</p>
-</div>
-
-
-                            </div>
-                            <div id="Operation.parameters" class="classattr">
-                                <div class="attr variable">
-            <span class="name">parameters</span><span class="annotation">: List[<a href="#Parameter">Parameter</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Operation.parameters"></a>
-    
-            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
 </div>
 
 
@@ -935,19 +935,6 @@ the best native QUIL program for a desired task, and so are provided as part of 
 
 
                             </div>
-                            <div id="InstructionSetArchitecture.instructions" class="classattr">
-                                <div class="attr variable">
-            <span class="name">instructions</span><span class="annotation">: List[<a href="#Operation">Operation</a>]</span>
-
-        
-    </div>
-    <a class="headerlink" href="#InstructionSetArchitecture.instructions"></a>
-    
-            <div class="docstring"><p>The list of native QUIL instructions supported by the quantum processor.</p>
-</div>
-
-
-                            </div>
                             <div id="InstructionSetArchitecture.name" class="classattr">
                                 <div class="attr variable">
             <span class="name">name</span><span class="annotation">: str</span>
@@ -957,6 +944,19 @@ the best native QUIL program for a desired task, and so are provided as part of 
     <a class="headerlink" href="#InstructionSetArchitecture.name"></a>
     
             <div class="docstring"><p>The name of the quantum processor.</p>
+</div>
+
+
+                            </div>
+                            <div id="InstructionSetArchitecture.instructions" class="classattr">
+                                <div class="attr variable">
+            <span class="name">instructions</span><span class="annotation">: List[<a href="#Operation">Operation</a>]</span>
+
+        
+    </div>
+    <a class="headerlink" href="#InstructionSetArchitecture.instructions"></a>
+    
+            <div class="docstring"><p>The list of native QUIL instructions supported by the quantum processor.</p>
 </div>
 
 
