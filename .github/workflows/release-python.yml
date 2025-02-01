@@ -44,14 +44,11 @@ jobs:
         package-name: ${{ matrix.package-name }}
         maturin-target: universal2-apple-darwin
 
-  linux:
+  linux-x86_64:
     runs-on: ubuntu-latest
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
-    strategy:
-      matrix:
-        target: [x86_64, aarch64]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -61,18 +58,15 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
-        artifact-key: linux-${{ matrix.target }}
+        artifact-key: linux-x86_64
         package-name: qcs-sdk-python
-        maturin-target: ${{ matrix.target }}
+        maturin-target: x86_64
 
-  linux-grpc-web:
-    runs-on: ubuntu-latest
+  linux-aarch64:
+    runs-on: ubuntu-24.04-arm
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
-    strategy:
-      matrix:
-        target: [x86_64, ppc64le]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -82,9 +76,46 @@ jobs:
         version: '3.20.1'
     - uses: ./.github/action-common-python-release
       with:
-        artifact-key: linux-${{ matrix.target }}
+        artifact-key: linux-aarch64
+        package-name: qcs-sdk-python
+        maturin-target: aarch64
+
+  linux-grpc-web-x86_64:
+    runs-on: ubuntu-latest
+    needs: [is-python-release, should-publish-wheels]
+    env:
+      CXXFLAGS: "-std=c++11"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
+    - uses: ./.github/action-common-python-release
+      with:
+        artifact-key: linux-grpc-web-x86_64
         package-name: qcs-sdk-python-grpc-web
-        maturin-target: ${{ matrix.target }}
+        maturin-target: x86_64
+
+  linux-grpc-web-ppc64le:
+    runs-on: ubuntu-latest
+    needs: [is-python-release, should-publish-wheels]
+    env:
+      CXXFLAGS: "-std=c++11"
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
+    - uses: ./.github/action-common-python-release
+      with:
+        artifact-key: linux-grpc-web-ppc64le
+        package-name: qcs-sdk-python-grpc-web
+        maturin-target: ppc64le
+        maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:ppc64le
 
   windows:
     runs-on: windows-latest
@@ -140,7 +171,7 @@ jobs:
     # finish, regardless of their outcome. In this case, we
     # still make sure that at least a source distribution
     # can be published.
-    needs: [ macos, linux, linux-grpc-web, windows, sdist ]
+    needs: [ macos, linux-x86_64, linux-aarch64, linux-grpc-web-x86_64, linux-grpc-web-ppc64le, windows, sdist ]
     if: always() && needs.sdist.result == 'success'
     permissions:
       id-token: write
