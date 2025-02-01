@@ -25,7 +25,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
         maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
         maturin-target: universal2-apple-darwin
-        maturin-extra-args: --universal2
   #
   # linux-x86_64:
   #   runs-on: ubuntu-latest
