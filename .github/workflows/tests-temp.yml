@@ -10,7 +10,8 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -30,7 +31,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -50,7 +52,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -64,14 +67,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
         maturin-target: aarch64
 
-  linux-grpc-web:
+  linux-grpc-web-x86_64:
     runs-on: ubuntu-latest
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        target: [x86_64, ppc64le]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -83,14 +86,37 @@ jobs:
       with:
         package-name: qcs-sdk-python-grpc-web
         python-version: ${{ matrix.python-version }}
-        maturin-target: ${{ matrix.target }}
+        maturin-target: x86_64
+
+  linux-grpc-web-ppc64le:
+    runs-on: ubuntu-latest
+    env:
+      CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install protoc
+      uses: arduino/setup-protoc@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        version: '3.20.1'
+    - uses: ./.github/action-common-python-release-test
+      with:
+        package-name: qcs-sdk-python-grpc-web
+        python-version: ${{ matrix.python-version }}
+        maturin-target: ppc64le
+        maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:ppc64le
 
   windows:
     runs-on: windows-latest
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8"]
     steps:
     - name: Enable long path support
       run: |

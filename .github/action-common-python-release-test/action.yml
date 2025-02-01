@@ -16,6 +16,8 @@ inputs:
     description: "Rust target used for script steps"
   maturin-target:
     description: "Rust target used for maturin compilation"
+  maturin-container:
+    description: "Docker container used for maturin compilation"
 
 runs:
   using: "composite"
@@ -39,6 +41,7 @@ runs:
     with:
       manylinux: '2_34'
       command: build
+      container: ${{ inputs.maturin-container }}
       target: ${{ inputs.maturin-target }}
       args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
       docker-options: -e CI
