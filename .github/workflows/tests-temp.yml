@@ -10,8 +10,7 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -31,8 +30,7 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -52,8 +50,7 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -73,8 +70,7 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -94,8 +90,7 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -115,8 +110,7 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        python-version: ["3.8"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - name: Enable long path support
       run: |
