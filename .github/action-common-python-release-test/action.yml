@@ -18,6 +18,8 @@ inputs:
     description: "Rust target used for maturin compilation"
   maturin-container:
     description: "Docker container used for maturin compilation"
+  maturin-extra-args:
+    description: "Extra maturin command arguments"
 
 runs:
   using: "composite"
@@ -43,7 +45,7 @@ runs:
       command: build
       container: ${{ inputs.maturin-container }}
       target: ${{ inputs.maturin-target }}
-      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} ${{ inputs.maturin-extra-args }}
       docker-options: -e CI
 
   # host will not be able to install wheel in this case
