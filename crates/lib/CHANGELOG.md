@@ -1,3 +1,9 @@
+## 0.25.8
+
+### Fixes
+
+- build wheels in better tailored environments (#532)
+
 ## 0.25.8-rc.0
 
 ### Fixes
