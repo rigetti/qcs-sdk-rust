@@ -21,7 +21,7 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 
-dependencies = ["quil>=0.11.2", "qcs-api-client-common>=0.10.0"]
+dependencies = ["quil>=0.15.2", "qcs-api-client-common>=0.11.8"]
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
