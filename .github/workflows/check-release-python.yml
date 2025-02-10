@@ -14,7 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -37,7 +38,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -59,7 +61,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -81,7 +84,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -103,7 +107,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -125,7 +130,8 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - name: Enable long path support
       run: |
@@ -153,7 +159,8 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
