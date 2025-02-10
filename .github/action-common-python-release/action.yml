@@ -44,7 +44,7 @@ runs:
     name: Maturin - Build
     uses: messense/maturin-action@v1
     with:
-      manylinux: '2_34'
+      manylinux: '2_28'
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
@@ -54,7 +54,7 @@ runs:
     name: Maturin - Source Distribution
     uses: messense/maturin-action@v1
     with:
-      manylinux: '2_34'
+      manylinux: '2_28'
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
@@ -65,7 +65,7 @@ runs:
     name: Install wheel
     shell: bash
     run: |
-      pip install ${{ inputs.package-name }} --find-links dist --force-reinstall
+      pip install dist/* --find-links dist --force-reinstall
   - name: Upload wheels
     uses: actions/upload-artifact@v4
     with:

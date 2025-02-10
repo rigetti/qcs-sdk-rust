@@ -14,8 +14,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        package-name: [qcs-sdk-python]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -38,7 +40,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -52,7 +55,7 @@ jobs:
         package-name: qcs-sdk-python
         python-version: ${{ matrix.python-version }}
         maturin-target: x86_64
-        maturin-container: quay.io/pypa/manylinux_2_34_x86_64:latest
+        maturin-container: quay.io/pypa/manylinux_2_28_x86_64:latest
 
   linux-aarch64:
     runs-on: ubuntu-24.04-arm
@@ -61,7 +64,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -83,7 +87,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -105,7 +110,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -126,8 +132,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        package-name: [qcs-sdk-python]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - name: Enable long path support
       run: |
@@ -154,8 +162,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        package-name: [qcs-sdk-python]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
