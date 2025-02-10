@@ -1,3 +1,9 @@
+## 0.21.11
+
+### Fixes
+
+- revert the manylinux update (#534)
+
 ## 0.21.11-rc.0
 
 ### Fixes
