@@ -1,3 +1,9 @@
+## 0.25.9
+
+### Fixes
+
+- test all python releases individually, use manylinux 2_34 (#533)
+
 ## 0.25.9-rc.0
 
 ### Fixes

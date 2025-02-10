@@ -1,3 +1,9 @@
+## 0.21.10
+
+### Fixes
+
+- test all python releases individually, use manylinux 2_34 (#533)
+
 ## 0.21.10-rc.0
 
 ### Fixes
