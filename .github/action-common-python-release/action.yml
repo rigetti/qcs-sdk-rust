@@ -8,6 +8,8 @@ inputs:
 
   artifact-key:
     description: "Unique upload-artifact key. Example: 'macos' or 'linux-x86_64'"
+  python-version:
+    description: "Python version used for script steps and wheel"
   python-architecture:
     description: "Python architecture used for script steps"
   rust-target:
@@ -27,7 +29,7 @@ runs:
   steps:
   - uses: actions/setup-python@v4
     with:
-      python-version: "3.12"
+      python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }}
   - name: Install Rust toolchain
     uses: actions-rs/toolchain@v1
@@ -42,17 +44,17 @@ runs:
     name: Maturin - Build
     uses: messense/maturin-action@v1
     with:
-      manylinux: '2_28'
+      manylinux: '2_34'
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: -i 3.8 3.9 3.10 3.11 3.12 --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
       docker-options: -e CI
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
     uses: messense/maturin-action@v1
     with:
-      manylinux: '2_28'
+      manylinux: '2_34'
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
@@ -67,5 +69,5 @@ runs:
   - name: Upload wheels
     uses: actions/upload-artifact@v4
     with:
-      name: wheels_${{ inputs.package-name }}-${{ inputs.artifact-key }}
+      name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.artifact-key }}
       path: dist/
