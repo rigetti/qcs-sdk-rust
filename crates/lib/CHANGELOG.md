@@ -1,3 +1,9 @@
+## 0.25.10-rc.0
+
+### Fixes
+
+- revert the manylinux update (#534)
+
 ## 0.25.9
 
 ### Fixes
