@@ -31,6 +31,7 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -42,6 +43,7 @@ jobs:
       with:
         artifact-key: macos
         package-name: ${{ matrix.package-name }}
+        python-version: ${{ matrix.python-version }}
         maturin-target: universal2-apple-darwin
         maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
 
@@ -50,6 +52,9 @@ jobs:
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -61,6 +66,7 @@ jobs:
       with:
         artifact-key: linux-x86_64
         package-name: qcs-sdk-python
+        python-version: ${{ matrix.python-version }}
         maturin-target: x86_64
 
   linux-aarch64:
@@ -68,6 +74,9 @@ jobs:
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -79,6 +88,7 @@ jobs:
       with:
         artifact-key: linux-aarch64
         package-name: qcs-sdk-python
+        python-version: ${{ matrix.python-version }}
         maturin-target: aarch64
 
   linux-grpc-web-x86_64:
@@ -86,6 +96,9 @@ jobs:
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -97,6 +110,7 @@ jobs:
       with:
         artifact-key: linux-grpc-web-x86_64
         package-name: qcs-sdk-python-grpc-web
+        python-version: ${{ matrix.python-version }}
         maturin-target: x86_64
 
   linux-grpc-web-ppc64le:
@@ -104,6 +118,9 @@ jobs:
     needs: [is-python-release, should-publish-wheels]
     env:
       CXXFLAGS: "-std=c++11"
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -115,6 +132,7 @@ jobs:
       with:
         artifact-key: linux-grpc-web-ppc64le
         package-name: qcs-sdk-python-grpc-web
+        python-version: ${{ matrix.python-version }}
         maturin-target: ppc64le
         maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:ppc64le
 
@@ -124,6 +142,7 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - name: Enable long path support
       run: |
@@ -139,6 +158,7 @@ jobs:
       with:
         artifact-key: windows
         package-name: ${{ matrix.package-name }}
+        python-version: ${{ matrix.python-version }}
         python-architecture: x64
         rust-target: x86_64-pc-windows-msvc
 
@@ -150,6 +170,7 @@ jobs:
     strategy:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -161,6 +182,7 @@ jobs:
       with:
         artifact-key: sdist
         package-name: ${{ matrix.package-name }}
+        python-version: ${{ matrix.python-version }}
         maturin-command: sdist
 
   publish:
