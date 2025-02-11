@@ -75,4 +75,5 @@ runs:
   - name: unzip test
     shell: bash
     run: |
-      unzip -l -T dist/*
+      unzip -l dist/*
+      unzip -T dist/*
