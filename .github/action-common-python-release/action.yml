@@ -71,3 +71,9 @@ runs:
     with:
       name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.artifact-key }}
       path: dist/
+
+  - name: unzip test
+    shell: bash
+    run: |
+      unzip -l dist/*
+      unzip -T dist/*
