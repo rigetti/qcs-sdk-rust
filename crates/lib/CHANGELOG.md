@@ -1,3 +1,9 @@
+## 0.25.11-rc.0
+
+### Fixes
+
+- add unzip check to wheel build
+
 ## 0.25.10
 
 ### Fixes
