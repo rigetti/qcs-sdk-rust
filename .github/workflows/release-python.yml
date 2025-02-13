@@ -18,7 +18,8 @@ jobs:
     steps:
     - run: echo "Release tag starts with python/v, proceeding with release"
   should-publish-wheels:
-    if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
+    # if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
     runs-on: ubuntu-latest
     steps:
     - run: echo "Publishing wheels"
@@ -30,8 +31,11 @@ jobs:
       CXXFLAGS: "-std=c++11 -stdlib=libc++"
     strategy:
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        package-name: [qcs-sdk-python]
+        python-version: ["3.9"]
+        target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -44,7 +48,7 @@ jobs:
         artifact-key: macos
         package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
-        maturin-target: universal2-apple-darwin
+        maturin-target: ${{ matrix.target }}
 
   linux-x86_64:
     runs-on: ubuntu-latest
@@ -53,7 +57,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -75,7 +80,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -97,7 +103,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -119,7 +126,8 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -139,8 +147,10 @@ jobs:
     needs: [is-python-release, should-publish-wheels]
     strategy:
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        package-name: [qcs-sdk-python]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9"]
     steps:
     - name: Enable long path support
       run: |
@@ -167,8 +177,10 @@ jobs:
       CXXFLAGS: "-std=c++11"
     strategy:
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
+        # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        package-name: [qcs-sdk-python]
+        python-version: ["3.9"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
