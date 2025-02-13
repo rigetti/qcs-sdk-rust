@@ -50,7 +50,6 @@ runs:
       container: ${{ inputs.maturin-container }}
       args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
       docker-options: -e CI
-        RUST_LOG=debug
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
     uses: messense/maturin-action@v1
