@@ -61,7 +61,7 @@ runs:
       args: --manifest-path crates/python/Cargo.toml --out dist
 
   # host will not be able to install wheel in this case
-  - if: inputs.maturin-target != 'ppc64le'
+  - if: inputs.maturin-target != 'ppc64le' && inputs.maturin-target != 'x86_64-apple-darwin'
     name: Install wheel
     shell: bash
     run: |
@@ -69,6 +69,6 @@ runs:
   - name: Upload wheels
     uses: actions/upload-artifact@v4
     with:
-      name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.artifact-key }}
+      name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.maturin-target }}-${{ inputs.artifact-key }}
       path: dist/
 

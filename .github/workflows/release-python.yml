@@ -34,7 +34,7 @@ jobs:
         # package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         # python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
         package-name: [qcs-sdk-python]
-        python-version: ["3.9"]
+        python-version: ["3.9", "3.12"]
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
     - uses: actions/checkout@v4
