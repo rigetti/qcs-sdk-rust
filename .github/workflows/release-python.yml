@@ -18,8 +18,7 @@ jobs:
     steps:
     - run: echo "Release tag starts with python/v, proceeding with release"
   should-publish-wheels:
-    # if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'python/v')
+    if: (github.event_name == 'workflow_dispatch' && inputs.publishWheels) || (github.event_name == 'release' && !github.event.release.prerelease)
     runs-on: ubuntu-latest
     steps:
     - run: echo "Publishing wheels"
