@@ -185,13 +185,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExeParameter.value">value</a>
+                                <a class="variable" href="#ExeParameter.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.index">index</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExeParameter.name">name</a>
+                                <a class="variable" href="#ExeParameter.value">value</a>
                         </li>
                 </ul>
 
@@ -200,10 +200,10 @@
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
                         </li>
                 </ul>
 
@@ -293,16 +293,16 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
@@ -966,13 +966,13 @@ qcs_sdk    </h1>
     
     
 
-                            <div id="ExeParameter.value" class="classattr">
+                            <div id="ExeParameter.name" class="classattr">
                                 <div class="attr variable">
-            <span class="name">value</span>
+            <span class="name">name</span>
 
         
     </div>
-    <a class="headerlink" href="#ExeParameter.value"></a>
+    <a class="headerlink" href="#ExeParameter.name"></a>
     
     
 
@@ -988,13 +988,13 @@ qcs_sdk    </h1>
     
 
                             </div>
-                            <div id="ExeParameter.name" class="classattr">
+                            <div id="ExeParameter.value" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span>
+            <span class="name">value</span>
 
         
     </div>
-    <a class="headerlink" href="#ExeParameter.name"></a>
+    <a class="headerlink" href="#ExeParameter.value"></a>
     
     
 
@@ -1012,17 +1012,6 @@ qcs_sdk    </h1>
     
     
 
-                            <div id="JobHandle.readout_map" class="classattr">
-                                <div class="attr variable">
-            <span class="name">readout_map</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.readout_map"></a>
-    
-    
-
-                            </div>
                             <div id="JobHandle.job_id" class="classattr">
                                 <div class="attr variable">
             <span class="name">job_id</span>
@@ -1030,6 +1019,17 @@ qcs_sdk    </h1>
         
     </div>
     <a class="headerlink" href="#JobHandle.job_id"></a>
+    
+    
+
+                            </div>
+                            <div id="JobHandle.readout_map" class="classattr">
+                                <div class="attr variable">
+            <span class="name">readout_map</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.readout_map"></a>
     
     
 
@@ -1402,13 +1402,13 @@ qcs_sdk    </h1>
     
 
                             </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
+                            <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">grpc_api_url</span>
+            <span class="name">api_url</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
     
     
 
@@ -1424,17 +1424,6 @@ qcs_sdk    </h1>
     
 
                             </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -1442,6 +1431,17 @@ qcs_sdk    </h1>
         
     </div>
     <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
     
 
@@ -1517,7 +1517,7 @@ qcs_sdk    </h1>
                 <section id="__version__">
                     <div class="attr variable">
             <span class="name">__version__</span>        =
-<span class="default_value">&#39;0.21.9&#39;</span>
+<span class="default_value">$CARGO_MAKE_PROJECT_VERSION</span>
 
         
     </div>
