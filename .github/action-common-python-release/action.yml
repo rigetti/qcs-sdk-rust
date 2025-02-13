@@ -48,7 +48,7 @@ runs:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
       docker-options: -e CI
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
@@ -61,7 +61,7 @@ runs:
       args: --manifest-path crates/python/Cargo.toml --out dist
 
   # host will not be able to install wheel in this case
-  - if: inputs.maturin-target != 'ppc64le'
+  - if: inputs.maturin-target != 'ppc64le' && inputs.maturin-target != 'x86_64-apple-darwin'
     name: Install wheel
     shell: bash
     run: |
@@ -69,5 +69,6 @@ runs:
   - name: Upload wheels
     uses: actions/upload-artifact@v4
     with:
-      name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.artifact-key }}
+      name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.maturin-target }}-${{ inputs.artifact-key }}
       path: dist/
+

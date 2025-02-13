@@ -32,6 +32,7 @@ jobs:
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -44,8 +45,7 @@ jobs:
         artifact-key: macos
         package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
-        maturin-target: universal2-apple-darwin
-        maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:aarch64
+        maturin-target: ${{ matrix.target }}
 
   linux-x86_64:
     runs-on: ubuntu-latest
@@ -134,7 +134,6 @@ jobs:
         package-name: qcs-sdk-python-grpc-web
         python-version: ${{ matrix.python-version }}
         maturin-target: ppc64le
-        maturin-container: ghcr.io/rust-cross/manylinux_2_28-cross:ppc64le
 
   windows:
     runs-on: windows-latest
