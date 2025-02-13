@@ -1,3 +1,9 @@
+## 0.25.11-rc.5
+
+### Fixes
+
+- wheel building for linux, macos (#535)
+
 ## 0.25.11-rc.4
 
 ### Fixes
