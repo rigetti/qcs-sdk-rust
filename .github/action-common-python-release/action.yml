@@ -48,8 +48,9 @@ runs:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }}
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
       docker-options: -e CI
+        RUST_LOG=debug
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
     uses: messense/maturin-action@v1
@@ -72,8 +73,3 @@ runs:
       name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.artifact-key }}
       path: dist/
 
-  - name: unzip test
-    shell: bash
-    run: |
-      unzip -l dist/*
-      unzip -T dist/*
