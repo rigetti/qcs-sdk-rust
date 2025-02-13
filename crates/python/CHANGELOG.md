@@ -1,3 +1,9 @@
+## 0.21.12
+
+### Fixes
+
+- wheel building for linux, macos (#535)
+
 ## 0.21.12-rc.5
 
 ### Fixes
