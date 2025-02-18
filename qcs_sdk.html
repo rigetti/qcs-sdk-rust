@@ -50,6 +50,9 @@
                     <a class="class" href="#ResultData">ResultData</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#ResultData.__init__">ResultData</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#ResultData.from_qpu">from_qpu</a>
                         </li>
                         <li>
@@ -185,13 +188,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExeParameter.value">value</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExeParameter.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.index">index</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.value">value</a>
                         </li>
                 </ul>
 
@@ -200,10 +203,10 @@
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                 </ul>
 
@@ -293,19 +296,19 @@
                                 <a class="function" href="#QCSClient.load">load</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -347,7 +350,13 @@
                     <h1 class="modulename">
 qcs_sdk    </h1>
 
-                
+                        <div class="docstring"><p>The <code><a href="">qcs_sdk</a></code> package provides a Python interface to the Rigetti Quantum Cloud Services (QCS) platform.</p>
+
+<p>For more information about QCS, see <a href="https://docs.rigetti.com/qcs/">the QCS documentation</a>.</p>
+
+<p>⚠️ This package is still in early development and breaking changes should be expected between minor versions.</p>
+</div>
+
                         <input id="mod-qcs_sdk-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-qcs_sdk-view-source"><span>View Source</span></label>
@@ -358,8 +367,9 @@ qcs_sdk    </h1>
 </span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a>
 </span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.qcs_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos">6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">qcs_sdk</span><span class="o">.</span><span class="vm">__doc__</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">qcs_sdk</span><span class="p">,</span> <span class="s2">&quot;__all__&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;diagnostics&quot;</span><span class="p">]</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a>
+</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">qcs_sdk</span><span class="o">.</span><span class="vm">__doc__</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos">9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">qcs_sdk</span><span class="p">,</span> <span class="s2">&quot;__all__&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;diagnostics&quot;</span><span class="p">]</span>
 </span></pre></div>
 
 
@@ -374,11 +384,13 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ExecutionData"></a>
     
-    
+            <div class="docstring"><p>Contains the <code><a href="#ResultData">ResultData</a></code> and the duration of the execution.</p>
+</div>
+
 
                             <div id="ExecutionData.duration" class="classattr">
                                 <div class="attr variable">
-            <span class="name">duration</span>
+            <span class="name">duration</span><span class="annotation">: Optional[datetime.timedelta]</span>
 
         
     </div>
@@ -391,7 +403,7 @@ qcs_sdk    </h1>
                             </div>
                             <div id="ExecutionData.result_data" class="classattr">
                                 <div class="attr variable">
-            <span class="name">result_data</span>
+            <span class="name">result_data</span><span class="annotation">: <a href="#ResultData">ResultData</a></span>
 
         
     </div>
@@ -413,13 +425,78 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ResultData"></a>
     
-    
+            <div class="docstring"><p>Represents the two possible types of data returned from either the QVM or a real QPU.
+Each variant contains the original data returned from its respective executor.</p>
 
+<h2 id="usage">Usage</h2>
+
+<p>Your usage of <code><a href="#ResultData">ResultData</a></code> will depend on the types of programs you are running and where.
+The <code><a href="#ResultData.to_register_map">ResultData.to_register_map()</a></code> method will attempt to build <code><a href="#RegisterMap">RegisterMap</a></code> out of the data, where each
+register name is mapped to a 2-dimensional rectangular <code><a href="#RegisterMatrix">RegisterMatrix</a></code> where each row
+represents the final values in each register index for a particular shot. This is often the
+desired form of the data and it is <em>probably</em> what you want. This transformation isn't always
+possible, in which case <code><a href="#ResultData.to_register_map">to_register_map()</a></code> will return an error.</p>
+
+<p>To understand why this transformation can fail, we need to understand a bit about how readout data is
+returned from the QVM and from a real QPU:</p>
+
+<p>The QVM treats each <code>DECLARE</code> statement as initialzing some amount of memory. This memory works
+as one might expect it to. It is zero-initalized, and subsequent writes to the same region
+overwrite the previous value. The QVM returns memory at the end of every shot. This means
+we get the last value in every memory reference for each shot, which is exactly the
+representation we want for a <code><a href="#RegisterMatrix">RegisterMatrix</a></code>. For this reason, <code><a href="#ResultData.to_register_map">to_register_map()</a></code> should
+always succeed for <code>ResultData::Qvm</code>.</p>
+
+<p>The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
+(ie. "ro[0]") is more like a stream than a value in memory. Every <code>MEASURE</code> to a memory
+reference emits a new value to said stream. This means that the number of values per memory
+reference can vary per shot. For this reason, it's not always clear what the final value in
+each shot was for a particular reference. When this is the case, <code><a href="#ResultData.to_register_map">to_register_map()</a></code> will return
+an error as it's impossible to build a correct <code><a href="#RegisterMatrix">RegisterMatrix</a></code>  from the data without
+knowing the intent of the program that was run. Instead, it's recommended to build the
+<code><a href="#RegisterMatrix">RegisterMatrix</a></code> you need from the inner <code>QPUResultData</code> data using the knowledge of your
+program to choose the correct readout values for each shot.</p>
+
+<p>For more information on QPU readout data, refer to the
+<a href="https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data">QCS Documentation</a>.</p>
+
+<h3 id="variants">Variants:</h3>
+
+<ul>
+<li><code>qvm</code>: Data returned from the QVM, stored as <code>QVMResultData</code></li>
+<li><code>qpu</code>: Data returned from the QPU, stored as <code>QPUResultData</code></li>
+</ul>
+
+<h3 id="methods-each-per-variant">Methods (each per variant):</h3>
+
+<ul>
+<li><code>is_*</code>: if the underlying values are that type.</li>
+<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
+<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
+<li><code>from_*</code>: wrap underlying values as this enum type.</li>
+</ul>
+</div>
+
+
+                            <div id="ResultData.__init__" class="classattr">
+                                <div class="attr function">
+            
+        <span class="name">ResultData</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">QPUResultData</span><span class="p">,</span> <span class="n">QVMResultData</span><span class="p">]</span></span>)</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ResultData.__init__"></a>
+    
+            <div class="docstring"><p>Create a new ResultData from either QVM or QPU result data.</p>
+</div>
+
+
+                            </div>
                             <div id="ResultData.from_qpu" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QPUResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
 
         
     </div>
@@ -434,7 +511,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QVMResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
 
         
     </div>
@@ -449,13 +526,13 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">QVMResultData</span><span class="p">,</span> <span class="n">QPUResultData</span><span class="p">]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#ResultData.inner"></a>
     
-            <div class="docstring"><p>Directly return the Python version of the variant discriminant wrapped by this value; i.e., performs the match <code>ResultData::Variant(x) =&gt; x</code> for every variant constructor in [<code><a href="#ResultData">ResultData</a></code>]</p>
+            <div class="docstring"><p>Returns the inner result data</p>
 </div>
 
 
@@ -464,7 +541,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -479,7 +556,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">QPUResultData</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -494,7 +571,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">QPUResultData</span>:</span></span>
 
         
     </div>
@@ -509,7 +586,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -524,7 +601,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">QVMResultData</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -539,7 +616,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">QVMResultData</span>:</span></span>
 
         
     </div>
@@ -554,26 +631,45 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_register_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_register_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMap">RegisterMap</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#ResultData.to_register_map"></a>
     
-    
+            <div class="docstring"><p>Convert <code><a href="#ResultData">ResultData</a></code> from its inner representation as <code>QVMResultData</code> or
+<code>QPUResultData</code> into a <code><a href="#RegisterMap">RegisterMap</a></code>. The <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for each register will be
+constructed such that each row contains all the final values in the register for a single shot.</p>
+
+<h2 id="errors">Errors</h2>
+
+<p>Raises a <code><a href="#RegisterMatrixConversionError">RegisterMatrixConversionError</a></code> if the inner execution data for any of the
+registers would result in a jagged matrix. <code>QPUResultData</code> data is captured per measure,
+meaning a value is returned for every measure to a memory reference, not just once per shot.
+This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+where measurements to the same memory reference might occur multiple times in a shot, or be
+skipped conditionally. In these cases, building a rectangular <code><a href="#RegisterMatrix">RegisterMatrix</a></code> would
+necessitate making assumptions about the data that could skew the data in undesirable ways.
+Instead, it's recommended to manually build a matrix from <code>QPUResultData</code> that accurately
+selects the last value per-shot based on the program that was run.</p>
+</div>
+
 
                             </div>
                             <div id="ResultData.to_raw_readout_data" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_raw_readout_data</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_raw_readout_data</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">RawQPUReadoutData</span><span class="p">,</span> <span class="n">RawQVMReadoutData</span><span class="p">]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#ResultData.to_raw_readout_data"></a>
     
-    
+            <div class="docstring"><p>Get the raw data returned from the QVM or QPU. See <code>RawQPUReadoutData</code> and
+<code>RawQVMReadoutData</code> for more information.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -587,26 +683,30 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#RegisterMap"></a>
     
-    
+            <div class="docstring"><p>A map of register names (ie. "ro") to a <code><a href="#RegisterMatrix">RegisterMatrix</a></code> containing the values of the register.</p>
+</div>
+
 
                             <div id="RegisterMap.get_register_matrix" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">register_name</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">register_name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#RegisterMap.get_register_matrix"></a>
     
-    
+            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for the given register. Returns <code>None</code> if the register doesn't exist.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterMap.keys" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -619,7 +719,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -632,7 +732,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -645,7 +745,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">key</span>, </span><span class="param"><span class="n">default</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">key</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
 
         
     </div>
@@ -665,26 +765,48 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#RegisterMatrix"></a>
     
-    
+            <div class="docstring"><p>Values in a 2-dimensional <code>ndarray</code> representing the final shot value in each memory reference across all shots.
+Each variant corresponds to the possible data types a register can contain.</p>
+
+<h2 id="variants">Variants:</h2>
+
+<ul>
+<li><code>integer</code>: Corresponds to the Quil <code>BIT</code>, <code>OCTET</code>, or <code>INTEGER</code> types.</li>
+<li><code>real</code>: Corresponds to the Quil <code>REAL</code> type.</li>
+<li><code>complex</code>: Registers containing complex numbers.</li>
+</ul>
+
+<h3 id="methods-each-per-variant">Methods (each per variant):</h3>
+
+<ul>
+<li><code>is_*</code>: if the underlying values are that type.</li>
+<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
+<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
+<li><code>from_*</code>: wrap underlying values as this enum type.</li>
+</ul>
+</div>
+
 
                             <div id="RegisterMatrix.to_ndarray" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_ndarray</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#RegisterMatrix.to_ndarray"></a>
     
-    
+            <div class="docstring"><p>Get the RegisterMatrix as numpy <code>ndarray</code>.</p>
+</div>
+
 
                             </div>
                             <div id="RegisterMatrix.from_integer" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_integer</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
 
         
     </div>
@@ -697,7 +819,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -710,7 +832,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -723,7 +845,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -736,7 +858,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_real</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
 
         
     </div>
@@ -749,7 +871,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -762,7 +884,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -775,7 +897,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -788,7 +910,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_complex</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
 
         
     </div>
@@ -801,7 +923,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -814,7 +936,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -827,7 +949,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -847,110 +969,208 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#Executable"></a>
     
-    
+            <div class="docstring"><p>The builder interface for executing Quil programs on QVMs and QPUs.</p>
+</div>
+
 
                             <div id="Executable.execute_on_qvm" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">execute_on_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
+        <span class="name">execute_on_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">client</span><span class="p">:</span> <span class="n">QVMClient</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qvm"></a>
     
-    
+            <div class="docstring"><p>Execute on a QVM which is accessible via the provided client.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.execute_on_qvm_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">def</span>
-        <span class="name">execute_on_qvm_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
+        <span class="def">async def</span>
+        <span class="name">execute_on_qvm_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">client</span><span class="p">:</span> <span class="n">QVMClient</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qvm_async"></a>
     
-    
+            <div class="docstring"><p>Execute on a QVM which is accessible via the provided client.
+(async analog of <code><a href="#Executable.execute_on_qvm">Executable.execute_on_qvm</a></code>.)</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.execute_on_qpu" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">execute_on_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">execute_on_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qpu"></a>
     
-    
+            <div class="docstring"><p>Compile the program and execute it on a QPU, waiting for results.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
+the default endpoint for the given quantum_processor_id is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.execute_on_qpu_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">def</span>
-        <span class="name">execute_on_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="def">async def</span>
+        <span class="name">execute_on_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qpu_async"></a>
     
-    
+            <div class="docstring"><p>Compile the program and execute it on a QPU, waiting for results.
+(async analog of <code><a href="#Executable.execute_on_qpu">Executable.execute_on_qpu</a></code>)</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
+the default endpoint for the given quantum_processor_id is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.submit_to_qpu" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">submit_to_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="name">submit_to_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#JobHandle">JobHandle</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.submit_to_qpu"></a>
     
-    
+            <div class="docstring"><p>Compile the program and execute it on a QPU, without waiting for results.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
+the default endpoint for the given quantum_processor_id is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.submit_to_qpu_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">def</span>
-        <span class="name">submit_to_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+        <span class="def">async def</span>
+        <span class="name">submit_to_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#JobHandle">JobHandle</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.submit_to_qpu_async"></a>
     
-    
+            <div class="docstring"><p>Compile the program and execute it on a QPU, without waiting for results.
+(async analog of <code><a href="#Executable.execute_on_qpu">Executable.execute_on_qpu</a></code>)</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
+the default endpoint for the given quantum_processor_id is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.retrieve_results" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">retrieve_results</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">job_handle</span></span><span class="return-annotation">):</span></span>
+        <span class="name">retrieve_results</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">job_handle</span><span class="p">:</span> <span class="n"><a href="#JobHandle">JobHandle</a></span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.retrieve_results"></a>
     
-    
+            <div class="docstring"><p>Wait for the results of a job to complete.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="Executable.retrieve_results_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">def</span>
-        <span class="name">retrieve_results_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">job_handle</span></span><span class="return-annotation">):</span></span>
+        <span class="def">async def</span>
+        <span class="name">retrieve_results_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">job_handle</span><span class="p">:</span> <span class="n"><a href="#JobHandle">JobHandle</a></span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.retrieve_results_async"></a>
     
-    
+            <div class="docstring"><p>Wait for the results of a job to complete.
+(async analog of <code><a href="#Executable.retrieve_results">Executable.retrieve_results</a></code>)</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#ExecutionError">ExecutionError</a></code></strong>:  If the job fails to execute.</li>
+</ul>
+</div>
+
 
                             </div>
                 </section>
@@ -964,11 +1184,26 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ExeParameter"></a>
     
+            <div class="docstring"><p>Program execution parameters.</p>
+
+<p>Note: The validity of parameters is not checked until execution.</p>
+</div>
+
+
+                            <div id="ExeParameter.value" class="classattr">
+                                <div class="attr variable">
+            <span class="name">value</span><span class="annotation">: float</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.value"></a>
+    
     
 
+                            </div>
                             <div id="ExeParameter.name" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span>
+            <span class="name">name</span><span class="annotation">: str</span>
 
         
     </div>
@@ -979,22 +1214,11 @@ qcs_sdk    </h1>
                             </div>
                             <div id="ExeParameter.index" class="classattr">
                                 <div class="attr variable">
-            <span class="name">index</span>
+            <span class="name">index</span><span class="annotation">: int</span>
 
         
     </div>
     <a class="headerlink" href="#ExeParameter.index"></a>
-    
-    
-
-                            </div>
-                            <div id="ExeParameter.value" class="classattr">
-                                <div class="attr variable">
-            <span class="name">value</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.value"></a>
     
     
 
@@ -1010,28 +1234,37 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#JobHandle"></a>
     
-    
+            <div class="docstring"><p>The result of submitting a job to a QPU.</p>
 
-                            <div id="JobHandle.job_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">job_id</span>
+<p>Used to retrieve the results of a job.</p>
+</div>
 
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.job_id"></a>
-    
-    
 
-                            </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
-            <span class="name">readout_map</span>
+            <span class="name">readout_map</span><span class="annotation">: Dict[str, str]</span>
 
         
     </div>
     <a class="headerlink" href="#JobHandle.readout_map"></a>
     
+            <div class="docstring"><p>The readout map from source readout memory locations to the filter pipeline node
+which publishes the data.</p>
+</div>
+
+
+                            </div>
+                            <div id="JobHandle.job_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">job_id</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.job_id"></a>
     
+            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1106,13 +1339,33 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#RegisterData"></a>
     
-    
+            <div class="docstring"><p>Values present in a register that are one of a set of variants.</p>
+
+<p>Variants:</p>
+
+<ul>
+<li><code>i8</code>: Corresponds to the Quil <code>BIT</code> or <code>OCTET</code> types.</li>
+<li><code>i16</code>: Corresponds to the Quil <code>INTEGER</code> type.</li>
+<li><code>f64</code>: Corresponds to the Quil <code>REAL</code> type.</li>
+<li><code>complex32</code>: Results containing complex numbers.</li>
+</ul>
+
+<p>Methods (each per variant):</p>
+
+<ul>
+<li><code>is_*</code>: if the underlying values are that type.</li>
+<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
+<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
+<li><code>from_*</code>: wrap underlying values as this enum type.</li>
+</ul>
+</div>
+
 
                             <div id="RegisterData.from_i8" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
 
         
     </div>
@@ -1127,7 +1380,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
 
         
     </div>
@@ -1142,7 +1395,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
 
         
     </div>
@@ -1157,7 +1410,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
 
         
     </div>
@@ -1172,13 +1425,13 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#RegisterData.inner"></a>
     
-            <div class="docstring"><p>Directly return the Python version of the variant discriminant wrapped by this value; i.e., performs the match <code>RegisterData::Variant(x) =&gt; x</code> for every variant constructor in [<code><a href="#RegisterData">RegisterData</a></code>]</p>
+            <div class="docstring"><p>Returns the inner value.</p>
 </div>
 
 
@@ -1187,7 +1440,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -1202,7 +1455,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -1217,7 +1470,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -1232,7 +1485,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -1247,7 +1500,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -1262,7 +1515,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -1277,7 +1530,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -1292,7 +1545,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -1307,7 +1560,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -1322,7 +1575,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">is_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">is_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
 
         
     </div>
@@ -1337,7 +1590,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
@@ -1352,7 +1605,7 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">to_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">to_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span>:</span></span>
 
         
     </div>
@@ -1367,13 +1620,15 @@ qcs_sdk    </h1>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">as_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+        <span class="name">as_ndarray</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]]</span>:</span></span>
 
         
     </div>
     <a class="headerlink" href="#RegisterData.as_ndarray"></a>
     
-    
+            <div class="docstring"><p>Returns the values as an <code>ndarray</code>.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1402,28 +1657,6 @@ qcs_sdk    </h1>
     
 
                             </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -1435,13 +1668,13 @@ qcs_sdk    </h1>
     
 
                             </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
+                            <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">grpc_api_url</span>
+            <span class="name">api_url</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
     
     
 
@@ -1457,6 +1690,28 @@ qcs_sdk    </h1>
     
 
                             </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+    
+
+                            </div>
                 </section>
                 <section id="ExecutionError">
                     <div class="attr class">
@@ -1468,7 +1723,7 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ExecutionError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>Error encountered when executing a program.</p>
 </div>
 
 
@@ -1483,7 +1738,7 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#RegisterMatrixConversionError"></a>
     
-            <div class="docstring"><p>Inappropriate argument value (of correct type).</p>
+            <div class="docstring"><p>Error that may occur when building a <code><a href="#RegisterMatrix">RegisterMatrix</a></code> from execution data.</p>
 </div>
 
 
@@ -1498,7 +1753,12 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#reset_logging"></a>
     
-    
+            <div class="docstring"><p>Reset all caches for logging configuration within this library, allowing the most recent Python-side
+changes to be applied.</p>
+
+<p>See <a href="https://docs.rs/pyo3-log/latest/pyo3_log/">https://docs.rs/pyo3-log/latest/pyo3_log/</a> for more information.</p>
+</div>
+
 
                 </section>
                 <section id="_gather_diagnostics">
@@ -1516,8 +1776,8 @@ qcs_sdk    </h1>
                 </section>
                 <section id="__version__">
                     <div class="attr variable">
-            <span class="name">__version__</span>        =
-<span class="default_value">$CARGO_MAKE_PROJECT_VERSION</span>
+            <span class="name">__version__</span><span class="annotation">: str</span>        =
+<span class="default_value">&#39;0.21.12&#39;</span>
 
         
     </div>
