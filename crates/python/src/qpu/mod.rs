@@ -8,6 +8,7 @@ use rigetti_pyo3::{
 pub use result_data::{PyQpuResultData, PyReadoutValues, RawQpuReadoutData};
 
 pub mod api;
+pub(crate) mod experimental;
 pub mod isa;
 mod result_data;
 pub mod translation;
@@ -33,7 +34,8 @@ create_init_submodule! {
     submodules: [
         "api": api::init_submodule,
         "isa": isa::init_submodule,
-        "translation": translation::init_submodule
+        "translation": translation::init_submodule,
+        "experimental": experimental::init_submodule
     ],
 }
 

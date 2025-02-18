@@ -22,8 +22,15 @@ run_task = [{name = "test-flow"}]
 dependencies = ["clippy-flow"]
 
 [tasks.examples]
+dependencies = ["examples-libquil", "examples-experimental"]
+
+[tasks.examples-libquil]
 command = "cargo"
 args = ["build", "--examples", "--features", "libquil"]
+
+[tasks.examples-experimental]
+command = "cargo"
+args = ["build", "--examples", "--features", "experimental"]
 
 [tasks.deny]
 install_crate = "cargo-deny"
