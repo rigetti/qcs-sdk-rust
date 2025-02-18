@@ -1,3 +1,9 @@
+## 0.21.13-rc.0
+
+### Features
+
+- add support for hardware randomization (#515)
+
 ## 0.21.12
 
 ### Fixes
