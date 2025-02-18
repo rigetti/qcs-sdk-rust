@@ -32,11 +32,14 @@ script = [
     '''
 ]
 
-[tasks.install-python-package]
+[tasks.maturin-develop]
 dependencies = ["check-venv", "install-deps"]
 description = "Build the python package and install to the active virtual environment."
 command = "maturin"
-args = ["develop"]
+args = ["develop", "--features", "pyo3-tracing-subscriber-build"]
+
+[tasks.install-python-package]
+dependencies = ["maturin-develop", "format-tracing-subscriber"]
 
 [tasks.pre-test-docker-up]
 script = [
@@ -48,6 +51,10 @@ script = [
 [tasks.format-tracing-subscriber]
 command = "black"
 args = ["qcs_sdk/_tracing_subscriber"]
+
+[tasks.format]
+command = "black"
+args = ["qcs_sdk", "tests"]
 
 [tasks.post-test]
 script = [
@@ -72,7 +79,6 @@ args = ["tests", "--with-qcs-session", "--with-qcs-execution"]
 dependencies = [
     "pre-test-docker-up",
     "install-python-package",
-    "format-tracing-subscriber",
     "test",
     "post-test",
 ]
@@ -90,7 +96,6 @@ args = [
 [tasks.stubtest-flow]
 dependencies = [
     "install-python-package",
-    "format-tracing-subscriber",
     "stubtest",
 ]
 

@@ -17,6 +17,7 @@ otel-tracing = ["tracing-config", "qcs-api-client-grpc/otel-tracing", "qcs-api-c
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
 tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
+experimental = []
 
 [dependencies]
 cached = "0.44.0"
@@ -73,3 +74,4 @@ built = "0.6.1"
 name = "compilation-and-simulation-with-libquil"
 path = "examples/libquil.rs"
 required-features = ["libquil"]
+
