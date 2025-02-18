@@ -1,4 +1,9 @@
 qcs_sdk.qcs_sdk
+<<<<<<< HEAD
 
 # maturin always regenerates these, but with errors - they're missing __all__ exports.
 qcs_sdk._tracing_subscriber.*.__all__
+=======
+qcs_sdk._unitary_set.QubitRandomization
+.*.__all__
+>>>>>>> fd4e316 (feat: choose random real subregions)

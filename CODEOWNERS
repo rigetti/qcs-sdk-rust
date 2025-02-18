@@ -1,0 +1,4 @@
+crates/lib/src/qpu/experimental @erichulburd
+crates/python/src/qpu/experimental.rs @erichulburd
+crates/python/qcs_sdk/qpu/experimental @erichulburd
+crates/python/tests/qpu/experimental @erichulburd
