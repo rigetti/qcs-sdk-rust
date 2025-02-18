@@ -1,4 +1,6 @@
 //! This module supports low-level primitives for randomization on Rigetti's QPUs.
+//! For an example application of this functionality see
+//! [`crate::qpu::experimental::randomized_measurements`].
 use std::{convert::TryFrom, ops::BitXor};
 
 use num::{complex::Complex64, ToPrimitive};

@@ -1,19 +1,11 @@
 """
 This module supports low-level primitives for randomization on Rigetti's QPUs.
+For an example application of this functionality see
+`qcs_sdk.qpu.experimental.randomized_measurements`.
 """
 
 from typing import List, final
 from typing_extensions import Self
-
-
-__all__ = [
-    "RandomError", 
-    "PrngSeedValue", 
-    "ChooseRandomRealSubRegions",
-    "lfsr_v1_next",
-    "choose_random_real_sub_region_indices",
-]
-
 
 @final
 class RandomError(ValueError):
@@ -90,4 +82,3 @@ def choose_random_real_sub_region_indices(
     The LFSR v1 pseudo-random number generator underlies this sequence.
     """
     ...
-

@@ -75,3 +75,7 @@ name = "compilation-and-simulation-with-libquil"
 path = "examples/libquil.rs"
 required-features = ["libquil"]
 
+[[example]]
+name = "randomized-measurements"
+path = "examples/randomized_measurements.rs"
+required-features = ["experimental"]

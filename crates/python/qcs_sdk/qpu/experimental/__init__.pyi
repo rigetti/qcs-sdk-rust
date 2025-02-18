@@ -12,7 +12,5 @@ ephemeral, and subject to specific authorization checks.
 
 from qcs_sdk.qpu.experimental import (
     random as random,
+    randomized_measurements as randomized_measurements,
 )
-
-
-__all__ = ["random"]

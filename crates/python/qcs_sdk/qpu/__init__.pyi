@@ -23,7 +23,6 @@ __all__ = [
     'RawQPUReadoutData',
     'ReadoutValues',
     'api',
-    'experimental',
     'isa',
     'list_quantum_processors',
     'list_quantum_processors_async',

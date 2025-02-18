@@ -8,3 +8,4 @@
 //! As such, the features contained herein should be considered unstable, possibly
 //! ephemeral, and subject to specific authorization checks.
 pub mod random;
+pub mod randomized_measurements;
