@@ -2628,7 +2628,7 @@ checksum = "0c1318b19085f08681016926435853bbf7858f9c082d0999b80550ff5d9abe15"
 dependencies = [
  "bytes",
  "heck 0.5.0",
- "itertools 0.13.0",
+ "itertools 0.11.0",
  "log",
  "multimap",
  "once_cell",
@@ -2648,7 +2648,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e9552f850d5f0964a4e4d0bf306459ac29323ddfbae05e35a7c0d35cb0803cc5"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.11.0",
  "proc-macro2",
  "quote",
  "syn 2.0.66",
@@ -2860,9 +2860,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.11.8"
+version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed485c8c48ec362a35bc5106b67520c63495cf04166c9d2733fc971bcf3ca2ca"
+checksum = "cfd6d5b09d8e6b8576ebf34a26e864c513e402ff49e10222eb04b029909b5253"
 dependencies = [
  "async-tempfile",
  "async-trait",
@@ -2893,9 +2893,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.11.8"
+version = "0.11.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a022867a1995c0509014d2786c3d6e85e0ff2869f5cb42488a92956655548ac2"
+checksum = "56d06564cd30895f83ac41c7995f0106860308a8b71638b3fd3b9fa532fa1d52"
 dependencies = [
  "backoff",
  "futures-util",
@@ -2932,9 +2932,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.12.8"
+version = "0.12.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42225f82f62536c99a99d50e7b1ab0222afc0053064a0fb8c3f8388e9ade2983"
+checksum = "9b82adef224d6e01d929dcceb139a33c2c6e0fa9bd6c6263b73e616c802b1790"
 dependencies = [
  "anyhow",
  "http 1.1.0",
