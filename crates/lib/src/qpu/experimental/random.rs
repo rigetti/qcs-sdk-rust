@@ -123,9 +123,7 @@ impl ChooseRandomRealSubRegions {
             .size
             .length
             .to_f64()
-            .map_or(true, |destination_length| {
-                destination_length % sub_region_size.into() != 0f64
-            })
+            .is_none_or(|destination_length| destination_length % sub_region_size.into() != 0f64)
         {
             return Err(Error::InvalidDestinationLength {
                 destination_length: destination.size.length,
@@ -133,9 +131,12 @@ impl ChooseRandomRealSubRegions {
             });
         }
 
-        if source.size.length.to_f64().map_or(true, |source_length| {
-            source_length % sub_region_size.into() != 0f64
-        }) {
+        if source
+            .size
+            .length
+            .to_f64()
+            .is_none_or(|source_length| source_length % sub_region_size.into() != 0f64)
+        {
             return Err(Error::InvalidSourceLength {
                 source_length: source.size.length,
                 sub_region_size: sub_region_size.into(),
