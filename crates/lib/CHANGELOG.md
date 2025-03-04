@@ -1,3 +1,13 @@
+## 0.25.12-rc.2
+
+### Features
+
+- add support for hardware randomization (#515)
+
+### Fixes
+
+- update grpc clients (#537)
+
 ## 0.25.12-rc.1
 
 ### Features
