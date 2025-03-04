@@ -74,10 +74,10 @@
                                 <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                 </ul>
 
@@ -86,10 +86,10 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.memory">memory</a>
@@ -179,10 +179,10 @@
                                 <a class="function" href="#APIExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -197,10 +197,10 @@
                                 <a class="function" href="#APIExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -468,19 +468,6 @@
 
 
                             </div>
-                            <div id="ExecutionResult.dtype" class="classattr">
-                                <div class="attr variable">
-            <span class="name">dtype</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.dtype"></a>
-    
-            <div class="docstring"><p>Name of the data type.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
             <span class="name">shape</span>
@@ -490,6 +477,19 @@
     <a class="headerlink" href="#ExecutionResult.shape"></a>
     
             <div class="docstring"><p>Describes result shape dimensions.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.dtype" class="classattr">
+                                <div class="attr variable">
+            <span class="name">dtype</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.dtype"></a>
+    
+            <div class="docstring"><p>Name of the data type.</p>
 </div>
 
 
@@ -507,19 +507,6 @@
     
     
 
-                            <div id="ExecutionResults.buffers" class="classattr">
-                                <div class="attr variable">
-            <span class="name">buffers</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.buffers"></a>
-    
-            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">execution_duration_microseconds</span>
@@ -529,6 +516,19 @@
     <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
     
             <div class="docstring"><p>QPU execution duration.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResults.buffers" class="classattr">
+                                <div class="attr variable">
+            <span class="name">buffers</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.buffers"></a>
+    
+            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
 </div>
 
 
@@ -844,17 +844,6 @@
     
 
                             </div>
-                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptions.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -862,6 +851,17 @@
         
     </div>
     <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
     
     
 
@@ -905,17 +905,6 @@
     
 
                             </div>
-                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -923,6 +912,17 @@
         
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
     
     
 
