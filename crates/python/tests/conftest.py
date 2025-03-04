@@ -61,7 +61,7 @@ def _read_fixture(relpath: str) -> str:
 
 @pytest.fixture
 def quantum_processor_id() -> str:
-    return os.getenv("TEST_LIVE_QUANTUM_PROCESSOR_ID", "Ankaa-9Q-3")
+    return os.getenv("TEST_LIVE_QUANTUM_PROCESSOR_ID", "Ankaa-3")
 
 
 @pytest.fixture

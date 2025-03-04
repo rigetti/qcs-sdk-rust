@@ -189,7 +189,6 @@ pub async fn run_program<C: Client + ?Sized>(
         .run(&request, options)
         .await
         .map(|response| QvmResultData::from_memory_map(response.registers))
-        .map_err(Into::into)
 }
 
 /// Returns a copy of the [`Program`] with the given parameters applied to it.

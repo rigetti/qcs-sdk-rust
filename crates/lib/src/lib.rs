@@ -1,5 +1,4 @@
 #![deny(clippy::all)]
-#![deny(clippy::pedantic)]
 #![deny(clippy::cargo)]
 #![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
 #![allow(clippy::missing_errors_doc)]
@@ -8,6 +7,7 @@
 #![forbid(unsafe_code)]
 #![warn(future_incompatible)]
 #![warn(rust_2018_compatibility, rust_2018_idioms)]
+#![warn(clippy::pedantic)]
 #![warn(
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,
