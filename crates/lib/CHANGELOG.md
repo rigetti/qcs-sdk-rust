@@ -1,3 +1,9 @@
+## 0.25.12-rc.1
+
+### Features
+
+- add support for hardware randomization (#515)
+
 ## 0.25.12-rc.0
 
 ### Features
