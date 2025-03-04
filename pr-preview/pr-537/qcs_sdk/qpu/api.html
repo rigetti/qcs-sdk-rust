@@ -71,13 +71,13 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                 </ul>
 
@@ -89,10 +89,10 @@
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                 </ul>
 
@@ -158,13 +158,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -455,6 +455,19 @@
     
 
                             </div>
+                            <div id="ExecutionResult.data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">data</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.data"></a>
+    
+            <div class="docstring"><p>Register data for this result.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
             <span class="name">shape</span>
@@ -477,19 +490,6 @@
     <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
             <div class="docstring"><p>Name of the data type.</p>
-</div>
-
-
-                            </div>
-                            <div id="ExecutionResult.data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">data</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.data"></a>
-    
-            <div class="docstring"><p>Register data for this result.</p>
 </div>
 
 
@@ -520,6 +520,17 @@
 
 
                             </div>
+                            <div id="ExecutionResults.memory" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
             <span class="name">buffers</span>
@@ -531,17 +542,6 @@
             <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
 </div>
 
-
-                            </div>
-                            <div id="ExecutionResults.memory" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
-    
-    
 
                             </div>
                 </section>
@@ -772,17 +772,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -801,6 +790,17 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
