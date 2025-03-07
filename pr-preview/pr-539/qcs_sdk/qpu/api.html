@@ -71,13 +71,13 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                 </ul>
 
@@ -86,13 +86,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.memory">memory</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                 </ul>
 
@@ -137,13 +137,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -158,10 +158,10 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
@@ -455,15 +455,15 @@
     
 
                             </div>
-                            <div id="ExecutionResult.dtype" class="classattr">
+                            <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
-            <span class="name">dtype</span>
+            <span class="name">shape</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResult.dtype"></a>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
     
-            <div class="docstring"><p>Name of the data type.</p>
+            <div class="docstring"><p>Describes result shape dimensions.</p>
 </div>
 
 
@@ -481,15 +481,15 @@
 
 
                             </div>
-                            <div id="ExecutionResult.shape" class="classattr">
+                            <div id="ExecutionResult.dtype" class="classattr">
                                 <div class="attr variable">
-            <span class="name">shape</span>
+            <span class="name">dtype</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
-            <div class="docstring"><p>Describes result shape dimensions.</p>
+            <div class="docstring"><p>Name of the data type.</p>
 </div>
 
 
@@ -507,19 +507,6 @@
     
     
 
-                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">execution_duration_microseconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
-    
-            <div class="docstring"><p>QPU execution duration.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
             <span class="name">buffers</span>
@@ -542,6 +529,19 @@
     <a class="headerlink" href="#ExecutionResults.memory"></a>
     
     
+
+                            </div>
+                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">execution_duration_microseconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
+    
+            <div class="docstring"><p>QPU execution duration.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -700,13 +700,13 @@
     
 
                             </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                            <div id="ExecutionOptions.connection_strategy" class="classattr">
                                 <div class="attr variable">
-            <span class="name">timeout_seconds</span>
+            <span class="name">connection_strategy</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
+    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
     
     
 
@@ -722,13 +722,13 @@
     
 
                             </div>
-                            <div id="ExecutionOptions.connection_strategy" class="classattr">
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
                                 <div class="attr variable">
-            <span class="name">connection_strategy</span>
+            <span class="name">timeout_seconds</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
     
     
 
@@ -772,17 +772,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -790,6 +779,17 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
