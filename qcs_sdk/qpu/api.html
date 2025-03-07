@@ -71,13 +71,13 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                 </ul>
 
@@ -86,13 +86,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                 </ul>
 
@@ -137,13 +137,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                 </ul>
 
@@ -158,13 +158,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -179,10 +179,10 @@
                                 <a class="function" href="#APIExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
                         </li>
                 </ul>
 
@@ -197,10 +197,10 @@
                                 <a class="function" href="#APIExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
                         </li>
                 </ul>
 
@@ -209,10 +209,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -455,15 +455,15 @@
     
 
                             </div>
-                            <div id="ExecutionResult.shape" class="classattr">
+                            <div id="ExecutionResult.data" class="classattr">
                                 <div class="attr variable">
-            <span class="name">shape</span>
+            <span class="name">data</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    <a class="headerlink" href="#ExecutionResult.data"></a>
     
-            <div class="docstring"><p>Describes result shape dimensions.</p>
+            <div class="docstring"><p>Register data for this result.</p>
 </div>
 
 
@@ -481,15 +481,15 @@
 
 
                             </div>
-                            <div id="ExecutionResult.data" class="classattr">
+                            <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
-            <span class="name">data</span>
+            <span class="name">shape</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResult.data"></a>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
     
-            <div class="docstring"><p>Register data for this result.</p>
+            <div class="docstring"><p>Describes result shape dimensions.</p>
 </div>
 
 
@@ -507,15 +507,17 @@
     
     
 
-                            <div id="ExecutionResults.memory" class="classattr">
+                            <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
-            <span class="name">memory</span>
+            <span class="name">buffers</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
+    <a class="headerlink" href="#ExecutionResults.buffers"></a>
     
-    
+            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
+</div>
+
 
                             </div>
                             <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
@@ -531,17 +533,15 @@
 
 
                             </div>
-                            <div id="ExecutionResults.buffers" class="classattr">
+                            <div id="ExecutionResults.memory" class="classattr">
                                 <div class="attr variable">
-            <span class="name">buffers</span>
+            <span class="name">memory</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.buffers"></a>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
     
-            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
-</div>
-
+    
 
                             </div>
                 </section>
@@ -700,6 +700,17 @@
     
 
                             </div>
+                            <div id="ExecutionOptions.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptions.timeout_seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout_seconds</span>
@@ -718,17 +729,6 @@
         
     </div>
     <a class="headerlink" href="#ExecutionOptions.api_options"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptions.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
     
     
 
@@ -772,13 +772,13 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
                                 <div class="attr variable">
-            <span class="name">api_options</span>
+            <span class="name">connection_strategy</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
     
     
 
@@ -794,13 +794,13 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
-            <span class="name">connection_strategy</span>
+            <span class="name">api_options</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
     
     
 
@@ -844,17 +844,6 @@
     
 
                             </div>
-                            <div id="APIExecutionOptions.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
                                 <div class="attr variable">
             <span class="name">bypass_settings_protection</span>
@@ -862,6 +851,17 @@
         
     </div>
     <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptions.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
     
     
 
@@ -905,17 +905,6 @@
     
 
                             </div>
-                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
                                 <div class="attr variable">
             <span class="name">bypass_settings_protection</span>
@@ -923,6 +912,17 @@
         
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
     
     
 
@@ -940,17 +940,6 @@
     
     
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -958,6 +947,17 @@
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 

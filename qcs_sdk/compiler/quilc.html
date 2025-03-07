@@ -59,22 +59,22 @@
                                 <a class="variable" href="#NativeQuilMetadata.program_duration">program_duration</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_depth">gate_depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.multiqubit_gate_depth">multiqubit_gate_depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.qpu_runtime_estimation">qpu_runtime_estimation</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_volume">gate_volume</a>
+                                <a class="variable" href="#NativeQuilMetadata.topological_swaps">topological_swaps</a>
                         </li>
                         <li>
                                 <a class="variable" href="#NativeQuilMetadata.program_fidelity">program_fidelity</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.topological_swaps">topological_swaps</a>
+                                <a class="variable" href="#NativeQuilMetadata.gate_depth">gate_depth</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NativeQuilMetadata.qpu_runtime_estimation">qpu_runtime_estimation</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NativeQuilMetadata.multiqubit_gate_depth">multiqubit_gate_depth</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NativeQuilMetadata.gate_volume">gate_volume</a>
                         </li>
                         <li>
                                 <a class="variable" href="#NativeQuilMetadata.final_rewiring">final_rewiring</a>
@@ -110,10 +110,10 @@
                     <a class="class" href="#ConjugateByCliffordRequest">ConjugateByCliffordRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
                         </li>
                 </ul>
 
@@ -134,6 +134,9 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
@@ -144,9 +147,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
                         </li>
                 </ul>
 
@@ -309,54 +309,15 @@
 
 
                             </div>
-                            <div id="NativeQuilMetadata.gate_depth" class="classattr">
+                            <div id="NativeQuilMetadata.topological_swaps" class="classattr">
                                 <div class="attr variable">
-            <span class="name">gate_depth</span>
+            <span class="name">topological_swaps</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_depth"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.topological_swaps"></a>
     
-            <div class="docstring"><p>Get the gate_depth field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.multiqubit_gate_depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">multiqubit_gate_depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.multiqubit_gate_depth"></a>
-    
-            <div class="docstring"><p>Get the multiqubit_gate_depth field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.qpu_runtime_estimation" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qpu_runtime_estimation</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.qpu_runtime_estimation"></a>
-    
-            <div class="docstring"><p>Get the qpu_runtime_estimation field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.gate_volume" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gate_volume</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_volume"></a>
-    
-            <div class="docstring"><p>Get the gate_volume field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Get the topological_swaps field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -374,15 +335,54 @@
 
 
                             </div>
-                            <div id="NativeQuilMetadata.topological_swaps" class="classattr">
+                            <div id="NativeQuilMetadata.gate_depth" class="classattr">
                                 <div class="attr variable">
-            <span class="name">topological_swaps</span>
+            <span class="name">gate_depth</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.topological_swaps"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.gate_depth"></a>
     
-            <div class="docstring"><p>Get the topological_swaps field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Get the gate_depth field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="NativeQuilMetadata.qpu_runtime_estimation" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qpu_runtime_estimation</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata.qpu_runtime_estimation"></a>
+    
+            <div class="docstring"><p>Get the qpu_runtime_estimation field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="NativeQuilMetadata.multiqubit_gate_depth" class="classattr">
+                                <div class="attr variable">
+            <span class="name">multiqubit_gate_depth</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata.multiqubit_gate_depth"></a>
+    
+            <div class="docstring"><p>Get the multiqubit_gate_depth field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="NativeQuilMetadata.gate_volume" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gate_volume</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata.gate_volume"></a>
+    
+            <div class="docstring"><p>Get the gate_volume field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -491,19 +491,6 @@
     
     
 
-                            <div id="ConjugateByCliffordRequest.pauli" class="classattr">
-                                <div class="attr variable">
-            <span class="name">pauli</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
-    
-            <div class="docstring"><p>Get the pauli field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugateByCliffordRequest.clifford" class="classattr">
                                 <div class="attr variable">
             <span class="name">clifford</span>
@@ -513,6 +500,19 @@
     <a class="headerlink" href="#ConjugateByCliffordRequest.clifford"></a>
     
             <div class="docstring"><p>Get the clifford field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugateByCliffordRequest.pauli" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pauli</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
+    
+            <div class="docstring"><p>Get the pauli field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -569,6 +569,19 @@
     
     
 
+                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
+                                <div class="attr variable">
+            <span class="name">interleaver</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
+    
+            <div class="docstring"><p>Get the interleaver field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
                             <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
                                 <div class="attr variable">
             <span class="name">gateset</span>
@@ -617,19 +630,6 @@
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
     
             <div class="docstring"><p>Get the qubits field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
-                                <div class="attr variable">
-            <span class="name">interleaver</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
-    
-            <div class="docstring"><p>Get the interleaver field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
