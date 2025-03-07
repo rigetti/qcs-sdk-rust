@@ -213,3 +213,4 @@ jobs:
       with:
         command: upload
         args: --skip-existing wheels/*
+        maturin-version: v1.8.2 # coordinate this with crates/python/pyproject.toml
