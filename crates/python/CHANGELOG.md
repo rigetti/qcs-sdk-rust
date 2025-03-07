@@ -1,3 +1,9 @@
+## 0.21.14-rc.1
+
+### Fixes
+
+- update and sync maturin versions between build and upload (#539)
+
 ## 0.21.13
 
 ### Features
