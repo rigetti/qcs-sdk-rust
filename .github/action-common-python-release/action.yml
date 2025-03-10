@@ -39,6 +39,13 @@ runs:
       profile: minimal
       default: true
 
+  - name: Patch package metadata for grpc-web
+    shell: bash
+    if: inputs.package-name == 'qcs-sdk-python-grpc-web'
+    run: |
+      pip install toml
+      python crates/python/scripts/patch_grpc_web.py
+
   # must be build or sdist
   - if: inputs.maturin-command == 'build'
     name: Maturin - Build
