@@ -1,3 +1,9 @@
+## 0.21.16
+
+### Fixes
+
+- action download-artifact wildcard (#541)
+
 ## 0.21.16-rc.0
 
 ### Fixes
