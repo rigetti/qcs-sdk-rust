@@ -1,3 +1,10 @@
+## 0.21.17
+
+### Fixes
+
+- build qcs-sdk-python-grpc-web separately (#542)
+- don't fail-fast when publishing github packages
+
 ## 0.21.17-rc.1
 
 ### Fixes

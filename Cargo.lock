@@ -2953,7 +2953,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.21.17-rc.1"
+version = "0.21.17"
 dependencies = [
  "async-trait",
  "numpy",
