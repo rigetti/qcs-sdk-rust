@@ -45,7 +45,6 @@ runs:
     run: |
       pip install toml
       python crates/python/scripts/patch_grpc_web.py
-      cargo update hyper-proxy
 
   # must be build or sdist
   - if: inputs.maturin-command == 'build'
