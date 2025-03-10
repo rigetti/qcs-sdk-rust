@@ -204,7 +204,7 @@ jobs:
     - uses: actions/download-artifact@v4
       with:
         path: wheels
-        pattern: wheels_${{ matrix.package-name }}-*
+        pattern: wheels_${{ matrix.package-name }}__*
         merge-multiple: true
     - name: List wheels to upload
       run: ls -R wheels
