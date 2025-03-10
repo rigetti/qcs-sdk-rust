@@ -1,3 +1,9 @@
+## 0.21.17-rc.0
+
+### Fixes
+
+- don't fail-fast when publishing github packages
+
 ## 0.21.16
 
 ### Fixes
