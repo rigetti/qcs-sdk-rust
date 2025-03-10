@@ -1,3 +1,9 @@
+## 0.21.15
+
+### Fixes
+
+- don't use compression when storing github actions artifacts (#540)
+
 ## 0.21.15-rc.0
 
 ### Fixes
