@@ -27,7 +27,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - uses: actions/setup-python@v4
+  - uses: actions/setup-python@v5
     with:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }}
@@ -71,4 +71,5 @@ runs:
     with:
       name: wheels_${{ inputs.package-name }}-${{ inputs.python-version }}-${{ inputs.maturin-target }}-${{ inputs.artifact-key }}
       path: dist/
+      compression-level: 0
 
