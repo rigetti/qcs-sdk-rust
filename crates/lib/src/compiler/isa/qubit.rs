@@ -70,6 +70,11 @@ impl Qubit {
         self.dead = false;
         Ok(())
     }
+
+    /// Check if the qubit has any valid operations (gates).
+    pub(crate) fn has_valid_operations(&self) -> bool {
+        !self.gates.is_empty()
+    }
 }
 
 /// All the errors that can occur within this module.
