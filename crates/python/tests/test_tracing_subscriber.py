@@ -5,7 +5,6 @@ import os
 from unittest import mock
 from typing import Generator
 import pytest
-from time import sleep
 
 from opentelemetry import trace
 from opentelemetry.sdk.trace import Span, TracerProvider
@@ -16,7 +15,9 @@ from opentelemetry.sdk.trace.export import (
 
 
 from qcs_sdk import Executable
+from qcs_sdk.compiler.quilc import QuilcClient, TargetDevice, compile_program
 from qcs_sdk.qpu.api import retrieve_results, retrieve_results_async, submit, submit_async
+from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.qpu.translation import (
     translate,
     translate_async,
@@ -26,126 +27,133 @@ from qcs_sdk._tracing_subscriber import GlobalTracingConfig, SimpleConfig, Traci
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 TRACE_DIR = os.path.join(DIR, "__output__", "traces")
-os.makedirs(TRACE_DIR, exist_ok=True)
+
+
+@pytest.mark.asyncio
+async def test_quilc_tracing(
+    tracing_environment_variables: None,
+    native_bitflip_program: str,
+    tracer: trace.Tracer,
+    rust_global_trace_file: str,
+    aspen_m_3_isa: InstructionSetArchitecture,
+    quilc_rpcq_client: QuilcClient,
+):
+    """Ensure that quilc `compile_program` is traced."""
+
+    python_spans = []
+    with tracer.start_as_current_span("test_quilc_tracing") as span:
+        python_spans.append(span)
+        compile_program(native_bitflip_program, TargetDevice.from_isa(aspen_m_3_isa), quilc_rpcq_client, None)
+
+    for span in python_spans:
+        _verify_resource_spans(
+            rust_global_trace_file,
+            _QUILC_COMPILE_PROGRAM_SPAN_NAME,
+            span,
+            minimum_expected_duration=_MIN_QUILC_COMPILATION_DURATION,
+        )
 
 
 @pytest.mark.qcs_session
 @pytest.mark.asyncio
-async def test_tracing_subscriber(
+async def test_translate_submit_retrieve(
     tracing_environment_variables: None,
     native_bitflip_program: str,
     quantum_processor_id: str,
     tracer: trace.Tracer,
-    rust_trace_file: str,
+    rust_global_trace_file: str,
     live_qpu_access: bool,
 ):
     """
-    Configure and initialize a Rust tracing subscriber for the QCS SDK. Run translation,
-    job submission, and result retrieval using async and non-async methods. Assert the
-    underlying gRPC calls were traced and that the trace span durations are greater
+    Run translation, job submission, and result retrieval using async and non-async methods.
+    Assert the underlying gRPC calls were traced and that the trace span durations are greater
     than some minimum value.
-
-    Note, this test uses `GlobalTracingConfig`, so no other test with such configuration
-    can run within the same test process. Additional assertions on the collected traces
-    may be added to this test. `CurrentThreadTracingConfig` is not viable for this test
-    because we are testing `pyo3_asyncio` methods.
-
-    By default, after the test is run, the Rust trace file is deleted. To keep the trace file
-    for debugging, set the environment variable `QCS_SDK_TESTS_KEEP_RUST_TRACES` to `1`.
     """
-    config = GlobalTracingConfig(export_process=SimpleConfig(subscriber=subscriber.Config(layer=layers.otel_otlp_file.Config(file_path=rust_trace_file))))
 
-    spans = []
-    with Tracing(config=config):
-        with tracer.start_as_current_span("translate_submit_retrieve") as span:
-            spans.append(span)
-            print("test_tracing_subscriber.py:translate_submit_retrieve trace_id", span.get_span_context().trace_id)
-            translated = translate(native_bitflip_program, 1, quantum_processor_id)
-            print("translated", translated)
-            assert translated.program is not None
-            if live_qpu_access:
-                job_id = submit(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-                retrieve_results(job_id, quantum_processor_id=quantum_processor_id)
-
-        with tracer.start_as_current_span("translate_submit_retrieve_async") as span:
-            spans.append(span)
-            translated = await translate_async(native_bitflip_program, 1, quantum_processor_id)
-            assert translated.program is not None
-            if live_qpu_access:
-                job_id = await submit_async(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-                await retrieve_results_async(job_id, quantum_processor_id=quantum_processor_id)
-
+    python_spans = []
+    with tracer.start_as_current_span("translate_submit_retrieve") as span:
+        python_spans.append(span)
+        translated = translate(native_bitflip_program, 1, quantum_processor_id)
+        assert translated.program is not None
         if live_qpu_access:
-            with tracer.start_as_current_span("execute_on_qpu") as span:
-                spans.append(span)
-                executable = Executable(native_bitflip_program, shots=1)
-                executable.execute_on_qpu(quantum_processor_id)
+            job_id = submit(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
+            retrieve_results(job_id, quantum_processor_id=quantum_processor_id)
 
-            with tracer.start_as_current_span("execute_on_qpu_async") as span:
-                spans.append(span)
-                executable = Executable(native_bitflip_program, shots=1)
-                await executable.execute_on_qpu_async(quantum_processor_id)
-
-    for span in spans:
-        _verify_resource_spans(rust_trace_file, _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB, span)
+    with tracer.start_as_current_span("translate_submit_retrieve_async") as span:
+        python_spans.append(span)
+        translated = await translate_async(native_bitflip_program, 1, quantum_processor_id)
+        assert translated.program is not None
         if live_qpu_access:
-            _verify_resource_spans(rust_trace_file, _EXECUTE_CONTROLLER_JOB, span)
-            _verify_resource_spans(rust_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
+            job_id = await submit_async(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
+            await retrieve_results_async(job_id, quantum_processor_id=quantum_processor_id)
 
-# @pytest.mark.qcs_session
-# @pytest.mark.asyncio
-# async def test_trace_propagation():
-#     """
-#     Configure and initialize a Rust tracing subscriber for the QCS SDK. Run translation,
-#     job submission, and result retrieval using async and non-async methods. Assert the
-#     that trace context was propagated between services by checking that the propagation headers
-#     are present in a span attribute.
+    if live_qpu_access:
+        with tracer.start_as_current_span("execute_on_qpu") as span:
+            python_spans.append(span)
+            executable = Executable(native_bitflip_program, shots=1)
+            executable.execute_on_qpu(quantum_processor_id)
 
-#     Note, this test uses `GlobalTracingConfig`, so no other test with such configuration
-#     can run within the same test process. Additional assertions on the collected traces
-#     may be added to this test. `CurrentThreadTracingConfig` is not viable for this test
-#     because we are testing `pyo3_asyncio` methods.
+        with tracer.start_as_current_span("execute_on_qpu_async") as span:
+            python_spans.append(span)
+            executable = Executable(native_bitflip_program, shots=1)
+            await executable.execute_on_qpu_async(quantum_processor_id)
 
-#     By default, after the test is run, the Rust trace file is deleted. To keep the trace file
-#     for debugging, set the environment variable `QCS_SDK_TESTS_KEEP_RUST_TRACES` to `1`.
+    for span in python_spans:
+        _verify_resource_spans(rust_global_trace_file, _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB, span)
+        if live_qpu_access:
+            _verify_resource_spans(rust_global_trace_file, _EXECUTE_CONTROLLER_JOB, span)
+            _verify_resource_spans(rust_global_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
 
-#     """
-#     config = GlobalTracingConfig(export_process=SimpleConfig(subscriber=subscriber.Config(layer=layers.otel_otlp_file.Config(file_path=rust_trace_file))))
 
-#     spans = []
-#     with Tracing(config=config):
-#         with tracer.start_as_current_span("translate_submit_retrieve") as span:
-#             spans.append(span) 
-#             translated = translate(native_bitflip_program, 1, quantum_processor_id)
-#             assert translated.program is not None
-#             if live_qpu_access:
-#                 job_id = submit(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-#                 retrieve_results(job_id, quantum_processor_id=quantum_processor_id)
+@pytest.mark.qcs_session
+@pytest.mark.asyncio
+async def test_translate_submit_retrieve_propagate(
+    tracing_environment_variables: None,
+    native_bitflip_program: str,
+    quantum_processor_id: str,
+    tracer: trace.Tracer,
+    rust_global_trace_file: str,
+    live_qpu_access: bool,
+):
+    """
+    Run translation, job submission, and result retrieval using async and non-async methods.
+    Assert the that trace context was propagated between services by checking that the
+    propagation headers are present in a span attribute.
+    """
 
-#         with tracer.start_as_current_span("translate_submit_retrieve_async") as span:
-#             spans.append(span)
-#             translated = await translate_async(native_bitflip_program, 1, quantum_processor_id)
-#             assert translated.program is not None
-#             if live_qpu_access:
-#                 job_id = await submit_async(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-#                 await retrieve_results_async(job_id, quantum_processor_id=quantum_processor_id)
+    python_spans = []
+    with tracer.start_as_current_span("translate_submit_retrieve") as span:
+        python_spans.append(span)
+        translated = translate(native_bitflip_program, 1, quantum_processor_id)
+        assert translated.program is not None
+        if live_qpu_access:
+            job_id = submit(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
+            retrieve_results(job_id, quantum_processor_id=quantum_processor_id)
 
-#         if live_qpu_access:
-#             with tracer.start_as_current_span("execute_on_qpu") as span:
-#                 spans.append(span)
-#                 executable = Executable(native_bitflip_program, shots=1)
-#                 executable.execute_on_qpu(quantum_processor_id)
+    with tracer.start_as_current_span("translate_submit_retrieve_async") as span:
+        python_spans.append(span)
+        translated = await translate_async(native_bitflip_program, 1, quantum_processor_id)
+        assert translated.program is not None
+        if live_qpu_access:
+            job_id = await submit_async(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
+            await retrieve_results_async(job_id, quantum_processor_id=quantum_processor_id)
 
-#             with tracer.start_as_current_span("execute_on_qpu_async") as span:
-#                 spans.append(span)
-#                 executable = Executable(native_bitflip_program, shots=1)
-#                 await executable.execute_on_qpu_async(quantum_processor_id)
+    if live_qpu_access:
+        with tracer.start_as_current_span("execute_on_qpu") as span:
+            python_spans.append(span)
+            executable = Executable(native_bitflip_program, shots=1)
+            executable.execute_on_qpu(quantum_processor_id)
 
-#     for span in spans:
-#         _verify_resource_spans(rust_trace_file, _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB, span)
-#         if live_qpu_access:
-#             _verify_resource_spans(rust_trace_file, _EXECUTE_CONTROLLER_JOB, span)
-#             _verify_resource_spans(rust_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
+        with tracer.start_as_current_span("execute_on_qpu_async") as span:
+            python_spans.append(span)
+            executable = Executable(native_bitflip_program, shots=1)
+            await executable.execute_on_qpu_async(quantum_processor_id)
+
+    for span in python_spans:
+        _verify_resource_spans(rust_global_trace_file, _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB, span)
+        if live_qpu_access:
+            _verify_resource_spans(rust_global_trace_file, _EXECUTE_CONTROLLER_JOB, span)
+            _verify_resource_spans(rust_global_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
 
 
 @pytest.fixture(scope="session")
@@ -165,6 +173,15 @@ def tracing_environment_variables() -> Generator[None, None, None]:
         yield
 
 
+_QUILC_COMPILE_PROGRAM_SPAN_NAME = "py_compile_program"
+"""
+This span is configured using the #[instrument] attribute on
+`qcs_sdk_python::compiler::quilc::compile_program`.
+"""
+
+_MIN_QUILC_COMPILATION_DURATION = timedelta(milliseconds=10)
+"""The minimum amount of time we would expect a quilc compile call to take."""
+
 _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB = "/services.translation.Translation/TranslateQuilToEncryptedControllerJob"
 """The gRPC method for translation."""
 
@@ -182,9 +199,15 @@ the translation span is not empty.
 """
 
 
-def _verify_resource_spans(rust_trace_file: str, span_name: str, parent_span: Span, count: int = 1, minimum_expected_duration: timedelta = _MIN_EXPECTED_GRPC_DURATION):
+def _verify_resource_spans(
+    rust_trace_file: str,
+    span_name: str,
+    parent_span: Span,
+    count: int = 1,
+    minimum_expected_duration: timedelta = _MIN_EXPECTED_GRPC_DURATION,
+):
     """
-    Open the Rust trace file and assert that it contains the expected number of 
+    Open the Rust trace file and assert that it contains the expected number of
     spans specified by `span_name` under the given `parent_span`. Assert that the
     duration of these spans is greater than `minimum_expected_duration`.
     """
@@ -192,7 +215,6 @@ def _verify_resource_spans(rust_trace_file: str, span_name: str, parent_span: Sp
         resource_spans = []
         for line in f.readlines():
             resource_spans += json.loads(line)["resourceSpans"]
-    print(resource_spans)
 
     parent_span_context = parent_span.get_span_context()
     if parent_span_context is None:
@@ -205,23 +227,36 @@ def _verify_resource_spans(rust_trace_file: str, span_name: str, parent_span: Sp
                 if trace_id == parent_span_context.trace_id:
                     counter[span["name"]] += 1
                     if span["name"] == span_name:
-                        duration_ns = span["endTimeUnixNano"] - span["startTimeUnixNano"]
+                        duration_ns = int(span["endTimeUnixNano"]) - int(span["startTimeUnixNano"])
                         duration = timedelta(microseconds=duration_ns / 1000)
                         assert duration >= minimum_expected_duration
 
-    assert counter[span_name] == count, f"Expected {count} spans with name {span_name} within parent \"{parent_span.name}\", but found {counter[span_name]}. See {rust_trace_file} trace {hex(parent_span_context.trace_id)}"
+    assert (
+        counter[span_name] == count
+    ), f'Expected {count} spans with name {span_name} within parent "{parent_span.name}", but found {counter[span_name]}. See {rust_trace_file} trace {hex(parent_span_context.trace_id)}'
 
 
-@pytest.fixture(scope="function")
-def rust_trace_file() -> Generator[str, None, None]:
+@pytest.fixture(scope="session")
+def rust_global_trace_file() -> Generator[str, None, None]:
     """
-    Open a file for writing Rust traces. Delete the file after the test is run (unless
-    `QCS_SDK_TESTS_KEEP_RUST_TRACES` is set to `1`).
+    This session fixture is initialized only once across the test process. This is necessary
+    because the Rust tracing subscriber is a global singleton that will panic if initialized
+    more than once within a single process.
+
+    The trace file is deleted after the test is run, unless the environment variable `QCS_SDK_TESTS_KEEP_RUST_TRACES` is set to `1`.
     """
     timestamp = datetime.now().astimezone(timezone.utc).isoformat()
     file_name = f"rust-traces-{timestamp}.json"
     try:
-        yield os.path.join(TRACE_DIR, file_name)
+        os.makedirs(TRACE_DIR, exist_ok=True)
+        rust_trace_file = os.path.join(TRACE_DIR, file_name)
+        config = GlobalTracingConfig(
+            export_process=SimpleConfig(
+                subscriber=subscriber.Config(layer=layers.otel_otlp_file.Config(file_path=rust_trace_file))
+            )
+        )
+        with Tracing(config=config):
+            yield rust_trace_file
     finally:
         if os.environ.get("QCS_SDK_TESTS_KEEP_RUST_TRACES", "false").lower() not in {"1", "true", "t"}:
             os.remove(os.path.join(TRACE_DIR, file_name))
