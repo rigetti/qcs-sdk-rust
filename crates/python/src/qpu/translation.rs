@@ -2,7 +2,7 @@
 use std::{collections::HashMap, time::Duration};
 
 use futures_util::TryFutureExt;
-use opentelemetry::trace::FutureExt;
+use opentelemetry::trace::{FutureExt, TraceContextExt};
 use prost::Message;
 use pyo3::types::PyBytes;
 use pyo3::Python;
@@ -14,8 +14,7 @@ use qcs_api_client_grpc::services::translation::{
     TranslationOptions as ApiTranslationOptions,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_simple_enum, py_sync,
-    ToPythonError,
+    create_init_submodule, py_sync, py_wrap_error, py_wrap_simple_enum, ToPythonError,
 };
 
 use crate::client::PyQcsClient;
@@ -38,12 +37,12 @@ create_init_submodule! {
     ],
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn get_quilt_calibrations(
         quantum_processor_id: String,
         client: Option<PyQcsClient>,
@@ -211,15 +210,15 @@ pub struct PyTranslationResult {
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     /// Translates a native Quil program into an executable
     ///
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="py_error")]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn translate(
         native_quil: String,
         num_shots: u32,
@@ -227,21 +226,19 @@ py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-        let current_span = tracing::Span::current();
-        println!("translation.rs:translate shim current_span.id {:?}", current_span.id());
-        let client = PyQcsClient::get_or_create_client(client);
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-        let result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
+            let client = PyQcsClient::get_or_create_client(client);
+            let translation_options = translation_options.map(|opts| opts.as_inner().clone());
+            let result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
+                    .map_err(RustTranslationError::from)
+                    .map_err(RustTranslationError::to_py_err).await?;
+
+            let program = serde_json::to_string(&result.job)
                 .map_err(RustTranslationError::from)
-                .map_err(RustTranslationError::to_py_err).await?;
+                .map_err(RustTranslationError::to_py_err)?;
 
-        let program = serde_json::to_string(&result.job)
-            .map_err(RustTranslationError::from)
-            .map_err(RustTranslationError::to_py_err)?;
-
-        Ok(PyTranslationResult {
-            program, 
-            ro_sources: Some(result.readout_map),
-        })
+            Ok(PyTranslationResult {
+                program,
+                ro_sources: Some(result.readout_map),
+            })
     }
 }

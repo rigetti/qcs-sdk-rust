@@ -243,10 +243,10 @@ impl PyQvmOptions {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn run(
         quil: String,
         #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]

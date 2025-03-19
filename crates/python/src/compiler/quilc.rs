@@ -1,3 +1,4 @@
+use opentelemetry::trace::TraceContextExt;
 use qcs::compiler::quilc::{
     CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
     GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
@@ -6,8 +7,8 @@ use qcs::compiler::quilc::{
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use quil_rs::quil::Quil;
 use rigetti_pyo3::{
-    create_init_submodule, impl_repr, py_function_sync_async, py_wrap_data_struct, py_wrap_error,
-    py_wrap_struct, py_wrap_type,
+    create_init_submodule, impl_repr, py_wrap_data_struct, py_wrap_error, py_wrap_struct,
+    py_wrap_type,
     pyo3::{
         exceptions::{PyRuntimeError, PyValueError},
         pyclass, pyfunction, pymethods,
@@ -191,11 +192,11 @@ impl PyQuilcClient {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn compile_program(
         quil: String,
         target: PyTargetDevice,
@@ -281,7 +282,7 @@ pub struct PyCompilationResult {
     native_quil_metadata: Option<PyNativeQuilMetadata>,
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     async fn get_version_info(
         client: PyQuilcClient,
@@ -333,7 +334,7 @@ py_wrap_data_struct! {
     }
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     async fn conjugate_pauli_by_clifford(
         request: PyConjugateByCliffordRequest,
@@ -383,7 +384,7 @@ py_wrap_data_struct! {
     }
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     async fn generate_randomized_benchmarking_sequence(
         request: PyRandomizedBenchmarkingRequest,
