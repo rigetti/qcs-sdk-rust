@@ -48,6 +48,10 @@ script = [
     '''
 ]
 
+[tasks.format]
+command = "black"
+args = ["qcs_sdk", "tests"]
+
 [tasks.format-tracing-subscriber]
 command = "black"
 args = ["qcs_sdk/_tracing_subscriber"]
