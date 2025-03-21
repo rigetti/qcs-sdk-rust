@@ -15,13 +15,15 @@ from opentelemetry.sdk.trace.export import (
 
 
 from qcs_sdk import Executable
-from qcs_sdk.compiler.quilc import QuilcClient, TargetDevice, compile_program
+from qcs_sdk.compiler.quilc import QuilcClient, TargetDevice, compile_program_async, compile_program
 from qcs_sdk.qpu.api import retrieve_results, retrieve_results_async, submit, submit_async
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.qpu.translation import (
     translate,
     translate_async,
 )
+from qcs_sdk.qvm import QVMClient
+from qcs_sdk.qvm.api import MultishotRequest, run_async as run_qvm_async, run as run_qvm
 from qcs_sdk._tracing_subscriber import GlobalTracingConfig, SimpleConfig, Tracing, subscriber, layers
 
 
@@ -38,20 +40,71 @@ async def test_quilc_tracing(
     aspen_m_3_isa: InstructionSetArchitecture,
     quilc_rpcq_client: QuilcClient,
 ):
-    """Ensure that quilc `compile_program` is traced."""
+    """
+    Ensure that qvm `run` is traced. This is a convenient unit test to ensure
+    that the basic tracing setup is working.
+    """
 
     python_spans = []
+    isa = TargetDevice.from_isa(aspen_m_3_isa)
     with tracer.start_as_current_span("test_quilc_tracing") as span:
         python_spans.append(span)
-        compile_program(native_bitflip_program, TargetDevice.from_isa(aspen_m_3_isa), quilc_rpcq_client, None)
+        compile_program(native_bitflip_program, isa, quilc_rpcq_client, None)
+        await compile_program_async(native_bitflip_program, isa, quilc_rpcq_client, None)
 
     for span in python_spans:
-        _verify_resource_spans(
-            rust_global_trace_file,
-            _QUILC_COMPILE_PROGRAM_SPAN_NAME,
-            span,
-            minimum_expected_duration=_MIN_QUILC_COMPILATION_DURATION,
+        # see `qcs_sdk_python::compiler::quilc::compile_program`
+        for expected_span_name in ["py_compile_program", "py_compile_program_async"]:
+            _verify_resource_spans(
+                rust_global_trace_file,
+                expected_span_name,
+                span,
+                minimum_expected_duration=timedelta(microseconds=10),
+            )
+
+
+@pytest.mark.asyncio
+async def test_qvm_tracing(
+    tracing_environment_variables: None,
+    native_bitflip_program: str,
+    tracer: trace.Tracer,
+    rust_global_trace_file: str,
+    qvm_http_client: QVMClient,
+):
+    """
+    Ensure that quilc `compile_program` is traced. This is a convenient unit test to ensure
+    that the basic tracing setup is working.
+    """
+
+    python_spans = []
+    request = MultishotRequest(
+        program=native_bitflip_program,
+        shots=10,
+        addresses={},
+        measurement_noise=None,
+        gate_noise=None,
+        rng_seed=None
+    )
+    with tracer.start_as_current_span("test_qvm_tracing") as span:
+        python_spans.append(span)
+        run_qvm(
+            request=request,
+            client=qvm_http_client,
         )
+        await run_qvm_async(
+            request=request,
+            client=qvm_http_client,
+        )
+
+    for span in python_spans:
+        # See `qcs_sdk_python::qvm::qpi::run`
+        for expected_span_name in ["py_run", "py_run_async"]:
+            _verify_resource_spans(
+                rust_global_trace_file,
+                expected_span_name,
+                span,
+                minimum_expected_duration=timedelta(microseconds=10),
+            )
 
 
 @pytest.mark.qcs_session
@@ -172,15 +225,6 @@ def tracing_environment_variables() -> Generator[None, None, None]:
     ):
         yield
 
-
-_QUILC_COMPILE_PROGRAM_SPAN_NAME = "py_compile_program"
-"""
-This span is configured using the #[instrument] attribute on
-`qcs_sdk_python::compiler::quilc::compile_program`.
-"""
-
-_MIN_QUILC_COMPILATION_DURATION = timedelta(milliseconds=10)
-"""The minimum amount of time we would expect a quilc compile call to take."""
 
 _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB = "/services.translation.Translation/TranslateQuilToEncryptedControllerJob"
 """The gRPC method for translation."""
