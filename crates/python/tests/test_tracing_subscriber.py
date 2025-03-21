@@ -41,7 +41,7 @@ async def test_quilc_tracing(
     quilc_rpcq_client: QuilcClient,
 ):
     """
-    Ensure that qvm `run` is traced. This is a convenient unit test to ensure
+    Ensure that quilc `compile_program` is traced. This is a convenient unit test to ensure
     that the basic tracing setup is working.
     """
 
@@ -72,7 +72,7 @@ async def test_qvm_tracing(
     qvm_http_client: QVMClient,
 ):
     """
-    Ensure that quilc `compile_program` is traced. This is a convenient unit test to ensure
+    Ensure that qvm `run` is traced. This is a convenient unit test to ensure
     that the basic tracing setup is working.
     """
 
