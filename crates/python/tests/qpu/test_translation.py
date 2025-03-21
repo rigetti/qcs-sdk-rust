@@ -3,7 +3,7 @@ import pytest
 from qcs_sdk.qpu.translation import (
     TranslationError,
     translate,
-    # translate_async,
+    translate_async,
     get_quilt_calibrations,
     get_quilt_calibrations_async,
 )
