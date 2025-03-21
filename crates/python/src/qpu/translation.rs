@@ -2,7 +2,7 @@
 use std::{collections::HashMap, time::Duration};
 
 use futures_util::TryFutureExt;
-use opentelemetry::trace::{FutureExt, TraceContextExt};
+use opentelemetry::trace::FutureExt;
 use prost::Message;
 use pyo3::types::PyBytes;
 use pyo3::Python;
@@ -13,9 +13,7 @@ use qcs_api_client_grpc::services::translation::{
     translation_options::TranslationBackend as ApiTranslationBackend,
     TranslationOptions as ApiTranslationOptions,
 };
-use rigetti_pyo3::{
-    create_init_submodule, py_sync, py_wrap_error, py_wrap_simple_enum, ToPythonError,
-};
+use rigetti_pyo3::{create_init_submodule, py_wrap_error, py_wrap_simple_enum, ToPythonError};
 
 use crate::client::PyQcsClient;
 
