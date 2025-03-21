@@ -226,19 +226,19 @@ crate::py_sync::py_function_sync_async! {
         client: Option<PyQcsClient>,
         translation_options: Option<PyTranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
-            let client = PyQcsClient::get_or_create_client(client);
-            let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-            let result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
-                    .map_err(RustTranslationError::from)
-                    .map_err(RustTranslationError::to_py_err).await?;
-
-            let program = serde_json::to_string(&result.job)
+        let client = PyQcsClient::get_or_create_client(client);
+        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
+        let result = qcs::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
                 .map_err(RustTranslationError::from)
-                .map_err(RustTranslationError::to_py_err)?;
+                .map_err(RustTranslationError::to_py_err).await?;
 
-            Ok(PyTranslationResult {
-                program,
-                ro_sources: Some(result.readout_map),
-            })
+        let program = serde_json::to_string(&result.job)
+            .map_err(RustTranslationError::from)
+            .map_err(RustTranslationError::to_py_err)?;
+
+        Ok(PyTranslationResult {
+            program,
+            ro_sources: Some(result.readout_map),
+        })
     }
 }
