@@ -1,8 +1,6 @@
 [env]
 RUST_BACKTRACE = 0
-# Disable --all-features to avoid manual tests in CI for now
-# libquil is not available on arm
-CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = { script = ["if echo $(uname -m) | grep -iq 'arm'; then echo '--features otel-tracing'; else echo '--features otel-tracing,libquil'; fi"] }
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features tracing-opentelemetry,libquil"  # Disable --all-features to avoid manual tests in CI for now
 
 [tasks.pre-test]
 command = "docker"
