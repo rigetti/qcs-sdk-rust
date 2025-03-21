@@ -3,9 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = { path = "/Users/gsmith/gitlab.com/rigetti/qcs/clients/qcs-api-client-rust/qcs-api-client-common" }
-qcs-api-client-grpc = { path = "/Users/gsmith/gitlab.com/rigetti/qcs/clients/qcs-api-client-rust/qcs-api-client-grpc", features = ["tracing", "tracing-opentelemetry"] }
-qcs-api-client-openapi = { path = "/Users/gsmith/gitlab.com/rigetti/qcs/clients/qcs-api-client-rust/qcs-api-client-openapi/public" }
+qcs-api-client-common = "0.12.0"
+qcs-api-client-grpc = { version = "0.12.0", features = ["tracing", "tracing-opentelemetry"] }
+qcs-api-client-openapi = "0.13.0"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -29,8 +29,8 @@ opentelemetry_sdk = { version = "0.27.1" }
 pyo3 = { version = "0.20.0", default-features = false}
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-log = { version = "0.8.2" }
-pyo3-opentelemetry = { path = "/Users/gsmith/github.com/rigetti/pyo3-opentelemetry/crates/opentelemetry" }
-pyo3-tracing-subscriber = { path = "/Users/gsmith/github.com/rigetti/pyo3-opentelemetry/crates/tracing-subscriber", default-features = false }
+pyo3-opentelemetry = "0.4.0" 
+pyo3-tracing-subscriber = { version = "0.2.0", default-features = false }
 
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
