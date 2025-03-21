@@ -5,16 +5,17 @@
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, TokenError};
+#[cfg(feature = "tracing")]
+use qcs_api_client_grpc::tonic::CustomTraceService;
 #[cfg(feature = "grpc-web")]
 use qcs_api_client_grpc::tonic::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
 use qcs_api_client_grpc::{
     services::translation::translation_client::TranslationClient,
     tonic::{
-        get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry, wrap_channel_with_tracing, RefreshService, RetryService
+        get_channel, parse_uri, wrap_channel_with, wrap_channel_with_retry,
+        wrap_channel_with_tracing, RefreshService, RetryService,
     },
 };
-#[cfg(feature = "tracing")]
-use qcs_api_client_grpc::tonic::CustomTraceService;
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
 use tonic::transport::Channel;
 use tonic::Status;
@@ -40,7 +41,6 @@ pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfigurati
 #[cfg(all(feature = "grpc-web", not(feature = "tracing")))]
 pub type GrpcConnection =
     GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
-
 
 #[cfg(all(not(feature = "grpc-web"), feature = "tracing"))]
 pub type GrpcConnection = RetryService<RefreshService<CustomTraceService, ClientConfiguration>>;
@@ -114,12 +114,14 @@ impl Qcs {
         let channel = wrap_channel_with_tracing(
             channel,
             translation_grpc_endpoint.to_string(),
-            self.get_config().tracing_configuration().cloned().unwrap_or_default()
+            self.get_config()
+                .tracing_configuration()
+                .cloned()
+                .unwrap_or_default(),
         );
 
         // Then wrap with refresh and retry
-        let channel =
-            wrap_channel_with(channel, self.get_config().clone());
+        let channel = wrap_channel_with(channel, self.get_config().clone());
         let channel = wrap_channel_with_retry(channel);
 
         #[cfg(feature = "grpc-web")]

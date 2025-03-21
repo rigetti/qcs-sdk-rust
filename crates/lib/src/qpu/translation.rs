@@ -3,6 +3,7 @@
 
 use std::{collections::HashMap, time::Duration};
 
+use pyo3::{exceptions::PyValueError, PyErr};
 use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
@@ -12,7 +13,6 @@ use qcs_api_client_grpc::{
         TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
 };
-use pyo3::{PyErr, exceptions::PyValueError};
 use tokio::time::error::Elapsed;
 #[cfg(feature = "tracing")]
 use tracing::instrument;
@@ -55,7 +55,10 @@ pub struct EncryptedTranslationResult {
 }
 
 /// Translate a program, returning an encrypted and translated program.
-#[cfg_attr(feature = "tracing", instrument(skip(quil_program, translation_options)))]
+#[cfg_attr(
+    feature = "tracing",
+    instrument(skip(quil_program, client, translation_options))
+)]
 pub async fn translate<TO>(
     quantum_processor_id: &str,
     quil_program: &str,
@@ -66,9 +69,6 @@ pub async fn translate<TO>(
 where
     TO: Into<ApiTranslationOptions>,
 {
-    let current_span = tracing::Span::current();
-    println!("translate.rs:translate current_span.id {:?}", current_span.id());
-
     let options = translation_options.map(Into::into);
 
     let request = TranslateQuilToEncryptedControllerJobRequest {

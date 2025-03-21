@@ -26,7 +26,8 @@ use qcs_api_client_grpc::{
         CancelControllerJobsRequest, ExecuteControllerJobRequest,
         ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
-    tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry}, wrap_channel,
+    tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
+    wrap_channel,
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{
@@ -583,18 +584,21 @@ pub trait ExecutionTarget<'a> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        
+
         // First add tracing if enabled
         #[cfg(feature = "tracing")]
         let channel = wrap_channel_with_tracing(
             channel,
             address.to_string(),
-            client.get_config().tracing_configuration().cloned().unwrap_or_default()
+            client
+                .get_config()
+                .tracing_configuration()
+                .cloned()
+                .unwrap_or_default(),
         );
 
         // Then wrap with refresh and retry
-        let channel =
-            wrap_channel_with(channel, client.get_config().clone());
+        let channel = wrap_channel_with(channel, client.get_config().clone());
         let channel = wrap_channel_with_retry(channel);
 
         // Add grpc-web if enabled
