@@ -69,6 +69,13 @@ pub async fn translate<TO>(
 where
     TO: Into<ApiTranslationOptions>,
 {
+    #[cfg(feature = "tracing")]
+    tracing::debug!(
+        %num_shots,
+        "translating program for {}",
+        quantum_processor_id,
+    );
+
     let options = translation_options.map(Into::into);
 
     let request = TranslateQuilToEncryptedControllerJobRequest {
