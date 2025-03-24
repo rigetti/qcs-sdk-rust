@@ -158,57 +158,6 @@ async def test_translate_submit_retrieve(
             _verify_resource_spans(rust_global_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
 
 
-@pytest.mark.qcs_session
-@pytest.mark.asyncio
-async def test_translate_submit_retrieve_propagate(
-    tracing_environment_variables: None,
-    native_bitflip_program: str,
-    quantum_processor_id: str,
-    tracer: trace.Tracer,
-    rust_global_trace_file: str,
-    live_qpu_access: bool,
-):
-    """
-    Run translation, job submission, and result retrieval using async and non-async methods.
-    Assert the that trace context was propagated between services by checking that the
-    propagation headers are present in a span attribute.
-    """
-
-    python_spans = []
-    with tracer.start_as_current_span("translate_submit_retrieve") as span:
-        python_spans.append(span)
-        translated = translate(native_bitflip_program, 1, quantum_processor_id)
-        assert translated.program is not None
-        if live_qpu_access:
-            job_id = submit(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-            retrieve_results(job_id, quantum_processor_id=quantum_processor_id)
-
-    with tracer.start_as_current_span("translate_submit_retrieve_async") as span:
-        python_spans.append(span)
-        translated = await translate_async(native_bitflip_program, 1, quantum_processor_id)
-        assert translated.program is not None
-        if live_qpu_access:
-            job_id = await submit_async(translated.program, patch_values={}, quantum_processor_id=quantum_processor_id)
-            await retrieve_results_async(job_id, quantum_processor_id=quantum_processor_id)
-
-    if live_qpu_access:
-        with tracer.start_as_current_span("execute_on_qpu") as span:
-            python_spans.append(span)
-            executable = Executable(native_bitflip_program, shots=1)
-            executable.execute_on_qpu(quantum_processor_id)
-
-        with tracer.start_as_current_span("execute_on_qpu_async") as span:
-            python_spans.append(span)
-            executable = Executable(native_bitflip_program, shots=1)
-            await executable.execute_on_qpu_async(quantum_processor_id)
-
-    for span in python_spans:
-        _verify_resource_spans(rust_global_trace_file, _TRANSLATE_QUIL_TO_ENCRYPTED_CONTROLLER_JOB, span)
-        if live_qpu_access:
-            _verify_resource_spans(rust_global_trace_file, _EXECUTE_CONTROLLER_JOB, span)
-            _verify_resource_spans(rust_global_trace_file, _GET_CONTROLLER_JOB_RESULTS, span)
-
-
 @pytest.fixture(scope="session")
 def tracing_environment_variables() -> Generator[None, None, None]:
     """
