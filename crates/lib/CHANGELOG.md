@@ -1,3 +1,9 @@
+## 0.25.13-rc.1
+
+### Fixes
+
+- ensure otel context propagated across ffi boundary (#544)
+
 ## 0.25.12
 
 ### Features
