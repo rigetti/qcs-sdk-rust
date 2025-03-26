@@ -11,6 +11,8 @@ use derive_builder::Builder;
 use qcs_api_client_common::configuration::TokenError;
 #[cfg(feature = "grpc-web")]
 use qcs_api_client_grpc::tonic::wrap_channel_with_grpc_web;
+#[cfg(feature = "tracing")]
+use qcs_api_client_grpc::tonic::wrap_channel_with_tracing;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 use qcs_api_client_grpc::{
     get_channel_with_timeout,
@@ -581,10 +583,27 @@ pub trait ExecutionTarget<'a> {
         let uri = parse_uri(address).map_err(QpuApiError::GrpcError)?;
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
-        let channel =
-            wrap_channel_with_retry(wrap_channel_with(channel, client.get_config().clone()));
+
+        // First add tracing if enabled
+        #[cfg(feature = "tracing")]
+        let channel = wrap_channel_with_tracing(
+            channel,
+            address.to_string(),
+            client
+                .get_config()
+                .tracing_configuration()
+                .cloned()
+                .unwrap_or_default(),
+        );
+
+        // Then wrap with refresh and retry
+        let channel = wrap_channel_with(channel, client.get_config().clone());
+        let channel = wrap_channel_with_retry(channel);
+
+        // Add grpc-web if enabled
         #[cfg(feature = "grpc-web")]
         let channel = wrap_channel_with_grpc_web(channel);
+
         Ok(channel)
     }
 

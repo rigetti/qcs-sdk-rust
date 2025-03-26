@@ -138,11 +138,11 @@ py_wrap_data_struct! {
 }
 impl_repr!(PyMultishotResponse);
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn run(
         request: PyMultishotRequest,
         client: super::PyQvmClient,
@@ -202,11 +202,11 @@ impl PyMultishotMeasureRequest {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn run_and_measure(request: PyMultishotMeasureRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<Vec<i64>>> {
         client.run_and_measure(request.as_inner(), options.unwrap_or_default().as_inner())
             .await
@@ -236,11 +236,11 @@ impl PyExpectationRequest {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn measure_expectation(request: PyExpectationRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<f64>> {
         client.measure_expectation(request.as_inner(), options.unwrap_or_default().as_inner())
             .await
@@ -277,11 +277,11 @@ impl PyWavefunctionRequest {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (request, client, options = None))]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn get_wavefunction(request: PyWavefunctionRequest, client: super::PyQvmClient, options: Option<PyQvmOptions>) -> PyResult<Vec<u8>> {
         client.get_wavefunction(request.as_inner(), options.unwrap_or_default().as_inner())
             .await

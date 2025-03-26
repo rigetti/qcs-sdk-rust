@@ -3,9 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.11.9"
-qcs-api-client-grpc = "0.11.9"
-qcs-api-client-openapi = "0.12.9"
+qcs-api-client-common = "0.12.0"
+qcs-api-client-grpc = "0.12.0"
+qcs-api-client-openapi = "0.13.0"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -24,11 +24,13 @@ quil-rs = { git = "https://github.com/rigetti/quil-rs", tag = "quil-py/v0.15.2" 
 # and need to be updated together.
 ndarray = { version = "0.15.6", features = ["serde"] }
 numpy = "0.20.0"
+opentelemetry = { version = "0.27.1" }
+opentelemetry_sdk = { version = "0.27.1" }
 pyo3 = { version = "0.20.0", default-features = false}
 pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
 pyo3-log = { version = "0.8.2" }
-pyo3-opentelemetry = { version = "0.3" }
-pyo3-tracing-subscriber = { version = "0.1.4", default-features = false }
+pyo3-opentelemetry = "0.4.0" 
+pyo3-tracing-subscriber = { version = "0.2.0", default-features = false }
 
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }

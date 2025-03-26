@@ -87,8 +87,8 @@ class MultishotRequest:
 
     def __new__(
         cls,
-        compiled_quil: str,
-        trials: int,
+        program: str,
+        shots: int,
         addresses: Mapping[str, AddressRequest],
         measurement_noise: Optional[Tuple[float, float, float]],
         gate_noise: Optional[Tuple[float, float, float]],
@@ -142,7 +142,7 @@ def run(
     """
     ...
 
-def run_async(
+async def run_async(
     request: MultishotRequest,
     client: QVMClient,
     options: Optional[QVMOptions] = None,

@@ -109,6 +109,7 @@ exceptions = [
     # Each entry is the crate and version constraint, and its specific allow
     # list
     #{ allow = ["Zlib"], crate = "adler32" },
+   { allow = ["MPL-2.0"], crate = "option-ext" },
    { allow = ["MPL-2.0"], crate = "webpki-roots" }
 ]
 
@@ -168,11 +169,19 @@ allow = [
 ]
 # List of crates to deny
 deny = [
-    #"ansi_term@0.11.0",
-    #{ crate = "ansi_term@0.11.0", reason = "you can specify a reason it is banned" },
-    # Wrapper crates can optionally be specified to allow the crate when it
-    # is a direct dependency of the otherwise banned crate
-    #{ crate = "ansi_term@0.11.0", wrappers = ["this-crate-directly-depends-on-ansi_term"] },
+    # Multiple versions of these crates (and possibly others?) are known to cause
+    # compilation and subtle unit test failures. We deny multiple versions to make
+    # the cause of those failures more explicit. If the deny check fails, perhaps,
+    # because a dependency depends on one of these crates that do not affect the
+    # APIs used in this workspace, then we can disable the deny check if, otherwise,
+    # there's no trivial solution.
+    { crate = "opentelemetry", deny-multiple-versions = true },
+    { crate = "opentelemetry_sdk", deny-multiple-versions = true },
+    { crate = "tonic", deny-multiple-versions = true },
+    # { crate = "tower", deny-multiple-versions = true },
+    { crate = "tracing", deny-multiple-versions = true },
+    { crate = "tracing-opentelemetry", deny-multiple-versions = true },
+    { crate = "tracing-subscriber", deny-multiple-versions = true },
 ]
 
 # Certain crates/versions that will be skipped when doing duplicate detection.

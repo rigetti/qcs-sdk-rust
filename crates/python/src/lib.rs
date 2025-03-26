@@ -16,6 +16,7 @@ pub mod qvm;
 pub mod register_data;
 
 pub(crate) mod from_py;
+pub(crate) mod py_sync;
 
 create_init_submodule! {
     classes: [

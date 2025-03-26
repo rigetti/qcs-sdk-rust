@@ -19,8 +19,8 @@ use qcs_api_client_grpc::models::controller::{
     data_value, readout_values, ControllerJobExecutionResult,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_function_sync_async,
-    py_wrap_error, py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, num_complex, py_wrap_error,
+    py_wrap_type, py_wrap_union_enum, wrap_error, PyWrapper, ToPythonError,
 };
 
 use crate::client::PyQcsClient;
@@ -71,7 +71,7 @@ enum RustSubmissionError {
 
 py_wrap_error!(runner, RustSubmissionError, SubmissionError, PyRuntimeError);
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     /// Submits an executable `program` to be run on the specified QPU
     ///
     /// # Errors
@@ -80,9 +80,9 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
@@ -113,10 +113,10 @@ py_function_sync_async! {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn submit_with_parameter_batch(
         program: String,
         patch_values: Vec<HashMap<String, Vec<f64>>>,
@@ -308,7 +308,7 @@ impl ExecutionResults {
     }
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
     async fn cancel_jobs(
@@ -332,7 +332,7 @@ py_function_sync_async! {
     }
 }
 
-py_function_sync_async! {
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn cancel_job(
@@ -356,10 +356,10 @@ py_function_sync_async! {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn retrieve_results(
         job_id: String,
         quantum_processor_id: Option<String>,

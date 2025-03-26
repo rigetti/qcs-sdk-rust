@@ -4,8 +4,7 @@ use qcs::{
     RegisterData,
 };
 use rigetti_pyo3::{
-    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, py_function_sync_async,
-    py_wrap_error, py_wrap_type,
+    create_init_submodule, impl_as_mut_for_wrapper, impl_repr, py_wrap_error, py_wrap_type,
     pyo3::{exceptions::PyRuntimeError, prelude::*, Python},
     wrap_error, PyTryFrom, PyWrapper, PyWrapperMut, ToPython, ToPythonError,
 };
@@ -243,10 +242,10 @@ impl PyQvmOptions {
     }
 }
 
-py_function_sync_async! {
-    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+crate::py_sync::py_function_sync_async! {
     #[pyfunction]
     #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn run(
         quil: String,
         #[pyo3(from_py_with = "crate::from_py::non_zero_u16")]
