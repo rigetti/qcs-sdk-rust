@@ -27,7 +27,6 @@ use qcs_api_client_grpc::{
         ExecutionOptions as InnerApiExecutionOptions, GetControllerJobResultsRequest,
     },
     tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
-    wrap_channel,
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 use qcs_api_client_openapi::apis::{

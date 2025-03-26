@@ -45,6 +45,13 @@ pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfigurati
 pub type GrpcConnection =
     GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
 
+/// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
+/// It is public so that users can create gRPC clients with different APIs using a "raw" connection
+/// initialized by this library. This ensures that the exact Tonic version used for such clients
+/// matches what this library uses.
+///
+/// The underlying [`tonic::transport::Channel`] is wrapped by [`CustomTraceService`],
+/// [`RefreshService`], and [`RetryService`] to provide tracing, token refresh, and retry.
 #[cfg(all(not(feature = "grpc-web"), feature = "tracing"))]
 pub type GrpcConnection = RetryService<RefreshService<CustomTraceService, ClientConfiguration>>;
 
