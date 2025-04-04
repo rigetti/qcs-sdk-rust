@@ -489,4 +489,21 @@ MEASURE 1 ro[1]
             }
         );
     }
+
+    #[tokio::test]
+    async fn test_parametric_compilation() {
+        let client = rpcq_client().await;
+        let isa = TargetDevice::try_from(aspen_9_isa())
+            .expect("aspen-9 compiler isa should become TargetDevice");
+        const PARAMETRIC_PROGRAM: &str = r#"
+PRAGMA INITIAL_REWIRING "PARTIAL"
+DECLARE ro BIT
+DECLARE theta REAL
+RX(theta) 0
+MEASURE 0 ro
+"#;
+        client
+            .compile_program(PARAMETRIC_PROGRAM, isa, CompilerOpts::new())
+            .expect("program should compile");
+    }
 }
