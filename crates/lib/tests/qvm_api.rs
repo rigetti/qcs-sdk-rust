@@ -1,7 +1,7 @@
 //! Integration tests for the [`qcs::qvm::http`] module. Requires the QVM
 //! web server to be running.
 
-use std::{collections::HashMap, num::NonZeroU16};
+use std::{collections::HashMap, num::NonZeroU32};
 
 use qcs::{
     client::Qcs,
@@ -49,7 +49,7 @@ async fn test_get_version_info<C: qvm::Client>(client: C) {
 async fn test_run<C: qvm::Client>(client: C) {
     let request = http::MultishotRequest::new(
         PROGRAM.to_string(),
-        NonZeroU16::new(2).expect("value is non-zero"),
+        NonZeroU32::new(2).expect("value is non-zero"),
         HashMap::from([("ro".to_string(), http::AddressRequest::IncludeAll)]),
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
@@ -74,7 +74,7 @@ async fn test_run<C: qvm::Client>(client: C) {
 async fn test_run_and_measure<C: qvm::Client>(client: C) {
     let request = http::MultishotMeasureRequest::new(
         PROGRAM.to_string(),
-        NonZeroU16::new(5).expect("value is non-zero"),
+        NonZeroU32::new(5).expect("value is non-zero"),
         &[0, 1],
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),

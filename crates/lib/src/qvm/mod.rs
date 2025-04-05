@@ -1,7 +1,13 @@
 //! This module contains all the functionality for running Quil programs on a QVM. Specifically,
 //! the [`Execution`] struct in this module.
 
-use std::{collections::HashMap, num::NonZeroU16, str::FromStr, sync::Arc, time::Duration};
+use std::{
+    collections::HashMap,
+    num::{NonZeroU32, TryFromIntError},
+    str::FromStr,
+    sync::Arc,
+    time::Duration,
+};
 
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
@@ -129,7 +135,7 @@ impl QvmResultData {
 #[allow(clippy::too_many_arguments)]
 pub async fn run<C: Client + Send + Sync + ?Sized>(
     quil: &str,
-    shots: NonZeroU16,
+    shots: NonZeroU32,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     measurement_noise: Option<(f64, f64, f64)>,
@@ -160,7 +166,7 @@ pub async fn run<C: Client + Send + Sync + ?Sized>(
 #[allow(clippy::too_many_arguments)]
 pub async fn run_program<C: Client + ?Sized>(
     program: &Program,
-    shots: NonZeroU16,
+    shots: NonZeroU32,
     addresses: HashMap<String, AddressRequest>,
     params: &Parameters,
     measurement_noise: Option<(f64, f64, f64)>,
@@ -274,6 +280,8 @@ pub enum Error {
     ToQuil(#[from] ToQuilError),
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
+    #[error("Requested shot count exceeds QVM limit.")]
+    ShotCountOverflow(#[from] TryFromIntError),
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
     RegionSizeMismatch {
         name: String,
