@@ -8,7 +8,7 @@ use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
     services::translation::{
         translate_quil_to_encrypted_controller_job_request::NumShots,
-        translation_options::{self, TranslationBackend},
+        translation_options::{self, Riverlane, TranslationBackend},
         BackendV1Options, BackendV2Options, GetQuantumProcessorQuilCalibrationProgramRequest,
         TranslateQuilToEncryptedControllerJobRequest, TranslationOptions as ApiTranslationOptions,
     },
@@ -276,6 +276,15 @@ impl TranslationOptions {
     /// specially authorized and not generally available to the client.
     pub fn q_ctrl(&mut self, q_ctrl: translation_options::QCtrl) -> &mut Self {
         self.inner.q_ctrl = Some(q_ctrl);
+        self
+    }
+
+    /// Set the Riverlane option for setting DF2 configuration data prior to execution.
+    ///
+    /// Generally, the client should set this option to `Riverlane::default()`,
+    /// as options are specially authorized and not generally available to the client.
+    pub fn riverlane(&mut self, riverlane: Riverlane) -> &mut Self {
+        self.inner.riverlane = Some(riverlane);
         self
     }
 }

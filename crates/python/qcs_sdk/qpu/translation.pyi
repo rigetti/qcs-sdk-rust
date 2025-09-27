@@ -1,12 +1,13 @@
-from typing import Dict, Optional, final
-from typing_extensions import Self
 from enum import Enum, auto
+from typing import Dict, Optional, final
+
+from typing_extensions import Self
 
 from qcs_sdk.client import QCSClient
 
-
 __all__ = [
     'QCtrl',
+    'Riverlane',
     'TranslationBackend',
     'TranslationError',
     'TranslationOptions',
@@ -136,6 +137,15 @@ class QCtrl:
     def __new__(cls, /, fixed_layout: Optional[bool] = ...) -> Self: ...
 
 @final
+class Riverlane:
+    """
+    Options for configuring Riverlane features prior to execution. Options here
+    are specially authorized and are not generally available to the client.
+    """
+
+    def __new__(cls, /, ds2_configuration_data: Optional[Dict[str, bytes]] = ...) -> Self: ...
+
+@final
 class TranslationOptions:
     """
     Options for translating via the QCS API.
@@ -159,6 +169,11 @@ class TranslationOptions:
         Compile the program through Q-CTRL's API prior to translation. The client
         should generally leave the `q_ctrl` compile options unset as it is
         specially authorized and not generally available.
+        """
+    def use_riverlane(self, riverlane: Riverlane = ..., /) -> None:
+        """
+        Configure Riverlane features prior to execution. Options here are
+        specially authorized and are not generally available to the client.
         """
     @staticmethod
     def v1() -> "TranslationOptions":
