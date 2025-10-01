@@ -50,22 +50,22 @@
                     <a class="class" href="#MultishotRequest">MultishotRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#MultishotRequest.measurement_noise">measurement_noise</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#MultishotRequest.addresses">addresses</a>
+                                <a class="variable" href="#MultishotRequest.trials">trials</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotRequest.compiled_quil">compiled_quil</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotRequest.rng_seed">rng_seed</a>
+                                <a class="variable" href="#MultishotRequest.measurement_noise">measurement_noise</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotRequest.gate_noise">gate_noise</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotRequest.trials">trials</a>
+                                <a class="variable" href="#MultishotRequest.rng_seed">rng_seed</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MultishotRequest.addresses">addresses</a>
                         </li>
                 </ul>
 
@@ -83,22 +83,22 @@
                     <a class="class" href="#MultishotMeasureRequest">MultishotMeasureRequest</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#MultishotMeasureRequest.trials">trials</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#MultishotMeasureRequest.compiled_quil">compiled_quil</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.qubits">qubits</a>
+                                <a class="variable" href="#MultishotMeasureRequest.measurement_noise">measurement_noise</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.measurement_noise">measurement_noise</a>
+                                <a class="variable" href="#MultishotMeasureRequest.qubits">qubits</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotMeasureRequest.gate_noise">gate_noise</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotMeasureRequest.rng_seed">rng_seed</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#MultishotMeasureRequest.trials">trials</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#ExpectationRequest">ExpectationRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExpectationRequest.state_preparation">state_preparation</a>
+                                <a class="variable" href="#ExpectationRequest.operators">operators</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExpectationRequest.operators">operators</a>
+                                <a class="variable" href="#ExpectationRequest.state_preparation">state_preparation</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExpectationRequest.rng_seed">rng_seed</a>
@@ -122,13 +122,13 @@
                     <a class="class" href="#WavefunctionRequest">WavefunctionRequest</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#WavefunctionRequest.compiled_quil">compiled_quil</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#WavefunctionRequest.measurement_noise">measurement_noise</a>
                         </li>
                         <li>
                                 <a class="variable" href="#WavefunctionRequest.gate_noise">gate_noise</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#WavefunctionRequest.compiled_quil">compiled_quil</a>
                         </li>
                         <li>
                                 <a class="variable" href="#WavefunctionRequest.rng_seed">rng_seed</a>
@@ -251,30 +251,15 @@
     
     
 
-                            <div id="MultishotRequest.measurement_noise" class="classattr">
+                            <div id="MultishotRequest.trials" class="classattr">
                                 <div class="attr variable">
-            <span class="name">measurement_noise</span>
+            <span class="name">trials</span>
 
         
     </div>
-    <a class="headerlink" href="#MultishotRequest.measurement_noise"></a>
+    <a class="headerlink" href="#MultishotRequest.trials"></a>
     
-            <div class="docstring"><p>Get the measurement_noise field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="MultishotRequest.addresses" class="classattr">
-                                <div class="attr variable">
-            <span class="name">addresses</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotRequest.addresses"></a>
     
-            <div class="docstring"><p>Get the addresses field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
 
                             </div>
                             <div id="MultishotRequest.compiled_quil" class="classattr">
@@ -290,15 +275,15 @@
 
 
                             </div>
-                            <div id="MultishotRequest.rng_seed" class="classattr">
+                            <div id="MultishotRequest.measurement_noise" class="classattr">
                                 <div class="attr variable">
-            <span class="name">rng_seed</span>
+            <span class="name">measurement_noise</span>
 
         
     </div>
-    <a class="headerlink" href="#MultishotRequest.rng_seed"></a>
+    <a class="headerlink" href="#MultishotRequest.measurement_noise"></a>
     
-            <div class="docstring"><p>Get the rng_seed field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Get the measurement_noise field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -316,15 +301,30 @@
 
 
                             </div>
-                            <div id="MultishotRequest.trials" class="classattr">
+                            <div id="MultishotRequest.rng_seed" class="classattr">
                                 <div class="attr variable">
-            <span class="name">trials</span>
+            <span class="name">rng_seed</span>
 
         
     </div>
-    <a class="headerlink" href="#MultishotRequest.trials"></a>
+    <a class="headerlink" href="#MultishotRequest.rng_seed"></a>
     
+            <div class="docstring"><p>Get the rng_seed field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="MultishotRequest.addresses" class="classattr">
+                                <div class="attr variable">
+            <span class="name">addresses</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotRequest.addresses"></a>
     
+            <div class="docstring"><p>Get the addresses field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -366,6 +366,17 @@
     
     
 
+                            <div id="MultishotMeasureRequest.trials" class="classattr">
+                                <div class="attr variable">
+            <span class="name">trials</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotMeasureRequest.trials"></a>
+    
+    
+
+                            </div>
                             <div id="MultishotMeasureRequest.compiled_quil" class="classattr">
                                 <div class="attr variable">
             <span class="name">compiled_quil</span>
@@ -379,19 +390,6 @@
 
 
                             </div>
-                            <div id="MultishotMeasureRequest.qubits" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qubits</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotMeasureRequest.qubits"></a>
-    
-            <div class="docstring"><p>Get the qubits field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
                             <div id="MultishotMeasureRequest.measurement_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">measurement_noise</span>
@@ -401,6 +399,19 @@
     <a class="headerlink" href="#MultishotMeasureRequest.measurement_noise"></a>
     
             <div class="docstring"><p>Get the measurement_noise field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="MultishotMeasureRequest.qubits" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qubits</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotMeasureRequest.qubits"></a>
+    
+            <div class="docstring"><p>Get the qubits field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -431,17 +442,6 @@
 
 
                             </div>
-                            <div id="MultishotMeasureRequest.trials" class="classattr">
-                                <div class="attr variable">
-            <span class="name">trials</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotMeasureRequest.trials"></a>
-    
-    
-
-                            </div>
                 </section>
                 <section id="ExpectationRequest">
                     <div class="attr class">
@@ -455,19 +455,6 @@
     
     
 
-                            <div id="ExpectationRequest.state_preparation" class="classattr">
-                                <div class="attr variable">
-            <span class="name">state_preparation</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExpectationRequest.state_preparation"></a>
-    
-            <div class="docstring"><p>Get the state_preparation field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
                             <div id="ExpectationRequest.operators" class="classattr">
                                 <div class="attr variable">
             <span class="name">operators</span>
@@ -477,6 +464,19 @@
     <a class="headerlink" href="#ExpectationRequest.operators"></a>
     
             <div class="docstring"><p>Get the operators field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExpectationRequest.state_preparation" class="classattr">
+                                <div class="attr variable">
+            <span class="name">state_preparation</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExpectationRequest.state_preparation"></a>
+    
+            <div class="docstring"><p>Get the state_preparation field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
@@ -507,6 +507,19 @@
     
     
 
+                            <div id="WavefunctionRequest.compiled_quil" class="classattr">
+                                <div class="attr variable">
+            <span class="name">compiled_quil</span>
+
+        
+    </div>
+    <a class="headerlink" href="#WavefunctionRequest.compiled_quil"></a>
+    
+            <div class="docstring"><p>Get the compiled_quil field from Python.  Annotated with <code>@property</code>.</p>
+</div>
+
+
+                            </div>
                             <div id="WavefunctionRequest.measurement_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">measurement_noise</span>
@@ -529,19 +542,6 @@
     <a class="headerlink" href="#WavefunctionRequest.gate_noise"></a>
     
             <div class="docstring"><p>Get the gate_noise field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="WavefunctionRequest.compiled_quil" class="classattr">
-                                <div class="attr variable">
-            <span class="name">compiled_quil</span>
-
-        
-    </div>
-    <a class="headerlink" href="#WavefunctionRequest.compiled_quil"></a>
-    
-            <div class="docstring"><p>Get the compiled_quil field from Python.  Annotated with <code>@property</code>.</p>
 </div>
 
 
