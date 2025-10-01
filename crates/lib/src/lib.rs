@@ -4,6 +4,8 @@
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::implicit_hasher)]
 #![allow(clippy::too_many_arguments)]
+#![warn(clippy::result_large_err)] // TODO #555: box the large variants or change the lint threshold
+#![warn(clippy::large_enum_variant)] // TODO #555: box the large variants
 #![forbid(unsafe_code)]
 #![warn(future_incompatible)]
 #![warn(rust_2018_compatibility, rust_2018_idioms)]
