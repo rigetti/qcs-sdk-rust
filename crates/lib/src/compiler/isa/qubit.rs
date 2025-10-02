@@ -42,15 +42,15 @@ impl Qubit {
     ///
     /// # Arguments
     /// 1. `op_name`: The name of the operation defined on this Qubit. This comes from
-    ///     `instructions[n].name` in the QCS response.
+    ///    `instructions[n].name` in the QCS response.
     /// 2. `characteristics`: Data related to the operation at a this site (Qubit). Comes from
-    ///     `instructions[n].sites[m].characteristics` in the QCS response.
+    ///    `instructions[n].sites[m].characteristics` in the QCS response.
     /// 3. `benchmarks`: Top level benchmarks on the Qubits, comes from `benchmarks` in the QCS
-    ///     response.
+    ///    response.
     ///
     /// # Errors
     /// 1. `randomized_benchmark_simultaneous_1q` was not present in `benchmarks`: this is necessary
-    ///     for RX and RZ gates.
+    ///    for RX and RZ gates.
     /// 2. An unknown `op_name` was provided.
     pub(crate) fn add_operation(
         &mut self,

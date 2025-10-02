@@ -8,7 +8,7 @@ use pyo3::types::PyBytes;
 use pyo3::Python;
 use pyo3::{exceptions::PyRuntimeError, pyclass, pyfunction, pymethods, PyResult};
 use qcs::qpu::translation::TranslationOptions;
-use qcs_api_client_grpc::services::translation::translation_options;
+use qcs_api_client_grpc::services::translation::translation_options::{self, Riverlane};
 use qcs_api_client_grpc::services::translation::{
     translation_options::TranslationBackend as ApiTranslationBackend,
     TranslationOptions as ApiTranslationOptions,
@@ -22,7 +22,8 @@ create_init_submodule! {
         PyTranslationOptions,
         PyTranslationResult,
         PyTranslationBackend,
-        PyQCtrl
+        PyQCtrl,
+        PyRiverlane
     ],
     errors: [
         TranslationError
@@ -119,6 +120,11 @@ impl PyTranslationOptions {
         self.0.q_ctrl(*q_ctrl.as_inner());
     }
 
+    #[pyo3(signature = (riverlane = PyRiverlane::default(), /))]
+    fn use_riverlane(&mut self, riverlane: PyRiverlane) {
+        self.0.riverlane(riverlane.as_inner().clone());
+    }
+
     #[staticmethod]
     fn v1() -> Self {
         let mut builder = TranslationOptions::default();
@@ -190,6 +196,27 @@ impl PyQCtrl {
 
 impl PyQCtrl {
     fn as_inner(&self) -> &translation_options::QCtrl {
+        &self.0
+    }
+}
+
+#[derive(Clone, Default, Debug)]
+#[pyclass(name = "Riverlane")]
+pub struct PyRiverlane(Riverlane);
+
+#[pymethods]
+impl PyRiverlane {
+    #[new]
+    #[pyo3(signature = (/, ds2_configuration_data = None))]
+    fn __new__(ds2_configuration_data: Option<HashMap<String, Vec<u8>>>) -> PyResult<Self> {
+        Ok(Self(Riverlane {
+            ds2_configuration_data: ds2_configuration_data.unwrap_or_default(),
+        }))
+    }
+}
+
+impl PyRiverlane {
+    fn as_inner(&self) -> &Riverlane {
         &self.0
     }
 }

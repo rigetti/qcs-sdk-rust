@@ -135,7 +135,6 @@ mod mock_qcs {
     use qcs_api_client_openapi::models::{
         InstructionSetArchitecture, ListQuantumProcessorAccessorsResponse,
         QuantumProcessorAccessor, QuantumProcessorAccessorType,
-        TranslateNativeQuilToEncryptedBinaryRequest, TranslateNativeQuilToEncryptedBinaryResponse,
     };
 
     const MOCK_QPU_ADDRESS: &str = "http://127.0.0.1:8002";
@@ -169,23 +168,6 @@ mod mock_qcs {
                 let isa: InstructionSetArchitecture =
                     serde_json::from_str(&isa).expect("Could not decode aspen 9 ISA");
                 warp::reply::json(&isa)
-            });
-
-        let translate = warp::path(format!("{QPU_ID}:translateNativeQuilToEncryptedBinary"))
-            .and(warp::post())
-            .and(warp::body::json())
-            .map(|_request: TranslateNativeQuilToEncryptedBinaryRequest| {
-                warp::reply::json(&TranslateNativeQuilToEncryptedBinaryResponse {
-                    memory_descriptors: None,
-                    program: "".to_string(),
-                    ro_sources: Some(vec![
-                        vec!["ro[0]".to_string(), "q0".to_string()],
-                        vec!["q0_unclassified".to_string(), "q0_unclassified".to_string()],
-                        vec!["ro[1]".to_string(), "q1".to_string()],
-                        vec!["q1_unclassified".to_string(), "q1_unclassified".to_string()],
-                    ]),
-                    settings_timestamp: None,
-                })
             });
 
         use std::sync::atomic::Ordering::SeqCst;
@@ -227,7 +209,7 @@ mod mock_qcs {
             });
 
         let quantum_processors = warp::path("quantumProcessors")
-            .and(isa.or(translate).or(default_endpoint).or(accessors));
+            .and(isa.or(default_endpoint).or(accessors));
 
         warp::serve(warp::path("v1").and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))

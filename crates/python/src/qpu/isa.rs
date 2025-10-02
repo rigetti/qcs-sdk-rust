@@ -1,5 +1,5 @@
 use qcs_api_client_openapi::models::{
-    Architecture1, Characteristic, Edge, Family, InstructionSetArchitecture, Node, Operation,
+    Architecture, Characteristic, Edge, Family, InstructionSetArchitecture, Node, Operation,
     OperationSite, Parameter,
 };
 use rigetti_pyo3::{
@@ -23,7 +23,7 @@ create_init_submodule! {
         PyFamily,
         PyEdge,
         PyNode,
-        PyArchitecture1,
+        PyArchitecture,
         PyCharacteristic,
         PyParameter,
         PyOperationSite,
@@ -69,7 +69,7 @@ py_wrap_data_struct! {
 }
 
 py_wrap_data_struct! {
-    PyArchitecture1(Architecture1) as "Architecture" {
+    PyArchitecture(Architecture) as "Architecture" {
         edges: Vec<Edge> => Vec<PyEdge>,
         family: Option<Box<Family>> => Option<PyFamily>,
         nodes: Vec<Node> => Vec<PyNode>
@@ -112,7 +112,7 @@ py_wrap_data_struct! {
 
 py_wrap_data_struct! {
     PyInstructionSetArchitecture(InstructionSetArchitecture) as "InstructionSetArchitecture" {
-        architecture: Box<Architecture1> => PyArchitecture1,
+        architecture: Box<Architecture> => PyArchitecture,
         benchmarks: Vec<Operation> => Vec<PyOperation>,
         instructions: Vec<Operation> => Vec<PyOperation>,
         name: String => Py<PyString>

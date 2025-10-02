@@ -113,7 +113,7 @@ impl<'executable> Executable<'executable, '_> {
     /// # Arguments
     ///
     /// 1. `quil` is a string slice representing the original program to be run. The returned
-    ///     [`Executable`] will only live as long as this reference.
+    ///    [`Executable`] will only live as long as this reference.
     #[must_use]
     #[allow(clippy::missing_panics_doc)]
     pub fn from_quil<Quil: Into<Arc<str>>>(quil: Quil) -> Self {
@@ -138,8 +138,8 @@ impl<'executable> Executable<'executable, '_> {
     /// # Arguments
     ///
     /// 1. `register` is a string reference of the name of a register to read from. The lifetime
-    ///     of this reference should be the lifetime of the [`Executable`], which is the lifetime of
-    ///     the `quil` argument to [`Executable::from_quil`].
+    ///    of this reference should be the lifetime of the [`Executable`], which is the lifetime of
+    ///    the `quil` argument to [`Executable::from_quil`].
     ///
     /// # Example
     ///
@@ -212,8 +212,8 @@ impl<'executable> Executable<'executable, '_> {
     /// # Arguments
     ///
     /// 1. `param_name`: Reference to the name of the parameter which should correspond to a
-    ///     `DECLARE` statement in the Quil program. The lifetime of the reference should be the
-    ///     same as the [`Executable`]: that is the same as the `quil` param to [`Executable::from_quil`].
+    ///    `DECLARE` statement in the Quil program. The lifetime of the reference should be the
+    ///    same as the [`Executable`]: that is the same as the `quil` param to [`Executable::from_quil`].
     /// 2. `index`: The index into the memory vector that you're setting.
     /// 3. `value`: The value to set for the specified memory.
     ///
@@ -424,8 +424,8 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Arguments
     /// 1. `quantum_processor_id`: The name of the QPU to run on. This parameter affects the
-    ///     lifetime of the [`Executable`]. The [`Executable`] will only live as long as the last
-    ///     parameter passed into this function.
+    ///    lifetime of the [`Executable`]. The [`Executable`] will only live as long as the last
+    ///    parameter passed into this function.
     ///
     /// # Warning
     ///
@@ -465,13 +465,13 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Arguments
     /// 1. `quantum_processor_id`: The ID of the QPU for which to translate the program.
-    ///     This parameter affects the lifetime of the [`Executable`].
-    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    ///    This parameter affects the lifetime of the [`Executable`].
+    ///    The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
     /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
-    ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
-    ///       overrides the `quantum_processor_id` parameter.
+    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///    overrides the `quantum_processor_id` parameter.
     ///
     /// # Warning
     ///
@@ -523,13 +523,13 @@ impl<'execution> Executable<'_, 'execution> {
     ///
     /// # Arguments
     /// 1. `quantum_processor_id`: The ID of the QPU for which to translate the program.
-    ///     This parameter affects the lifetime of the [`Executable`].
-    ///     The [`Executable`] will only live as long as the last parameter passed into this function.
+    ///    This parameter affects the lifetime of the [`Executable`].
+    ///    The [`Executable`] will only live as long as the last parameter passed into this function.
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
     /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
-    ///       is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
-    ///       overrides the `quantum_processor_id` parameter.
+    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///    overrides the `quantum_processor_id` parameter.
     ///
     /// # Errors
     ///

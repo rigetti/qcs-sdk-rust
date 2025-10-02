@@ -100,10 +100,10 @@ impl<'a> Execution<'a> {
     /// * `shots`: The number of times to run this program with each call to [`Execution::run`].
     /// * `quantum_processor_id`: The QPU this Quil will be run on and should be compiled for.
     /// * `client`: A [`qcs::qpu::client::Qcs`] instance provided by the user which contains connection info
-    ///     for QCS and the `quilc` compiler.
+    ///   for QCS and the `quilc` compiler.
     /// * `compile_with_quilc`: A boolean that if set, will compile the given `quil` using `quilc`
     /// * `compiler_options`: A [`qcs::qpu::quilc::CompilerOpts`] instance with configuration
-    ///     options for quilc. Has no effect if `compile_with_quilc` is false
+    ///   options for quilc. Has no effect if `compile_with_quilc` is false
     ///
     /// returns: Result<Execution, Report>
     ///
@@ -112,11 +112,11 @@ impl<'a> Execution<'a> {
     /// All errors will be human readable by way of [`mod@eyre`]. Some potential issues:
     ///
     /// 1. Unable to fetch ISA from QCS for the provided QPU. Either the QCS connection details in
-    ///     `config` are wrong or that QPU does not exist.
+    ///    `config` are wrong or that QPU does not exist.
     /// 1. Unable to compile the program to Native Quil. This probably means the `quil` is invalid.
     /// 1. Unable to parse the Native Quil that was output by `quilc`. This is probably a bug.
     /// 1. Unable to rewrite the Native Quil for a QPU. This may mean that the `quil` was invalid
-    ///     for the QPU or that there is a bug in this library.
+    ///    for the QPU or that there is a bug in this library.
     pub(crate) async fn new(
         quil: Arc<str>,
         shots: NonZeroU16,
