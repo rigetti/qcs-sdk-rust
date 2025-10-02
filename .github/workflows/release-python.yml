@@ -29,6 +29,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11 -stdlib=libc++"
     strategy:
+      fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -53,6 +54,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
@@ -75,6 +77,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
@@ -97,6 +100,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
@@ -119,6 +123,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
@@ -139,6 +144,7 @@ jobs:
     runs-on: windows-latest
     needs: [is-python-release, should-publish-wheels]
     strategy:
+      fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -167,6 +173,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     strategy:
+      fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
@@ -198,6 +205,7 @@ jobs:
     permissions:
       id-token: write
     strategy:
+      fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
       fail-fast: false
