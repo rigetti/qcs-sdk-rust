@@ -1,3 +1,9 @@
+## 0.21.19
+
+### Features
+
+- #554: Riverlane translation options (#553)
+
 ## 0.21.19-rc.0
 
 ### Features

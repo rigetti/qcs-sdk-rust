@@ -1,3 +1,9 @@
+## 0.25.14
+
+### Features
+
+- #554: Riverlane translation options (#553)
+
 ## 0.25.14-rc.0
 
 ### Features
