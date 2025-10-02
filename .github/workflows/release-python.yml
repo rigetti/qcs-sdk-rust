@@ -208,7 +208,6 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-      fail-fast: false
     steps:
     - uses: actions/download-artifact@v4
       with:
