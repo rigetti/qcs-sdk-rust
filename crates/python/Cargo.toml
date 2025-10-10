@@ -10,6 +10,7 @@ categories = ["api-bindings", "compilers", "science", "emulators"]
 readme = "./README.md"
 
 [features]
+abi3 = ["rigetti-pyo3/abi3"]
 libquil = ["qcs/libquil"]
 grpc-web = ["qcs/grpc-web"]
 pyo3-tracing-subscriber-build = []
@@ -34,7 +35,7 @@ serde_json.workspace = true
 tokio.workspace = true
 thiserror.workspace = true
 numpy.workspace = true
-rigetti-pyo3.workspace = true
+rigetti-pyo3 = { workspace = true }
 paste = "1.0.11"
 pyo3-log.workspace = true
 once_cell = "1.18.0"
