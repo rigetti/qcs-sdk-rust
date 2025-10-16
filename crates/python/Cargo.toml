@@ -21,7 +21,8 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 async-trait = "0.1.73"
 futures-util = "0.3.24"
-qcs = { path = "../lib", features = ["tracing-opentelemetry", "experimental"] }
+# TODO #507: automatically update the version when publishing
+qcs = { version = "0.25", path = "../lib", features = ["tracing-opentelemetry", "experimental"] }
 qcs-api-client-common = { workspace = true, features = ["python"] }
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true

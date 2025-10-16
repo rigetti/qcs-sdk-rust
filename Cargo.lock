@@ -2846,8 +2846,8 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.30.0"
-source = "git+https://github.com/rigetti/quil-rs?tag=quil-py%2Fv0.15.2#ead13b6c1db0e8089b5c22a1e6125b69632558d4"
+version = "0.32.0"
+source = "git+https://github.com/rigetti/quil-rs?tag=quil-rs%2Fv0.32.0#9db8cb4cfe75e67a4fa572e96e86ae8e59d0bdfc"
 dependencies = [
  "approx",
  "indexmap 2.11.4",
@@ -2858,6 +2858,7 @@ dependencies = [
  "nom_locate",
  "num-complex",
  "once_cell",
+ "paste",
  "petgraph 0.6.5",
  "regex",
  "serde",
