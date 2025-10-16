@@ -3,6 +3,7 @@
 
 use std::{collections::HashMap, time::Duration};
 
+#[cfg(feature = "pyo3")]
 use pyo3::{exceptions::PyValueError, PyErr};
 use qcs_api_client_grpc::{
     models::controller::EncryptedControllerJob,
@@ -30,6 +31,7 @@ pub enum Error {
     ClientTimeout(#[from] Elapsed),
 }
 
+#[cfg(feature = "pyo3")]
 impl From<Error> for PyErr {
     fn from(value: Error) -> Self {
         let message = value.to_string();
