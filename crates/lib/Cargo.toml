@@ -16,7 +16,7 @@ tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-cl
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
 tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
-pyo3 = ["dep:pyo3"]
+python = ["dep:pyo3"]
 experimental = []
 
 [dependencies]
