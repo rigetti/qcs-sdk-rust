@@ -20,10 +20,6 @@ type = "PrepareRelease"
 
 [[workflows.steps]]
 type = "Command"
-command = "cargo update -w"
-
-[[workflows.steps]]
-type = "Command"
 command = "git commit -m \"chore: prepare new release(s) [skip ci]\""
 
 [[workflows.steps]]
