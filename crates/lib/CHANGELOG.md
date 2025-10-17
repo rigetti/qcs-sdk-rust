@@ -1,3 +1,11 @@
+## 0.25.15 (2025-10-17)
+
+### Fixes
+
+- update to the latest quil-rs release; should fix Rust crate release (#558)
+- put pyo3 behind feature flag for qcs crate (#560)
+- use knope's native functionality for updating workspace dependencies (#561)
+
 ## 0.25.15-rc.0 (2025-10-17)
 
 ### Fixes
