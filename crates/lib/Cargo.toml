@@ -16,6 +16,7 @@ tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-cl
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
 tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
+python = ["dep:pyo3"]
 experimental = []
 
 [dependencies]
@@ -29,7 +30,7 @@ num = { version = "0.4.0", features = ["serde"] }
 opentelemetry = { workspace = true }
 opentelemetry_sdk = { workspace = true }
 pbjson-types = "0.7.0"
-pyo3 = { workspace = true }
+pyo3 = { workspace = true, optional = true }
 qcs-api-client-common.workspace = true
 qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
