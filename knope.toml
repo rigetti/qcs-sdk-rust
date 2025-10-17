@@ -24,25 +24,7 @@ command = "cargo update -w"
 
 [[workflows.steps]]
 type = "Command"
-command = "git add Cargo.lock && git commit -m \"chore: prepare new release(s) [skip ci]\""
-
-[[workflows.steps]]
-type = "Command"
-command = "git push"
-
-[[workflows.steps]]
-type = "Release"
-
-[[workflows]]
-name = "prerelease"
-
-[[workflows.steps]]
-type = "PrepareRelease"
-prerelease_label = "rc"
-
-[[workflows.steps]]
-type = "Command"
-command = "cargo update -w && git add Cargo.lock && git commit -m \"chore: prepare new prerelease(s) [skip ci]\""
+command = "git commit -m \"chore: prepare new release(s) [skip ci]\""
 
 [[workflows.steps]]
 type = "Command"

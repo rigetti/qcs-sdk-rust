@@ -19,6 +19,6 @@ jobs:
         with:
           version: 0.19.2 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
       - name: Display Pending Release
-        run: knope release --dry-run
+        run: knope release --dry-run --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
