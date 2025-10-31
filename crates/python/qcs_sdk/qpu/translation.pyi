@@ -143,7 +143,7 @@ class Riverlane:
     are specially authorized and are not generally available to the client.
     """
 
-    def __new__(cls, /, ds2_configuration_data: Optional[Dict[str, bytes]] = ...) -> Self: ...
+    def __new__(cls, /, qeci_configuration_data: Optional[Dict[str, bytes]] = ...) -> Self: ...
 
 @final
 class TranslationOptions:

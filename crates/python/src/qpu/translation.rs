@@ -207,10 +207,10 @@ pub struct PyRiverlane(Riverlane);
 #[pymethods]
 impl PyRiverlane {
     #[new]
-    #[pyo3(signature = (/, ds2_configuration_data = None))]
-    fn __new__(ds2_configuration_data: Option<HashMap<String, Vec<u8>>>) -> PyResult<Self> {
+    #[pyo3(signature = (/, qeci_configuration_data = None))]
+    fn __new__(qeci_configuration_data: Option<HashMap<String, Vec<u8>>>) -> PyResult<Self> {
         Ok(Self(Riverlane {
-            ds2_configuration_data: ds2_configuration_data.unwrap_or_default(),
+            qeci_configuration_data: qeci_configuration_data.unwrap_or_default(),
         }))
     }
 }
