@@ -1,3 +1,9 @@
+## 0.21.21-rc.0 (2025-10-31)
+
+### Fixes
+
+- update QCS API-client versions (#565)
+
 ## 0.21.20 (2025-10-17)
 
 ### Fixes
