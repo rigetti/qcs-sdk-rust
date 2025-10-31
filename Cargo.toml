@@ -3,9 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.12.5"
-qcs-api-client-grpc = "0.12.5"
-qcs-api-client-openapi = "0.13.5"
+qcs-api-client-common = "0.12.8"
+qcs-api-client-grpc = "0.12.8"
+qcs-api-client-openapi = "0.13.8"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
