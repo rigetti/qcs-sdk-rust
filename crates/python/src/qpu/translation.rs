@@ -17,6 +17,9 @@ use rigetti_pyo3::{create_init_submodule, py_wrap_error, py_wrap_simple_enum, To
 
 use crate::client::PyQcsClient;
 
+// XXX is there a reasonable default?
+const DEFAULT_QECI_MAX_NANOS_READ: u64 = 8787;
+
 create_init_submodule! {
     classes: [
         PyTranslationOptions,
@@ -207,10 +210,17 @@ pub struct PyRiverlane(Riverlane);
 #[pymethods]
 impl PyRiverlane {
     #[new]
-    #[pyo3(signature = (/, qeci_configuration_data = None))]
-    fn __new__(qeci_configuration_data: Option<HashMap<String, Vec<u8>>>) -> PyResult<Self> {
+    #[pyo3(
+        signature = (/, qeci_configuration_data = None, qeci_max_nanoseconds_until_read_available = None)
+    )]
+    fn __new__(
+        qeci_configuration_data: Option<HashMap<String, Vec<u8>>>,
+        qeci_max_nanoseconds_until_read_available: Option<u64>,
+    ) -> PyResult<Self> {
         Ok(Self(Riverlane {
             qeci_configuration_data: qeci_configuration_data.unwrap_or_default(),
+            qeci_max_nanoseconds_until_read_available: qeci_max_nanoseconds_until_read_available
+                .unwrap_or(DEFAULT_QECI_MAX_NANOS_READ),
         }))
     }
 }
