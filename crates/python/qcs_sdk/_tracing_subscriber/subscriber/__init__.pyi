@@ -22,3 +22,4 @@ class Config:
     """
 
     def __new__(cls, *, layer: layers.Config) -> "Config": ...
+
