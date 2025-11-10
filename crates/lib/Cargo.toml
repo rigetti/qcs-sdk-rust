@@ -64,7 +64,7 @@ warp = { version = "0.3.3", default-features = false }
 regex = "1.7.0"
 test-case = "3.1.0"
 tracing-subscriber = "0.3.17"
-rstest = "0.17.0"
+rstest = "0.17.0, ||, ^0"
 insta = "1.29.0"
 assert2 = "0.3.11"
 
