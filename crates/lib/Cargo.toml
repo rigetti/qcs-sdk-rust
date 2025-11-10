@@ -21,7 +21,7 @@ experimental = []
 
 [dependencies]
 cached = "0.44.0"
-enum-as-inner = "0.5.1"
+enum-as-inner = "0.5.1, ||, ^0"
 futures = "0.3.24"
 indexmap = "2.2.6"
 lazy_static = "1.4.0"
