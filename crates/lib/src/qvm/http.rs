@@ -1,7 +1,7 @@
 //! This module provides types and functions for making HTTP-based API calls to the QVM.
 //! Consider [`super::run_program`] for higher level access to the QVM that allows
 //! for running parameterized programs.
-use std::{collections::HashMap, num::NonZeroU16};
+use std::{collections::HashMap, num::NonZeroU32};
 
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -62,7 +62,7 @@ pub struct MultishotRequest {
     /// The memory regions to include in the response.
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
-    pub trials: NonZeroU16,
+    pub trials: NonZeroU32,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub measurement_noise: Option<(f64, f64, f64)>,
@@ -109,7 +109,7 @@ impl MultishotRequest {
     #[must_use]
     pub fn new(
         compiled_quil: String,
-        trials: NonZeroU16,
+        trials: NonZeroU32,
         addresses: HashMap<String, AddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -142,7 +142,7 @@ pub struct MultishotMeasureRequest {
     /// The Quil program to run.
     pub compiled_quil: String,
     /// The number of trials ("shots") to run the program.
-    pub trials: NonZeroU16,
+    pub trials: NonZeroU32,
     /// Qubits to measure
     pub qubits: Vec<u64>,
     /// Simulated measurement noise for the X, Y, and Z axes.
@@ -163,7 +163,7 @@ impl MultishotMeasureRequest {
     #[must_use]
     pub fn new(
         compiled_quil: String,
-        trials: NonZeroU16,
+        trials: NonZeroU32,
         qubits: &[u64],
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
@@ -389,7 +389,7 @@ where
 
 #[cfg(test)]
 mod describe_request {
-    use std::{collections::HashMap, num::NonZeroU16};
+    use std::{collections::HashMap, num::NonZeroU32};
 
     use crate::qvm::http::AddressRequest;
 
@@ -400,7 +400,7 @@ mod describe_request {
         let program = "H 0";
         let request = MultishotRequest::new(
             program.to_string(),
-            NonZeroU16::new(1).expect("value is non-zero"),
+            NonZeroU32::new(1).expect("value is non-zero"),
             HashMap::new(),
             None,
             None,
@@ -413,7 +413,7 @@ mod describe_request {
     fn it_uses_kebab_case_for_json() {
         let request = MultishotRequest::new(
             "H 0".to_string(),
-            NonZeroU16::new(10).expect("value is non-zero"),
+            NonZeroU32::new(10).expect("value is non-zero"),
             [("ro".to_string(), AddressRequest::IncludeAll)]
                 .iter()
                 .cloned()
