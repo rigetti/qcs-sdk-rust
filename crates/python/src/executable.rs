@@ -171,6 +171,7 @@ impl PyExecutable {
                     quantum_processor_id,
                     endpoint_id,
                     translation_options,
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
             None => py_sync!(
@@ -205,6 +206,7 @@ impl PyExecutable {
                     quantum_processor_id,
                     endpoint_id,
                     translation_options,
+                    execution_options.unwrap_or_default().as_inner(),
                 )
             ),
             None => py_async!(
@@ -239,6 +241,7 @@ impl PyExecutable {
                     quantum_processor_id,
                     endpoint_id,
                     translation_options,
+                    execution_options.unwrap_or_default().as_inner()
                 )
             ),
             None => py_sync!(
@@ -274,6 +277,7 @@ impl PyExecutable {
                         quantum_processor_id,
                         endpoint_id,
                         translation_options,
+                        execution_options.unwrap_or_default().as_inner()
                     )
                 )
             }
