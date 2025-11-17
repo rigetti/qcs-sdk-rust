@@ -1,39 +1,41 @@
 [workspace]
-members = ["crates/*"]
+members = ["crates/lib"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.12.8"
-qcs-api-client-grpc = "0.12.8"
-qcs-api-client-openapi = "0.13.8"
-serde_json = "1.0.86"
-thiserror = "1.0.57"
-tokio = "1.36.0"
 # We specify quil-rs as a git and versioned dependency so that we can keep the version of
 # quil-rs used in both the Rust and Python packages in sync. The tag used should always
 # be a `quil-py` tag and should be compatible with the version specified in
 # `crates/python/pyproject.toml`.
 # The version must also be specified in order to publish to crates.io. Cargo enforces
 # that the specified version is the same as the version in the git repository.
-quil-rs = { version = "0.32.0", git = "https://github.com/rigetti/quil-rs", tag = "quil-rs/v0.32.0" }
 
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
 # crates' versions of ndarray in sync.
 # Similarly, pyo3 packages (`numpy`, `rigetti-pyo3`, `pyo3*`) track versions together
 # and need to be updated together.
-ndarray = { version = "0.15.6", features = ["serde"] }
-numpy = "0.20.0"
+ndarray = { version = "0.16.1", features = ["serde"] }
+numpy = "0.26.0"
 opentelemetry = { version = "0.27.1" }
 opentelemetry_sdk = { version = "0.27.1" }
-pyo3 = { version = "0.20.0", default-features = false}
-pyo3-asyncio = { version = "0.20", features = ["tokio-runtime"] }
-pyo3-log = { version = "0.8.2" }
-pyo3-opentelemetry = "0.4.0" 
+pyo3 = { version = "0.26.0", features = ["num-complex", "multiple-pymethods"] }
+pyo3-async-runtimes = { version = "0.26", features = ["attributes", "tokio-runtime"] }
+pyo3-build-config = "0.26.0"
+pyo3-log = { version = "0.13.2" }
+pyo3-opentelemetry = "0.4.0"
 pyo3-tracing-subscriber = { version = "0.2.0", default-features = false }
+pyo3-stub-gen = { version = "0.14.1", features = ["numpy"] }
 
-pyo3-build-config = "0.20.0"
-rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
+qcs-api-client-common = "0.12.8"
+qcs-api-client-grpc = "0.12.8"
+qcs-api-client-openapi = "0.13.8"
+quil-rs = "0.33"
+
+serde_json = "1.0.86"
+thiserror = "1.0.57"
+tokio = "1.36.0"
+# rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.

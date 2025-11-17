@@ -8,6 +8,9 @@ use quil_rs::{
     quil::ToQuilError,
 };
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
+
 /// Hardware values are 48 bits long.
 const MAX_SEQUENCER_VALUE: u64 = 0x0000_FFFF_FFFF_FFFF;
 
@@ -76,6 +79,9 @@ pub type RandomResult<T> = Result<T, Error>;
 /// An [`ExternedCall`] that may be used to select one or more random
 /// sub-regions from a source array of real values to a destination array.
 #[derive(Debug, Clone)]
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen)]
 pub struct ChooseRandomRealSubRegions {
     destination_memory_region_name: String,
     source_memory_region_name: String,
@@ -227,15 +233,22 @@ impl TryFrom<ChooseRandomRealSubRegions> for Call {
 /// values are in the range `[1, MAX_SEQUENCER_VALUE]` and are losslessly
 /// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen)]
 pub struct PrngSeedValue {
     u64_value: u64,
     f64_value: f64,
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl PrngSeedValue {
     /// Attempt to create a new instance of `PrngSeedValue` from a `u64`.
     /// The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
     /// losslessly convertible to `f64`.
+    #[new]
     pub fn try_new(value: u64) -> RandomResult<Self> {
         if !(1..=MAX_SEQUENCER_VALUE).contains(&value) {
             return Err(Error::InvalidSeed(value));
@@ -270,6 +283,11 @@ fn lfsr_next(seed: u64, taps: &[u32]) -> u64 {
 /// it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
 /// The taps have been shown to produce maximal sequence lengths for 48-bit strings.
 #[must_use]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+)]
+#[pyo3::pyfunction]
 pub fn lfsr_v1_next(seed: PrngSeedValue) -> u64 {
     lfsr_next(seed.u64_value, &V1_TAPS)
 }
@@ -327,6 +345,11 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 /// let _random_indices = choose_random_real_sub_region_indices(seed, start_index, series_length, sub_region_count);
 /// ```
 #[must_use]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+)]
+#[pyo3::pyfunction]
 pub fn choose_random_real_sub_region_indices(
     seed: PrngSeedValue,
     start_index: u32,

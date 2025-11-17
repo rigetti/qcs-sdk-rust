@@ -39,3 +39,133 @@ args = ["deny", "--all-features", "check"]
 
 [tasks.pre-ci-flow]
 dependencies = ["deny", "lint"]
+
+[tasks.ci-flow]
+dependencies = ["pytest-flow", "stubtest"]
+
+# ----
+
+[tasks.install-python-deps]
+description = "Install python dependencies using poetry."
+command = "poetry"
+args = ["install", "--extras", "dev", "--no-root"]
+
+[tasks.generate-stubs]
+description = "Generate Python stub files."
+command = "cargo"
+args = ["run", "-p", "python", "--features", "stubs", "--bin", "stub_gen"]
+install_crate = false
+
+[tasks.package-python]
+description = "Build a release version of the Python package to the active virtual environment."
+dependencies = ["generate-stubs"]
+command = "poetry"
+args = ["run", "maturin", "build", "--features", "python", "--release"]
+
+[tasks.install-python-package]
+description = "Build the Python package and install to the active virtual environment."
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "maturin", "develop", "--features", "python"]
+
+[tasks.install-python-package-with-stubs]
+description = "Install the Python package with up-to-date stubs (not needed for testing)."
+dependencies = ["generate-stubs", "install-quil"]
+
+[tasks.pytest]
+description = "Run Python tests."
+dependencies = ["install-python-package"]
+command = "poetry"
+args = ["run", "pytest"]
+
+[tasks.pytest-flow]
+dependencies = [
+    "pre-test",
+    "install-python-package",
+    "pytest",
+    "post-test",
+]
+
+[tasks.stubtest]
+description = "Check Python stubfiles."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+cwd = "python"
+args = [
+    "run", 
+    "stubtest", 
+    "--allowlist",
+    ".stubtest-allowlist",
+    "--allowlist",
+    "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
+    "qcs_sdk"
+]
+# TODO(#475): Enable error reporting once stubtest is happy with stubgen's output.
+ignore_errors = true
+
+[tasks.stubtest-flow]
+dependencies = [
+    "install-python-package",
+    "stubtest",
+]
+
+[tasks.lint-python-package]
+description = "Find errors in Python-related Rust code."
+command = "poetry"
+args = ["run", "python", "./scripts/lint-sdk.py", "--base", "src", "--show-mistakes"]
+
+[tasks.show-python-package-layout]
+description = "Print the Python package layout as defined within Rust code."
+command = "poetry"
+args = ["run", "python", "./scripts/lint-sdk.py", "--base", "src", "--show-package"]
+
+[tasks.test-python-package]
+description = "Run all Python-related tests."
+dependencies = ["pytest", "lint-python-package", "stubtest"]
+
+[tasks.test-all]
+description = "Run all tests."
+dependencies = ["test", "test-python-package"]
+
+[tasks.default]
+alias = "test-all"
+
+[tasks.check-python-api]
+description = "Check if Python API has breaking changes."
+dependencies = ["install-python-package-with-stubs"]
+script = { file = "./scripts/check-python-api.sh" }
+
+[tasks.document-python-package]
+description = "Generate Python package documentation."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = [
+    "run",
+    "pdoc",
+    "-o", "build/docs",
+    "qcs_sdk",
+    "!qcs_sdk.qcs_sdk", 
+    "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg",
+]
+
+# ----
+
+[tasks.format-tracing-subscriber]
+command = "black"
+args = ["qcs_sdk/_tracing_subscriber"]
+
+[tasks.format]
+command = "black"
+args = ["qcs_sdk", "tests"]
+
+[tasks.test-session]
+command = "pytest"
+args = ["tests", "--with-qcs-session"]
+
+[tasks.test-execution]
+command = "pytest"
+args = ["tests", "--with-qcs-session", "--with-qcs-execution"]
+
+[tasks.dev-flow]
+dependencies = ["dev-test-flow", "pytest-flow", "stubtest"]
+

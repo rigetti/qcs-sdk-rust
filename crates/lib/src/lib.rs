@@ -70,6 +70,9 @@ pub mod qpu;
 pub mod qvm;
 mod register_data;
 
+#[cfg(feature = "python")]
+pub mod python;
+
 /// Build information about the crate and environment in which it was built.
 pub mod build_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));

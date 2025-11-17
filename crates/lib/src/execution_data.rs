@@ -17,6 +17,9 @@ use crate::{
     RegisterData,
 };
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
+
 /// Represents the two possible types of data returned from either the QVM or a real QPU.
 /// Each variant contains the original data returned from its respective executor.
 ///
@@ -49,6 +52,8 @@ use crate::{
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner, Deserialize, Serialize)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk"))]
 pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmResultData`]
     Qvm(QvmResultData),
@@ -58,6 +63,8 @@ pub enum ResultData {
 
 /// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
 pub struct ExecutionData {
     /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
     pub result_data: ResultData,
@@ -83,6 +90,8 @@ pub enum RegisterMatrix {
 /// register.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", mapping))]
 pub struct RegisterMap(pub HashMap<String, RegisterMatrix>);
 
 /// Errors that may occur when trying to build a [`RegisterMatrix`] from execution data
@@ -109,6 +118,8 @@ pub enum RegisterMatrixConversionError {
     MemoryReferenceParseError(MemoryReferenceParseError),
 }
 
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl ResultData {
     /// Convert [`ResultData`] from its inner representation as [`QvmResultData`] or
     /// [`QpuResultData`] into a [`RegisterMap`]. The [`RegisterMatrix`] for each register will be

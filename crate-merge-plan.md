@@ -15,9 +15,81 @@ using the details from the other merge work as a template.
 
 - eliminate the separate Python crate
 - add PyO3 attributes directly in main crate, gated behind a `python` feature
-- replace features of `rigetti-pyo3` that were subsumed by modern PyO3
+- update to modern PyO3 patterns (removing `rigetti-pyo3` dependencies)
 - switch to copy/pickle via `__getnewargs__`
-- add linting scripts, auto-stub generation, and CI matrices for Python 3.10–3.13.
+- add linting scripts, auto-stub generation, and CI matrices for Python 3.10–3.13
+
+---
+
+# Step-by-Step Implementation Plan
+
+## Preparation Steps
+
+1. **Update main crate Cargo.toml** (`crates/lib/Cargo.toml`):
+   - Add `python` feature flag
+   - Add PyO3, pyo3-stub-gen dependencies (gated by `python` and `stubs` features)
+   - Add `pyo3-build-config` to build-dependencies
+   - Update crate-type to include `"cdylib"`
+1. **Update root workspace configuration**:
+    - Remove `crates/python` from `Cargo.toml` workspace members
+    - Update any workspace-level scripts or tools
+1. **Create Python module directory structure** in `crates/lib/src/`:
+   - Create `crates/lib/python/` directory for output of stub generation
+   - Move build-related files (e.g.`pyproject.toml`, `poetry.lock`) to `crates/lib/`
+   - Add PyO3 build configuration when `python` feature is enabled
+   - Copy any custom build logic from python crate's `build.rs`
+   - Move `.flake8`, `.stubtest-allowlist` to main crate
+   - Update any path references in config files
+1. **Implement stub generation binary**:
+    - Create `src/bin/stub_gen.rs` (similar to quil-rs)
+    - Add stub generation logic for QCS SDK types
+    - Create `python/qcs_sdk/` directory for stub files
+1. **Add linting script**:
+    - Copy and adapt linting script from quil-rs
+    - Update for QCS SDK module structure
+    - Add to `scripts/` directory
+1. **Create Makefile.toml** (similar to quil-rs):
+    - Add tasks: `install-deps`, `generate-stubs`, `package-qcs`, `install-qcs`
+    - Add tasks: `pytest`, `stubtest`, `lint-qcs`, `test-qcs`, `test-all`
+    - Add `check-api` task for API compatibility checking
+1. **Set up basic Python module registration**:
+   - Add `python.rs` file for the Python module root
+   - Implement top-level `#[pymodule]` function similar to quil-rs pattern and register modules
+   - Create `#[pymodule]` functions for each module
+1. **Migrate core modules** from `crates/python` to `crates/lib/python`:
+   - For wrappers in `crates/python/src/`,
+   instead annotate their corresponding Rust structs with PyO3 attributes,
+   gated appropriately, following the pattern in `quil-rs`
+1. **Migrate Python tests**:
+    - Move `crates/python/tests/` → `crates/lib/tests_py/`
+    - Update import statements in test files
+    - Ensure tests work with new module structure
+
+## CI/CD Updates
+
+1. **Update GitHub Actions workflows**:
+    - Modify CI to test Python builds with different Python versions (3.10-3.13)
+    - Add stub generation and validation steps
+    - Add API compatibility checking
+    - Update artifact publishing for combined crate
+1. **Update documentation build**:
+    - Modify doc generation to handle merged crate
+    - Update paths in documentation workflows
+
+## Final Steps
+
+1. **Delete python crate directory**:
+    - Remove `crates/python/` entirely
+    - Verify no lingering references exist
+1. **Update documentation**:
+    - Update README.md files
+    - Update CONTRIBUTING.md
+    - Add migration notes for users
+    - Update examples and usage instructions
+1. **Version alignment**:
+    - Update `knope.toml`
+    - Ensure version numbers are coordinated
+    - Update changelog with merge information
 
 ---
 
@@ -91,15 +163,19 @@ impl Foo { /* … */ }
 **Pattern:** anywhere the old Python crate/macros/helpers were used,
 re-express with first-party PyO3 attributes on the Rust types.
 
-Common replacements:
+**Note:** The current QCS SDK Python crate already uses modern PyO3 patterns,
+so this step involves migrating existing PyO3 code rather than replacing `rigetti-pyo3`.
 
-* Class exposure → `#[cfg_attr(feature = "python", pyclass(module = "quil", name = "TypeName"))]`
+Common patterns to apply:
+
+* Class exposure → `#[cfg_attr(feature = "python", pyclass(module = "qcs_sdk", name = "TypeName"))]`
     (and similar for enums)
 * Constructor → `#[cfg(feature = "python")] #[pymethods] impl TypeName { #[new] fn new(…) -> Self { … } }`
     (or use the `pickleable_new` macro, which would need to be copied over, too)
 * Methods → inside `#[pymethods]` blocks (split as needed)
 * Properties → `#[getter] fn x(&self) -> …` and `#[setter] fn set_x(&mut self, v: …)`
     (but try for `get_all` or `#[get]` if possible)
+* Async methods → use `pyo3-asyncio` patterns for async functions
 
 ---
 
@@ -111,16 +187,22 @@ Common replacements:
 use pyo3::prelude::*;
 
 #[pymodule]
-#[pyo3(name = "_quil")]
+#[pyo3(name = "_qcs_sdk")]
 fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    use crate::qcs_sdk::errors;
+    use crate::python::errors;
 
     let py = m.py();
 
-    m.add_wrapped(wrap_pymodule!(submodule::qcs_sdk::init_submodule))?;
+    // Add submodules
+    m.add_wrapped(wrap_pymodule!(crate::python::client::init_submodule))?;
+    m.add_wrapped(wrap_pymodule!(crate::python::compiler::init_submodule))?;
+    m.add_wrapped(wrap_pymodule!(crate::python::qpu::init_submodule))?;
+    m.add_wrapped(wrap_pymodule!(crate::python::qvm::init_submodule))?;
 
-    m.add_class::<Foo>()?;
-    m.add_class::<Bar>()?;
+    // Add main classes
+    m.add_class::<crate::Client>()?;
+    m.add_class::<crate::Executable>()?;
+    m.add_class::<crate::ExecutionData>()?;
     // ...
 
     m.add("QscSdkError", py.get_type::<errors::QcsSdkError>())?;
@@ -135,7 +217,7 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
         ComplexA,
         // ...
     );
-
+    
     Ok(())
 }
 ```
@@ -188,13 +270,13 @@ impl FooEnum {
 **Pattern:** annotate all exported symbols; keep Python-visible API centralized and predictable.
 
 * a linter to catch missing `#[pyclass]` / `#[pymethods]` coverage,
-* generated Python stub files (`python/quil/*.pyi`) 
+* generated Python stub files (`python/qcs_sdk/*.pyi`) 
 
 ---
 
 ## Update CI 
 
-* Run checks and semver script (add a “Check quil API” job).
+* Run checks and semver script (add a "Check QCS SDK API" job).
 * Run tests on 3.10-3.13 across macOS/Linux/Windows.
 * Add a stub validation step (e.g., mypy `stubtest`) once your stubs are in place
 

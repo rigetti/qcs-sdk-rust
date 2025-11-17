@@ -1,0 +1,139 @@
+# This is the metadata Maturin uploads to PyPI on publish
+[project]
+name = "qcs-sdk-python"
+version = "0.21.21"
+requires-python = ">=3.10,<4"
+description = "Python interface for the QCS Rust SDK"
+readme = "README-py.md"
+license = { text = "Apache-2.0" }
+authors = [
+  { name = "Rigetti Computing", email = "softapps@rigetti.com" },
+  { name = "Mark Skilbeck", email = "mark.skilbeck@rigetti.com" },
+  { name = "Marquess Valdez", email = "mvaldez@rigetti.com" },
+  { name = "Randall Fulton", email = "rfulton@rigetti.com" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+]
+
+dependencies = ["quil>=0.33.0-rc.4", "qcs-api-client-common>=0.11.8"]
+
+[tool.maturin]
+features = ["pyo3/extension-module", "python"]
+bindings = "pyo3"
+include = ["README-py.md", "THIRDPARTY.yaml"]
+python-source = "python"
+module-name = "qcs_sdk._qcs_sdk"
+sdist-include = ["README-py.md", "THIRDPARTY.yaml"]
+compatibility = "linux"
+
+[project.optional-dependencies]
+pyquil = [
+    "pyquil==5.0.0-rc.2",
+]
+dev = [
+    "black >= 24.8.0",
+    "opentelemetry-sdk==1.25.0",
+    "pytest >= 8.1.1",
+    "pytest-asyncio >= 0.23.6",
+    "pytest-mock >= 3.14.0",
+    "pytest-sugar >= 1.0.0",
+    "pytest-clarity >= 1.0.1",
+    "syrupy >= 4.0.0",
+    "maturin == 1.9.4", # TODO coordinate this with .github/workflows/release-python.yml
+    "numpy >= 1.24.1",
+    "pdoc >= 14.6.1",
+    "ruff >= 0.3.5",
+    "mypy >= 1.14.1",
+]
+
+[build-system]
+requires = ["maturin==1.9.4"] # coordinate this with .github/workflows/release-python.yml
+build-backend = "maturin"
+
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311', 'py312', 'py313']
+include = '\.pyi?$'
+
+[tool.pyright]
+# This diagnostic is raised when a type stub is found without a corresponding source file. This is
+# necessarily the case for a pure Rust pyo3 module, so disabling it.
+reportMissingModuleSource = false
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+griffe = "^1.14.0"
+
+[tool.ruff]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+line-length = 120
+indent-width = 4
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["D", "E4", "E7", "E9", "F", "I", "B", "S", "W"]
+ignore = [
+    "E741" # "Ambiguous" variable names like "I" aren't ambiguous in this contex.
+]
+fixable = ["ALL"]
+unfixable = []
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.lint.per-file-ignores]
+"quil/**/*.py" = [
+    "F403", # * imports allowed in extension module glue.
+    "D100", # docstrings belong in type stubs
+    "D104",
+]
+"test/**/*.py" = [
+    "D",    # docstrings are not enforced in tests
+    "S101", # asserts are allowed in tests
+    "S301", # we need to test pickling
+]
+"make_docs.py" = [ "D" ]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"

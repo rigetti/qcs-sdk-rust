@@ -4,5 +4,7 @@
 mod isa;
 #[cfg(feature = "libquil")]
 pub mod libquil;
+#[cfg(feature = "python")]
+pub(crate) mod python;
 pub mod quilc;
 pub mod rpcq;

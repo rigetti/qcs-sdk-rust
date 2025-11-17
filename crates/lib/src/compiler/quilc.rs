@@ -11,6 +11,9 @@ use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use super::isa::{self, Compiler};
 use super::rpcq;
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass;
+
 /// Number of seconds to wait before timing out.
 pub const DEFAULT_COMPILER_TIMEOUT: f64 = 30.0;
 
@@ -42,13 +45,13 @@ pub trait Client {
     /// gateset.
     ///
     /// If interleaver is not provided, the returned sequence will have the form
-    /// ```C_1 C_2 ... C_(depth-1) C_inv ,```
+    /// `C_1 C_2 ... C_(depth-1) C_inv ,`
     ///
-    /// where each C is a Clifford element drawn from gateset, ``C_{< depth}`` are randomly selected,
-    /// and ``C_inv`` is selected so that the entire sequence composes to the identity.  If an
-    /// interleaver ``G`` (which must be a Clifford, and which will be decomposed into the native
+    /// where each C is a Clifford element drawn from gateset, `C_{< depth}` are randomly selected,
+    /// and `C_inv` is selected so that the entire sequence composes to the identity.  If an
+    /// interleaver `G` (which must be a Clifford, and which will be decomposed into the native
     /// gateset) is provided, then the sequence instead takes the form
-    /// ```C_1 G C_2 G ... C_(depth-1) G C_inv .```
+    /// `C_1 G C_2 G ... C_(depth-1) G C_inv .`
     fn generate_randomized_benchmarking_sequence(
         &self,
         request: RandomizedBenchmarkingRequest,
@@ -57,6 +60,8 @@ pub trait Client {
 
 /// The result of compiling a Quil program to native quil with `quilc`
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", get_all, frozen))]
 pub struct CompilationResult {
     /// The compiled program
     pub program: Program,
@@ -66,6 +71,11 @@ pub struct CompilationResult {
 
 /// A set of options that determine the behavior of compiling programs with quilc
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen)
+)]
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
     pub(crate) timeout: Option<f64>,
@@ -117,6 +127,11 @@ impl Default for CompilerOpts {
 /// Pauli Term
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub struct PauliTerm {
     /// Qubit indices onto which the factors of the Pauli term are applied.
     pub indices: Vec<u64>,
@@ -128,6 +143,11 @@ pub struct PauliTerm {
 /// Request to conjugate a Pauli Term by a Clifford element.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub struct ConjugateByCliffordRequest {
     /// Pauli Term to conjugate.
     pub pauli: PauliTerm,
@@ -138,6 +158,11 @@ pub struct ConjugateByCliffordRequest {
 
 /// The "outer" request shape for a `conjugate_pauli_by_clifford` request.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub(crate) struct ConjugatePauliByCliffordRequest {
     #[serde(rename = "*args")]
     args: [ConjugateByCliffordRequest; 1],
@@ -151,6 +176,11 @@ impl From<ConjugateByCliffordRequest> for ConjugatePauliByCliffordRequest {
 
 /// Conjugate Pauli by Clifford response.
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub struct ConjugatePauliByCliffordResponse {
     /// Encoded global phase factor on the emitted Pauli.
     pub phase: i64,
@@ -162,6 +192,11 @@ pub struct ConjugatePauliByCliffordResponse {
 /// Request to generate a randomized benchmarking sequence.
 #[derive(Clone, Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 #[serde(tag = "_type")]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub struct RandomizedBenchmarkingRequest {
     /// Depth of the benchmarking sequence.
     pub depth: u64,
@@ -194,6 +229,11 @@ impl From<RandomizedBenchmarkingRequest> for GenerateRandomizedBenchmarkingSeque
 
 /// Randomly generated benchmarking sequence response.
 #[derive(Clone, Deserialize, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+)]
 pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     /// List of Cliffords, each expressed as a list of generator indices.
     pub sequence: Vec<Vec<i64>>,
@@ -253,6 +293,11 @@ where
 
 /// Metadata about a program compiled to native quil.
 #[derive(Clone, Deserialize, Serialize, Debug, PartialEq, PartialOrd)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", eq)
+)]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
     #[serde(deserialize_with = "deserialize_none_as_default")]
@@ -318,6 +363,11 @@ impl NativeQuilRequest {
 }
 
 /// Description of a device to compile for.
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen)
+)]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]
 pub struct TargetDevice {
@@ -400,7 +450,7 @@ MEASURE 1 ro[1]
             .unwrap()
             .run(
                 NonZeroU16::new(10).expect("value is non-zero"),
-                [("ro".to_string(), AddressRequest::IncludeAll)]
+                [("ro".to_string(), AddressRequest::IncludeAll())]
                     .iter()
                     .cloned()
                     .collect(),

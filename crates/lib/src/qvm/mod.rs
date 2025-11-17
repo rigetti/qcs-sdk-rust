@@ -3,6 +3,9 @@
 
 use std::{collections::HashMap, num::NonZeroU16, str::FromStr, sync::Arc, time::Duration};
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pymethods};
+
 use quil_rs::{
     instruction::{ArithmeticOperand, Instruction, MemoryReference, Move},
     program::ProgramError,
@@ -21,6 +24,8 @@ mod execution;
 pub mod http;
 #[cfg(feature = "libquil")]
 pub mod libquil;
+#[cfg(feature = "python")]
+pub mod python;
 
 /// Number of seconds to wait before timing out.
 const DEFAULT_QVM_TIMEOUT: Duration = Duration::from_secs(30);
@@ -106,17 +111,29 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 /// Encapsulates data returned after running a program on the QVM
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMResultData", get_all)
+)]
 pub struct QvmResultData {
+    /// A map of register names (ie. "ro") to a `RegisterData` containing their values.
     pub(crate) memory: HashMap<String, RegisterData>,
 }
 
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl QvmResultData {
     #[must_use]
+    #[staticmethod]
     /// Build a [`QvmResultData`] from a mapping of register names to a [`RegisterData`]
     pub fn from_memory_map(memory: HashMap<String, RegisterData>) -> Self {
         Self { memory }
     }
+}
 
+impl QvmResultData {
     /// Get a map of register names (ie. "ro") to a [`RegisterData`] containing their values.
     #[must_use]
     pub fn memory(&self) -> &HashMap<String, RegisterData> {
@@ -240,6 +257,11 @@ pub fn apply_parameters_to_program(
 /// Options avaialable for running programs on the QVM.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMOptions")
+)]
 pub struct QvmOptions {
     /// The timeout to use for requests to the QVM. If set to [`None`], there is no timeout.
     pub timeout: Option<Duration>,

@@ -50,7 +50,7 @@ async fn test_run<C: qvm::Client>(client: C) {
     let request = http::MultishotRequest::new(
         PROGRAM.to_string(),
         NonZeroU16::new(2).expect("value is non-zero"),
-        HashMap::from([("ro".to_string(), http::AddressRequest::IncludeAll)]),
+        HashMap::from([("ro".to_string(), http::AddressRequest::IncludeAll())]),
         Some((0.1, 0.5, 0.4)),
         Some((0.1, 0.5, 0.4)),
         Some(1),

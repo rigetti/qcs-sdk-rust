@@ -16,8 +16,13 @@ use tokio::time::error::Elapsed;
 
 pub mod api;
 mod execution;
+// Currently the isa module is only used by the python bindings.
 #[cfg(feature = "experimental")]
 pub mod experimental;
+#[cfg(feature = "python")]
+pub mod isa;
+#[cfg(feature = "python")]
+pub mod python;
 pub mod result_data;
 pub mod translation;
 

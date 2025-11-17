@@ -3,6 +3,9 @@
 //! for running parameterized programs.
 use std::{collections::HashMap, num::NonZeroU16};
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
+
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
@@ -56,21 +59,30 @@ impl<T: DeserializeOwned> QvmResponse<T> {
 /// The request body needed to make a multishot [`run`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm"))]
 pub struct MultishotRequest {
     /// The Quil program to run.
+    #[pyo3(get)]
     pub compiled_quil: String,
     /// The memory regions to include in the response.
+    #[pyo3(get)]
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
+    #[pyo3(get)]
     pub trials: NonZeroU16,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -79,13 +91,15 @@ pub struct MultishotRequest {
 /// An enum encapsulating the different ways to request data back from the QVM for an address.
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm", eq))]
 pub enum AddressRequest {
     /// Get all values for the address.
     #[serde(serialize_with = "serialize_true")]
-    IncludeAll,
+    IncludeAll(),
     /// Exclude all values for the address.
     #[serde(serialize_with = "serialize_false")]
-    ExcludeAll,
+    ExcludeAll(),
     /// A list of specific indices to get back for the address.
     Indices(Vec<usize>),
 }
@@ -129,6 +143,8 @@ impl MultishotRequest {
 
 /// The response body returned by the QVM after a multishot [`run`] request.
 #[derive(Debug, Deserialize, Clone, PartialEq)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm", get_all))]
 pub struct MultishotResponse {
     /// The requested readout registers and their final values for each shot.
     #[serde(flatten)]
@@ -138,21 +154,30 @@ pub struct MultishotResponse {
 /// The request body needed for a [`run_and_measure`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm"))]
 pub struct MultishotMeasureRequest {
     /// The Quil program to run.
+    #[pyo3(get)]
     pub compiled_quil: String,
     /// The number of trials ("shots") to run the program.
+    #[pyo3(get)]
     pub trials: NonZeroU16,
     /// Qubits to measure
+    #[pyo3(get)]
     pub qubits: Vec<u64>,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -184,13 +209,19 @@ impl MultishotMeasureRequest {
 /// The request body needed for a [`measure_expectation`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm"))]
 pub struct ExpectationRequest {
     /// A Quil program defining the state.
+    #[pyo3(get)]
     pub state_preparation: String,
     /// A list of Pauli operators to measure.
+    #[pyo3(get)]
     pub operators: Vec<String>,
     /// An optional seed for the random number generator.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -212,17 +243,24 @@ impl ExpectationRequest {
 /// The request body needed to make a [`get_wavefunction`] request to the QVM.
 #[derive(Serialize, Debug, Clone, PartialEq)]
 #[serde(rename_all = "kebab-case")]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm"))]
 pub struct WavefunctionRequest {
     /// The Quil program to run.
+    #[pyo3(get)]
     pub compiled_quil: String,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[pyo3(get)]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,
@@ -414,7 +452,7 @@ mod describe_request {
         let request = MultishotRequest::new(
             "H 0".to_string(),
             NonZeroU16::new(10).expect("value is non-zero"),
-            [("ro".to_string(), AddressRequest::IncludeAll)]
+            [("ro".to_string(), AddressRequest::IncludeAll())]
                 .iter()
                 .cloned()
                 .collect(),

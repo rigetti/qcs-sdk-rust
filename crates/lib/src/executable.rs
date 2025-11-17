@@ -7,6 +7,9 @@ use std::num::NonZeroU16;
 use std::sync::Arc;
 use std::time::Duration;
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass_enum;
+
 use qcs_api_client_common::configuration::LoadError;
 use quil_rs::quil::ToQuilError;
 
@@ -380,7 +383,7 @@ impl Executable<'_, '_> {
                 self.shots,
                 self.get_readouts()
                     .iter()
-                    .map(|address| (address.to_string(), AddressRequest::IncludeAll))
+                    .map(|address| (address.to_string(), AddressRequest::IncludeAll()))
                     .collect(),
                 &self.params,
                 client,
@@ -678,6 +681,8 @@ pub enum Error {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
 /// The external services that this SDK may connect to. Used to differentiate between networking
 /// issues in [`Error::Connection`].
 pub enum Service {

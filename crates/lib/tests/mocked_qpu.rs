@@ -35,10 +35,10 @@ async fn test_qcs_against_mocks() {
     for _ in 0..3 {
         // Test direct access
         handles.push(tokio::spawn(run_bell_state(
-            ConnectionStrategy::DirectAccess,
+            ConnectionStrategy::DirectAccess(),
         )));
         // Check gateway access
-        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway)));
+        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway())));
     }
 
     // Ensure both access methods were cached
@@ -208,8 +208,8 @@ mod mock_qcs {
                 warp::reply::json(&rsp)
             });
 
-        let quantum_processors = warp::path("quantumProcessors")
-            .and(isa.or(default_endpoint).or(accessors));
+        let quantum_processors =
+            warp::path("quantumProcessors").and(isa.or(default_endpoint).or(accessors));
 
         warp::serve(warp::path("v1").and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))

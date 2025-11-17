@@ -9,31 +9,87 @@ keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
 categories = ["api-bindings", "compilers", "science", "emulators"]
 readme = "./README.md"
 
+[lib]
+name = "qcs"
+crate-type = ["cdylib", "rlib"]
+
 [features]
 manual-tests = []
-tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/tracing", "qcs-api-client-openapi/tracing"]
-tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
+tracing = [
+    "dep:tracing",
+    "qcs-api-client-common/tracing",
+    "qcs-api-client-grpc/tracing",
+    "qcs-api-client-openapi/tracing",
+]
+tracing-config = [
+    "tracing",
+    "qcs-api-client-common/tracing-config",
+    "qcs-api-client-grpc/tracing-config",
+    "qcs-api-client-openapi/tracing-config",
+]
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
-tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
-python = ["dep:pyo3"]
+tracing-opentelemetry = [
+    "tracing-config",
+    "qcs-api-client-grpc/tracing-opentelemetry",
+    "qcs-api-client-openapi/tracing-opentelemetry",
+]
+python = [
+  "dep:futures-util",
+  "dep:numpy",
+  "dep:paste",
+  "dep:prost",
+  "dep:pyo3",
+  "dep:pyo3-async-runtimes",
+  "dep:pyo3-build-config",
+  "dep:pyo3-log",
+  # "dep:pyo3-opentelemetry",
+  # "dep:pyo3-tracing-subscriber",
+  "experimental",
+  "tracing-opentelemetry",
+  "quil-rs/python",
+]
+stubs = [
+  "python",
+  "dep:pyo3-stub-gen",
+  "quil-rs/stubs",
+]
 experimental = []
 
 [dependencies]
+async-trait = "0.1.73"
 cached = "0.44.0"
+derive_builder = "0.12.0"
 enum-as-inner = "0.5.1"
 futures = "0.3.24"
 indexmap = "2.2.6"
+itertools = "0.11.0"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
+
+libquil-sys = { version = "0.4.0", optional = true }
+numpy = { workspace = true, optional = true }
 opentelemetry = { workspace = true }
 opentelemetry_sdk = { workspace = true }
+optipy = "0.1.0"
+paste = { version = "1.0.15", optional = true }
 pbjson-types = "0.7.0"
+prost = { version = "0.13.3", optional = true }
+futures-util = { version = "0.3.24", optional = true }
+
 pyo3 = { workspace = true, optional = true }
+pyo3-async-runtimes = { workspace = true, optional = true }
+pyo3-log = { workspace = true, optional = true }
+# pyo3-opentelemetry = { workspace = true, optional = true }
+# pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
+
+# Enabled with the "stubs" feature.
+pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
+
 qcs-api-client-common.workspace = true
-qcs-api-client-openapi.workspace = true
 qcs-api-client-grpc.workspace = true
+qcs-api-client-openapi.workspace = true
 quil-rs.workspace = true
 reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
@@ -42,34 +98,34 @@ serde_json.workspace = true
 thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 toml = "0.7.3"
+tonic = { version = "0.12.3", features = ["tls", "tls-roots"] }
 tracing = { version = "0.1", optional = true, features = ["log"] }
 uuid = { version = "1.2.1", features = ["v4"] }
-tonic = { version = "0.12.3", features = ["tls", "tls-roots"] }
 zmq = { version = "0.10.0" }
-itertools = "0.11.0"
-derive_builder = "0.12.0"
-async-trait = "0.1.73"
-libquil-sys = { version = "0.4.0", optional = true }
 
-[dev-dependencies]
-erased-serde = "0.3.23"
-float-cmp = "0.9.0"
-hex = "0.4.3"
-maplit = "1.0.2"
-qcs-api-client-grpc = { workspace = true, features = ["server"] }
-simple_logger = { version = "4.1.0", default-features = false }
-tempfile = "3.3.0"
-tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
-warp = { version = "0.3.3", default-features = false }
-regex = "1.7.0"
-test-case = "3.1.0"
-tracing-subscriber = "0.3.17"
-rstest = "0.17.0"
-insta = "1.29.0"
-assert2 = "0.3.11"
+# TODO: quil-rs somehow was published with 7.0.1, even though it uses features from 7.0.5.
+lexical = "7.0.5"
 
 [build-dependencies]
 built = "0.6.1"
+pyo3-build-config = { workspace = true, optional = true }
+
+[dev-dependencies]
+assert2 = "0.3.11"
+erased-serde = "0.3.23"
+float-cmp = "0.9.0"
+hex = "0.4.3"
+insta = "1.29.0"
+maplit = "1.0.2"
+qcs-api-client-grpc = { workspace = true, features = ["server"] }
+regex = "1.7.0"
+rstest = "0.17.0"
+simple_logger = { version = "4.1.0", default-features = false }
+tempfile = "3.3.0"
+test-case = "3.1.0"
+tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = "0.3.17"
+warp = { version = "0.3.3", default-features = false }
 
 [[example]]
 name = "compilation-and-simulation-with-libquil"

@@ -1,9 +1,6 @@
 # Cargo / rustc artifacts
 /target
 
-# Python artifacts
-__pycache__/
-
 # Local config
 .env
 .envrc
@@ -30,11 +27,9 @@ qcs-api/docs
 # Python artifacts
 **/__pycache__
 **/null-ls-cache*
-crates/python/.hypothesis
-crates/python/qcs_sdk/*.so
-crates/python/build
-
-crates/python/tests/__output__/
+crates/lib/.hypothesis
+crates/lib/python/qcs_sdk/*.so
+crates/lib/tests/__output__/
 
 # unversioned developer notes
 scratch/

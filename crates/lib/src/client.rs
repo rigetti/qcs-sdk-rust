@@ -27,6 +27,9 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass;
+
 const DEFAULT_MAX_MESSAGE_ENCODING_SIZE: usize = 50 * 1024 * 1024;
 const DEFAULT_MAX_MESSAGE_DECODING_SIZE: usize = 50 * 1024 * 1024;
 
@@ -61,6 +64,11 @@ pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// A client providing helper functionality for accessing QCS APIs
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.client", name = "QCSClient", eq)
+)]
 pub struct Qcs {
     config: ClientConfiguration,
 }

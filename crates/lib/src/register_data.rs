@@ -2,6 +2,9 @@ use enum_as_inner::EnumAsInner;
 use num::complex::Complex32;
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass_complex_enum;
+
 /// Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`)
 ///
 /// This represents a single vector (or "register") of typed memory across some number of shots.
@@ -25,6 +28,11 @@ use serde::{Deserialize, Serialize};
 /// convert any variant type to its inner data.
 #[derive(Clone, Debug, Deserialize, EnumAsInner, PartialEq, Serialize)]
 #[serde(untagged)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk", eq, frozen, get_all)
+)]
 pub enum RegisterData {
     /// Corresponds to the Quil `BIT` or `OCTET` types.
     I8(Vec<Vec<i8>>),

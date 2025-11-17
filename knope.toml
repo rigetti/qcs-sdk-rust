@@ -2,15 +2,15 @@
 versioned_files = [
     "crates/lib/Cargo.toml",
     "Cargo.lock",
-    { path = "crates/python/Cargo.toml", dependency = "qcs" },
+    # { path = "crates/python/Cargo.toml", dependency = "qcs" },
 ]
 changelog = "crates/lib/CHANGELOG.md"
-scopes = ["lib", "rust"]
+scopes = ["lib", "rust", "python"]
 
-[packages.python]
-versioned_files = ["crates/python/Cargo.toml", "crates/python/pyproject.toml"]
-changelog = "crates/python/CHANGELOG.md"
-scopes = ["python"]
+# [packages.python]
+# versioned_files = ["crates/python/Cargo.toml", "crates/python/pyproject.toml"]
+# changelog = "crates/python/CHANGELOG.md"
+# scopes = ["python"]
 
 [[workflows]]
 name = "release"
