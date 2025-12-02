@@ -3069,7 +3069,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-sdk-python"
-version = "0.21.20"
+version = "0.21.21"
 dependencies = [
  "async-trait",
  "futures-util",

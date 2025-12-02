@@ -208,8 +208,8 @@ mod mock_qcs {
                 warp::reply::json(&rsp)
             });
 
-        let quantum_processors = warp::path("quantumProcessors")
-            .and(isa.or(default_endpoint).or(accessors));
+        let quantum_processors =
+            warp::path("quantumProcessors").and(isa.or(default_endpoint).or(accessors));
 
         warp::serve(warp::path("v1").and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))
