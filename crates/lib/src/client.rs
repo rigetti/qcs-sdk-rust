@@ -3,7 +3,6 @@
 //! initialize those clients (e.g. with authentication metadata).
 
 use std::time::Duration;
-use std::usize;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, TokenError};
 #[cfg(feature = "tracing")]
@@ -28,8 +27,8 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
-/// The maximum size of a gRPC response to the translation service, in bytes.
-const MAX_TRANSLATION_REQUEST_SIZE: usize = 50 * 1024 * 1024;
+/// The maximum size of a gRPC request to the translation service, in bytes.
+const MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE: usize = 50 * 1024 * 1024;
 
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
@@ -138,9 +137,10 @@ impl Qcs {
         #[cfg(feature = "grpc-web")]
         let channel = wrap_channel_with_grpc_web(service);
         Ok(TranslationClient::new(channel)
-            .max_encoding_message_size(MAX_TRANSLATION_REQUEST_SIZE)
-            // do not limit the received response size - practically, the limit is 4Gb.
-            .max_decoding_message_size(usize::MAX))
+            .max_encoding_message_size(MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE)
+            // do not limit the received response size, although practically the limit is 4Gb due
+            // to the frame_length of the message being a u32.
+            .max_decoding_message_size(u32::MAX as usize))
     }
 }
 
