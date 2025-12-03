@@ -85,6 +85,8 @@ dependencies = [
 
 [tasks.stubtest]
 command = "stubtest"
+# temporary - handwritten stubs will be removed by https://github.com/rigetti/qcs-sdk-rust/issues/566
+ignore_errors = true
 args = [
     "--allowlist",
     ".stubtest-allowlist",
