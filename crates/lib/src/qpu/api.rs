@@ -44,8 +44,8 @@ use crate::executable::Parameters;
 
 use crate::client::{GrpcClientError, GrpcConnection, Qcs};
 
-/// The maximum size of a gRPC response, in bytes.
-const MAX_DECODING_MESSAGE_SIZE_BYTES: usize = 250 * 1024 * 1024;
+/// The maximum size of a gRPC request to the controller service, in bytes.
+const MAX_CONTROLLER_OUTBOUND_REQUEST_SIZE: usize = 250 * 1024 * 1024;
 
 pub(crate) fn params_into_job_execution_configuration(
     params: &Parameters,
@@ -539,7 +539,10 @@ pub trait ExecutionTarget<'a> {
             .get_qpu_grpc_connection(client, quantum_processor_id)
             .await?;
         Ok(ControllerClient::new(service)
-            .max_decoding_message_size(MAX_DECODING_MESSAGE_SIZE_BYTES))
+            .max_encoding_message_size(MAX_CONTROLLER_OUTBOUND_REQUEST_SIZE)
+            // do not limit the received response size, although practically the limit is 4Gb due
+            // to the frame_length of the message being a u32.
+            .max_decoding_message_size(u32::MAX as usize))
     }
 
     /// Get a GRPC connection to a QPU, without specifying the API to use.
