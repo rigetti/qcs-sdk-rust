@@ -1,3 +1,10 @@
+## 0.21.22 (2025-12-03)
+
+### Fixes
+
+- increase gRPC max response size to 4GB (#568)
+- temporarily ignore stubtest errors, anticipating #566 (#569)
+
 ## 0.21.22-rc.1 (2025-12-03)
 
 ### Fixes
