@@ -1,3 +1,9 @@
+## 0.21.22-rc.0 (2025-12-03)
+
+### Fixes
+
+- increase gRPC max response size to 4GB (#568)
+
 ## 0.21.21 (2025-10-31)
 
 ### Fixes
