@@ -4,7 +4,7 @@ use qcs_api_client_common::configuration::{
     ExternallyManaged, OAuthSession, RefreshToken,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_type,
+    create_init_submodule, py_async, py_function_sync_async, py_wrap_error, py_wrap_type,
     pyo3::{
         conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods, PyObject,
         PyResult, Python,
@@ -13,6 +13,9 @@ use rigetti_pyo3::{
 };
 
 use qcs::client::{self, Qcs};
+use tokio_util::sync::CancellationToken;
+
+use crate::py_sync;
 
 create_init_submodule! {
     classes: [
@@ -113,6 +116,37 @@ impl PyQcsClient {
                 .map_err(RustLoadClientError::to_py_err)?,
             None => Self(Qcs::load()),
         })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
+        let cancel_token = CancellationToken::new();
+        let cancel_token_ctrl_c = cancel_token.clone();
+        tokio::spawn(cancel_token.clone().run_until_cancelled(async move {
+            tokio::signal::ctrl_c().await;
+            cancel_token_ctrl_c.cancel();
+        }));
+
+        py_sync!(py, Qcs::with_login(cancel_token, profile_name))
+            .map(PyQcsClient)
+            .map_err(RustLoadClientError)
+            .map_err(RustLoadClientError::to_py_err)?
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
+        let cancel_token = CancellationToken::new();
+        let cancel_token_ctrl_c = cancel_token.clone();
+        tokio::spawn(cancel_token.clone().run_until_cancelled(async move {
+            tokio::signal::ctrl_c().await;
+            cancel_token_ctrl_c.cancel();
+        }));
+
+        py_async!(py, Qcs::with_login(cancel_token, profile_name))
+            .map_err(RustLoadClientError)
+            .map_err(RustLoadClientError::to_py_err)?
     }
 
     #[getter]
