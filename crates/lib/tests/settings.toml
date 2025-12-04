@@ -10,4 +10,4 @@ grpc_api_url = "http://localhost:8003"
 [auth_servers]
 [auth_servers.default]
 client_id = "default_client_id"
-issuer = "http://localhost:8001"
+issuer = "https://localhost:8001"
