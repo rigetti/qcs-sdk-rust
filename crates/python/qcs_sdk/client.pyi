@@ -52,7 +52,7 @@ class QCSClient:
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
 
-        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment.
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment.
 
         See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
         for more details.
@@ -73,7 +73,7 @@ class QCSClient:
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
 
-        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment or if the PKCE login flow fails.
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
 
         See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
         for more details.
@@ -94,7 +94,7 @@ class QCSClient:
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
 
-        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment or if the PKCE login flow fails.
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
 
         See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
         for more details.
