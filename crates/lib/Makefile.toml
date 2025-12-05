@@ -70,7 +70,7 @@ args = ["run", "maturin", "develop", "--features", "python"]
 
 [tasks.install-python-package-with-stubs]
 description = "Install the Python package with up-to-date stubs (not needed for testing)."
-dependencies = ["generate-stubs", "install-quil"]
+dependencies = ["generate-stubs", "install-python-package"]
 
 [tasks.pytest]
 description = "Run Python tests."
