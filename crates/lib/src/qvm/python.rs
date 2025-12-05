@@ -7,8 +7,8 @@ use pyo3::{prelude::*, types::PyList, Py};
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
 use crate::{
-    python::{errors, impl_repr, py_function_sync_async, NonZeroU16},
-    qvm::{self, http, Error, QvmOptions, QvmResultData},
+    python::{NonZeroU16, errors, impl_repr, py_function_sync_async},
+    qvm::{self, Error, QvmOptions, QvmResultData, http},
     register_data::RegisterData,
 };
 
@@ -225,6 +225,31 @@ impl QvmResultData {
     }
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl http::MultishotRequest {
+    // This is defined explicitly in order to override the generated stubtype.
+    #[getter]
+    #[gen_stub(override_return_type(type_repr = "builtins.int"))]
+    fn trials(&self) -> NonZeroU16 {
+        NonZeroU16(self.trials)
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl http::MultishotMeasureRequest {
+    // This is defined explicitly in order to override the generated stubtype.
+    #[getter]
+    #[gen_stub(override_return_type(type_repr = "builtins.int"))]
+    fn trials(&self) -> NonZeroU16 {
+        NonZeroU16(self.trials)
+    }
+}
+
+
 py_function_sync_async! {
     #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm"))]
@@ -391,3 +416,4 @@ mod api {
         }
     }
 }
+

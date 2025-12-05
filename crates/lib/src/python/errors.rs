@@ -5,6 +5,7 @@ use qcs_api_client_common::configuration;
 
 /// Create a new Python exception using the correct macro
 /// based on whether the "stubs" features is active.
+#[allow(unused_macro_rules)]
 macro_rules! create_exception {
     ( $module:expr, $py_err: ident, $base: ty ) => {
         create_exception!($module, $py_err, $base, "");

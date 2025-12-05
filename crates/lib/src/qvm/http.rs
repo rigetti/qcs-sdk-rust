@@ -70,7 +70,7 @@ pub struct MultishotRequest {
     #[pyo3(get)]
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
-    #[pyo3(get)]
+    // This also has a Python getter method, but it's defined directly to set the stub return type.
     pub trials: NonZeroU16,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -162,7 +162,7 @@ pub struct MultishotMeasureRequest {
     #[pyo3(get)]
     pub compiled_quil: String,
     /// The number of trials ("shots") to run the program.
-    #[pyo3(get)]
+    // This also has a Python getter method, but it's defined directly to set the stub return type.
     pub trials: NonZeroU16,
     /// Qubits to measure
     #[pyo3(get)]

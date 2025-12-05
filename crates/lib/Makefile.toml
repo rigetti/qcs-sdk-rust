@@ -53,7 +53,7 @@ args = ["install", "--extras", "dev", "--no-root"]
 [tasks.generate-stubs]
 description = "Generate Python stub files."
 command = "cargo"
-args = ["run", "-p", "python", "--features", "stubs", "--bin", "stub_gen"]
+args = ["run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
 install_crate = false
 
 [tasks.package-python]
@@ -92,8 +92,8 @@ dependencies = ["install-python-package-with-stubs"]
 command = "poetry"
 cwd = "python"
 args = [
-    "run", 
-    "stubtest", 
+    "run",
+    "stubtest",
     "--allowlist",
     ".stubtest-allowlist",
     "--allowlist",
@@ -144,7 +144,7 @@ args = [
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
-    "!qcs_sdk.qcs_sdk", 
+    "!qcs_sdk.qcs_sdk",
     "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg",
 ]
 
