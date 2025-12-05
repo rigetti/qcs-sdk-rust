@@ -97,7 +97,7 @@ async fn run_bell_state(connection_strategy: ConnectionStrategy) {
 mod mock_oauth2 {
     use oauth2_test_server::{Client, IssuerConfig, OAuthTestServer};
 
-    /// A test harness for serving a valid oauth2 server for testing.
+    /// A test harness for serving a valid oauth2 issuer, including the well-known endpoint.
     pub(super) async fn run() -> Result<(), JoinError> {
         const SCHEME: &str = "http";
         const HOST: &str = "localhost";
@@ -121,7 +121,7 @@ mod mock_oauth2 {
         server.register_client(serde_json::json!({
             "scope": "openid",
             "redirect_uris": [format!("{SCHEME}://{HOST}:{port}")],
-            "client_name": "PkceTestServerHarness"
+            "client_name": "mock_oauth2"
         }));
 
         server.wait_for_shutdown().await
