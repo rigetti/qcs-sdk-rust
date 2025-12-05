@@ -3,9 +3,9 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.12.11"
-qcs-api-client-grpc = "0.12.11"
-qcs-api-client-openapi = "0.13.12"
+qcs-api-client-common = "0.12.12"
+qcs-api-client-grpc = "0.12.12"
+qcs-api-client-openapi = "0.13.13"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
@@ -35,6 +35,9 @@ pyo3-tracing-subscriber = { version = "0.2.0", default-features = false }
 
 pyo3-build-config = "0.20.0"
 rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
+
+# keep pinned until this crate matures
+oauth2-test-server = "=0.1.2"
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.

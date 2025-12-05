@@ -59,7 +59,7 @@ async fn setup() {
     std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
     tokio::spawn(qpu::run());
     tokio::spawn(translation::run());
-    tokio::spawn(auth_server::run());
+    tokio::spawn(mock_oauth2::run());
     tokio::spawn(mock_qcs::run());
 }
 
@@ -94,35 +94,37 @@ async fn run_bell_state(connection_strategy: ConnectionStrategy) {
     assert_eq!(result.duration, Some(Duration::from_micros(8675)));
 }
 
-#[allow(dead_code)]
-mod auth_server {
-    use serde::{Deserialize, Serialize};
-    use warp::Filter;
+mod mock_oauth2 {
+    use oauth2_test_server::{Client, IssuerConfig, OAuthTestServer};
 
-    #[derive(Debug, Deserialize)]
-    struct TokenRequest {
-        grant_type: String,
-        client_id: String,
-        refresh_token: String,
-    }
+    /// A test harness for serving a valid oauth2 server for testing.
+    pub(super) async fn run() -> Result<(), JoinError> {
+        const SCHEME: &str = "http";
+        const HOST: &str = "localhost";
+        const PORT: u16 = 8001;
 
-    #[derive(Serialize, Debug)]
-    struct TokenResponse {
-        refresh_token: &'static str,
-        access_token: &'static str,
-    }
+        let mut server = OAuthTestServer::start_with_config(IssuerConfig {
+            scheme: SCHEME.to_string(),
+            host: HOST.to_string(),
+            port: PORT,
+            ..Default::default()
+        })
+        .await;
 
-    pub(crate) async fn run() {
-        let token = warp::post()
-            .and(warp::path("v1").and(warp::path("token")))
-            .and(warp::body::form())
-            .map(|_request: TokenRequest| {
-                warp::reply::json(&TokenResponse {
-                    refresh_token: "refreshed",
-                    access_token: "accessed",
-                })
-            });
-        warp::serve(token).run(([127, 0, 0, 1], 8001)).await;
+        // The library is very young and seems to swap these for some reason..!
+        // ... and yes, `regsiter` is misspelled.
+        std::mem::swap(
+            &mut server.endpoints.authorize,
+            &mut server.endpoints.regsiter,
+        );
+
+        server.register_client(serde_json::json!({
+            "scope": "openid",
+            "redirect_uris": [format!("{SCHEME}://{HOST}:{port}")],
+            "client_name": "PkceTestServerHarness"
+        }));
+
+        server.wait_for_shutdown().await
     }
 }
 
