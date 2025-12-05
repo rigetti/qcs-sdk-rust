@@ -74,16 +74,16 @@
                                 <a class="function" href="#ResultData.to_qvm">to_qvm</a>
                         </li>
                         <li>
-                                <a class="function" href="#ResultData.from_qvm">from_qvm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.from_qpu">from_qpu</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ResultData.to_register_map">to_register_map</a>
                         </li>
                         <li>
                                 <a class="function" href="#ResultData.to_raw_readout_data">to_raw_readout_data</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ResultData.from_qvm">from_qvm</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ResultData.from_qpu">from_qpu</a>
                         </li>
                 </ul>
 
@@ -188,13 +188,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExeParameter.name">name</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExeParameter.index">index</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.value">value</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.name">name</a>
                         </li>
                 </ul>
 
@@ -275,16 +275,16 @@
                                 <a class="function" href="#RegisterData.to_complex32">to_complex32</a>
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.from_i16">from_i16</a>
+                                <a class="function" href="#RegisterData.from_complex32">from_complex32</a>
                         </li>
                         <li>
                                 <a class="function" href="#RegisterData.from_i8">from_i8</a>
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
+                                <a class="function" href="#RegisterData.from_i16">from_i16</a>
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.from_complex32">from_complex32</a>
+                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
                         </li>
                 </ul>
 
@@ -302,10 +302,10 @@
                                 <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
@@ -603,36 +603,6 @@ program to choose the correct readout values for each shot.</p>
 
 
                             </div>
-                            <div id="ResultData.from_qvm" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QVMResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.from_qvm"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qvm</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.from_qpu" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QPUResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.from_qpu"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qpu</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
                             <div id="ResultData.to_register_map" class="classattr">
                                 <div class="attr function">
             
@@ -674,6 +644,36 @@ selects the last value per-shot based on the program that was run.</p>
     
             <div class="docstring"><p>Get the raw data returned from the QVM or QPU. See <code>RawQPUReadoutData</code> and
 <code>RawQVMReadoutData</code> for more information.</p>
+</div>
+
+
+                            </div>
+                            <div id="ResultData.from_qvm" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QVMResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ResultData.from_qvm"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qvm</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
+</div>
+
+
+                            </div>
+                            <div id="ResultData.from_qpu" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QPUResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ResultData.from_qpu"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qpu</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
 </div>
 
 
@@ -1196,6 +1196,17 @@ the default endpoint for the given quantum_processor_id is used.</li>
 </div>
 
 
+                            <div id="ExeParameter.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span><span class="annotation">: str</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.name"></a>
+    
+    
+
+                            </div>
                             <div id="ExeParameter.index" class="classattr">
                                 <div class="attr variable">
             <span class="name">index</span><span class="annotation">: int</span>
@@ -1214,17 +1225,6 @@ the default endpoint for the given quantum_processor_id is used.</li>
         
     </div>
     <a class="headerlink" href="#ExeParameter.value"></a>
-    
-    
-
-                            </div>
-                            <div id="ExeParameter.name" class="classattr">
-                                <div class="attr variable">
-            <span class="name">name</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.name"></a>
     
     
 
@@ -1577,17 +1577,17 @@ which publishes the data.</p>
 
 
                             </div>
-                            <div id="RegisterData.from_i16" class="classattr">
+                            <div id="RegisterData.from_complex32" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
+        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
 
         
     </div>
-    <a class="headerlink" href="#RegisterData.from_i16"></a>
+    <a class="headerlink" href="#RegisterData.from_complex32"></a>
     
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I16</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::Complex32</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
 </div>
 
 
@@ -1607,6 +1607,21 @@ which publishes the data.</p>
 
 
                             </div>
+                            <div id="RegisterData.from_i16" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.from_i16"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I16</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+</div>
+
+
+                            </div>
                             <div id="RegisterData.as_ndarray" class="classattr">
                                 <div class="attr function">
             
@@ -1618,21 +1633,6 @@ which publishes the data.</p>
     <a class="headerlink" href="#RegisterData.as_ndarray"></a>
     
             <div class="docstring"><p>Returns the values as an <code>ndarray</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.from_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.from_complex32"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::Complex32</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
 </div>
 
 
@@ -1689,17 +1689,6 @@ which publishes the data.</p>
     
 
                             </div>
-                            <div id="QCSClient.quilc_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">quilc_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.quilc_url"></a>
-    
-    
-
-                            </div>
                             <div id="QCSClient.qvm_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">qvm_url</span>
@@ -1707,6 +1696,17 @@ which publishes the data.</p>
         
     </div>
     <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+    
+
+                            </div>
+                            <div id="QCSClient.quilc_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quilc_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.quilc_url"></a>
     
     
 
