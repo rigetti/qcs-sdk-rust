@@ -55,8 +55,10 @@ async fn test_qcs_against_mocks() {
 
 async fn setup() {
     simple_logger::init_with_env().unwrap();
-    std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
-    std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
+    unsafe {
+        std::env::set_var(SETTINGS_PATH_VAR, "tests/settings.toml");
+        std::env::set_var(SECRETS_PATH_VAR, "tests/secrets.toml");
+    }
     tokio::spawn(qpu::run());
     tokio::spawn(translation::run());
     tokio::spawn(mock_oauth2::run());
@@ -95,7 +97,8 @@ async fn run_bell_state(connection_strategy: ConnectionStrategy) {
 }
 
 mod mock_oauth2 {
-    use oauth2_test_server::{Client, IssuerConfig, OAuthTestServer};
+    use oauth2_test_server::{IssuerConfig, OAuthTestServer};
+    use tokio::task::JoinError;
 
     /// A test harness for serving a valid oauth2 issuer, including the well-known endpoint.
     pub(super) async fn run() -> Result<(), JoinError> {
@@ -113,7 +116,7 @@ mod mock_oauth2 {
 
         server.register_client(serde_json::json!({
             "scope": "openid",
-            "redirect_uris": [format!("{SCHEME}://{HOST}:{port}")],
+            "redirect_uris": [format!("{SCHEME}://{HOST}:{PORT}")],
             "client_name": "mock_oauth2"
         }));
 
