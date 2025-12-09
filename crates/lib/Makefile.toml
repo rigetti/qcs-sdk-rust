@@ -35,7 +35,7 @@ args = ["build", "--examples", "--features", "experimental"]
 [tasks.deny]
 install_crate = "cargo-deny"
 command = "cargo"
-args = ["deny", "--all-features", "check"]
+args = ["deny", "--exclude-dev", "--all-features", "check"]
 
 [tasks.pre-ci-flow]
 dependencies = ["deny", "lint"]

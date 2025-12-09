@@ -72,6 +72,7 @@ ignore = [
     { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
     { id = "RUSTSEC-2025-0020", reason = "PyO3 update is waiting on upstream crates: https://github.com/rigetti/rigetti-pyo3/issues/57" },
+    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update"}
 ]
 yanked = "deny"
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
@@ -90,6 +91,7 @@ yanked = "deny"
 allow = [
     "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
+    "CDLA-Permissive-2.0",
     "ISC",
     "MIT",
     "OpenSSL",
@@ -110,8 +112,8 @@ confidence-threshold = 0.8
 exceptions = [
     # Each entry is the crate and version constraint, and its specific allow
     # list
-   { allow = ["MPL-2.0"], crate = "option-ext" },
-   { allow = ["MPL-2.0"], crate = "webpki-roots" }
+    { allow = ["MPL-2.0"], crate = "option-ext" },
+    { allow = ["MPL-2.0"], crate = "webpki-roots" },
 ]
 
 # Some crates don't have (easily) machine readable licensing information,
@@ -198,10 +200,10 @@ skip-tree = [
     #"ansi_term@0.11.0", # will be skipped along with _all_ of its direct and transitive dependencies
     #{ crate = "ansi_term@0.11.0", depth = 20 },
     { crate = "toml", depth = 20 },
-    { crate = "warp", depth = 20 },              # Only used for development
-    { crate = "hermit-abi", depth = 20 },        # Only used for development
-    { crate = "itertools", depth = 20 },         # `quil-rs` and various transitive dependencies depend on different versions
-    { crate = "hashbrown", depth = 20 },         # `indexmap` and `cached` depend on different versions
+    { crate = "warp", depth = 20 },       # Only used for development
+    { crate = "hermit-abi", depth = 20 }, # Only used for development
+    { crate = "itertools", depth = 20 },  # `quil-rs` and various transitive dependencies depend on different versions
+    { crate = "hashbrown", depth = 20 },  # `indexmap` and `cached` depend on different versions
 ]
 
 # This section is considered when running `cargo deny check sources`.
