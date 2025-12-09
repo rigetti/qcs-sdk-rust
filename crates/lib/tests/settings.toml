@@ -4,10 +4,10 @@ default_profile_name = "default"
 [profiles.default]
 auth_server_name = "default"
 credentials_name = "default"
-api_url = "http://localhost:8000"
-grpc_api_url = "http://localhost:8003"
+api_url = "http://127.0.0.1:8000"
+grpc_api_url = "http://127.0.0.1:8003"
 
 [auth_servers]
 [auth_servers.default]
 client_id = "default_client_id"
-issuer = "http://localhost:8001"
+issuer = "http://127.0.0.1:8001"

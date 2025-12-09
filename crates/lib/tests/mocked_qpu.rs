@@ -103,7 +103,7 @@ mod mock_oauth2 {
     /// A test harness for serving a valid oauth2 issuer, including the well-known endpoint.
     pub(super) async fn run() -> Result<(), JoinError> {
         const SCHEME: &str = "http";
-        const HOST: &str = "localhost";
+        const HOST: &str = "127.0.0.1";
         const PORT: u16 = 8001;
 
         let mut server = OAuthTestServer::start_with_config(IssuerConfig {
