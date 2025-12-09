@@ -111,13 +111,6 @@ mod mock_oauth2 {
         })
         .await;
 
-        // The library is very young and seems to swap these for some reason..!
-        // ... and yes, `regsiter` is misspelled.
-        std::mem::swap(
-            &mut server.endpoints.authorize,
-            &mut server.endpoints.regsiter,
-        );
-
         server.register_client(serde_json::json!({
             "scope": "openid",
             "redirect_uris": [format!("{SCHEME}://{HOST}:{port}")],
