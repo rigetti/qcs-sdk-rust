@@ -43,16 +43,19 @@ python = [
   "dep:pyo3-async-runtimes",
   "dep:pyo3-build-config",
   "dep:pyo3-log",
-  # "dep:pyo3-opentelemetry",
-  # "dep:pyo3-tracing-subscriber",
+  "dep:pyo3-opentelemetry",
+  "dep:pyo3-tracing-subscriber",
   "experimental",
   "tracing-opentelemetry",
   "quil-rs/python",
+  "qcs-api-client-common/python",
 ]
 stubs = [
   "python",
   "dep:pyo3-stub-gen",
   "quil-rs/stubs",
+  "qcs-api-client-common/stubs",
+  "pyo3-tracing-subscriber/stubs",
 ]
 experimental = []
 
@@ -81,8 +84,8 @@ futures-util = { version = "0.3.24", optional = true }
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { workspace = true, optional = true }
 pyo3-log = { workspace = true, optional = true }
-# pyo3-opentelemetry = { workspace = true, optional = true }
-# pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
+pyo3-opentelemetry = { workspace = true, optional = true }
+pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
 
 # Enabled with the "stubs" feature.
 pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }

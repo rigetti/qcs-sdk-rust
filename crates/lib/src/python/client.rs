@@ -1,4 +1,10 @@
-use qcs_api_client_common::configuration::{self, ClientConfigurationBuilder};
+use qcs_api_client_common::configuration::{
+    self,
+    secrets::SecretRefreshToken,
+    settings::AuthServer,
+    tokens::{ClientCredentials, ExternallyManaged, OAuthSession, RefreshToken},
+    ClientConfigurationBuilder,
+};
 
 use pyo3::prelude::*;
 
@@ -6,24 +12,7 @@ use pyo3::prelude::*;
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
 use crate::client::Qcs;
-use crate::py_sync;
-use crate::python::{errors, py_function_sync_async};
-
-macro_rules! py_wrap {
-    (struct $name:ident ($py:ty)) => {
-        #[derive(Clone)]
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-        #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-        #[pyclass(module = "qcs_sdk.client")]
-        struct $name($py);
-    };
-}
-
-py_wrap!(struct OAuthSession(configuration::OAuthSession));
-py_wrap!(struct AuthServer(configuration::AuthServer));
-py_wrap!(struct RefreshToken(configuration::RefreshToken));
-py_wrap!(struct ClientCredentials(configuration::ClientCredentials));
-py_wrap!(struct ExternallyManaged(configuration::ExternallyManaged));
+use crate::python::{errors, py_function_sync_async, py_sync};
 
 #[pymodule]
 #[pyo3(name = "client", module = "qcs_sdk", submodule)]
@@ -41,6 +30,7 @@ pub(super) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<OAuthSession>()?;
     m.add_class::<AuthServer>()?;
     m.add_class::<RefreshToken>()?;
+    m.add_class::<SecretRefreshToken>()?;
     m.add_class::<ClientCredentials>()?;
     m.add_class::<ExternallyManaged>()?;
 
@@ -63,12 +53,6 @@ impl Qcs {
         qvm_url = None
     ))]
     fn __new__(
-        #[gen_stub(
-            override_type(
-                type_repr="OAuthSession",
-                imports=("qcs_api_client_common.configuration")
-            )
-        )]
         oauth_session: Option<OAuthSession>,
         api_url: Option<String>,
         grpc_api_url: Option<String>,
@@ -77,8 +61,8 @@ impl Qcs {
     ) -> PyResult<Self> {
         let mut builder = ClientConfigurationBuilder::default();
 
-        if let Some(oauth_session) = oauth_session {
-            builder.oauth_session(Some(oauth_session.0));
+        if oauth_session.is_some() {
+            builder.oauth_session(oauth_session);
         }
         if let Some(api_url) = api_url {
             builder.api_url(api_url);
@@ -148,7 +132,6 @@ impl Qcs {
             config
                 .oauth_session()
                 .await
-                .map(OAuthSession)
                 .map_err(errors::ClientError::token_error)
         })
     }
@@ -160,7 +143,6 @@ impl Qcs {
             config
                 .oauth_session()
                 .await
-                .map(OAuthSession)
                 .map_err(errors::ClientError::token_error)
         })
     }
@@ -182,7 +164,6 @@ py_function_sync_async! {
             .get_config()
             .oauth_session()
             .await
-            .map(OAuthSession)
             .map_err(errors::ClientError::token_error)
     }
 }

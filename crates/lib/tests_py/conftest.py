@@ -77,7 +77,7 @@ def device_2q() -> str:
 @pytest.fixture
 def native_bitflip_program() -> str:
     return """
-DECLARE ro BIT[0]
+DECLARE ro BIT[1]
 RX(pi) 0
 MEASURE 0 ro[0]
 """

@@ -32,7 +32,7 @@ pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
         py.get_type::<errors::TranslationError>(),
     )?;
 
-    m.add_class::<PyTranslationOptions>()?;
+    m.add_class::<TranslationOptions>()?;
     m.add_class::<PyTranslationResult>()?;
     m.add_class::<PyTranslationBackend>()?;
     m.add_class::<PyQCtrl>()?;
@@ -55,7 +55,7 @@ py_function_sync_async! {
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn get_quilt_calibrations(
         quantum_processor_id: String,
         client: Option<Qcs>,
@@ -65,7 +65,7 @@ py_function_sync_async! {
         let timeout = timeout.map(Duration::from_secs_f64);
         get_quilt_calibrations(quantum_processor_id, &client, timeout)
             .await
-            .map_err(Into::into)
+            .map_err(|err| TranslationError::from(err).into())
     }
 }
 
@@ -77,42 +77,26 @@ pub enum TranslationError {
     Serialization(#[from] serde_json::Error),
 }
 
-impl From<Error> for PyErr {
-    fn from(value: Error) -> Self {
-        let message = value.to_string();
-        match value {
-            Error::Grpc(_) => PyValueError::new_err(message),
-            Error::ClientTimeout(_) => PyValueError::new_err(message),
-        }
-    }
-}
-
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
-#[pyclass(module = "qcs_sdk.qpu.translation", name = "TranslationBackend")]
+#[pyclass(module = "qcs_sdk.qpu.translation", name = "TranslationBackend", eq)]
 pub enum PyTranslationBackend {
     V1,
     V2,
-}
-
-#[derive(Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "TranslationOptions", module = "qcs_sdk.qpu.translation")]
-pub(crate) struct PyTranslationOptions(TranslationOptions);
-
-impl PyTranslationOptions {
-    pub fn as_inner(&self) -> &TranslationOptions {
-        &self.0
-    }
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl TranslationOptions {
+    #[new]
+    fn __new__() -> Self {
+        Self::default()
+    }
+
     /// Get the backend used for translation
-    #[pyo3(name = "backend")]
+    #[getter("backend")]
     pub fn py_backend(&self) -> Option<PyTranslationBackend> {
         self.inner.translation_backend.map(|b| match b {
             ApiTranslationBackend::V1(_) => PyTranslationBackend::V1,
@@ -120,17 +104,23 @@ impl TranslationOptions {
         })
     }
 
+    /// Use the first-generation translation backend available on QCS since 2018.
     fn use_backend_v1(&mut self) {
         self.with_backend_v1();
     }
 
+    /// Use the second-generation translation backend available on QCS since 2023
     fn use_backend_v2(&mut self) {
         self.with_backend_v2();
     }
 
-    #[pyo3(signature = (q_ctrl = PyQCtrl::default()))]
-    fn use_q_ctrl(&mut self, q_ctrl: PyQCtrl) {
-        self.q_ctrl(*q_ctrl.as_inner());
+    #[pyo3(signature = (q_ctrl = None))]
+    fn use_q_ctrl(&mut self, q_ctrl: Option<&PyQCtrl>) {
+        if let Some(q_ctrl) = q_ctrl {
+            self.q_ctrl(*q_ctrl.as_inner());
+        } else {
+            self.q_ctrl(*PyQCtrl::default().as_inner());
+        }
     }
 
     #[pyo3(signature = (riverlane = PyRiverlane::default()))]
@@ -275,17 +265,15 @@ py_function_sync_async! {
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn translate(
         native_quil: String,
         num_shots: u32,
         quantum_processor_id: String,
         client: Option<Qcs>,
-        translation_options: Option<PyTranslationOptions>,
+        translation_options: Option<TranslationOptions>,
     ) -> PyResult<PyTranslationResult> {
         let client = client.unwrap_or_else(Qcs::load);
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-
         let result = crate::qpu::translation::translate(&quantum_processor_id, &native_quil, num_shots, &client, translation_options).with_current_context()
                 .map_err(TranslationError::from)
                 .await?;

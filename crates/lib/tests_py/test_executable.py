@@ -58,10 +58,10 @@ def test_execute_qvm(
 ):
     executable = Executable(bell_program, shots=1)
     results = executable.execute_on_qvm(qvm_http_client)
-    results = results.result_data.as_qvm()
+    results = results.result_data._0
 
     vals = results.memory["ro"]
-    shot = vals.as_i8()[0]
+    shot = vals._0[0]
     shot_value = shot[0]
 
     assert shot_value in [ 0, 1 ]

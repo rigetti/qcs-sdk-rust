@@ -5,7 +5,6 @@ use pyo3::{prelude::*, wrap_pymodule};
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
-use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use quil_rs::quil::Quil;
 
 use crate::{
@@ -17,7 +16,9 @@ use crate::{
         },
         rpcq,
     },
-    python::{errors, py_function_sync_async},
+    pickle::pickleable_new,
+    python::{errors, impl_repr, py_function_sync_async},
+    qpu::isa::python::PyInstructionSetArchitecture,
 };
 
 #[pymodule]
@@ -66,6 +67,8 @@ pub(crate) fn init_submodule_quilc(m: &Bound<'_, PyModule>) -> PyResult<()> {
     Ok(())
 }
 
+impl_repr!(NativeQuilMetadata);
+
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
@@ -85,11 +88,6 @@ impl CompilerOpts {
         Self::default()
     }
 }
-
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen)]
-struct PyInstructionSetArchitecture(InstructionSetArchitecture);
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
@@ -196,7 +194,7 @@ py_function_sync_async! {
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
     #[tracing::instrument(skip_all)]
-    // #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn compile_program(
         quil: String,
         target: TargetDevice,
@@ -205,7 +203,7 @@ py_function_sync_async! {
     ) -> PyResult<CompilationResult> {
         let client = client.inner.as_client();
         let options = options.unwrap_or_default();
-        client.compile_program(&quil, target.into(), options.into())
+        client.compile_program(&quil, target, options)
             .map(|result| CompilationResult {
                 program: result
                     .program
@@ -217,35 +215,33 @@ py_function_sync_async! {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
-#[pymethods]
-impl NativeQuilMetadata {
-    #[new]
-    #[allow(clippy::too_many_arguments)]
-    pub fn __new__(
-        final_rewiring: Option<Vec<u64>>,
-        gate_depth: Option<u64>,
-        gate_volume: Option<u64>,
-        multiqubit_gate_depth: Option<u64>,
-        program_duration: Option<f64>,
-        program_fidelity: Option<f64>,
-        topological_swaps: Option<u64>,
-        qpu_runtime_estimation: Option<f64>,
-    ) -> Self {
-        Self {
-            final_rewiring: final_rewiring.unwrap_or_default(),
-            gate_depth,
-            gate_volume,
-            multiqubit_gate_depth,
-            program_duration,
-            program_fidelity,
-            topological_swaps,
-            qpu_runtime_estimation,
+pickleable_new! {
+    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+    #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+    impl NativeQuilMetadata {
+        #[allow(clippy::too_many_arguments)]
+        pub fn __new__(
+            final_rewiring: Option<Vec<u64>>,
+            gate_depth: Option<u64>,
+            gate_volume: Option<u64>,
+            multiqubit_gate_depth: Option<u64>,
+            program_duration: Option<f64>,
+            program_fidelity: Option<f64>,
+            topological_swaps: Option<u64>,
+            qpu_runtime_estimation: Option<f64>,
+        ) -> Self {
+            Self {
+                final_rewiring: final_rewiring.unwrap_or_default(),
+                gate_depth,
+                gate_volume,
+                multiqubit_gate_depth,
+                program_duration,
+                program_fidelity,
+                topological_swaps,
+                qpu_runtime_estimation,
+            }
         }
     }
-
-    // TODO: pickle
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]

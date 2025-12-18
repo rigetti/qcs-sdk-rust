@@ -6,16 +6,16 @@ use tokio::sync::Mutex;
 use pyo3::prelude::*;
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pymethods};
+use tracing::instrument;
 
 use crate::{
     compiler::{python::PyQuilcClient, quilc::CompilerOpts},
     executable::Executable,
     execution_data::ExecutionData,
-    py_sync,
-    python::NonZeroU16,
+    python::{py_sync, NonZeroU16},
     qpu::{
         api::{ExecutionOptions, JobId},
-        translation::python::PyTranslationOptions,
+        translation::TranslationOptions,
     },
     qvm::python::PyQvmClient,
     JobHandle,
@@ -108,8 +108,8 @@ impl PyJobHandle {
     }
 }
 
-/// Invoke a PyExecutable's inner Executable::method with given arguments,
-/// then mapped to `Future<Output = Result<ExecutionData, ExecutionError>>`
+/// Invoke a `PyExecutable`'s inner `Executable::method` with given arguments,
+/// then mapped to `Future<Output = Result<ExecutionData, ExecutionError>>`.
 macro_rules! py_executable_data {
     ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
         let arc = $self.0.clone();
@@ -124,7 +124,7 @@ macro_rules! py_executable_data {
     }};
 }
 
-/// Invoke a PyExecutable's inner Executable::method with given arguments,
+/// Invoke a `PyExecutable`'s inner `Executable::method` with given arguments,
 /// then mapped to `Future<Output = Result<PyJobHandle, ExecutionError>>`
 macro_rules! py_job_handle {
     ($self: ident, $method: ident $(, $arg: expr)* $(,)?) => {{
@@ -142,22 +142,20 @@ macro_rules! py_job_handle {
     }};
 }
 
-// TODO: #[pyo3_opentelemetry::pypropagate(exclude(new), on_context_extraction_failure = "ignore")]
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-// TODO: #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyExecutable {
     #[new]
     #[pyo3(signature = (
         quil,
-        /,
         registers = Vec::new(),
         parameters = Vec::new(),
         shots = None,
         quilc_client = None,
         compiler_options = None,
     ))]
-    pub fn new(
+    pub(crate) fn __new__(
         quil: String,
         registers: Vec<String>,
         parameters: Vec<ExeParameter>,
@@ -188,12 +186,12 @@ impl PyExecutable {
     }
 }
 
-// TODO #[pyo3_opentelemetry::pypropagate(exclude(new), on_context_extraction_failure = "ignore")]
+#[pyo3_opentelemetry::pypropagate(on_context_extraction_failure = "ignore")]
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyExecutable {
-    // TODO: #[instrument(skip_all)]
+    #[instrument(skip_all)]
     pub fn execute_on_qvm<'py>(
         &self,
         py: Python<'py>,
@@ -202,7 +200,7 @@ impl PyExecutable {
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
-    // TODO: #[instrument(skip_all)]
+    #[instrument(skip_all)]
     pub fn execute_on_qvm_async<'py>(
         &self,
         py: Python<'py>,
@@ -220,10 +218,9 @@ impl PyExecutable {
         py: Python<'_>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
-        translation_options: Option<PyTranslationOptions>,
+        translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<ExecutionData> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -254,11 +251,9 @@ impl PyExecutable {
         py: Python<'py>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
-        translation_options: Option<PyTranslationOptions>,
+        translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-
         match endpoint_id {
             Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
                 py,
@@ -289,11 +284,9 @@ impl PyExecutable {
         py: Python<'_>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
-        translation_options: Option<PyTranslationOptions>,
+        translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<PyJobHandle> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-
         match endpoint_id {
             Some(endpoint_id) => py_sync!(
                 py,
@@ -324,11 +317,9 @@ impl PyExecutable {
         py: Python<'py>,
         quantum_processor_id: String,
         endpoint_id: Option<String>,
-        translation_options: Option<PyTranslationOptions>,
+        translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<Bound<'py, PyAny>> {
-        let translation_options = translation_options.map(|opts| opts.as_inner().clone());
-
         match endpoint_id {
             Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
                 py,

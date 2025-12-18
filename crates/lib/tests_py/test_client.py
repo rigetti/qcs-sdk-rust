@@ -6,6 +6,7 @@ from qcs_sdk.client import (
     LoadClientError,
     OAuthSession,
     RefreshToken,
+    SecretRefreshToken,
     AuthServer,
 )
 
@@ -56,8 +57,8 @@ def test_client_oauth_session_can_be_manually_defined():
     """Ensures that pyo3 usage is correct."""
     auth_server = AuthServer("url", "issuer")
     session = OAuthSession(RefreshToken("refresh"), auth_server, "access")
-    assert session.payload.refresh_token == "refresh"
-    assert session.access_token == "access"
+    assert session.payload.refresh_token.secret == "refresh"
+    assert session.access_token.secret == "access"
     assert session.auth_server == auth_server
 
 

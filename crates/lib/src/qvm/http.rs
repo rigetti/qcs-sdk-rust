@@ -4,7 +4,7 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
@@ -64,25 +64,25 @@ impl<T: DeserializeOwned> QvmResponse<T> {
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm"))]
 pub struct MultishotRequest {
     /// The Quil program to run.
-    #[pyo3(get)]
+    #[pyo3(get, set)]
     pub compiled_quil: String,
     /// The memory regions to include in the response.
-    #[pyo3(get)]
+    #[pyo3(get, set)]
     pub addresses: HashMap<String, AddressRequest>,
     /// The number of trials ("shots") to run.
     // This also has a Python getter method, but it's defined directly to set the stub return type.
     pub trials: NonZeroU16,
     /// Simulated measurement noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[pyo3(get)]
+    #[pyo3(get, set)]
     pub measurement_noise: Option<(f64, f64, f64)>,
     /// Simulated gate noise for the X, Y, and Z axes.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[pyo3(get)]
+    #[pyo3(get, set)]
     pub gate_noise: Option<(f64, f64, f64)>,
     /// An optional seed for the random number generator.
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[pyo3(get)]
+    #[pyo3(get, set)]
     pub rng_seed: Option<i64>,
     #[serde(rename = "type")]
     request_type: RequestType,

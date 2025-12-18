@@ -1,9 +1,10 @@
 use std::time::Duration;
 
+use numpy::Complex64;
 use pyo3::{prelude::*, wrap_pymodule};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::gen_stub_pyfunction;
+use pyo3_stub_gen::derive::{gen_stub_pyfunction, gen_stub_pymethods};
 
 use crate::{
     client::Qcs,
@@ -42,6 +43,46 @@ pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     translation::python::init_module(m)?;
 
     Ok(())
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl ReadoutValues {
+    #[new]
+    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let Ok(values) = values.extract::<Vec<i64>>() {
+            Ok(Self::Integer(values))
+        } else if let Ok(values) = values.extract::<Vec<f64>>() {
+            Ok(Self::Real(values))
+        } else if let Ok(values) = values.extract::<Vec<Complex64>>() {
+            Ok(Self::Complex(values))
+        } else {
+            Err(pyo3::exceptions::PyTypeError::new_err(
+                "expected a list of integers, reals, or complex numbers",
+            ))
+        }
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl MemoryValues {
+    #[new]
+    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let Ok(values) = values.extract::<Vec<u8>>() {
+            Ok(Self::Binary(values))
+        } else if let Ok(values) = values.extract::<Vec<i64>>() {
+            Ok(Self::Integer(values))
+        } else if let Ok(values) = values.extract::<Vec<f64>>() {
+            Ok(Self::Real(values))
+        } else {
+            Err(pyo3::exceptions::PyTypeError::new_err(
+                "expected a list of integers, reals, or complex numbers",
+            ))
+        }
+    }
 }
 
 py_function_sync_async! {

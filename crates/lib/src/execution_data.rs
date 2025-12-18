@@ -67,11 +67,13 @@ pub enum ResultData {
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
 pub struct ExecutionData {
     /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
+    #[pyo3(get)]
     pub result_data: ResultData,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
     ///
     /// This will always be `None` for QVM execution.
+    #[pyo3(get)]
     pub duration: Option<Duration>,
 }
 

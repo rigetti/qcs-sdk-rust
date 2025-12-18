@@ -87,7 +87,7 @@ struct PyOperation(Operation);
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "InstructionSetArchitecture", module = "qcs_sdk.qpu.isa")]
-struct PyInstructionSetArchitecture(InstructionSetArchitecture);
+pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
 
 #[cfg(feature = "python")]
 #[derive(Debug, thiserror::Error)]
@@ -114,6 +114,176 @@ impl PyInstructionSetArchitecture {
         }?;
         Ok(data)
     }
+
+    #[getter]
+    fn architecture(&self) -> PyArchitecture {
+        PyArchitecture(*self.0.architecture.clone())
+    }
+
+    #[getter]
+    fn benchmarks(&self) -> Vec<PyOperation> {
+        self.0.benchmarks.iter().cloned().map(PyOperation).collect()
+    }
+
+    #[setter]
+    fn set_benchmarks(&mut self, benchmarks: Vec<PyOperation>) {
+        self.0.benchmarks = benchmarks.into_iter().map(|op| op.0).collect();
+    }
+
+    #[getter]
+    fn instructions(&self) -> Vec<PyOperation> {
+        self.0
+            .instructions
+            .iter()
+            .cloned()
+            .map(PyOperation)
+            .collect()
+    }
+
+    #[getter]
+    fn name(&self) -> &str {
+        &self.0.name
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyOperation {
+    #[getter]
+    fn characteristics(&self) -> Vec<PyCharacteristic> {
+        self.0
+            .characteristics
+            .iter()
+            .cloned()
+            .map(PyCharacteristic)
+            .collect()
+    }
+
+    #[getter]
+    fn name(&self) -> &str {
+        &self.0.name
+    }
+
+    #[getter]
+    fn node_count(&self) -> Option<i64> {
+        self.0.node_count
+    }
+
+    #[getter]
+    fn parameters(&self) -> Vec<PyParameter> {
+        self.0.parameters.iter().cloned().map(PyParameter).collect()
+    }
+
+    #[getter]
+    fn sites(&self) -> Vec<PyOperationSite> {
+        self.0.sites.iter().cloned().map(PyOperationSite).collect()
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyOperationSite {
+    #[getter]
+    fn characteristics(&self) -> Vec<PyCharacteristic> {
+        self.0
+            .characteristics
+            .iter()
+            .cloned()
+            .map(PyCharacteristic)
+            .collect()
+    }
+
+    #[getter]
+    fn node_ids(&self) -> Vec<i64> {
+        self.0.node_ids.clone()
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyParameter {
+    #[getter]
+    fn name(&self) -> &str {
+        &self.0.name
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyCharacteristic {
+    #[getter]
+    fn error(&self) -> Option<f64> {
+        self.0.error
+    }
+
+    #[getter]
+    fn name(&self) -> &str {
+        &self.0.name
+    }
+
+    #[getter]
+    fn node_ids(&self) -> Option<Vec<i64>> {
+        self.0.node_ids.clone()
+    }
+
+    #[getter]
+    fn parameter_values(&self) -> Option<Vec<f64>> {
+        self.0.parameter_values.clone()
+    }
+
+    #[getter]
+    fn timestamp(&self) -> &str {
+        &self.0.timestamp
+    }
+
+    #[getter]
+    fn value(&self) -> f64 {
+        self.0.value
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyArchitecture {
+    #[getter]
+    fn edges(&self) -> Vec<PyEdge> {
+        self.0.edges.iter().cloned().map(PyEdge).collect()
+    }
+
+    #[getter]
+    fn family(&self) -> Option<PyFamily> {
+        self.0.family.clone().map(|f| PyFamily(*f))
+    }
+
+    #[getter]
+    fn nodes(&self) -> Vec<PyNode> {
+        self.0.nodes.iter().cloned().map(PyNode).collect()
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyNode {
+    #[getter]
+    fn node_id(&self) -> i64 {
+        self.0.node_id
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyEdge {
+    #[getter]
+    fn node_ids(&self) -> Vec<i64> {
+        self.0.node_ids.clone()
+    }
 }
 
 py_function_sync_async! {
@@ -129,7 +299,7 @@ py_function_sync_async! {
 
         get_isa(&quantum_processor_id, &client)
             .await
-            .map(|isa| PyInstructionSetArchitecture(isa))
+            .map(PyInstructionSetArchitecture)
             .map_err(Into::into)
     }
 }

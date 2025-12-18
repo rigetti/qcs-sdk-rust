@@ -6,6 +6,7 @@
 
 use std::sync::OnceLock;
 
+use numpy::Complex32;
 use pyo3::{
     prelude::*,
     types::{PyDict, PyList, PyTuple, PyType, PyTypeMethods},
@@ -13,7 +14,10 @@ use pyo3::{
 };
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::{define_stub_info_gatherer, derive::gen_stub_pyfunction};
+use pyo3_stub_gen::{
+    define_stub_info_gatherer,
+    derive::{gen_stub_pyfunction, gen_stub_pymethods},
+};
 
 use crate::{
     client::Qcs,
@@ -22,7 +26,9 @@ use crate::{
         executable::{ExeParameter, PyExecutable, PyJobHandle},
         execution_data::PyRegisterMatrix,
     },
-    qpu, qvm, ExecutionData, RegisterData, RegisterMap, ResultData, Service,
+    qpu::{self, QpuResultData},
+    qvm::{self, QvmResultData},
+    ExecutionData, RegisterData, RegisterMap, ResultData, Service,
 };
 
 pub(crate) mod client;
@@ -70,15 +76,6 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(reset_logging, m)?)?;
     m.add_function(wrap_pyfunction!(gather_diagnostics, m)?)?;
 
-    // todo: _tracing_subscriber
-
-    /*
-    m.add_class::<RawQpuReadoutData>()?;
-    m.add_class::<RegisterMapItemsIter>()?;
-    m.add_class::<RegisterMapKeysIter>()?;
-    m.add_class::<RegisterMapValuesIter>()?;
-    */
-
     m.add_wrapped(wrap_pymodule!(client::init_module))?;
     m.add_wrapped(wrap_pymodule!(compiler::python::init_module))?;
     m.add_wrapped(wrap_pymodule!(qpu::python::init_module))?;
@@ -99,11 +96,17 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
         qvm::http::AddressRequest
     );
 
-    // TODO pyo3_tracing_subscriber::add_submodule("qcs_sdk", "_tracing_subscriber", py, m)?;
     m.add("__version__", env!("CARGO_PKG_VERSION"))?;
 
     let sys = PyModule::import(py, "sys")?;
-    let sys_modules: Bound<'_, PyDict> = sys.getattr("modules")?.downcast_into()?;
+    let sys_modules: Bound<'_, PyDict> = sys.getattr("modules")?.cast_into()?;
+
+    pyo3_tracing_subscriber::add_submodule("qcs_sdk", "_tracing_subscriber", py, m)?;
+    // let submodule = m.getattr("_tracing_subscriber")?;
+    // sys_modules.set_item("qcs_sdk._tracing_subscriber.subscriber", submodule.getattr("subscriber")?)?;
+    // sys_modules.set_item("qcs_sdk._tracing_subscriber.layers", submodule.getattr("layers")?)?;
+    // sys_modules.set_item("qcs_sdk._tracing_subscriber.common", submodule.getattr("common")?)?;
+    // sys_modules.set_item("qcs_sdk._tracing_subscriber", submodule)?;
 
     let submodule = m.getattr("client")?;
     sys_modules.set_item("qcs_sdk.client", submodule)?;
@@ -174,15 +177,15 @@ pub(crate) fn fix_enum_qual_names<'py>(typ: &Bound<'py, PyType>) -> PyResult<()>
     let prefix = prefix.as_borrowed();
     let prefix = prefix.to_str()?;
 
-    let inner: Bound<'_, PyList> = get_members.call((typ, isclass), None)?.downcast_into()?;
+    let inner: Bound<'_, PyList> = get_members.call((typ, isclass), None)?.cast_into()?;
     for item in &inner {
-        let item = item.downcast::<PyTuple>()?;
+        let item = item.cast::<PyTuple>()?;
 
         let cls = item.get_borrowed_item(1)?;
-        if cls.downcast()?.is_subclass(typ)? {
+        if cls.cast()?.is_subclass(typ)? {
             // See https://pyo3.rs/v0.25.1/types#borroweda-py-t for info on `get_borrowed_item`.
             let name = item.get_borrowed_item(0)?;
-            let fixed_name = format!("{prefix}.{}", name.downcast()?.to_str()?);
+            let fixed_name = format!("{prefix}.{}", name.cast()?.to_str()?);
             cls.setattr(pyo3::intern!(py, "__qualname__"), fixed_name)?;
         }
     }
@@ -268,7 +271,6 @@ macro_rules! impl_repr {
 /// ```py
 /// assert say_hello("Rigetti") == "hello Rigetti"
 /// ```
-#[macro_export]
 macro_rules! py_sync {
     ($py: ident, $body: expr) => {{
         $py.detach(|| {
@@ -315,7 +317,7 @@ macro_rules! py_function_sync_async {
         #[pyo3(name = $name "")]
         $pub fn [< py_ $name >](py: ::pyo3::Python<'_> $(, $(#[$arg_meta])*$arg: $kind)*) $(-> $ret)? {
             use opentelemetry::trace::FutureExt;
-            crate::py_sync!(py, [< $name _impl >]($($arg),*).with_current_context())
+            $crate::python::py_sync!(py, [< $name _impl >]($($arg),*).with_current_context())
         }
 
         $(#[$meta])+
@@ -330,10 +332,9 @@ macro_rules! py_function_sync_async {
     };
 }
 
-pub(crate) use py_function_sync_async;
-
 pub(crate) use fix_complex_enums;
 pub(crate) use impl_repr;
+pub(crate) use py_function_sync_async;
 pub(crate) use py_sync;
 
 #[cfg(feature = "stubs")]
@@ -354,4 +355,44 @@ fn reset_logging() {
 #[pyo3(name = "_gather_diagnostics")]
 fn gather_diagnostics(py: Python<'_>) -> PyResult<String> {
     py_sync!(py, async { Ok(crate::diagnostics::get_report().await) })
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl RegisterData {
+    #[new]
+    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let Ok(values) = values.extract::<Vec<Vec<i8>>>() {
+            Ok(Self::I8(values))
+        } else if let Ok(values) = values.extract::<Vec<Vec<f64>>>() {
+            Ok(Self::F64(values))
+        } else if let Ok(values) = values.extract::<Vec<Vec<i16>>>() {
+            Ok(Self::I16(values))
+        } else if let Ok(values) = values.extract::<Vec<Vec<Complex32>>>() {
+            Ok(Self::Complex32(values))
+        } else {
+            Err(pyo3::exceptions::PyTypeError::new_err(
+                "expected a list of lists of integers, reals, or complex numbers",
+            ))
+        }
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl ResultData {
+    #[new]
+    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let Ok(data) = values.extract::<QvmResultData>() {
+            Ok(Self::Qvm(data))
+        } else if let Ok(data) = values.extract::<QpuResultData>() {
+            Ok(Self::Qpu(data))
+        } else {
+            Err(pyo3::exceptions::PyTypeError::new_err(
+                "expected QVM or QPU result data",
+            ))
+        }
+    }
 }

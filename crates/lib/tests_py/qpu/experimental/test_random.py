@@ -25,26 +25,26 @@ CALL choose_random_real_sub_regions destination source 3 seed[0]
 def test_choose_random_real_subregions():
     """Test that `ChooseRandomRealSubRegions` is correctly added to a Quil progrram."""
     program = Program()
-    destination = Declaration("destination", Vector(ScalarType.Real, 3), None)
-    program.add_instruction(Instruction.from_declaration(destination))
-    source = Declaration("source", Vector(ScalarType.Real, 12), None)
-    program.add_instruction(Instruction.from_declaration(source))
-    seed = Declaration("seed", Vector(ScalarType.Integer, 1), None)
-    program.add_instruction(Instruction.from_declaration(seed))
+    destination = Declaration("destination", Vector(ScalarType.REAL, 3), None)
+    program.add_instruction(Instruction.Declaration(destination))
+    source = Declaration("source", Vector(ScalarType.REAL, 12), None)
+    program.add_instruction(Instruction.Declaration(source))
+    seed = Declaration("seed", Vector(ScalarType.INTEGER, 1), None)
+    program.add_instruction(Instruction.Declaration(seed))
     pragma_extern = Pragma(
         "EXTERN",
-        [PragmaArgument.from_identifier(ChooseRandomRealSubRegions.NAME)],
+        [PragmaArgument.Identifier(ChooseRandomRealSubRegions.NAME)],
         ChooseRandomRealSubRegions.build_signature(),
     )
-    program.add_instruction(Instruction.from_pragma(pragma_extern))
+    program.add_instruction(Instruction.Pragma(pragma_extern))
     call = Call(
         ChooseRandomRealSubRegions.NAME,
         [
-            CallArgument.from_identifier("destination"),
-            CallArgument.from_identifier("source"),
-            CallArgument.from_immediate(complex(3, 0)),
-            CallArgument.from_memory_reference(MemoryReference("seed", 0)),
+            CallArgument.Identifier("destination"),
+            CallArgument.Identifier("source"),
+            CallArgument.Immediate(complex(3, 0)),
+            CallArgument.MemoryReference(MemoryReference("seed", 0)),
         ],
     )
-    program.add_instruction(Instruction.from_call(call))
+    program.add_instruction(Instruction.Call(call))
     assert program == Program.parse(EXPECTED_QUIL)

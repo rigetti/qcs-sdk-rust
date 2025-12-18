@@ -1,35 +1,39 @@
 import pickle
+import typing_extensions
 import pytest
 
 from qcs_sdk.qpu.translation import (
     translate,
 )
 
+from qcs_sdk.qpu import ConnectionStrategy
+
 from qcs_sdk.qpu.api import (
-    ConnectionStrategy,
     ExecutionOptions,
     Register,
     retrieve_results,
     submit,
 )
 
-def test_register():
-    """Register should accept setting and getting data correctly."""
-    data = [0j, 1j, 2j]
-    register = Register.from_complex32(data)
-    assert register.as_complex32() == data
-    assert register.to_complex32() == data
-    assert register.as_i32() == None
-    with pytest.raises(ValueError):
-        register.to_i32()
+def fn(b: bool) -> tuple[()]:
+    return ()
 
-    data = [3, 4, 5]
-    register = Register.from_i32(data)
-    assert register.as_complex32() == None
-    with pytest.raises(ValueError):
-        register.to_complex32()
-    assert register.as_i32() == data
-    assert register.as_i32() == data
+@pytest.mark.parametrize(("name", "cls", "data"),
+    [
+        ("Complex32", Register.Complex32, [0j, 1j, 2j]),
+        ("I32", Register.I32, [3, 4, 5]),
+    ]
+)
+def test_register(name: str, cls: Register.Complex32 | Register.I32, data: list[complex | int]):
+    """Register should accept setting and getting data correctly."""
+    register = cls(data)
+    match (name, register):
+        case ("Complex32", Register.Complex32(d)):
+            assert d == data
+        case ("I32", Register.I32(d)):
+            assert d == data
+        case _:
+            pytest.fail("Register did not match")
 
 
 @pytest.mark.qcs_execution
@@ -47,9 +51,10 @@ def test_submit_retrieve(
 
     job_id = submit(translated.program, memory, quantum_processor_id)
     results = retrieve_results(job_id)
+    assert results is not None
 
 class TestPickle():
-    @pytest.mark.parametrize("strategy", [ConnectionStrategy.gateway(), ConnectionStrategy.direct_access(), ConnectionStrategy.endpoint_id("endpoint_id")])
+    @pytest.mark.parametrize("strategy", [ConnectionStrategy.Gateway(), ConnectionStrategy.DirectAccess(), ConnectionStrategy.EndpointId("endpoint_id")])
     def test_connection_strategy(self, strategy: ConnectionStrategy):
         pickled = pickle.dumps(strategy)
         unpickled = pickle.loads(pickled)

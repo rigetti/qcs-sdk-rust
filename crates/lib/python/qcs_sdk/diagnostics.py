@@ -1,6 +1,6 @@
 import sys
 
-from .qcs_sdk import __version__, _gather_diagnostics  # type: ignore
+from . import __version__, _gather_diagnostics  # type: ignore
 
 
 def get_report() -> str:

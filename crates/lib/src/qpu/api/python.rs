@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use numpy::Complex32;
-use pyo3::prelude::*;
+use pyo3::{prelude::*, types::PyTuple};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{
@@ -73,7 +73,7 @@ impl_repr!(ConnectionStrategy);
 #[pyclass(name = "ExecutionOptionsBuilder", module = "qcs_sdk.qpu.api")]
 struct PyExecutionOptionsBuilder(ExecutionOptionsBuilder);
 
-/// Variants of data vectors within a single ExecutionResult.
+/// Variants of data vectors within a single `ExecutionResult`.
 #[derive(Clone, Debug)]
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
@@ -108,13 +108,12 @@ impl From<readout_values::Values> for ExecutionResult {
                         .into_iter()
                         .map(|c| Complex32::new(c.real, c.imaginary))
                         .collect(),
-                )
-                .into(),
+                ),
             },
             readout_values::Values::IntegerValues(ns) => ExecutionResult {
                 shape: [ns.values.len(), 1],
                 dtype: "integer".into(),
-                data: Register::I32(ns.values).into(),
+                data: Register::I32(ns.values),
             },
         }
     }
@@ -164,8 +163,8 @@ impl ExecutionResults {
     ) -> Self {
         Self {
             buffers,
-            memory,
             execution_duration_microseconds,
+            memory,
         }
     }
 }
@@ -320,7 +319,7 @@ impl ExecutionOptions {
     #[staticmethod]
     #[pyo3(name = "default")]
     fn py_default() -> Self {
-        ExecutionOptions::default()
+        Self::default()
     }
 
     #[staticmethod]
@@ -337,6 +336,38 @@ impl ExecutionOptions {
     #[getter(api_options)]
     fn py_api_options(&self) -> Option<ApiExecutionOptions> {
         self.api_options.map(Into::into)
+    }
+
+    #[new]
+    #[pyo3(signature = (
+            connection_strategy = ConnectionStrategy::default(),
+            timeout = Some(Duration::from_secs(30)),
+            api_options = None
+    ))]
+    fn __new__(
+        connection_strategy: ConnectionStrategy,
+        timeout: Option<Duration>,
+        api_options: Option<ApiExecutionOptions>,
+    ) -> Self {
+        Self {
+            connection_strategy,
+            timeout,
+            api_options: api_options.map(Into::into),
+        }
+    }
+
+    fn __getnewargs__(
+        &self,
+    ) -> (
+        ConnectionStrategy,
+        Option<Duration>,
+        Option<ApiExecutionOptions>,
+    ) {
+        (
+            self.connection_strategy.clone(),
+            self.timeout,
+            self.api_options.map(Into::into),
+        )
     }
 }
 
@@ -395,7 +426,13 @@ impl ConnectionStrategy {
         }
     }
 
-    // TODO: pickle
+    #[gen_stub(override_return_type(type_repr = "tuple[str] | tuple[()]"))]
+    fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
+        match self {
+            Self::EndpointId(id) => (id.clone(),).into_pyobject(py),
+            Self::Gateway() | Self::DirectAccess() => Ok(PyTuple::empty(py)),
+        }
+    }
 }
 
 #[cfg(feature = "stubs")]
@@ -435,7 +472,7 @@ py_function_sync_async! {
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn submit(
         program: String,
         patch_values: HashMap<String, Vec<f64>>,
@@ -478,7 +515,7 @@ py_function_sync_async! {
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn submit_with_parameter_batch(
         program: String,
         patch_values: Vec<HashMap<String, Vec<f64>>>,
@@ -558,7 +595,7 @@ py_function_sync_async! {
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn retrieve_results(
         job_id: JobId,
         quantum_processor_id: Option<String>,

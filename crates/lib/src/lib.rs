@@ -70,6 +70,7 @@ pub mod qpu;
 pub mod qvm;
 mod register_data;
 
+mod pickle;
 #[cfg(feature = "python")]
 pub mod python;
 

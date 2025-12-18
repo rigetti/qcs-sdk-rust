@@ -73,6 +73,11 @@ package-mode = false
 [tool.poetry.group.dev.dependencies]
 griffe = "^1.14.0"
 
+[tool.pytest.ini_options]
+addopts = [
+    "--ignore=scripts",
+]
+
 [tool.ruff]
 exclude = [
     ".bzr",

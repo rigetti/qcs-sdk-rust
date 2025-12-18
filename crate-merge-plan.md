@@ -209,7 +209,7 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     //...
     
     let sys = PyModule::import(py, "sys")?;
-    let sys_modules: Bound<'_, PyDict> = sys.getattr("modules")?.downcast_into()?;
+    let sys_modules: Bound<'_, PyDict> = sys.getattr("modules")?.cast_into()?;
     sys_modules.set_item("qcs_sdk.submodule", m.getattr("submodule")?)?;
     
     fix_complex_enums!(

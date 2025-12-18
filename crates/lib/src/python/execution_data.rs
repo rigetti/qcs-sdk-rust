@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::time::Duration;
 
-use numpy::ToPyArray;
+use numpy::{Complex64, PyArray2};
 use pyo3::{
-    exceptions::PyRuntimeError,
+    exceptions::{PyRuntimeError, PyValueError},
     intern,
     prelude::*,
     types::{PyBytes, PyDelta, PyList},
@@ -11,7 +11,7 @@ use pyo3::{
 };
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pymethods};
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
 use crate::qvm::QvmResultData;
 use crate::{
@@ -43,7 +43,7 @@ impl Default for ResultData {
 impl ResultData {
     /// Get the raw readout data from either QPU or QVM result.
     #[gen_stub(override_return_type(type_repr = "dict[str, list] | RawQPUReadoutData"))]
-    pub fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         match self {
             ResultData::Qpu(data) => data.to_raw_readout_data(py)?.into_bound_py_any(py),
             ResultData::Qvm(data) => data.to_raw_readout_data(py)?.into_bound_py_any(py),
@@ -57,18 +57,17 @@ impl ResultData {
 impl ExecutionData {
     /// Python constructor for `ExecutionData`.
     ///
-    /// result_data is optional here
+    /// `result_data` is optional here
     /// because pickling an object requires calling __new__ without arguments.
     #[new]
     #[pyo3(signature = (result_data=None, duration=None))]
-    pub fn __new__<'py>(
+    fn __new__(
         result_data: Option<ResultData>,
         duration: Option<Py<PyDelta>>,
-        py: Python<'py>,
+        py: Python<'_>,
     ) -> PyResult<Self> {
-        let result_data = result_data.unwrap_or_else(|| {
-            ResultData::Qvm(QvmResultData::from_memory_map(HashMap::new()))
-        });
+        let result_data = result_data
+            .unwrap_or_else(|| ResultData::Qvm(QvmResultData::from_memory_map(HashMap::new())));
 
         let duration = duration
             .map(|delta| {
@@ -86,7 +85,7 @@ impl ExecutionData {
         })
     }
 
-    pub fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+    fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
         Ok(PyBytes::new(
             py,
             &serde_json::to_vec(self)
@@ -94,11 +93,7 @@ impl ExecutionData {
         ))
     }
 
-    pub fn __setstate__<'py>(
-        &mut self,
-        _py: Python<'py>,
-        state: Bound<'py, PyBytes>,
-    ) -> PyResult<()> {
+    fn __setstate__<'py>(&mut self, _py: Python<'py>, state: Bound<'py, PyBytes>) -> PyResult<()> {
         let execution_data: ExecutionData = serde_json::from_slice(state.as_bytes())
             .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
         *self = execution_data;
@@ -106,20 +101,62 @@ impl ExecutionData {
     }
 }
 
-/// An enum representing every possible register type as a 2 dimensional matrix.
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "RegisterMatrix", module = "qcs_sdk", frozen)]
-pub(crate) struct PyRegisterMatrix(RegisterMatrix);
+/// A 2 dimensional matrix of register values.
+#[derive(Debug)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[pyclass(name = "RegisterMatrix", module = "qcs_sdk")]
+pub(crate) enum PyRegisterMatrix {
+    /// Integer register
+    Integer(Py<PyArray2<i64>>),
+    /// Real numbered register
+    Real(Py<PyArray2<f64>>),
+    /// Complex numbered register
+    Complex(Py<PyArray2<Complex64>>),
+}
+
+impl<'a, 'py> FromPyObject<'a, 'py> for PyRegisterMatrix {
+    type Error = PyErr;
+
+    fn extract(ob: Borrowed<'a, 'py, PyAny>) -> Result<Self, Self::Error> {
+        if let Ok(m) = ob.cast::<PyArray2<i64>>() {
+            Ok(PyRegisterMatrix::Integer(m.to_owned().unbind()))
+        } else if let Ok(m) = ob.cast::<PyArray2<f64>>() {
+            Ok(PyRegisterMatrix::Real(m.to_owned().unbind()))
+        } else if let Ok(m) = ob.cast::<PyArray2<Complex64>>() {
+            Ok(PyRegisterMatrix::Complex(m.to_owned().unbind()))
+        } else {
+            Err(PyValueError::new_err(
+                "expected a 2D numpy array of integers, reals, or complex numbers",
+            ))
+        }
+    }
+}
+
+impl PyRegisterMatrix {
+    fn from_register_matrix(py: Python<'_>, matrix: RegisterMatrix) -> Self {
+        match matrix {
+            RegisterMatrix::Integer(m) => {
+                PyRegisterMatrix::Integer(PyArray2::from_owned_array(py, m).unbind())
+            }
+            RegisterMatrix::Real(m) => {
+                PyRegisterMatrix::Real(PyArray2::from_owned_array(py, m).unbind())
+            }
+            RegisterMatrix::Complex(m) => {
+                PyRegisterMatrix::Complex(PyArray2::from_owned_array(py, m).unbind())
+            }
+        }
+    }
+}
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
 impl PyRegisterMatrix {
-    fn to_ndarray<'py>(&self, py: Python<'py>) -> Bound<'py, PyAny> {
-        match &self.0 {
-            RegisterMatrix::Integer(m) => m.to_pyarray(py).into_any(),
-            RegisterMatrix::Real(m) => m.to_pyarray(py).into_any(),
-            RegisterMatrix::Complex(m) => m.to_pyarray(py).into_any(),
+    fn to_ndarray(&self, py: Python<'_>) -> Py<PyAny> {
+        match self {
+            PyRegisterMatrix::Integer(m) => m.clone_ref(py).into_any(),
+            PyRegisterMatrix::Real(m) => m.clone_ref(py).into_any(),
+            PyRegisterMatrix::Complex(m) => m.clone_ref(py).into_any(),
         }
     }
 }
@@ -129,25 +166,31 @@ impl PyRegisterMatrix {
 #[pymethods]
 impl RegisterMap {
     #[pyo3(name = "get_register_matrix")]
-    pub fn py_get_register_matrix(&self, register_name: &str) -> Option<PyRegisterMatrix> {
-        self.0.get(register_name).cloned().map(PyRegisterMatrix)
+    fn py_get_register_matrix(
+        &self,
+        py: Python<'_>,
+        register_name: &str,
+    ) -> Option<PyRegisterMatrix> {
+        self.0
+            .get(register_name)
+            .map(|matrix| PyRegisterMatrix::from_register_matrix(py, matrix.clone()))
     }
 
-    pub fn __len__(&self) -> usize {
+    fn __len__(&self) -> usize {
         self.0.len()
     }
 
-    pub fn __contains__(&self, key: &str) -> bool {
+    fn __contains__(&self, key: &str) -> bool {
         self.0.contains_key(key)
     }
 
-    pub fn __getitem__(&self, item: &str) -> PyResult<PyRegisterMatrix> {
-        self.py_get_register_matrix(item).ok_or_else(|| {
+    fn __getitem__<'py>(&self, py: Python<'py>, item: &str) -> PyResult<PyRegisterMatrix> {
+        self.py_get_register_matrix(py, item).ok_or_else(|| {
             pyo3::exceptions::PyKeyError::new_err(format!("Key {item} not found in RegisterMap"))
         })
     }
 
-    pub fn __iter__<'py>(&self, py: Python<'py>) -> PyResult<Py<RegisterMapKeysIter>> {
+    fn __iter__<'py>(&self, py: Python<'py>) -> PyResult<Py<RegisterMapKeysIter>> {
         Py::new(
             py,
             RegisterMapKeysIter {
@@ -156,11 +199,11 @@ impl RegisterMap {
         )
     }
 
-    pub fn keys(&self, py: Python<'_>) -> PyResult<Py<RegisterMapKeysIter>> {
+    fn keys(&self, py: Python<'_>) -> PyResult<Py<RegisterMapKeysIter>> {
         self.__iter__(py)
     }
 
-    pub fn values(&self, py: Python<'_>) -> PyResult<Py<RegisterMapValuesIter>> {
+    fn values(&self, py: Python<'_>) -> PyResult<Py<RegisterMapValuesIter>> {
         Py::new(
             py,
             RegisterMapValuesIter {
@@ -169,7 +212,7 @@ impl RegisterMap {
         )
     }
 
-    pub fn items(&self, py: Python<'_>) -> PyResult<Py<RegisterMapItemsIter>> {
+    fn items(&self, py: Python<'_>) -> PyResult<Py<RegisterMapItemsIter>> {
         Py::new(
             py,
             RegisterMapItemsIter {
@@ -178,15 +221,20 @@ impl RegisterMap {
         )
     }
 
-    pub fn get(&self, key: &str, default: Option<PyRegisterMatrix>) -> Option<PyRegisterMatrix> {
-        self.__getitem__(key).ok().or(default)
+    fn get(
+        &self,
+        key: &str,
+        py: Python<'_>,
+        default: Option<PyRegisterMatrix>,
+    ) -> Option<PyRegisterMatrix> {
+        self.__getitem__(py, key).ok().or(default)
     }
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
-pub struct RegisterMapItemsIter {
+pub(crate) struct RegisterMapItemsIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
@@ -199,16 +247,19 @@ impl RegisterMapItemsIter {
     }
 
     fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<(String, PyRegisterMatrix)> {
-        slf.inner
-            .next()
-            .map(|(register, matrix)| (register, PyRegisterMatrix(matrix)))
+        slf.inner.next().map(|(register, matrix)| {
+            (
+                register,
+                PyRegisterMatrix::from_register_matrix(slf.py(), matrix),
+            )
+        })
     }
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
-pub struct RegisterMapKeysIter {
+pub(crate) struct RegisterMapKeysIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
@@ -228,7 +279,7 @@ impl RegisterMapKeysIter {
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
-pub struct RegisterMapValuesIter {
+pub(crate) struct RegisterMapValuesIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
@@ -240,8 +291,10 @@ impl RegisterMapValuesIter {
         slf
     }
 
-    fn __next__(&mut self) -> Option<PyRegisterMatrix> {
-        self.inner.next().map(|(_, value)| PyRegisterMatrix(value))
+    fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<PyRegisterMatrix> {
+        slf.inner
+            .next()
+            .map(|(_, value)| PyRegisterMatrix::from_register_matrix(slf.py(), value))
     }
 }
 
@@ -251,7 +304,7 @@ impl RegisterMapValuesIter {
 impl QpuResultData {
     /// Construct a new `QPUResultData` from mappings and values.
     #[new]
-    pub fn __new__(
+    fn __new__(
         mappings: HashMap<String, String>,
         readout_values: HashMap<String, ReadoutValues>,
         memory_values: HashMap<String, MemoryValues>,
@@ -260,7 +313,7 @@ impl QpuResultData {
     }
 
     /// Get the raw readout data as a flattened structure.
-    pub fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<RawQpuReadoutData> {
+    fn to_raw_readout_data(&self, py: Python<'_>) -> PyResult<RawQpuReadoutData> {
         Ok(RawQpuReadoutData {
             mappings: self.mappings().clone(),
             readout_values: self
@@ -308,88 +361,3 @@ pub struct RawQpuReadoutData {
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl QvmResultData {}
-
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[pymethods]
-impl MultishotRequest {
-    /// Creates a new `MultishotRequest` with the given parameters.
-    #[new]
-    #[pyo3(signature = (compiled_quil, trials, addresses, measurement_noise=None, gate_noise=None, rng_seed=None))]
-    pub fn __new__(
-        compiled_quil: String,
-        trials: NonZeroU16,
-        addresses: HashMap<String, AddressRequest>,
-        measurement_noise: Option<(f64, f64, f64)>,
-        gate_noise: Option<(f64, f64, f64)>,
-        rng_seed: Option<i64>,
-    ) -> PyResult<Self> {
-        Ok(MultishotRequest::new(
-            compiled_quil,
-            trials.0,
-            addresses,
-            measurement_noise,
-            gate_noise,
-            rng_seed,
-        ))
-    }
-}
-
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[pymethods]
-impl MultishotMeasureRequest {
-    /// Construct a new `MultishotMeasureRequest` using the given parameters.
-    #[new]
-    #[pyo3(signature = (compiled_quil, trials, qubits, measurement_noise=None, gate_noise=None, rng_seed=None))]
-    pub fn __new__(
-        compiled_quil: String,
-        trials: NonZeroU16,
-        qubits: Vec<u64>,
-        measurement_noise: Option<(f64, f64, f64)>,
-        gate_noise: Option<(f64, f64, f64)>,
-        rng_seed: Option<i64>,
-    ) -> PyResult<Self> {
-        Ok(MultishotMeasureRequest::new(
-            compiled_quil,
-            trials.0,
-            &qubits,
-            measurement_noise,
-            gate_noise,
-            rng_seed,
-        ))
-    }
-}
-
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[pymethods]
-impl ExpectationRequest {
-    /// Creates a new `ExpectationRequest` using the given parameters.
-    #[new]
-    #[pyo3(signature = (state_preparation, operators, rng_seed=None))]
-    pub fn __new__(
-        state_preparation: String,
-        operators: Vec<String>,
-        rng_seed: Option<i64>,
-    ) -> Self {
-        ExpectationRequest::new(state_preparation, &operators, rng_seed)
-    }
-}
-
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[pymethods]
-impl WavefunctionRequest {
-    /// Create a new `WavefunctionRequest` with the given parameters.
-    #[new]
-    #[pyo3(signature = (compiled_quil, measurement_noise=None, gate_noise=None, rng_seed=None))]
-    pub fn __new__(
-        compiled_quil: String,
-        measurement_noise: Option<(f64, f64, f64)>,
-        gate_noise: Option<(f64, f64, f64)>,
-        rng_seed: Option<i64>,
-    ) -> Self {
-        WavefunctionRequest::new(compiled_quil, measurement_noise, gate_noise, rng_seed)
-    }
-}

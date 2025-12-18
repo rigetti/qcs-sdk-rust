@@ -7,8 +7,8 @@ use pyo3::{prelude::*, types::PyList, Py};
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
 use crate::{
-    python::{NonZeroU16, errors, impl_repr, py_function_sync_async},
-    qvm::{self, Error, QvmOptions, QvmResultData, http},
+    python::{errors, impl_repr, py_function_sync_async, NonZeroU16},
+    qvm::{self, http, Error, QvmOptions, QvmResultData},
     register_data::RegisterData,
 };
 
@@ -28,7 +28,6 @@ pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(py_run_async, m)?)?;
 
     let submodule = PyModule::new(py, "api")?;
-    // m.add_wrapped(wrap_pymodule!(api::init_module))?;
     api::init_module(&submodule)?;
     m.add_submodule(&submodule)?;
 
@@ -226,36 +225,116 @@ impl QvmResultData {
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl http::MultishotRequest {
+    /// Creates a new `MultishotRequest` with the given parameters.
+    #[new]
+    #[pyo3(signature = (program, shots, addresses, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        program: String,
+        shots: NonZeroU16,
+        addresses: HashMap<String, http::AddressRequest>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self::new(
+            program,
+            shots.0,
+            addresses,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+        )
+    }
+
     // This is defined explicitly in order to override the generated stubtype.
     #[getter]
     #[gen_stub(override_return_type(type_repr = "builtins.int"))]
     fn trials(&self) -> NonZeroU16 {
         NonZeroU16(self.trials)
+    }
+
+    #[setter]
+    fn set_trials(&mut self, trials: NonZeroU16) {
+        self.trials = trials.0;
     }
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl http::MultishotMeasureRequest {
+    /// Construct a new `MultishotMeasureRequest` using the given parameters.
+    #[new]
+    #[pyo3(signature = (program, shots, qubits, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        program: String,
+        shots: NonZeroU16,
+        #[gen_stub(override_type(type_repr = "builtins.list[builtins.int]"))] qubits: Vec<u64>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self::new(
+            program,
+            shots.0,
+            &qubits,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+        )
+    }
+
     // This is defined explicitly in order to override the generated stubtype.
     #[getter]
     #[gen_stub(override_return_type(type_repr = "builtins.int"))]
     fn trials(&self) -> NonZeroU16 {
         NonZeroU16(self.trials)
     }
+
+    #[setter]
+    fn set_trials(&mut self, trials: NonZeroU16) {
+        self.trials = trials.0;
+    }
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl http::ExpectationRequest {
+    /// Creates a new `ExpectationRequest` using the given parameters.
+    #[new]
+    #[pyo3(signature = (state_preparation, operators, rng_seed=None))]
+    fn __new__(state_preparation: String, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
+        http::ExpectationRequest::new(state_preparation, &operators, rng_seed)
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl http::WavefunctionRequest {
+    /// Create a new `WavefunctionRequest` with the given parameters.
+    #[new]
+    #[pyo3(signature = (program, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        program: String,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        http::WavefunctionRequest::new(program, measurement_noise, gate_noise, rng_seed)
+    }
+}
 
 py_function_sync_async! {
     #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm"))]
     #[pyfunction]
     #[tracing::instrument(skip_all)]
-    // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
     async fn run(
         quil: String,
         shots: NonZeroU16,
@@ -348,7 +427,7 @@ mod api {
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
-        // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn get_wavefunction(
             request: http::WavefunctionRequest,
             client: PyQvmClient,
@@ -367,7 +446,7 @@ mod api {
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
-        //TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn measure_expectation(
             request: http::ExpectationRequest,
             client: PyQvmClient,
@@ -385,7 +464,7 @@ mod api {
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
-        // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn run_and_measure(
             request: http::MultishotMeasureRequest,
             client: PyQvmClient,
@@ -403,7 +482,7 @@ mod api {
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
-        // TODO #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn run(
             request: http::MultishotRequest,
             client: PyQvmClient,
@@ -416,4 +495,3 @@ mod api {
         }
     }
 }
-

@@ -152,19 +152,19 @@ args = [
 
 [tasks.format-tracing-subscriber]
 command = "black"
-args = ["qcs_sdk/_tracing_subscriber"]
+args = ["python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
 command = "black"
-args = ["qcs_sdk", "tests"]
+args = ["python/qcs_sdk", "tests"]
 
 [tasks.test-session]
 command = "pytest"
-args = ["tests", "--with-qcs-session"]
+args = ["tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
 command = "pytest"
-args = ["tests", "--with-qcs-session", "--with-qcs-execution"]
+args = ["tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest"]

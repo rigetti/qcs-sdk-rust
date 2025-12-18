@@ -12,29 +12,29 @@ from qcs_sdk.qpu import (
 
 def test_readout_values():
     inner = [0, 1]
-    readout_values = ReadoutValues.from_integer(inner)
-    assert readout_values.to_integer() == inner
+    readout_values = ReadoutValues.Integer(inner)
+    assert readout_values._0 == inner
 
     inner = [2.5, 3.5]
-    readout_values = ReadoutValues.from_real(inner)
-    assert readout_values.to_real() == inner
+    readout_values = ReadoutValues.Real(inner)
+    assert readout_values._0 == inner
 
     inner = [4j, 5j]
-    readout_values = ReadoutValues.from_complex(inner)
-    assert readout_values.to_complex() == inner
+    readout_values = ReadoutValues.Complex(inner)
+    assert readout_values._0 == inner
 
 
 def test_qpu_result_data():
     mappings = {"a": "_q0"}
-    readout_values = {"a": ReadoutValues.from_integer([0, 1])}
-    memory_values = { "int": MemoryValues.from_integer([2, 3]), "real": MemoryValues.from_real([3.0, 4.0]), "binary": MemoryValues.from_binary([0, 1]) }
+    readout_values = {"a": ReadoutValues.Integer([0, 1])}
+    memory_values = { "int": MemoryValues.Integer([2, 3]), "real": MemoryValues.Real([3.0, 4.0]), "binary": MemoryValues.Binary([0, 1]) }
     result_data = QPUResultData(mappings, readout_values, memory_values)
 
     assert result_data.mappings == mappings
-    assert result_data.readout_values["a"].as_integer() == readout_values["a"].as_integer()
-    assert result_data.memory_values["int"].as_integer() == memory_values["int"].as_integer()
-    assert result_data.memory_values["binary"].as_integer() == memory_values["binary"].as_integer()
-    assert result_data.memory_values["real"].as_integer() == memory_values["real"].as_integer()
+    assert result_data.readout_values["a"]._0 == readout_values["a"]._0
+    assert result_data.memory_values["int"]._0 == memory_values["int"]._0
+    assert result_data.memory_values["binary"]._0 == memory_values["binary"]._0
+    assert result_data.memory_values["real"]._0 == memory_values["real"]._0
     raw_data = result_data.to_raw_readout_data()
     assert raw_data.mappings == {"a": "_q0"}
     assert raw_data.readout_values == {"a": [0, 1]}

@@ -13,24 +13,24 @@ resolver = "2"
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
 # crates' versions of ndarray in sync.
-# Similarly, pyo3 packages (`numpy`, `rigetti-pyo3`, `pyo3*`) track versions together
+# Similarly, pyo3 packages (`numpy`, `pyo3*`) track versions together
 # and need to be updated together.
 ndarray = { version = "0.16.1", features = ["serde"] }
-numpy = "0.26.0"
+numpy = "0.27.1"
 opentelemetry = { version = "0.27.1" }
 opentelemetry_sdk = { version = "0.27.1" }
-pyo3 = { version = "0.26.0", features = ["num-complex", "multiple-pymethods"] }
-pyo3-async-runtimes = { version = "0.26", features = ["attributes", "tokio-runtime"] }
-pyo3-build-config = "0.26.0"
+pyo3 = { version = "0.27.2", features = ["num-complex", "multiple-pymethods"] }
+pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runtime"] }
+pyo3-build-config = "0.27.2"
 pyo3-log = { version = "0.13.2" }
-pyo3-opentelemetry = "0.4.0"
-pyo3-tracing-subscriber = { version = "0.2.0", default-features = false }
+pyo3-opentelemetry = { path = "../pyo3-opentelemetry/crates/opentelemetry" }
+pyo3-tracing-subscriber = { path = "../pyo3-opentelemetry/crates/tracing-subscriber", default-features = false }
 pyo3-stub-gen = { version = "0.14.1", features = ["numpy"] }
 
-qcs-api-client-common = "0.12.8"
-qcs-api-client-grpc = "0.12.8"
-qcs-api-client-openapi = "0.13.8"
-quil-rs = "0.33"
+qcs-api-client-common = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-common" }
+qcs-api-client-grpc = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-grpc" }
+qcs-api-client-openapi = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-openapi/public" }
+quil-rs = { path = "../quil-rs/quil-rs" }
 
 serde_json = "1.0.86"
 thiserror = "1.0.57"

@@ -11,15 +11,20 @@ macro_rules! make_nonzero {
         // but it raises a TypeError that says "failed to extract field NonZeroU64.0".
         // By implementing it manually, an invalid value instead reads:
         // "ValueError: expected a positive value".
-        impl<'py> ::pyo3::FromPyObject<'py> for $name {
-            fn extract_bound(ob: &::pyo3::Bound<'py, ::pyo3::PyAny>) -> ::pyo3::PyResult<Self> {
-                ::pyo3::prelude::PyAnyMethods::extract::<$num>(ob).and_then(|value| {
-                    ::std::convert::TryFrom::try_from(value)
-                        .map_err(|_| {
-                            ::pyo3::exceptions::PyValueError::new_err("expected a positive value")
-                        })
-                        .map(Self)
-                })
+        impl<'a, 'py> ::pyo3::FromPyObject<'a, 'py> for $name {
+            type Error = ::pyo3::PyErr;
+
+            fn extract(ob: ::pyo3::Borrowed<'a, 'py, ::pyo3::PyAny>) -> Result<Self, Self::Error> {
+                ob.extract::<$num>()
+                    .ok()
+                    .and_then(|value| ::std::convert::TryFrom::try_from(value).ok())
+                    .map(Self)
+                    .ok_or_else(|| {
+                        ::pyo3::exceptions::PyValueError::new_err(concat!(
+                            "expected a positive ",
+                            stringify!($num)
+                        ))
+                    })
             }
         }
 

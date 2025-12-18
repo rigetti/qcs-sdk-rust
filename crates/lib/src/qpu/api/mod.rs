@@ -355,7 +355,6 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.api", eq))]
-// TODO: pickle
 pub struct ExecutionOptions {
     #[pyo3(get)]
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
