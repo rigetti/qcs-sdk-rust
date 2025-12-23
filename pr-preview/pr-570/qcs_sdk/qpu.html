@@ -45,10 +45,10 @@
                                 <a class="function" href="#QPUResultData.to_raw_readout_data">to_raw_readout_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
+                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
+                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QPUResultData.mappings">mappings</a>
@@ -60,13 +60,13 @@
                     <a class="class" href="#RawQPUReadoutData">RawQPUReadoutData</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
                         </li>
                 </ul>
 
@@ -76,6 +76,9 @@
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#ReadoutValues.from_integer">from_integer</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ReadoutValues.from_complex">from_complex</a>
                         </li>
                         <li>
                                 <a class="function" href="#ReadoutValues.inner">inner</a>
@@ -110,21 +113,12 @@
                         <li>
                                 <a class="function" href="#ReadoutValues.from_real">from_real</a>
                         </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.from_complex">from_complex</a>
-                        </li>
                 </ul>
 
             </li>
             <li>
                     <a class="class" href="#MemoryValues">MemoryValues</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#MemoryValues.from_integer">from_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.from_real">from_real</a>
-                        </li>
                         <li>
                                 <a class="function" href="#MemoryValues.from_binary">from_binary</a>
                         </li>
@@ -157,6 +151,12 @@
                         </li>
                         <li>
                                 <a class="function" href="#MemoryValues.to_real">to_real</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#MemoryValues.from_real">from_real</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#MemoryValues.from_integer">from_integer</a>
                         </li>
                 </ul>
 
@@ -219,17 +219,6 @@
     
 
                             </div>
-                            <div id="QPUResultData.readout_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">readout_values</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.readout_values"></a>
-    
-    
-
-                            </div>
                             <div id="QPUResultData.memory_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">memory_values</span>
@@ -237,6 +226,17 @@
         
     </div>
     <a class="headerlink" href="#QPUResultData.memory_values"></a>
+    
+    
+
+                            </div>
+                            <div id="QPUResultData.readout_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">readout_values</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.readout_values"></a>
     
     
 
@@ -270,6 +270,17 @@ each register contains.</p>
 </div>
 
 
+                            <div id="RawQPUReadoutData.memory_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory_values</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RawQPUReadoutData.memory_values"></a>
+    
+    
+
+                            </div>
                             <div id="RawQPUReadoutData.mappings" class="classattr">
                                 <div class="attr variable">
             <span class="name">mappings</span>
@@ -288,17 +299,6 @@ each register contains.</p>
         
     </div>
     <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
-    
-    
-
-                            </div>
-                            <div id="RawQPUReadoutData.memory_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory_values</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RawQPUReadoutData.memory_values"></a>
     
     
 
@@ -327,6 +327,21 @@ each register contains.</p>
     <a class="headerlink" href="#ReadoutValues.from_integer"></a>
     
             <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Integer</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
+</div>
+
+
+                            </div>
+                            <div id="ReadoutValues.from_complex" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ReadoutValues.from_complex"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Complex</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
 </div>
 
 
@@ -496,21 +511,6 @@ each register contains.</p>
 
 
                             </div>
-                            <div id="ReadoutValues.from_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.from_complex"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Complex</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="MemoryValues">
                     <div class="attr class">
@@ -524,36 +524,6 @@ each register contains.</p>
     
     
 
-                            <div id="MemoryValues.from_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.from_integer"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Integer</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.from_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.from_real"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Real</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
                             <div id="MemoryValues.from_binary" class="classattr">
                                 <div class="attr function">
             
@@ -715,6 +685,36 @@ each register contains.</p>
     <a class="headerlink" href="#MemoryValues.to_real"></a>
     
             <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::real</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="MemoryValues.from_real" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.from_real"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Real</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
+</div>
+
+
+                            </div>
+                            <div id="MemoryValues.from_integer" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.from_integer"></a>
+    
+            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Integer</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
 </div>
 
 
