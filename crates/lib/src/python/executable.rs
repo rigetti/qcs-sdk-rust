@@ -21,89 +21,82 @@ use crate::{
     JobHandle,
 };
 
+// Note the Python PROGRAM example _must not_ use `r"""`
+// or it'll break the generated docstring associated with its stubfile.
 /// A builder interface for executing Quil programs on QVMs and QPUs.
 ///
 /// # Example
 ///
-/// ```python
+/// This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient::
 ///
-/// PROGRAM = r"""
-/// DECLARE ro BIT[2]
+///     from qcs_sdk import Executable
+///     from qcs_sdk.client import QCSClient
+///     from qcs_sdk.qvm import QVMClient
 ///
-/// H 0
-/// CNOT 0 1
+///     PROGRAM = """
+///     DECLARE ro BIT[2]
 ///
-/// MEASURE 0 ro[0]
-/// MEASURE 1 ro[1]
-/// """
+///     H 0
+///     CNOT 0 1
 ///
-/// async def run():
-///     # TODO: update this example
-///     use std::num::NonZeroU16;
-///     use qcs::qvm;
-///     let qvm_client = qvm::http::HttpClient::from(&Qcs::load());
-///     let mut result = Executable::from_quil(PROGRAM).with_qcs_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm(&qvm_client).await.unwrap();
-///     // "ro" is the only source read from by default if you don't specify a .read_from()
+///     MEASURE 0 ro[0]
+///     MEASURE 1 ro[1]
+///     """
 ///
-///     // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
-///     // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
-///     // the memory offset `index` during shot `shot`.
-///     // There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
-///     // which case you should build the matrix you need from [`QpuResultData`] directly. See
-///     // the [`RegisterMap`] documentation for more information on when this transformation
-///     // might fail.
-///     let data = result.result_data
-///                         .to_register_map()
-///                         .expect("should convert to readout map")
-///                         .get_register_matrix("ro")
-///                         .expect("should have data in ro")
-///                         .as_integer()
-///                         .expect("should be integer matrix")
-///                         .to_owned();
+///     async def run():
+///         client = QVMClient.new_http(QCSClient.load().qvm_url)
+///         result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
+///         let data = result.result_data
+///                             .to_register_map()
+///                             .expect("should convert to readout map")
+///                             .get_register_matrix("ro")
+///                             .expect("should have data in ro")
+///                             .as_integer()
+///                             .expect("should be integer matrix")
+///                             .to_owned();
 ///
-///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
-///     assert_eq!(data.nrows(), 4);
-///     for shot in data.rows() {
-///         // Each shot will contain all the memory, in order, for the vector (or "register") we
-///         // requested the results of. In this case, "ro" (the default).
-///         assert_eq!(shot.len(), 2);
-///         // In the case of this particular program, we know ro[0] should equal ro[1]
-///         assert_eq!(shot[0], shot[1]);
-///     }
+///         // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+///         assert_eq!(data.nrows(), 4);
+///         for shot in data.rows() {
+///             // Each shot will contain all the memory, in order, for the vector (or "register") we
+///             // requested the results of. In this case, "ro" (the default).
+///             assert_eq!(shot.len(), 2);
+///             // In the case of this particular program, we know ro[0] should equal ro[1]
+///             assert_eq!(shot[0], shot[1]);
+///         }
 ///
-/// def main():
-///     import asyncio
-///     asyncio.run(run())
-/// ```
+///     def main():
+///         import asyncio
+///         asyncio.run(run())
 ///
-/// # A Note on Lifetimes
+///         # "ro" is the only source read from by default if you don't specify `registers`.
 ///
-/// This structure utilizes multiple lifetimes for the sake of runtime efficiency.
-/// You should be able to largely ignore these, just keep in mind that any borrowed data passed to
-/// the methods most likely needs to live as long as this struct. Check individual methods for
-/// specifics. If only using `'static` strings then everything should just work.
+///         # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
+///         # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+///         # the memory offset `index` during shot `shot`.
+///         # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
+///         # which case you should build the matrix you need from [`QpuResultData`] directly. See
+///         # the [`RegisterMap`] documentation for more information on when this transformation
+///         # might fail.
 #[derive(Clone)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", name = "Executable", frozen)]
 pub(crate) struct PyExecutable(Arc<Mutex<Executable<'static, 'static>>>);
 
 #[derive(Clone)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", name = "JobHandle", frozen)]
 pub(crate) struct PyJobHandle(JobHandle<'static>);
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[pymethods]
 impl PyJobHandle {
     #[getter]
-    pub fn job_id(&self) -> JobId {
+    fn job_id(&self) -> JobId {
         self.0.job_id()
     }
 
     #[getter]
-    pub fn readout_map(&self) -> &HashMap<String, String> {
+    fn readout_map(&self) -> &HashMap<String, String> {
         self.0.readout_map()
     }
 }
@@ -142,7 +135,6 @@ macro_rules! py_job_handle {
     }};
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyExecutable {
@@ -201,6 +193,10 @@ impl PyExecutable {
     }
 
     #[instrument(skip_all)]
+    #[gen_stub(override_return_type(
+        type_repr="collections.abc.Awaitable[ExecutionData]",
+        imports=("collections.abc")
+    ))]
     pub fn execute_on_qvm_async<'py>(
         &self,
         py: Python<'py>,
@@ -246,6 +242,10 @@ impl PyExecutable {
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[gen_stub(override_return_type(
+        type_repr="collections.abc.Awaitable[ExecutionData]",
+        imports=("collections.abc")
+    ))]
     pub fn execute_on_qpu_async<'py>(
         &self,
         py: Python<'py>,
@@ -312,6 +312,10 @@ impl PyExecutable {
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[gen_stub(override_return_type(
+        type_repr="collections.abc.Awaitable[ExecutionData]",
+        imports=("collections.abc")
+    ))]
     pub fn submit_to_qpu_async<'py>(
         &self,
         py: Python<'py>,
@@ -355,6 +359,10 @@ impl PyExecutable {
         )
     }
 
+    #[gen_stub(override_return_type(
+        type_repr="collections.abc.Awaitable[ExecutionData]",
+        imports=("collections.abc")
+    ))]
     pub fn retrieve_results_async<'py>(
         &self,
         py: Python<'py>,
@@ -370,13 +378,12 @@ impl PyExecutable {
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", get_all, set_all)]
-pub struct ExeParameter {
-    pub name: String,
-    pub index: usize,
-    pub value: f64,
+pub(crate) struct ExeParameter {
+    name: String,
+    index: usize,
+    value: f64,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExeParameter {

@@ -45,6 +45,7 @@ python = [
   "dep:pyo3-log",
   "dep:pyo3-opentelemetry",
   "dep:pyo3-tracing-subscriber",
+  "dep:rigetti-pyo3",
   "experimental",
   "tracing-opentelemetry",
   "quil-rs/python",
@@ -56,6 +57,7 @@ stubs = [
   "quil-rs/stubs",
   "qcs-api-client-common/stubs",
   "pyo3-tracing-subscriber/stubs",
+  "rigetti-pyo3/stubs",
 ]
 experimental = []
 
@@ -70,26 +72,10 @@ itertools = "0.11.0"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
-
-libquil-sys = { version = "0.4.0", optional = true }
-numpy = { workspace = true, optional = true }
 opentelemetry = { workspace = true }
 opentelemetry_sdk = { workspace = true }
 optipy = "0.1.0"
-paste = { version = "1.0.15", optional = true }
 pbjson-types = "0.7.0"
-prost = { version = "0.13.3", optional = true }
-futures-util = { version = "0.3.24", optional = true }
-
-pyo3 = { workspace = true, optional = true }
-pyo3-async-runtimes = { workspace = true, optional = true }
-pyo3-log = { workspace = true, optional = true }
-pyo3-opentelemetry = { workspace = true, optional = true }
-pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
-
-# Enabled with the "stubs" feature.
-pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
-
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true
@@ -102,15 +88,34 @@ thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 toml = "0.7.3"
 tonic = { version = "0.12.3", features = ["tls", "tls-roots"] }
-tracing = { version = "0.1", optional = true, features = ["log"] }
 uuid = { version = "1.2.1", features = ["v4"] }
 zmq = { version = "0.10.0" }
 
-# TODO: quil-rs somehow was published with 7.0.1, even though it uses features from 7.0.5.
-lexical = "7.0.5"
+# Enabled with the "libquil" feature.
+libquil-sys = { version = "0.4.0", optional = true }
+
+# Enabled with the "tracing", "tracing-config", "tracing-opentelemtry", "python", or "stubs" features.
+tracing = { version = "0.1", optional = true, features = ["log"] }
+
+# Enabled with the "python" or "stubs" features.
+futures-util = { version = "0.3.24", optional = true }
+numpy = { workspace = true, optional = true }
+paste = { version = "1.0.15", optional = true }
+prost = { version = "0.13.3", optional = true }
+pyo3 = { workspace = true, optional = true }
+pyo3-async-runtimes = { workspace = true, optional = true }
+pyo3-log = { workspace = true, optional = true }
+pyo3-opentelemetry = { workspace = true, optional = true }
+pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
+rigetti-pyo3 = { workspace = true, optional = true }
+
+# Enabled with the "stubs" feature.
+pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
 
 [build-dependencies]
 built = "0.6.1"
+
+# Enabled with the "stubs" feature.
 pyo3-build-config = { workspace = true, optional = true }
 
 [dev-dependencies]

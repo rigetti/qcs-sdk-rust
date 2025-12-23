@@ -2,19 +2,24 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import collections.abc
 import datetime
+import enum
+import numpy
+import numpy.typing
 import typing
-from qcs_sdk.compiler.quilc import NativeQuilMetadata
+from qcs_sdk.compiler.quilc import CompilerOpts, NativeQuilMetadata, QuilcClient
 from qcs_sdk.qpu import QPUResultData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData
 from quil.program import Program
+from . import _qcs_sdk
 from . import client
 from . import qpu
 from . import qvm
-from enum import Enum
 
+@typing.final
 class CompilationResult:
     r"""
     The result of compiling a Quil program to native quil with `quilc`
@@ -30,6 +35,7 @@ class CompilationResult:
         The compiled program
         """
 
+@typing.final
 class ExeParameter:
     @property
     def index(self) -> builtins.int: ...
@@ -43,95 +49,105 @@ class ExeParameter:
     def value(self) -> builtins.float: ...
     @value.setter
     def value(self, value: builtins.float) -> None: ...
-    def __new__(cls, name:builtins.str, index:builtins.int, value:builtins.float) -> ExeParameter: ...
+    def __new__(cls, name: builtins.str, index: builtins.int, value: builtins.float) -> ExeParameter: ...
 
+@typing.final
 class Executable:
     r"""
     A builder interface for executing Quil programs on QVMs and QPUs.
     
     # Example
     
-    ```python
+    This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient::
     
-    PROGRAM = r"""
-    DECLARE ro BIT[2]
+        from qcs_sdk import Executable
+        from qcs_sdk.client import QCSClient
+        from qcs_sdk.qvm import QVMClient
     
-    H 0
-    CNOT 0 1
+        PROGRAM = """
+        DECLARE ro BIT[2]
     
-    MEASURE 0 ro[0]
-    MEASURE 1 ro[1]
+        H 0
+        CNOT 0 1
+    
+        MEASURE 0 ro[0]
+        MEASURE 1 ro[1]
+        """
+    
+        async def run():
+            client = QVMClient.new_http(QCSClient.load().qvm_url)
+            result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
+            let data = result.result_data
+                                .to_register_map()
+                                .expect("should convert to readout map")
+                                .get_register_matrix("ro")
+                                .expect("should have data in ro")
+                                .as_integer()
+                                .expect("should be integer matrix")
+                                .to_owned();
+    
+            // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+            assert_eq!(data.nrows(), 4);
+            for shot in data.rows() {
+                // Each shot will contain all the memory, in order, for the vector (or "register") we
+                // requested the results of. In this case, "ro" (the default).
+                assert_eq!(shot.len(), 2);
+                // In the case of this particular program, we know ro[0] should equal ro[1]
+                assert_eq!(shot[0], shot[1]);
+            }
+    
+        def main():
+            import asyncio
+            asyncio.run(run())
+    
+            # "ro" is the only source read from by default if you don't specify `registers`.
+    
+            # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
+            # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+            # the memory offset `index` during shot `shot`.
+            # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
+            # which case you should build the matrix you need from [`QpuResultData`] directly. See
+            # the [`RegisterMap`] documentation for more information on when this transformation
+            # might fail.
     """
-    
-    async def run():
-        # TODO: update this example
-        use std::num::NonZeroU16;
-        use qcs::qvm;
-        let qvm_client = qvm::http::HttpClient::from(&Qcs::load());
-        let mut result = Executable::from_quil(PROGRAM).with_qcs_client(Qcs::default()).with_shots(NonZeroU16::new(4).unwrap()).execute_on_qvm(&qvm_client).await.unwrap();
-        // "ro" is the only source read from by default if you don't specify a .read_from()
-    
-        // We first convert the readout data to a [`RegisterMap`] to get a mapping of registers
-        // (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
-        // the memory offset `index` during shot `shot`.
-        // There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
-        // which case you should build the matrix you need from [`QpuResultData`] directly. See
-        // the [`RegisterMap`] documentation for more information on when this transformation
-        // might fail.
-        let data = result.result_data
-                            .to_register_map()
-                            .expect("should convert to readout map")
-                            .get_register_matrix("ro")
-                            .expect("should have data in ro")
-                            .as_integer()
-                            .expect("should be integer matrix")
-                            .to_owned();
-    
-        // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
-        assert_eq!(data.nrows(), 4);
-        for shot in data.rows() {
-            // Each shot will contain all the memory, in order, for the vector (or "register") we
-            // requested the results of. In this case, "ro" (the default).
-            assert_eq!(shot.len(), 2);
-            // In the case of this particular program, we know ro[0] should equal ro[1]
-            assert_eq!(shot[0], shot[1]);
-        }
-    
-    def main():
-        import asyncio
-        asyncio.run(run())
-    ```
-    
-    # A Note on Lifetimes
-    
-    This structure utilizes multiple lifetimes for the sake of runtime efficiency.
-    You should be able to largely ignore these, just keep in mind that any borrowed data passed to
-    the methods most likely needs to live as long as this struct. Check individual methods for
-    specifics. If only using `'static` strings then everything should just work.
-    """
-    def execute_on_qpu(self, quantum_processor_id:builtins.str, endpoint_id:typing.Optional[builtins.str]=None, translation_options:typing.Optional[TranslationOptions]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> ExecutionData: ...
-    def execute_on_qpu_async(self, quantum_processor_id:builtins.str, endpoint_id:typing.Optional[builtins.str]=None, translation_options:typing.Optional[TranslationOptions]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
-    def execute_on_qvm(self, client:QVMClient) -> ExecutionData: ...
-    def execute_on_qvm_async(self, client:QVMClient) -> typing.Any: ...
-    def retrieve_results(self, job_handle:JobHandle) -> ExecutionData: ...
-    def retrieve_results_async(self, job_handle:JobHandle) -> typing.Any: ...
-    def submit_to_qpu(self, quantum_processor_id:builtins.str, endpoint_id:typing.Optional[builtins.str]=None, translation_options:typing.Optional[TranslationOptions]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> JobHandle: ...
-    def submit_to_qpu_async(self, quantum_processor_id:builtins.str, endpoint_id:typing.Optional[builtins.str]=None, translation_options:typing.Optional[TranslationOptions]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
+    def __new__(cls, quil: builtins.str, registers: typing.Sequence[builtins.str] = [], parameters: typing.Sequence[ExeParameter] = [], shots: typing.Optional[builtins.int] = None, quilc_client: typing.Optional[QuilcClient] = None, compiler_options: typing.Optional[CompilerOpts] = None) -> Executable: ...
+    def execute_on_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionData: ...
+    def execute_on_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]: ...
+    def execute_on_qvm(self, client: QVMClient) -> ExecutionData: ...
+    def execute_on_qvm_async(self, client: QVMClient) -> collections.abc.Awaitable[ExecutionData]: ...
+    def retrieve_results(self, job_handle: JobHandle) -> ExecutionData: ...
+    def retrieve_results_async(self, job_handle: JobHandle) -> collections.abc.Awaitable[ExecutionData]: ...
+    def submit_to_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> JobHandle: ...
+    def submit_to_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]: ...
 
+@typing.final
 class ExecutionData:
     r"""
     The result of executing an [`Executable`](crate::Executable)
     """
-    def __eq__(self, other:builtins.object) -> builtins.bool: ...
+    @property
+    def duration(self) -> typing.Optional[datetime.timedelta]:
+        r"""
+        The time it took to execute the program on the QPU, not including any network or queueing
+        time. If paying for on-demand execution, this is the amount you will be billed for.
+        
+        This will always be `None` for QVM execution.
+        """
+    @property
+    def result_data(self) -> ResultData:
+        r"""
+        The [`ResultData`] that was read from the [`Executable`](crate::Executable).
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
     def __getstate__(self) -> bytes: ...
-    def __new__(cls, result_data:typing.Optional[ResultData]=None, duration:typing.Optional[datetime.timedelta]=None) -> ExecutionData:
+    def __new__(cls, result_data: typing.Optional[ResultData] = None, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
         r"""
         Python constructor for `ExecutionData`.
         
-        result_data is optional here
+        `result_data` is optional here
         because pickling an object requires calling __new__ without arguments.
         """
-    def __setstate__(self, state:bytes) -> None: ...
+    def __setstate__(self, state: bytes) -> None: ...
 
 class ExecutionError(QcsSdkError):
     r"""
@@ -139,6 +155,7 @@ class ExecutionError(QcsSdkError):
     """
     ...
 
+@typing.final
 class JobHandle:
     ...
 
@@ -178,10 +195,12 @@ class RegisterData:
     have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
     convert any variant type to its inner data.
     """
+    def __new__(cls, values: typing.Any) -> RegisterData: ...
     def as_ndarray(self) -> typing.Any:
         r"""
         Returns the values as a 2D numpy ndarray.
         """
+    @typing.final
     class Complex32(RegisterData):
         r"""
         Results containing complex numbers.
@@ -189,10 +208,11 @@ class RegisterData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.complex]]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData.Complex32: ...
+        def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData.Complex32: ...
     
+    @typing.final
     class F64(RegisterData):
         r"""
         Corresponds to the Quil `REAL` type.
@@ -200,10 +220,11 @@ class RegisterData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.float]]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[typing.Sequence[builtins.float]]) -> RegisterData.F64: ...
+        def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.float]]) -> RegisterData.F64: ...
     
+    @typing.final
     class I16(RegisterData):
         r"""
         Corresponds to the Quil `INTEGER` type.
@@ -211,10 +232,11 @@ class RegisterData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.int]]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I16: ...
+        def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I16: ...
     
+    @typing.final
     class I8(RegisterData):
         r"""
         Corresponds to the Quil `BIT` or `OCTET` types.
@@ -222,43 +244,83 @@ class RegisterData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.int]]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I8: ...
+        def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I8: ...
     
 
+@typing.final
 class RegisterMap:
     r"""
     A mapping of a register name (ie. "ro") to a [`RegisterMatrix`] containing the values for the
     register.
     """
-    def __contains__(self, key:builtins.str) -> builtins.bool: ...
-    def __getitem__(self, item:builtins.str) -> RegisterMatrix: ...
+    def __contains__(self, key: builtins.str) -> builtins.bool: ...
+    def __getitem__(self, item: builtins.str) -> RegisterMatrix: ...
     def __iter__(self) -> RegisterMapKeysIter: ...
     def __len__(self) -> builtins.int: ...
-    def get(self, key:builtins.str, default:typing.Optional[RegisterMatrix]) -> typing.Optional[RegisterMatrix]: ...
-    def get_register_matrix(self, register_name:builtins.str) -> typing.Optional[RegisterMatrix]: ...
+    def get(self, key: builtins.str, default: typing.Optional[RegisterMatrix]) -> typing.Optional[RegisterMatrix]: ...
+    def get_register_matrix(self, register_name: builtins.str) -> typing.Optional[RegisterMatrix]: ...
     def items(self) -> RegisterMapItemsIter: ...
     def keys(self) -> RegisterMapKeysIter: ...
     def values(self) -> RegisterMapValuesIter: ...
 
+@typing.final
 class RegisterMapItemsIter:
     def __iter__(self) -> RegisterMapItemsIter: ...
     def __next__(self) -> typing.Optional[tuple[builtins.str, RegisterMatrix]]: ...
 
+@typing.final
 class RegisterMapKeysIter:
     def __iter__(self) -> RegisterMapKeysIter: ...
     def __next__(self) -> typing.Optional[builtins.str]: ...
 
+@typing.final
 class RegisterMapValuesIter:
     def __iter__(self) -> RegisterMapValuesIter: ...
     def __next__(self) -> typing.Optional[RegisterMatrix]: ...
 
 class RegisterMatrix:
     r"""
-    An enum representing every possible register type as a 2 dimensional matrix.
+    A 2 dimensional matrix of register values.
     """
     def to_ndarray(self) -> typing.Any: ...
+    @typing.final
+    class Complex(RegisterMatrix):
+        r"""
+        Complex numbered register
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> numpy.typing.NDArray[numpy.complex128]: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: numpy.typing.NDArray[numpy.complex128]) -> RegisterMatrix.Complex: ...
+    
+    @typing.final
+    class Integer(RegisterMatrix):
+        r"""
+        Integer register
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> numpy.typing.NDArray[numpy.int64]: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: numpy.typing.NDArray[numpy.int64]) -> RegisterMatrix.Integer: ...
+    
+    @typing.final
+    class Real(RegisterMatrix):
+        r"""
+        Real numbered register
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> numpy.typing.NDArray[numpy.float64]: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: numpy.typing.NDArray[numpy.float64]) -> RegisterMatrix.Real: ...
+    
 
 class RegisterMatrixConversionError(QcsSdkError):
     r"""
@@ -300,7 +362,12 @@ class ResultData:
     [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
     program to choose the correct readout values for each shot.
     """
-    def __repr__(self) -> builtins.str: ...
+    def __new__(cls, values: typing.Any) -> ResultData: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     def to_raw_readout_data(self) -> dict[str, list] | RawQPUReadoutData:
         r"""
         Get the raw readout data from either QPU or QVM result.
@@ -323,6 +390,7 @@ class ResultData:
         Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
         selects the last value per-shot based on the program that was run.
         """
+    @typing.final
     class Qpu(ResultData):
         r"""
         Readout data returned from the QPU, stored as [`QpuResultData`]
@@ -330,10 +398,11 @@ class ResultData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> QPUResultData: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:QPUResultData) -> ResultData.Qpu: ...
+        def __new__(cls, _0: QPUResultData) -> ResultData.Qpu: ...
     
+    @typing.final
     class Qvm(ResultData):
         r"""
         Data returned from the QVM, stored as [`QvmResultData`]
@@ -341,12 +410,13 @@ class ResultData:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> QVMResultData: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:QVMResultData) -> ResultData.Qvm: ...
+        def __new__(cls, _0: QVMResultData) -> ResultData.Qvm: ...
     
 
-class Service(Enum):
+@typing.final
+class Service(enum.Enum):
     r"""
     The external services that this SDK may connect to. Used to differentiate between networking
     issues in [`Error::Connection`].

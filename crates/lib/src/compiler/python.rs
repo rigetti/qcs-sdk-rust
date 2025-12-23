@@ -1,6 +1,7 @@
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 use std::convert::TryFrom;
 
-use pyo3::{prelude::*, wrap_pymodule};
+use pyo3::prelude::*;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
@@ -16,60 +17,49 @@ use crate::{
         },
         rpcq,
     },
-    pickle::pickleable_new,
-    python::{errors, impl_repr, py_function_sync_async},
+    python::errors,
     qpu::isa::python::PyInstructionSetArchitecture,
 };
 
-#[pymodule]
-#[pyo3(name = "compiler", module = "qcs_sdk", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_wrapped(wrap_pymodule!(init_submodule_quilc))?;
-    init_submodule_quilc(m)?;
-
-    Ok(())
+// compiler
+create_init_submodule! {
+    submodules: [ "quilc": pyquilc::init_submodule ],
 }
 
-#[pymodule]
-#[pyo3(name = "quilc", module = "qcs_sdk.compiler", submodule)]
-pub(crate) fn init_submodule_quilc(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
+mod pyquilc {
+    use super::*;
+    use rigetti_pyo3::create_init_submodule;
 
-    m.add("QuilcError", py.get_type::<errors::QuilcError>())?;
-    m.add("DEFAULT_COMPILER_TIMEOUT", DEFAULT_COMPILER_TIMEOUT)?;
-
-    m.add_class::<CompilerOpts>()?;
-    m.add_class::<CompilationResult>()?;
-    m.add_class::<NativeQuilMetadata>()?;
-    m.add_class::<TargetDevice>()?;
-    m.add_class::<PauliTerm>()?;
-    m.add_class::<ConjugateByCliffordRequest>()?;
-    m.add_class::<ConjugatePauliByCliffordResponse>()?;
-    m.add_class::<RandomizedBenchmarkingRequest>()?;
-    m.add_class::<GenerateRandomizedBenchmarkingSequenceResponse>()?;
-    m.add_class::<PyQuilcClient>()?;
-
-    m.add_function(wrap_pyfunction!(py_compile_program, m)?)?;
-    m.add_function(wrap_pyfunction!(py_compile_program_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_get_version_info, m)?)?;
-    m.add_function(wrap_pyfunction!(py_get_version_info_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_conjugate_pauli_by_clifford, m)?)?;
-    m.add_function(wrap_pyfunction!(py_conjugate_pauli_by_clifford_async, m)?)?;
-    m.add_function(wrap_pyfunction!(
-        py_generate_randomized_benchmarking_sequence,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        py_generate_randomized_benchmarking_sequence_async,
-        m
-    )?)?;
-
-    Ok(())
+    create_init_submodule! {
+        classes: [
+            CompilerOpts,
+            CompilationResult,
+            NativeQuilMetadata,
+            TargetDevice,
+            PauliTerm,
+            ConjugateByCliffordRequest,
+            ConjugatePauliByCliffordResponse,
+            RandomizedBenchmarkingRequest,
+            GenerateRandomizedBenchmarkingSequenceResponse,
+            PyQuilcClient
+        ],
+        consts: [ DEFAULT_COMPILER_TIMEOUT ],
+        errors: [ errors::QuilcError ],
+        funcs: [
+            py_compile_program,
+            py_compile_program_async,
+            py_get_version_info,
+            py_get_version_info_async,
+            py_conjugate_pauli_by_clifford,
+            py_conjugate_pauli_by_clifford_async,
+            py_generate_randomized_benchmarking_sequence,
+            py_generate_randomized_benchmarking_sequence_async
+        ],
+    }
 }
 
 impl_repr!(NativeQuilMetadata);
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl CompilerOpts {
@@ -89,7 +79,6 @@ impl CompilerOpts {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl TargetDevice {
@@ -105,7 +94,7 @@ impl TargetDevice {
 }
 
 #[derive(Clone, Debug)]
-pub enum QuilcClient {
+pub(crate) enum QuilcClient {
     Rpcq(rpcq::Client),
     #[cfg(feature = "libquil")]
     LibquilSys(super::libquil::Client),
@@ -119,7 +108,7 @@ pub(crate) struct PyQuilcClient {
 }
 
 impl QuilcClient {
-    pub fn as_client(&self) -> &dyn quilc::Client {
+    pub(crate) fn as_client(&self) -> &dyn quilc::Client {
         match self {
             QuilcClient::Rpcq(client) => client,
             #[cfg(feature = "libquil")]
@@ -158,7 +147,6 @@ impl quilc::Client for QuilcClient {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQuilcClient {
@@ -178,8 +166,13 @@ impl PyQuilcClient {
             inner: QuilcClient::Rpcq(rpcq::Client::new(endpoint)?),
         })
     }
+}
 
-    #[cfg(feature = "libquil")]
+// These are pulled out separately so that the feature flag won't confuse the stub generator.
+#[cfg(feature = "libquil")]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQuilcClient {
     #[staticmethod]
     fn new_libquil() -> Self {
         let libquil_client = qcs::compiler::libquil::Client {};
@@ -188,8 +181,23 @@ impl PyQuilcClient {
         }
     }
 }
+
+#[cfg(not(feature = "libquil"))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQuilcClient {
+    #[staticmethod]
+    #[pyo3(warn(
+        message = "The installed version of qcs_sdk was built without the libquil feature. Use QuilcClient.new_rpcq() instead.",
+    ))]
+    fn new_libquil() -> PyResult<Self> {
+        Err(errors::QuilcError::new_err(
+            "Cannot create a liquil QuilcClient. Use QuilcClient.new_rpcq() instead.",
+        ))
+    }
+}
+
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
@@ -215,32 +223,60 @@ py_function_sync_async! {
     }
 }
 
-pickleable_new! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-    #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
-    impl NativeQuilMetadata {
-        #[allow(clippy::too_many_arguments)]
-        pub fn __new__(
-            final_rewiring: Option<Vec<u64>>,
-            gate_depth: Option<u64>,
-            gate_volume: Option<u64>,
-            multiqubit_gate_depth: Option<u64>,
-            program_duration: Option<f64>,
-            program_fidelity: Option<f64>,
-            topological_swaps: Option<u64>,
-            qpu_runtime_estimation: Option<f64>,
-        ) -> Self {
-            Self {
-                final_rewiring: final_rewiring.unwrap_or_default(),
-                gate_depth,
-                gate_volume,
-                multiqubit_gate_depth,
-                program_duration,
-                program_fidelity,
-                topological_swaps,
-                qpu_runtime_estimation,
-            }
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl NativeQuilMetadata {
+    #[new]
+    #[expect(clippy::too_many_arguments)]
+    pub fn __new__(
+        final_rewiring: Option<Vec<u64>>,
+        gate_depth: Option<u64>,
+        gate_volume: Option<u64>,
+        multiqubit_gate_depth: Option<u64>,
+        program_duration: Option<f64>,
+        program_fidelity: Option<f64>,
+        topological_swaps: Option<u64>,
+        qpu_runtime_estimation: Option<f64>,
+    ) -> NativeQuilMetadata {
+        Self {
+            final_rewiring: final_rewiring.unwrap_or_default(),
+            gate_depth,
+            gate_volume,
+            multiqubit_gate_depth,
+            program_duration,
+            program_fidelity,
+            topological_swaps,
+            qpu_runtime_estimation,
         }
+    }
+
+    #[expect(clippy::type_complexity)]
+    fn __getnewargs__(
+        &self,
+    ) -> (
+        Option<Vec<u64>>,
+        Option<u64>,
+        Option<u64>,
+        Option<u64>,
+        Option<f64>,
+        Option<f64>,
+        Option<u64>,
+        Option<f64>,
+    ) {
+        (
+            if self.final_rewiring.is_empty() {
+                None
+            } else {
+                Some(self.final_rewiring.clone())
+            },
+            self.gate_depth,
+            self.gate_volume,
+            self.multiqubit_gate_depth,
+            self.program_duration,
+            self.program_fidelity,
+            self.topological_swaps,
+            self.qpu_runtime_estimation,
+        )
     }
 }
 
@@ -249,13 +285,12 @@ pickleable_new! {
     feature = "python",
     pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
 )]
-pub struct CompilationResult {
+pub(crate) struct CompilationResult {
     program: String,
     native_quil_metadata: Option<NativeQuilMetadata>,
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn get_version_info(client: PyQuilcClient) -> PyResult<String> {
@@ -263,7 +298,6 @@ py_function_sync_async! {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PauliTerm {
@@ -273,7 +307,6 @@ impl PauliTerm {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ConjugateByCliffordRequest {
@@ -284,7 +317,6 @@ impl ConjugateByCliffordRequest {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn conjugate_pauli_by_clifford(
@@ -297,7 +329,6 @@ py_function_sync_async! {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RandomizedBenchmarkingRequest {
@@ -320,7 +351,6 @@ impl RandomizedBenchmarkingRequest {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn generate_randomized_benchmarking_sequence(

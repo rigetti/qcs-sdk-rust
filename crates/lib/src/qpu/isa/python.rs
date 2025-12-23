@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use rigetti_pyo3::{create_init_submodule, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
@@ -8,40 +9,23 @@ use qcs_api_client_openapi::models::{
     OperationSite, Parameter,
 };
 
-use crate::{
-    client::Qcs,
-    python::{errors, py_function_sync_async},
-    qpu::get_isa,
-};
+use crate::{client::Qcs, python::errors, qpu::get_isa};
 
-#[pymodule]
-#[pyo3(name = "isa", module = "qcs_sdk.qpu", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
-
-    m.add(
-        "SerializeISAError",
-        py.get_type::<errors::SerializeISAError>(),
-    )?;
-    m.add("GetISAError", py.get_type::<errors::GetISAError>())?;
-
-    m.add_class::<PyFamily>()?;
-    m.add_class::<PyEdge>()?;
-    m.add_class::<PyNode>()?;
-    m.add_class::<PyArchitecture>()?;
-    m.add_class::<PyCharacteristic>()?;
-    m.add_class::<PyParameter>()?;
-    m.add_class::<PyOperationSite>()?;
-    m.add_class::<PyOperation>()?;
-    m.add_class::<PyInstructionSetArchitecture>()?;
-
-    m.add_function(wrap_pyfunction!(py_get_instruction_set_architecture, m)?)?;
-    m.add_function(wrap_pyfunction!(
-        py_get_instruction_set_architecture_async,
-        m
-    )?)?;
-
-    Ok(())
+// #[pyo3(name = "isa", module = "qcs_sdk.qpu", submodule)]
+create_init_submodule! {
+    classes: [
+        PyFamily,
+        PyEdge,
+        PyNode,
+        PyArchitecture,
+        PyCharacteristic,
+        PyParameter,
+        PyOperationSite,
+        PyOperation,
+        PyInstructionSetArchitecture
+    ],
+    errors: [ errors::SerializeISAError, errors::GetISAError ],
+    funcs: [ py_get_instruction_set_architecture, py_get_instruction_set_architecture_async ],
 }
 
 #[derive(Clone)]
@@ -94,17 +78,16 @@ pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
 #[error("Failed to serialize instruction set architecture: {0}")]
 pub struct SerializeIsaError(#[from] serde_json::Error);
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyInstructionSetArchitecture {
     #[staticmethod]
-    pub fn from_raw(json: String) -> Result<Self, SerializeIsaError> {
+    pub(crate) fn from_raw(json: String) -> Result<Self, SerializeIsaError> {
         Ok(Self(serde_json::from_str(&json)?))
     }
 
     #[pyo3(signature = (pretty = false))]
-    pub fn json(&self, pretty: bool) -> Result<String, SerializeIsaError> {
+    pub(crate) fn json(&self, pretty: bool) -> Result<String, SerializeIsaError> {
         let data = {
             if pretty {
                 serde_json::to_string_pretty(&self.0)
@@ -146,7 +129,6 @@ impl PyInstructionSetArchitecture {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyOperation {
@@ -181,7 +163,6 @@ impl PyOperation {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyOperationSite {
@@ -201,7 +182,6 @@ impl PyOperationSite {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyParameter {
@@ -211,7 +191,6 @@ impl PyParameter {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyCharacteristic {
@@ -246,7 +225,6 @@ impl PyCharacteristic {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyArchitecture {
@@ -266,7 +244,6 @@ impl PyArchitecture {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyNode {
@@ -276,7 +253,6 @@ impl PyNode {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyEdge {
@@ -287,7 +263,6 @@ impl PyEdge {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None))]

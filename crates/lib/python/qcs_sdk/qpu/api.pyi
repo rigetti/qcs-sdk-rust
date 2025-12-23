@@ -2,11 +2,14 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import collections.abc
+import datetime
 import typing
 from qcs_sdk import QcsSdkError
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu import ConnectionStrategy, MemoryValues
 
+@typing.final
 class APIExecutionOptions:
     r"""
     Options available when executing a job on a QPU, particular to the execution service's API.
@@ -34,16 +37,21 @@ class APIExecutionOptions:
         
         The service may also enforce a maximum value for this field.
         """
-    def __repr__(self) -> builtins.str: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     @staticmethod
-    def builder() -> ApiExecutionOptionsBuilder:
+    def builder() -> APIExecutionOptionsBuilder:
         r"""
         Get an [`ExecutionOptionsBuilder`] that can be used to build a custom [`ExecutionOptions`].
         """
     @staticmethod
     def default() -> APIExecutionOptions: ...
 
-class ApiExecutionOptionsBuilder:
+@typing.final
+class APIExecutionOptionsBuilder:
     r"""
     Builder for [`ApiExecutionOptions`](struct.ApiExecutionOptions.html).
     """
@@ -51,10 +59,10 @@ class ApiExecutionOptionsBuilder:
     def bypass_settings_protection(self, value: builtins.bool) -> None: ...
     @timeout.setter
     def timeout(self, value: typing.Optional[QpuApiDuration]) -> None: ...
-    def __new__(cls) -> ApiExecutionOptionsBuilder: ...
+    def __new__(cls) -> APIExecutionOptionsBuilder: ...
     def build(self) -> APIExecutionOptions: ...
     @staticmethod
-    def default() -> ApiExecutionOptionsBuilder: ...
+    def default() -> APIExecutionOptionsBuilder: ...
 
 class BuildOptionsError(QpuApiError):
     r"""
@@ -62,6 +70,7 @@ class BuildOptionsError(QpuApiError):
     """
     ...
 
+@typing.final
 class ExecutionOptions:
     r"""
     Options available when executing a job on a QPU.
@@ -78,16 +87,24 @@ class ExecutionOptions:
         """
     @property
     def timeout_seconds(self) -> typing.Optional[builtins.float]: ...
-    def __eq__(self, other:builtins.object) -> builtins.bool: ...
-    def __repr__(self) -> builtins.str: ...
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __getnewargs__(self) -> tuple[ConnectionStrategy, typing.Optional[datetime.timedelta], typing.Optional[APIExecutionOptions]]: ...
+    def __new__(cls, connection_strategy: ConnectionStrategy = ..., timeout: typing.Optional[datetime.timedelta] = ..., api_options: typing.Optional[APIExecutionOptions] = None) -> ExecutionOptions: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     @staticmethod
     def builder() -> ExecutionOptionsBuilder: ...
     @staticmethod
     def default() -> ExecutionOptions: ...
 
+@typing.final
 class ExecutionOptionsBuilder:
     ...
 
+@typing.final
 class ExecutionOptionsBuilder:
     r"""
     Builder for [`ExecutionOptions`](struct.ExecutionOptions.html).
@@ -103,6 +120,7 @@ class ExecutionOptionsBuilder:
     @staticmethod
     def default() -> ExecutionOptionsBuilder: ...
 
+@typing.final
 class ExecutionResult:
     r"""
     The execution readout data from a particular memory location.
@@ -123,8 +141,9 @@ class ExecutionResult:
         Describes result shape dimensions.
         """
     @staticmethod
-    def from_register(register:Register) -> ExecutionResult: ...
+    def from_register(register: Register) -> ExecutionResult: ...
 
+@typing.final
 class ExecutionResults:
     @property
     def buffers(self) -> builtins.dict[builtins.str, ExecutionResult]:
@@ -138,14 +157,15 @@ class ExecutionResults:
         """
     @property
     def memory(self) -> builtins.dict[builtins.str, MemoryValues]: ...
-    def __new__(cls, buffers:typing.Mapping[builtins.str, ExecutionResult], memory:typing.Mapping[builtins.str, MemoryValues], execution_duration_microseconds:typing.Optional[builtins.int]) -> ExecutionResults: ...
+    def __new__(cls, buffers: typing.Mapping[builtins.str, ExecutionResult], memory: typing.Mapping[builtins.str, MemoryValues], execution_duration_microseconds: typing.Optional[builtins.int]) -> ExecutionResults: ...
 
+@typing.final
 class QpuApiDuration:
     @property
     def nanos(self) -> builtins.int: ...
     @property
     def seconds(self) -> builtins.int: ...
-    def __new__(cls, seconds:builtins.int, nanos:builtins.int) -> QpuApiDuration: ...
+    def __new__(cls, seconds: builtins.int, nanos: builtins.int) -> QpuApiDuration: ...
 
 class QpuApiError(QcsSdkError):
     r"""
@@ -155,23 +175,25 @@ class QpuApiError(QcsSdkError):
 
 class Register:
     r"""
-    Variants of data vectors within a single ExecutionResult.
+    Variants of data vectors within a single `ExecutionResult`.
     """
+    @typing.final
     class Complex32(Register):
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.complex]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[builtins.complex]) -> Register.Complex32: ...
+        def __new__(cls, _0: typing.Sequence[builtins.complex]) -> Register.Complex32: ...
     
+    @typing.final
     class I32(Register):
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[builtins.int]) -> Register.I32: ...
+        def __new__(cls, _0: typing.Sequence[builtins.int]) -> Register.I32: ...
     
     ...
 
@@ -181,19 +203,19 @@ class SubmissionError(QpuApiError):
     """
     ...
 
-def cancel_job(job_id:builtins.str, quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> None: ...
+def cancel_job(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None: ...
 
-def cancel_job_async(job_id:builtins.str, quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
+def cancel_job_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]: ...
 
-def cancel_jobs(job_ids:typing.Sequence[builtins.str], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> None: ...
+def cancel_jobs(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None: ...
 
-def cancel_jobs_async(job_ids:typing.Sequence[builtins.str], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
+def cancel_jobs_async(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]: ...
 
-def retrieve_results(job_id:builtins.str, quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> ExecutionResults: ...
+def retrieve_results(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionResults: ...
 
-def retrieve_results_async(job_id:builtins.str, quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
+def retrieve_results_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionResults]: ...
 
-def submit(program:builtins.str, patch_values:typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> builtins.str:
+def submit(program: builtins.str, patch_values: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> builtins.str:
     r"""
     Submits an executable `program` to be run on the specified QPU
     
@@ -205,7 +227,7 @@ def submit(program:builtins.str, patch_values:typing.Mapping[builtins.str, typin
     * the program cannot be submitted
     """
 
-def submit_async(program:builtins.str, patch_values:typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any:
+def submit_async(program: builtins.str, patch_values: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[builtins.str]:
     r"""
     Submits an executable `program` to be run on the specified QPU
     
@@ -217,7 +239,7 @@ def submit_async(program:builtins.str, patch_values:typing.Mapping[builtins.str,
     * the program cannot be submitted
     """
 
-def submit_with_parameter_batch(program:builtins.str, patch_values:typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> builtins.list[builtins.str]: ...
+def submit_with_parameter_batch(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> builtins.list[builtins.str]: ...
 
-def submit_with_parameter_batch_async(program:builtins.str, patch_values:typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id:typing.Optional[builtins.str]=None, client:typing.Optional[QCSClient]=None, execution_options:typing.Optional[ExecutionOptions]=None) -> typing.Any: ...
+def submit_with_parameter_batch_async(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]: ...
 

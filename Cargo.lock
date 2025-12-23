@@ -504,7 +504,7 @@ dependencies = [
  "bitflags 1.3.2",
  "strsim 0.8.0",
  "textwrap",
- "unicode-width",
+ "unicode-width 0.1.14",
  "vec_map",
 ]
 
@@ -620,6 +620,12 @@ name = "crossbeam-utils"
 version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
+
+[[package]]
+name = "crunchy"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 
 [[package]]
 name = "crypto-common"
@@ -1066,6 +1072,15 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "getopts"
+version = "0.2.24"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cfe4fbac503b8d1f88e6676011885f34b7174f46e59956bba534ba83abded4df"
+dependencies = [
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
@@ -1854,6 +1869,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "469fb0b9cefa57e3ef31275ee7cacb78f2fdca44e4765491884a2b119d4eb130"
 
 [[package]]
+name = "is-macro"
+version = "0.3.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d57a3e447e24c22647738e4607f1df1e0ec6f72e16182c4cd199f647cdfb0e4"
+dependencies = [
+ "heck 0.5.0",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.110",
+]
+
+[[package]]
 name = "is-terminal"
 version = "0.4.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1971,6 +1998,12 @@ dependencies = [
  "crossbeam",
  "rayon",
 ]
+
+[[package]]
+name = "lalrpop-util"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "507460a910eb7b32ee961886ff48539633b788a36b65692b95f225b844c82553"
 
 [[package]]
 name = "lazy_static"
@@ -2636,6 +2669,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "optipy"
+version = "0.1.0"
+source = "git+https://github.com/rigetti/rigetti-pyo3.git?rev=refs%2Fpull%2F62%2Fhead#3c65932332870ec440219b5f60906f799140ff3b"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.110",
+]
+
+[[package]]
 name = "ordered-float"
 version = "5.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2816,6 +2859,44 @@ checksum = "3672b37090dbd86368a4145bc067582552b29c27377cad4e0a306c97f9bd7772"
 dependencies = [
  "fixedbitset 0.5.7",
  "indexmap 2.12.0",
+]
+
+[[package]]
+name = "phf"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd6780a80ae0c52cc120a26a1a42c1ae51b247a253e4e06113d23d2c2edd078"
+dependencies = [
+ "phf_shared",
+]
+
+[[package]]
+name = "phf_codegen"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aef8048c789fa5e851558d709946d6d79a8ff88c0440c587967f8e94bfb1216a"
+dependencies = [
+ "phf_generator",
+ "phf_shared",
+]
+
+[[package]]
+name = "phf_generator"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c80231409c20246a13fddb31776fb942c38553c51e871f8cbd687a4cfb5843d"
+dependencies = [
+ "phf_shared",
+ "rand 0.8.5",
+]
+
+[[package]]
+name = "phf_shared"
+version = "0.11.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67eabc2ef2a60eb7faa00097bd1ffdb5bd28e62bf39990626a582201b7a754e5"
+dependencies = [
+ "siphasher",
 ]
 
 [[package]]
@@ -3081,7 +3162,8 @@ dependencies = [
 
 [[package]]
 name = "pyo3-opentelemetry"
-version = "0.5.0"
+version = "0.4.0"
+source = "git+https://github.com/rigetti/pyo3-opentelemetry.git?rev=refs%2Fpull%2F29%2Fhead#5ce1fefa3171c19719b2cffe2850f6fdca469977"
 dependencies = [
  "opentelemetry",
  "opentelemetry_sdk",
@@ -3092,6 +3174,7 @@ dependencies = [
 [[package]]
 name = "pyo3-opentelemetry-macros"
 version = "0.4.0"
+source = "git+https://github.com/rigetti/pyo3-opentelemetry.git?rev=refs%2Fpull%2F29%2Fhead#5ce1fefa3171c19719b2cffe2850f6fdca469977"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3100,16 +3183,16 @@ dependencies = [
 
 [[package]]
 name = "pyo3-stub-gen"
-version = "0.14.1"
+version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "847a5d16b7e5b702d35bcb99d72611259821837dd6fe9ca6930e73608e41d46b"
+checksum = "398b833826a83ca72c1e26d1b2c7c71f9ca7c3bfc74eacc663901895c362ae33"
 dependencies = [
  "anyhow",
  "chrono",
  "either",
  "indexmap 2.12.0",
  "inventory",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "log",
  "maplit",
  "num-complex",
@@ -3123,19 +3206,22 @@ dependencies = [
 
 [[package]]
 name = "pyo3-stub-gen-derive"
-version = "0.14.1"
+version = "0.17.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f7fd6cb0dc721eb475e2bec659ea57474a9407250465293197fd073b5eaa9af"
+checksum = "2426ba759d848787239d80f9fdb1f223786976f87fb6c3da8188ca7c17744b28"
 dependencies = [
  "heck 0.5.0",
+ "indexmap 2.12.0",
  "proc-macro2",
  "quote",
+ "rustpython-parser",
  "syn 2.0.110",
 ]
 
 [[package]]
 name = "pyo3-tracing-subscriber"
 version = "0.3.0"
+source = "git+https://github.com/rigetti/pyo3-opentelemetry.git?rev=refs%2Fpull%2F29%2Fhead#5ce1fefa3171c19719b2cffe2850f6fdca469977"
 dependencies = [
  "futures-core",
  "handlebars",
@@ -3174,7 +3260,6 @@ dependencies = [
  "insta",
  "itertools 0.11.0",
  "lazy_static",
- "lexical",
  "libquil-sys",
  "maplit",
  "ndarray",
@@ -3182,7 +3267,7 @@ dependencies = [
  "numpy",
  "opentelemetry",
  "opentelemetry_sdk",
- "optipy",
+ "optipy 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "paste",
  "pbjson-types",
  "prost",
@@ -3199,6 +3284,7 @@ dependencies = [
  "quil-rs",
  "regex",
  "reqwest",
+ "rigetti-pyo3",
  "rmp-serde",
  "rstest",
  "serde",
@@ -3220,6 +3306,7 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-common"
 version = "0.12.12"
+source = "git+https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git?rev=refs%2Fmerge-requests%2F177%2Fhead#82e3946c69b879b16dc7bcda7b8e71c7b5887eb0"
 dependencies = [
  "async-tempfile",
  "async-trait",
@@ -3234,13 +3321,14 @@ dependencies = [
  "hyper-util",
  "jsonwebtoken",
  "oauth2",
- "optipy",
+ "optipy 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "paste",
  "pyo3",
  "pyo3-async-runtimes",
  "pyo3-build-config",
  "pyo3-stub-gen",
  "reqwest",
+ "rigetti-pyo3",
  "serde",
  "serde_json",
  "shellexpand",
@@ -3259,6 +3347,7 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-grpc"
 version = "0.12.12"
+source = "git+https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git?rev=refs%2Fmerge-requests%2F177%2Fhead#82e3946c69b879b16dc7bcda7b8e71c7b5887eb0"
 dependencies = [
  "backoff",
  "futures-util",
@@ -3296,6 +3385,7 @@ dependencies = [
 [[package]]
 name = "qcs-api-client-openapi"
 version = "0.13.13"
+source = "git+https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git?rev=refs%2Fmerge-requests%2F177%2Fhead#82e3946c69b879b16dc7bcda7b8e71c7b5887eb0"
 dependencies = [
  "anyhow",
  "http 1.3.1",
@@ -3321,6 +3411,7 @@ checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
 [[package]]
 name = "quil-rs"
 version = "0.33.0"
+source = "git+https://github.com/rigetti/quil-rs.git?rev=refs%2Fpull%2F491%2Fhead#ce2fa49a604797d9e5fcf3cff4349b2ae8982ee3"
 dependencies = [
  "approx",
  "indexmap 2.12.0",
@@ -3333,13 +3424,14 @@ dependencies = [
  "num-complex",
  "numpy",
  "once_cell",
- "optipy",
+ "optipy 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "paste",
  "petgraph 0.6.5",
  "pyo3",
  "pyo3-build-config",
  "pyo3-stub-gen",
  "regex",
+ "rigetti-pyo3",
  "serde",
  "statrs",
  "strum",
@@ -3653,6 +3745,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rigetti-pyo3"
+version = "0.4.4"
+source = "git+https://github.com/rigetti/rigetti-pyo3.git?rev=refs%2Fpull%2F62%2Fhead#3c65932332870ec440219b5f60906f799140ff3b"
+dependencies = [
+ "indexmap 2.12.0",
+ "itertools 0.11.0",
+ "optipy 0.1.0 (git+https://github.com/rigetti/rigetti-pyo3.git?rev=refs%2Fpull%2F62%2Fhead)",
+ "pyo3",
+ "pyo3-async-runtimes",
+ "pyo3-stub-gen",
+ "tokio",
+]
+
+[[package]]
 name = "ring"
 version = "0.17.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3846,6 +3952,63 @@ dependencies = [
  "ring",
  "rustls-pki-types",
  "untrusted",
+]
+
+[[package]]
+name = "rustpython-ast"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4cdaf8ee5c1473b993b398c174641d3aa9da847af36e8d5eb8291930b72f31a5"
+dependencies = [
+ "is-macro",
+ "num-bigint",
+ "rustpython-parser-core",
+ "static_assertions",
+]
+
+[[package]]
+name = "rustpython-parser"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "868f724daac0caf9bd36d38caf45819905193a901e8f1c983345a68e18fb2abb"
+dependencies = [
+ "anyhow",
+ "is-macro",
+ "itertools 0.11.0",
+ "lalrpop-util",
+ "log",
+ "num-bigint",
+ "num-traits",
+ "phf",
+ "phf_codegen",
+ "rustc-hash 1.1.0",
+ "rustpython-ast",
+ "rustpython-parser-core",
+ "tiny-keccak",
+ "unic-emoji-char",
+ "unic-ucd-ident",
+ "unicode_names2",
+]
+
+[[package]]
+name = "rustpython-parser-core"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4b6c12fa273825edc7bccd9a734f0ad5ba4b8a2f4da5ff7efe946f066d0f4ad"
+dependencies = [
+ "is-macro",
+ "memchr",
+ "rustpython-parser-vendored",
+]
+
+[[package]]
+name = "rustpython-parser-vendored"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "04fcea49a4630a3a5d940f4d514dc4f575ed63c14c3e3ed07146634aed7f67a6"
+dependencies = [
+ "memchr",
+ "once_cell",
 ]
 
 [[package]]
@@ -4127,6 +4290,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "siphasher"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56199f7ddabf13fe5074ce809e7d3f42b42ae711800501b5b16ea82ad029c39d"
+
+[[package]]
 name = "slab"
 version = "0.4.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4156,6 +4325,12 @@ name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
+
+[[package]]
+name = "static_assertions"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
 name = "statrs"
@@ -4344,7 +4519,7 @@ version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
- "unicode-width",
+ "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -4426,6 +4601,15 @@ checksum = "3f252a68540fde3a3877aeea552b832b40ab9a69e318efd078774a01ddee1ccf"
 dependencies = [
  "num-conv",
  "time-core",
+]
+
+[[package]]
+name = "tiny-keccak"
+version = "2.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c9d3793400a45f954c52e73d068316d76b6f4e36977e3fcebb13a2721e80237"
+dependencies = [
+ "crunchy",
 ]
 
 [[package]]
@@ -4924,6 +5108,58 @@ dependencies = [
 ]
 
 [[package]]
+name = "unic-char-property"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a8c57a407d9b6fa02b4795eb81c5b6652060a15a7903ea981f3d723e6c0be221"
+dependencies = [
+ "unic-char-range",
+]
+
+[[package]]
+name = "unic-char-range"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0398022d5f700414f6b899e10b8348231abf9173fa93144cbc1a43b9793c1fbc"
+
+[[package]]
+name = "unic-common"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "80d7ff825a6a654ee85a63e80f92f054f904f21e7d12da4e22f9834a4aaa35bc"
+
+[[package]]
+name = "unic-emoji-char"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b07221e68897210270a38bde4babb655869637af0f69407f96053a34f76494d"
+dependencies = [
+ "unic-char-property",
+ "unic-char-range",
+ "unic-ucd-version",
+]
+
+[[package]]
+name = "unic-ucd-ident"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e230a37c0381caa9219d67cf063aa3a375ffed5bf541a452db16e744bdab6987"
+dependencies = [
+ "unic-char-property",
+ "unic-char-range",
+ "unic-ucd-version",
+]
+
+[[package]]
+name = "unic-ucd-version"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96bd2f2237fe450fcd0a1d2f5f4e91711124f7857ba2e964247776ebeeb7b0c4"
+dependencies = [
+ "unic-common",
+]
+
+[[package]]
 name = "unicase"
 version = "2.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4940,6 +5176,34 @@ name = "unicode-width"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
+name = "unicode-width"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4ac048d71ede7ee76d585517add45da530660ef4390e49b098733c6e897f254"
+
+[[package]]
+name = "unicode_names2"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d1673eca9782c84de5f81b82e4109dcfb3611c8ba0d52930ec4a9478f547b2dd"
+dependencies = [
+ "phf",
+ "unicode_names2_generator",
+]
+
+[[package]]
+name = "unicode_names2_generator"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b91e5b84611016120197efd7dc93ef76774f4e084cd73c9fb3ea4a86c570c56e"
+dependencies = [
+ "getopts",
+ "log",
+ "phf_codegen",
+ "rand 0.8.5",
+]
 
 [[package]]
 name = "unindent"

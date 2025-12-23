@@ -344,17 +344,20 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 /// to build a custom set of options.
 #[derive(Builder, Clone, Debug, PartialEq)]
 #[cfg_attr(
-    not(feature = "stubs"),
-    builder_struct_attr(optipy::strip_pyo3(only_stubs))
+    not(feature = "python"),
+    builder_struct_attr(optipy::strip_pyo3),
+    optipy::strip_pyo3
 )]
-#[cfg_attr(feature = "stubs", builder_struct_attr(gen_stub_pyclass))]
+#[cfg_attr(
+    feature = "stubs",
+    builder_struct_attr(gen_stub_pyclass),
+    gen_stub_pyclass
+)]
 #[cfg_attr(
     feature = "python",
-    builder_struct_attr(pyo3::pyclass(module = "qcs_sdk.qpu.api"))
+    builder_struct_attr(pyo3::pyclass(module = "qcs_sdk.qpu.api")),
+    pyo3::pyclass(module = "qcs_sdk.qpu.api", eq)
 )]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.api", eq))]
 pub struct ExecutionOptions {
     #[pyo3(get)]
     #[doc = "The [`ConnectionStrategy`] to use to establish a connection to the QPU."]
@@ -385,15 +388,18 @@ impl Eq for ExecutionOptions {}
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default, PartialEq)]
-#[cfg_attr(feature = "stubs", builder_struct_attr(gen_stub_pyclass))]
+#[derive(Builder, Clone, Copy, Debug, Default, PartialEq)]
 #[cfg_attr(
-    feature = "python",
-    builder_struct_attr(pyo3::pyclass(module = "qcs_sdk.qpu.api"))
+    feature = "stubs",
+    builder_struct_attr(gen_stub_pyclass),
+    gen_stub_pyclass
 )]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
+    builder_struct_attr(pyo3::pyclass(
+        name = "APIExecutionOptionsBuilder",
+        module = "qcs_sdk.qpu.api"
+    )),
     pyo3::pyclass(name = "APIExecutionOptions", module = "qcs_sdk.qpu.api")
 )]
 #[allow(clippy::module_name_repetitions)]
@@ -404,7 +410,7 @@ pub struct ApiExecutionOptions {
 
 impl Eq for ApiExecutionOptions {}
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[cfg_attr(feature = "python", pyo3::pymethods)]
 impl ApiExecutionOptions {

@@ -25,7 +25,7 @@ classifiers = [
 dependencies = ["quil>=0.33.0-rc.4", "qcs-api-client-common>=0.11.8"]
 
 [tool.maturin]
-features = ["pyo3/extension-module", "python"]
+features = ["python"]
 bindings = "pyo3"
 include = ["README-py.md", "THIRDPARTY.yaml"]
 python-source = "python"
@@ -46,7 +46,7 @@ dev = [
     "pytest-sugar >= 1.0.0",
     "pytest-clarity >= 1.0.1",
     "syrupy >= 4.0.0",
-    "maturin == 1.9.4", # TODO coordinate this with .github/workflows/release-python.yml
+    "maturin >= 1.9.4", # TODO coordinate this with .github/workflows/release-python.yml
     "numpy >= 1.24.1",
     "pdoc >= 14.6.1",
     "ruff >= 0.3.5",
@@ -54,7 +54,7 @@ dev = [
 ]
 
 [build-system]
-requires = ["maturin==1.9.4"] # coordinate this with .github/workflows/release-python.yml
+requires = ["maturin>=1.9.4,<2.0.0"] # coordinate this with .github/workflows/release-python.yml
 build-backend = "maturin"
 
 [tool.black]

@@ -9,23 +9,16 @@ use pyo3::{
     types::{PyBytes, PyDelta, PyList},
     Bound, IntoPyObjectExt, Py, PyAny, PyRef, PyRefMut, PyResult, Python,
 };
+use rigetti_pyo3::impl_repr;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
+use crate::qpu::QpuResultData;
 use crate::qvm::QvmResultData;
 use crate::{
-    python::impl_repr,
     qpu::{result_data::MemoryValues, ReadoutValues},
     ExecutionData, RegisterMap, RegisterMatrix, ResultData,
-};
-use crate::{
-    python::NonZeroU16,
-    qpu::QpuResultData,
-    qvm::http::{
-        AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
-        WavefunctionRequest,
-    },
 };
 
 impl_repr!(ResultData);
@@ -41,6 +34,19 @@ impl Default for ResultData {
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl ResultData {
+    #[new]
+    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
+        if let Ok(data) = values.extract::<QvmResultData>() {
+            Ok(Self::Qvm(data))
+        } else if let Ok(data) = values.extract::<QpuResultData>() {
+            Ok(Self::Qpu(data))
+        } else {
+            Err(pyo3::exceptions::PyTypeError::new_err(
+                "expected QVM or QPU result data",
+            ))
+        }
+    }
+
     /// Get the raw readout data from either QPU or QVM result.
     #[gen_stub(override_return_type(type_repr = "dict[str, list] | RawQPUReadoutData"))]
     fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
@@ -51,7 +57,6 @@ impl ResultData {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionData {
@@ -148,7 +153,6 @@ impl PyRegisterMatrix {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl PyRegisterMatrix {
@@ -161,7 +165,6 @@ impl PyRegisterMatrix {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMap {
@@ -184,13 +187,13 @@ impl RegisterMap {
         self.0.contains_key(key)
     }
 
-    fn __getitem__<'py>(&self, py: Python<'py>, item: &str) -> PyResult<PyRegisterMatrix> {
+    fn __getitem__(&self, py: Python<'_>, item: &str) -> PyResult<PyRegisterMatrix> {
         self.py_get_register_matrix(py, item).ok_or_else(|| {
             pyo3::exceptions::PyKeyError::new_err(format!("Key {item} not found in RegisterMap"))
         })
     }
 
-    fn __iter__<'py>(&self, py: Python<'py>) -> PyResult<Py<RegisterMapKeysIter>> {
+    fn __iter__(&self, py: Python<'_>) -> PyResult<Py<RegisterMapKeysIter>> {
         Py::new(
             py,
             RegisterMapKeysIter {
@@ -231,14 +234,12 @@ impl RegisterMap {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
 pub(crate) struct RegisterMapItemsIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapItemsIter {
@@ -256,14 +257,12 @@ impl RegisterMapItemsIter {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
 pub(crate) struct RegisterMapKeysIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapKeysIter {
@@ -276,14 +275,12 @@ impl RegisterMapKeysIter {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk")]
 pub(crate) struct RegisterMapValuesIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapValuesIter {
@@ -298,7 +295,6 @@ impl RegisterMapValuesIter {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl QpuResultData {
@@ -351,13 +347,8 @@ impl QpuResultData {
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk.qpu", name = "RawQPUReadoutData", get_all)]
-pub struct RawQpuReadoutData {
+pub(crate) struct RawQpuReadoutData {
     pub mappings: HashMap<String, String>,
     pub readout_values: HashMap<String, Py<PyList>>,
     pub memory_values: HashMap<String, Py<PyList>>,
 }
-
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[pymethods]
-impl QvmResultData {}

@@ -63,6 +63,7 @@ pub enum ResultData {
 
 /// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
 pub struct ExecutionData {

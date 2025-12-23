@@ -4,7 +4,7 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
 
 use reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};

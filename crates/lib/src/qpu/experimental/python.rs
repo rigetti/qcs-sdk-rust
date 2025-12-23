@@ -1,4 +1,5 @@
-use pyo3::{prelude::*, types::PyType, wrap_pymodule};
+use pyo3::{prelude::*, types::PyType};
+use rigetti_pyo3::create_init_submodule;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::gen_stub_pymethods;
@@ -13,29 +14,20 @@ use crate::{
     },
 };
 
-#[pymodule]
-#[pyo3(name = "experimental", module = "qcs_sdk.qpu", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_wrapped(wrap_pymodule!(init_submodule_random))?;
-    init_submodule_random(m)?;
-
-    Ok(())
+// #[pyo3(name = "experimental", module = "qcs_sdk.qpu", submodule)]
+create_init_submodule! {
+    submodules: [ "random": random::init_submodule ],
 }
 
-#[pymodule]
-#[pyo3(name = "random", module = "qcs_sdk.qpu.experimental", submodule)]
-pub(crate) fn init_submodule_random(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
+mod random {
+    use super::*;
 
-    m.add("RandomError", py.get_type::<errors::RandomError>())?;
-
-    m.add_class::<ChooseRandomRealSubRegions>()?;
-    m.add_class::<PrngSeedValue>()?;
-
-    m.add_function(wrap_pyfunction!(choose_random_real_sub_region_indices, m)?)?;
-    m.add_function(wrap_pyfunction!(lfsr_v1_next, m)?)?;
-
-    Ok(())
+    // #[pyo3(name = "random", module = "qcs_sdk.qpu.experimental", submodule)]
+    create_init_submodule! {
+        classes: [ ChooseRandomRealSubRegions, PrngSeedValue ],
+        errors: [ errors::RandomError ],
+        funcs: [ choose_random_real_sub_region_indices, lfsr_v1_next ],
+    }
 }
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]

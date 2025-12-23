@@ -23,14 +23,15 @@ pyo3 = { version = "0.27.2", features = ["num-complex", "multiple-pymethods"] }
 pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runtime"] }
 pyo3-build-config = "0.27.2"
 pyo3-log = { version = "0.13.2" }
-pyo3-opentelemetry = { path = "../pyo3-opentelemetry/crates/opentelemetry" }
-pyo3-tracing-subscriber = { path = "../pyo3-opentelemetry/crates/tracing-subscriber", default-features = false }
-pyo3-stub-gen = { version = "0.14.1", features = ["numpy"] }
+pyo3-opentelemetry = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
+pyo3-tracing-subscriber = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
+pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
+rigetti-pyo3 = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
 
-qcs-api-client-common = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-common" }
-qcs-api-client-grpc = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-grpc" }
-qcs-api-client-openapi = { path = "../../internal/stack/qcs/clients/qcs-api-client-rust/qcs-api-client-openapi/public" }
-quil-rs = { path = "../quil-rs/quil-rs" }
+qcs-api-client-common = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
+qcs-api-client-grpc = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
+qcs-api-client-openapi = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
+quil-rs = { git = "https://github.com/rigetti/quil-rs.git", rev = "refs/pull/491/head" }
 
 serde_json = "1.0.86"
 thiserror = "1.0.57"

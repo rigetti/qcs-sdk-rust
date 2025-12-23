@@ -114,7 +114,7 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMResultData", get_all)
+    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMResultData", get_all, frozen)
 )]
 pub struct QvmResultData {
     /// A map of register names (ie. "ro") to a `RegisterData` containing their values.

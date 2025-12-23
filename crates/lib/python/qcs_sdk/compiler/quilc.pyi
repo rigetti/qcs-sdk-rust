@@ -2,20 +2,24 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import collections.abc
 import typing
 from qcs_sdk import QcsSdkError
+from qcs_sdk.qpu.isa import InstructionSetArchitecture
 
+@typing.final
 class CompilationResult:
     @property
     def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]: ...
     @property
     def program(self) -> builtins.str: ...
 
+@typing.final
 class CompilerOpts:
     r"""
     A set of options that determine the behavior of compiling programs with quilc
     """
-    def __new__(cls, timeout:typing.Optional[builtins.float]=30.0, protoquil:typing.Optional[builtins.bool]=None) -> CompilerOpts:
+    def __new__(cls, timeout: typing.Optional[builtins.float] = 30.0, protoquil: typing.Optional[builtins.bool] = None) -> CompilerOpts:
         r"""
         Creates a new instance of [`CompilerOpts`] with zero values for each option.
         
@@ -24,6 +28,7 @@ class CompilerOpts:
     @staticmethod
     def default() -> CompilerOpts: ...
 
+@typing.final
 class ConjugateByCliffordRequest:
     r"""
     Request to conjugate a Pauli Term by a Clifford element.
@@ -38,8 +43,9 @@ class ConjugateByCliffordRequest:
         r"""
         Pauli Term to conjugate.
         """
-    def __new__(cls, pauli:PauliTerm, clifford:builtins.str) -> ConjugateByCliffordRequest: ...
+    def __new__(cls, pauli: PauliTerm, clifford: builtins.str) -> ConjugateByCliffordRequest: ...
 
+@typing.final
 class ConjugatePauliByCliffordRequest:
     r"""
     The "outer" request shape for a `conjugate_pauli_by_clifford` request.
@@ -47,6 +53,7 @@ class ConjugatePauliByCliffordRequest:
     @property
     def args(self) -> builtins.list[ConjugateByCliffordRequest]: ...
 
+@typing.final
 class ConjugatePauliByCliffordResponse:
     r"""
     Conjugate Pauli by Clifford response.
@@ -62,6 +69,7 @@ class ConjugatePauliByCliffordResponse:
         Encoded global phase factor on the emitted Pauli.
         """
 
+@typing.final
 class GenerateRandomizedBenchmarkingSequenceResponse:
     r"""
     Randomly generated benchmarking sequence response.
@@ -72,13 +80,21 @@ class GenerateRandomizedBenchmarkingSequenceResponse:
         List of Cliffords, each expressed as a list of generator indices.
         """
 
+@typing.final
 class NativeQuilMetadata:
     r"""
     Metadata about a program compiled to native quil.
     """
-    def __eq__(self, other:builtins.object) -> builtins.bool: ...
-    def __new__(cls, final_rewiring:typing.Optional[typing.Sequence[builtins.int]], gate_depth:typing.Optional[builtins.int], gate_volume:typing.Optional[builtins.int], multiqubit_gate_depth:typing.Optional[builtins.int], program_duration:typing.Optional[builtins.float], program_fidelity:typing.Optional[builtins.float], topological_swaps:typing.Optional[builtins.int], qpu_runtime_estimation:typing.Optional[builtins.float]) -> NativeQuilMetadata: ...
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __getnewargs__(self) -> tuple[typing.Optional[builtins.list[builtins.int]], typing.Optional[builtins.int], typing.Optional[builtins.int], typing.Optional[builtins.int], typing.Optional[builtins.float], typing.Optional[builtins.float], typing.Optional[builtins.int], typing.Optional[builtins.float]]: ...
+    def __new__(cls, final_rewiring: typing.Optional[typing.Sequence[builtins.int]], gate_depth: typing.Optional[builtins.int], gate_volume: typing.Optional[builtins.int], multiqubit_gate_depth: typing.Optional[builtins.int], program_duration: typing.Optional[builtins.float], program_fidelity: typing.Optional[builtins.float], topological_swaps: typing.Optional[builtins.int], qpu_runtime_estimation: typing.Optional[builtins.float]) -> NativeQuilMetadata: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
 
+@typing.final
 class PauliTerm:
     r"""
     Pauli Term
@@ -93,17 +109,15 @@ class PauliTerm:
         r"""
         Ordered factors of the Pauli term.
         """
-    def __new__(cls, indices:typing.Sequence[builtins.int], symbols:typing.Sequence[builtins.str]) -> PauliTerm: ...
+    def __new__(cls, indices: typing.Sequence[builtins.int], symbols: typing.Sequence[builtins.str]) -> PauliTerm: ...
 
-class PyInstructionSetArchitecture:
-    ...
-
+@typing.final
 class QuilcClient:
     def __new__(cls) -> QuilcClient: ...
     @staticmethod
     def new_libquil() -> QuilcClient: ...
     @staticmethod
-    def new_rpcq(endpoint:builtins.str) -> QuilcClient: ...
+    def new_rpcq(endpoint: builtins.str) -> QuilcClient: ...
 
 class QuilcError(QcsSdkError):
     r"""
@@ -111,6 +125,7 @@ class QuilcError(QcsSdkError):
     """
     ...
 
+@typing.final
 class RandomizedBenchmarkingRequest:
     r"""
     Request to generate a randomized benchmarking sequence.
@@ -140,30 +155,31 @@ class RandomizedBenchmarkingRequest:
         r"""
         PRNG seed. Set this to guarantee repeatable results.
         """
-    def __new__(cls, depth:builtins.int, qubits:builtins.int, gateset:typing.Sequence[builtins.str], seed:typing.Optional[builtins.int], interleaver:typing.Optional[builtins.str]) -> RandomizedBenchmarkingRequest: ...
+    def __new__(cls, depth: builtins.int, qubits: builtins.int, gateset: typing.Sequence[builtins.str], seed: typing.Optional[builtins.int], interleaver: typing.Optional[builtins.str]) -> RandomizedBenchmarkingRequest: ...
 
+@typing.final
 class TargetDevice:
     r"""
     Description of a device to compile for.
     """
     @staticmethod
-    def from_isa(isa:PyInstructionSetArchitecture) -> TargetDevice: ...
+    def from_isa(isa: InstructionSetArchitecture) -> TargetDevice: ...
     @staticmethod
-    def from_json(value:builtins.str) -> TargetDevice: ...
+    def from_json(value: builtins.str) -> TargetDevice: ...
 
-def compile_program(quil:builtins.str, target:TargetDevice, client:QuilcClient, options:typing.Optional[CompilerOpts]=None) -> CompilationResult: ...
+def compile_program(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> CompilationResult: ...
 
-def compile_program_async(quil:builtins.str, target:TargetDevice, client:QuilcClient, options:typing.Optional[CompilerOpts]=None) -> typing.Any: ...
+def compile_program_async(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> collections.abc.Awaitable[CompilationResult]: ...
 
-def conjugate_pauli_by_clifford(request:ConjugateByCliffordRequest, client:QuilcClient) -> ConjugatePauliByCliffordResponse: ...
+def conjugate_pauli_by_clifford(request: ConjugateByCliffordRequest, client: QuilcClient) -> ConjugatePauliByCliffordResponse: ...
 
-def conjugate_pauli_by_clifford_async(request:ConjugateByCliffordRequest, client:QuilcClient) -> typing.Any: ...
+def conjugate_pauli_by_clifford_async(request: ConjugateByCliffordRequest, client: QuilcClient) -> collections.abc.Awaitable[ConjugatePauliByCliffordResponse]: ...
 
-def generate_randomized_benchmarking_sequence(request:RandomizedBenchmarkingRequest, client:QuilcClient) -> GenerateRandomizedBenchmarkingSequenceResponse: ...
+def generate_randomized_benchmarking_sequence(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> GenerateRandomizedBenchmarkingSequenceResponse: ...
 
-def generate_randomized_benchmarking_sequence_async(request:RandomizedBenchmarkingRequest, client:QuilcClient) -> typing.Any: ...
+def generate_randomized_benchmarking_sequence_async(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> collections.abc.Awaitable[GenerateRandomizedBenchmarkingSequenceResponse]: ...
 
-def get_version_info(client:QuilcClient) -> builtins.str: ...
+def get_version_info(client: QuilcClient) -> builtins.str: ...
 
-def get_version_info_async(client:QuilcClient) -> typing.Any: ...
+def get_version_info_async(client: QuilcClient) -> collections.abc.Awaitable[builtins.str]: ...
 

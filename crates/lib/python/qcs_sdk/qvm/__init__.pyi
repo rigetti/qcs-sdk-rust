@@ -2,6 +2,7 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import collections.abc
 import typing
 from qcs_sdk import QcsSdkError, RegisterData
 from . import api
@@ -10,24 +11,27 @@ class AddressRequest:
     r"""
     An enum encapsulating the different ways to request data back from the QVM for an address.
     """
+    @typing.final
     class ExcludeAll(AddressRequest):
         r"""
         Exclude all values for the address.
         """
         __match_args__ = ()
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls) -> AddressRequest.ExcludeAll: ...
     
+    @typing.final
     class IncludeAll(AddressRequest):
         r"""
         Get all values for the address.
         """
         __match_args__ = ()
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls) -> AddressRequest.IncludeAll: ...
     
+    @typing.final
     class Indices(AddressRequest):
         r"""
         A list of specific indices to get back for the address.
@@ -35,12 +39,13 @@ class AddressRequest:
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
-        def __getitem__(self, key:builtins.int) -> typing.Any: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0:typing.Sequence[builtins.int]) -> AddressRequest.Indices: ...
+        def __new__(cls, _0: typing.Sequence[builtins.int]) -> AddressRequest.Indices: ...
     
     ...
 
+@typing.final
 class ExpectationRequest:
     r"""
     The request body needed for a [`measure_expectation`] request to the QVM.
@@ -60,11 +65,12 @@ class ExpectationRequest:
         r"""
         A Quil program defining the state.
         """
-    def __new__(cls, state_preparation:builtins.str, operators:typing.Sequence[builtins.str], rng_seed:typing.Optional[builtins.int]=None) -> ExpectationRequest:
+    def __new__(cls, state_preparation: builtins.str, operators: typing.Sequence[builtins.str], rng_seed: typing.Optional[builtins.int] = None) -> ExpectationRequest:
         r"""
         Creates a new `ExpectationRequest` using the given parameters.
         """
 
+@typing.final
 class MultishotMeasureRequest:
     r"""
     The request body needed for a [`run_and_measure`] request to the QVM.
@@ -96,11 +102,14 @@ class MultishotMeasureRequest:
         """
     @property
     def trials(self) -> builtins.int: ...
-    def __new__(cls, compiled_quil:builtins.str, trials:builtins.int, qubits:typing.Sequence[builtins.int], measurement_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, gate_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, rng_seed:typing.Optional[builtins.int]=None) -> MultishotMeasureRequest:
+    @trials.setter
+    def trials(self, value: builtins.int) -> None: ...
+    def __new__(cls, program: builtins.str, shots: builtins.int, qubits: builtins.list[builtins.int], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotMeasureRequest:
         r"""
         Construct a new `MultishotMeasureRequest` using the given parameters.
         """
 
+@typing.final
 class MultishotRequest:
     r"""
     The request body needed to make a multishot [`run`] request to the QVM.
@@ -110,8 +119,18 @@ class MultishotRequest:
         r"""
         The memory regions to include in the response.
         """
+    @addresses.setter
+    def addresses(self, value: builtins.dict[builtins.str, AddressRequest]) -> None:
+        r"""
+        The memory regions to include in the response.
+        """
     @property
     def compiled_quil(self) -> builtins.str:
+        r"""
+        The Quil program to run.
+        """
+    @compiled_quil.setter
+    def compiled_quil(self, value: builtins.str) -> None:
         r"""
         The Quil program to run.
         """
@@ -120,8 +139,18 @@ class MultishotRequest:
         r"""
         Simulated gate noise for the X, Y, and Z axes.
         """
+    @gate_noise.setter
+    def gate_noise(self, value: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]) -> None:
+        r"""
+        Simulated gate noise for the X, Y, and Z axes.
+        """
     @property
     def measurement_noise(self) -> typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]:
+        r"""
+        Simulated measurement noise for the X, Y, and Z axes.
+        """
+    @measurement_noise.setter
+    def measurement_noise(self, value: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]) -> None:
         r"""
         Simulated measurement noise for the X, Y, and Z axes.
         """
@@ -130,13 +159,21 @@ class MultishotRequest:
         r"""
         An optional seed for the random number generator.
         """
+    @rng_seed.setter
+    def rng_seed(self, value: typing.Optional[builtins.int]) -> None:
+        r"""
+        An optional seed for the random number generator.
+        """
     @property
     def trials(self) -> builtins.int: ...
-    def __new__(cls, compiled_quil:builtins.str, trials:builtins.int, addresses:typing.Mapping[builtins.str, AddressRequest], measurement_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, gate_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, rng_seed:typing.Optional[builtins.int]=None) -> MultishotRequest:
+    @trials.setter
+    def trials(self, value: builtins.int) -> None: ...
+    def __new__(cls, program: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotRequest:
         r"""
         Creates a new `MultishotRequest` with the given parameters.
         """
 
+@typing.final
 class MultishotResponse:
     r"""
     The response body returned by the QVM after a multishot [`run`] request.
@@ -147,19 +184,17 @@ class MultishotResponse:
         The requested readout registers and their final values for each shot.
         """
 
+@typing.final
 class QVMClient:
     @property
     def qvm_url(self) -> builtins.str: ...
     def __new__(cls) -> QVMClient: ...
     @staticmethod
-    def new_http(endpoint:builtins.str) -> QVMClient: ...
-    @typing.overload
-    @staticmethod
-    def new_libquil() -> QVMClient: ...
-    @typing.overload
+    def new_http(endpoint: builtins.str) -> QVMClient: ...
     @staticmethod
     def new_libquil() -> QVMClient: ...
 
+@typing.final
 class QVMOptions:
     r"""
     Options avaialable for running programs on the QVM.
@@ -168,11 +203,16 @@ class QVMOptions:
     def timeout(self) -> typing.Optional[builtins.float]: ...
     @timeout.setter
     def timeout(self, value: typing.Optional[builtins.float]) -> None: ...
-    def __new__(cls, timeout_seconds:typing.Optional[builtins.float]=None) -> QVMOptions: ...
-    def __repr__(self) -> builtins.str: ...
+    def __new__(cls, timeout_seconds: typing.Optional[builtins.float] = None) -> QVMOptions: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     @staticmethod
     def default() -> QVMOptions: ...
 
+@typing.final
 class QVMResultData:
     r"""
     Encapsulates data returned after running a program on the QVM
@@ -182,12 +222,12 @@ class QVMResultData:
         r"""
         A map of register names (ie. "ro") to a `RegisterData` containing their values.
         """
-    def __new__(cls, memory:typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
+    def __new__(cls, memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
         r"""
         Construct a new `QVMResultData` from a memory map.
         """
     @staticmethod
-    def from_memory_map(memory:typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
+    def from_memory_map(memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
         r"""
         Build a [`QvmResultData`] from a mapping of register names to a [`RegisterData`]
         """
@@ -202,11 +242,17 @@ class QvmError(QcsSdkError):
     """
     ...
 
+@typing.final
 class RawQVMReadoutData:
     @property
     def memory(self) -> builtins.dict[builtins.str, list]: ...
-    def __repr__(self) -> builtins.str: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
 
+@typing.final
 class WavefunctionRequest:
     r"""
     The request body needed to make a [`get_wavefunction`] request to the QVM.
@@ -231,12 +277,12 @@ class WavefunctionRequest:
         r"""
         An optional seed for the random number generator.
         """
-    def __new__(cls, compiled_quil:builtins.str, measurement_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, gate_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]]=None, rng_seed:typing.Optional[builtins.int]=None) -> WavefunctionRequest:
+    def __new__(cls, program: builtins.str, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> WavefunctionRequest:
         r"""
         Create a new `WavefunctionRequest` with the given parameters.
         """
 
-def run(quil:builtins.str, shots:builtins.int, addresses:typing.Mapping[builtins.str, AddressRequest], params:typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client:QVMClient, measurement_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed:typing.Optional[builtins.int], options:typing.Optional[QVMOptions]) -> QVMResultData: ...
+def run(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed: typing.Optional[builtins.int], options: typing.Optional[QVMOptions]) -> QVMResultData: ...
 
-def run_async(quil:builtins.str, shots:builtins.int, addresses:typing.Mapping[builtins.str, AddressRequest], params:typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client:QVMClient, measurement_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise:typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed:typing.Optional[builtins.int], options:typing.Optional[QVMOptions]) -> typing.Any: ...
+def run_async(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed: typing.Optional[builtins.int], options: typing.Optional[QVMOptions]) -> collections.abc.Awaitable[QVMResultData]: ...
 

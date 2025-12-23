@@ -4,8 +4,9 @@ use std::time::Duration;
 use futures_util::TryFutureExt;
 use opentelemetry::trace::FutureExt;
 use prost::Message;
+use pyo3::prelude::*;
 use pyo3::types::PyBytes;
-use pyo3::{exceptions::PyValueError, prelude::*, PyErr};
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{
@@ -19,31 +20,25 @@ use qcs_api_client_grpc::services::translation::{
 };
 
 use crate::client::Qcs;
-use crate::python::{errors, impl_repr, py_function_sync_async};
+use crate::python::errors;
 use crate::qpu::translation::{get_quilt_calibrations, Error, TranslationOptions};
 
-#[pymodule]
-#[pyo3(name = "translation", module = "qcs_sdk.qpu", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
-
-    m.add(
-        "TranslationError",
-        py.get_type::<errors::TranslationError>(),
-    )?;
-
-    m.add_class::<TranslationOptions>()?;
-    m.add_class::<PyTranslationResult>()?;
-    m.add_class::<PyTranslationBackend>()?;
-    m.add_class::<PyQCtrl>()?;
-    m.add_class::<PyRiverlane>()?;
-
-    m.add_function(wrap_pyfunction!(py_get_quilt_calibrations, m)?)?;
-    m.add_function(wrap_pyfunction!(py_get_quilt_calibrations_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_translate, m)?)?;
-    m.add_function(wrap_pyfunction!(py_translate_async, m)?)?;
-
-    Ok(())
+// #[pyo3(name = "translation", module = "qcs_sdk.qpu", submodule)]
+create_init_submodule! {
+    classes: [
+        TranslationOptions,
+        PyTranslationResult,
+        PyTranslationBackend,
+        PyQCtrl,
+        PyRiverlane
+    ],
+    errors: [ errors::TranslationError ],
+    funcs: [
+        py_get_quilt_calibrations,
+        py_get_quilt_calibrations_async,
+        py_translate,
+        py_translate_async
+    ],
 }
 
 impl_repr!(TranslationOptions);
@@ -51,7 +46,6 @@ impl_repr!(TranslationOptions);
 py_function_sync_async! {
     /// Query the QCS API for Quil-T calibrations.
     /// If `None`, the default `timeout` used is 10 seconds.
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
@@ -78,7 +72,6 @@ pub enum TranslationError {
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
 #[pyclass(module = "qcs_sdk.qpu.translation", name = "TranslationBackend", eq)]
 pub enum PyTranslationBackend {
@@ -86,7 +79,6 @@ pub enum PyTranslationBackend {
     V2,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl TranslationOptions {
@@ -186,12 +178,10 @@ impl TranslationOptions {
 }
 
 #[derive(Clone, Default, Debug)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QCtrl", module = "qcs_sdk.qpu.translation", frozen)]
 pub struct PyQCtrl(translation_options::QCtrl);
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQCtrl {
@@ -209,12 +199,10 @@ impl PyQCtrl {
 }
 
 #[derive(Clone, Default, Debug)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Riverlane", module = "qcs_sdk.qpu.translation", frozen)]
 pub struct PyRiverlane(Riverlane);
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyRiverlane {
@@ -239,7 +227,6 @@ impl PyRiverlane {
 
 /// The result of a call to [`translate`] which provides information about the
 /// translated program.
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(
     module = "qcs_sdk.qpu.translation",
@@ -261,7 +248,6 @@ py_function_sync_async! {
     /// # Errors
     ///
     /// Returns a [`TranslationError`] if translation fails.
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]

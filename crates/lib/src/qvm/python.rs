@@ -1,3 +1,4 @@
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 use std::collections::HashMap;
 use std::time::Duration;
 
@@ -7,31 +8,18 @@ use pyo3::{prelude::*, types::PyList, Py};
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
 use crate::{
-    python::{errors, impl_repr, py_function_sync_async, NonZeroU16},
+    python::{errors, NonZeroU16},
     qvm::{self, http, Error, QvmOptions, QvmResultData},
     register_data::RegisterData,
 };
 
-#[pymodule]
-#[pyo3(name = "qvm", module = "qcs_sdk", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
-
-    m.add("QVMError", py.get_type::<errors::QvmError>())?;
-
-    m.add_class::<QvmResultData>()?;
-    m.add_class::<QvmOptions>()?;
-    m.add_class::<RawQvmReadoutData>()?;
-    m.add_class::<PyQvmClient>()?;
-
-    m.add_function(wrap_pyfunction!(py_run, m)?)?;
-    m.add_function(wrap_pyfunction!(py_run_async, m)?)?;
-
-    let submodule = PyModule::new(py, "api")?;
-    api::init_module(&submodule)?;
-    m.add_submodule(&submodule)?;
-
-    Ok(())
+// #[pyo3(name = "qvm", module = "qcs_sdk", submodule)]
+create_init_submodule! {
+    classes: [ QvmResultData, QvmOptions, RawQvmReadoutData, PyQvmClient ],
+    complex_enums: [ http::AddressRequest ],
+    errors: [ errors::QvmError ],
+    funcs: [ py_run, py_run_async ],
+    submodules: [ "api": api::init_submodule ],
 }
 
 impl_repr!(QvmOptions);
@@ -68,48 +56,62 @@ impl PyQvmClient {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQvmClient {
     #[new]
     fn new() -> PyResult<Self> {
-        Err(errors::QvmError::new_err(
-                "QVMClient cannot be instantiated directly. See the static methods: QVMClient.new_http() and QVMClient.new_libquil()."
-                ))
+        Err(errors::QuilcError::new_err(
+            #[cfg(not(feature = "libquil"))]
+            "QVMClient cannot be instantiated directly. Use QVMClient.new_http() instead.",
+            #[cfg(feature = "libquil")]
+            "QVMClient cannot be instantiated directly. Use QVMClient.new_http() and QVMClient.new_libquil().",
+        ))
     }
 
     #[staticmethod]
-    fn new_http(endpoint: &str) -> Self {
-        let http_client = http::HttpClient::new(endpoint.to_string());
+    fn new_http(endpoint: String) -> Self {
+        let http_client = http::HttpClient::new(endpoint);
         Self {
             inner: QvmClient::Http(http_client),
         }
     }
 
-    #[cfg(feature = "libquil")]
+    #[getter]
+    fn qvm_url(&self) -> String {
+        match &self.inner {
+            QvmClient::Http(client) => client.qvm_url.clone(),
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(_) => "".into(),
+        }
+    }
+}
+
+// These are pulled out separately so that the feature flag won't confuse the stub generator.
+#[cfg(feature = "libquil")]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQvmClient {
     #[staticmethod]
     fn new_libquil() -> Self {
         Self {
             inner: QvmClient::Libquil(qvm::libquil::Client {}),
         }
     }
+}
 
-    #[cfg(not(feature = "libquil"))]
+#[cfg(not(feature = "libquil"))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQvmClient {
     #[staticmethod]
+    #[pyo3(warn(
+        message = "The installed version of qcs_sdk was built without the libquil feature. Use QVMClient.new_http() instead.",
+    ))]
     fn new_libquil() -> PyResult<Self> {
         Err(errors::QvmError::new_err(
-            "Cannot create a libquil QVM client as feature is not enabled.",
+            "Cannot create a libquil QVMClient. Use QVMClient.new_http() instead.",
         ))
-    }
-
-    #[getter]
-    fn qvm_url(&self) -> String {
-        match &self.inner {
-            QvmClient::Http(client) => client.qvm_url.to_string(),
-            #[cfg(feature = "libquil")]
-            QvmClient::Libquil(_) => "".into(),
-        }
     }
 }
 
@@ -165,7 +167,6 @@ impl qvm::Client for PyQvmClient {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl QvmOptions {
@@ -194,7 +195,6 @@ impl QvmOptions {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl QvmResultData {
@@ -224,7 +224,6 @@ impl QvmResultData {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl http::MultishotRequest {
@@ -249,9 +248,7 @@ impl http::MultishotRequest {
         )
     }
 
-    // This is defined explicitly in order to override the generated stubtype.
     #[getter]
-    #[gen_stub(override_return_type(type_repr = "builtins.int"))]
     fn trials(&self) -> NonZeroU16 {
         NonZeroU16(self.trials)
     }
@@ -287,9 +284,7 @@ impl http::MultishotMeasureRequest {
         )
     }
 
-    // This is defined explicitly in order to override the generated stubtype.
     #[getter]
-    #[gen_stub(override_return_type(type_repr = "builtins.int"))]
     fn trials(&self) -> NonZeroU16 {
         NonZeroU16(self.trials)
     }
@@ -300,7 +295,6 @@ impl http::MultishotMeasureRequest {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl http::ExpectationRequest {
@@ -312,7 +306,6 @@ impl http::ExpectationRequest {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl http::WavefunctionRequest {
@@ -330,7 +323,6 @@ impl http::WavefunctionRequest {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm"))]
     #[pyfunction]
     #[tracing::instrument(skip_all)]
@@ -371,45 +363,42 @@ py_function_sync_async! {
 
 mod api {
     use pyo3::prelude::*;
+    use rigetti_pyo3::{create_init_submodule, py_function_sync_async};
 
     #[cfg(feature = "stubs")]
     use pyo3_stub_gen::derive::gen_stub_pyfunction;
 
     use crate::{
-        python::{errors, py_function_sync_async},
+        python::errors,
         qvm::{http, python::PyQvmClient, Client, QvmOptions},
     };
 
-    // #[pymodule]
     // #[pyo3(name = "api", module = "qcs_sdk.qvm", submodule)]
-    pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-        let py = m.py();
-
-        m.add("QuilcError", py.get_type::<errors::QuilcError>())?;
-
-        m.add_class::<http::AddressRequest>()?;
-        m.add_class::<http::MultishotRequest>()?;
-        m.add_class::<http::MultishotResponse>()?;
-        m.add_class::<http::MultishotMeasureRequest>()?;
-        m.add_class::<http::ExpectationRequest>()?;
-        m.add_class::<http::WavefunctionRequest>()?;
-
-        m.add_function(wrap_pyfunction!(py_get_version_info, m)?)?;
-        m.add_function(wrap_pyfunction!(py_get_version_info_async, m)?)?;
-        m.add_function(wrap_pyfunction!(py_run, m)?)?;
-        m.add_function(wrap_pyfunction!(py_run_async, m)?)?;
-        m.add_function(wrap_pyfunction!(py_run_and_measure, m)?)?;
-        m.add_function(wrap_pyfunction!(py_run_and_measure_async, m)?)?;
-        m.add_function(wrap_pyfunction!(py_measure_expectation, m)?)?;
-        m.add_function(wrap_pyfunction!(py_measure_expectation_async, m)?)?;
-        m.add_function(wrap_pyfunction!(py_get_wavefunction, m)?)?;
-        m.add_function(wrap_pyfunction!(py_get_wavefunction_async, m)?)?;
-
-        Ok(())
+    create_init_submodule! {
+        classes: [
+            http::AddressRequest,
+            http::MultishotRequest,
+            http::MultishotResponse,
+            http::MultishotMeasureRequest,
+            http::ExpectationRequest,
+            http::WavefunctionRequest
+        ],
+        errors: [ errors::QuilcError ],
+        funcs: [
+            py_get_version_info,
+            py_get_version_info_async,
+            py_run,
+            py_run_async,
+            py_run_and_measure,
+            py_run_and_measure_async,
+            py_measure_expectation,
+            py_measure_expectation_async,
+            py_get_wavefunction,
+            py_get_wavefunction_async
+        ],
     }
 
     py_function_sync_async! {
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
         #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (client, options = None))]
@@ -422,7 +411,6 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
         #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
@@ -441,7 +429,6 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
         #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
@@ -459,7 +446,6 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
         #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
@@ -477,7 +463,6 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
         #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]

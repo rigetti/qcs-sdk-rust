@@ -5,6 +5,7 @@ macro_rules! make_nonzero {
     ($name:ident($ty:ty), $num:ty) => {
         /// A non-zero wrapper with [`pyo3_stub_gen::PyStubType`] stubs.
         #[derive(Copy, Clone, Debug, PartialEq, PartialOrd, Eq, Hash, ::pyo3::IntoPyObject)]
+        #[allow(unreachable_pub)]
         pub struct $name(pub $ty);
 
         // PyO3 has a conversion we could derive from,
@@ -37,13 +38,4 @@ macro_rules! make_nonzero {
     };
 }
 
-make_nonzero!(NonZeroU64(std::num::NonZeroU64), u64);
-make_nonzero!(NonZeroU32(std::num::NonZeroU32), u32);
 make_nonzero!(NonZeroU16(std::num::NonZeroU16), u16);
-make_nonzero!(NonZeroU8(std::num::NonZeroU8), u8);
-make_nonzero!(NonZeroUsize(std::num::NonZeroUsize), usize);
-
-make_nonzero!(NonZeroI64(std::num::NonZeroI64), i64);
-make_nonzero!(NonZeroI32(std::num::NonZeroI32), i32);
-make_nonzero!(NonZeroI16(std::num::NonZeroI16), i16);
-make_nonzero!(NonZeroI8(std::num::NonZeroI8), i8);

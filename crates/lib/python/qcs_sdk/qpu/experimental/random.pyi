@@ -2,8 +2,10 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import typing
 from qcs_sdk import QcsSdkError
 
+@typing.final
 class ChooseRandomRealSubRegions:
     r"""
     An [`ExternedCall`] that may be used to select one or more random
@@ -13,13 +15,14 @@ class ChooseRandomRealSubRegions:
     @classmethod
     def build_signature(cls) -> builtins.str: ...
 
+@typing.final
 class PrngSeedValue:
     r"""
     A valid seed value that may be used to initialize the PRNG. Such
     values are in the range `[1, MAX_SEQUENCER_VALUE]` and are losslessly
     convertible to `f64`.
     """
-    def __new__(cls, value:builtins.int) -> PrngSeedValue:
+    def __new__(cls, value: builtins.int) -> PrngSeedValue:
         r"""
         Attempt to create a new instance of `PrngSeedValue` from a `u64`.
         The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
@@ -33,7 +36,7 @@ class RandomError(QcsSdkError):
     """
     ...
 
-def choose_random_real_sub_region_indices(seed:PrngSeedValue, start_index:builtins.int, series_length:builtins.int, sub_region_count:builtins.int) -> builtins.list[builtins.int]:
+def choose_random_real_sub_region_indices(seed: PrngSeedValue, start_index: builtins.int, series_length: builtins.int, sub_region_count: builtins.int) -> builtins.list[builtins.int]:
     r"""
     Given a seed, start index, series length, and sub-region count, this function
     will generate and return the sequence of pseudo-randomly chosen indices on
@@ -69,7 +72,7 @@ def choose_random_real_sub_region_indices(seed:PrngSeedValue, start_index:builti
     ```
     """
 
-def lfsr_v1_next(seed:PrngSeedValue) -> builtins.int:
+def lfsr_v1_next(seed: PrngSeedValue) -> builtins.int:
     r"""
     This represents the [linear feedback shift
     register](https://en.wikipedia.org/wiki/Linear-feedback_shift_register)

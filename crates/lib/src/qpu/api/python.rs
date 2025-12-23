@@ -4,6 +4,7 @@ use std::time::Duration;
 
 use numpy::Complex32;
 use pyo3::{prelude::*, types::PyTuple};
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{
@@ -16,7 +17,7 @@ use qcs_api_client_grpc::models::controller::{
 
 use crate::{
     client::Qcs,
-    python::{errors, impl_repr, py_function_sync_async},
+    python::errors,
     qpu::{
         api::{
             self, ApiExecutionOptions, ApiExecutionOptionsBuilder, ApiExecutionOptionsBuilderError,
@@ -27,40 +28,35 @@ use crate::{
     },
 };
 
-#[pymodule]
-#[pyo3(name = "api", module = "qcs_sdk.qpu", submodule)]
-pub(crate) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
-
-    m.add("QpuApiError", py.get_type::<errors::QpuApiError>())?;
-    m.add("SubmissionError", py.get_type::<errors::SubmissionError>())?;
-    m.add(
-        "BuildOptionsError",
-        py.get_type::<errors::BuildOptionsError>(),
-    )?;
-
-    m.add_class::<Register>()?;
-    m.add_class::<ExecutionResult>()?;
-    m.add_class::<ExecutionResults>()?;
-    m.add_class::<ConnectionStrategy>()?;
-    m.add_class::<ExecutionOptions>()?;
-    m.add_class::<ExecutionOptionsBuilder>()?;
-    m.add_class::<ApiExecutionOptions>()?;
-    m.add_class::<ApiExecutionOptionsBuilder>()?;
-    m.add_class::<PyQpuApiDuration>()?;
-
-    m.add_function(wrap_pyfunction!(py_submit, m)?)?;
-    m.add_function(wrap_pyfunction!(py_submit_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_submit_with_parameter_batch, m)?)?;
-    m.add_function(wrap_pyfunction!(py_submit_with_parameter_batch_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_cancel_job, m)?)?;
-    m.add_function(wrap_pyfunction!(py_cancel_job_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_cancel_jobs, m)?)?;
-    m.add_function(wrap_pyfunction!(py_cancel_jobs_async, m)?)?;
-    m.add_function(wrap_pyfunction!(py_retrieve_results, m)?)?;
-    m.add_function(wrap_pyfunction!(py_retrieve_results_async, m)?)?;
-
-    Ok(())
+create_init_submodule! {
+    classes: [
+        Register,
+        ExecutionResult,
+        ExecutionResults,
+        ExecutionOptions,
+        ExecutionOptionsBuilder,
+        ApiExecutionOptions,
+        ApiExecutionOptionsBuilder,
+        PyQpuApiDuration
+    ],
+    complex_enums: [ ConnectionStrategy ],
+    errors: [
+        errors::QpuApiError,
+        errors::SubmissionError,
+        errors::BuildOptionsError
+    ],
+    funcs: [
+        py_submit,
+        py_submit_async,
+        py_submit_with_parameter_batch,
+        py_submit_with_parameter_batch_async,
+        py_cancel_job,
+        py_cancel_job_async,
+        py_cancel_jobs,
+        py_cancel_jobs_async,
+        py_retrieve_results,
+        py_retrieve_results_async
+    ],
 }
 
 impl_repr!(ExecutionOptions);
@@ -68,14 +64,12 @@ impl_repr!(ApiExecutionOptions);
 impl_repr!(ConnectionStrategy);
 
 #[derive(Clone)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "ExecutionOptionsBuilder", module = "qcs_sdk.qpu.api")]
 struct PyExecutionOptionsBuilder(ExecutionOptionsBuilder);
 
 /// Variants of data vectors within a single `ExecutionResult`.
 #[derive(Clone, Debug)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[pyclass(module = "qcs_sdk.qpu.api")]
 pub enum Register {
@@ -85,7 +79,6 @@ pub enum Register {
 
 /// The execution readout data from a particular memory location.
 #[derive(Clone, Debug)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk.qpu.api", frozen, get_all)]
 pub struct ExecutionResult {
@@ -119,7 +112,6 @@ impl From<readout_values::Values> for ExecutionResult {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionResult {
@@ -151,7 +143,6 @@ pub struct ExecutionResults {
     pub memory: HashMap<String, MemoryValues>,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionResults {
@@ -202,14 +193,12 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 }
 
 #[derive(Debug, Clone)]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QpuApiDuration", module = "qcs_sdk.qpu.api", frozen)]
 pub struct PyQpuApiDuration {
     inner: QpuApiDuration,
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQpuApiDuration {
@@ -255,7 +244,6 @@ pub enum BuildOptionsError {
     ApiExecutionOptions(#[from] ApiExecutionOptionsBuilderError),
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ApiExecutionOptionsBuilder {
@@ -286,7 +274,6 @@ impl ApiExecutionOptionsBuilder {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ApiExecutionOptions {
@@ -312,7 +299,6 @@ impl ApiExecutionOptions {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionOptions {
@@ -371,7 +357,6 @@ impl ExecutionOptions {
     }
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionOptionsBuilder {
@@ -468,7 +453,6 @@ py_function_sync_async! {
     /// * an engagement is not available
     /// * an RPCQ client cannot be built
     /// * the program cannot be submitted
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
@@ -511,7 +495,6 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
@@ -547,7 +530,6 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
@@ -569,7 +551,6 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
@@ -591,7 +572,6 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]

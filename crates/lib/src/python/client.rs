@@ -1,5 +1,4 @@
 use qcs_api_client_common::configuration::{
-    self,
     secrets::SecretRefreshToken,
     settings::AuthServer,
     tokens::{ClientCredentials, ExternallyManaged, OAuthSession, RefreshToken},
@@ -7,37 +6,31 @@ use qcs_api_client_common::configuration::{
 };
 
 use pyo3::prelude::*;
+use rigetti_pyo3::{create_init_submodule, py_sync};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
+use pyo3_stub_gen::derive::gen_stub_pymethods;
 
 use crate::client::Qcs;
-use crate::python::{errors, py_function_sync_async, py_sync};
+use crate::python::errors;
 
-#[pymodule]
-#[pyo3(name = "client", module = "qcs_sdk", submodule)]
-pub(super) fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    let py = m.py();
-
-    m.add(
-        "BuildClientError",
-        py.get_type::<errors::BuildClientError>(),
-    )?;
-    m.add("ClientError", py.get_type::<errors::ClientError>())?;
-    m.add("LoadClientError", py.get_type::<errors::LoadClientError>())?;
-
-    m.add_class::<Qcs>()?;
-    m.add_class::<OAuthSession>()?;
-    m.add_class::<AuthServer>()?;
-    m.add_class::<RefreshToken>()?;
-    m.add_class::<SecretRefreshToken>()?;
-    m.add_class::<ClientCredentials>()?;
-    m.add_class::<ExternallyManaged>()?;
-
-    Ok(())
+create_init_submodule! {
+    classes: [
+        Qcs,
+        OAuthSession,
+        AuthServer,
+        RefreshToken,
+        SecretRefreshToken,
+        ClientCredentials,
+        ExternallyManaged
+    ],
+    errors: [
+        errors::BuildClientError,
+        errors::ClientError,
+        errors::LoadClientError
+    ],
 }
 
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl Qcs {
@@ -125,10 +118,11 @@ impl Qcs {
         self.get_config().qvm_url().to_string()
     }
 
-    /// Get a copy of the OAuth session in an async context.
-    fn oauth_session_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    /// Get a copy of the OAuth session.
+    #[getter]
+    fn oauth_session(&self, py: Python<'_>) -> PyResult<OAuthSession> {
         let config = self.get_config().clone();
-        pyo3_async_runtimes::tokio::future_into_py(py, async move {
+        py_sync!(py, async move {
             config
                 .oauth_session()
                 .await
@@ -136,10 +130,10 @@ impl Qcs {
         })
     }
 
-    /// Get a copy of the OAuth session.
-    fn oauth_session<'py>(&self, py: Python<'py>) -> PyResult<OAuthSession> {
+    /// Get a copy of the OAuth session in an async context.
+    fn get_oauth_session_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         let config = self.get_config().clone();
-        py_sync!(py, async move {
+        pyo3_async_runtimes::tokio::future_into_py(py, async move {
             config
                 .oauth_session()
                 .await
@@ -150,20 +144,6 @@ impl Qcs {
 
 impl PartialEq for Qcs {
     fn eq(&self, other: &Self) -> bool {
-        format!("{:?}", self) == format!("{:?}", other)
-    }
-}
-
-py_function_sync_async! {
-    /// Get a copy of the OAuth session.
-    #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.client"))]
-    #[pyfunction]
-    async fn get_oauth_session(client: Qcs) -> PyResult<OAuthSession> {
-        client
-            .get_config()
-            .oauth_session()
-            .await
-            .map_err(errors::ClientError::token_error)
+        format!("{self:?}") == format!("{other:?}")
     }
 }

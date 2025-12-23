@@ -2,20 +2,14 @@
 # ruff: noqa: E501, F401
 
 import builtins
-import qcs_api_client_common.configuration
 import typing
+from qcs_api_client_common.configuration import OAuthSession
 from qcs_sdk import QcsSdkError
-
-class AuthServer:
-    ...
 
 class BuildClientError(ClientError):
     r"""
     Errors encountered while building the QCS API client configuration manually.
     """
-    ...
-
-class ClientCredentials:
     ...
 
 class ClientError(QcsSdkError):
@@ -24,18 +18,13 @@ class ClientError(QcsSdkError):
     """
     ...
 
-class ExternallyManaged:
-    ...
-
 class LoadClientError(ClientError):
     r"""
     Errors encountered while loading the QCS API client configuration from the environment configuration.
     """
     ...
 
-class OAuthSession:
-    ...
-
+@typing.final
 class QCSClient:
     r"""
     A client providing helper functionality for accessing QCS APIs
@@ -51,6 +40,11 @@ class QCSClient:
         URL to access the QCS gRPC API.
         """
     @property
+    def oauth_session(self) -> OAuthSession:
+        r"""
+        Get a copy of the OAuth session.
+        """
+    @property
     def quilc_url(self) -> builtins.str:
         r"""
         URL to access the ``quilc`` compiler.
@@ -60,29 +54,25 @@ class QCSClient:
         r"""
         URL to access the QVM.
         """
-    def __eq__(self, other:builtins.object) -> builtins.bool: ...
-    def __new__(cls, oauth_session:OAuthSession=None, api_url:typing.Optional[builtins.str]=None, grpc_api_url:typing.Optional[builtins.str]=None, quilc_url:typing.Optional[builtins.str]=None, qvm_url:typing.Optional[builtins.str]=None) -> QCSClient:
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, oauth_session: typing.Optional[OAuthSession] = None, api_url: typing.Optional[builtins.str] = None, grpc_api_url: typing.Optional[builtins.str] = None, quilc_url: typing.Optional[builtins.str] = None, qvm_url: typing.Optional[builtins.str] = None) -> QCSClient:
         r"""
         Manually construct a `QCSClient`.
         
         Prefer to use `QCSClient.load` to construct an environment-based profile.
         """
+    def get_oauth_session_async(self) -> typing.Any:
+        r"""
+        Get a copy of the OAuth session in an async context.
+        """
     @staticmethod
-    def load(profile_name:typing.Optional[builtins.str]=None) -> QCSClient:
+    def load(profile_name: typing.Optional[builtins.str] = None) -> QCSClient:
         r"""
         Create a `QCSClient` configuration using an environment-based configuration.
         
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
         
         :raises `LoadClientError`: If there is an issue loading the profile details from the environment.
-        """
-    def oauth_session(self) -> OAuthSession:
-        r"""
-        Get a copy of the OAuth session.
-        """
-    def oauth_session_async(self) -> typing.Any:
-        r"""
-        Get a copy of the OAuth session in an async context.
         """
 
 class RPCQQuilcError(ClientError):
@@ -91,22 +81,9 @@ class RPCQQuilcError(ClientError):
     """
     ...
 
-class RefreshToken:
-    ...
-
 class TokenError(ClientError):
     r"""
     Errors that can occur when managing authorization tokens.
     """
     ...
-
-def get_oauth_session(client:QCSClient) -> OAuthSession:
-    r"""
-    Get a copy of the OAuth session.
-    """
-
-def get_oauth_session_async(client:QCSClient) -> typing.Any:
-    r"""
-    Get a copy of the OAuth session.
-    """
 
