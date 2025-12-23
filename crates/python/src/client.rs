@@ -1,10 +1,12 @@
-use pyo3::{exceptions::PyValueError, pyfunction};
+use std::process::Output;
+
+use pyo3::{exceptions::PyValueError, pyfunction, PyAny};
 use qcs_api_client_common::configuration::{
     AuthServer, ClientConfigurationBuilder, ClientConfigurationBuilderError, ClientCredentials,
     ExternallyManaged, OAuthSession, RefreshToken,
 };
 use rigetti_pyo3::{
-    create_init_submodule, py_function_sync_async, py_wrap_error, py_wrap_type,
+    create_init_submodule, py_async, py_function_sync_async, py_wrap_error, py_wrap_type,
     pyo3::{
         conversion::IntoPy, exceptions::PyRuntimeError, pyclass::CompareOp, pymethods, PyObject,
         PyResult, Python,
@@ -13,6 +15,9 @@ use rigetti_pyo3::{
 };
 
 use qcs::client::{self, Qcs};
+use tokio_util::sync::CancellationToken;
+
+use crate::py_sync;
 
 create_init_submodule! {
     classes: [
@@ -115,6 +120,34 @@ impl PyQcsClient {
         })
     }
 
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
+        do_until_ctrl_c(move |cancel_token| {
+            py_sync!(py, async move {
+                Qcs::with_login(cancel_token, profile_name)
+                    .await
+                    .map(PyQcsClient)
+                    .map_err(RustLoadClientError::from)
+                    .map_err(RustLoadClientError::to_py_err)
+            })
+        })
+    }
+
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login_async(py: Python<'_>, profile_name: Option<String>) -> PyResult<&PyAny> {
+        do_until_ctrl_c(move |cancel_token| {
+            py_async!(py, async move {
+                Qcs::with_login(cancel_token, profile_name)
+                    .await
+                    .map(PyQcsClient)
+                    .map_err(RustLoadClientError::from)
+                    .map_err(RustLoadClientError::to_py_err)
+            })
+        })
+    }
+
     #[getter]
     pub fn api_url(&self) -> String {
         self.as_ref().get_config().api_url().to_string()
@@ -155,4 +188,18 @@ py_function_sync_async! {
         client.as_inner().get_config().oauth_session().await.map_err(|e| PyValueError::new_err(e.to_string()))
 
     }
+}
+
+/// Run the given function with a CancellationToken that is cancelled when `Ctrl+C` is pressed.
+fn do_until_ctrl_c<T>(f: impl FnOnce(CancellationToken) -> T) -> T {
+    let cancel_token = CancellationToken::new();
+    let cancel_token_ctrl_c = cancel_token.clone();
+    tokio::spawn(cancel_token.clone().run_until_cancelled_owned(async move {
+        let _ = tokio::signal::ctrl_c().await;
+        cancel_token_ctrl_c.cancel();
+    }));
+
+    let value = f(cancel_token.clone());
+    cancel_token.cancel();
+    value
 }

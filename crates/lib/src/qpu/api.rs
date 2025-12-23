@@ -365,7 +365,7 @@ impl Eq for ExecutionOptions {}
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
 /// to build a custom set of options.
-#[derive(Builder, Clone, Debug, Default, PartialEq)]
+#[derive(Builder, Clone, Copy, Debug, Default, PartialEq)]
 #[allow(clippy::module_name_repetitions)]
 pub struct ApiExecutionOptions {
     /// the inner proto representation
