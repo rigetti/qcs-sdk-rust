@@ -199,5 +199,6 @@ fn do_until_ctrl_c<T>(f: impl FnOnce(CancellationToken) -> T) -> T {
         cancel_token_ctrl_c.cancel();
     }));
 
-    f(cancel_token)
+    let value = f(cancel_token.clone());
+    cancel_token.cancel()
 }
