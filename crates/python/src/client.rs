@@ -195,10 +195,11 @@ fn do_until_ctrl_c<T>(f: impl FnOnce(CancellationToken) -> T) -> T {
     let cancel_token = CancellationToken::new();
     let cancel_token_ctrl_c = cancel_token.clone();
     tokio::spawn(cancel_token.clone().run_until_cancelled_owned(async move {
-        tokio::signal::ctrl_c().await;
+        let _ = tokio::signal::ctrl_c().await;
         cancel_token_ctrl_c.cancel();
     }));
 
     let value = f(cancel_token.clone());
-    cancel_token.cancel()
+    cancel_token.cancel();
+    value
 }
