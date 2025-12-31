@@ -19,6 +19,7 @@ use qcs_api_client_grpc::{
     },
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
+use tokio_util::sync::CancellationToken;
 #[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
 use tonic::transport::Channel;
 use tonic::Status;
@@ -94,6 +95,27 @@ impl Qcs {
     /// not correctly configured or the given profile is not defined.
     pub fn with_profile(profile: String) -> Result<Qcs, LoadError> {
         ClientConfiguration::load_profile(profile).map(Self::with_config)
+    }
+
+    /// Create a [`Qcs`] and initialized with the given optional `profile`.
+    /// If credentials are not found or stale, a PKCE login redirect flow
+    /// will be initialized. Note that this opens up a TCP port on your
+    /// system to accept a browser HTTP redirect, so you should not use
+    /// this in environments where that is not possible, such as hosted
+    /// JupyterLab sessions.
+    ///
+    /// # Errors
+    ///
+    /// A [`LoadError`] will be returned if QCS credentials are
+    /// not correctly configured or the given profile is not defined
+    /// or the PKCE login flow failed.
+    pub async fn with_login(
+        cancel_token: CancellationToken,
+        profile: Option<String>,
+    ) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_with_login(cancel_token, profile)
+            .await
+            .map(Self::with_config)
     }
 
     /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.

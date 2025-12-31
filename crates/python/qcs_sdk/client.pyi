@@ -52,7 +52,49 @@ class QCSClient:
 
         :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
 
-        :raises `LoadClientError`: If there is an issue loading the profile defails from the environment.
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment.
+
+        See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+        for more details.
+        """
+        ...
+    @staticmethod
+    def load_with_login(
+        profile_name: Optional[str] = None,
+    ) -> "QCSClient":
+        """
+        Create a `QCSClient` configuration using an environment-based configuration.
+
+        If credentials are not found or stale, a PKCE login redirect flow
+        will be initialized. Note that this opens up a TCP port on your
+        system to accept a browser HTTP redirect, so you should not use
+        this in environments where that is not possible, such as hosted
+        JupyterLab sessions.
+
+        :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
+
+        See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+        for more details.
+        """
+        ...
+    @staticmethod
+    async def load_with_login_async(
+        profile_name: Optional[str] = None,
+    ) -> "QCSClient":
+        """
+        Create a `QCSClient` configuration using an environment-based configuration.
+
+        If credentials are not found or stale, a PKCE login redirect flow
+        will be initialized. Note that this opens up a TCP port on your
+        system to accept a browser HTTP redirect, so you should not use
+        this in environments where that is not possible, such as hosted
+        JupyterLab sessions.
+
+        :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+
+        :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
 
         See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
         for more details.

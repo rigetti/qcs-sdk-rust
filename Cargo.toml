@@ -3,12 +3,13 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.dependencies]
-qcs-api-client-common = "0.12.8"
-qcs-api-client-grpc = "0.12.8"
-qcs-api-client-openapi = "0.13.8"
+qcs-api-client-common = "0.12.12"
+qcs-api-client-grpc = "0.12.12"
+qcs-api-client-openapi = "0.13.13"
 serde_json = "1.0.86"
 thiserror = "1.0.57"
 tokio = "1.36.0"
+tokio-util = "0.7"
 # We specify quil-rs as a git and versioned dependency so that we can keep the version of
 # quil-rs used in both the Rust and Python packages in sync. The tag used should always
 # be a `quil-py` tag and should be compatible with the version specified in
