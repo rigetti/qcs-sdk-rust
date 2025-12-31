@@ -1,3 +1,9 @@
+## 0.25.18-rc.0 (2025-12-31)
+
+### Fixes
+
+- update qcs-api-client dependencies to 0.12.12, (0.13.13 grpc) (#570)
+
 ## 0.25.17 (2025-12-03)
 
 ### Fixes
