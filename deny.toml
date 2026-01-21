@@ -182,6 +182,8 @@ deny = [
     # because a dependency depends on one of these crates that do not affect the
     # APIs used in this workspace, then we can disable the deny check if, otherwise,
     # there's no trivial solution.
+    #
+    # TODO: reqwest-tracing has older tracing versions; determine if it really is an issue.
     { crate = "opentelemetry", deny-multiple-versions = true },
     { crate = "opentelemetry_sdk", deny-multiple-versions = true },
     { crate = "tonic", deny-multiple-versions = true },
