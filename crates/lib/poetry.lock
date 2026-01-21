@@ -2082,4 +2082,4 @@ pyquil = ["pyquil"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "bc824506706a618d54ab2a9c1dfae6e95517748d2b2100568f9b5448bf6f892a"
+content-hash = "3e5baecf541a6f9e6213ad03d5969fc0e8e82f81764439c95db0888babf2fa69"

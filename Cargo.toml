@@ -15,28 +15,29 @@ resolver = "2"
 # crates' versions of ndarray in sync.
 # Similarly, pyo3 packages (`numpy`, `pyo3*`) track versions together
 # and need to be updated together.
-ndarray = { version = "0.16.1", features = ["serde"] }
+ndarray = { version = "0.17.2", features = ["serde"] }
 numpy = "0.27.1"
-opentelemetry = { version = "0.27.1" }
-opentelemetry_sdk = { version = "0.27.1" }
 pyo3 = { version = "0.27.2", features = ["num-complex", "multiple-pymethods"] }
 pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runtime"] }
 pyo3-build-config = "0.27.2"
 pyo3-log = { version = "0.13.2" }
-pyo3-opentelemetry = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
-pyo3-tracing-subscriber = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
-pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
-rigetti-pyo3 = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
 
+# TODO: Update refs once PRs are merged.
+optipy = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
+pyo3-opentelemetry = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head" }
+pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
+pyo3-tracing-subscriber = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
 qcs-api-client-common = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
 qcs-api-client-grpc = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
 qcs-api-client-openapi = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
 quil-rs = { git = "https://github.com/rigetti/quil-rs.git", rev = "refs/pull/491/head" }
+rigetti-pyo3 = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
 
-serde_json = "1.0.86"
-thiserror = "1.0.57"
-tokio = "1.36.0"
-# rigetti-pyo3 = { version = "0.4.1", default-features = false, features = ["complex", "time"] }
+opentelemetry = { version = "0.31.0" }
+opentelemetry_sdk = { version = "0.31.0" }
+thiserror = "2.0.17"
+tokio = "1.38.0"
+tracing = "0.1.41"
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.

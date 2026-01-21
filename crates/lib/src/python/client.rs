@@ -6,7 +6,7 @@ use qcs_api_client_common::configuration::{
 };
 
 use pyo3::prelude::*;
-use rigetti_pyo3::{create_init_submodule, py_sync};
+use rigetti_pyo3::{create_init_submodule, py_sync, sync::Awaitable};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::gen_stub_pymethods;
@@ -131,7 +131,7 @@ impl Qcs {
     }
 
     /// Get a copy of the OAuth session in an async context.
-    fn get_oauth_session_async<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn get_oauth_session_async<'py>(&self, py: Python<'py>) -> PyResult<Awaitable<'py, PyAny>> {
         let config = self.get_config().clone();
         pyo3_async_runtimes::tokio::future_into_py(py, async move {
             config
@@ -139,6 +139,7 @@ impl Qcs {
                 .await
                 .map_err(errors::ClientError::token_error)
         })
+        .map(Into::into)
     }
 }
 

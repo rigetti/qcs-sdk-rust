@@ -6,6 +6,7 @@ use tokio::sync::Mutex;
 use pyo3::prelude::*;
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pymethods};
+use rigetti_pyo3::sync::Awaitable;
 use tracing::instrument;
 
 use crate::{
@@ -179,7 +180,6 @@ impl PyExecutable {
 }
 
 #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure = "ignore")]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyExecutable {
@@ -193,19 +193,16 @@ impl PyExecutable {
     }
 
     #[instrument(skip_all)]
-    #[gen_stub(override_return_type(
-        type_repr="collections.abc.Awaitable[ExecutionData]",
-        imports=("collections.abc")
-    ))]
     pub fn execute_on_qvm_async<'py>(
         &self,
         py: Python<'py>,
         client: PyQvmClient,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    ) -> PyResult<Awaitable<'py, ExecutionData>> {
         pyo3_async_runtimes::tokio::future_into_py(
             py,
             py_executable_data!(self, execute_on_qvm, &client),
         )
+        .map(Into::into)
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -242,10 +239,6 @@ impl PyExecutable {
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
-    #[gen_stub(override_return_type(
-        type_repr="collections.abc.Awaitable[ExecutionData]",
-        imports=("collections.abc")
-    ))]
     pub fn execute_on_qpu_async<'py>(
         &self,
         py: Python<'py>,
@@ -253,7 +246,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    ) -> PyResult<Awaitable<'py, ExecutionData>> {
         match endpoint_id {
             Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
                 py,
@@ -276,6 +269,7 @@ impl PyExecutable {
                 ),
             ),
         }
+        .map(Into::into)
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -312,10 +306,6 @@ impl PyExecutable {
     }
 
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
-    #[gen_stub(override_return_type(
-        type_repr="collections.abc.Awaitable[ExecutionData]",
-        imports=("collections.abc")
-    ))]
     pub fn submit_to_qpu_async<'py>(
         &self,
         py: Python<'py>,
@@ -323,7 +313,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    ) -> PyResult<Awaitable<'py, ExecutionData>> {
         match endpoint_id {
             Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
                 py,
@@ -346,6 +336,7 @@ impl PyExecutable {
                 ),
             ),
         }
+        .map(Into::into)
     }
 
     pub fn retrieve_results(
@@ -359,19 +350,16 @@ impl PyExecutable {
         )
     }
 
-    #[gen_stub(override_return_type(
-        type_repr="collections.abc.Awaitable[ExecutionData]",
-        imports=("collections.abc")
-    ))]
     pub fn retrieve_results_async<'py>(
         &self,
         py: Python<'py>,
         job_handle: PyJobHandle,
-    ) -> PyResult<Bound<'py, PyAny>> {
+    ) -> PyResult<Awaitable<'py, ExecutionData>> {
         pyo3_async_runtimes::tokio::future_into_py(
             py,
             py_executable_data!(self, retrieve_results, job_handle.0),
         )
+        .map(Into::into)
     }
 }
 

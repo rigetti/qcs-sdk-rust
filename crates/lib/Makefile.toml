@@ -1,6 +1,6 @@
 [env]
 RUST_BACKTRACE = 0
-CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features tracing-opentelemetry,libquil"  # Disable --all-features to avoid manual tests in CI for now
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features tracing-opentelemetry,libquil,_insecure-issuer-validation"  # Disable --all-features to avoid manual tests in CI for now
 
 [tasks.pre-test]
 command = "docker"
@@ -41,7 +41,7 @@ args = ["deny", "--all-features", "check"]
 dependencies = ["deny", "lint"]
 
 [tasks.ci-flow]
-dependencies = ["pytest-flow", "stubtest"]
+dependencies = ["test-flow", "pytest-flow", "stubtest-flow"]
 
 # ----
 
@@ -167,5 +167,5 @@ command = "pytest"
 args = ["tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
-dependencies = ["dev-test-flow", "pytest-flow", "stubtest"]
+dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]
 

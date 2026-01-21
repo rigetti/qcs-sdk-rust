@@ -12,7 +12,9 @@ use qcs::{
     qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
     Executable,
 };
-use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
+use qcs_api_client_common::configuration::{
+    secrets::SECRETS_PATH_VAR, settings::SETTINGS_PATH_VAR,
+};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -26,6 +28,10 @@ MEASURE 1 ro[1]
 
 const QPU_ID: &str = "Aspen-M-3";
 
+#[cfg_attr(
+    not(feature = "_insecure-issuer-validation"),
+    ignore = "uses mock auth server, requires `_insecure-issuer-validation` feature"
+)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn test_qcs_against_mocks() {
     // Shared setup
@@ -122,7 +128,22 @@ mod auth_server {
                     access_token: "accessed",
                 })
             });
-        warp::serve(token).run(([127, 0, 0, 1], 8001)).await;
+
+        let well_known = warp::get()
+            .and(warp::path(".well-known").and(warp::path("openid-configuration")))
+            .map(|| {
+                warp::reply::json(&serde_json::json!({
+                    "issuer": "http://localhost:8001",
+                    "authorization_endpoint": "http://localhost:8001/v1/authorize",
+                    "token_endpoint": "http://localhost:8001/v1/token",
+                    "jwks_uri": "http://localhost:8001/.well-known/jwks.json",
+                    "scopes": ["openid"],
+                }))
+            });
+
+        warp::serve(token.or(well_known))
+            .run(([127, 0, 0, 1], 8001))
+            .await;
     }
 }
 
