@@ -20,7 +20,7 @@ class Config:
     """
 
     def __new__(
-        cls, *, file_path: Optional[str] = None, pretty: bool = False, filter: Optional[str] = None, json: bool = True
+        cls, file_path: Optional[str] = None, pretty: bool = False, filter: Optional[str] = None, json: bool = True
     ) -> "Config":
         """
         Create a new `Config`.

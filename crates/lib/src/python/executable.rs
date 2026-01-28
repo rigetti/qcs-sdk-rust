@@ -22,7 +22,7 @@ use crate::{
     JobHandle,
 };
 
-// Note the Python PROGRAM example _must not_ use `r"""`
+// Note the Python PROGRAM example _must not_ use `"""`
 // or it'll break the generated docstring associated with its stubfile.
 /// A builder interface for executing Quil programs on QVMs and QPUs.
 ///
@@ -34,7 +34,7 @@ use crate::{
 ///     from qcs_sdk.client import QCSClient
 ///     from qcs_sdk.qvm import QVMClient
 ///
-///     PROGRAM = """
+///     PROGRAM = '''
 ///     DECLARE ro BIT[2]
 ///
 ///     H 0
@@ -42,7 +42,7 @@ use crate::{
 ///
 ///     MEASURE 0 ro[0]
 ///     MEASURE 1 ro[1]
-///     """
+///     '''
 ///
 ///     async def run():
 ///         client = QVMClient.new_http(QCSClient.load().qvm_url)

@@ -6,6 +6,23 @@ import collections.abc
 import typing
 from qcs_sdk import QcsSdkError
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
+from quil.program import Program
+
+@typing.final
+class CompilationResult:
+    r"""
+    The result of compiling a Quil program to native quil with `quilc`
+    """
+    @property
+    def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]:
+        r"""
+        Metadata about the compiled program
+        """
+    @property
+    def program(self) -> Program:
+        r"""
+        The compiled program
+        """
 
 @typing.final
 class CompilationResult:

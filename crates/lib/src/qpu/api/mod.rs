@@ -505,7 +505,7 @@ impl ExecutionOptions {
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu", eq))]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.api", eq))]
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
     Gateway(),

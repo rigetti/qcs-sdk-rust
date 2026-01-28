@@ -7,7 +7,7 @@ import datetime
 import typing
 from qcs_sdk import QcsSdkError
 from qcs_sdk.client import QCSClient
-from qcs_sdk.qpu import ConnectionStrategy, MemoryValues
+from qcs_sdk.qpu import MemoryValues
 
 @typing.final
 class APIExecutionOptions:
@@ -70,6 +70,53 @@ class BuildOptionsError(QpuApiError):
     """
     ...
 
+class ConnectionStrategy:
+    r"""
+    The connection strategy to use when submitting and retrieving jobs from a QPU.
+    """
+    def __getnewargs__(self) -> tuple[str] | tuple[()]: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
+    @staticmethod
+    def default() -> ConnectionStrategy: ...
+    def get_endpoint_id(self) -> builtins.str: ...
+    @typing.final
+    class DirectAccess(ConnectionStrategy):
+        r"""
+        Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
+        have direct network access and an active reservation.
+        """
+        __match_args__ = ()
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls) -> ConnectionStrategy.DirectAccess: ...
+    
+    @typing.final
+    class EndpointId(ConnectionStrategy):
+        r"""
+        Connect directly to a specific endpoint using its ID.
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> builtins.str: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: builtins.str) -> ConnectionStrategy.EndpointId: ...
+    
+    @typing.final
+    class Gateway(ConnectionStrategy):
+        r"""
+        Connect through the publicly accessible gateway.
+        """
+        __match_args__ = ()
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls) -> ConnectionStrategy.Gateway: ...
+    
+
 @typing.final
 class ExecutionOptions:
     r"""
@@ -99,10 +146,6 @@ class ExecutionOptions:
     def builder() -> ExecutionOptionsBuilder: ...
     @staticmethod
     def default() -> ExecutionOptions: ...
-
-@typing.final
-class ExecutionOptionsBuilder:
-    ...
 
 @typing.final
 class ExecutionOptionsBuilder:

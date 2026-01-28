@@ -11,8 +11,9 @@ use quil_rs::quil::Quil;
 use crate::{
     compiler::{
         quilc::{
-            self, CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordResponse,
-            Error, GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
+            self, CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordRequest,
+            ConjugatePauliByCliffordResponse, Error,
+            GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
             RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
         },
         rpcq,
@@ -38,6 +39,7 @@ mod pyquilc {
             TargetDevice,
             PauliTerm,
             ConjugateByCliffordRequest,
+            ConjugatePauliByCliffordRequest,
             ConjugatePauliByCliffordResponse,
             RandomizedBenchmarkingRequest,
             GenerateRandomizedBenchmarkingSequenceResponse,

@@ -73,7 +73,12 @@ pub enum TranslationError {
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
-#[pyclass(module = "qcs_sdk.qpu.translation", name = "TranslationBackend", eq)]
+#[pyclass(
+    module = "qcs_sdk.qpu.translation",
+    name = "TranslationBackend",
+    rename_all = "SCREAMING_SNAKE_CASE",
+    eq
+)]
 pub enum PyTranslationBackend {
     V1,
     V2,

@@ -16,21 +16,12 @@ PY_PACKAGE="qcs_sdk"
 # The name of the package that `knope` adds change logs for.
 KNOPE_PACKAGE="qcs-sdk"
 
-# Directories containing the $PY_PACKAGE's pyproject.toml, relative the project root;
-# if you've moved it between commits, you should add its new home to this collection.
-#
-# `griffe` doesn't mind if the path doesn't exist, but if you compare tags across the merge,
-# it won't find the Python package at all, and it'll fail with a obscure error.
-#
-# The first entry is assumed to be the current one, and is used for `poetry run -P`.
-PYPROJECT_PATHS=(
-  "crates/lib"
-  "crates/python"
-)
-
 # Check if `griffe` says this is a breaking change.
-poetry run -P "${PYPROJECT_PATHS[0]}" -- \
-  griffe check "${PYPROJECT_PATHS[@]/#/--search=}" $PY_PACKAGE
+poetry run -P crates/lib -- \
+  griffe check \
+    --search crates/python \
+    --search crates/lib/python \
+    "${PY_PACKAGE}"
 api_break=$?
 
 # Now check if `knope` knows this has "Breaking Changes".

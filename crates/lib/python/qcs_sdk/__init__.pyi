@@ -8,32 +8,15 @@ import enum
 import numpy
 import numpy.typing
 import typing
-from qcs_sdk.compiler.quilc import CompilerOpts, NativeQuilMetadata, QuilcClient
+from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
 from qcs_sdk.qpu import QPUResultData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData
-from quil.program import Program
 from . import _qcs_sdk
 from . import client
 from . import qpu
 from . import qvm
-
-@typing.final
-class CompilationResult:
-    r"""
-    The result of compiling a Quil program to native quil with `quilc`
-    """
-    @property
-    def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]:
-        r"""
-        Metadata about the compiled program
-        """
-    @property
-    def program(self) -> Program:
-        r"""
-        The compiled program
-        """
 
 @typing.final
 class ExeParameter:
@@ -64,7 +47,7 @@ class Executable:
         from qcs_sdk.client import QCSClient
         from qcs_sdk.qvm import QVMClient
     
-        PROGRAM = """
+        PROGRAM = '''
         DECLARE ro BIT[2]
     
         H 0
@@ -72,7 +55,7 @@ class Executable:
     
         MEASURE 0 ro[0]
         MEASURE 1 ro[1]
-        """
+        '''
     
         async def run():
             client = QVMClient.new_http(QCSClient.load().qvm_url)
@@ -157,12 +140,6 @@ class ExecutionError(QcsSdkError):
 
 @typing.final
 class JobHandle:
-    ...
-
-class ListQuantumProcessorsError(QcsSdkError):
-    r"""
-    API Errors encountered when trying to list available quantum processors.
-    """
     ...
 
 class QcsSdkError(builtins.Exception):
@@ -421,7 +398,7 @@ class Service(enum.Enum):
     The external services that this SDK may connect to. Used to differentiate between networking
     issues in [`Error::Connection`].
     """
-    Quilc = ...
+    QUILC = ...
     r"""
     The open source [`quilc`](https://github.com/quil-lang/quilc) compiler.
     
@@ -430,7 +407,7 @@ class Service(enum.Enum):
     this is running on `tcp://localhost:5555`, but this can be overridden via
     `[profiles.<profile_name>.applications.pyquil.quilc_url]` in your `.qcs/settings.toml` file.
     """
-    Qvm = ...
+    QVM = ...
     r"""
     The open source [`qvm`](https://github.com/quil-lang/qvm) simulator.
     
@@ -438,14 +415,14 @@ class Service(enum.Enum):
     it's assumed that this is running on `http://localhost:5000`, but this can be overridden via
     `[profiles.<profile_name>.applications.pyquil.qvm_url]` in your `.qcs/settings.toml` file.
     """
-    Qcs = ...
+    QCS = ...
     r"""
     The connection to [`QCS`](https://docs.rigetti.com/qcs/), the API for authentication,
     QPU lookup, and translation.
     
     You should be able to reach this service as long as you have a connection to the internet.
     """
-    Qpu = ...
+    QPU = ...
     r"""
     The connection to the QPU itself. You can only connect to the QPU from an authorized network
     (like QCS JupyterLab).

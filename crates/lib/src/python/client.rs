@@ -1,9 +1,4 @@
-use qcs_api_client_common::configuration::{
-    secrets::SecretRefreshToken,
-    settings::AuthServer,
-    tokens::{ClientCredentials, ExternallyManaged, OAuthSession, RefreshToken},
-    ClientConfigurationBuilder,
-};
+use qcs_api_client_common::configuration::{tokens::OAuthSession, ClientConfigurationBuilder};
 
 use pyo3::prelude::*;
 use rigetti_pyo3::{create_init_submodule, py_sync, sync::Awaitable};
@@ -14,20 +9,31 @@ use pyo3_stub_gen::derive::gen_stub_pymethods;
 use crate::client::Qcs;
 use crate::python::errors;
 
+#[cfg(not(feature = "libquil"))]
 create_init_submodule! {
-    classes: [
-        Qcs,
-        OAuthSession,
-        AuthServer,
-        RefreshToken,
-        SecretRefreshToken,
-        ClientCredentials,
-        ExternallyManaged
-    ],
+    classes: [ Qcs ],
     errors: [
         errors::BuildClientError,
         errors::ClientError,
+        errors::RPCQQuilcError,
+        errors::TokenError,
         errors::LoadClientError
+    ],
+}
+
+// TODO (rigetti-pyo3#63): The `create_init_submodule` macro doesn't support feature-gated items.
+// Developer note: putting this block second lets the `pyo3_linter` see the additional items.
+
+#[cfg(feature = "libquil")]
+create_init_submodule! {
+    classes: [ Qcs ],
+    errors: [
+        errors::BuildClientError,
+        errors::ClientError,
+        errors::LoadClientError,
+        errors::RPCQQuilcError,
+        errors::TokenError,
+        errors::LibquilQuilcError
     ],
 }
 
@@ -80,7 +86,7 @@ impl Qcs {
 
     /// Create a `QCSClient` configuration using an environment-based configuration.
     ///
-    /// :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+    /// :param `profile_name`: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
     ///
     /// :raises `LoadClientError`: If there is an issue loading the profile details from the environment.
     #[staticmethod]

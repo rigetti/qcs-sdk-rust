@@ -10,10 +10,7 @@ use pyo3_stub_gen::derive::{gen_stub_pyfunction, gen_stub_pymethods};
 use crate::{
     client::Qcs,
     python::{errors, execution_data::RawQpuReadoutData},
-    qpu::{
-        self, api, experimental, isa, result_data::MemoryValues, translation, QpuResultData,
-        ReadoutValues,
-    },
+    qpu::{self, result_data::MemoryValues, QpuResultData, ReadoutValues},
 };
 
 // #[pyo3(name = "qpu", module = "qcs_sdk", submodule)]
@@ -23,10 +20,10 @@ create_init_submodule! {
     errors: [ errors::ListQuantumProcessorsError ],
     funcs: [ py_list_quantum_processors, py_list_quantum_processors_async ],
     submodules: [
-        "api": api::python::init_submodule,
-        "experimental": experimental::python::init_submodule,
-        "isa": isa::python::init_submodule,
-        "translation": translation::python::init_submodule
+        "api": qpu::api::python::init_submodule,
+        "experimental": qpu::experimental::python::init_submodule,
+        "isa": qpu::isa::python::init_submodule,
+        "translation": qpu::translation::python::init_submodule
     ],
 }
 

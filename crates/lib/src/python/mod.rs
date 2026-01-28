@@ -17,7 +17,9 @@ use crate::{
     compiler,
     python::{
         executable::{ExeParameter, PyExecutable, PyJobHandle},
-        execution_data::PyRegisterMatrix,
+        execution_data::{
+            PyRegisterMatrix, RegisterMapItemsIter, RegisterMapKeysIter, RegisterMapValuesIter,
+        },
     },
     qpu, qvm, ExecutionData, RegisterData, RegisterMap, ResultData, Service,
 };
@@ -39,17 +41,27 @@ create_init_submodule! {
         ExecutionData,
         PyExecutable,
         PyJobHandle,
-        PyRegisterMatrix,
-        Qcs,
         RegisterMap,
+        RegisterMapItemsIter,
+        RegisterMapKeysIter,
+        RegisterMapValuesIter,
         Service
     ],
+
     complex_enums: [
+        PyRegisterMatrix,
         RegisterData,
         ResultData
     ],
-    errors: [ errors::QcsSdkError, errors::ExecutionError, errors::RegisterMatrixConversionError ],
+
+    errors: [
+        errors::QcsSdkError,
+        errors::ExecutionError,
+        errors::RegisterMatrixConversionError
+    ],
+
     funcs: [ reset_logging, gather_diagnostics ],
+
     submodules: [
         "client": client::init_submodule,
         "compiler": compiler::python::init_submodule,

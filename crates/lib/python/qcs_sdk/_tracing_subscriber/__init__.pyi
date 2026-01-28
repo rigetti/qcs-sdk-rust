@@ -51,7 +51,7 @@ class BatchConfig:
     This configuration is typically favorable unless the tracing context manager is short lived.
     """
 
-    def __new__(cls, *, subscriber: subscriber.Config) -> "BatchConfig": ...
+    def __new__(cls, subscriber: subscriber.Config | None = None) -> "BatchConfig": ...
 
 @final
 class SimpleConfig:
@@ -65,7 +65,7 @@ class SimpleConfig:
     background Tokio runtime.
     """
 
-    def __new__(cls, *, subscriber: subscriber.Config) -> "SimpleConfig": ...
+    def __new__(cls, subscriber: subscriber.Config | None = None) -> "SimpleConfig": ...
 
 @final
 class CurrentThreadTracingConfig:
@@ -77,7 +77,7 @@ class CurrentThreadTracingConfig:
     Note, this configuration is currently incompatible with async methods defined with `pyo3_asyncio`.
     """
 
-    def __new__(cls, *, export_process: "ExportConfig") -> "CurrentThreadTracingConfig": ...
+    def __new__(cls, export_process: "ExportConfig" | None = None) -> "CurrentThreadTracingConfig": ...
 
 @final
 class GlobalTracingConfig:
@@ -89,7 +89,7 @@ class GlobalTracingConfig:
     application.
     """
 
-    def __new__(cls, *, export_process: "ExportConfig") -> "GlobalTracingConfig": ...
+    def __new__(cls, export_process: "ExportConfig" | None = None) -> "GlobalTracingConfig": ...
 
 @final
 class Tracing:
@@ -101,20 +101,20 @@ class Tracing:
     Each instance of this context manager can only be used once and only once.
     """
 
-    def __new__(cls, *, config: "TracingConfig") -> "Tracing": ...
+    def __new__(cls, config: "TracingConfig" | None = None) -> "Tracing": ...
     def __enter__(self): ...
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]] = None,
-        exc_value: Optional[BaseException] = None,
-        traceback: Optional[TracebackType] = None,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ): ...
     async def __aenter__(self): ...
     async def __aexit__(
         self,
-        exc_type: Optional[Type[BaseException]] = None,
-        exc_value: Optional[BaseException] = None,
-        traceback: Optional[TracebackType] = None,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
     ): ...
 
 if TYPE_CHECKING:

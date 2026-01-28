@@ -2,6 +2,7 @@
 # ruff: noqa: E501, F401
 
 import builtins
+import collections.abc
 import typing
 from qcs_api_client_common.configuration import OAuthSession
 from qcs_sdk import QcsSdkError
@@ -61,7 +62,7 @@ class QCSClient:
         
         Prefer to use `QCSClient.load` to construct an environment-based profile.
         """
-    def get_oauth_session_async(self) -> typing.Any:
+    def get_oauth_session_async(self) -> collections.abc.Awaitable[typing.Any]:
         r"""
         Get a copy of the OAuth session in an async context.
         """
@@ -70,7 +71,7 @@ class QCSClient:
         r"""
         Create a `QCSClient` configuration using an environment-based configuration.
         
-        :param profile_name: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+        :param `profile_name`: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
         
         :raises `LoadClientError`: If there is an issue loading the profile details from the environment.
         """

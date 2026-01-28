@@ -104,7 +104,7 @@ exception!(
 
 exception!(
     crate::qpu::ListQuantumProcessorsError,
-    qcs_sdk,
+    qcs_sdk.qpu,
     ListQuantumProcessorsError,
     QcsSdkError,
     "API Errors encountered when trying to list available quantum processors."

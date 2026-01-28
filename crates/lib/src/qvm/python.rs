@@ -9,14 +9,25 @@ use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pyme
 
 use crate::{
     python::{errors, NonZeroU16},
-    qvm::{self, http, Error, QvmOptions, QvmResultData},
+    qvm::{
+        self,
+        http::{
+            self, AddressRequest, ExpectationRequest, HttpClient, MultishotMeasureRequest,
+            MultishotRequest, MultishotResponse, WavefunctionRequest,
+        },
+        Error, QvmOptions, QvmResultData,
+    },
     register_data::RegisterData,
 };
 
 // #[pyo3(name = "qvm", module = "qcs_sdk", submodule)]
 create_init_submodule! {
-    classes: [ QvmResultData, QvmOptions, RawQvmReadoutData, PyQvmClient ],
-    complex_enums: [ http::AddressRequest ],
+    classes: [
+        PyQvmClient,
+        QvmOptions,
+        QvmResultData,
+        RawQvmReadoutData
+    ],
     errors: [ errors::QvmError ],
     funcs: [ py_run, py_run_async ],
     submodules: [ "api": api::init_submodule ],
@@ -27,7 +38,7 @@ impl_repr!(RawQvmReadoutData);
 
 #[derive(Clone)]
 pub enum QvmClient {
-    Http(http::HttpClient),
+    Http(HttpClient),
     #[cfg(feature = "libquil")]
     Libquil(qvm::libquil::Client),
 }
@@ -71,7 +82,7 @@ impl PyQvmClient {
 
     #[staticmethod]
     fn new_http(endpoint: String) -> Self {
-        let http_client = http::HttpClient::new(endpoint);
+        let http_client = HttpClient::new(endpoint);
         Self {
             inner: QvmClient::Http(http_client),
         }
@@ -125,9 +136,9 @@ impl qvm::Client for PyQvmClient {
     /// Execute a program on the QVM.
     async fn run(
         &self,
-        request: &http::MultishotRequest,
+        request: &MultishotRequest,
         options: &QvmOptions,
-    ) -> Result<http::MultishotResponse, Error> {
+    ) -> Result<MultishotResponse, Error> {
         self.as_client().run(request, options).await
     }
 
@@ -136,13 +147,13 @@ impl qvm::Client for PyQvmClient {
     /// The behavior of this method is different to that of [`Self::run`]
     /// in that [`Self::run_and_measure`] will execute the program a single
     /// time; the resulting wavefunction is then sampled some number of times
-    /// (specified in [`http::MultishotMeasureRequest`]).
+    /// (specified in [`MultishotMeasureRequest`]).
     ///
     /// This can be useful if the program is expensive to execute and does
     /// not change per "shot".
     async fn run_and_measure(
         &self,
-        request: &http::MultishotMeasureRequest,
+        request: &MultishotMeasureRequest,
         options: &QvmOptions,
     ) -> Result<Vec<Vec<i64>>, Error> {
         self.as_client().run_and_measure(request, options).await
@@ -151,7 +162,7 @@ impl qvm::Client for PyQvmClient {
     /// Measure the expectation value of a program
     async fn measure_expectation(
         &self,
-        request: &http::ExpectationRequest,
+        request: &ExpectationRequest,
         options: &QvmOptions,
     ) -> Result<Vec<f64>, Error> {
         self.as_client().measure_expectation(request, options).await
@@ -160,7 +171,7 @@ impl qvm::Client for PyQvmClient {
     /// Get the wavefunction produced by a program
     async fn get_wavefunction(
         &self,
-        request: &http::WavefunctionRequest,
+        request: &WavefunctionRequest,
         options: &QvmOptions,
     ) -> Result<Vec<u8>, Error> {
         self.as_client().get_wavefunction(request, options).await
@@ -226,14 +237,14 @@ impl QvmResultData {
 
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
-impl http::MultishotRequest {
+impl MultishotRequest {
     /// Creates a new `MultishotRequest` with the given parameters.
     #[new]
     #[pyo3(signature = (program, shots, addresses, measurement_noise=None, gate_noise=None, rng_seed=None))]
     fn __new__(
         program: String,
         shots: NonZeroU16,
-        addresses: HashMap<String, http::AddressRequest>,
+        addresses: HashMap<String, AddressRequest>,
         measurement_noise: Option<(f64, f64, f64)>,
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
@@ -262,7 +273,7 @@ impl http::MultishotRequest {
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
-impl http::MultishotMeasureRequest {
+impl MultishotMeasureRequest {
     /// Construct a new `MultishotMeasureRequest` using the given parameters.
     #[new]
     #[pyo3(signature = (program, shots, qubits, measurement_noise=None, gate_noise=None, rng_seed=None))]
@@ -297,18 +308,18 @@ impl http::MultishotMeasureRequest {
 
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
-impl http::ExpectationRequest {
+impl ExpectationRequest {
     /// Creates a new `ExpectationRequest` using the given parameters.
     #[new]
     #[pyo3(signature = (state_preparation, operators, rng_seed=None))]
     fn __new__(state_preparation: String, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
-        http::ExpectationRequest::new(state_preparation, &operators, rng_seed)
+        ExpectationRequest::new(state_preparation, &operators, rng_seed)
     }
 }
 
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
-impl http::WavefunctionRequest {
+impl WavefunctionRequest {
     /// Create a new `WavefunctionRequest` with the given parameters.
     #[new]
     #[pyo3(signature = (program, measurement_noise=None, gate_noise=None, rng_seed=None))]
@@ -318,7 +329,7 @@ impl http::WavefunctionRequest {
         gate_noise: Option<(f64, f64, f64)>,
         rng_seed: Option<i64>,
     ) -> Self {
-        http::WavefunctionRequest::new(program, measurement_noise, gate_noise, rng_seed)
+        WavefunctionRequest::new(program, measurement_noise, gate_noise, rng_seed)
     }
 }
 
@@ -330,7 +341,7 @@ py_function_sync_async! {
     async fn run(
         quil: String,
         shots: NonZeroU16,
-        addresses: HashMap<String, http::AddressRequest>,
+        addresses: HashMap<String, AddressRequest>,
         params: HashMap<String, Vec<f64>>,
         client: PyQvmClient,
         measurement_noise: Option<(f64, f64, f64)>,
@@ -370,20 +381,26 @@ mod api {
 
     use crate::{
         python::errors,
-        qvm::{http, python::PyQvmClient, Client, QvmOptions},
+        qvm::{
+            http::{
+                AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
+                MultishotResponse, WavefunctionRequest,
+            },
+            python::PyQvmClient,
+            Client, QvmOptions,
+        },
     };
 
     // #[pyo3(name = "api", module = "qcs_sdk.qvm", submodule)]
     create_init_submodule! {
         classes: [
-            http::AddressRequest,
-            http::MultishotRequest,
-            http::MultishotResponse,
-            http::MultishotMeasureRequest,
-            http::ExpectationRequest,
-            http::WavefunctionRequest
+            ExpectationRequest,
+            MultishotMeasureRequest,
+            MultishotRequest,
+            MultishotResponse,
+            WavefunctionRequest
         ],
-        errors: [ errors::QuilcError ],
+        complex_enums: [ AddressRequest ],
         funcs: [
             py_get_version_info,
             py_get_version_info_async,
@@ -417,7 +434,7 @@ mod api {
         #[tracing::instrument(skip_all)]
         #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn get_wavefunction(
-            request: http::WavefunctionRequest,
+            request: WavefunctionRequest,
             client: PyQvmClient,
             options: Option<QvmOptions>
         ) -> PyResult<Vec<u8>> {
@@ -435,7 +452,7 @@ mod api {
         #[tracing::instrument(skip_all)]
         #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn measure_expectation(
-            request: http::ExpectationRequest,
+            request: ExpectationRequest,
             client: PyQvmClient,
             options: Option<QvmOptions>) -> PyResult<Vec<f64>> {
             client
@@ -452,7 +469,7 @@ mod api {
         #[tracing::instrument(skip_all)]
         #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn run_and_measure(
-            request: http::MultishotMeasureRequest,
+            request: MultishotMeasureRequest,
             client: PyQvmClient,
             options: Option<QvmOptions>) -> PyResult<Vec<Vec<i64>>> {
             client
@@ -469,10 +486,10 @@ mod api {
         #[tracing::instrument(skip_all)]
         #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
         async fn run(
-            request: http::MultishotRequest,
+            request: MultishotRequest,
             client: PyQvmClient,
             options: Option<QvmOptions>,
-        ) -> PyResult<http::MultishotResponse> {
+        ) -> PyResult<MultishotResponse> {
             client
                 .run(&request, &options.unwrap_or_default())
                 .await

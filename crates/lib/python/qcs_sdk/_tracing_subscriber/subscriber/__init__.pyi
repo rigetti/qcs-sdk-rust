@@ -21,5 +21,5 @@ class Config:
     set on the `tracing_subscriber::Registry`.
     """
 
-    def __new__(cls, *, layer: layers.Config) -> "Config": ...
+    def __new__(cls, layer: layers.Config | None = None) -> "Config": ...
 

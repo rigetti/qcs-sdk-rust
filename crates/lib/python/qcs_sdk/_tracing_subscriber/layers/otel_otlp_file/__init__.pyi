@@ -21,7 +21,7 @@ class Config:
     layer.
     """
 
-    def __new__(cls, *, file_path: Optional[str] = None, filter: Optional[str] = None, instrumentation_library: Optional[InstrumentationLibrary] = None) -> "Config":
+    def __new__(cls, file_path: Optional[str] = None, filter: Optional[str] = None, instrumentation_library: Optional[InstrumentationLibrary] = None) -> "Config":
         """
         :param file_path: The path to the file to write to. If not specified, defaults to stdout.
         :param filter: A filter string to use for this layer. This uses the same format as the

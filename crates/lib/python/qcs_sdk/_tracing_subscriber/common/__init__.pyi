@@ -28,6 +28,7 @@ class InstrumentationLibrary:
     def __new__(
         cls,
         name: str,
+        /,
         version: Optional[str] = None,
         schema_url: Optional[str] = None,
         attributes: Optional[Dict[str, str]] = None,

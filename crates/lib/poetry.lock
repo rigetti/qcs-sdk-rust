@@ -1188,6 +1188,27 @@ files = [
 windows-terminal = ["colorama (>=0.4.6)"]
 
 [[package]]
+name = "pyo3-linter"
+version = "0.0.1"
+description = "A linter for Rust code that uses PyO3 and rigetti-pyo3."
+optional = true
+python-versions = ">=3.10,<4"
+groups = ["main"]
+markers = "extra == \"dev\""
+files = []
+develop = false
+
+[package.dependencies]
+typing-extensions = "^4.15.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/rigetti/rigetti-pyo3.git"
+reference = "feat-pyo3-linter"
+resolved_reference = "d43c02b77df8c23ca7a989a00166f3287f2e1e8b"
+subdirectory = "pyo3_linter"
+
+[[package]]
 name = "pyquil"
 version = "5.0.0rc2"
 description = "A Python library for creating Quantum Instruction Language (Quil) programs."
@@ -2076,10 +2097,10 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more_it
 type = ["pytest-mypy"]
 
 [extras]
-dev = ["black", "maturin", "mypy", "numpy", "opentelemetry-sdk", "pdoc", "pytest", "pytest-asyncio", "pytest-clarity", "pytest-mock", "pytest-sugar", "ruff", "syrupy"]
+dev = ["black", "maturin", "mypy", "numpy", "opentelemetry-sdk", "pdoc", "pyo3_linter", "pytest", "pytest-asyncio", "pytest-clarity", "pytest-mock", "pytest-sugar", "ruff", "syrupy"]
 pyquil = ["pyquil"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<4"
-content-hash = "3e5baecf541a6f9e6213ad03d5969fc0e8e82f81764439c95db0888babf2fa69"
+content-hash = "0d94b3f7f69dbc907a16078a3305dec68c64e6b6d3deeb5272ba86d0a44d7a41"

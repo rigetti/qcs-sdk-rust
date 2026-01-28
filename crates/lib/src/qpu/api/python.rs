@@ -30,7 +30,6 @@ use crate::{
 
 create_init_submodule! {
     classes: [
-        Register,
         ExecutionResult,
         ExecutionResults,
         ExecutionOptions,
@@ -39,7 +38,10 @@ create_init_submodule! {
         ApiExecutionOptionsBuilder,
         PyQpuApiDuration
     ],
-    complex_enums: [ ConnectionStrategy ],
+    complex_enums: [
+        ConnectionStrategy,
+        Register
+    ],
     errors: [
         errors::QpuApiError,
         errors::SubmissionError,
@@ -62,11 +64,6 @@ create_init_submodule! {
 impl_repr!(ExecutionOptions);
 impl_repr!(ApiExecutionOptions);
 impl_repr!(ConnectionStrategy);
-
-#[derive(Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "ExecutionOptionsBuilder", module = "qcs_sdk.qpu.api")]
-struct PyExecutionOptionsBuilder(ExecutionOptionsBuilder);
 
 /// Variants of data vectors within a single `ExecutionResult`.
 #[derive(Clone, Debug)]
