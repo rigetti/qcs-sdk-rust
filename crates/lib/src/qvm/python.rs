@@ -45,6 +45,7 @@ pub enum QvmClient {
     Libquil(qvm::libquil::Client),
 }
 
+/// Client used to communicate with QVM.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QVMClient", module = "qcs_sdk.qvm")]
@@ -52,10 +53,13 @@ pub struct PyQvmClient {
     inner: QvmClient,
 }
 
+/// Encapsulates raw data returned from the QVM after executing a program.
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyo3::pyclass(name = "RawQVMReadoutData", module = "qcs_sdk.qvm", frozen, get_all)]
 pub struct RawQvmReadoutData {
+    /// The mapping of register names (ie. "ro") to a 2-d list containing the
+    /// values for that register.
     memory: HashMap<String, Py<PyList>>,
 }
 
@@ -82,6 +86,7 @@ impl PyQvmClient {
         ))
     }
 
+    /// Construct a new QVM client which uses HTTP to communicate with a QVM service.
     #[staticmethod]
     fn new_http(endpoint: String) -> Self {
         let http_client = HttpClient::new(endpoint);
@@ -90,6 +95,7 @@ impl PyQvmClient {
         }
     }
 
+    /// Return the address of the client.
     #[getter]
     fn qvm_url(&self) -> String {
         match &self.inner {
@@ -105,6 +111,7 @@ impl PyQvmClient {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQvmClient {
+    /// Construct a new QVM client which uses libquil.
     #[staticmethod]
     fn new_libquil() -> Self {
         Self {
@@ -191,16 +198,22 @@ impl QvmOptions {
         }
     }
 
+    /// The timeout used for requests to the QVM. If set to None, there is no timeout.
     #[getter]
     pub fn timeout(&self) -> Option<f32> {
         self.timeout.map(|duration| duration.as_secs_f32())
     }
 
+    /// The timeout used for requests to the QVM. If set to None, there is no timeout.
     #[setter]
     pub fn set_timeout(&mut self, timeout_seconds: Option<f64>) {
         self.timeout = timeout_seconds.map(Duration::from_secs_f64);
     }
 
+    /// Get the default set of ``QVMOptions`` used for QVM requests.
+    ///
+    /// Settings:
+    ///     timeout: 30.0 seconds
     #[staticmethod]
     #[pyo3(name = "default")]
     fn py_default() -> Self {
@@ -211,13 +224,13 @@ impl QvmOptions {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl QvmResultData {
-    /// Construct a new `QVMResultData` from a memory map.
+    /// Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.
     #[new]
     fn __new__(memory: HashMap<String, RegisterData>) -> Self {
         QvmResultData::from_memory_map(memory)
     }
 
-    /// Get the raw readout data as a flattened structure.
+    /// Get a copy of this result data flattened into a ``RawQVMReadoutData``.
     pub fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<RawQvmReadoutData> {
         let memory = self
             .memory()

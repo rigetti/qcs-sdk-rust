@@ -113,6 +113,7 @@ pub(crate) enum QuilcClient {
     LibquilSys(super::libquil::Client),
 }
 
+/// Client used to communicate with Quilc.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk.compiler.quilc", name = "QuilcClient")]
@@ -173,6 +174,7 @@ impl PyQuilcClient {
         ))
     }
 
+    /// Construct a QuilcClient that uses RPCQ to communicate with Quilc.
     #[staticmethod]
     fn new_rpcq(endpoint: &str) -> PyResult<Self> {
         Ok(Self {
@@ -186,6 +188,7 @@ impl PyQuilcClient {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyQuilcClient {
+    /// Construct a QuilcClient that uses libquil.
     #[staticmethod]
     fn new_libquil() -> Self {
         let libquil_client = qcs::compiler::libquil::Client {};
@@ -211,6 +214,14 @@ impl PyQuilcClient {
 }
 
 py_function_sync_async! {
+    /// Compile a quil program for a target device.
+    ///
+    /// :param quil: The Quil program to compile.
+    /// :param target: Architectural description of device to compile for.
+    /// :param client: Client used to send compilation requests to Quilc.
+    /// :param options: Optional compiler options. If ``None``, default values are used.
+    ///
+    /// :raises QuilcError: If compilation fails.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
@@ -295,17 +306,25 @@ impl NativeQuilMetadata {
     }
 }
 
+/// The result of compiling a Quil program.
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
     pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
 )]
 pub(crate) struct CompilationResult {
+    /// The compiled program.
     program: String,
+    /// Metadata about the compiled program.
     native_quil_metadata: Option<NativeQuilMetadata>,
 }
 
 py_function_sync_async! {
+    /// Fetch the version information from the running Quilc service.
+    ///
+    /// :param client: Client used to send compilation requests to Quilc.
+    ///
+    /// :raises QuilcError: If there is a failure connecting to Quilc.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn get_version_info(client: PyQuilcClient) -> PyResult<String> {
@@ -332,6 +351,13 @@ impl ConjugateByCliffordRequest {
 }
 
 py_function_sync_async! {
+    /// Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
+    /// In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    ///
+    /// :param request: Pauli Term conjugation request.
+    /// :param client: Client used to send compilation requests to Quilc.
+    ///
+    /// :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn conjugate_pauli_by_clifford(
@@ -366,6 +392,22 @@ impl RandomizedBenchmarkingRequest {
 }
 
 py_function_sync_async! {
+    /// Construct a randomized benchmarking experiment on the given qubits, decomposing into
+    /// gateset. If interleaver is not provided, the returned sequence will have the form
+    ///
+    ///     C_1 C_2 ... C_(depth-1) C_inv ,
+    ///
+    /// where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
+    /// and C_inv is selected so that the entire sequence composes to the identity. If an
+    /// interleaver G (which must be a Clifford, and which will be decomposed into the native
+    /// gateset) is provided, then the sequence instead takes the form
+    ///
+    ///     C_1 G C_2 G ... C_(depth-1) G C_inv .
+    ///
+    /// :param request: Randomized benchmarking request.
+    /// :param client: Client used to send compilation requests to Quilc.
+    ///
+    /// :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn generate_randomized_benchmarking_sequence(

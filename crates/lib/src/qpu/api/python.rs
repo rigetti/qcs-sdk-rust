@@ -65,7 +65,17 @@ impl_repr!(ExecutionOptions);
 impl_repr!(ApiExecutionOptions);
 impl_repr!(ConnectionStrategy);
 
-/// Variants of data vectors within a single `ExecutionResult`.
+/// Data vectors within a single ``ExecutionResult``.
+///
+/// ## Variants:
+/// - ``i32``: A register of 32-bit integers.
+/// - ``complex32``: A register of 32-bit complex numbers.
+///
+/// ## Methods (each per variant):
+/// - ``is_*``: if the underlying values are that type.
+/// - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
+/// - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
+/// - ``from_*``: wrap underlying values as this enum type.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[pyclass(module = "qcs_sdk.qpu.api")]
@@ -74,16 +84,16 @@ pub enum Register {
     Complex32(Vec<Complex32>),
 }
 
-/// The execution readout data from a particular memory location.
+/// Execution readout data from a particular memory location.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk.qpu.api", frozen, get_all)]
 pub struct ExecutionResult {
-    /// Describes result shape dimensions.
+    /// The shape of the result data.
     pub shape: [usize; 2],
-    /// Register data for this result.
+    /// The result data for all shots by the particular memory location.
     pub data: Register,
-    /// Name of the data type.
+    /// The type of the result data (as a `numpy` `dtype`).
     pub dtype: String,
 }
 
@@ -112,6 +122,7 @@ impl From<readout_values::Values> for ExecutionResult {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionResult {
+    /// Build an `ExecutionResult` from a `Register`.
     #[staticmethod]
     fn from_register(register: Register) -> Self {
         match register {
@@ -129,14 +140,20 @@ impl ExecutionResult {
     }
 }
 
+/// Execution readout data for all memory locations.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk.qpu.api", frozen, get_all)]
 pub struct ExecutionResults {
-    /// Result data buffers keyed by readout alias name.
+    /// The readout results of execution, mapping a published filter node to its data.
+    ///
+    /// See `TranslationResult.ro_sources` which provides the mapping from the filter node name
+    /// to the name of the memory declaration in the source program.
     pub buffers: HashMap<String, ExecutionResult>,
-    /// QPU execution duration.
+    /// The time spent executing the program.
     pub execution_duration_microseconds: Option<u64>,
+    /// The final state of memory for parameters that were read from and written to during
+    /// the execution of the program.
     pub memory: HashMap<String, MemoryValues>,
 }
 
@@ -509,14 +526,18 @@ mod stubs {
 }
 
 py_function_sync_async! {
-    /// Submits an executable `program` to be run on the specified QPU
+    /// Submits an executable `program` to be run on the specified QPU.
     ///
-    /// # Errors
+    /// :param program: An executable program (see ``translate``).
+    /// :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
+    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     ///
-    /// May return an error if
-    /// * an engagement is not available
-    /// * an RPCQ client cannot be built
-    /// * the program cannot be submitted
+    /// :returns: The ID of the submitted job which can be used to fetch results.
+    ///
+    /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    /// :raises SubmissionError: If there was a problem submitting the program for execution.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
@@ -559,6 +580,23 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    /// Execute a compiled program on a QPU with multiple sets of ``patch_values``.
+    ///
+    /// This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+    /// function will return a list of strings where the length and order correspond to the
+    /// ``patch_values`` given. However, note that execution in the order of given patch values is not
+    /// guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+    ///
+    /// :param program: An executable program (see ``translate``).
+    /// :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
+    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param execution_options: The ``ExecutionOptions`` to use.
+    ///
+    /// :returns: The IDs of the submitted jobs which can be used to fetch results.
+    ///
+    /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    /// :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no ``patch_values`` are given.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
@@ -594,6 +632,19 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    /// Cancel all given jobs that have yet to begin executing.
+    ///
+    /// This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
+    /// cancelled. A job can be cancelled only if it has not yet started executing.
+    ///
+    /// Success response indicates only that the request was received. Cancellation is not guaranteed,
+    /// as it is based on job state at the time of cancellation, and is completed on a best effort
+    /// basis.
+    ///
+    /// :param job_ids: The job IDs to cancel.
+    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use.
+    /// :param execution_options: The ``ExecutionOptions`` to use.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
@@ -615,6 +666,19 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    /// Cancel a job that has yet to begin executing.
+    ///
+    /// This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    /// job can be cancelled only if it has not yet started executing.
+    ///
+    /// Success response indicates only that the request was received. Cancellation is not guaranteed,
+    /// as it is based on job state at the time of cancellation, and is completed on a best effort
+    /// basis.
+    ///
+    /// :param job_id: The job ID to cancel.
+    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use.
+    /// :param execution_options: The ``ExecutionOptions`` to use.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
@@ -636,6 +700,17 @@ py_function_sync_async! {
 }
 
 py_function_sync_async! {
+    /// Fetches execution results for the given QCS Job ID.
+    ///
+    /// :param job_id: The ID of the job to retrieve results for.
+    /// :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param execution_options: The ``ExecutionOptions`` to use.
+    ///
+    /// :returns: Results from execution.
+    ///
+    /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    /// :raises QpuApiError: If there was a problem retrieving the results.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]

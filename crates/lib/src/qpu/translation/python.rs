@@ -44,8 +44,16 @@ create_init_submodule! {
 impl_repr!(TranslationOptions);
 
 py_function_sync_async! {
-    /// Query the QCS API for Quil-T calibrations.
-    /// If `None`, the default `timeout` used is 10 seconds.
+    /// Retrieve the calibration data used for client-side Quil-T generation.
+    ///
+    /// :param quantum_processor_id: The ID of the quantum processor.
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param timeout: Maximum duration to wait for API calls to complete, in seconds. Defaults to 10 seconds.
+    ///
+    /// :returns: The Quil calibration program for the requested quantum processor.
+    ///
+    /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    /// :raises TranslationError: If there was a problem fetching Quil-T calibrations.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
@@ -106,11 +114,14 @@ impl TranslationOptions {
         self.with_backend_v1();
     }
 
-    /// Use the second-generation translation backend available on QCS since 2023
+    /// Use the second-generation translation backend available on QCS since 2023.
     fn use_backend_v2(&mut self) {
         self.with_backend_v2();
     }
 
+    /// Compile the program through Q-CTRL's API prior to translation. The client
+    /// should generally leave the `q_ctrl` compile options unset as it is
+    /// specially authorized and not generally available.
     #[pyo3(signature = (q_ctrl = None))]
     fn use_q_ctrl(&mut self, q_ctrl: Option<&PyQCtrl>) {
         if let Some(q_ctrl) = q_ctrl {
@@ -120,11 +131,14 @@ impl TranslationOptions {
         }
     }
 
+    /// Configure Riverlane features prior to execution. Options here are
+    /// specially authorized and are not generally available to the client.
     #[pyo3(signature = (riverlane = PyRiverlane::default()))]
     fn use_riverlane(&mut self, riverlane: PyRiverlane) {
         self.riverlane(riverlane.as_inner().clone());
     }
 
+    /// Use the v1 backend for translation, available on QCS since 2018.
     #[staticmethod]
     fn v1() -> Self {
         let mut builder = TranslationOptions::default();
@@ -132,6 +146,12 @@ impl TranslationOptions {
         builder
     }
 
+    /// Use the v2 backend for translation, available on QCS since 2023.
+    ///
+    /// :param prepend_default_calibrations: If False, do not prepend the default calibrations to the translated program.
+    /// :param passive_reset_delay_seconds: The delay between passive resets, in seconds.
+    /// :param allow_unchecked_pointer_arithmetic: If True, disable runtime memory bounds checking. Only available to certain users.
+    /// :param allow_frame_redefinition: If True, allow defined frames to differ from Rigetti defaults. Only available to certain users. Otherwise, only ``INITIAL-FREQUENCY`` and ``CHANNEL-DELAY`` may be modified.
     #[staticmethod]
     #[pyo3(signature = (
         *,
@@ -176,12 +196,15 @@ impl TranslationOptions {
         builder
     }
 
+    /// Serialize these translation options into the Protocol Buffer format.
     fn encode_as_protobuf<'py>(&self, py: Python<'py>) -> Bound<'py, PyBytes> {
         let options: ApiTranslationOptions = self.clone().into();
         PyBytes::new(py, options.encode_to_vec().as_slice())
     }
 }
 
+/// Options for compiling programs through the Q-CTRL API. Options here are specially authorized
+/// and are not generally available to the client.
 #[derive(Clone, Default, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QCtrl", module = "qcs_sdk.qpu.translation", frozen)]
@@ -203,6 +226,8 @@ impl PyQCtrl {
     }
 }
 
+/// Options for configuring Riverlane features prior to execution. Options here
+/// are specially authorized and are not generally available to the client.
 #[derive(Clone, Default, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Riverlane", module = "qcs_sdk.qpu.translation", frozen)]
@@ -243,16 +268,21 @@ pub struct PyTranslationResult {
     /// The translated program.
     pub program: String,
 
-    /// The memory locations used for readout.
+    /// A mapping from the program's memory references to the key used to index the results map.
     pub ro_sources: Option<HashMap<String, String>>,
 }
 
 py_function_sync_async! {
-    /// Translates a native Quil program into an executable
+    /// Translates a native Quil program into an executable program.
     ///
-    /// # Errors
+    /// :param native_quil: A Quil program.
+    /// :param num_shots: The number of shots to perform.
+    /// :param quantum_processor_id: The ID of the quantum processor the executable will run on (e.g. "Aspen-M-2").
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param translation_options: Optional translation options.
     ///
-    /// Returns a [`TranslationError`] if translation fails.
+    /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    /// :raises TranslationError: If the `native_quil` program could not be translated.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]

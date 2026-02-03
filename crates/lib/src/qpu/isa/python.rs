@@ -72,37 +72,57 @@ pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
 #[pyclass(name = "Architecture", module = "qcs_sdk.qpu.isa")]
 struct PyArchitecture(Architecture);
 
+/// The architecture family identifier of an ``InstructionSetArchitecture``.
+///
+/// Value "Full" implies that each node is connected to every other (fully-connected architecture).
 #[derive(Clone)]
 #[expect(dead_code)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Family", module = "qcs_sdk.qpu.isa")]
 struct PyFamily(Family);
 
+/// A degree-two logical connection in the quantum processor's architecture.
+///
+/// The existence of an edge in the ISA ``Architecture`` does not necessarily mean that a given 2Q
+/// operation will be available on the edge. This information is conveyed by the presence of the
+/// two `node_id` values in instances of ``Instruction``.
+///
+/// Note that edges are undirected in this model. Thus edge :math:`(a, b)` is equivalent to edge
+/// :math:`(b, a)`.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Edge", module = "qcs_sdk.qpu.isa")]
 struct PyEdge(Edge);
 
+/// A logical node in the quantum processor's architecture.
+///
+/// The existence of a node in the ISA ``Architecture`` does not necessarily mean that a given 1Q
+/// operation will be available on the node. This information is conveyed by the presence of the
+/// specific `node_id` in instances of ``Instruction``.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Node", module = "qcs_sdk.qpu.isa")]
 struct PyNode(Node);
 
+/// A measured characteristic of an operation.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Characteristic", module = "qcs_sdk.qpu.isa")]
 struct PyCharacteristic(Characteristic);
 
+/// A parameter to an operation.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Parameter", module = "qcs_sdk.qpu.isa")]
 struct PyParameter(Parameter);
 
+/// A site for an operation, with its site-dependent characteristics.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "OperationSite", module = "qcs_sdk.qpu.isa")]
 struct PyOperationSite(OperationSite);
 
+/// An operation, with its sites and site-independent characteristics.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Operation", module = "qcs_sdk.qpu.isa")]
@@ -198,6 +218,7 @@ impl PyInstructionSetArchitecture {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyOperation {
+    /// The list of site-independent characteristics of this operation.
     #[getter]
     fn characteristics(&self) -> Vec<PyCharacteristic> {
         self.0
@@ -208,21 +229,26 @@ impl PyOperation {
             .collect()
     }
 
+    /// The name of the operation.
     #[getter]
     fn name(&self) -> &str {
         &self.0.name
     }
 
+    /// The number of nodes that this operation applies to. None if unspecified.
     #[getter]
     fn node_count(&self) -> Option<i64> {
         self.0.node_count
     }
 
+    /// The list of parameters. Each parameter must be uniquely named. May be empty.
     #[getter]
     fn parameters(&self) -> Vec<PyParameter> {
         self.0.parameters.iter().cloned().map(PyParameter).collect()
     }
 
+    /// The list of sites at which this operation can be applied,
+    /// together with its site-dependent characteristics.
     #[getter]
     fn sites(&self) -> Vec<PyOperationSite> {
         self.0.sites.iter().cloned().map(PyOperationSite).collect()
@@ -232,6 +258,7 @@ impl PyOperation {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyOperationSite {
+    /// The list of site-dependent characteristics of this operation.
     #[getter]
     fn characteristics(&self) -> Vec<PyCharacteristic> {
         self.0
@@ -242,6 +269,8 @@ impl PyOperationSite {
             .collect()
     }
 
+    /// The list of architecture node ids for the site. The order of these node ids
+    /// obey the definition of node symmetry from the enclosing operation.
     #[getter]
     fn node_ids(&self) -> Vec<i64> {
         self.0.node_ids.clone()
@@ -251,6 +280,7 @@ impl PyOperationSite {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyParameter {
+    /// The name of the parameter, such as the name of a mathematical symbol.
     #[getter]
     fn name(&self) -> &str {
         &self.0.name
@@ -260,31 +290,42 @@ impl PyParameter {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyCharacteristic {
+    /// The error in the characteristic value, or None if otherwise.
     #[getter]
     fn error(&self) -> Option<f64> {
         self.0.error
     }
 
+    /// The name of the characteristic.
     #[getter]
     fn name(&self) -> &str {
         &self.0.name
     }
 
+    /// The list of architecture node ids for the site where the characteristic is
+    /// measured, if that is different from the site of the enclosing operation.
+    /// `None` if it is the same. The order of this or the enclosing node ids obey
+    /// the definition of node symmetry from the enclosing operation.
     #[getter]
     fn node_ids(&self) -> Option<Vec<i64>> {
         self.0.node_ids.clone()
     }
 
+    /// The optional ordered list of parameter values used to generate the characteristic.
+    /// The order matches the parameters in the enclosing operation, and so the lengths of
+    /// these two lists must match.
     #[getter]
     fn parameter_values(&self) -> Option<Vec<f64>> {
         self.0.parameter_values.clone()
     }
 
+    /// ISO8601 date and time at which the characteristic was measured.
     #[getter]
     fn timestamp(&self) -> &str {
         &self.0.timestamp
     }
 
+    /// The characteristic value measured.
     #[getter]
     fn value(&self) -> f64 {
         self.0.value
@@ -294,16 +335,19 @@ impl PyCharacteristic {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyArchitecture {
+    /// A list of all computational edges in the instruction set architecture.
     #[getter]
     fn edges(&self) -> Vec<PyEdge> {
         self.0.edges.iter().cloned().map(PyEdge).collect()
     }
 
+    /// The architecture family. The nodes and edges conform to this family.
     #[getter]
     fn family(&self) -> Option<PyFamily> {
         self.0.family.clone().map(|f| PyFamily(*f))
     }
 
+    /// A list of all computational nodes in the instruction set architecture.
     #[getter]
     fn nodes(&self) -> Vec<PyNode> {
         self.0.nodes.iter().cloned().map(PyNode).collect()
@@ -313,6 +357,8 @@ impl PyArchitecture {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyNode {
+    /// An integer id assigned to the computational node.
+    /// The ids may not be contiguous and will be assigned based on the architecture family.
     #[getter]
     fn node_id(&self) -> i64 {
         self.0.node_id
@@ -322,6 +368,8 @@ impl PyNode {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyEdge {
+    /// The integer ids of the computational nodes at the two ends of the edge.
+    /// Order is not important; an architecture edge is treated as undirected.
     #[getter]
     fn node_ids(&self) -> Vec<i64> {
         self.0.node_ids.clone()
@@ -329,6 +377,13 @@ impl PyEdge {
 }
 
 py_function_sync_async! {
+    /// Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
+    ///
+    /// :param quantum_processor_id: The ID of the quantum processor.
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    ///
+    /// :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    /// :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None))]

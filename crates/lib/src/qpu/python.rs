@@ -66,6 +66,12 @@ impl MemoryValues {
 }
 
 py_function_sync_async! {
+    /// Returns all available Quantum Processor (QPU) IDs.
+    ///
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    /// :param timeout: Maximum duration to wait for API calls to complete, in seconds.
+    ///
+    /// :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu"))]
     #[pyfunction]
     #[pyo3(signature = (client = None, timeout = None))]
