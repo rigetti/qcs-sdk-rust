@@ -104,7 +104,7 @@ class MultishotMeasureRequest:
     def trials(self) -> builtins.int: ...
     @trials.setter
     def trials(self, value: builtins.int) -> None: ...
-    def __new__(cls, program: builtins.str, shots: builtins.int, qubits: builtins.list[builtins.int], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotMeasureRequest:
+    def __new__(cls, compiled_quil: builtins.str, trials: builtins.int, qubits: builtins.list[builtins.int], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotMeasureRequest:
         r"""
         Construct a new `MultishotMeasureRequest` using the given parameters.
         """
@@ -209,7 +209,7 @@ class WavefunctionRequest:
         r"""
         An optional seed for the random number generator.
         """
-    def __new__(cls, program: builtins.str, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> WavefunctionRequest:
+    def __new__(cls, compiled_quil: builtins.str, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> WavefunctionRequest:
         r"""
         Create a new `WavefunctionRequest` with the given parameters.
         """

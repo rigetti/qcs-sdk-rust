@@ -18,6 +18,12 @@ class QVMClient:
     @staticmethod
     def new_libquil() -> QVMClient: ...
 
+class QVMError(QcsSdkError):
+    r"""
+    Errors that can occur when running a Quil program on QVM.
+    """
+    ...
+
 @typing.final
 class QVMOptions:
     r"""
@@ -60,12 +66,6 @@ class QVMResultData:
         Get the raw readout data as a flattened structure.
         """
 
-class QvmError(QcsSdkError):
-    r"""
-    Errors that can occur when running a Quil program on QVM.
-    """
-    ...
-
 @typing.final
 class RawQVMReadoutData:
     @property
@@ -76,7 +76,35 @@ class RawQVMReadoutData:
         [`Debug`](std::fmt::Debug) implementation.
         """
 
-def run(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed: typing.Optional[builtins.int], options: typing.Optional[QVMOptions]) -> QVMResultData: ...
+def run(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None, options: typing.Optional[QVMOptions] = None) -> QVMResultData:
+    r"""
+    Runs the given program on the QVM.
+    
+    :param quil: A quil program as a string.
+    :param shots: The number of times to run the program. Should be a value greater than zero.
+    :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param params: A mapping of memory region names to their desired values.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+    :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
+    
+    :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
+    
+    :raises QVMError: If one of the parameters is invalid, or if there was a problem communicating with the QVM server.
+    """
 
-def run_async(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]], rng_seed: typing.Optional[builtins.int], options: typing.Optional[QVMOptions]) -> collections.abc.Awaitable[QVMResultData]: ...
+def run_async(quil: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], params: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], client: QVMClient, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None, options: typing.Optional[QVMOptions] = None) -> collections.abc.Awaitable[QVMResultData]:
+    r"""
+    Runs the given program on the QVM.
+    
+    :param quil: A quil program as a string.
+    :param shots: The number of times to run the program. Should be a value greater than zero.
+    :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    :param params: A mapping of memory region names to their desired values.
+    :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+    :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
+    
+    :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
+    
+    :raises QVMError: If one of the parameters is invalid, or if there was a problem communicating with the QVM server.
+    """
 

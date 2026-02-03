@@ -102,6 +102,10 @@ impl ChooseRandomRealSubRegions {
     ///
     /// The values provided for `destination`, `source`, and `seed` must
     /// be declared within the Quil program where the call is made.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the data type of the destination's or source's size is not `Real`.
     pub fn try_new<T: Into<f64> + Copy>(
         destination: &quil_rs::instruction::Declaration,
         source: &quil_rs::instruction::Declaration,
@@ -155,57 +159,52 @@ impl ChooseRandomRealSubRegions {
             seed_memory_region_name: seed.name.clone(),
         })
     }
+}
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
+impl ChooseRandomRealSubRegions {
+    #[classattr]
+    #[pyo3(name = "NAME")]
     /// The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
     pub const EXTERN_NAME: &str = "choose_random_real_sub_regions";
 
-    #[allow(clippy::doc_markdown)]
-    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions`
-    /// instruction. The signature expressed in Quil is as follows:
+    #[expect(clippy::missing_panics_doc)]
+    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
+    ///
+    /// The signature expressed in Quil is as follows:
     ///
     /// ```text
     /// "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
     /// ```
-    pub fn build_signature() -> RandomResult<ExternSignature> {
-        vec![
+    #[must_use]
+    #[staticmethod]
+    pub fn build_signature() -> ExternSignature {
+        let parameters = vec![
             ExternParameter::try_new(
                 "destination".to_string(),
                 true,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ),
+            ).expect("`destination` should be a valid identifier"),
             ExternParameter::try_new(
                 "source".to_string(),
                 false,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ),
+            ).expect("`source` should be a valid identifier"),
             ExternParameter::try_new(
                 "sub_region_size".to_string(),
                 false,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ),
+            ).expect("`sub_region_size` should be a valid identifier"),
             ExternParameter::try_new(
                 "seed".to_string(),
                 true,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ),
-        ]
-        .into_iter()
-        .map(|r| r.map_err(Error::from))
-        .collect::<RandomResult<Vec<ExternParameter>>>()
-        .map(|parameters| ExternSignature::new(None, parameters))
-    }
+            ).expect("`seed` should be a valid identifier"),
+        ];
 
-    /// Build a `PRAGMA EXTERN` instruction for the externed function.
-    pub(super) fn pragma_extern() -> Result<quil_rs::instruction::Pragma, Error> {
-        use quil_rs::quil::Quil;
-
-        Ok(quil_rs::instruction::Pragma::new(
-            quil_rs::instruction::RESERVED_PRAGMA_EXTERN.to_string(),
-            vec![quil_rs::instruction::PragmaArgument::Identifier(
-                Self::EXTERN_NAME.to_string(),
-            )],
-            Some(Self::build_signature()?.to_quil().map_err(Error::from)?),
-        ))
+        ExternSignature::new(None, parameters)
     }
 }
 
@@ -244,8 +243,11 @@ pub struct PrngSeedValue {
 #[cfg_attr(feature = "python", pyo3::pymethods)]
 impl PrngSeedValue {
     /// Attempt to create a new instance of `PrngSeedValue` from a `u64`.
-    /// The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
-    /// losslessly convertible to `f64`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::InvalidSeed`] if the value is not in range `[1, MAX_SEQUENCER_VALUE]`
+    /// or if it is not losslessly convertible to `f64`.
     #[new]
     pub fn try_new(value: u64) -> RandomResult<Self> {
         if !(1..=MAX_SEQUENCER_VALUE).contains(&value) {

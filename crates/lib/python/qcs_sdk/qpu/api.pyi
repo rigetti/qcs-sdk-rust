@@ -55,8 +55,24 @@ class APIExecutionOptionsBuilder:
     r"""
     Builder for [`ApiExecutionOptions`](struct.ApiExecutionOptions.html).
     """
+    @property
+    def bypass_settings_protection(self) -> typing.Never:
+        r"""
+        DO NOT CALL THIS METHOD.
+        
+        `mypy` requires write-only properties to have a getter,
+        but this method is not actually available at runtime.
+        """
     @bypass_settings_protection.setter
     def bypass_settings_protection(self, value: builtins.bool) -> None: ...
+    @property
+    def timeout(self) -> typing.Never:
+        r"""
+        DO NOT CALL THIS METHOD.
+        
+        `mypy` requires write-only properties to have a getter,
+        but this method is not actually available at runtime.
+        """
     @timeout.setter
     def timeout(self, value: typing.Optional[QpuApiDuration]) -> None: ...
     def __new__(cls) -> APIExecutionOptionsBuilder: ...
@@ -152,10 +168,34 @@ class ExecutionOptionsBuilder:
     r"""
     Builder for [`ExecutionOptions`](struct.ExecutionOptions.html).
     """
+    @property
+    def api_options(self) -> typing.Never:
+        r"""
+        DO NOT CALL THIS METHOD.
+        
+        `mypy` requires write-only properties to have a getter,
+        but this method is not actually available at runtime.
+        """
     @api_options.setter
     def api_options(self, value: typing.Optional[APIExecutionOptions]) -> None: ...
+    @property
+    def connection_strategy(self) -> typing.Never:
+        r"""
+        DO NOT CALL THIS METHOD.
+        
+        `mypy` requires write-only properties to have a getter,
+        but this method is not actually available at runtime.
+        """
     @connection_strategy.setter
     def connection_strategy(self, value: ConnectionStrategy) -> None: ...
+    @property
+    def timeout_seconds(self) -> typing.Never:
+        r"""
+        DO NOT CALL THIS METHOD.
+        
+        `mypy` requires write-only properties to have a getter,
+        but this method is not actually available at runtime.
+        """
     @timeout_seconds.setter
     def timeout_seconds(self, value: typing.Optional[builtins.float]) -> None: ...
     def __new__(cls) -> ExecutionOptionsBuilder: ...

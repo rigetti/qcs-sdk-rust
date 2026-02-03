@@ -170,7 +170,7 @@ exception!(
 exception!(
     crate::qvm::Error,
     qcs_sdk.qvm,
-    QvmError,
+    QVMError,
     QcsSdkError,
     "Errors that can occur when running a Quil program on QVM."
 );

@@ -43,7 +43,7 @@ use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
 /// always succeed for [`ResultData::Qvm`].
 ///
 /// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-/// (ie. "ro\[0\]") is more like a stream than a value in memory. Every `MEASURE` to a memory
+/// (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
 /// reference emits a new value to said stream. This means that the number of values per memory
 /// reference can vary per shot. For this reason, it's not always clear what the final value in
 /// each shot was for a particular reference. When this is the case, `to_register_map()` will return

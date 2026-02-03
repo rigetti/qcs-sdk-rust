@@ -22,14 +22,13 @@ use crate::{
     qpu::isa::python::PyInstructionSetArchitecture,
 };
 
-// compiler
 create_init_submodule! {
     submodules: [ "quilc": pyquilc::init_submodule ],
 }
 
 mod pyquilc {
+    #[allow(clippy::wildcard_imports)]
     use super::*;
-    use rigetti_pyo3::create_init_submodule;
 
     create_init_submodule! {
         classes: [
@@ -84,14 +83,26 @@ impl CompilerOpts {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl TargetDevice {
+    /// Create a [`TargetDevice`] based on an [`InstructionSetArchitecture`].
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`QuilcError`] if the [`InstructionSetArchitecture`]
+    /// cannot be converted into a format that Quilc understands.
+    #[expect(clippy::result_large_err)]
     #[staticmethod]
-    pub fn from_isa(isa: PyInstructionSetArchitecture) -> Result<Self, Error> {
+    pub(crate) fn from_isa(isa: PyInstructionSetArchitecture) -> Result<Self, Error> {
         TargetDevice::try_from(isa.0)
     }
 
+    /// Create a [`TargetDevice`] from a JSON string.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`QuilcError`] if the JSON is malformed.
     #[staticmethod]
-    pub fn from_json(value: String) -> PyResult<Self> {
-        serde_json::from_str(&value).map_err(|err| errors::QuilcError::new_err(err.to_string()))
+    pub(crate) fn from_json(value: &str) -> PyResult<Self> {
+        serde_json::from_str(value).map_err(|err| errors::QuilcError::new_err(err.to_string()))
     }
 }
 
@@ -228,8 +239,10 @@ py_function_sync_async! {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl NativeQuilMetadata {
-    #[new]
+    /// Construct a new `NativeQuilMetadata` from arguments.
     #[expect(clippy::too_many_arguments)]
+    #[must_use]
+    #[new]
     pub fn __new__(
         final_rewiring: Option<Vec<u64>>,
         gate_depth: Option<u64>,

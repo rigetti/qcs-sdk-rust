@@ -3,10 +3,10 @@ use std::time::Duration;
 
 use numpy::{Complex64, PyArray2};
 use pyo3::{
-    exceptions::{PyRuntimeError, PyValueError},
+    exceptions::PyValueError,
     intern,
     prelude::*,
-    types::{PyBytes, PyDelta, PyList},
+    types::{PyDelta, PyList},
     Bound, IntoPyObjectExt, Py, PyAny, PyRef, PyRefMut, PyResult, Python,
 };
 use rigetti_pyo3::impl_repr;
@@ -24,26 +24,24 @@ use crate::{
 impl_repr!(ResultData);
 impl_repr!(RawQpuReadoutData);
 
-impl Default for ResultData {
-    fn default() -> Self {
-        ResultData::Qvm(QvmResultData::from_memory_map(HashMap::new()))
-    }
+#[derive(FromPyObject)]
+enum PyResultData {
+    Qvm(QvmResultData),
+    Qpu(QpuResultData),
 }
+
+#[cfg(feature = "stubs")]
+pyo3_stub_gen::impl_stub_type!(PyResultData = QvmResultData | QpuResultData);
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl ResultData {
     #[new]
-    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
-        if let Ok(data) = values.extract::<QvmResultData>() {
-            Ok(Self::Qvm(data))
-        } else if let Ok(data) = values.extract::<QpuResultData>() {
-            Ok(Self::Qpu(data))
-        } else {
-            Err(pyo3::exceptions::PyTypeError::new_err(
-                "expected QVM or QPU result data",
-            ))
+    fn __new__(inner: PyResultData) -> ResultData {
+        match inner {
+            PyResultData::Qvm(data) => Self::Qvm(data),
+            PyResultData::Qpu(data) => Self::Qpu(data),
         }
     }
 
@@ -61,19 +59,13 @@ impl ResultData {
 #[pymethods]
 impl ExecutionData {
     /// Python constructor for `ExecutionData`.
-    ///
-    /// `result_data` is optional here
-    /// because pickling an object requires calling __new__ without arguments.
     #[new]
-    #[pyo3(signature = (result_data=None, duration=None))]
+    #[pyo3(signature = (result_data, duration=None))]
     fn __new__(
-        result_data: Option<ResultData>,
+        result_data: ResultData,
         duration: Option<Py<PyDelta>>,
         py: Python<'_>,
     ) -> PyResult<Self> {
-        let result_data = result_data
-            .unwrap_or_else(|| ResultData::Qvm(QvmResultData::from_memory_map(HashMap::new())));
-
         let duration = duration
             .map(|delta| {
                 delta
@@ -90,19 +82,8 @@ impl ExecutionData {
         })
     }
 
-    fn __getstate__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
-        Ok(PyBytes::new(
-            py,
-            &serde_json::to_vec(self)
-                .map_err(|e| PyRuntimeError::new_err(format!("failed to serialize: {e}")))?,
-        ))
-    }
-
-    fn __setstate__<'py>(&mut self, _py: Python<'py>, state: Bound<'py, PyBytes>) -> PyResult<()> {
-        let execution_data: ExecutionData = serde_json::from_slice(state.as_bytes())
-            .map_err(|e| PyRuntimeError::new_err(format!("failed to deserialize: {e}")))?;
-        *self = execution_data;
-        Ok(())
+    fn __getnewargs__(&self) -> (ResultData, Option<Duration>) {
+        (self.result_data.clone(), self.duration)
     }
 }
 
@@ -224,6 +205,7 @@ impl RegisterMap {
         )
     }
 
+    #[pyo3(signature = (key, default = None))]
     fn get(
         &self,
         key: &str,

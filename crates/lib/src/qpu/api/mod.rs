@@ -344,6 +344,12 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 /// to build a custom set of options.
 #[derive(Builder, Clone, Debug, PartialEq)]
 #[cfg_attr(
+    not(feature = "stubs"),
+    builder_struct_attr(optipy::strip_pyo3(only_stubs)),
+    builder_field_attr(stub_gen(skip)),
+    optipy::strip_pyo3(only_stubs)
+)]
+#[cfg_attr(
     not(feature = "python"),
     builder_struct_attr(optipy::strip_pyo3),
     optipy::strip_pyo3

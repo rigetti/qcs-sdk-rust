@@ -28,74 +28,83 @@ use crate::{
 ///
 /// # Example
 ///
-/// This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient::
+/// This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient`:
 ///
-///     from qcs_sdk import Executable
-///     from qcs_sdk.client import QCSClient
-///     from qcs_sdk.qvm import QVMClient
+/// ```python
+/// from qcs_sdk import Executable
+/// from qcs_sdk.client import QCSClient
+/// from qcs_sdk.qvm import QVMClient
 ///
-///     PROGRAM = '''
-///     DECLARE ro BIT[2]
+/// PROGRAM = r'''
+/// DECLARE ro BIT[2]
 ///
-///     H 0
-///     CNOT 0 1
+/// H 0
+/// CNOT 0 1
 ///
-///     MEASURE 0 ro[0]
-///     MEASURE 1 ro[1]
-///     '''
+/// MEASURE 0 ro[0]
+/// MEASURE 1 ro[1]
+/// '''
 ///
-///     async def run():
-///         client = QVMClient.new_http(QCSClient.load().qvm_url)
-///         result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
-///         let data = result.result_data
-///                             .to_register_map()
-///                             .expect("should convert to readout map")
-///                             .get_register_matrix("ro")
-///                             .expect("should have data in ro")
-///                             .as_integer()
-///                             .expect("should be integer matrix")
-///                             .to_owned();
+/// async def run():
+///     client = QVMClient.new_http(QCSClient.load().qvm_url)
+///     result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
+///     let data = result.result_data
+///                         .to_register_map()
+///                         .expect("should convert to readout map")
+///                         .get_register_matrix("ro")
+///                         .expect("should have data in ro")
+///                         .as_integer()
+///                         .expect("should be integer matrix")
+///                         .to_owned();
 ///
-///         // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
-///         assert_eq!(data.nrows(), 4);
-///         for shot in data.rows() {
-///             // Each shot will contain all the memory, in order, for the vector (or "register") we
-///             // requested the results of. In this case, "ro" (the default).
-///             assert_eq!(shot.len(), 2);
-///             // In the case of this particular program, we know ro[0] should equal ro[1]
-///             assert_eq!(shot[0], shot[1]);
-///         }
+///     // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+///     assert_eq!(data.nrows(), 4);
+///     for shot in data.rows() {
+///         // Each shot will contain all the memory, in order, for the vector (or "register") we
+///         // requested the results of. In this case, "ro" (the default).
+///         assert_eq!(shot.len(), 2);
+///         // In the case of this particular program, we know ro[0] should equal ro[1]
+///         assert_eq!(shot[0], shot[1]);
+///     }
 ///
-///     def main():
-///         import asyncio
-///         asyncio.run(run())
+/// def main():
+///     import asyncio
+///     asyncio.run(run())
 ///
-///         # "ro" is the only source read from by default if you don't specify `registers`.
+///     # "ro" is the only source read from by default if you don't specify `registers`.
 ///
-///         # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
-///         # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
-///         # the memory offset `index` during shot `shot`.
-///         # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
-///         # which case you should build the matrix you need from [`QpuResultData`] directly. See
-///         # the [`RegisterMap`] documentation for more information on when this transformation
-///         # might fail.
+///     # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
+///     # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+///     # the memory offset `index` during shot `shot`.
+///     # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
+///     # which case you should build the matrix you need from [`QpuResultData`] directly. See
+///     # the [`RegisterMap`] documentation for more information on when this transformation
+///     # might fail.
+/// ```
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", name = "Executable", frozen)]
 pub(crate) struct PyExecutable(Arc<Mutex<Executable<'static, 'static>>>);
 
+/// The result of submitting a job to a QPU.
+///
+/// Used to retrieve the results of a job.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", name = "JobHandle", frozen)]
 pub(crate) struct PyJobHandle(JobHandle<'static>);
 
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyJobHandle {
+    /// Unique ID associated with a single job execution.
     #[getter]
     fn job_id(&self) -> JobId {
         self.0.job_id()
     }
 
+    /// The readout map from "source readout memory locations"
+    /// to the "filter pipeline node" which publishes the data.
     #[getter]
     fn readout_map(&self) -> &HashMap<String, String> {
         self.0.readout_map()
@@ -142,6 +151,7 @@ impl PyExecutable {
     #[new]
     #[pyo3(signature = (
         quil,
+        /,
         registers = Vec::new(),
         parameters = Vec::new(),
         shots = None,

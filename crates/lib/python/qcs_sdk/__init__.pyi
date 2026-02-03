@@ -18,6 +18,7 @@ from . import client
 from . import qpu
 from . import qvm
 
+__version__: typing.Final = '0.25.16'
 @typing.final
 class ExeParameter:
     @property
@@ -41,59 +42,61 @@ class Executable:
     
     # Example
     
-    This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient::
+    This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient`:
     
-        from qcs_sdk import Executable
-        from qcs_sdk.client import QCSClient
-        from qcs_sdk.qvm import QVMClient
+    ```python
+    from qcs_sdk import Executable
+    from qcs_sdk.client import QCSClient
+    from qcs_sdk.qvm import QVMClient
     
-        PROGRAM = '''
-        DECLARE ro BIT[2]
+    PROGRAM = r'''
+    DECLARE ro BIT[2]
     
-        H 0
-        CNOT 0 1
+    H 0
+    CNOT 0 1
     
-        MEASURE 0 ro[0]
-        MEASURE 1 ro[1]
-        '''
+    MEASURE 0 ro[0]
+    MEASURE 1 ro[1]
+    '''
     
-        async def run():
-            client = QVMClient.new_http(QCSClient.load().qvm_url)
-            result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
-            let data = result.result_data
-                                .to_register_map()
-                                .expect("should convert to readout map")
-                                .get_register_matrix("ro")
-                                .expect("should have data in ro")
-                                .as_integer()
-                                .expect("should be integer matrix")
-                                .to_owned();
+    async def run():
+        client = QVMClient.new_http(QCSClient.load().qvm_url)
+        result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
+        let data = result.result_data
+                            .to_register_map()
+                            .expect("should convert to readout map")
+                            .get_register_matrix("ro")
+                            .expect("should have data in ro")
+                            .as_integer()
+                            .expect("should be integer matrix")
+                            .to_owned();
     
-            // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
-            assert_eq!(data.nrows(), 4);
-            for shot in data.rows() {
-                // Each shot will contain all the memory, in order, for the vector (or "register") we
-                // requested the results of. In this case, "ro" (the default).
-                assert_eq!(shot.len(), 2);
-                // In the case of this particular program, we know ro[0] should equal ro[1]
-                assert_eq!(shot[0], shot[1]);
-            }
+        // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
+        assert_eq!(data.nrows(), 4);
+        for shot in data.rows() {
+            // Each shot will contain all the memory, in order, for the vector (or "register") we
+            // requested the results of. In this case, "ro" (the default).
+            assert_eq!(shot.len(), 2);
+            // In the case of this particular program, we know ro[0] should equal ro[1]
+            assert_eq!(shot[0], shot[1]);
+        }
     
-        def main():
-            import asyncio
-            asyncio.run(run())
+    def main():
+        import asyncio
+        asyncio.run(run())
     
-            # "ro" is the only source read from by default if you don't specify `registers`.
+        # "ro" is the only source read from by default if you don't specify `registers`.
     
-            # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
-            # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
-            # the memory offset `index` during shot `shot`.
-            # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
-            # which case you should build the matrix you need from [`QpuResultData`] directly. See
-            # the [`RegisterMap`] documentation for more information on when this transformation
-            # might fail.
+        # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
+        # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
+        # the memory offset `index` during shot `shot`.
+        # There are some programs where QPU readout data does not fit into a [`RegisterMap`], in
+        # which case you should build the matrix you need from [`QpuResultData`] directly. See
+        # the [`RegisterMap`] documentation for more information on when this transformation
+        # might fail.
+    ```
     """
-    def __new__(cls, quil: builtins.str, registers: typing.Sequence[builtins.str] = [], parameters: typing.Sequence[ExeParameter] = [], shots: typing.Optional[builtins.int] = None, quilc_client: typing.Optional[QuilcClient] = None, compiler_options: typing.Optional[CompilerOpts] = None) -> Executable: ...
+    def __new__(cls, quil: builtins.str, /, registers: typing.Sequence[builtins.str] = [], parameters: typing.Sequence[ExeParameter] = [], shots: typing.Optional[builtins.int] = None, quilc_client: typing.Optional[QuilcClient] = None, compiler_options: typing.Optional[CompilerOpts] = None) -> Executable: ...
     def execute_on_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionData: ...
     def execute_on_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]: ...
     def execute_on_qvm(self, client: QVMClient) -> ExecutionData: ...
@@ -122,15 +125,11 @@ class ExecutionData:
         The [`ResultData`] that was read from the [`Executable`](crate::Executable).
         """
     def __eq__(self, other: builtins.object) -> builtins.bool: ...
-    def __getstate__(self) -> bytes: ...
-    def __new__(cls, result_data: typing.Optional[ResultData] = None, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
+    def __getnewargs__(self) -> tuple[ResultData, typing.Optional[datetime.timedelta]]: ...
+    def __new__(cls, result_data: ResultData, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
         r"""
         Python constructor for `ExecutionData`.
-        
-        `result_data` is optional here
-        because pickling an object requires calling __new__ without arguments.
         """
-    def __setstate__(self, state: bytes) -> None: ...
 
 class ExecutionError(QcsSdkError):
     r"""
@@ -140,7 +139,22 @@ class ExecutionError(QcsSdkError):
 
 @typing.final
 class JobHandle:
-    ...
+    r"""
+    The result of submitting a job to a QPU.
+    
+    Used to retrieve the results of a job.
+    """
+    @property
+    def job_id(self) -> builtins.str:
+        r"""
+        Unique ID associated with a single job execution.
+        """
+    @property
+    def readout_map(self) -> builtins.dict[builtins.str, builtins.str]:
+        r"""
+        The readout map from "source readout memory locations"
+        to the "filter pipeline node" which publishes the data.
+        """
 
 class QcsSdkError(builtins.Exception):
     r"""
@@ -236,7 +250,7 @@ class RegisterMap:
     def __getitem__(self, item: builtins.str) -> RegisterMatrix: ...
     def __iter__(self) -> RegisterMapKeysIter: ...
     def __len__(self) -> builtins.int: ...
-    def get(self, key: builtins.str, default: typing.Optional[RegisterMatrix]) -> typing.Optional[RegisterMatrix]: ...
+    def get(self, key: builtins.str, default: typing.Optional[RegisterMatrix] = None) -> typing.Optional[RegisterMatrix]: ...
     def get_register_matrix(self, register_name: builtins.str) -> typing.Optional[RegisterMatrix]: ...
     def items(self) -> RegisterMapItemsIter: ...
     def keys(self) -> RegisterMapKeysIter: ...
@@ -330,7 +344,7 @@ class ResultData:
     always succeed for [`ResultData::Qvm`].
     
     The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-    (ie. "ro\[0\]") is more like a stream than a value in memory. Every `MEASURE` to a memory
+    (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
     reference emits a new value to said stream. This means that the number of values per memory
     reference can vary per shot. For this reason, it's not always clear what the final value in
     each shot was for a particular reference. When this is the case, `to_register_map()` will return
@@ -339,7 +353,7 @@ class ResultData:
     [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
     program to choose the correct readout values for each shot.
     """
-    def __new__(cls, values: typing.Any) -> ResultData: ...
+    def __new__(cls, inner: QVMResultData | QPUResultData) -> ResultData: ...
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust

@@ -421,6 +421,7 @@ impl ConnectionStrategy {
 mod stubs {
     use super::{ApiExecutionOptionsBuilder, ExecutionOptionsBuilder, JobId};
     use pyo3_stub_gen::{PyStubType, TypeInfo};
+    use pyo3::prelude::*;
 
     impl PyStubType for JobId {
         fn type_output() -> TypeInfo {
@@ -439,6 +440,72 @@ mod stubs {
             ApiExecutionOptionsBuilder::type_output()
         }
     }
+
+
+    // The following works around a `mypy` bug that requires write-only properties have getters.
+    // These methods won't be available at runtime, but they'll show up in the type stubs,
+    // so they're typed in a way that static type checkers should alert the user
+    // that they shouldn't be calling the function in question. 
+    
+    #[doc(hidden)]
+    struct WriteOnly(&'static str);
+
+    impl PyStubType for WriteOnly {
+        fn type_output() -> TypeInfo {
+            TypeInfo::with_module("typing.Never", "typing".into())
+        }
+    }
+
+    impl<'py> IntoPyObject<'py> for WriteOnly {
+        type Target = ();
+        type Output = Bound<'py, Self::Target>;
+        type Error = PyErr;
+
+        fn into_pyobject(self, _py: Python<'py>) -> Result<Self::Output, Self::Error> {
+            Err(pyo3::exceptions::PyAttributeError::new_err(format!("{} is write-only", self.0)))
+        }
+    }
+
+    use paste::paste;
+
+    /// Generate stubs for write-only properites.
+    ///
+    /// # Usage
+    ///
+    /// For some type `T` with write-only properties `a`, `b`, and `c`, call the macro like so:
+    ///
+    /// ```ignore
+    /// stub_write_only!(T, a, b, c);
+    /// ```
+    ///
+    /// This will generate the correct stubs to satisfy `mypy`
+    /// while alerting the user that these properties are write-only.
+    macro_rules! stub_write_only {
+        ($t:ty, $($field:ident),+ $(,)?) => { 
+            paste! {
+                #[cfg(feature = "stubs")]
+                #[pyo3_stub_gen::derive::gen_stub_pymethods]
+                #[pymethods]
+                impl $t {
+                    $( 
+                        /// DO NOT CALL THIS METHOD.
+                        ///
+                        /// `mypy` requires write-only properties to have a getter,
+                        /// but this method is not actually available at runtime. 
+                        #[doc(hidden)]
+                        #[allow(clippy::unused_self)]
+                        #[getter($field)]
+                        fn [< get_ $field >](&self) -> WriteOnly {
+                            WriteOnly(stringify!($field))
+                        }
+                    )+
+                }
+            }
+        };
+    }
+
+    stub_write_only!(ExecutionOptionsBuilder, connection_strategy, timeout_seconds, api_options);
+    stub_write_only!(ApiExecutionOptionsBuilder, bypass_settings_protection, timeout); 
 }
 
 py_function_sync_async! {

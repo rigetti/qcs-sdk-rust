@@ -13,7 +13,6 @@ use rigetti_pyo3::{create_init_submodule, py_sync};
 use pyo3_stub_gen::{define_stub_info_gatherer, derive::gen_stub_pyfunction};
 
 use crate::{
-    client::Qcs,
     compiler,
     python::{
         executable::{ExeParameter, PyExecutable, PyJobHandle},
@@ -88,6 +87,20 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
     pyo3_tracing_subscriber::add_submodule("qcs_sdk", "_tracing_subscriber", py, m)?;
 
     Ok(())
+}
+
+#[cfg(feature = "stubs")]
+mod stubs {
+    #[derive(pyo3::IntoPyObject)]
+    struct Final<T>(T);
+
+    impl<T> pyo3_stub_gen::PyStubType for Final<T> {
+        fn type_output() -> pyo3_stub_gen::TypeInfo {
+            pyo3_stub_gen::TypeInfo::with_module("typing.Final", "typing".into())
+        }
+    }
+
+    pyo3_stub_gen::module_variable!("qcs_sdk", "__version__", Final<&str>, Final(env!("CARGO_PKG_VERSION")));
 }
 
 #[cfg(feature = "stubs")]

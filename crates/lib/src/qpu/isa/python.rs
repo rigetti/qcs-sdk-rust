@@ -28,7 +28,52 @@ create_init_submodule! {
     funcs: [ py_get_instruction_set_architecture, py_get_instruction_set_architecture_async ],
 }
 
+/// The native instruction set architecture (ISA) of a quantum processor, annotated with characteristics.
+///
+/// The operations described by the `instructions` field are named by their QUIL instruction name,
+/// while the operation described by the `benchmarks` field are named by their benchmark routine
+/// and are a future extension point.
+///
+/// The characteristics that annotate both instructions and benchmarks assist the user to generate
+/// the best native QUIL program for a desired task, and so are provided as part of the native ISA.
 #[derive(Clone)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyclass(name = "InstructionSetArchitecture", module = "qcs_sdk.qpu.isa")]
+pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
+
+/// Represents the logical underlying architecture of a quantum processor.
+///
+/// The architecture is defined in detail by the nodes and edges that constitute the quantum
+/// processor. This defines the set of all nodes that could be operated upon, and indicates to
+/// some approximation their physical layout. The main purpose of this is to support geometry
+/// calculations that are independent of the available operations, and rendering ISA-based
+/// information. Architecture layouts are defined by the `family`, as follows.
+///
+/// The "Aspen" family of quantum processor indicates a 2D planar grid layout of octagon unit
+/// cells. The `node_id` in this architecture is computed as :math:`100 p_y + 10 p_x + p_u` where
+/// :math:`p_y` is the zero-based Y position in the unit cell grid, :math:`p_x` is the zero-based
+/// X position in the unit cell grid, and :math:`p_u` is the zero-based position in the octagon
+/// unit cell and always ranges from 0 to 7.
+///
+/// The "Ankaa" architecture is based on a grid topology; having, in "vertical" orientation,
+/// qubits numbered starting from 0 at the top-left and increasing from left to right,
+/// then top to bottom, so the final qubit is in the bottom-right. Each qubit is connected
+/// with a tunable coupler to their direct vertical and horizontal neighbors, producing an edge.
+/// Edges are ordered top-left to bottom-right in this orientation as well, with horizontal rows
+/// alternating with vertical rows. Ankaa chips are, in vertical orientation,
+/// 7 qubits wide and 12 tall. This architecture may also be presented in "landscape"
+/// orientation, which is a simple 90-degree clockwise rotation of the vertical orientation.
+///
+/// Note that the operations that are actually available are defined entirely by ``Operation``
+/// instances. The presence of a node or edge in the ``Architecture`` model provides no guarantee
+/// that any 1Q or 2Q operation will be available to users writing QUIL programs.
+#[derive(Clone)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyclass(name = "Architecture", module = "qcs_sdk.qpu.isa")]
+struct PyArchitecture(Architecture);
+
+#[derive(Clone)]
+#[expect(dead_code)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Family", module = "qcs_sdk.qpu.isa")]
 struct PyFamily(Family);
@@ -42,11 +87,6 @@ struct PyEdge(Edge);
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "Node", module = "qcs_sdk.qpu.isa")]
 struct PyNode(Node);
-
-#[derive(Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Architecture", module = "qcs_sdk.qpu.isa")]
-struct PyArchitecture(Architecture);
 
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
@@ -68,11 +108,6 @@ struct PyOperationSite(OperationSite);
 #[pyclass(name = "Operation", module = "qcs_sdk.qpu.isa")]
 struct PyOperation(Operation);
 
-#[derive(Clone)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "InstructionSetArchitecture", module = "qcs_sdk.qpu.isa")]
-pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
-
 #[cfg(feature = "python")]
 #[derive(Debug, thiserror::Error)]
 #[error("Failed to serialize instruction set architecture: {0}")]
@@ -81,11 +116,23 @@ pub struct SerializeIsaError(#[from] serde_json::Error);
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyInstructionSetArchitecture {
+    /// Deserialize an [`InstructionSetArchitecture`] from a json representation.
+    ///
+    /// # Errors
+    ///
+    /// Returns `[SerializeIsaError`] if the input string was not deserialized correctly.
     #[staticmethod]
-    pub(crate) fn from_raw(json: String) -> Result<Self, SerializeIsaError> {
-        Ok(Self(serde_json::from_str(&json)?))
+    pub(crate) fn from_raw(json: &str) -> Result<Self, SerializeIsaError> {
+        Ok(Self(serde_json::from_str(json)?))
     }
 
+    /// Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed.
+    ///
+    /// If `pretty` is true, the json output should be pretty-printed with newlines and indents.
+    ///
+    /// # Errors 
+    ///
+    /// Returns [`SerializeIsaError`] if the ISA could not be serialized. 
     #[pyo3(signature = (pretty = false))]
     pub(crate) fn json(&self, pretty: bool) -> Result<String, SerializeIsaError> {
         let data = {
@@ -98,11 +145,18 @@ impl PyInstructionSetArchitecture {
         Ok(data)
     }
 
+    /// The architecture of the quantum processor.
     #[getter]
     fn architecture(&self) -> PyArchitecture {
         PyArchitecture(*self.0.architecture.clone())
     }
 
+    #[setter]
+    fn set_architecture(&mut self, architecture: PyArchitecture) {
+        *self.0.architecture = architecture.0;
+    }
+
+    /// The list of benchmarks that have characterized the quantum processor.
     #[getter]
     fn benchmarks(&self) -> Vec<PyOperation> {
         self.0.benchmarks.iter().cloned().map(PyOperation).collect()
@@ -113,6 +167,7 @@ impl PyInstructionSetArchitecture {
         self.0.benchmarks = benchmarks.into_iter().map(|op| op.0).collect();
     }
 
+    /// The list of native QUIL instructions supported by the quantum processor.
     #[getter]
     fn instructions(&self) -> Vec<PyOperation> {
         self.0
@@ -122,10 +177,21 @@ impl PyInstructionSetArchitecture {
             .map(PyOperation)
             .collect()
     }
+    
+    #[setter]
+    fn set_instructions(&mut self, instructions: Vec<PyOperation>) {
+        self.0.instructions = instructions.into_iter().map(|op| op.0).collect();
+    }
 
+    /// The name of the quantum processor.
     #[getter]
     fn name(&self) -> &str {
         &self.0.name
+    }
+
+    #[setter]
+    fn set_name(&mut self, name: String) {
+        self.0.name = name;
     }
 }
 
