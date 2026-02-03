@@ -4,6 +4,7 @@
 import builtins
 import typing
 from qcs_sdk import QcsSdkError
+from quil.instructions import ExternSignature
 
 @typing.final
 class ChooseRandomRealSubRegions:
@@ -12,8 +13,20 @@ class ChooseRandomRealSubRegions:
     sub-regions from a source array of real values to a destination array.
     """
     NAME: builtins.str = 'choose_random_real_sub_regions'
-    @classmethod
-    def build_signature(cls) -> builtins.str: ...
+    r"""
+    The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
+    """
+    @staticmethod
+    def build_signature() -> ExternSignature:
+        r"""
+        Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
+        
+        The signature expressed in Quil is as follows:
+        
+        ```text
+        "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
+        ```
+        """
 
 @typing.final
 class PrngSeedValue:
@@ -25,8 +38,11 @@ class PrngSeedValue:
     def __new__(cls, value: builtins.int) -> PrngSeedValue:
         r"""
         Attempt to create a new instance of `PrngSeedValue` from a `u64`.
-        The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
-        losslessly convertible to `f64`.
+        
+        # Errors
+        
+        Returns [`Error::InvalidSeed`] if the value is not in range `[1, MAX_SEQUENCER_VALUE]`
+        or if it is not losslessly convertible to `f64`.
         """
     def as_f64(self) -> builtins.float: ...
 

@@ -1,3 +1,5 @@
+#![expect(clippy::unsafe_derive_deserialize)]
+
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use quil_rs::program::SyntaxError;
@@ -200,7 +202,7 @@ impl RegisterMap {
                     }
                     .map_err(|_| {
                         RegisterMatrixConversionError::InvalidShape {
-                            register: name.to_string(),
+                            register: name.clone(),
                         }
                     })?;
                     Ok((name.clone(), register_matrix))
@@ -233,8 +235,8 @@ impl RegisterMap {
                             })?,
                             qpu_result_data.readout_values.get(alias).ok_or_else(||
                                 RegisterMatrixConversionError::UnmappedAlias {
-                                    memory_reference: memory_reference.to_string(),
-                                    alias: alias.to_string(),
+                                    memory_reference: memory_reference.clone(),
+                                    alias: alias.clone(),
                                 },
                             )?,
                         ))

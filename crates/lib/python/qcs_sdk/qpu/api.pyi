@@ -13,6 +13,7 @@ from qcs_sdk.qpu import MemoryValues
 class APIExecutionOptions:
     r"""
     Options available when executing a job on a QPU, particular to the execution service's API.
+    
     This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
     
     Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
@@ -206,44 +207,60 @@ class ExecutionOptionsBuilder:
 @typing.final
 class ExecutionResult:
     r"""
-    The execution readout data from a particular memory location.
+    Execution readout data from a particular memory location.
     """
     @property
     def data(self) -> Register:
         r"""
-        Register data for this result.
+        The result data for all shots by the particular memory location.
         """
     @property
     def dtype(self) -> builtins.str:
         r"""
-        Name of the data type.
+        The type of the result data (as a `numpy` `dtype`).
         """
     @property
     def shape(self) -> builtins.list[builtins.int]:
         r"""
-        Describes result shape dimensions.
+        The shape of the result data.
         """
     @staticmethod
-    def from_register(register: Register) -> ExecutionResult: ...
+    def from_register(register: Register) -> ExecutionResult:
+        r"""
+        Build an `ExecutionResult` from a `Register`.
+        """
 
 @typing.final
 class ExecutionResults:
+    r"""
+    Execution readout data for all memory locations.
+    """
     @property
     def buffers(self) -> builtins.dict[builtins.str, ExecutionResult]:
         r"""
-        Result data buffers keyed by readout alias name.
+        The readout results of execution, mapping a published filter node to its data.
+        
+        See `TranslationResult.ro_sources` which provides the mapping from the filter node name
+        to the name of the memory declaration in the source program.
         """
     @property
     def execution_duration_microseconds(self) -> typing.Optional[builtins.int]:
         r"""
-        QPU execution duration.
+        The time spent executing the program.
         """
     @property
-    def memory(self) -> builtins.dict[builtins.str, MemoryValues]: ...
+    def memory(self) -> builtins.dict[builtins.str, MemoryValues]:
+        r"""
+        The final state of memory for parameters that were read from and written to during
+        the execution of the program.
+        """
     def __new__(cls, buffers: typing.Mapping[builtins.str, ExecutionResult], memory: typing.Mapping[builtins.str, MemoryValues], execution_duration_microseconds: typing.Optional[builtins.int]) -> ExecutionResults: ...
 
 @typing.final
 class QpuApiDuration:
+    r"""
+    The duration of an API call.
+    """
     @property
     def nanos(self) -> builtins.int: ...
     @property
@@ -258,10 +275,13 @@ class QpuApiError(QcsSdkError):
 
 class Register:
     r"""
-    Variants of data vectors within a single `ExecutionResult`.
+    Data vectors within a single ``ExecutionResult``.
     """
     @typing.final
     class Complex32(Register):
+        r"""
+        A register of 32-bit complex numbers.
+        """
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.complex]: ...
@@ -271,6 +291,9 @@ class Register:
     
     @typing.final
     class I32(Register):
+        r"""
+        A register of 32-bit integers.
+        """
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
@@ -286,43 +309,175 @@ class SubmissionError(QpuApiError):
     """
     ...
 
-def cancel_job(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None: ...
+def cancel_job(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None:
+    r"""
+    Cancel a job that has yet to begin executing.
+    
+    This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    job can be cancelled only if it has not yet started executing.
+    
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+    
+    :param job_id: The job ID to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+    :param execution_options: The ``ExecutionOptions`` to use.
+    """
 
-def cancel_job_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]: ...
+def cancel_job_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]:
+    r"""
+    Cancel a job that has yet to begin executing.
+    
+    This action is *not* atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+    job can be cancelled only if it has not yet started executing.
+    
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+    
+    :param job_id: The job ID to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+    :param execution_options: The ``ExecutionOptions`` to use.
+    """
 
-def cancel_jobs(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None: ...
+def cancel_jobs(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> None:
+    r"""
+    Cancel all given jobs that have yet to begin executing.
+    
+    This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
+    cancelled. A job can be cancelled only if it has not yet started executing.
+    
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+    
+    :param job_ids: The job IDs to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+    :param execution_options: The ``ExecutionOptions`` to use.
+    """
 
-def cancel_jobs_async(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]: ...
+def cancel_jobs_async(job_ids: typing.Sequence[builtins.str], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[None]:
+    r"""
+    Cancel all given jobs that have yet to begin executing.
+    
+    This action is *not* atomic, and will attempt to cancel every job even when some jobs cannot be
+    cancelled. A job can be cancelled only if it has not yet started executing.
+    
+    Success response indicates only that the request was received. Cancellation is not guaranteed,
+    as it is based on job state at the time of cancellation, and is completed on a best effort
+    basis.
+    
+    :param job_ids: The job IDs to cancel.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+    :param execution_options: The ``ExecutionOptions`` to use.
+    """
 
-def retrieve_results(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionResults: ...
+def retrieve_results(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionResults:
+    r"""
+    Fetches execution results for the given QCS Job ID.
+    
+    :param job_id: The ID of the job to retrieve results for.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use.
+    
+    :returns: Results from execution.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises QpuApiError: If there was a problem retrieving the results.
+    """
 
-def retrieve_results_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionResults]: ...
+def retrieve_results_async(job_id: builtins.str, quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionResults]:
+    r"""
+    Fetches execution results for the given QCS Job ID.
+    
+    :param job_id: The ID of the job to retrieve results for.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use.
+    
+    :returns: Results from execution.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises QpuApiError: If there was a problem retrieving the results.
+    """
 
 def submit(program: builtins.str, patch_values: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> builtins.str:
     r"""
-    Submits an executable `program` to be run on the specified QPU
+    Submits an executable `program` to be run on the specified QPU.
     
-    # Errors
+    :param program: An executable program (see ``translate``).
+    :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
-    May return an error if
-    * an engagement is not available
-    * an RPCQ client cannot be built
-    * the program cannot be submitted
+    :returns: The ID of the submitted job which can be used to fetch results.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting the program for execution.
     """
 
 def submit_async(program: builtins.str, patch_values: typing.Mapping[builtins.str, typing.Sequence[builtins.float]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[builtins.str]:
     r"""
-    Submits an executable `program` to be run on the specified QPU
+    Submits an executable `program` to be run on the specified QPU.
     
-    # Errors
+    :param program: An executable program (see ``translate``).
+    :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
-    May return an error if
-    * an engagement is not available
-    * an RPCQ client cannot be built
-    * the program cannot be submitted
+    :returns: The ID of the submitted job which can be used to fetch results.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting the program for execution.
     """
 
-def submit_with_parameter_batch(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> builtins.list[builtins.str]: ...
+def submit_with_parameter_batch(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> builtins.list[builtins.str]:
+    r"""
+    Execute a compiled program on a QPU with multiple sets of ``patch_values``.
+    
+    This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+    function will return a list of strings where the length and order correspond to the
+    ``patch_values`` given. However, note that execution in the order of given patch values is not
+    guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+    
+    :param program: An executable program (see ``translate``).
+    :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use.
+    
+    :returns: The IDs of the submitted jobs which can be used to fetch results.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no ``patch_values`` are given.
+    """
 
-def submit_with_parameter_batch_async(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]: ...
+def submit_with_parameter_batch_async(program: builtins.str, patch_values: typing.Sequence[typing.Mapping[builtins.str, typing.Sequence[builtins.float]]], quantum_processor_id: typing.Optional[builtins.str] = None, client: typing.Optional[QCSClient] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
+    r"""
+    Execute a compiled program on a QPU with multiple sets of ``patch_values``.
+    
+    This action is *atomic* in that all jobs will be queued, or none of them will. On success, this
+    function will return a list of strings where the length and order correspond to the
+    ``patch_values`` given. However, note that execution in the order of given patch values is not
+    guaranteed. If there is a failure to queue any of the jobs, then none will be queued.
+    
+    :param program: An executable program (see ``translate``).
+    :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param execution_options: The ``ExecutionOptions`` to use.
+    
+    :returns: The IDs of the submitted jobs which can be used to fetch results.
+    
+    :raises LoadClientError: If there is an issue loading the QCS Client configuration.
+    :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no ``patch_values`` are given.
+    """
 

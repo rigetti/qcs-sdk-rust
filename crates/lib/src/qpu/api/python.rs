@@ -66,21 +66,13 @@ impl_repr!(ApiExecutionOptions);
 impl_repr!(ConnectionStrategy);
 
 /// Data vectors within a single ``ExecutionResult``.
-///
-/// ## Variants:
-/// - ``i32``: A register of 32-bit integers.
-/// - ``complex32``: A register of 32-bit complex numbers.
-///
-/// ## Methods (each per variant):
-/// - ``is_*``: if the underlying values are that type.
-/// - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-/// - ``to_*``: the underlying values as that type, raises ``ValueError`` if they are not.
-/// - ``from_*``: wrap underlying values as this enum type.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[pyclass(module = "qcs_sdk.qpu.api")]
 pub enum Register {
+    /// A register of 32-bit integers.
     I32(Vec<i32>),
+    /// A register of 32-bit complex numbers.
     Complex32(Vec<Complex32>),
 }
 
@@ -206,7 +198,8 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
     }
 }
 
-#[derive(Debug, Clone)]
+/// The duration of an API call.
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QpuApiDuration", module = "qcs_sdk.qpu.api", frozen)]
 pub struct PyQpuApiDuration {
@@ -437,8 +430,8 @@ impl ConnectionStrategy {
 #[cfg(feature = "stubs")]
 mod stubs {
     use super::{ApiExecutionOptionsBuilder, ExecutionOptionsBuilder, JobId};
-    use pyo3_stub_gen::{PyStubType, TypeInfo};
     use pyo3::prelude::*;
+    use pyo3_stub_gen::{PyStubType, TypeInfo};
 
     impl PyStubType for JobId {
         fn type_output() -> TypeInfo {
@@ -458,12 +451,11 @@ mod stubs {
         }
     }
 
-
     // The following works around a `mypy` bug that requires write-only properties have getters.
     // These methods won't be available at runtime, but they'll show up in the type stubs,
     // so they're typed in a way that static type checkers should alert the user
-    // that they shouldn't be calling the function in question. 
-    
+    // that they shouldn't be calling the function in question.
+
     #[doc(hidden)]
     struct WriteOnly(&'static str);
 
@@ -479,7 +471,10 @@ mod stubs {
         type Error = PyErr;
 
         fn into_pyobject(self, _py: Python<'py>) -> Result<Self::Output, Self::Error> {
-            Err(pyo3::exceptions::PyAttributeError::new_err(format!("{} is write-only", self.0)))
+            Err(pyo3::exceptions::PyAttributeError::new_err(format!(
+                "{} is write-only",
+                self.0
+            )))
         }
     }
 
@@ -498,17 +493,17 @@ mod stubs {
     /// This will generate the correct stubs to satisfy `mypy`
     /// while alerting the user that these properties are write-only.
     macro_rules! stub_write_only {
-        ($t:ty, $($field:ident),+ $(,)?) => { 
+        ($t:ty, $($field:ident),+ $(,)?) => {
             paste! {
                 #[cfg(feature = "stubs")]
                 #[pyo3_stub_gen::derive::gen_stub_pymethods]
                 #[pymethods]
                 impl $t {
-                    $( 
+                    $(
                         /// DO NOT CALL THIS METHOD.
                         ///
                         /// `mypy` requires write-only properties to have a getter,
-                        /// but this method is not actually available at runtime. 
+                        /// but this method is not actually available at runtime.
                         #[doc(hidden)]
                         #[allow(clippy::unused_self)]
                         #[getter($field)]
@@ -521,8 +516,17 @@ mod stubs {
         };
     }
 
-    stub_write_only!(ExecutionOptionsBuilder, connection_strategy, timeout_seconds, api_options);
-    stub_write_only!(ApiExecutionOptionsBuilder, bypass_settings_protection, timeout); 
+    stub_write_only!(
+        ExecutionOptionsBuilder,
+        connection_strategy,
+        timeout_seconds,
+        api_options
+    );
+    stub_write_only!(
+        ApiExecutionOptionsBuilder,
+        bypass_settings_protection,
+        timeout
+    );
 }
 
 py_function_sync_async! {

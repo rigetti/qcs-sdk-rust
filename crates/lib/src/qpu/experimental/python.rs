@@ -1,3 +1,5 @@
+//! Python bindings for the experimental QPU module.
+
 use rigetti_pyo3::create_init_submodule;
 
 // #[pyo3(name = "experimental", module = "qcs_sdk.qpu", submodule)]
@@ -12,7 +14,7 @@ mod random {
         python::errors,
         qpu::experimental::random::{
             choose_random_real_sub_region_indices, lfsr_v1_next, ChooseRandomRealSubRegions,
-            PrngSeedValue
+            PrngSeedValue,
         },
     };
 
@@ -23,4 +25,3 @@ mod random {
         funcs: [ choose_random_real_sub_region_indices, lfsr_v1_next ],
     }
 }
-

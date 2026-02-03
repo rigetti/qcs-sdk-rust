@@ -1,4 +1,9 @@
-#![expect(clippy::needless_pass_by_value, reason = "PyO3 types often require it.")]
+//! Python bindings for the QVM module.
+
+#![expect(
+    clippy::needless_pass_by_value,
+    reason = "PyO3 types often require it."
+)]
 
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 use std::collections::HashMap;
@@ -38,15 +43,19 @@ create_init_submodule! {
 impl_repr!(QvmOptions);
 impl_repr!(RawQvmReadoutData);
 
-#[derive(Clone)]
+/// Client used to communicate with QVM.
+#[derive(Clone, Debug)]
 pub enum QvmClient {
+    /// A client which uses HTTP to communicate with a QVM service.
     Http(HttpClient),
+
+    /// A client which uses libquil to communicate with a QVM service.
     #[cfg(feature = "libquil")]
     Libquil(qvm::libquil::Client),
 }
 
 /// Client used to communicate with QVM.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(name = "QVMClient", module = "qcs_sdk.qvm")]
 pub struct PyQvmClient {
@@ -64,6 +73,8 @@ pub struct RawQvmReadoutData {
 }
 
 impl PyQvmClient {
+    /// Access the underlying QVM client.
+    #[must_use]
     pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
         match &self.inner {
             QvmClient::Http(client) => client,
@@ -200,6 +211,7 @@ impl QvmOptions {
 
     /// The timeout used for requests to the QVM. If set to None, there is no timeout.
     #[getter]
+    #[must_use]
     pub fn timeout(&self) -> Option<f32> {
         self.timeout.map(|duration| duration.as_secs_f32())
     }
@@ -230,8 +242,9 @@ impl QvmResultData {
         QvmResultData::from_memory_map(memory)
     }
 
+    #[expect(clippy::missing_errors_doc)]
     /// Get a copy of this result data flattened into a ``RawQVMReadoutData``.
-    pub fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<RawQvmReadoutData> {
+    pub fn to_raw_readout_data(&self, py: Python<'_>) -> PyResult<RawQvmReadoutData> {
         let memory = self
             .memory()
             .iter()
@@ -410,13 +423,13 @@ mod api {
     use pyo3_stub_gen::derive::gen_stub_pyfunction;
 
     use crate::qvm::{
-            http::{
-                AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
-                MultishotResponse, WavefunctionRequest,
-            },
-            python::PyQvmClient,
-            Client, QvmOptions,
-        };
+        http::{
+            AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
+            MultishotResponse, WavefunctionRequest,
+        },
+        python::PyQvmClient,
+        Client, QvmOptions,
+    };
 
     // #[pyo3(name = "api", module = "qcs_sdk.qvm", submodule)]
     create_init_submodule! {

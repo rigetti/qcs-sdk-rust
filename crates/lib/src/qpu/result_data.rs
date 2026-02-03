@@ -14,20 +14,11 @@ use qcs_api_client_grpc::models::controller::{
     DataValue as ControllerMemoryValues, ReadoutValues as ControllerReadoutValues,
 };
 
-/// A row of readout values from the QPU. Each row contains all the values emitted to a
-/// memory reference across all shots. There is a variant for each possible type
-/// the list of readout values could be.
+/// A row of readout values from the QPU.
 ///
-/// ## Variants:
-/// - ``integer``: Corresponds to the Quil ``BIT``, ``OCTET``, or ``INTEGER`` types.
-/// - ``real``: Corresponds to the Quil ``REAL`` type.
-/// - ``complex``: Corresponds to readout values containing complex numbers.
-///
-/// ## Methods (each per variant):
-/// - ``is_*``: if the underlying values are that type.
-/// - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-/// - ``to_*``: the underlying values as that type, raises `ValueError` if they are not.
-/// - ``from_*``: wrap underlying values as this enum type.
+/// Each row contains all the values emitted to a memory reference across all shots.
+/// There is a variant for each possible type the list of readout values could be.
+#[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu"))]
@@ -40,19 +31,10 @@ pub enum ReadoutValues {
     Complex(Vec<Complex64>),
 }
 
-/// A row of data containing the contents of a memory region at the end of a job. There
-/// is a variant for each possible type the memory region could be.
+/// A row of data containing the contents of a memory region at the end of a job.
 ///
-/// ## Variants:
-/// - ``binary``: Corresponds to the Quil ``BIT`` and ``OCTET`` types.
-/// - ``integer``: Corresponds to the Quil ``INTEGER`` types.
-/// - ``real``: Corresponds to the Quil ``REAL`` type.
-///
-/// ## Methods (each per variant):
-/// - ``is_*``: if the underlying values are that type.
-/// - ``as_*``: if the underlying values are that type, then those values, otherwise ``None``.
-/// - ``to_*``: the underlying values as that type, raises `ValueError` if they are not.
-/// - ``from_*``: wrap underlying values as this enum type.
+/// There is a variant for each possible type the memory region could be.
+#[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu", eq))]
@@ -67,14 +49,14 @@ pub enum MemoryValues {
 
 /// Encapsulates data returned from the QPU after executing a job.
 ///
-/// `QPUResultData` contains "mappings", which map declared memory regions
-/// in a program (ie. "ro[0]") to that region's readout key in `QPUResultData.readout_values`.
+/// `QpuResultData` contains "mappings", which map declared memory regions
+/// in a program (ie. "ro[0]") to that region's readout key in `QpuResultData.readout_values`.
 /// `readout_values` maps those readout keys to the values emitted for that region
 /// across all shots.
 ///
 /// Read more about QPU readout data in the
 /// [QCS Documentation](https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data)
-#[allow(clippy::module_name_repetitions)]
+#[expect(clippy::module_name_repetitions, clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(

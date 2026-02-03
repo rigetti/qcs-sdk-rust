@@ -26,10 +26,19 @@ class CompilationResult:
 
 @typing.final
 class CompilationResult:
+    r"""
+    The result of compiling a Quil program.
+    """
     @property
-    def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]: ...
+    def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]:
+        r"""
+        Metadata about the compiled program.
+        """
     @property
-    def program(self) -> builtins.str: ...
+    def program(self) -> builtins.str:
+        r"""
+        The compiled program.
+        """
 
 @typing.final
 class CompilerOpts:
@@ -104,7 +113,10 @@ class NativeQuilMetadata:
     """
     def __eq__(self, other: builtins.object) -> builtins.bool: ...
     def __getnewargs__(self) -> tuple[typing.Optional[builtins.list[builtins.int]], typing.Optional[builtins.int], typing.Optional[builtins.int], typing.Optional[builtins.int], typing.Optional[builtins.float], typing.Optional[builtins.float], typing.Optional[builtins.int], typing.Optional[builtins.float]]: ...
-    def __new__(cls, final_rewiring: typing.Optional[typing.Sequence[builtins.int]], gate_depth: typing.Optional[builtins.int], gate_volume: typing.Optional[builtins.int], multiqubit_gate_depth: typing.Optional[builtins.int], program_duration: typing.Optional[builtins.float], program_fidelity: typing.Optional[builtins.float], topological_swaps: typing.Optional[builtins.int], qpu_runtime_estimation: typing.Optional[builtins.float]) -> NativeQuilMetadata: ...
+    def __new__(cls, final_rewiring: typing.Optional[typing.Sequence[builtins.int]], gate_depth: typing.Optional[builtins.int], gate_volume: typing.Optional[builtins.int], multiqubit_gate_depth: typing.Optional[builtins.int], program_duration: typing.Optional[builtins.float], program_fidelity: typing.Optional[builtins.float], topological_swaps: typing.Optional[builtins.int], qpu_runtime_estimation: typing.Optional[builtins.float]) -> NativeQuilMetadata:
+        r"""
+        Construct a new `NativeQuilMetadata` from arguments.
+        """
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
@@ -130,11 +142,17 @@ class PauliTerm:
 
 @typing.final
 class QuilcClient:
+    r"""
+    Client used to communicate with Quilc.
+    """
     def __new__(cls) -> QuilcClient: ...
     @staticmethod
     def new_libquil() -> QuilcClient: ...
     @staticmethod
-    def new_rpcq(endpoint: builtins.str) -> QuilcClient: ...
+    def new_rpcq(endpoint: builtins.str) -> QuilcClient:
+        r"""
+        Construct a QuilcClient that uses RPCQ to communicate with Quilc.
+        """
 
 class QuilcError(QcsSdkError):
     r"""
@@ -180,23 +198,126 @@ class TargetDevice:
     Description of a device to compile for.
     """
     @staticmethod
-    def from_isa(isa: InstructionSetArchitecture) -> TargetDevice: ...
+    def from_isa(isa: InstructionSetArchitecture) -> TargetDevice:
+        r"""
+        Create a [`TargetDevice`] based on an [`InstructionSetArchitecture`].
+        
+        # Errors
+        
+        Returns a [`QuilcError`] if the [`InstructionSetArchitecture`]
+        cannot be converted into a format that Quilc understands.
+        """
     @staticmethod
-    def from_json(value: builtins.str) -> TargetDevice: ...
+    def from_json(value: builtins.str) -> TargetDevice:
+        r"""
+        Create a [`TargetDevice`] from a JSON string.
+        
+        # Errors
+        
+        Returns a [`QuilcError`] if the JSON is malformed.
+        """
 
-def compile_program(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> CompilationResult: ...
+def compile_program(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> CompilationResult:
+    r"""
+    Compile a quil program for a target device.
+    
+    :param quil: The Quil program to compile.
+    :param target: Architectural description of device to compile for.
+    :param client: Client used to send compilation requests to Quilc.
+    :param options: Optional compiler options. If ``None``, default values are used.
+    
+    :raises QuilcError: If compilation fails.
+    """
 
-def compile_program_async(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> collections.abc.Awaitable[CompilationResult]: ...
+def compile_program_async(quil: builtins.str, target: TargetDevice, client: QuilcClient, options: typing.Optional[CompilerOpts] = None) -> collections.abc.Awaitable[CompilationResult]:
+    r"""
+    Compile a quil program for a target device.
+    
+    :param quil: The Quil program to compile.
+    :param target: Architectural description of device to compile for.
+    :param client: Client used to send compilation requests to Quilc.
+    :param options: Optional compiler options. If ``None``, default values are used.
+    
+    :raises QuilcError: If compilation fails.
+    """
 
-def conjugate_pauli_by_clifford(request: ConjugateByCliffordRequest, client: QuilcClient) -> ConjugatePauliByCliffordResponse: ...
+def conjugate_pauli_by_clifford(request: ConjugateByCliffordRequest, client: QuilcClient) -> ConjugatePauliByCliffordResponse:
+    r"""
+    Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    
+    :param request: Pauli Term conjugation request.
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
+    """
 
-def conjugate_pauli_by_clifford_async(request: ConjugateByCliffordRequest, client: QuilcClient) -> collections.abc.Awaitable[ConjugatePauliByCliffordResponse]: ...
+def conjugate_pauli_by_clifford_async(request: ConjugateByCliffordRequest, client: QuilcClient) -> collections.abc.Awaitable[ConjugatePauliByCliffordResponse]:
+    r"""
+    Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
+    In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.
+    
+    :param request: Pauli Term conjugation request.
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
+    """
 
-def generate_randomized_benchmarking_sequence(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> GenerateRandomizedBenchmarkingSequenceResponse: ...
+def generate_randomized_benchmarking_sequence(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> GenerateRandomizedBenchmarkingSequenceResponse:
+    r"""
+    Construct a randomized benchmarking experiment on the given qubits, decomposing into
+    gateset. If interleaver is not provided, the returned sequence will have the form
+    
+        C_1 C_2 ... C_(depth-1) C_inv ,
+    
+    where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
+    and C_inv is selected so that the entire sequence composes to the identity. If an
+    interleaver G (which must be a Clifford, and which will be decomposed into the native
+    gateset) is provided, then the sequence instead takes the form
+    
+        C_1 G C_2 G ... C_(depth-1) G C_inv .
+    
+    :param request: Randomized benchmarking request.
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
+    """
 
-def generate_randomized_benchmarking_sequence_async(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> collections.abc.Awaitable[GenerateRandomizedBenchmarkingSequenceResponse]: ...
+def generate_randomized_benchmarking_sequence_async(request: RandomizedBenchmarkingRequest, client: QuilcClient) -> collections.abc.Awaitable[GenerateRandomizedBenchmarkingSequenceResponse]:
+    r"""
+    Construct a randomized benchmarking experiment on the given qubits, decomposing into
+    gateset. If interleaver is not provided, the returned sequence will have the form
+    
+        C_1 C_2 ... C_(depth-1) C_inv ,
+    
+    where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
+    and C_inv is selected so that the entire sequence composes to the identity. If an
+    interleaver G (which must be a Clifford, and which will be decomposed into the native
+    gateset) is provided, then the sequence instead takes the form
+    
+        C_1 G C_2 G ... C_(depth-1) G C_inv .
+    
+    :param request: Randomized benchmarking request.
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
+    """
 
-def get_version_info(client: QuilcClient) -> builtins.str: ...
+def get_version_info(client: QuilcClient) -> builtins.str:
+    r"""
+    Fetch the version information from the running Quilc service.
+    
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc.
+    """
 
-def get_version_info_async(client: QuilcClient) -> collections.abc.Awaitable[builtins.str]: ...
+def get_version_info_async(client: QuilcClient) -> collections.abc.Awaitable[builtins.str]:
+    r"""
+    Fetch the version information from the running Quilc service.
+    
+    :param client: Client used to send compilation requests to Quilc.
+    
+    :raises QuilcError: If there is a failure connecting to Quilc.
+    """
 

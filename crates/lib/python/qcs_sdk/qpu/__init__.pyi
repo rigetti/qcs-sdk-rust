@@ -18,7 +18,9 @@ class ListQuantumProcessorsError(QcsSdkError):
 
 class MemoryValues:
     r"""
-    A row of data containing the contents of each memory region at the end of a job.
+    A row of data containing the contents of a memory region at the end of a job.
+    
+    There is a variant for each possible type the memory region could be.
     """
     def __new__(cls, values: typing.Any) -> MemoryValues: ...
     @typing.final
@@ -61,7 +63,15 @@ class MemoryValues:
 @typing.final
 class QPUResultData:
     r"""
-    This struct encapsulates data returned from the QPU after executing a job.
+    Encapsulates data returned from the QPU after executing a job.
+    
+    `QpuResultData` contains "mappings", which map declared memory regions
+    in a program (ie. "ro[0]") to that region's readout key in `QpuResultData.readout_values`.
+    `readout_values` maps those readout keys to the values emitted for that region
+    across all shots.
+    
+    Read more about QPU readout data in the
+    [QCS Documentation](https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data)
     """
     @property
     def mappings(self) -> builtins.dict[builtins.str, builtins.str]:
@@ -109,8 +119,10 @@ class RawQPUReadoutData:
 
 class ReadoutValues:
     r"""
-    A row of readout values from the QPU. Each row contains all the values emitted to a
-    memory reference across all shots.
+    A row of readout values from the QPU.
+    
+    Each row contains all the values emitted to a memory reference across all shots.
+    There is a variant for each possible type the list of readout values could be.
     """
     def __new__(cls, values: typing.Any) -> ReadoutValues: ...
     @typing.final
@@ -150,7 +162,23 @@ class ReadoutValues:
         def __new__(cls, _0: typing.Sequence[builtins.float]) -> ReadoutValues.Real: ...
     
 
-def list_quantum_processors(client: typing.Optional[QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> builtins.list[builtins.str]: ...
+def list_quantum_processors(client: typing.Optional[QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> builtins.list[builtins.str]:
+    r"""
+    Returns all available Quantum Processor (QPU) IDs.
+    
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param timeout: Maximum duration to wait for API calls to complete, in seconds.
+    
+    :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
+    """
 
-def list_quantum_processors_async(client: typing.Optional[QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]: ...
+def list_quantum_processors_async(client: typing.Optional[QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
+    r"""
+    Returns all available Quantum Processor (QPU) IDs.
+    
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    :param timeout: Maximum duration to wait for API calls to complete, in seconds.
+    
+    :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
+    """
 

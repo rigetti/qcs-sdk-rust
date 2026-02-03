@@ -114,12 +114,14 @@ impl Qcs {
         OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
 
+    #[expect(clippy::result_large_err)]
     pub(crate) fn get_translation_client(
         &self,
     ) -> Result<TranslationClient<GrpcConnection>, GrpcError<TokenError>> {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
+    #[expect(clippy::result_large_err)]
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,

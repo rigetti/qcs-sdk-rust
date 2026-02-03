@@ -193,6 +193,9 @@ impl PyExecutable {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl PyExecutable {
+    /// Execute on a QVM which is accessible via the provided client.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[instrument(skip_all)]
     pub fn execute_on_qvm<'py>(
         &self,
@@ -202,6 +205,10 @@ impl PyExecutable {
         py_sync!(py, py_executable_data!(self, execute_on_qvm, &client))
     }
 
+    /// Execute on a QVM which is accessible via the provided client
+    /// (async analog of ``Executable.execute_on_qvm``).
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[instrument(skip_all)]
     pub fn execute_on_qvm_async<'py>(
         &self,
@@ -215,6 +222,12 @@ impl PyExecutable {
         .map(Into::into)
     }
 
+    /// Compile the program and execute it on a QPU, waiting for results.
+    ///
+    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu(
         &self,
@@ -247,7 +260,13 @@ impl PyExecutable {
             ),
         }
     }
-
+    /// Compile the program and execute it on a QPU, waiting for results
+    /// (async analog of `Executable.execute_on_qpu`).
+    ///
+    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu_async<'py>(
         &self,
@@ -282,6 +301,12 @@ impl PyExecutable {
         .map(Into::into)
     }
 
+    /// Compile the program and execute it on a QPU, without waiting for results.
+    ///
+    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu(
         &self,
@@ -315,6 +340,13 @@ impl PyExecutable {
         }
     }
 
+    /// Compile the program and execute it on a QPU, without waiting for results
+    /// (async analog of `Executable.submit_to_qpu`).
+    ///
+    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu_async<'py>(
         &self,
@@ -349,6 +381,9 @@ impl PyExecutable {
         .map(Into::into)
     }
 
+    /// Wait for the results of a job to complete.
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     pub fn retrieve_results(
         &self,
         py: Python<'_>,
@@ -360,6 +395,10 @@ impl PyExecutable {
         )
     }
 
+    /// Wait for the results of a job to complete
+    /// (async analog of `Executable.retrieve_results`).
+    ///
+    /// :raises `ExecutionError`: If the job fails to execute.
     pub fn retrieve_results_async<'py>(
         &self,
         py: Python<'py>,
@@ -373,6 +412,9 @@ impl PyExecutable {
     }
 }
 
+/// Program execution parameters.
+///
+/// Note: The validity of parameters is not checked until execution.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(module = "qcs_sdk", get_all, set_all)]
@@ -386,7 +428,7 @@ pub(crate) struct ExeParameter {
 #[pymethods]
 impl ExeParameter {
     #[new]
-    fn new(name: String, index: usize, value: f64) -> Self {
+    fn __new__(name: String, index: usize, value: f64) -> Self {
         Self { name, index, value }
     }
 }

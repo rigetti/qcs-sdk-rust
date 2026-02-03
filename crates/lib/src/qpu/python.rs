@@ -1,3 +1,5 @@
+//! Python bindings for the QPU module.
+
 use std::time::Duration;
 
 use numpy::Complex64;

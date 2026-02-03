@@ -88,11 +88,13 @@ impl From<String> for JobId {
     }
 }
 
+#[expect(clippy::missing_errors_doc)]
 /// Execute compiled program on a QPU.
 ///
 /// See [`ExecuteControllerJobRequest`] for more details.
 ///
 /// # Arguments
+///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
 ///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
 ///   to target a specific endpoint ID.
@@ -128,6 +130,7 @@ pub async fn submit(
 /// See [`ExecuteControllerJobRequest`] for more details.
 ///
 /// # Arguments
+///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
 ///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
 ///   to target a specific endpoint ID.
@@ -141,9 +144,9 @@ pub async fn submit(
 ///
 /// # Errors
 ///
-/// * Returns a [`QpuApiError`] if:
-///     * Any of the jobs fail to be queued.
-///     * The provided `patch_values` iterator is empty.
+/// Returns a [`QpuApiError`] if:
+/// * Any of the jobs fail to be queued.
+/// * The provided `patch_values` iterator is empty.
 pub async fn submit_with_parameter_batch<'a, I>(
     quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
@@ -199,6 +202,7 @@ where
 /// completed on a best effort basis.
 ///
 /// # Arguments
+///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
 ///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
 ///   to target a specific endpoint ID.
@@ -209,6 +213,7 @@ where
 ///   overrides the `quantum_processor_id` parameter.
 ///
 /// # Errors
+///
 /// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if any of
 ///   the jobs could not be cancelled.
 pub async fn cancel_jobs(
@@ -243,6 +248,7 @@ pub async fn cancel_jobs(
 /// completed on a best effort basis.
 ///
 /// # Arguments
+///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter is
 ///   required unless using [`ConnectionStrategy::EndpointId`] in `execution_options` to target
 ///   a specific endpoint ID.
@@ -253,6 +259,7 @@ pub async fn cancel_jobs(
 ///   `quantum_processor_id` parameter.
 ///
 /// # Errors
+///
 /// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if the
 ///   job could not be cancelled.
 pub async fn cancel_job(
@@ -270,9 +277,11 @@ pub async fn cancel_job(
     .await
 }
 
+#[expect(clippy::missing_errors_doc)]
 /// Fetch results from QPU job execution.
 ///
 /// # Arguments
+///
 /// * `job_id` - The [`JobId`] to retrieve results for.
 /// * `quantum_processor_id` - The quantum processor the job was run on. This parameter
 ///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
@@ -390,6 +399,7 @@ impl Default for ExecutionOptions {
 impl Eq for ExecutionOptions {}
 
 /// Options available when executing a job on a QPU, particular to the execution service's API.
+///
 /// This is a conventent alias for [`InnerApiExecutionOptions`] which provides a builder.
 ///
 /// Use [`Default`] to get a reasonable set of defaults, or start with [`ApiExecutionOptionsBuilder`]
@@ -547,7 +557,7 @@ pub trait ExecutionTarget<'a> {
     ) -> Option<execute_controller_job_request::Target> {
         match self.connection_strategy() {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                execute_controller_job_request::Target::EndpointId(endpoint_id.to_string()),
+                execute_controller_job_request::Target::EndpointId(endpoint_id.clone()),
             ),
             ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
                 quantum_processor_id
@@ -564,7 +574,7 @@ pub trait ExecutionTarget<'a> {
     ) -> Option<get_controller_job_results_request::Target> {
         match self.connection_strategy() {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                get_controller_job_results_request::Target::EndpointId(endpoint_id.to_string()),
+                get_controller_job_results_request::Target::EndpointId(endpoint_id.clone()),
             ),
             ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
                 quantum_processor_id
@@ -581,7 +591,7 @@ pub trait ExecutionTarget<'a> {
     ) -> Option<cancel_controller_jobs_request::Target> {
         match self.connection_strategy() {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                cancel_controller_jobs_request::Target::EndpointId(endpoint_id.to_string()),
+                cancel_controller_jobs_request::Target::EndpointId(endpoint_id.clone()),
             ),
             ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
                 quantum_processor_id
@@ -636,6 +646,7 @@ pub trait ExecutionTarget<'a> {
         self.grpc_address_to_channel(&address, client)
     }
 
+    #[expect(clippy::missing_errors_doc, clippy::result_large_err)]
     /// Get a channel from the given gRPC address.
     fn grpc_address_to_channel(
         &self,

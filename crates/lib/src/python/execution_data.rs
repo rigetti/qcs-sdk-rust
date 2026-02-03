@@ -24,7 +24,7 @@ use crate::{
 impl_repr!(ResultData);
 impl_repr!(RawQpuReadoutData);
 
-#[derive(FromPyObject)]
+#[derive(FromPyObject, IntoPyObject)]
 enum PyResultData {
     Qvm(QvmResultData),
     Qpu(QpuResultData),
@@ -37,6 +37,7 @@ pyo3_stub_gen::impl_stub_type!(PyResultData = QvmResultData | QpuResultData);
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl ResultData {
+    /// Create a new `ResultData` from either QVM or QPU result data.
     #[new]
     fn __new__(inner: PyResultData) -> ResultData {
         match inner {
@@ -46,6 +47,8 @@ impl ResultData {
     }
 
     /// Get the raw readout data from either QPU or QVM result.
+    ///
+    /// See `RawQPUReadoutData` and `RawQVMReadoutData` for more information.
     #[gen_stub(override_return_type(type_repr = "dict[str, list] | RawQPUReadoutData"))]
     fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
         match self {
@@ -53,12 +56,20 @@ impl ResultData {
             ResultData::Qvm(data) => data.to_raw_readout_data(py)?.into_bound_py_any(py),
         }
     }
+
+    /// Returns a clone of the inner result data.
+    fn inner(&self) -> PyResultData {
+        match self {
+            ResultData::Qvm(data) => PyResultData::Qvm(data.clone()),
+            ResultData::Qpu(data) => PyResultData::Qpu(data.clone()),
+        }
+    }
 }
 
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionData {
-    /// Python constructor for `ExecutionData`.
+    /// Create `ExecutionData` from `ResultData` and an optional `duration`.
     #[new]
     #[pyo3(signature = (result_data, duration=None))]
     fn __new__(
@@ -87,16 +98,18 @@ impl ExecutionData {
     }
 }
 
-/// A 2 dimensional matrix of register values.
+/// A 2-dimensional matrix of register values.
+///
+/// Each variant corresponds to the possible data types a register can contain.
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[pyclass(name = "RegisterMatrix", module = "qcs_sdk")]
 pub(crate) enum PyRegisterMatrix {
-    /// Integer register
+    /// Integer register.
     Integer(Py<PyArray2<i64>>),
-    /// Real numbered register
+    /// Real numbered register.
     Real(Py<PyArray2<f64>>),
-    /// Complex numbered register
+    /// Complex numbered register.
     Complex(Py<PyArray2<Complex64>>),
 }
 
@@ -137,6 +150,7 @@ impl PyRegisterMatrix {
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl PyRegisterMatrix {
+    /// Get the `RegisterMatrix` as Numpy ``ndarray``.
     fn to_ndarray(&self, py: Python<'_>) -> Py<PyAny> {
         match self {
             PyRegisterMatrix::Integer(m) => m.clone_ref(py).into_any(),
@@ -149,6 +163,9 @@ impl PyRegisterMatrix {
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMap {
+    /// Get the `RegisterMatrix` for the given register.
+    ///
+    /// Returns `None` if the register doesn't exist.
     #[pyo3(name = "get_register_matrix")]
     fn py_get_register_matrix(
         &self,

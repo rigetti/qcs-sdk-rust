@@ -109,7 +109,7 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 }
 
 /// Encapsulates data returned after running a program on the QVM
-#[allow(clippy::module_name_repetitions)]
+#[expect(clippy::module_name_repetitions, clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
@@ -141,9 +141,9 @@ impl QvmResultData {
     }
 }
 
-/// Run a Quil program on the QVM. The given parameters are used to parameterize the value of
-/// memory locations across shots.
-#[allow(clippy::too_many_arguments)]
+/// Run a Quil program on the QVM.
+///
+/// The given parameters are used to parameterize the value of memory locations across shots.
 pub async fn run<C: Client + Send + Sync + ?Sized>(
     quil: &str,
     shots: NonZeroU16,
@@ -174,7 +174,6 @@ pub async fn run<C: Client + Send + Sync + ?Sized>(
 
 /// Run a [`Program`] on the QVM. The given parameters are used to parametrize the value of
 /// memory locations across shots.
-#[allow(clippy::too_many_arguments)]
 pub async fn run_program<C: Client + ?Sized>(
     program: &Program,
     shots: NonZeroU16,
@@ -287,30 +286,49 @@ impl Default for QvmOptions {
 }
 
 /// All of the errors that can occur when running a Quil program on QVM.
-#[allow(missing_docs)]
+#[expect(clippy::large_enum_variant)]
 #[derive(Debug, thiserror::Error)]
 pub enum Error {
+    /// Returned when there is an error parsing the Quil program.
     #[error("Error parsing Quil program: {0}")]
     Parsing(#[from] ProgramError),
+    /// Returned when there is an error converting the Quil program to valid Quil.
     #[error("Error converting program to valid Quil: {0}")]
     ToQuil(#[from] ToQuilError),
+    /// Returned when the number of shots is not a positive integer.
     #[error("Shots must be a positive integer.")]
     ShotsMustBePositive,
+    /// Returned when the size of the parameters does not match the size of the declared region.
     #[error("Declared region {name} has size {declared} but parameters have size {parameters}.")]
     RegionSizeMismatch {
+        /// The name of the region.
         name: String,
+        /// The size of the declared region.
         declared: u64,
+        /// The size of the parameters.
         parameters: usize,
     },
+    /// Returned when the region could not be found in the program.
     #[error("Could not find region {name} for parameter. Are you missing a DECLARE instruction?")]
-    RegionNotFound { name: Box<str> },
+    RegionNotFound {
+        /// The name of the region.
+        name: Box<str>,
+    },
+    /// An error communicating with the QVM.
     #[error("Could not communicate with QVM at {qvm_url}")]
     QvmCommunication {
+        /// The URL of the QVM that we tried to communicate with.
         qvm_url: String,
+        /// The error that occurred when trying to communicate with the QVM.
         source: reqwest::Error,
     },
+    /// Returned when the QVM returns an error.
     #[error("QVM reported a problem running your program: {message}")]
-    Qvm { message: String },
+    Qvm {
+        /// The error message from the QVM.
+        message: String,
+    },
+    /// Returned when the client fails to make the request.
     #[error("The client failed to make the request: {0}")]
     Client(#[from] reqwest::Error),
 }

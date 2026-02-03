@@ -186,22 +186,26 @@ impl ChooseRandomRealSubRegions {
                 "destination".to_string(),
                 true,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ).expect("`destination` should be a valid identifier"),
+            )
+            .expect("`destination` should be a valid identifier"),
             ExternParameter::try_new(
                 "source".to_string(),
                 false,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ).expect("`source` should be a valid identifier"),
+            )
+            .expect("`source` should be a valid identifier"),
             ExternParameter::try_new(
                 "sub_region_size".to_string(),
                 false,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ).expect("`sub_region_size` should be a valid identifier"),
+            )
+            .expect("`sub_region_size` should be a valid identifier"),
             ExternParameter::try_new(
                 "seed".to_string(),
                 true,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ).expect("`seed` should be a valid identifier"),
+            )
+            .expect("`seed` should be a valid identifier"),
         ];
 
         ExternSignature::new(None, parameters)

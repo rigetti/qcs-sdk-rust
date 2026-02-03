@@ -21,6 +21,11 @@ from . import qvm
 __version__: typing.Final = '0.25.16'
 @typing.final
 class ExeParameter:
+    r"""
+    Program execution parameters.
+    
+    Note: The validity of parameters is not checked until execution.
+    """
     @property
     def index(self) -> builtins.int: ...
     @index.setter
@@ -97,14 +102,70 @@ class Executable:
     ```
     """
     def __new__(cls, quil: builtins.str, /, registers: typing.Sequence[builtins.str] = [], parameters: typing.Sequence[ExeParameter] = [], shots: typing.Optional[builtins.int] = None, quilc_client: typing.Optional[QuilcClient] = None, compiler_options: typing.Optional[CompilerOpts] = None) -> Executable: ...
-    def execute_on_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionData: ...
-    def execute_on_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]: ...
-    def execute_on_qvm(self, client: QVMClient) -> ExecutionData: ...
-    def execute_on_qvm_async(self, client: QVMClient) -> collections.abc.Awaitable[ExecutionData]: ...
-    def retrieve_results(self, job_handle: JobHandle) -> ExecutionData: ...
-    def retrieve_results_async(self, job_handle: JobHandle) -> collections.abc.Awaitable[ExecutionData]: ...
-    def submit_to_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> JobHandle: ...
-    def submit_to_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]: ...
+    def execute_on_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> ExecutionData:
+        r"""
+        Compile the program and execute it on a QPU, waiting for results.
+        
+        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+            If `None`, the default endpoint for the given quantum_processor_id is used.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def execute_on_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]:
+        r"""
+        Compile the program and execute it on a QPU, waiting for results
+        (async analog of `Executable.execute_on_qpu`).
+        
+        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+            If `None`, the default endpoint for the given quantum_processor_id is used.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def execute_on_qvm(self, client: QVMClient) -> ExecutionData:
+        r"""
+        Execute on a QVM which is accessible via the provided client.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def execute_on_qvm_async(self, client: QVMClient) -> collections.abc.Awaitable[ExecutionData]:
+        r"""
+        Execute on a QVM which is accessible via the provided client
+        (async analog of ``Executable.execute_on_qvm``).
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
+        r"""
+        Wait for the results of a job to complete.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def retrieve_results_async(self, job_handle: JobHandle) -> collections.abc.Awaitable[ExecutionData]:
+        r"""
+        Wait for the results of a job to complete
+        (async analog of `Executable.retrieve_results`).
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def submit_to_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> JobHandle:
+        r"""
+        Compile the program and execute it on a QPU, without waiting for results.
+        
+        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+            If `None`, the default endpoint for the given quantum_processor_id is used.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
+    def submit_to_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[TranslationOptions] = None, execution_options: typing.Optional[ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]:
+        r"""
+        Compile the program and execute it on a QPU, without waiting for results
+        (async analog of `Executable.submit_to_qpu`).
+        
+        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
+            If `None`, the default endpoint for the given quantum_processor_id is used.
+        
+        :raises `ExecutionError`: If the job fails to execute.
+        """
 
 @typing.final
 class ExecutionData:
@@ -128,7 +189,7 @@ class ExecutionData:
     def __getnewargs__(self) -> tuple[ResultData, typing.Optional[datetime.timedelta]]: ...
     def __new__(cls, result_data: ResultData, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
         r"""
-        Python constructor for `ExecutionData`.
+        Create `ExecutionData` from `ResultData` and an optional `duration`.
         """
 
 class ExecutionError(QcsSdkError):
@@ -186,10 +247,10 @@ class RegisterData:
     have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
     convert any variant type to its inner data.
     """
-    def __new__(cls, values: typing.Any) -> RegisterData: ...
-    def as_ndarray(self) -> typing.Any:
+    def __new__(cls, inner: typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.float]] | typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData: ...
+    def as_ndarray(self) -> numpy.ndarray:
         r"""
-        Returns the values as a 2D numpy ndarray.
+        Return the inner values as a 2D Numpy ``ndarray``.
         """
     @typing.final
     class Complex32(RegisterData):
@@ -251,7 +312,12 @@ class RegisterMap:
     def __iter__(self) -> RegisterMapKeysIter: ...
     def __len__(self) -> builtins.int: ...
     def get(self, key: builtins.str, default: typing.Optional[RegisterMatrix] = None) -> typing.Optional[RegisterMatrix]: ...
-    def get_register_matrix(self, register_name: builtins.str) -> typing.Optional[RegisterMatrix]: ...
+    def get_register_matrix(self, register_name: builtins.str) -> typing.Optional[RegisterMatrix]:
+        r"""
+        Get the `RegisterMatrix` for the given register.
+        
+        Returns `None` if the register doesn't exist.
+        """
     def items(self) -> RegisterMapItemsIter: ...
     def keys(self) -> RegisterMapKeysIter: ...
     def values(self) -> RegisterMapValuesIter: ...
@@ -273,13 +339,18 @@ class RegisterMapValuesIter:
 
 class RegisterMatrix:
     r"""
-    A 2 dimensional matrix of register values.
+    A 2-dimensional matrix of register values.
+    
+    Each variant corresponds to the possible data types a register can contain.
     """
-    def to_ndarray(self) -> typing.Any: ...
+    def to_ndarray(self) -> typing.Any:
+        r"""
+        Get the `RegisterMatrix` as Numpy ``ndarray``.
+        """
     @typing.final
     class Complex(RegisterMatrix):
         r"""
-        Complex numbered register
+        Complex numbered register.
         """
         __match_args__ = ("_0",)
         @property
@@ -291,7 +362,7 @@ class RegisterMatrix:
     @typing.final
     class Integer(RegisterMatrix):
         r"""
-        Integer register
+        Integer register.
         """
         __match_args__ = ("_0",)
         @property
@@ -303,7 +374,7 @@ class RegisterMatrix:
     @typing.final
     class Real(RegisterMatrix):
         r"""
-        Real numbered register
+        Real numbered register.
         """
         __match_args__ = ("_0",)
         @property
@@ -353,15 +424,24 @@ class ResultData:
     [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
     program to choose the correct readout values for each shot.
     """
-    def __new__(cls, inner: QVMResultData | QPUResultData) -> ResultData: ...
+    def __new__(cls, inner: QVMResultData | QPUResultData) -> ResultData:
+        r"""
+        Create a new `ResultData` from either QVM or QPU result data.
+        """
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
         [`Debug`](std::fmt::Debug) implementation.
         """
+    def inner(self) -> QVMResultData | QPUResultData:
+        r"""
+        Returns a clone of the inner result data.
+        """
     def to_raw_readout_data(self) -> dict[str, list] | RawQPUReadoutData:
         r"""
         Get the raw readout data from either QPU or QVM result.
+        
+        See `RawQPUReadoutData` and `RawQVMReadoutData` for more information.
         """
     def to_register_map(self) -> RegisterMap:
         r"""
@@ -444,5 +524,11 @@ class Service(enum.Enum):
 
 def _gather_diagnostics() -> builtins.str: ...
 
-def reset_logging() -> None: ...
+def reset_logging() -> None:
+    r"""
+    Reset all caches for logging configuration within this library,
+    allowing the most recent Python-side changes to be applied.
+    
+    See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
+    """
 

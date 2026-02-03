@@ -10,11 +10,20 @@ from . import api
 
 @typing.final
 class QVMClient:
+    r"""
+    Client used to communicate with QVM.
+    """
     @property
-    def qvm_url(self) -> builtins.str: ...
+    def qvm_url(self) -> builtins.str:
+        r"""
+        Return the address of the client.
+        """
     def __new__(cls) -> QVMClient: ...
     @staticmethod
-    def new_http(endpoint: builtins.str) -> QVMClient: ...
+    def new_http(endpoint: builtins.str) -> QVMClient:
+        r"""
+        Construct a new QVM client which uses HTTP to communicate with a QVM service.
+        """
     @staticmethod
     def new_libquil() -> QVMClient: ...
 
@@ -30,9 +39,15 @@ class QVMOptions:
     Options avaialable for running programs on the QVM.
     """
     @property
-    def timeout(self) -> typing.Optional[builtins.float]: ...
+    def timeout(self) -> typing.Optional[builtins.float]:
+        r"""
+        The timeout used for requests to the QVM. If set to None, there is no timeout.
+        """
     @timeout.setter
-    def timeout(self, value: typing.Optional[builtins.float]) -> None: ...
+    def timeout(self, value: typing.Optional[builtins.float]) -> None:
+        r"""
+        The timeout used for requests to the QVM. If set to None, there is no timeout.
+        """
     def __new__(cls, timeout_seconds: typing.Optional[builtins.float] = None) -> QVMOptions: ...
     def __repr__(self) -> builtins.str:
         r"""
@@ -40,7 +55,13 @@ class QVMOptions:
         [`Debug`](std::fmt::Debug) implementation.
         """
     @staticmethod
-    def default() -> QVMOptions: ...
+    def default() -> QVMOptions:
+        r"""
+        Get the default set of ``QVMOptions`` used for QVM requests.
+        
+        Settings:
+            timeout: 30.0 seconds
+        """
 
 @typing.final
 class QVMResultData:
@@ -54,7 +75,7 @@ class QVMResultData:
         """
     def __new__(cls, memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
         r"""
-        Construct a new `QVMResultData` from a memory map.
+        Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.
         """
     @staticmethod
     def from_memory_map(memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
@@ -63,13 +84,20 @@ class QVMResultData:
         """
     def to_raw_readout_data(self) -> RawQVMReadoutData:
         r"""
-        Get the raw readout data as a flattened structure.
+        Get a copy of this result data flattened into a ``RawQVMReadoutData``.
         """
 
 @typing.final
 class RawQVMReadoutData:
+    r"""
+    Encapsulates raw data returned from the QVM after executing a program.
+    """
     @property
-    def memory(self) -> builtins.dict[builtins.str, list]: ...
+    def memory(self) -> builtins.dict[builtins.str, list]:
+        r"""
+        The mapping of register names (ie. "ro") to a 2-d list containing the
+        values for that register.
+        """
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust

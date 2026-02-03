@@ -150,9 +150,9 @@ impl PyInstructionSetArchitecture {
     ///
     /// If `pretty` is true, the json output should be pretty-printed with newlines and indents.
     ///
-    /// # Errors 
+    /// # Errors
     ///
-    /// Returns [`SerializeIsaError`] if the ISA could not be serialized. 
+    /// Returns [`SerializeIsaError`] if the ISA could not be serialized.
     #[pyo3(signature = (pretty = false))]
     pub(crate) fn json(&self, pretty: bool) -> Result<String, SerializeIsaError> {
         let data = {
@@ -197,7 +197,7 @@ impl PyInstructionSetArchitecture {
             .map(PyOperation)
             .collect()
     }
-    
+
     #[setter]
     fn set_instructions(&mut self, instructions: Vec<PyOperation>) {
         self.0.instructions = instructions.into_iter().map(|op| op.0).collect();

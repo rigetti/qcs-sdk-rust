@@ -100,7 +100,12 @@ mod stubs {
         }
     }
 
-    pyo3_stub_gen::module_variable!("qcs_sdk", "__version__", Final<&str>, Final(env!("CARGO_PKG_VERSION")));
+    pyo3_stub_gen::module_variable!(
+        "qcs_sdk",
+        "__version__",
+        Final<&str>,
+        Final(env!("CARGO_PKG_VERSION"))
+    );
 }
 
 #[cfg(feature = "stubs")]
@@ -108,6 +113,10 @@ define_stub_info_gatherer!(stub_info);
 
 #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk"))]
 #[pyfunction]
+/// Reset all caches for logging configuration within this library,
+/// allowing the most recent Python-side changes to be applied.
+///
+/// See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
 fn reset_logging() {
     if let Some(handle) = PY_RESET_LOGGING_HANDLE.get() {
         handle.reset();
