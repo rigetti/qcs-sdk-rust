@@ -10,7 +10,7 @@ higher-level interface for building and executing Quil programs. This package is
 
 # Documentation
 
-Documentation for the current release of `qcs_sdk` is published [here](https://rigetti.github.io/qcs-sdk-rust/qcs_sdk.html). Every version of `qcs_sdk` ships [with type stubs](https://github.com/rigetti/qcs-sdk-rust/tree/main/crates/python/qcs_sdk) that can provide type hints and documentation to Python tooling and editors.
+Documentation for the current release of `qcs_sdk` is published [here](https://rigetti.github.io/qcs-sdk-rust/qcs_sdk.html). Every version of `qcs_sdk` ships [with type stubs](https://github.com/rigetti/qcs-sdk-rust/tree/main/crates/lib/python/qcs_sdk) that can provide type hints and documentation to Python tooling and editors.
 
 ## Troubleshooting
 
