@@ -10,6 +10,7 @@ use rigetti_pyo3::{create_init_submodule, py_sync, sync::Awaitable};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::gen_stub_pymethods;
+use tokio_util::sync::CancellationToken;
 
 use crate::client::Qcs;
 use crate::python::errors;
@@ -121,6 +122,60 @@ impl Qcs {
         }
     }
 
+    /// Create a `QCSClient` configuration using an environment-based configuration.
+    ///
+    /// If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+    /// Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+    /// so you should not use this in environments where that is not possible,
+    /// such as hosted `JupyterLab` sessions.
+    ///
+    /// :param `profile_name`: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+    ///
+    /// :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
+    ///
+    /// See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+    /// for more details.
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login(py: Python<'_>, profile_name: Option<String>) -> PyResult<Self> {
+        do_until_ctrl_c(move |cancel_token| {
+            py_sync!(py, async move {
+                Qcs::with_login(cancel_token, profile_name)
+                    .await
+                    .map_err(errors::ClientError::load_error)
+            })
+        })
+    }
+
+    /// Create a `QCSClient` configuration using an environment-based configuration.
+    ///
+    /// If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+    /// Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+    /// so you should not use this in environments where that is not possible,
+    /// such as hosted `JupyterLab` sessions.
+    ///
+    /// :param `profile_name`: The QCS setting's profile name to use. If ``None``, the default value configured in your environment is used.
+    ///
+    /// :raises `LoadClientError`: If there is an issue loading the profile details from the environment or if the PKCE login flow fails.
+    ///
+    /// See the [QCS documentation](https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files)
+    /// for more details.
+    #[staticmethod]
+    #[pyo3(signature = (/, profile_name = None))]
+    fn load_with_login_async(
+        py: Python<'_>,
+        profile_name: Option<String>,
+    ) -> PyResult<Awaitable<'_, Self>> {
+        do_until_ctrl_c(move |cancel_token| {
+            pyo3_async_runtimes::tokio::future_into_py(py, async move {
+                Qcs::with_login(cancel_token, profile_name)
+                    .await
+                    .map_err(errors::ClientError::load_error)
+            })
+            .map(Into::into)
+        })
+    }
+
     /// URL to access the QCS API.
     #[getter]
     fn api_url(&self) -> String {
@@ -174,4 +229,18 @@ impl PartialEq for Qcs {
     fn eq(&self, other: &Self) -> bool {
         format!("{self:?}") == format!("{other:?}")
     }
+}
+
+/// Run the given function with a [`CancellationToken`] that is cancelled when `Ctrl+C` is pressed.
+fn do_until_ctrl_c<T>(f: impl FnOnce(CancellationToken) -> T) -> T {
+    let cancel_token = CancellationToken::new();
+    let cancel_token_ctrl_c = cancel_token.clone();
+    tokio::spawn(cancel_token.clone().run_until_cancelled_owned(async move {
+        drop(tokio::signal::ctrl_c().await);
+        cancel_token_ctrl_c.cancel();
+    }));
+
+    let value = f(cancel_token.clone());
+    cancel_token.cancel();
+    value
 }

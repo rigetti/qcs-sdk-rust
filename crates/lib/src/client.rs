@@ -19,6 +19,7 @@ use qcs_api_client_grpc::{
     },
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
+use tokio_util::sync::CancellationToken;
 #[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
 use tonic::transport::Channel;
 use tonic::Status;
@@ -30,8 +31,8 @@ pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::gen_stub_pyclass;
 
-const DEFAULT_MAX_MESSAGE_ENCODING_SIZE: usize = 50 * 1024 * 1024;
-const DEFAULT_MAX_MESSAGE_DECODING_SIZE: usize = 50 * 1024 * 1024;
+/// The maximum size of a gRPC request to the translation service, in bytes.
+const MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE: usize = 50 * 1024 * 1024;
 
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
@@ -104,6 +105,27 @@ impl Qcs {
         ClientConfiguration::load_profile(profile).map(Self::with_config)
     }
 
+    /// Create a [`Qcs`] and initialized with the given optional `profile`.
+    /// If credentials are not found or stale, a PKCE login redirect flow
+    /// will be initialized. Note that this opens up a TCP port on your
+    /// system to accept a browser HTTP redirect, so you should not use
+    /// this in environments where that is not possible, such as hosted
+    /// JupyterLab sessions.
+    ///
+    /// # Errors
+    ///
+    /// A [`LoadError`] will be returned if QCS credentials are
+    /// not correctly configured or the given profile is not defined
+    /// or the PKCE login flow failed.
+    pub async fn with_login(
+        cancel_token: CancellationToken,
+        profile: Option<String>,
+    ) -> Result<Qcs, LoadError> {
+        ClientConfiguration::load_with_login(cancel_token, profile)
+            .await
+            .map(Self::with_config)
+    }
+
     /// Return a reference to the underlying [`ClientConfiguration`] with all settings parsed and resolved from configuration sources.
     #[must_use]
     pub fn get_config(&self) -> &ClientConfiguration {
@@ -147,8 +169,10 @@ impl Qcs {
         #[cfg(feature = "grpc-web")]
         let channel = wrap_channel_with_grpc_web(service);
         Ok(TranslationClient::new(channel)
-            .max_encoding_message_size(DEFAULT_MAX_MESSAGE_ENCODING_SIZE)
-            .max_decoding_message_size(DEFAULT_MAX_MESSAGE_DECODING_SIZE))
+            .max_encoding_message_size(MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE)
+            // do not limit the received response size, although practically the limit is 4Gb due
+            // to the frame_length of the message being a u32.
+            .max_decoding_message_size(u32::MAX as usize))
     }
 }
 

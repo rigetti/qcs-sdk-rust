@@ -1,3 +1,29 @@
+## 0.25.18-rc.0 (2025-12-31)
+
+### Fixes
+
+- update qcs-api-client dependencies to 0.12.12, (0.13.13 grpc) (#570)
+
+## 0.25.17 (2025-12-03)
+
+### Fixes
+
+- increase gRPC max response size to 4GB (#568)
+- temporarily ignore stubtest errors, anticipating #566 (#569)
+
+## 0.25.17-rc.1 (2025-12-03)
+
+### Fixes
+
+- increase gRPC max response size to 4GB (#568)
+- temporarily ignore stubtest errors, anticipating #566 (#569)
+
+## 0.25.17-rc.0 (2025-12-03)
+
+### Fixes
+
+- increase gRPC max response size to 4GB (#568)
+
 ## 0.25.16 (2025-10-31)
 
 ### Fixes
