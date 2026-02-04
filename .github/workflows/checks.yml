@@ -5,16 +5,18 @@ on:
       - main
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   checks:
     name: Run Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
+      - uses: actions/checkout@v5
+      - uses: Swatinem/rust-cache@v2
+
       - name: Install protoc
         uses: arduino/setup-protoc@v1
         with:
@@ -30,7 +32,6 @@ jobs:
       - name: Install libquil
         run: |
           curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0
-      - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
         uses: actions-rs/cargo@v1
         with:
@@ -40,8 +41,12 @@ jobs:
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
-      - name: Run Rust CI
-        uses: actions-rs/cargo@v1
+
+      - uses: taiki-e/install-action@cargo-hack
+      - uses: taiki-e/install-action@cargo-deny
+      - uses: taiki-e/install-action@cargo-make
+
+      - name: Run CI Flow
         env:
           CARGO_MAKE_RUN_CHECK_FORMAT: true
           CARGO_MAKE_RUN_CLIPPY: true
@@ -49,8 +54,4 @@ jobs:
         with:
           command: make
           args: --cwd crates/lib --makefile Makefile.toml ci-flow
-      - name: Run Python CI
-        uses: actions-rs/cargo@v1
-        with:
-          command: make
-          args: --cwd crates/python --makefile Makefile.toml ci-flow
+
