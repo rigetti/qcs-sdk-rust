@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
     - uses: actions/checkout@v4
@@ -56,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -79,7 +79,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -102,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -125,7 +125,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -147,7 +147,7 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - name: Enable long path support
       run: |
@@ -176,7 +176,7 @@ jobs:
       fail-fast: false
       matrix:
         package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
     - name: Install protoc
@@ -221,4 +221,4 @@ jobs:
       with:
         command: upload
         args: --skip-existing wheels/*
-        maturin-version: v1.8.2 # coordinate this with crates/python/pyproject.toml
+        maturin-version: v1.9.4 # coordinate this with crates/python/pyproject.toml
