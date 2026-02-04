@@ -78,7 +78,7 @@ num = { version = "0.4.0", features = ["serde"] }
 opentelemetry = { workspace = true }
 opentelemetry_sdk = { workspace = true }
 optipy.workspace = true
-pbjson-types = "0.9.0"
+pbjson-types = "0.7.0"
 qcs-api-client-common.workspace = true
 qcs-api-client-grpc.workspace = true
 qcs-api-client-openapi.workspace = true
@@ -91,7 +91,7 @@ thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 tokio-util = { workspace = true }
 toml = "0.9.8"
-tonic = { version = "0.14.2", features = ["tls-aws-lc", "tls-native-roots"] }
+tonic = { version = "0.13.1", features = ["tls-aws-lc", "tls-native-roots"] }
 uuid = { version = "1.10.0", features = ["v4"] }
 zmq = { version = "0.10.0" }
 
@@ -105,7 +105,7 @@ tracing = { workspace = true, optional = true, features = ["log"] }
 futures-util = { version = "0.3.30", optional = true }
 numpy = { workspace = true, optional = true }
 paste = { version = "1.0.15", optional = true }
-prost = { version = "0.14.1", optional = true }
+prost = { version = "0.13.3", optional = true }
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { workspace = true, optional = true }
 pyo3-log = { workspace = true, optional = true }

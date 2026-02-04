@@ -24,17 +24,17 @@ tracing-subscriber = { version = "0.3.19" }
 # and need to be updated together.
 ndarray = { version = "0.17.2", features = ["serde"] }
 numpy = "0.27.1"
-opentelemetry = { version = "0.31.0" }
-opentelemetry_sdk = { version = "0.31.0" }
+opentelemetry = { version = "0.30.0" }
+opentelemetry_sdk = { version = "0.30.0" }
 pyo3 = { version = "0.27.2", features = ["num-complex", "multiple-pymethods"] }
 pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runtime"] }
 pyo3-build-config = "0.27.2"
 pyo3-log = { version = "0.13.2" }
+pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
 
 # TODO: Update refs once PRs are merged.
 optipy = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
 pyo3-opentelemetry = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head" }
-pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
 pyo3-tracing-subscriber = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
 qcs-api-client-common = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
 qcs-api-client-grpc = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }

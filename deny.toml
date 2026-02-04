@@ -67,7 +67,7 @@ ignore = [
     { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
     { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
-    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update"}
+    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update" },
     # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
     # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
     # We'll ignore it for now, since `pyo3-stub-gen` is effectively a build-time dependency anyway.
@@ -183,12 +183,10 @@ deny = [
     # because a dependency depends on one of these crates that do not affect the
     # APIs used in this workspace, then we can disable the deny check if, otherwise,
     # there's no trivial solution.
-    #
-    # TODO: reqwest-tracing has older tracing versions; determine if it really is an issue.
     { crate = "opentelemetry", deny-multiple-versions = true },
     { crate = "opentelemetry_sdk", deny-multiple-versions = true },
     { crate = "tonic", deny-multiple-versions = true },
-    # { crate = "tower", deny-multiple-versions = true },
+    { crate = "tower", deny-multiple-versions = true },
     { crate = "tracing", deny-multiple-versions = true },
     { crate = "tracing-opentelemetry", deny-multiple-versions = true },
     { crate = "tracing-subscriber", deny-multiple-versions = true },
@@ -211,7 +209,6 @@ skip-tree = [
     { crate = "hermit-abi", depth = 20 },       # Only used for development
     { crate = "itertools", depth = 20 },        # `quil-rs` and various transitive dependencies depend on different versions
     { crate = "hashbrown", depth = 20 },        # `indexmap` and `cached` depend on different versions
-    { crate = "reqwest-tracing", depth = 20 },  # Uses a different version of tracing-opentelemetry
 ]
 
 [[bans.features]]
