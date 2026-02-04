@@ -183,7 +183,7 @@ class InstructionSetArchitecture:
         
         If `pretty` is true, the json output should be pretty-printed with newlines and indents.
         
-        # Errors 
+        # Errors
         
         Returns [`SerializeIsaError`] if the ISA could not be serialized.
         """

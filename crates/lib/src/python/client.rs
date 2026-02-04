@@ -1,4 +1,9 @@
-use qcs_api_client_common::configuration::{tokens::OAuthSession, ClientConfigurationBuilder};
+use qcs_api_client_common::configuration::{
+    secrets::SecretRefreshToken,
+    settings::AuthServer,
+    tokens::{ClientCredentials, ExternallyManaged, OAuthSession, RefreshToken},
+    ClientConfigurationBuilder,
+};
 
 use pyo3::prelude::*;
 use rigetti_pyo3::{create_init_submodule, py_sync, sync::Awaitable};
@@ -11,7 +16,15 @@ use crate::python::errors;
 
 #[cfg(not(feature = "libquil"))]
 create_init_submodule! {
-    classes: [ Qcs ],
+    classes: [
+        Qcs,
+        OAuthSession,
+        AuthServer,
+        RefreshToken,
+        SecretRefreshToken,
+        ClientCredentials,
+        ExternallyManaged
+    ],
     errors: [
         errors::BuildClientError,
         errors::ClientError,
@@ -26,7 +39,15 @@ create_init_submodule! {
 
 #[cfg(feature = "libquil")]
 create_init_submodule! {
-    classes: [ Qcs ],
+    classes: [
+        Qcs,
+        OAuthSession,
+        AuthServer,
+        RefreshToken,
+        SecretRefreshToken,
+        ClientCredentials,
+        ExternallyManaged
+    ],
     errors: [
         errors::BuildClientError,
         errors::ClientError,

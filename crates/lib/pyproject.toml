@@ -22,10 +22,13 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 
-dependencies = ["quil>=0.33.0-rc.4", "qcs-api-client-common>=0.11.8"]
+dependencies = [
+    "quil @ git+https://github.com/rigetti/quil-rs.git@490-feat-update-pyo3#subdirectory=quil-rs",
+    "qcs-api-client-common @ git+https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git@125-feat-update-pyo3#subdirectory=qcs-api-client-common",
+]
 
 [tool.maturin]
-features = ["python"]
+features = ["python", "pyo3/extension-module"]
 bindings = "pyo3"
 include = ["README-py.md", "THIRDPARTY.yaml"]
 python-source = "python"
@@ -34,9 +37,6 @@ sdist-include = ["README-py.md", "THIRDPARTY.yaml"]
 compatibility = "linux"
 
 [project.optional-dependencies]
-pyquil = [
-    "pyquil==5.0.0-rc.2",
-]
 dev = [
     "black >= 24.8.0",
     "opentelemetry-sdk==1.25.0",

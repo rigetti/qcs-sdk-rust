@@ -242,6 +242,10 @@ impl QvmResultData {
         QvmResultData::from_memory_map(memory)
     }
 
+    fn __getnewargs__(&self) -> (HashMap<String, RegisterData>,) {
+        (self.memory().clone(),)
+    }
+
     #[expect(clippy::missing_errors_doc)]
     /// Get a copy of this result data flattened into a ``RawQVMReadoutData``.
     pub fn to_raw_readout_data(&self, py: Python<'_>) -> PyResult<RawQvmReadoutData> {

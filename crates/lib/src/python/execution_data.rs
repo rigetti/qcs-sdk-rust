@@ -7,15 +7,15 @@ use pyo3::{
     intern,
     prelude::*,
     types::{PyDelta, PyList},
-    Bound, IntoPyObjectExt, Py, PyAny, PyRef, PyRefMut, PyResult, Python,
+    Py, PyAny, PyRef, PyRefMut, PyResult, Python,
 };
 use rigetti_pyo3::impl_repr;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
-use crate::qpu::QpuResultData;
 use crate::qvm::QvmResultData;
+use crate::{qpu::QpuResultData, qvm::python::RawQvmReadoutData};
 use crate::{
     qpu::{result_data::MemoryValues, ReadoutValues},
     ExecutionData, RegisterMap, RegisterMatrix, ResultData,
@@ -33,6 +33,15 @@ enum PyResultData {
 #[cfg(feature = "stubs")]
 pyo3_stub_gen::impl_stub_type!(PyResultData = QvmResultData | QpuResultData);
 
+#[derive(IntoPyObject)]
+enum PyRawReadoutData {
+    Qvm(RawQvmReadoutData),
+    Qpu(RawQpuReadoutData),
+}
+
+#[cfg(feature = "stubs")]
+pyo3_stub_gen::impl_stub_type!(PyRawReadoutData = RawQvmReadoutData | RawQpuReadoutData);
+
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
@@ -46,14 +55,17 @@ impl ResultData {
         }
     }
 
+    fn __getnewargs__(&self) -> (PyResultData,) {
+        (self.inner(),)
+    }
+
     /// Get the raw readout data from either QPU or QVM result.
     ///
     /// See `RawQPUReadoutData` and `RawQVMReadoutData` for more information.
-    #[gen_stub(override_return_type(type_repr = "dict[str, list] | RawQPUReadoutData"))]
-    fn to_raw_readout_data<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+    fn to_raw_readout_data(&self, py: Python<'_>) -> PyResult<PyRawReadoutData> {
         match self {
-            ResultData::Qpu(data) => data.to_raw_readout_data(py)?.into_bound_py_any(py),
-            ResultData::Qvm(data) => data.to_raw_readout_data(py)?.into_bound_py_any(py),
+            ResultData::Qvm(data) => Ok(PyRawReadoutData::Qvm(data.to_raw_readout_data(py)?)),
+            ResultData::Qpu(data) => Ok(PyRawReadoutData::Qpu(data.to_raw_readout_data(py)?)),
         }
     }
 
@@ -239,6 +251,7 @@ pub(crate) struct RegisterMapItemsIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapItemsIter {
@@ -246,6 +259,7 @@ impl RegisterMapItemsIter {
         slf
     }
 
+    #[gen_stub(override_return_type(type_repr = "tuple[builtins.str, RegisterMatrix]"))]
     fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<(String, PyRegisterMatrix)> {
         slf.inner.next().map(|(register, matrix)| {
             (
@@ -262,6 +276,7 @@ pub(crate) struct RegisterMapKeysIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapKeysIter {
@@ -269,6 +284,7 @@ impl RegisterMapKeysIter {
         slf
     }
 
+    #[gen_stub(override_return_type(type_repr = "builtins.str"))]
     fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<String> {
         slf.inner.next().map(|(key, _)| key)
     }
@@ -280,6 +296,7 @@ pub(crate) struct RegisterMapValuesIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl RegisterMapValuesIter {
@@ -287,6 +304,7 @@ impl RegisterMapValuesIter {
         slf
     }
 
+    #[gen_stub(override_return_type(type_repr = "RegisterMatrix"))]
     fn __next__(mut slf: PyRefMut<'_, Self>) -> Option<PyRegisterMatrix> {
         slf.inner
             .next()
@@ -305,6 +323,20 @@ impl QpuResultData {
         memory_values: HashMap<String, MemoryValues>,
     ) -> Self {
         QpuResultData::from_mappings_and_values(mappings, readout_values, memory_values)
+    }
+
+    fn __getnewargs__(
+        &self,
+    ) -> (
+        HashMap<String, String>,
+        HashMap<String, ReadoutValues>,
+        HashMap<String, MemoryValues>,
+    ) {
+        (
+            self.mappings().clone(),
+            self.readout_values().clone(),
+            self.memory_values().clone(),
+        )
     }
 
     /// Get the raw readout data as a flattened structure.

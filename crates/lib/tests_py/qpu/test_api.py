@@ -6,9 +6,8 @@ from qcs_sdk.qpu.translation import (
     translate,
 )
 
-from qcs_sdk.qpu import ConnectionStrategy
-
 from qcs_sdk.qpu.api import (
+    ConnectionStrategy,
     ExecutionOptions,
     Register,
     retrieve_results,

@@ -169,7 +169,9 @@ impl ChooseRandomRealSubRegions {
     #[pyo3(name = "NAME")]
     /// The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
     pub const EXTERN_NAME: &str = "choose_random_real_sub_regions";
+}
 
+impl ChooseRandomRealSubRegions {
     #[expect(clippy::missing_panics_doc)]
     /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
     ///
@@ -179,7 +181,6 @@ impl ChooseRandomRealSubRegions {
     /// "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
     /// ```
     #[must_use]
-    #[staticmethod]
     pub fn build_signature() -> ExternSignature {
         let parameters = vec![
             ExternParameter::try_new(

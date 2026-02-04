@@ -29,7 +29,13 @@ qcs-api/docs
 **/null-ls-cache*
 crates/lib/.hypothesis
 crates/lib/python/qcs_sdk/*.so
-crates/lib/tests/__output__/
+crates/lib/tests_py/__output__/
+
+# Ignore extraneous generated stubs
+crates/lib/python/quil/
+crates/lib/python/qcs_api_client_common/
+crates/lib/python/contextmanager.pyi
+crates/lib/python/export_process.pyi
 
 # unversioned developer notes
 scratch/

@@ -14,6 +14,7 @@ enum PyRegisterData {
 #[cfg(feature = "stubs")]
 pyo3_stub_gen::impl_stub_type!(PyRegisterData = Vec<Vec<i8>> | Vec<Vec<f64>> | Vec<Vec<i16>> | Vec<Vec<Complex32>>);
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
 #[pymethods]
 impl RegisterData {
@@ -25,6 +26,10 @@ impl RegisterData {
             PyRegisterData::I16(matrix) => RegisterData::I16(matrix),
             PyRegisterData::Complex32(matrix) => RegisterData::Complex32(matrix),
         }
+    }
+
+    fn __getnewargs__(&self) -> (PyRegisterData,) {
+        (self.inner(),)
     }
 
     /// Return the inner values as a 2D Numpy ``ndarray``.
@@ -43,6 +48,15 @@ impl RegisterData {
             RegisterData::Complex32(matrix) => {
                 PyArray::from_vec2(py, matrix.as_slice())?.into_bound_py_any(py)
             }
+        }
+    }
+
+    fn inner(&self) -> PyRegisterData {
+        match self {
+            RegisterData::I8(matrix) => PyRegisterData::I8(matrix.clone()),
+            RegisterData::F64(matrix) => PyRegisterData::F64(matrix.clone()),
+            RegisterData::I16(matrix) => PyRegisterData::I16(matrix.clone()),
+            RegisterData::Complex32(matrix) => PyRegisterData::Complex32(matrix.clone()),
         }
     }
 }

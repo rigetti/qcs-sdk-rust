@@ -29,21 +29,47 @@ create_init_submodule! {
     ],
 }
 
+#[derive(FromPyObject, IntoPyObject)]
+enum PyReadoutValues {
+    Integer(Vec<i64>),
+    Real(Vec<f64>),
+    Complex(Vec<Complex64>),
+}
+
+#[derive(FromPyObject, IntoPyObject)]
+enum PyMemoryValues {
+    Binary(Vec<u8>),
+    Integer(Vec<i64>),
+    Real(Vec<f64>),
+}
+
+#[cfg(feature = "stubs")]
+pyo3_stub_gen::impl_stub_type!(PyReadoutValues = Vec<i64> | Vec<f64> | Vec<Complex64>);
+
+#[cfg(feature = "stubs")]
+pyo3_stub_gen::impl_stub_type!(PyMemoryValues = Vec<u8> | Vec<i64> | Vec<f64>);
+
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ReadoutValues {
     #[new]
-    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
-        if let Ok(values) = values.extract::<Vec<i64>>() {
-            Ok(Self::Integer(values))
-        } else if let Ok(values) = values.extract::<Vec<f64>>() {
-            Ok(Self::Real(values))
-        } else if let Ok(values) = values.extract::<Vec<Complex64>>() {
-            Ok(Self::Complex(values))
-        } else {
-            Err(pyo3::exceptions::PyTypeError::new_err(
-                "expected a list of integers, reals, or complex numbers",
-            ))
+    fn __new__(values: PyReadoutValues) -> Self {
+        match values {
+            PyReadoutValues::Integer(values) => Self::Integer(values),
+            PyReadoutValues::Real(values) => Self::Real(values),
+            PyReadoutValues::Complex(values) => Self::Complex(values),
+        }
+    }
+
+    fn __getnewargs__(&self) -> (PyReadoutValues,) {
+        (self.inner(),)
+    }
+
+    fn inner(&self) -> PyReadoutValues {
+        match self {
+            Self::Integer(values) => PyReadoutValues::Integer(values.clone()),
+            Self::Real(values) => PyReadoutValues::Real(values.clone()),
+            Self::Complex(values) => PyReadoutValues::Complex(values.clone()),
         }
     }
 }
@@ -52,17 +78,23 @@ impl ReadoutValues {
 #[pymethods]
 impl MemoryValues {
     #[new]
-    fn __new__(values: &Bound<'_, PyAny>) -> PyResult<Self> {
-        if let Ok(values) = values.extract::<Vec<u8>>() {
-            Ok(Self::Binary(values))
-        } else if let Ok(values) = values.extract::<Vec<i64>>() {
-            Ok(Self::Integer(values))
-        } else if let Ok(values) = values.extract::<Vec<f64>>() {
-            Ok(Self::Real(values))
-        } else {
-            Err(pyo3::exceptions::PyTypeError::new_err(
-                "expected a list of integers, reals, or complex numbers",
-            ))
+    fn __new__(values: PyMemoryValues) -> Self {
+        match values {
+            PyMemoryValues::Binary(values) => Self::Binary(values),
+            PyMemoryValues::Integer(values) => Self::Integer(values),
+            PyMemoryValues::Real(values) => Self::Real(values),
+        }
+    }
+
+    fn __getnewargs__(&self) -> (PyMemoryValues,) {
+        (self.inner(),)
+    }
+
+    fn inner(&self) -> PyMemoryValues {
+        match self {
+            Self::Binary(values) => PyMemoryValues::Binary(values.clone()),
+            Self::Integer(values) => PyMemoryValues::Integer(values.clone()),
+            Self::Real(values) => PyMemoryValues::Real(values.clone()),
         }
     }
 }

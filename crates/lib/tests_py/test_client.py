@@ -55,7 +55,7 @@ def test_client_broken_raises():
 
 def test_client_oauth_session_can_be_manually_defined():
     """Ensures that pyo3 usage is correct."""
-    auth_server = AuthServer("url", "issuer")
+    auth_server = AuthServer("url", "issuer", scopes=None)
     session = OAuthSession(RefreshToken("refresh"), auth_server, "access")
     assert session.payload.refresh_token.secret == "refresh"
     assert session.access_token.secret == "access"

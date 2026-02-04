@@ -9,10 +9,10 @@ import numpy
 import numpy.typing
 import typing
 from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
-from qcs_sdk.qpu import QPUResultData
+from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
-from qcs_sdk.qvm import QVMClient, QVMResultData
+from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
 from . import _qcs_sdk
 from . import client
 from . import qpu
@@ -325,17 +325,17 @@ class RegisterMap:
 @typing.final
 class RegisterMapItemsIter:
     def __iter__(self) -> RegisterMapItemsIter: ...
-    def __next__(self) -> typing.Optional[tuple[builtins.str, RegisterMatrix]]: ...
+    def __next__(self) -> tuple[builtins.str, RegisterMatrix]: ...
 
 @typing.final
 class RegisterMapKeysIter:
     def __iter__(self) -> RegisterMapKeysIter: ...
-    def __next__(self) -> typing.Optional[builtins.str]: ...
+    def __next__(self) -> builtins.str: ...
 
 @typing.final
 class RegisterMapValuesIter:
     def __iter__(self) -> RegisterMapValuesIter: ...
-    def __next__(self) -> typing.Optional[RegisterMatrix]: ...
+    def __next__(self) -> RegisterMatrix: ...
 
 class RegisterMatrix:
     r"""
@@ -437,7 +437,7 @@ class ResultData:
         r"""
         Returns a clone of the inner result data.
         """
-    def to_raw_readout_data(self) -> dict[str, list] | RawQPUReadoutData:
+    def to_raw_readout_data(self) -> RawQVMReadoutData | RawQPUReadoutData:
         r"""
         Get the raw readout data from either QPU or QVM result.
         

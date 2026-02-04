@@ -11,6 +11,7 @@
 #![allow(clippy::implicit_hasher)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::unsafe_derive_deserialize)]
+#![allow(clippy::enum_variant_names)]
 #![warn(
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,

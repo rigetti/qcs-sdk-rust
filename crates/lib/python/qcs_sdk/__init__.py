@@ -1,9 +1,8 @@
 
 from . import _qcs_sdk
-from _qcs_sdk.client import Qcs, QCSClient  # noqa
+from .client import QCSClient  # noqa
 
 _additional_exports = [
-    "Qcs",
     "QCSClient",
 ]
 

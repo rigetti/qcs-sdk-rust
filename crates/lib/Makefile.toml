@@ -1,6 +1,6 @@
 [env]
 RUST_BACKTRACE = 0
-CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features tracing-opentelemetry,libquil,_insecure-issuer-validation"  # Disable --all-features to avoid manual tests in CI for now
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now
 
 [tasks.pre-test]
 command = "docker"
@@ -60,13 +60,13 @@ install_crate = false
 description = "Build a release version of the Python package to the active virtual environment."
 dependencies = ["generate-stubs"]
 command = "poetry"
-args = ["run", "maturin", "build", "--features", "python", "--release"]
+args = ["run", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
 description = "Build the Python package and install to the active virtual environment."
 dependencies = ["install-python-deps"]
 command = "poetry"
-args = ["run", "maturin", "develop", "--features", "python"]
+args = ["run", "maturin", "develop"]
 
 [tasks.install-python-package-with-stubs]
 description = "Install the Python package with up-to-date stubs (not needed for testing)."
