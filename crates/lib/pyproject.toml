@@ -22,10 +22,9 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 
-# TODO: Update refs once PRs are merged.
 dependencies = [
-    "quil>=0.35.0,<0.36.0"
-    "qcs-api-client-common @ git+https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git@125-feat-update-pyo3#subdirectory=qcs-api-client-common",
+    "quil>=0.35.0,<0.36.0",
+    "qcs-api-client-common>=0.15.0,<0.16.0",
 ]
 
 [tool.maturin]

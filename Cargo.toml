@@ -3,20 +3,6 @@ members = ["crates/lib"]
 resolver = "2"
 
 [workspace.dependencies]
-serde_json = "1.0.86"
-thiserror = "2.0.17"
-tokio = "1.36.0"
-tokio-util = "0.7"
-tracing = { version = "0.1", features = ["log"] }
-tracing-subscriber = { version = "0.3.19" }
-
-# We specify quil-rs as a git and versioned dependency so that we can keep the version of
-# quil-rs used in both the Rust and Python packages in sync. The tag used should always
-# be a `quil-py` tag and should be compatible with the version specified in
-# `crates/python/pyproject.toml`.
-# The version must also be specified in order to publish to crates.io. Cargo enforces
-# that the specified version is the same as the version in the git repository.
-
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
 # crates' versions of ndarray in sync.
@@ -31,16 +17,22 @@ pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runti
 pyo3-build-config = "0.27.2"
 pyo3-log = { version = "0.13.2" }
 pyo3-stub-gen = { version = "0.17.2", features = ["numpy"] }
+serde_json = "1.0.86"
+thiserror = "2.0.17"
+tokio = "1.36.0"
+tokio-util = "0.7"
+tracing = { version = "0.1", features = ["log"] }
+tracing-subscriber = { version = "0.3.19" }
 
-# TODO: Update refs once PRs are merged.
-optipy = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
-pyo3-opentelemetry = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head" }
-pyo3-tracing-subscriber = { git = "https://github.com/rigetti/pyo3-opentelemetry.git", rev = "refs/pull/29/head", default-features = false }
-qcs-api-client-common = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
-qcs-api-client-grpc = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
-qcs-api-client-openapi = { git = "https://gitlab.com/rigetti/qcs/clients/qcs-api-client-rust.git", rev = "refs/merge-requests/177/head" }
-quil-rs = { git = "https://github.com/rigetti/quil-rs.git", rev = "refs/pull/491/head" }
-rigetti-pyo3 = { git = "https://github.com/rigetti/rigetti-pyo3.git", rev = "refs/pull/62/head" }
+# These dependencies we manage.
+optipy = "0.1.0"
+pyo3-opentelemetry = "0.6.0"
+pyo3-tracing-subscriber = { version = "0.4.0", default-features = false }
+qcs-api-client-common = "0.15.0" 
+qcs-api-client-grpc = "0.15.0"
+qcs-api-client-openapi = "0.16.0"
+quil-rs = "0.35.0" 
+rigetti-pyo3 = "0.5.0"
 
 # The primary intent of these options is to reduce the binary size for Python wheels
 # since PyPi has limits on how much storage a project can use.
