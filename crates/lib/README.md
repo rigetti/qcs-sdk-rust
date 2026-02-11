@@ -75,6 +75,8 @@ For Python consumers, please be aware of the following changes:
     but instead directly expose them as `#[pyclass]`es; in particular,
     the `from_*`, `as_*`, `to_*`, `is_*`, and `inner` methods have been removed,
     You should replace their usage with more typical Python operations (see below for examples).
+- `compiler.quilc.CompilationResult.program` is now a `quil.Program` instead of a `str`.
+    To obtain the `str` representation, simply call `to_quil()` on the program.
 - `Service.Quilc` has been renamed `Service.QUILC` to match other Python enumeration variants.
 - `ExecutionData` now requires `result_data`, whereas it had been optional for `pickle` support.
     Constructing it without explicit `result_data` is almost certainly a bug,
