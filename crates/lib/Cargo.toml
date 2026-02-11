@@ -113,7 +113,7 @@ pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { workspace = true, optional = true }
 pyo3-log = { workspace = true, optional = true }
 pyo3-opentelemetry = { workspace = true, optional = true }
-rigetti-pyo3 = { workspace = true, optional = true }
+rigetti-pyo3 = { workspace = true, optional = true, features = ["opentelemetry", "stubs", "async-tokio"] }
 
 # Enabled with the "stubs" feature.
 pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
