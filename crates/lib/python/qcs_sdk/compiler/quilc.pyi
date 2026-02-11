@@ -25,22 +25,6 @@ class CompilationResult:
         """
 
 @typing.final
-class CompilationResult:
-    r"""
-    The result of compiling a Quil program.
-    """
-    @property
-    def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]:
-        r"""
-        Metadata about the compiled program.
-        """
-    @property
-    def program(self) -> builtins.str:
-        r"""
-        The compiled program.
-        """
-
-@typing.final
 class CompilerOpts:
     r"""
     A set of options that determine the behavior of compiling programs with quilc
@@ -151,7 +135,7 @@ class QuilcClient:
     @staticmethod
     def new_rpcq(endpoint: builtins.str) -> QuilcClient:
         r"""
-        Construct a QuilcClient that uses RPCQ to communicate with Quilc.
+        Construct a `QuilcClient` that uses RPCQ to communicate with Quilc.
         """
 
 class QuilcError(QcsSdkError):
@@ -268,14 +252,18 @@ def generate_randomized_benchmarking_sequence(request: RandomizedBenchmarkingReq
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
     gateset. If interleaver is not provided, the returned sequence will have the form
     
+    ```ignore
         C_1 C_2 ... C_(depth-1) C_inv ,
+    ```
     
     where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
     and C_inv is selected so that the entire sequence composes to the identity. If an
     interleaver G (which must be a Clifford, and which will be decomposed into the native
     gateset) is provided, then the sequence instead takes the form
     
+    ```ignore
         C_1 G C_2 G ... C_(depth-1) G C_inv .
+    ```
     
     :param request: Randomized benchmarking request.
     :param client: Client used to send compilation requests to Quilc.
@@ -288,14 +276,18 @@ def generate_randomized_benchmarking_sequence_async(request: RandomizedBenchmark
     Construct a randomized benchmarking experiment on the given qubits, decomposing into
     gateset. If interleaver is not provided, the returned sequence will have the form
     
+    ```ignore
         C_1 C_2 ... C_(depth-1) C_inv ,
+    ```
     
     where each C is a Clifford element drawn from gateset, C_{< depth} are randomly selected,
     and C_inv is selected so that the entire sequence composes to the identity. If an
     interleaver G (which must be a Clifford, and which will be decomposed into the native
     gateset) is provided, then the sequence instead takes the form
     
+    ```ignore
         C_1 G C_2 G ... C_(depth-1) G C_inv .
+    ```
     
     :param request: Randomized benchmarking request.
     :param client: Client used to send compilation requests to Quilc.

@@ -11,8 +11,10 @@ enum PyRegisterData {
     Complex32(Vec<Vec<Complex32>>),
 }
 
+// This type stub only mentions `i16` because the output type will be `Sequence[Sequence[int]]`.
+// If we list the `i8` one too, it'll just be duplicated.
 #[cfg(feature = "stubs")]
-pyo3_stub_gen::impl_stub_type!(PyRegisterData = Vec<Vec<i8>> | Vec<Vec<f64>> | Vec<Vec<i16>> | Vec<Vec<Complex32>>);
+pyo3_stub_gen::impl_stub_type!(PyRegisterData = Vec<Vec<i16>> | Vec<Vec<f64>> | Vec<Vec<Complex32>>);
 
 #[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]

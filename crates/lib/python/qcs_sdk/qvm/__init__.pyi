@@ -73,6 +73,7 @@ class QVMResultData:
         r"""
         A map of register names (ie. "ro") to a `RegisterData` containing their values.
         """
+    def __getnewargs__(self) -> tuple[builtins.dict[builtins.str, RegisterData]]: ...
     def __new__(cls, memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
         r"""
         Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.

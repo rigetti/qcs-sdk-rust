@@ -4,7 +4,6 @@
 import builtins
 import typing
 from qcs_sdk import QcsSdkError
-from quil.instructions import ExternSignature
 
 @typing.final
 class ChooseRandomRealSubRegions:
@@ -17,7 +16,7 @@ class ChooseRandomRealSubRegions:
     The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
     """
     @staticmethod
-    def build_signature() -> ExternSignature:
+    def build_signature() -> builtins.str:
         r"""
         Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
         

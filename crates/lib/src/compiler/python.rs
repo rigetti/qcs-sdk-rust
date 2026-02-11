@@ -6,13 +6,11 @@ use pyo3::prelude::*;
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
 
-use quil_rs::quil::Quil;
-
 use crate::{
     compiler::{
         quilc::{
-            self, CompilerOpts, ConjugateByCliffordRequest, ConjugatePauliByCliffordRequest,
-            ConjugatePauliByCliffordResponse, Error,
+            self, CompilationResult, CompilerOpts, ConjugateByCliffordRequest,
+            ConjugatePauliByCliffordRequest, ConjugatePauliByCliffordResponse, Error,
             GenerateRandomizedBenchmarkingSequenceResponse, NativeQuilMetadata, PauliTerm,
             RandomizedBenchmarkingRequest, TargetDevice, DEFAULT_COMPILER_TIMEOUT,
         },
@@ -137,7 +135,7 @@ impl quilc::Client for QuilcClient {
         quil: &str,
         isa: TargetDevice,
         options: CompilerOpts,
-    ) -> Result<quilc::CompilationResult, Error> {
+    ) -> Result<CompilationResult, Error> {
         self.as_client().compile_program(quil, isa, options)
     }
 
@@ -174,7 +172,7 @@ impl PyQuilcClient {
         ))
     }
 
-    /// Construct a QuilcClient that uses RPCQ to communicate with Quilc.
+    /// Construct a `QuilcClient` that uses RPCQ to communicate with Quilc.
     #[staticmethod]
     fn new_rpcq(endpoint: &str) -> PyResult<Self> {
         Ok(Self {
@@ -236,13 +234,6 @@ py_function_sync_async! {
         let client = client.inner.as_client();
         let options = options.unwrap_or_default();
         client.compile_program(&quil, target, options)
-            .map(|result| CompilationResult {
-                program: result
-                    .program
-                    .to_quil()
-                    .expect("successfully compiled program should convert to valid quil"),
-                native_quil_metadata: result.native_quil_metadata
-            })
             .map_err(Into::into)
     }
 }
@@ -304,19 +295,6 @@ impl NativeQuilMetadata {
             self.qpu_runtime_estimation,
         )
     }
-}
-
-/// The result of compiling a Quil program.
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(
-    feature = "python",
-    pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
-)]
-pub(crate) struct CompilationResult {
-    /// The compiled program.
-    program: String,
-    /// Metadata about the compiled program.
-    native_quil_metadata: Option<NativeQuilMetadata>,
 }
 
 py_function_sync_async! {

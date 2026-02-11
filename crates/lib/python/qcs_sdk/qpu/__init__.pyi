@@ -22,7 +22,9 @@ class MemoryValues:
     
     There is a variant for each possible type the memory region could be.
     """
-    def __new__(cls, values: typing.Any) -> MemoryValues: ...
+    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.int] | builtins.list[builtins.float]]: ...
+    def __new__(cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.int] | typing.Sequence[builtins.float]) -> MemoryValues: ...
+    def inner(self) -> builtins.list[builtins.int] | builtins.list[builtins.int] | builtins.list[builtins.float]: ...
     @typing.final
     class Binary(MemoryValues):
         r"""
@@ -88,6 +90,7 @@ class QPUResultData:
         r"""
         Mapping of a readout values identifier (ie. "q0") to a set of `ReadoutValues`.
         """
+    def __getnewargs__(self) -> tuple[builtins.dict[builtins.str, builtins.str], builtins.dict[builtins.str, ReadoutValues], builtins.dict[builtins.str, MemoryValues]]: ...
     def __new__(cls, mappings: typing.Mapping[builtins.str, builtins.str], readout_values: typing.Mapping[builtins.str, ReadoutValues], memory_values: typing.Mapping[builtins.str, MemoryValues]) -> QPUResultData:
         r"""
         Construct a new `QPUResultData` from mappings and values.
@@ -124,7 +127,9 @@ class ReadoutValues:
     Each row contains all the values emitted to a memory reference across all shots.
     There is a variant for each possible type the list of readout values could be.
     """
-    def __new__(cls, values: typing.Any) -> ReadoutValues: ...
+    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]]: ...
+    def __new__(cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.float] | typing.Sequence[builtins.complex]) -> ReadoutValues: ...
+    def inner(self) -> builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]: ...
     @typing.final
     class Complex(ReadoutValues):
         r"""

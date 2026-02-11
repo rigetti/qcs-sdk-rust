@@ -13,12 +13,11 @@ from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
-from . import _qcs_sdk
 from . import client
 from . import qpu
 from . import qvm
 
-__version__: typing.Final = '0.25.16'
+__version__: typing.Final = '0.25.18-rc.0'
 @typing.final
 class ExeParameter:
     r"""
@@ -247,11 +246,13 @@ class RegisterData:
     have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
     convert any variant type to its inner data.
     """
-    def __new__(cls, inner: typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.float]] | typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData: ...
+    def __getnewargs__(self) -> tuple[builtins.list[builtins.list[builtins.int]] | builtins.list[builtins.list[builtins.float]] | builtins.list[builtins.list[builtins.complex]]]: ...
+    def __new__(cls, inner: typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.float]] | typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData: ...
     def as_ndarray(self) -> numpy.ndarray:
         r"""
         Return the inner values as a 2D Numpy ``ndarray``.
         """
+    def inner(self) -> builtins.list[builtins.list[builtins.int]] | builtins.list[builtins.list[builtins.float]] | builtins.list[builtins.list[builtins.complex]]: ...
     @typing.final
     class Complex32(RegisterData):
         r"""
@@ -424,6 +425,7 @@ class ResultData:
     [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
     program to choose the correct readout values for each shot.
     """
+    def __getnewargs__(self) -> tuple[QVMResultData | QPUResultData]: ...
     def __new__(cls, inner: QVMResultData | QPUResultData) -> ResultData:
         r"""
         Create a new `ResultData` from either QVM or QPU result data.
