@@ -20,7 +20,7 @@ use crate::{
 };
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
+use pyo3_stub_gen::derive::gen_stub_pyclass;
 
 /// Represents the two possible types of data returned from either the QVM or a real QPU.
 /// Each variant contains the original data returned from its respective executor.
@@ -54,8 +54,7 @@ use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner, Deserialize, Serialize)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk"))]
+#[cfg_attr(feature = "python", derive(pyo3::FromPyObject, pyo3::IntoPyObject))]
 pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmResultData`]
     Qvm(QvmResultData),
@@ -123,8 +122,6 @@ pub enum RegisterMatrixConversionError {
     MemoryReferenceParseError(MemoryReferenceParseError),
 }
 
-#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
-#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl ResultData {
     /// Convert [`ResultData`] from its inner representation as [`QvmResultData`] or
     /// [`QpuResultData`] into a [`RegisterMap`]. The [`RegisterMatrix`] for each register will be
@@ -163,7 +160,7 @@ impl RegisterMap {
     }
 
     /// Returns a [`RegisterMap`] built from [`QvmResultData`]
-    fn from_qvm_result_data(
+    pub(crate) fn from_qvm_result_data(
         result_data: &QvmResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
         #[cfg(feature = "tracing")]
@@ -218,7 +215,7 @@ impl RegisterMap {
     ///
     /// This fails if the underlying [`QpuResultData`] data is jagged. See [`RegisterMap`] for more
     /// detailed explanations of why and when this occurs.
-    fn from_qpu_result_data(
+    pub(crate) fn from_qpu_result_data(
         qpu_result_data: &QpuResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
         #[cfg(feature = "tracing")]

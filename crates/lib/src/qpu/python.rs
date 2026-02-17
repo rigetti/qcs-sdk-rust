@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use numpy::Complex64;
 use pyo3::prelude::*;
-use rigetti_pyo3::{create_init_submodule, py_function_sync_async};
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyfunction, gen_stub_pymethods};
@@ -15,7 +15,6 @@ use crate::{
     qpu::{self, result_data::MemoryValues, QpuResultData, ReadoutValues},
 };
 
-// #[pyo3(name = "qpu", module = "qcs_sdk", submodule)]
 create_init_submodule! {
     classes: [ QpuResultData, RawQpuReadoutData ],
     complex_enums: [ ReadoutValues, MemoryValues ],
@@ -28,6 +27,9 @@ create_init_submodule! {
         "translation": qpu::translation::python::init_submodule
     ],
 }
+
+impl_repr!(QpuResultData);
+impl_repr!(RawQpuReadoutData);
 
 #[derive(FromPyObject, IntoPyObject)]
 enum PyReadoutValues {
@@ -46,8 +48,9 @@ enum PyMemoryValues {
 #[cfg(feature = "stubs")]
 pyo3_stub_gen::impl_stub_type!(PyReadoutValues = Vec<i64> | Vec<f64> | Vec<Complex64>);
 
+// The Python type will be the same for `Vec<u8>` as `Vec<i64>`, so only list one here.
 #[cfg(feature = "stubs")]
-pyo3_stub_gen::impl_stub_type!(PyMemoryValues = Vec<u8> | Vec<i64> | Vec<f64>);
+pyo3_stub_gen::impl_stub_type!(PyMemoryValues = Vec<i64> | Vec<f64>);
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]

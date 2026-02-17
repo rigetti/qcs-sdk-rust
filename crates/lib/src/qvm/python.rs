@@ -25,9 +25,9 @@ use crate::{
         Error, QvmOptions, QvmResultData,
     },
     register_data::RegisterData,
+    RegisterMap, RegisterMatrixConversionError,
 };
 
-// #[pyo3(name = "qvm", module = "qcs_sdk", submodule)]
 create_init_submodule! {
     classes: [
         PyQvmClient,
@@ -41,6 +41,7 @@ create_init_submodule! {
 }
 
 impl_repr!(QvmOptions);
+impl_repr!(QvmResultData);
 impl_repr!(RawQvmReadoutData);
 
 /// Client used to communicate with QVM.
@@ -265,6 +266,25 @@ impl QvmResultData {
 
         Ok(RawQvmReadoutData { memory })
     }
+
+    /// Convert into a [`RegisterMap`].
+    ///
+    /// The [`RegisterMatrix`] for each register will be
+    /// constructed such that each row contains all the final values in the register for a single shot.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`RegisterMatrixConversionError`] if the inner execution data for any of the
+    /// registers would result in a jagged matrix.
+    /// This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+    /// where measurements to the same memory reference might occur multiple times in a shot, or be
+    /// skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
+    /// necessitate making assumptions about the data that could skew the data in undesirable ways.
+    /// Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
+    /// selects the last value per-shot based on the program that was run.
+    fn to_register_map(&self) -> Result<RegisterMap, RegisterMatrixConversionError> {
+        RegisterMap::from_qvm_result_data(self)
+    }
 }
 
 #[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
@@ -435,7 +455,6 @@ mod api {
         Client, QvmOptions,
     };
 
-    // #[pyo3(name = "api", module = "qcs_sdk.qvm", submodule)]
     create_init_submodule! {
         classes: [
             ExpectationRequest,

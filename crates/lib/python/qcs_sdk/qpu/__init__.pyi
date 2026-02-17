@@ -4,7 +4,7 @@
 import builtins
 import collections.abc
 import typing
-from qcs_sdk import QcsSdkError
+from qcs_sdk import QcsSdkError, RegisterMap
 from qcs_sdk.client import QCSClient
 from . import api
 from . import isa
@@ -22,9 +22,9 @@ class MemoryValues:
     
     There is a variant for each possible type the memory region could be.
     """
-    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.int] | builtins.list[builtins.float]]: ...
-    def __new__(cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.int] | typing.Sequence[builtins.float]) -> MemoryValues: ...
-    def inner(self) -> builtins.list[builtins.int] | builtins.list[builtins.int] | builtins.list[builtins.float]: ...
+    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.float]]: ...
+    def __new__(cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.float]) -> MemoryValues: ...
+    def inner(self) -> builtins.list[builtins.int] | builtins.list[builtins.float]: ...
     @typing.final
     class Binary(MemoryValues):
         r"""
@@ -95,9 +95,35 @@ class QPUResultData:
         r"""
         Construct a new `QPUResultData` from mappings and values.
         """
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     def to_raw_readout_data(self) -> RawQPUReadoutData:
         r"""
         Get the raw readout data as a flattened structure.
+        """
+    def to_register_map(self) -> RegisterMap:
+        r"""
+        Convert into a [`RegisterMap`].
+        
+        The [`RegisterMatrix`] for each register will be
+        constructed such that each row contains all the final values in the register for a single shot.
+        
+        # Errors
+        
+        Returns a [`RegisterMatrixConversionError`] if the execution data for any of the
+        registers would result in a jagged matrix.
+        [`QpuResultData`] data is captured per measure,
+        meaning a value is returned for every measure to a memory reference, not just once per shot.
+        
+        This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+        where measurements to the same memory reference might occur multiple times in a shot, or be
+        skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
+        necessitate making assumptions about the data that could skew the data in undesirable ways.
+        Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
+        selects the last value per-shot based on the program that was run.
         """
 
 @typing.final

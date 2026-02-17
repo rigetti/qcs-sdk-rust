@@ -20,7 +20,7 @@ use crate::{
             PyRegisterMatrix, RegisterMapItemsIter, RegisterMapKeysIter, RegisterMapValuesIter,
         },
     },
-    qpu, qvm, ExecutionData, RegisterData, RegisterMap, ResultData, Service,
+    qpu, qvm, ExecutionData, RegisterData, RegisterMap, Service,
 };
 
 pub(crate) mod client;
@@ -49,8 +49,7 @@ create_init_submodule! {
 
     complex_enums: [
         PyRegisterMatrix,
-        RegisterData,
-        ResultData
+        RegisterData
     ],
 
     errors: [

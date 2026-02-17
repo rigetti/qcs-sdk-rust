@@ -9,10 +9,10 @@ import numpy
 import numpy.typing
 import typing
 from qcs_sdk.compiler.quilc import CompilerOpts, QuilcClient
-from qcs_sdk.qpu import QPUResultData, RawQPUReadoutData
+from qcs_sdk.qpu import QPUResultData
 from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
-from qcs_sdk.qvm import QVMClient, QVMResultData, RawQVMReadoutData
+from qcs_sdk.qvm import QVMClient, QVMResultData
 from . import client
 from . import qpu
 from . import qvm
@@ -180,13 +180,13 @@ class ExecutionData:
         This will always be `None` for QVM execution.
         """
     @property
-    def result_data(self) -> ResultData:
+    def result_data(self) -> QVMResultData | QPUResultData:
         r"""
         The [`ResultData`] that was read from the [`Executable`](crate::Executable).
         """
     def __eq__(self, other: builtins.object) -> builtins.bool: ...
-    def __getnewargs__(self) -> tuple[ResultData, typing.Optional[datetime.timedelta]]: ...
-    def __new__(cls, result_data: ResultData, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
+    def __getnewargs__(self) -> tuple[QVMResultData | QPUResultData, typing.Optional[datetime.timedelta]]: ...
+    def __new__(cls, result_data: QVMResultData | QPUResultData, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
         r"""
         Create `ExecutionData` from `ResultData` and an optional `duration`.
         """
@@ -390,103 +390,6 @@ class RegisterMatrixConversionError(QcsSdkError):
     Error that may occur when building a `RegisterMatrix` from execution data.
     """
     ...
-
-class ResultData:
-    r"""
-    Represents the two possible types of data returned from either the QVM or a real QPU.
-    Each variant contains the original data returned from its respective executor.
-    
-    # Usage
-    
-    Your usage of [`ResultData`] will depend on the types of programs you are running and where.
-    The `to_register_map()` method will attempt to build a [`RegisterMap`] out of the data, where each
-    register name is mapped to a 2-dimensional rectangular [`RegisterMatrix`] where each row
-    represents the final values in each register index for a particular shot. This is often the
-    desired form of the data and it is _probably_ what you want. This transformation isn't always
-    possible, in which case `to_register_map()` will return an error.
-    
-    To understand why this transformation can fail, we need to understand a bit about how readout data is
-    returned from the QVM and from a real QPU:
-    
-    The QVM treats each `DECLARE` statement as initialzing some amount of memory. This memory works
-    as one might expect it to. It is zero-initialized on each shot, and subsequent writes to the same region
-    overwrite the previous value. The QVM returns memory at the end of every shot. This means
-    we get the last value in every memory reference for each shot, which is exactly the
-    representation we want for a [`RegisterMatrix`]. For this reason, `to_register_map()` should
-    always succeed for [`ResultData::Qvm`].
-    
-    The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-    (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
-    reference emits a new value to said stream. This means that the number of values per memory
-    reference can vary per shot. For this reason, it's not always clear what the final value in
-    each shot was for a particular reference. When this is the case, `to_register_map()` will return
-    an error as it's impossible to build a correct [`RegisterMatrix`] from the data without
-    knowing the intent of the program that was run. Instead, it's recommended to build the
-    [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
-    program to choose the correct readout values for each shot.
-    """
-    def __getnewargs__(self) -> tuple[QVMResultData | QPUResultData]: ...
-    def __new__(cls, inner: QVMResultData | QPUResultData) -> ResultData:
-        r"""
-        Create a new `ResultData` from either QVM or QPU result data.
-        """
-    def __repr__(self) -> builtins.str:
-        r"""
-        Implements `__repr__` for Python in terms of the Rust
-        [`Debug`](std::fmt::Debug) implementation.
-        """
-    def inner(self) -> QVMResultData | QPUResultData:
-        r"""
-        Returns a clone of the inner result data.
-        """
-    def to_raw_readout_data(self) -> RawQVMReadoutData | RawQPUReadoutData:
-        r"""
-        Get the raw readout data from either QPU or QVM result.
-        
-        See `RawQPUReadoutData` and `RawQVMReadoutData` for more information.
-        """
-    def to_register_map(self) -> RegisterMap:
-        r"""
-        Convert [`ResultData`] from its inner representation as [`QvmResultData`] or
-        [`QpuResultData`] into a [`RegisterMap`]. The [`RegisterMatrix`] for each register will be
-        constructed such that each row contains all the final values in the register for a single shot.
-        
-        # Errors
-        
-        Returns a [`RegisterMatrixConversionError`] if the inner execution data for any of the
-        registers would result in a jagged matrix. [`QpuResultData`] data is captured per measure,
-        meaning a value is returned for every measure to a memory reference, not just once per shot.
-        This is often the case in programs that use mid-circuit measurement or dynamic control flow,
-        where measurements to the same memory reference might occur multiple times in a shot, or be
-        skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
-        necessitate making assumptions about the data that could skew the data in undesirable ways.
-        Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
-        selects the last value per-shot based on the program that was run.
-        """
-    @typing.final
-    class Qpu(ResultData):
-        r"""
-        Readout data returned from the QPU, stored as [`QpuResultData`]
-        """
-        __match_args__ = ("_0",)
-        @property
-        def _0(self) -> QPUResultData: ...
-        def __getitem__(self, key: builtins.int) -> typing.Any: ...
-        def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0: QPUResultData) -> ResultData.Qpu: ...
-    
-    @typing.final
-    class Qvm(ResultData):
-        r"""
-        Data returned from the QVM, stored as [`QvmResultData`]
-        """
-        __match_args__ = ("_0",)
-        @property
-        def _0(self) -> QVMResultData: ...
-        def __getitem__(self, key: builtins.int) -> typing.Any: ...
-        def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0: QVMResultData) -> ResultData.Qvm: ...
-    
 
 @typing.final
 class Service(enum.Enum):

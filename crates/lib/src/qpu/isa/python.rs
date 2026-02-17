@@ -1,32 +1,41 @@
 use pyo3::prelude::*;
-use rigetti_pyo3::{create_init_submodule, py_function_sync_async};
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
+use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
-
-use qcs_api_client_openapi::models::{
-    Architecture, Characteristic, Edge, Family, InstructionSetArchitecture, Node, Operation,
-    OperationSite, Parameter,
+use pyo3_stub_gen::{
+    derive::{gen_stub_pyclass, gen_stub_pyclass_enum, gen_stub_pyfunction, gen_stub_pymethods},
+    impl_stub_type,
 };
+
+use qcs_api_client_openapi::models;
 
 use crate::{client::Qcs, python::errors, qpu::get_isa};
 
-// #[pyo3(name = "isa", module = "qcs_sdk.qpu", submodule)]
 create_init_submodule! {
     classes: [
-        PyFamily,
-        PyEdge,
-        PyNode,
-        PyArchitecture,
-        PyCharacteristic,
-        PyParameter,
-        PyOperationSite,
-        PyOperation,
-        PyInstructionSetArchitecture
+        Architecture,
+        Characteristic,
+        Edge,
+        Family,
+        InstructionSetArchitecture,
+        Node,
+        Operation,
+        OperationSite,
+        Parameter
     ],
     errors: [ errors::SerializeISAError, errors::GetISAError ],
     funcs: [ py_get_instruction_set_architecture, py_get_instruction_set_architecture_async ],
 }
+
+impl_repr!(Architecture);
+impl_repr!(Characteristic);
+impl_repr!(Edge);
+impl_repr!(InstructionSetArchitecture);
+impl_repr!(Node);
+impl_repr!(Operation);
+impl_repr!(OperationSite);
+impl_repr!(Parameter);
 
 /// The native instruction set architecture (ISA) of a quantum processor, annotated with characteristics.
 ///
@@ -36,10 +45,18 @@ create_init_submodule! {
 ///
 /// The characteristics that annotate both instructions and benchmarks assist the user to generate
 /// the best native QUIL program for a desired task, and so are provided as part of the native ISA.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "InstructionSetArchitecture", module = "qcs_sdk.qpu.isa")]
-pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+pub(crate) struct InstructionSetArchitecture {
+    architecture: Architecture,
+    /// The list of benchmarks that have characterized the quantum processor.
+    benchmarks: Vec<Operation>,
+    /// The list of native QUIL instructions supported by the quantum processor.
+    instructions: Vec<Operation>,
+    /// The name of the quantum processor.
+    name: String,
+}
 
 /// Represents the logical underlying architecture of a quantum processor.
 ///
@@ -67,19 +84,105 @@ pub(crate) struct PyInstructionSetArchitecture(pub InstructionSetArchitecture);
 /// Note that the operations that are actually available are defined entirely by ``Operation``
 /// instances. The presence of a node or edge in the ``Architecture`` model provides no guarantee
 /// that any 1Q or 2Q operation will be available to users writing QUIL programs.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Architecture", module = "qcs_sdk.qpu.isa")]
-struct PyArchitecture(Architecture);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Architecture {
+    /// A list of all computational edges in the instruction set architecture.
+    pub edges: Vec<Edge>,
+    /// The architecture family. The nodes and edges conform to this family.
+    pub family: Option<PyFamily>,
+    /// A list of all computational nodes in the instruction set architecture.
+    pub nodes: Vec<Node>,
+}
 
 /// The architecture family identifier of an ``InstructionSetArchitecture``.
 ///
-/// Value "Full" implies that each node is connected to every other (fully-connected architecture).
-#[derive(Clone)]
-#[expect(dead_code)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Family", module = "qcs_sdk.qpu.isa")]
-struct PyFamily(Family);
+/// Value 'NONE' implies the architecture has no specific layout topology.
+/// Value 'FULL' implies that each node is connected to every other (a fully-connected architecture).
+/// For other values based on deployed architecture layouts (e.g. `Aspen` and `Ankaa`),
+/// refer to the architecture classes themselves for more details.
+///
+/// Note: Within an ``InstructionSetArchitecture``, the `family` may be one of these,
+/// or may be a `str` for an unknown family, or may be `None` if the `family` is not specified.
+/// The latter in particular is distinct from the `NONE` value within this enumeration.
+#[derive(
+    Clone, Copy, Debug, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize,
+)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.qpu.isa", eq, rename_all = "SCREAMING_SNAKE_CASE")
+)]
+enum Family {
+    #[default]
+    None,
+    Full,
+    Aspen,
+    Ankaa,
+}
+
+#[derive(
+    Clone,
+    Debug,
+    Eq,
+    PartialEq,
+    Ord,
+    PartialOrd,
+    Hash,
+    Serialize,
+    Deserialize,
+    pyo3::FromPyObject,
+    pyo3::IntoPyObject,
+)]
+#[serde(untagged)]
+enum PyFamily {
+    #[pyo3(transparent)]
+    Known(Family),
+    #[pyo3(transparent)]
+    Unknown(String),
+}
+
+#[cfg(feature = "stubs")]
+impl_stub_type!(PyFamily = Family | String);
+
+impl Default for PyFamily {
+    fn default() -> Self {
+        Self::Known(Family::default())
+    }
+}
+
+impl<T: AsRef<models::Family>> From<T> for PyFamily {
+    fn from(family: T) -> Self {
+        match family.as_ref() {
+            models::Family::None => PyFamily::Known(Family::None),
+            models::Family::Full => PyFamily::Known(Family::Full),
+            models::Family::Aspen => PyFamily::Known(Family::Aspen),
+            models::Family::Ankaa => PyFamily::Known(Family::Ankaa),
+            models::Family::Unknown(s) => PyFamily::Unknown(s.clone()),
+        }
+    }
+}
+
+impl From<PyFamily> for models::Family {
+    fn from(family: PyFamily) -> Self {
+        match family {
+            PyFamily::Known(f) => f.into(),
+            PyFamily::Unknown(s) => models::Family::Unknown(s),
+        }
+    }
+}
+
+impl From<Family> for models::Family {
+    fn from(family: Family) -> Self {
+        match family {
+            Family::None => models::Family::None,
+            Family::Full => models::Family::Full,
+            Family::Aspen => models::Family::Aspen,
+            Family::Ankaa => models::Family::Ankaa,
+        }
+    }
+}
 
 /// A degree-two logical connection in the quantum processor's architecture.
 ///
@@ -89,64 +192,303 @@ struct PyFamily(Family);
 ///
 /// Note that edges are undirected in this model. Thus edge :math:`(a, b)` is equivalent to edge
 /// :math:`(b, a)`.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Edge", module = "qcs_sdk.qpu.isa")]
-struct PyEdge(Edge);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Edge {
+    /// The integer ids of the computational nodes at the two ends of the edge.
+    /// Order is not important; an architecture edge is treated as undirected.
+    pub node_ids: Vec<i64>,
+}
 
 /// A logical node in the quantum processor's architecture.
 ///
 /// The existence of a node in the ISA ``Architecture`` does not necessarily mean that a given 1Q
 /// operation will be available on the node. This information is conveyed by the presence of the
 /// specific `node_id` in instances of ``Instruction``.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Node", module = "qcs_sdk.qpu.isa")]
-struct PyNode(Node);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Node {
+    /// An integer id assigned to the computational node.
+    ///
+    /// The ids may not be contiguous and will be assigned based on the architecture family.
+    pub node_id: i64,
+}
 
 /// A measured characteristic of an operation.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Characteristic", module = "qcs_sdk.qpu.isa")]
-struct PyCharacteristic(Characteristic);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Characteristic {
+    /// The error in the characteristic value, or None otherwise.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<f64>,
+    /// The name of the characteristic.
+    pub name: String,
+    /// The list of architecture node ids for the site where the characteristic is measured, if that is different from the site of the enclosing operation. None if it is the same. The order of this or the enclosing node ids obey the definition of node symmetry from the enclosing operation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub node_ids: Option<Vec<i64>>,
+    /// The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameter_values: Option<Vec<f64>>,
+    /// The date and time at which the characteristic was measured.
+    pub timestamp: String,
+    /// The characteristic value measured.
+    pub value: f64,
+}
 
 /// A parameter to an operation.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Parameter", module = "qcs_sdk.qpu.isa")]
-struct PyParameter(Parameter);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Parameter {
+    /// The name of the parameter, such as the name of a mathematical symbol.
+    pub name: String,
+}
 
 /// A site for an operation, with its site-dependent characteristics.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "OperationSite", module = "qcs_sdk.qpu.isa")]
-struct PyOperationSite(OperationSite);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct OperationSite {
+    /// The list of site-dependent characteristics of this operation.
+    pub characteristics: Vec<Characteristic>,
+    /// The list of architecture node ids for the site.
+    ///
+    /// The order of these node ids obey the definition of node symmetry from the enclosing operation.
+    pub node_ids: Vec<i64>,
+}
 
 /// An operation, with its sites and site-independent characteristics.
-#[derive(Clone)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Operation", module = "qcs_sdk.qpu.isa")]
-struct PyOperation(Operation);
+#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+struct Operation {
+    /// The list of site-independent characteristics of this operation.
+    pub characteristics: Vec<Characteristic>,
+    /// The name of the operation.
+    pub name: String,
+    /// The number of nodes that this operation applies to. None if unspecified.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub node_count: Option<i64>,
+    /// The list of parameters. Each parameter must be uniquely named. May be empty.
+    pub parameters: Vec<Parameter>,
+    /// The list of sites at which this operation can be applied, together with its site-dependent characteristics.
+    pub sites: Vec<OperationSite>,
+}
 
 #[cfg(feature = "python")]
 #[derive(Debug, thiserror::Error)]
 #[error("Failed to serialize instruction set architecture: {0}")]
 pub struct SerializeIsaError(#[from] serde_json::Error);
 
+impl From<models::InstructionSetArchitecture> for InstructionSetArchitecture {
+    fn from(isa: models::InstructionSetArchitecture) -> Self {
+        Self {
+            architecture: (*isa.architecture).into(),
+            benchmarks: convert_vec(isa.benchmarks),
+            instructions: convert_vec(isa.instructions),
+            name: isa.name,
+        }
+    }
+}
+
+impl From<InstructionSetArchitecture> for models::InstructionSetArchitecture {
+    fn from(isa: InstructionSetArchitecture) -> Self {
+        Self {
+            architecture: Box::new(isa.architecture.into()),
+            benchmarks: convert_vec(isa.benchmarks),
+            instructions: convert_vec(isa.instructions),
+            name: isa.name,
+        }
+    }
+}
+
+impl From<models::Architecture> for Architecture {
+    fn from(arch: models::Architecture) -> Self {
+        Self {
+            edges: arch
+                .edges
+                .into_iter()
+                .map(|e| Edge {
+                    node_ids: e.node_ids,
+                })
+                .collect(),
+            family: arch.family.as_ref().map(Into::into),
+            nodes: convert_vec(arch.nodes),
+        }
+    }
+}
+
+impl From<Architecture> for models::Architecture {
+    fn from(arch: Architecture) -> Self {
+        Self {
+            edges: arch
+                .edges
+                .into_iter()
+                .map(|e| models::Edge {
+                    node_ids: e.node_ids,
+                })
+                .collect(),
+            family: arch.family.map(|f| Box::new(f.into())),
+            nodes: convert_vec(arch.nodes),
+        }
+    }
+}
+
+impl From<models::Edge> for Edge {
+    fn from(edge: models::Edge) -> Self {
+        Self {
+            node_ids: edge.node_ids,
+        }
+    }
+}
+
+impl From<Edge> for models::Edge {
+    fn from(edge: Edge) -> Self {
+        Self {
+            node_ids: edge.node_ids,
+        }
+    }
+}
+
+impl From<models::Node> for Node {
+    fn from(node: models::Node) -> Self {
+        Self {
+            node_id: node.node_id,
+        }
+    }
+}
+
+impl From<Node> for models::Node {
+    fn from(node: Node) -> Self {
+        Self {
+            node_id: node.node_id,
+        }
+    }
+}
+
+impl From<models::Characteristic> for Characteristic {
+    fn from(characteristic: models::Characteristic) -> Self {
+        Self {
+            error: characteristic.error,
+            name: characteristic.name,
+            node_ids: characteristic.node_ids,
+            parameter_values: characteristic.parameter_values,
+            timestamp: characteristic.timestamp,
+            value: characteristic.value,
+        }
+    }
+}
+
+impl From<Characteristic> for models::Characteristic {
+    fn from(characteristic: Characteristic) -> Self {
+        Self {
+            error: characteristic.error,
+            name: characteristic.name,
+            node_ids: characteristic.node_ids,
+            parameter_values: characteristic.parameter_values,
+            timestamp: characteristic.timestamp,
+            value: characteristic.value,
+        }
+    }
+}
+
+impl From<models::Parameter> for Parameter {
+    fn from(parameter: models::Parameter) -> Self {
+        Self {
+            name: parameter.name,
+        }
+    }
+}
+
+impl From<Parameter> for models::Parameter {
+    fn from(parameter: Parameter) -> Self {
+        Self {
+            name: parameter.name,
+        }
+    }
+}
+
+impl From<models::OperationSite> for OperationSite {
+    fn from(site: models::OperationSite) -> Self {
+        Self {
+            characteristics: convert_vec(site.characteristics),
+            node_ids: site.node_ids,
+        }
+    }
+}
+
+impl From<OperationSite> for models::OperationSite {
+    fn from(site: OperationSite) -> Self {
+        Self {
+            characteristics: convert_vec(site.characteristics),
+            node_ids: site.node_ids,
+        }
+    }
+}
+
+impl From<models::Operation> for Operation {
+    fn from(operation: models::Operation) -> Self {
+        Self {
+            characteristics: convert_vec(operation.characteristics),
+            name: operation.name,
+            node_count: operation.node_count,
+            parameters: convert_vec(operation.parameters),
+            sites: convert_vec(operation.sites),
+        }
+    }
+}
+
+impl From<Operation> for models::Operation {
+    fn from(operation: Operation) -> Self {
+        Self {
+            characteristics: convert_vec(operation.characteristics),
+            name: operation.name,
+            node_count: operation.node_count,
+            parameters: convert_vec(operation.parameters),
+            sites: convert_vec(operation.sites),
+        }
+    }
+}
+
+fn convert_vec<T, U>(vec: Vec<T>) -> Vec<U>
+where
+    T: Into<U>,
+{
+    vec.into_iter().map(Into::into).collect()
+}
+
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyInstructionSetArchitecture {
-    /// Deserialize an [`InstructionSetArchitecture`] from a json representation.
+impl InstructionSetArchitecture {
+    #[new]
+    fn __new__(
+        architecture: Architecture,
+        benchmarks: Vec<Operation>,
+        instructions: Vec<Operation>,
+        name: String,
+    ) -> Self {
+        Self {
+            architecture,
+            benchmarks,
+            instructions,
+            name,
+        }
+    }
+
+    /// Deserialize an `InstructionSetArchitecture` from a json representation.
     ///
     /// # Errors
     ///
-    /// Returns `[SerializeIsaError`] if the input string was not deserialized correctly.
+    /// Returns [`SerializeIsaError`] if the input string was not deserialized correctly.
     #[staticmethod]
     pub(crate) fn from_raw(json: &str) -> Result<Self, SerializeIsaError> {
-        Ok(Self(serde_json::from_str(json)?))
+        Ok(serde_json::from_str(json)?)
     }
 
-    /// Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed.
+    /// Serialize the `InstructionSetArchitecture` to a json string, optionally pretty-printed.
     ///
     /// If `pretty` is true, the json output should be pretty-printed with newlines and indents.
     ///
@@ -157,222 +499,103 @@ impl PyInstructionSetArchitecture {
     pub(crate) fn json(&self, pretty: bool) -> Result<String, SerializeIsaError> {
         let data = {
             if pretty {
-                serde_json::to_string_pretty(&self.0)
+                serde_json::to_string_pretty(&self)
             } else {
-                serde_json::to_string(&self.0)
+                serde_json::to_string(&self)
             }
         }?;
         Ok(data)
     }
+}
 
-    /// The architecture of the quantum processor.
-    #[getter]
-    fn architecture(&self) -> PyArchitecture {
-        PyArchitecture(*self.0.architecture.clone())
-    }
-
-    #[setter]
-    fn set_architecture(&mut self, architecture: PyArchitecture) {
-        *self.0.architecture = architecture.0;
-    }
-
-    /// The list of benchmarks that have characterized the quantum processor.
-    #[getter]
-    fn benchmarks(&self) -> Vec<PyOperation> {
-        self.0.benchmarks.iter().cloned().map(PyOperation).collect()
-    }
-
-    #[setter]
-    fn set_benchmarks(&mut self, benchmarks: Vec<PyOperation>) {
-        self.0.benchmarks = benchmarks.into_iter().map(|op| op.0).collect();
-    }
-
-    /// The list of native QUIL instructions supported by the quantum processor.
-    #[getter]
-    fn instructions(&self) -> Vec<PyOperation> {
-        self.0
-            .instructions
-            .iter()
-            .cloned()
-            .map(PyOperation)
-            .collect()
-    }
-
-    #[setter]
-    fn set_instructions(&mut self, instructions: Vec<PyOperation>) {
-        self.0.instructions = instructions.into_iter().map(|op| op.0).collect();
-    }
-
-    /// The name of the quantum processor.
-    #[getter]
-    fn name(&self) -> &str {
-        &self.0.name
-    }
-
-    #[setter]
-    fn set_name(&mut self, name: String) {
-        self.0.name = name;
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl Operation {
+    #[new]
+    /// An operation, with its sites and site-independent characteristics.
+    fn __new__(
+        characteristics: Vec<Characteristic>,
+        name: String,
+        parameters: Vec<Parameter>,
+        sites: Vec<OperationSite>,
+    ) -> Self {
+        Self {
+            characteristics,
+            name,
+            node_count: None,
+            parameters,
+            sites,
+        }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyOperation {
-    /// The list of site-independent characteristics of this operation.
-    #[getter]
-    fn characteristics(&self) -> Vec<PyCharacteristic> {
-        self.0
-            .characteristics
-            .iter()
-            .cloned()
-            .map(PyCharacteristic)
-            .collect()
-    }
-
-    /// The name of the operation.
-    #[getter]
-    fn name(&self) -> &str {
-        &self.0.name
-    }
-
-    /// The number of nodes that this operation applies to. None if unspecified.
-    #[getter]
-    fn node_count(&self) -> Option<i64> {
-        self.0.node_count
-    }
-
-    /// The list of parameters. Each parameter must be uniquely named. May be empty.
-    #[getter]
-    fn parameters(&self) -> Vec<PyParameter> {
-        self.0.parameters.iter().cloned().map(PyParameter).collect()
-    }
-
-    /// The list of sites at which this operation can be applied,
-    /// together with its site-dependent characteristics.
-    #[getter]
-    fn sites(&self) -> Vec<PyOperationSite> {
-        self.0.sites.iter().cloned().map(PyOperationSite).collect()
+impl OperationSite {
+    #[new]
+    /// A site for an operation, with its site-dependent characteristics.
+    fn __new__(characteristics: Vec<Characteristic>, node_ids: Vec<i64>) -> Self {
+        Self {
+            characteristics,
+            node_ids,
+        }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyOperationSite {
-    /// The list of site-dependent characteristics of this operation.
-    #[getter]
-    fn characteristics(&self) -> Vec<PyCharacteristic> {
-        self.0
-            .characteristics
-            .iter()
-            .cloned()
-            .map(PyCharacteristic)
-            .collect()
-    }
-
-    /// The list of architecture node ids for the site. The order of these node ids
-    /// obey the definition of node symmetry from the enclosing operation.
-    #[getter]
-    fn node_ids(&self) -> Vec<i64> {
-        self.0.node_ids.clone()
+impl Parameter {
+    #[new]
+    fn __new__(name: String) -> Self {
+        Self { name }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyParameter {
-    /// The name of the parameter, such as the name of a mathematical symbol.
-    #[getter]
-    fn name(&self) -> &str {
-        &self.0.name
+impl Characteristic {
+    #[new]
+    /// A measured characteristic of an operation.
+    fn __new__(name: String, timestamp: String, value: f64) -> Self {
+        Self {
+            error: None,
+            name,
+            node_ids: None,
+            parameter_values: None,
+            timestamp,
+            value,
+        }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyCharacteristic {
-    /// The error in the characteristic value, or None if otherwise.
-    #[getter]
-    fn error(&self) -> Option<f64> {
-        self.0.error
-    }
-
-    /// The name of the characteristic.
-    #[getter]
-    fn name(&self) -> &str {
-        &self.0.name
-    }
-
-    /// The list of architecture node ids for the site where the characteristic is
-    /// measured, if that is different from the site of the enclosing operation.
-    /// `None` if it is the same. The order of this or the enclosing node ids obey
-    /// the definition of node symmetry from the enclosing operation.
-    #[getter]
-    fn node_ids(&self) -> Option<Vec<i64>> {
-        self.0.node_ids.clone()
-    }
-
-    /// The optional ordered list of parameter values used to generate the characteristic.
-    /// The order matches the parameters in the enclosing operation, and so the lengths of
-    /// these two lists must match.
-    #[getter]
-    fn parameter_values(&self) -> Option<Vec<f64>> {
-        self.0.parameter_values.clone()
-    }
-
-    /// ISO8601 date and time at which the characteristic was measured.
-    #[getter]
-    fn timestamp(&self) -> &str {
-        &self.0.timestamp
-    }
-
-    /// The characteristic value measured.
-    #[getter]
-    fn value(&self) -> f64 {
-        self.0.value
+impl Architecture {
+    #[new]
+    fn __new__(edges: Vec<Edge>, family: Option<PyFamily>, nodes: Vec<Node>) -> Self {
+        Self {
+            edges,
+            family,
+            nodes,
+        }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyArchitecture {
-    /// A list of all computational edges in the instruction set architecture.
-    #[getter]
-    fn edges(&self) -> Vec<PyEdge> {
-        self.0.edges.iter().cloned().map(PyEdge).collect()
-    }
-
-    /// The architecture family. The nodes and edges conform to this family.
-    #[getter]
-    fn family(&self) -> Option<PyFamily> {
-        self.0.family.clone().map(|f| PyFamily(*f))
-    }
-
-    /// A list of all computational nodes in the instruction set architecture.
-    #[getter]
-    fn nodes(&self) -> Vec<PyNode> {
-        self.0.nodes.iter().cloned().map(PyNode).collect()
+impl Node {
+    #[new]
+    fn __new__(node_id: i64) -> Self {
+        Self { node_id }
     }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
-impl PyNode {
-    /// An integer id assigned to the computational node.
-    /// The ids may not be contiguous and will be assigned based on the architecture family.
-    #[getter]
-    fn node_id(&self) -> i64 {
-        self.0.node_id
-    }
-}
-
-#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
-#[pymethods]
-impl PyEdge {
-    /// The integer ids of the computational nodes at the two ends of the edge.
-    /// Order is not important; an architecture edge is treated as undirected.
-    #[getter]
-    fn node_ids(&self) -> Vec<i64> {
-        self.0.node_ids.clone()
+impl Edge {
+    #[new]
+    fn __new__(node_ids: Vec<i64>) -> Self {
+        Self { node_ids }
     }
 }
 
@@ -390,12 +613,12 @@ py_function_sync_async! {
     async fn get_instruction_set_architecture(
         quantum_processor_id: String,
         client: Option<Qcs>,
-    ) -> PyResult<PyInstructionSetArchitecture> {
+    ) -> PyResult<InstructionSetArchitecture> {
         let client = client.unwrap_or_else(Qcs::load);
 
         get_isa(&quantum_processor_id, &client)
             .await
-            .map(PyInstructionSetArchitecture)
+            .map(Into::into)
             .map_err(Into::into)
     }
 }

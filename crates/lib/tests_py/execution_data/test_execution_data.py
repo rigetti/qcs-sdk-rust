@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from qcs_sdk import QcsSdkError
 from qcs_sdk.qpu import ReadoutValues, MemoryValues, QPUResultData
 from qcs_sdk.qvm import QVMResultData
-from qcs_sdk import ResultData, RegisterData, RegisterMatrix, ExecutionData
+from qcs_sdk import RegisterData, RegisterMatrix, ExecutionData
 
 
 class TestResultData:
@@ -26,7 +26,7 @@ class TestResultData:
         memory_values = {
             "ro": MemoryValues.Integer([1, 2, 3]),
         }
-        result_data = ResultData.Qpu(QPUResultData(mappings, readout_values, memory_values))
+        result_data = QPUResultData(mappings, readout_values, memory_values)
         register_map = result_data.to_register_map()
         ro = register_map.get_register_matrix("ro")
         assert ro is not None, "'ro' should exist in the register map"
@@ -51,15 +51,14 @@ class TestResultData:
             "qB": ReadoutValues.Integer([1]),
             "qC": ReadoutValues.Integer([2, 3]),
         }
-        result_data = ResultData.Qpu(QPUResultData(mappings, values, {}))
+        result_data = QPUResultData(mappings, values, {})
 
         with pytest.raises(QcsSdkError):
             result_data.to_register_map()
 
     def test_to_register_map_from_qvm_result_data(self):
         qvm_memory_map = {"ro": RegisterData.I16([[0, 1, 2], [1, 2, 3]])}
-        qvm_result_data = QVMResultData.from_memory_map(qvm_memory_map)
-        result_data = ResultData.Qvm(qvm_result_data)
+        result_data = QVMResultData.from_memory_map(qvm_memory_map)
         register_map = result_data.to_register_map()
         ro = register_map.get_register_matrix("ro")
         assert ro is not None, "'ro' should exist in the register map"
@@ -106,8 +105,7 @@ class TestRegisterMap:
             "ro": RegisterData.I16([[0, 1, 2], [1, 2, 3]]),
             "foo": RegisterData.I16([[0, 1, 2], [1, 2, 3]]),
         }
-        qvm_result_data = QVMResultData.from_memory_map(memory_map)
-        result_data = ResultData.Qvm(qvm_result_data)
+        result_data = QVMResultData.from_memory_map(memory_map)
         register_map = result_data.to_register_map()
         expected_keys = {"ro", "foo"}
         actual_keys = set()
@@ -129,8 +127,8 @@ class TestExecutionData:
         qvm_result_data = QVMResultData.from_memory_map({"ro": RegisterData([[0, 1]])})
 
         for execution_data in [
-            ExecutionData(result_data=ResultData(qpu_result_data), duration=timedelta(seconds=1)),
-            ExecutionData(result_data=ResultData(qvm_result_data), duration=None),
+            ExecutionData(result_data=qpu_result_data, duration=timedelta(seconds=1)),
+            ExecutionData(result_data=qvm_result_data, duration=None),
         ]:
             print(execution_data.result_data)
             pickled = pickle.dumps(execution_data)

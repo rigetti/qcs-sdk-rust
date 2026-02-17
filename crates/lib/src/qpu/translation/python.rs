@@ -25,7 +25,6 @@ use crate::client::Qcs;
 use crate::python::errors;
 use crate::qpu::translation::{get_quilt_calibrations, Error, TranslationOptions};
 
-// #[pyo3(name = "translation", module = "qcs_sdk.qpu", submodule)]
 create_init_submodule! {
     classes: [
         TranslationOptions,

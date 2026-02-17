@@ -4,7 +4,7 @@
 import builtins
 import collections.abc
 import typing
-from qcs_sdk import QcsSdkError, RegisterData
+from qcs_sdk import QcsSdkError, RegisterData, RegisterMap
 from qcs_sdk.qvm.api import AddressRequest
 from . import api
 
@@ -78,6 +78,11 @@ class QVMResultData:
         r"""
         Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.
         """
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     @staticmethod
     def from_memory_map(memory: typing.Mapping[builtins.str, RegisterData]) -> QVMResultData:
         r"""
@@ -86,6 +91,24 @@ class QVMResultData:
     def to_raw_readout_data(self) -> RawQVMReadoutData:
         r"""
         Get a copy of this result data flattened into a ``RawQVMReadoutData``.
+        """
+    def to_register_map(self) -> RegisterMap:
+        r"""
+        Convert into a [`RegisterMap`].
+        
+        The [`RegisterMatrix`] for each register will be
+        constructed such that each row contains all the final values in the register for a single shot.
+        
+        # Errors
+        
+        Returns a [`RegisterMatrixConversionError`] if the inner execution data for any of the
+        registers would result in a jagged matrix.
+        This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+        where measurements to the same memory reference might occur multiple times in a shot, or be
+        skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
+        necessitate making assumptions about the data that could skew the data in undesirable ways.
+        Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
+        selects the last value per-shot based on the program that was run.
         """
 
 @typing.final

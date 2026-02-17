@@ -3,6 +3,7 @@
 
 import builtins
 import collections.abc
+import enum
 import typing
 from qcs_sdk import QcsSdkError
 from qcs_sdk.client import QCSClient
@@ -42,8 +43,18 @@ class Architecture:
         r"""
         A list of all computational edges in the instruction set architecture.
         """
+    @edges.setter
+    def edges(self, value: builtins.list[Edge]) -> None:
+        r"""
+        A list of all computational edges in the instruction set architecture.
+        """
     @property
-    def family(self) -> typing.Optional[Family]:
+    def family(self) -> typing.Optional[Family | builtins.str]:
+        r"""
+        The architecture family. The nodes and edges conform to this family.
+        """
+    @family.setter
+    def family(self, value: typing.Optional[Family | builtins.str]) -> None:
         r"""
         The architecture family. The nodes and edges conform to this family.
         """
@@ -51,6 +62,18 @@ class Architecture:
     def nodes(self) -> builtins.list[Node]:
         r"""
         A list of all computational nodes in the instruction set architecture.
+        """
+    @nodes.setter
+    def nodes(self, value: builtins.list[Node]) -> None:
+        r"""
+        A list of all computational nodes in the instruction set architecture.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, edges: typing.Sequence[Edge], family: typing.Optional[Family | builtins.str], nodes: typing.Sequence[Node]) -> Architecture: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
         """
 
 @typing.final
@@ -61,37 +84,72 @@ class Characteristic:
     @property
     def error(self) -> typing.Optional[builtins.float]:
         r"""
-        The error in the characteristic value, or None if otherwise.
+        The error in the characteristic value, or None otherwise.
+        """
+    @error.setter
+    def error(self, value: typing.Optional[builtins.float]) -> None:
+        r"""
+        The error in the characteristic value, or None otherwise.
         """
     @property
     def name(self) -> builtins.str:
         r"""
         The name of the characteristic.
         """
+    @name.setter
+    def name(self, value: builtins.str) -> None:
+        r"""
+        The name of the characteristic.
+        """
     @property
     def node_ids(self) -> typing.Optional[builtins.list[builtins.int]]:
         r"""
-        The list of architecture node ids for the site where the characteristic is
-        measured, if that is different from the site of the enclosing operation.
-        `None` if it is the same. The order of this or the enclosing node ids obey
-        the definition of node symmetry from the enclosing operation.
+        The list of architecture node ids for the site where the characteristic is measured, if that is different from the site of the enclosing operation. None if it is the same. The order of this or the enclosing node ids obey the definition of node symmetry from the enclosing operation.
+        """
+    @node_ids.setter
+    def node_ids(self, value: typing.Optional[builtins.list[builtins.int]]) -> None:
+        r"""
+        The list of architecture node ids for the site where the characteristic is measured, if that is different from the site of the enclosing operation. None if it is the same. The order of this or the enclosing node ids obey the definition of node symmetry from the enclosing operation.
         """
     @property
     def parameter_values(self) -> typing.Optional[builtins.list[builtins.float]]:
         r"""
-        The optional ordered list of parameter values used to generate the characteristic.
-        The order matches the parameters in the enclosing operation, and so the lengths of
-        these two lists must match.
+        The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.
+        """
+    @parameter_values.setter
+    def parameter_values(self, value: typing.Optional[builtins.list[builtins.float]]) -> None:
+        r"""
+        The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.
         """
     @property
     def timestamp(self) -> builtins.str:
         r"""
-        ISO8601 date and time at which the characteristic was measured.
+        The date and time at which the characteristic was measured.
+        """
+    @timestamp.setter
+    def timestamp(self, value: builtins.str) -> None:
+        r"""
+        The date and time at which the characteristic was measured.
         """
     @property
     def value(self) -> builtins.float:
         r"""
         The characteristic value measured.
+        """
+    @value.setter
+    def value(self, value: builtins.float) -> None:
+        r"""
+        The characteristic value measured.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, name: builtins.str, timestamp: builtins.str, value: builtins.float) -> Characteristic:
+        r"""
+        A measured characteristic of an operation.
+        """
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
         """
 
 @typing.final
@@ -112,15 +170,19 @@ class Edge:
         The integer ids of the computational nodes at the two ends of the edge.
         Order is not important; an architecture edge is treated as undirected.
         """
-
-@typing.final
-class Family:
-    r"""
-    The architecture family identifier of an ``InstructionSetArchitecture``.
-    
-    Value "Full" implies that each node is connected to every other (fully-connected architecture).
-    """
-    ...
+    @node_ids.setter
+    def node_ids(self, value: builtins.list[builtins.int]) -> None:
+        r"""
+        The integer ids of the computational nodes at the two ends of the edge.
+        Order is not important; an architecture edge is treated as undirected.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, node_ids: typing.Sequence[builtins.int]) -> Edge: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
 
 class GetISAError(QcsSdkError):
     r"""
@@ -141,10 +203,7 @@ class InstructionSetArchitecture:
     the best native QUIL program for a desired task, and so are provided as part of the native ISA.
     """
     @property
-    def architecture(self) -> Architecture:
-        r"""
-        The architecture of the quantum processor.
-        """
+    def architecture(self) -> Architecture: ...
     @architecture.setter
     def architecture(self, value: Architecture) -> None: ...
     @property
@@ -153,33 +212,49 @@ class InstructionSetArchitecture:
         The list of benchmarks that have characterized the quantum processor.
         """
     @benchmarks.setter
-    def benchmarks(self, value: builtins.list[Operation]) -> None: ...
+    def benchmarks(self, value: builtins.list[Operation]) -> None:
+        r"""
+        The list of benchmarks that have characterized the quantum processor.
+        """
     @property
     def instructions(self) -> builtins.list[Operation]:
         r"""
         The list of native QUIL instructions supported by the quantum processor.
         """
     @instructions.setter
-    def instructions(self, value: builtins.list[Operation]) -> None: ...
+    def instructions(self, value: builtins.list[Operation]) -> None:
+        r"""
+        The list of native QUIL instructions supported by the quantum processor.
+        """
     @property
     def name(self) -> builtins.str:
         r"""
         The name of the quantum processor.
         """
     @name.setter
-    def name(self, value: builtins.str) -> None: ...
+    def name(self, value: builtins.str) -> None:
+        r"""
+        The name of the quantum processor.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, architecture: Architecture, benchmarks: typing.Sequence[Operation], instructions: typing.Sequence[Operation], name: builtins.str) -> InstructionSetArchitecture: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
     @staticmethod
     def from_raw(json: builtins.str) -> InstructionSetArchitecture:
         r"""
-        Deserialize an [`InstructionSetArchitecture`] from a json representation.
+        Deserialize an `InstructionSetArchitecture` from a json representation.
         
         # Errors
         
-        Returns `[SerializeIsaError`] if the input string was not deserialized correctly.
+        Returns [`SerializeIsaError`] if the input string was not deserialized correctly.
         """
     def json(self, pretty: builtins.bool = False) -> builtins.str:
         r"""
-        Serialize the ``InstructionSetArchitecture`` to a json string, optionally pretty-printed.
+        Serialize the `InstructionSetArchitecture` to a json string, optionally pretty-printed.
         
         If `pretty` is true, the json output should be pretty-printed with newlines and indents.
         
@@ -201,7 +276,22 @@ class Node:
     def node_id(self) -> builtins.int:
         r"""
         An integer id assigned to the computational node.
+        
         The ids may not be contiguous and will be assigned based on the architecture family.
+        """
+    @node_id.setter
+    def node_id(self, value: builtins.int) -> None:
+        r"""
+        An integer id assigned to the computational node.
+        
+        The ids may not be contiguous and will be assigned based on the architecture family.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, node_id: builtins.int) -> Node: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
         """
 
 @typing.final
@@ -214,8 +304,18 @@ class Operation:
         r"""
         The list of site-independent characteristics of this operation.
         """
+    @characteristics.setter
+    def characteristics(self, value: builtins.list[Characteristic]) -> None:
+        r"""
+        The list of site-independent characteristics of this operation.
+        """
     @property
     def name(self) -> builtins.str:
+        r"""
+        The name of the operation.
+        """
+    @name.setter
+    def name(self, value: builtins.str) -> None:
         r"""
         The name of the operation.
         """
@@ -224,16 +324,40 @@ class Operation:
         r"""
         The number of nodes that this operation applies to. None if unspecified.
         """
+    @node_count.setter
+    def node_count(self, value: typing.Optional[builtins.int]) -> None:
+        r"""
+        The number of nodes that this operation applies to. None if unspecified.
+        """
     @property
     def parameters(self) -> builtins.list[Parameter]:
+        r"""
+        The list of parameters. Each parameter must be uniquely named. May be empty.
+        """
+    @parameters.setter
+    def parameters(self, value: builtins.list[Parameter]) -> None:
         r"""
         The list of parameters. Each parameter must be uniquely named. May be empty.
         """
     @property
     def sites(self) -> builtins.list[OperationSite]:
         r"""
-        The list of sites at which this operation can be applied,
-        together with its site-dependent characteristics.
+        The list of sites at which this operation can be applied, together with its site-dependent characteristics.
+        """
+    @sites.setter
+    def sites(self, value: builtins.list[OperationSite]) -> None:
+        r"""
+        The list of sites at which this operation can be applied, together with its site-dependent characteristics.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, characteristics: typing.Sequence[Characteristic], name: builtins.str, parameters: typing.Sequence[Parameter], sites: typing.Sequence[OperationSite]) -> Operation:
+        r"""
+        An operation, with its sites and site-independent characteristics.
+        """
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
         """
 
 @typing.final
@@ -246,11 +370,34 @@ class OperationSite:
         r"""
         The list of site-dependent characteristics of this operation.
         """
+    @characteristics.setter
+    def characteristics(self, value: builtins.list[Characteristic]) -> None:
+        r"""
+        The list of site-dependent characteristics of this operation.
+        """
     @property
     def node_ids(self) -> builtins.list[builtins.int]:
         r"""
-        The list of architecture node ids for the site. The order of these node ids
-        obey the definition of node symmetry from the enclosing operation.
+        The list of architecture node ids for the site.
+        
+        The order of these node ids obey the definition of node symmetry from the enclosing operation.
+        """
+    @node_ids.setter
+    def node_ids(self, value: builtins.list[builtins.int]) -> None:
+        r"""
+        The list of architecture node ids for the site.
+        
+        The order of these node ids obey the definition of node symmetry from the enclosing operation.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, characteristics: typing.Sequence[Characteristic], node_ids: typing.Sequence[builtins.int]) -> OperationSite:
+        r"""
+        A site for an operation, with its site-dependent characteristics.
+        """
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
         """
 
 @typing.final
@@ -263,12 +410,43 @@ class Parameter:
         r"""
         The name of the parameter, such as the name of a mathematical symbol.
         """
+    @name.setter
+    def name(self, value: builtins.str) -> None:
+        r"""
+        The name of the parameter, such as the name of a mathematical symbol.
+        """
+    def __eq__(self, other: builtins.object) -> builtins.bool: ...
+    def __new__(cls, name: builtins.str) -> Parameter: ...
+    def __repr__(self) -> builtins.str:
+        r"""
+        Implements `__repr__` for Python in terms of the Rust
+        [`Debug`](std::fmt::Debug) implementation.
+        """
 
 class SerializeISAError(QcsSdkError):
     r"""
     Errors raised due to failure to serialize an ISA.
     """
     ...
+
+@typing.final
+class Family(enum.Enum):
+    r"""
+    The architecture family identifier of an ``InstructionSetArchitecture``.
+    
+    Value 'NONE' implies the architecture has no specific layout topology.
+    Value 'FULL' implies that each node is connected to every other (a fully-connected architecture).
+    For other values based on deployed architecture layouts (e.g. `Aspen` and `Ankaa`),
+    refer to the architecture classes themselves for more details.
+    
+    Note: Within an ``InstructionSetArchitecture``, the `family` may be one of these,
+    or may be a `str` for an unknown family, or may be `None` if the `family` is not specified.
+    The latter in particular is distinct from the `NONE` value within this enumeration.
+    """
+    NONE = ...
+    FULL = ...
+    ASPEN = ...
+    ANKAA = ...
 
 def get_instruction_set_architecture(quantum_processor_id: builtins.str, client: typing.Optional[QCSClient] = None) -> InstructionSetArchitecture:
     r"""

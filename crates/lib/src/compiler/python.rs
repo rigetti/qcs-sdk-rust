@@ -1,3 +1,4 @@
+use qcs_api_client_openapi::models::InstructionSetArchitecture;
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 use std::convert::TryFrom;
 
@@ -17,7 +18,7 @@ use crate::{
         rpcq,
     },
     python::errors,
-    qpu::isa::python::PyInstructionSetArchitecture,
+    qpu::isa::python::InstructionSetArchitecture as PyInstructionSetArchitecture,
 };
 
 create_init_submodule! {
@@ -90,7 +91,7 @@ impl TargetDevice {
     #[expect(clippy::result_large_err)]
     #[staticmethod]
     pub(crate) fn from_isa(isa: PyInstructionSetArchitecture) -> Result<Self, Error> {
-        TargetDevice::try_from(isa.0)
+        TargetDevice::try_from(InstructionSetArchitecture::from(isa))
     }
 
     /// Create a [`TargetDevice`] from a JSON string.

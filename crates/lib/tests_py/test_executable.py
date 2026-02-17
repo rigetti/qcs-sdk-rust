@@ -1,19 +1,7 @@
 import pytest
 
-from qcs_sdk import (
-    ExecutionData,
-    ResultData,
-    RegisterMap,
-    RegisterMatrix,
-    Executable,
-    ExeParameter,
-    JobHandle,
-    Service,
-    RegisterData,
-    ExecutionError,
-    RegisterMatrixConversionError,
-)
-from qcs_sdk.qvm import QVMClient
+from qcs_sdk import Executable
+from qcs_sdk.qvm import QVMClient, QVMResultData
 
 @pytest.mark.qcs_session
 @pytest.mark.qcs_execution
@@ -58,7 +46,8 @@ def test_execute_qvm(
 ):
     executable = Executable(bell_program, shots=1)
     results = executable.execute_on_qvm(qvm_http_client)
-    results = results.result_data._0
+    results = results.result_data
+    assert isinstance(results, QVMResultData)
 
     vals = results.memory["ro"]
     shot = vals._0[0]

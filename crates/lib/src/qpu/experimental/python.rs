@@ -5,7 +5,6 @@ use rigetti_pyo3::create_init_submodule;
 
 use crate::qpu::experimental::random::ChooseRandomRealSubRegions;
 
-// #[pyo3(name = "experimental", module = "qcs_sdk.qpu", submodule)]
 create_init_submodule! {
     submodules: [ "random": random::init_submodule ],
 }
@@ -21,7 +20,6 @@ mod random {
         },
     };
 
-    // #[pyo3(name = "random", module = "qcs_sdk.qpu.experimental", submodule)]
     create_init_submodule! {
         classes: [ ChooseRandomRealSubRegions, PrngSeedValue ],
         errors: [ errors::RandomError ],
