@@ -71,7 +71,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: Swatinem/rust-cache@v2
-      - uses: taiki-e/install-action@cargo-make
 
       - name: Install protoc
         uses: arduino/setup-protoc@v1
@@ -97,6 +96,8 @@ jobs:
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
+
+      - uses: taiki-e/install-action@cargo-make
 
       # Knope is used as part of the Python API check.
       - uses: knope-dev/action@v2.1.0
