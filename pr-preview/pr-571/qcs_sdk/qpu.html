@@ -48,10 +48,10 @@
                                 <a class="function" href="#QPUResultData.to_register_map">to_register_map</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
+                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.mappings">mappings</a>
+                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
@@ -66,10 +66,10 @@
                                 <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
+                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
+                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                 </ul>
 
@@ -230,19 +230,6 @@ selects the last value per-shot based on the program that was run.</p>
 
 
                             </div>
-                            <div id="QPUResultData.memory_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory_values</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.memory_values"></a>
-    
-            <div class="docstring"><p>The final contents of each memory region, keyed on region name.</p>
-</div>
-
-
-                            </div>
                             <div id="QPUResultData.mappings" class="classattr">
                                 <div class="attr variable">
             <span class="name">mappings</span>
@@ -252,6 +239,19 @@ selects the last value per-shot based on the program that was run.</p>
     <a class="headerlink" href="#QPUResultData.mappings"></a>
     
             <div class="docstring"><p>Mappings of a memory region (ie. "ro[0]") to its key name in <code><a href="#QPUResultData.readout_values">readout_values</a></code> (ie. "q0").</p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.memory_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory_values</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.memory_values"></a>
+    
+            <div class="docstring"><p>The final contents of each memory region, keyed on region name.</p>
 </div>
 
 
@@ -298,17 +298,6 @@ each register contains.</p>
     
 
                             </div>
-                            <div id="RawQPUReadoutData.mappings" class="classattr">
-                                <div class="attr variable">
-            <span class="name">mappings</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
-    
-    
-
-                            </div>
                             <div id="RawQPUReadoutData.memory_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">memory_values</span>
@@ -316,6 +305,17 @@ each register contains.</p>
         
     </div>
     <a class="headerlink" href="#RawQPUReadoutData.memory_values"></a>
+    
+    
+
+                            </div>
+                            <div id="RawQPUReadoutData.mappings" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mappings</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
     
     
 
