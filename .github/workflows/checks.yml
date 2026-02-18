@@ -62,3 +62,52 @@ jobs:
           CARGO_MAKE_BUILD_EXAMPLES: true
         run: cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
 
+  check-python:
+    name: Run Python Checks
+    runs-on: ubuntu-latest
+    steps:
+      # Need full history for Knope and Griffe API checks
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@cargo-make
+
+      - name: Install protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          version: '3.20.1'
+      - name: Install libquil dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libffi\* libblas\* liblapack\* curl
+          curl -O https://mirrors.edge.kernel.org/ubuntu/pool/main/libf/libffi/libffi7_3.3-4_amd64.deb
+          sudo apt install -y ./libffi7_3.3-4_amd64.deb
+          sudo apt install -y libffi-dev
+      - name: Install libquil
+        run: |
+          curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0
+      - name: Install cargo-make
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug cargo-make
+      - uses: syphar/restore-virtualenv@v1
+      # may protect against linking failure: no space left on device
+      - name: Delete huge unnecessary tools folder
+        run: rm -rf /opt/hostedtoolcache
+
+      # Knope is used as part of the Python API check.
+      - uses: knope-dev/action@v2.1.0
+        with:
+          version: 0.21.3
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - uses: abatilo/actions-poetry@v4
+
+      - name: Test Python Package
+        run: cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
