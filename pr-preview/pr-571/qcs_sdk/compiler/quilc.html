@@ -107,10 +107,10 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                 </ul>
 
@@ -119,19 +119,19 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
                         </li>
                 </ul>
 
@@ -473,19 +473,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
-                                <div class="attr variable">
-            <span class="name">pauli</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
-    
-            <div class="docstring"><p>Description of the encoded Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
                                 <div class="attr variable">
             <span class="name">phase</span>
@@ -495,6 +482,19 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
     
             <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pauli</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
+    
+            <div class="docstring"><p>Description of the encoded Pauli.</p>
 </div>
 
 
@@ -514,45 +514,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gateset</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
-    
-            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
-                                <div class="attr variable">
-            <span class="name">interleaver</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
-    
-            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
-    
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
                             <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
                                 <div class="attr variable">
             <span class="name">qubits</span>
@@ -575,6 +536,45 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.seed"></a>
     
             <div class="docstring"><p>PRNG seed. Set this to guarantee repeatable results.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gateset</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                                <div class="attr variable">
+            <span class="name">depth</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
+                                <div class="attr variable">
+            <span class="name">interleaver</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
+    
+            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
 </div>
 
 

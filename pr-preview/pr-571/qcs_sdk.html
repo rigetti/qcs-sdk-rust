@@ -44,13 +44,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExeParameter.index">index</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExeParameter.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.value">value</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExeParameter.index">index</a>
                         </li>
                 </ul>
 
@@ -59,10 +59,10 @@
                     <a class="class" href="#ExecutionData">ExecutionData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionData.duration">duration</a>
+                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
+                                <a class="variable" href="#ExecutionData.duration">duration</a>
                         </li>
                 </ul>
 
@@ -101,10 +101,10 @@
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                 </ul>
 
@@ -272,9 +272,6 @@
                                 <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                         <li>
@@ -285,6 +282,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                 </ul>
 
@@ -326,7 +326,7 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
 </span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_qcs_sdk</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>  <span class="c1"># noqa</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>  <span class="c1"># noqa: re-export</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
 </span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">_additional_exports</span> <span class="o">=</span> <span class="p">[</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;QCSClient&quot;</span><span class="p">,</span>
@@ -359,17 +359,6 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 </div>
 
 
-                            <div id="ExeParameter.index" class="classattr">
-                                <div class="attr variable">
-            <span class="name">index</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.index"></a>
-    
-    
-
-                            </div>
                             <div id="ExeParameter.name" class="classattr">
                                 <div class="attr variable">
             <span class="name">name</span>
@@ -392,6 +381,17 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
     
 
                             </div>
+                            <div id="ExeParameter.index" class="classattr">
+                                <div class="attr variable">
+            <span class="name">index</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.index"></a>
+    
+    
+
+                            </div>
                 </section>
                 <section id="ExecutionData">
                     <div class="attr class">
@@ -407,6 +407,19 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 </div>
 
 
+                            <div id="ExecutionData.result_data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">result_data</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData.result_data"></a>
+    
+            <div class="docstring"><p>The [<code>ResultData</code>] that was read from the <a href="crate::Executable"><code>Executable</code></a>.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionData.duration" class="classattr">
                                 <div class="attr variable">
             <span class="name">duration</span>
@@ -419,19 +432,6 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 time. If paying for on-demand execution, this is the amount you will be billed for.</p>
 
 <p>This will always be <code>None</code> for QVM execution.</p>
-</div>
-
-
-                            </div>
-                            <div id="ExecutionData.result_data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">result_data</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData.result_data"></a>
-    
-            <div class="docstring"><p>The [<code>ResultData</code>] that was read from the <a href="crate::Executable"><code>Executable</code></a>.</p>
 </div>
 
 
@@ -725,19 +725,6 @@ If <code>None</code>, the default endpoint for the given quantum_processor_id is
 </div>
 
 
-                            <div id="JobHandle.job_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">job_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.job_id"></a>
-    
-            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
-</div>
-
-
-                            </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_map</span>
@@ -748,6 +735,19 @@ If <code>None</code>, the default endpoint for the given quantum_processor_id is
     
             <div class="docstring"><p>The readout map from "source readout memory locations"
 to the "filter pipeline node" which publishes the data.</p>
+</div>
+
+
+                            </div>
+                            <div id="JobHandle.job_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">job_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.job_id"></a>
+    
+            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
 </div>
 
 
@@ -1433,19 +1433,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">grpc_api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
-</div>
-
-
-                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -1494,6 +1481,19 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.qvm_url"></a>
     
             <div class="docstring"><p>URL to access the QVM.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
 </div>
 
 
