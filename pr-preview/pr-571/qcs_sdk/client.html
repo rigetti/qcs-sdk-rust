@@ -56,10 +56,10 @@
                                 <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -95,13 +95,13 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.scopes">scopes</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AuthServer.issuer">issuer</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#AuthServer.scopes">scopes</a>
                         </li>
                 </ul>
 
@@ -361,19 +361,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-            <div class="docstring"><p>URL to access the QVM.</p>
-</div>
-
-
-                            </div>
                             <div id="QCSClient.quilc_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">quilc_url</span>
@@ -383,6 +370,19 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.quilc_url"></a>
     
             <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
 </div>
 
 
@@ -520,21 +520,6 @@ credentials or payload data.</p>
     
 
                             </div>
-                            <div id="AuthServer.scopes" class="classattr">
-                                <div class="attr variable">
-            <span class="name">scopes</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.scopes"></a>
-    
-            <div class="docstring"><p>OAuth 2.0 scopes to request during authorization requests.
-If not specified, <code>supported_scopes</code> from the discovery document hosted at <code><a href="#AuthServer.issuer">issuer</a></code> will be used.
-The scope <code>openid</code> is always requested, even if not present in this list.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.client_id" class="classattr">
                                 <div class="attr variable">
             <span class="name">client_id</span>
@@ -566,6 +551,21 @@ For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.co
 which is the canonical URI that the identity provider uses to sign and validate tokens,
 but the OpenID specification requires that they match exactly,
 and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.scopes" class="classattr">
+                                <div class="attr variable">
+            <span class="name">scopes</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.scopes"></a>
+    
+            <div class="docstring"><p>OAuth 2.0 scopes to request during authorization requests.
+If not specified, <code>supported_scopes</code> from the discovery document hosted at <code><a href="#AuthServer.issuer">issuer</a></code> will be used.
+The scope <code>openid</code> is always requested, even if not present in this list.</p>
 </div>
 
 
