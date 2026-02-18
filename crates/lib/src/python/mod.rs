@@ -10,7 +10,7 @@ use pyo3::prelude::*;
 use rigetti_pyo3::{create_init_submodule, py_sync};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::{define_stub_info_gatherer, derive::gen_stub_pyfunction};
+use pyo3_stub_gen::derive::gen_stub_pyfunction;
 
 use crate::{
     compiler,
@@ -90,6 +90,9 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
 #[cfg(feature = "stubs")]
 mod stubs {
+    use pyo3_stub_gen::{define_stub_info_gatherer, generate::Module, Result, StubInfo};
+    use std::path::Path;
+
     #[derive(pyo3::IntoPyObject)]
     struct Final<T>(T);
 
@@ -105,10 +108,53 @@ mod stubs {
         Final<&str>,
         Final(env!("CARGO_PKG_VERSION"))
     );
+
+    define_stub_info_gatherer!(internal_stub_info);
+
+    /// Ensures modules exist in the stubs, even if they don't have any members.
+    fn ensure_submod(stubs: &mut StubInfo, module: &str) {
+        stubs.modules.entry(module.to_string()).or_insert(Module {
+            name: module.to_string(),
+            ..Default::default()
+        });
+
+        if let Some((parent, child)) = module.rsplit_once('.') {
+            stubs
+                .modules
+                .entry(parent.to_string())
+                .or_insert(Module {
+                    name: parent.to_string(),
+                    ..Default::default()
+                })
+                .submodules
+                .insert(child.to_string());
+
+            ensure_submod(stubs, parent);
+        }
+    }
+
+    /// Gather stub information to generate stub files.
+    pub fn stub_info() -> Result<StubInfo> {
+        let manifest_dir: &Path = env!("CARGO_MANIFEST_DIR").as_ref();
+        let mut stubs = StubInfo::from_pyproject_toml(manifest_dir.join("pyproject.toml"))?;
+
+        // Add otherwise empty modules, as they aren't found automatically.
+        let module_leaves = [
+            "qcs_sdk.compiler.quilc",
+            "qcs_sdk.qpu.experimental.random",
+            "qcs_sdk.qvm",
+        ];
+
+        for mod_name in module_leaves {
+            ensure_submod(&mut stubs, mod_name);
+        }
+
+        Ok(stubs)
+    }
 }
 
 #[cfg(feature = "stubs")]
-define_stub_info_gatherer!(stub_info);
+pub use stubs::stub_info;
 
 #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk"))]
 #[pyfunction]

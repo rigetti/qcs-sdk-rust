@@ -14,6 +14,7 @@ from qcs_sdk.qpu.api import ExecutionOptions
 from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData
 from . import client
+from . import compiler
 from . import qpu
 from . import qvm
 

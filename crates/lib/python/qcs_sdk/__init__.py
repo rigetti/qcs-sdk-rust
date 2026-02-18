@@ -7,7 +7,7 @@ This package is still in development and breaking changes should be expected bet
 """
 
 from . import _qcs_sdk
-from .client import QCSClient  # noqa
+from .client import QCSClient  # noqa: re-export
 
 _additional_exports = [
     "QCSClient",

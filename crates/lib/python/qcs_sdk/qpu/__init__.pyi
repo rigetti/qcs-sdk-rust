@@ -7,6 +7,7 @@ import typing
 from qcs_sdk import QcsSdkError, RegisterMap
 from qcs_sdk.client import QCSClient
 from . import api
+from . import experimental
 from . import isa
 from . import translation
 

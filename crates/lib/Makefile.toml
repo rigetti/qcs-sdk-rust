@@ -95,10 +95,12 @@ args = [
     "run",
     "stubtest",
     "--allowlist",
-    ".stubtest-allowlist",
+    "stubtest-allowlist",
     "--allowlist",
     "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
-    "qcs_sdk"
+    "--ignore-disjoint-bases",
+    "--ignore-unused-allowlist",
+    "qcs_sdk",
 ]
 # TODO(#475): Enable error reporting once stubtest is happy with stubgen's output.
 ignore_errors = true
