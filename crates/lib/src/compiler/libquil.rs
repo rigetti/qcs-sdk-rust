@@ -232,7 +232,7 @@ MEASURE 1 ro[1]
             .unwrap()
             .run(
                 NonZeroU16::new(10).expect("value is non-zero"),
-                [("ro".to_string(), AddressRequest::IncludeAll)]
+                [("ro".to_string(), AddressRequest::IncludeAll())]
                     .iter()
                     .cloned()
                     .collect(),

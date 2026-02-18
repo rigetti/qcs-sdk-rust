@@ -70,11 +70,11 @@ impl crate::qvm::Client for Client {
                             .collect::<Result<_, _>>()?,
                     ),
                 )),
-                AddressRequest::IncludeAll => Ok((
+                AddressRequest::IncludeAll() => Ok((
                     address.clone(),
                     libquil_sys::qvm::MultishotAddressRequest::All,
                 )),
-                AddressRequest::ExcludeAll => Err(Error::UnsupportedIndicesRequestType),
+                AddressRequest::ExcludeAll() => Err(Error::UnsupportedIndicesRequestType),
             })
             .collect::<Result<_, _>>()?;
         let result = libquil_sys::qvm::multishot(
