@@ -63,15 +63,14 @@ impl_repr!(NativeQuilMetadata);
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl CompilerOpts {
-    /// Creates a new instance of [`CompilerOpts`] with zero values for each option.
-    ///
-    /// Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+    /// Create a new instance of `CompilerOpts`.
     #[new]
     #[pyo3(signature = (timeout = Some(DEFAULT_COMPILER_TIMEOUT), protoquil = None))]
     fn __new__(timeout: Option<f64>, protoquil: Option<bool>) -> Self {
         Self::new().with_timeout(timeout).with_protoquil(protoquil)
     }
 
+    /// Create a new instance of `CompilerOpts` with default values.
     #[staticmethod]
     #[pyo3(name = "default")]
     fn py_default() -> Self {
