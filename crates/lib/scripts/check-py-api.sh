@@ -13,8 +13,8 @@ trap popd EXIT
 
 # The Python package name to check.
 PY_PACKAGE="qcs_sdk"
-# The name of the package that `knope` adds change logs for.
-KNOPE_PACKAGE="qcs-sdk"
+# The name of the CHANGELOG that `knope` adds change logs for.
+KNOPE_PACKAGE="crates/lib"
 
 # Check if `griffe` says this is a breaking change.
 poetry run -P crates/lib -- \
