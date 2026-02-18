@@ -26,6 +26,9 @@ jobs:
         uses: taiki-e/install-action@cargo-make
       - uses: syphar/restore-virtualenv@v1
 
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v4
+
       - name: Build qcs-sdk-python documentation
         run: cargo make --cwd crates/lib document-python-package
 

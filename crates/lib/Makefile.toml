@@ -41,7 +41,7 @@ args = ["deny", "--exclude-dev", "--all-features", "check"]
 dependencies = ["deny", "lint"]
 
 [tasks.ci-flow]
-dependencies = ["test-flow", "pytest-flow", "stubtest-flow"]
+dependencies = ["test-flow", "test-python-package"]
 
 # ----
 
@@ -112,16 +112,21 @@ dependencies = [
 [tasks.lint-python-package]
 description = "Find errors in Python-related Rust code."
 command = "poetry"
-args = ["run", "python", "./scripts/lint-sdk.py", "--base", "src", "--show-mistakes"]
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
 description = "Print the Python package layout as defined within Rust code."
 command = "poetry"
-args = ["run", "python", "./scripts/lint-sdk.py", "--base", "src", "--show-package"]
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
 [tasks.test-python-package]
 description = "Run all Python-related tests."
-dependencies = ["pytest", "lint-python-package", "stubtest"]
+dependencies = [
+    "lint-python-package",
+    "check-python-api",
+    "stubtest-flow",
+    "pytest-flow",
+]
 
 [tasks.test-all]
 description = "Run all tests."
@@ -133,7 +138,7 @@ alias = "test-all"
 [tasks.check-python-api]
 description = "Check if Python API has breaking changes."
 dependencies = ["install-python-package-with-stubs"]
-script = { file = "./scripts/check-python-api.sh" }
+script = { file = "./scripts/check-py-api.sh" }
 
 [tasks.document-python-package]
 description = "Generate Python package documentation."
