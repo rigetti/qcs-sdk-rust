@@ -31,12 +31,13 @@ class CompilerOpts:
     """
     def __new__(cls, timeout: typing.Optional[builtins.float] = 30.0, protoquil: typing.Optional[builtins.bool] = None) -> CompilerOpts:
         r"""
-        Creates a new instance of [`CompilerOpts`] with zero values for each option.
-        
-        Consider using [`CompilerOpts::default()`] to create an instance with recommended defaults.
+        Create a new instance of `CompilerOpts`.
         """
     @staticmethod
-    def default() -> CompilerOpts: ...
+    def default() -> CompilerOpts:
+        r"""
+        Create a new instance of `CompilerOpts` with default values.
+        """
 
 @typing.final
 class ConjugateByCliffordRequest:
