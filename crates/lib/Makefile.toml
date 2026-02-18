@@ -58,7 +58,7 @@ install_crate = false
 
 [tasks.package-python]
 description = "Build a release version of the Python package to the active virtual environment."
-dependencies = ["generate-stubs"]
+dependencies = ["install-python-deps", "generate-stubs"]
 command = "poetry"
 args = ["run", "maturin", "build", "--release"]
 
@@ -104,18 +104,17 @@ args = [
 ignore_errors = true
 
 [tasks.stubtest-flow]
-dependencies = [
-    "install-python-package",
-    "stubtest",
-]
+dependencies = ["stubtest"]
 
 [tasks.lint-python-package]
 description = "Find errors in Python-related Rust code."
+dependencies = ["install-python-package-with-stubs"]
 command = "poetry"
 args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
 description = "Print the Python package layout as defined within Rust code."
+dependencies = ["install-python-package-with-stubs"]
 command = "poetry"
 args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
@@ -156,20 +155,24 @@ args = [
 # ----
 
 [tasks.format-tracing-subscriber]
-command = "black"
-args = ["python/qcs_sdk/_tracing_subscriber"]
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
-command = "black"
-args = ["python/qcs_sdk", "tests"]
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "black", "python/qcs_sdk", "tests"]
 
 [tasks.test-session]
-command = "pytest"
-args = ["tests_py", "--with-qcs-session"]
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "pytest", "tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
-command = "pytest"
-args = ["tests_py", "--with-qcs-session", "--with-qcs-execution"]
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]
