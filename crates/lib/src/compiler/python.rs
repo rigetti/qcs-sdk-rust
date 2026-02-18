@@ -190,7 +190,7 @@ impl PyQuilcClient {
     /// Construct a QuilcClient that uses libquil.
     #[staticmethod]
     fn new_libquil() -> Self {
-        let libquil_client = qcs::compiler::libquil::Client {};
+        let libquil_client = crate::compiler::libquil::Client {};
         Self {
             inner: QuilcClient::LibquilSys(libquil_client),
         }
