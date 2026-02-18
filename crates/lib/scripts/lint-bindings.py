@@ -31,6 +31,21 @@ def main():
     package_config = PackageConfig(root_module="qcs_sdk", internal_module="_qcs_sdk")
     annotated, exported = process_dir(args.base, package_config, default_macro_handlers())
 
+    # Remove reexports that came from the `qcs_api_client_common` crate,
+    # since they won't have matching module annotations.
+    reexports = {
+        "OAuthSession",
+        "AuthServer",
+        "RefreshToken",
+        "SecretRefreshToken",
+        "ClientCredentials",
+        "ExternallyManaged",
+    }
+    client_mod = exported["qcs_sdk.client"]
+    to_remove = {item for item in client_mod if item.rust_name in reexports}
+    for export in to_remove:
+        client_mod.discard(export)
+
     issues = find_possible_mistakes(package_config, annotated, exported)
     if args.show_mistakes:
         for issue in issues:
