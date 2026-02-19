@@ -15,6 +15,7 @@ from qcs_sdk.qpu.translation import TranslationOptions
 from qcs_sdk.qvm import QVMClient, QVMResultData
 from . import client
 from . import compiler
+from . import diagnostics
 from . import qpu
 from . import qvm
 

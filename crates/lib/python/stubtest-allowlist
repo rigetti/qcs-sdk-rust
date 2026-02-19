@@ -5,6 +5,7 @@ qcs_sdk.__all__
 qcs_sdk.client.__all__
 qcs_sdk.compiler.__all__
 qcs_sdk.compiler.quilc.__all__
+qcs_sdk.diagnostics.__all__
 qcs_sdk.qpu.__all__
 qcs_sdk.qpu.api.__all__
 qcs_sdk.qpu.experimental.__all__

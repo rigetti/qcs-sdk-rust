@@ -13,7 +13,7 @@ use rigetti_pyo3::{create_init_submodule, py_sync};
 use pyo3_stub_gen::derive::gen_stub_pyfunction;
 
 use crate::{
-    compiler,
+    compiler, diagnostics,
     python::{
         executable::{ExeParameter, PyExecutable, PyJobHandle},
         execution_data::{
@@ -64,7 +64,8 @@ create_init_submodule! {
         "client": client::init_submodule,
         "compiler": compiler::python::init_submodule,
         "qpu": qpu::python::init_submodule,
-        "qvm": qvm::python::init_submodule
+        "qvm": qvm::python::init_submodule,
+        "diagnostics": diagnostics::python::init_submodule
     ],
 }
 
@@ -172,5 +173,5 @@ fn reset_logging() {
 #[pyfunction]
 #[pyo3(name = "_gather_diagnostics")]
 fn gather_diagnostics(py: Python<'_>) -> PyResult<String> {
-    py_sync!(py, async { Ok(crate::diagnostics::get_report().await) })
+    py_sync!(py, async { Ok(diagnostics::get_report().await) })
 }

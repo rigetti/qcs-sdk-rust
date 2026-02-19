@@ -12,6 +12,9 @@ use crate::{
     qvm::{self, Client as _, QvmOptions},
 };
 
+#[cfg(feature = "python")]
+pub(crate) mod python;
+
 /// Collect package diagnostics in string form
 pub async fn get_report() -> String {
     Diagnostics::gather().await.to_string()
@@ -22,7 +25,7 @@ pub async fn get_report() -> String {
 /// behavior.
 #[derive(Debug)]
 struct Diagnostics {
-    /// The version of this crate    
+    /// The version of this crate
     version: String,
 
     rust_version: String,
