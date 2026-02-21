@@ -6,27 +6,9 @@ from qcs_sdk.qpu.translation import translate
 from qcs_sdk.qpu.api import (
     ConnectionStrategy,
     ExecutionOptions,
-    Register,
     retrieve_results,
     submit,
 )
-
-@pytest.mark.parametrize(("name", "cls", "data"),
-    [
-        ("Complex32", Register.Complex32, [0j, 1j, 2j]),
-        ("I32", Register.I32, [3, 4, 5]),
-    ]
-)
-def test_register(name: str, cls: Register.Complex32 | Register.I32, data: list[complex | int]):
-    """Register should accept setting and getting data correctly."""
-    register = cls(data)  # pyright: ignore[reportCallIssue]  # types are callable
-    match (name, register):
-        case ("Complex32", Register.Complex32(d)):
-            assert d == data
-        case ("I32", Register.I32(d)):
-            assert d == data
-        case _:
-            pytest.fail("Register did not match")
 
 
 @pytest.mark.qcs_execution

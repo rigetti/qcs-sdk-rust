@@ -7,8 +7,9 @@ use pyo3::{prelude::*, types::PyTuple};
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{
-    gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pyfunction, gen_stub_pymethods,
+use pyo3_stub_gen::{
+    derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods},
+    impl_stub_type,
 };
 
 use qcs_api_client_grpc::models::controller::{
@@ -38,10 +39,7 @@ create_init_submodule! {
         ApiExecutionOptionsBuilder,
         PyQpuApiDuration
     ],
-    complex_enums: [
-        ConnectionStrategy,
-        Register
-    ],
+    complex_enums: [ ConnectionStrategy ],
     errors: [
         errors::QpuApiError,
         errors::SubmissionError,
@@ -66,15 +64,16 @@ impl_repr!(ApiExecutionOptions);
 impl_repr!(ConnectionStrategy);
 
 /// Data vectors within a single ``ExecutionResult``.
-#[derive(Clone, Debug)]
-#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[pyclass(module = "qcs_sdk.qpu.api")]
+#[derive(Clone, Debug, IntoPyObject, IntoPyObjectRef, FromPyObject)]
 pub enum Register {
     /// A register of 32-bit integers.
     I32(Vec<i32>),
     /// A register of 32-bit complex numbers.
     Complex32(Vec<Complex32>),
 }
+
+#[cfg(feature = "stubs")]
+impl_stub_type!(Register = Vec<i32> | Vec<Complex32>);
 
 /// Execution readout data from a particular memory location.
 #[derive(Clone, Debug)]

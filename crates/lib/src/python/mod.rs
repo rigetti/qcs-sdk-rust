@@ -47,10 +47,7 @@ create_init_submodule! {
         Service
     ],
 
-    complex_enums: [
-        PyRegisterMatrix,
-        RegisterData
-    ],
+    complex_enums: [ PyRegisterMatrix, RegisterData ],
 
     errors: [
         errors::QcsSdkError,

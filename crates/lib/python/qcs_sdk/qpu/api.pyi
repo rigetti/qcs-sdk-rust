@@ -211,7 +211,7 @@ class ExecutionResult:
     Execution readout data from a particular memory location.
     """
     @property
-    def data(self) -> Register:
+    def data(self) -> builtins.list[builtins.int] | builtins.list[builtins.complex]:
         r"""
         The result data for all shots by the particular memory location.
         """
@@ -226,7 +226,7 @@ class ExecutionResult:
         The shape of the result data.
         """
     @staticmethod
-    def from_register(register: Register) -> ExecutionResult:
+    def from_register(register: typing.Sequence[builtins.int] | typing.Sequence[builtins.complex]) -> ExecutionResult:
         r"""
         Build an `ExecutionResult` from a `Register`.
         """
@@ -272,36 +272,6 @@ class QpuApiError(QcsSdkError):
     r"""
     Errors that can occur while attempting to establish a connection to the QPU.
     """
-    ...
-
-class Register:
-    r"""
-    Data vectors within a single ``ExecutionResult``.
-    """
-    @typing.final
-    class Complex32(Register):
-        r"""
-        A register of 32-bit complex numbers.
-        """
-        __match_args__ = ("_0",)
-        @property
-        def _0(self) -> builtins.list[builtins.complex]: ...
-        def __getitem__(self, key: builtins.int) -> typing.Any: ...
-        def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0: typing.Sequence[builtins.complex]) -> Register.Complex32: ...
-    
-    @typing.final
-    class I32(Register):
-        r"""
-        A register of 32-bit integers.
-        """
-        __match_args__ = ("_0",)
-        @property
-        def _0(self) -> builtins.list[builtins.int]: ...
-        def __getitem__(self, key: builtins.int) -> typing.Any: ...
-        def __len__(self) -> builtins.int: ...
-        def __new__(cls, _0: typing.Sequence[builtins.int]) -> Register.I32: ...
-    
     ...
 
 class SubmissionError(QpuApiError):

@@ -121,9 +121,7 @@ def execution_timeout() -> datetime.timedelta:
 
 @pytest.fixture
 def api_execution_options(execution_timeout: datetime.timedelta) -> APIExecutionOptions:
-    builder = APIExecutionOptionsBuilder.default()
-    builder.timeout(execution_timeout)
-    return builder.build()
+    return APIExecutionOptions(timeout=execution_timeout)
 
 
 @pytest.fixture
