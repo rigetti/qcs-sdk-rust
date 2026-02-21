@@ -81,6 +81,10 @@ For Python consumers, please be aware of the following changes:
 - `ExecutionData` now requires `result_data`, whereas it had been optional for `pickle` support.
     Constructing it without explicit `result_data` is almost certainly a bug,
     so now that it implements `__getnewargs__`, the `result_data` parameter is required.
+- Most synchronous wrappers around `_async` methods and functions now raise an error
+    if used within an async context. You should use `await` and the `_async` method instead.
+    Although some synchronous wrappers may happen to work within an async context incidentally,
+    it is not officially supported behavior, and you should use their async counterparts.
 
 #### Specific Python Examples
 
