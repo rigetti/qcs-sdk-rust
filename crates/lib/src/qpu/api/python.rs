@@ -284,6 +284,18 @@ impl ApiExecutionOptionsBuilder {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ApiExecutionOptions {
+    #[new]
+    #[pyo3(signature = (bypass_settings_protection = false, timeout = None))]
+    fn __new__(
+        bypass_settings_protection: bool,
+        timeout: Option<Duration>,
+    ) -> Result<Self, BuildOptionsError> {
+        let mut builder = ApiExecutionOptionsBuilder::default();
+        builder.bypass_settings_protection(bypass_settings_protection);
+        builder.timeout(timeout.map(Into::into));
+        Ok(builder.build()?)
+    }
+
     #[staticmethod]
     #[pyo3(name = "default")]
     fn py_default() -> Self {
@@ -532,11 +544,16 @@ mod stubs {
 py_function_sync_async! {
     /// Submits an executable `program` to be run on the specified QPU.
     ///
-    /// :param program: An executable program (see ``translate``).
+    /// :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     /// :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
-    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
-    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    /// :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
+    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+    ///     This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param client: The ``Qcs`` client to use.
+    ///     Creates one using environment configuration if unset.
+    ///     See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
+    /// :param execution_options: The ``ExecutionOptions`` to use.
+    ///     If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+    ///     then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     ///
     /// :returns: The ID of the submitted job which can be used to fetch results.
     ///

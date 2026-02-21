@@ -1,10 +1,7 @@
 import pickle
-import typing_extensions
 import pytest
 
-from qcs_sdk.qpu.translation import (
-    translate,
-)
+from qcs_sdk.qpu.translation import translate
 
 from qcs_sdk.qpu.api import (
     ConnectionStrategy,
@@ -14,9 +11,6 @@ from qcs_sdk.qpu.api import (
     submit,
 )
 
-def fn(b: bool) -> tuple[()]:
-    return ()
-
 @pytest.mark.parametrize(("name", "cls", "data"),
     [
         ("Complex32", Register.Complex32, [0j, 1j, 2j]),
@@ -25,7 +19,7 @@ def fn(b: bool) -> tuple[()]:
 )
 def test_register(name: str, cls: Register.Complex32 | Register.I32, data: list[complex | int]):
     """Register should accept setting and getting data correctly."""
-    register = cls(data)
+    register = cls(data)  # pyright: ignore[reportCallIssue]  # types are callable
     match (name, register):
         case ("Complex32", Register.Complex32(d)):
             assert d == data
@@ -36,9 +30,7 @@ def test_register(name: str, cls: Register.Complex32 | Register.I32, data: list[
 
 
 @pytest.mark.qcs_execution
-def test_submit_retrieve(
-    quantum_processor_id: str,
-):
+def test_submit_retrieve(quantum_processor_id: str, execution_options: ExecutionOptions):
     """
     Test the full program submission and retrieval.
     """
@@ -48,8 +40,12 @@ def test_submit_retrieve(
 
     translated = translate(program, 1, quantum_processor_id)
 
-    job_id = submit(translated.program, memory, quantum_processor_id)
-    results = retrieve_results(job_id)
+    job_id = submit(program=translated.program, patch_values=memory, quantum_processor_id=quantum_processor_id)
+    results = retrieve_results(
+        job_id=job_id,
+        quantum_processor_id=quantum_processor_id,
+        execution_options=execution_options,
+    )
     assert results is not None
 
 class TestPickle():

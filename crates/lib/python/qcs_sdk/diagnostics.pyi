@@ -8,7 +8,8 @@ def get_report() -> builtins.str:
     r"""
     Return a string describing the package and its environment for use in bug reporting and diagnosis.
     
-    This is a synchronous wrapper around `get_report_async`. Use that version in async environments.
+    This is a synchronous wrapper around `get_report_async`.
+    Use that version in async environments.
     
     Note: this format is not stable and its content may change between versions.
     """

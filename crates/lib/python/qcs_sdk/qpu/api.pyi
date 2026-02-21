@@ -38,6 +38,7 @@ class APIExecutionOptions:
         
         The service may also enforce a maximum value for this field.
         """
+    def __new__(cls, bypass_settings_protection: builtins.bool = False, timeout: typing.Optional[datetime.timedelta] = None) -> APIExecutionOptions: ...
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
@@ -411,11 +412,16 @@ def submit(program: builtins.str, patch_values: typing.Mapping[builtins.str, typ
     r"""
     Submits an executable `program` to be run on the specified QPU.
     
-    :param program: An executable program (see ``translate``).
+    :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
-    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+        Creates one using environment configuration if unset.
+        See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
+    :param execution_options: The ``ExecutionOptions`` to use.
+        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+        then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
     :returns: The ID of the submitted job which can be used to fetch results.
     
@@ -427,11 +433,16 @@ def submit_async(program: builtins.str, patch_values: typing.Mapping[builtins.st
     r"""
     Submits an executable `program` to be run on the specified QPU.
     
-    :param program: An executable program (see ``translate``).
+    :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
-    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    :param execution_options: The ``ExecutionOptions`` to use. If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``, then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on.
+        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param client: The ``Qcs`` client to use.
+        Creates one using environment configuration if unset.
+        See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
+    :param execution_options: The ``ExecutionOptions`` to use.
+        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+        then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
     :returns: The ID of the submitted job which can be used to fetch results.
     

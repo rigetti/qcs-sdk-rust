@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import List
 
@@ -7,6 +8,7 @@ from _pytest.config.argparsing import Parser
 from _pytest.nodes import Item
 
 from qcs_sdk.client import QCSClient
+from qcs_sdk.qpu.api import APIExecutionOptions, APIExecutionOptionsBuilder, ExecutionOptions
 from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.qvm import QVMClient
 from qcs_sdk.compiler.quilc import QuilcClient
@@ -109,5 +111,28 @@ def live_qpu_access(request: pytest.FixtureRequest) -> bool:
     return (
         request.config.getoption("--with-qcs-execution") is not None
         and request.config.getoption("--with-qcs-execution") is not False
+    )
+
+
+@pytest.fixture
+def execution_timeout() -> datetime.timedelta:
+    return datetime.timedelta(seconds=60)
+
+
+@pytest.fixture
+def api_execution_options(execution_timeout: datetime.timedelta) -> APIExecutionOptions:
+    builder = APIExecutionOptionsBuilder.default()
+    builder.timeout(execution_timeout)
+    return builder.build()
+
+
+@pytest.fixture
+def execution_options(
+    execution_timeout: datetime.timedelta,
+    api_execution_options: APIExecutionOptions
+) -> ExecutionOptions:
+    return ExecutionOptions(
+        timeout=execution_timeout,
+        api_options=api_execution_options
     )
 

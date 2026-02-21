@@ -1,7 +1,7 @@
 //! Provides diagnostics for the QCS SDK.
 
 use pyo3::{ffi::c_str, prelude::*, types::IntoPyDict, IntoPyObjectExt};
-use rigetti_pyo3::{create_init_submodule, py_sync, sync::Awaitable};
+use rigetti_pyo3::{create_init_submodule, sync::Awaitable};
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::gen_stub_pyfunction;
@@ -42,15 +42,16 @@ pub(crate) fn get_report_async(py: Python<'_>) -> PyResult<Awaitable<'_, String>
 
 /// Return a string describing the package and its environment for use in bug reporting and diagnosis.
 ///
-/// This is a synchronous wrapper around `get_report_async`. Use that version in async environments.
+/// This is a synchronous wrapper around `get_report_async`.
+/// Use that version in async environments.
 ///
 /// Note: this format is not stable and its content may change between versions.
 #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.diagnostics"))]
 #[pyfunction]
 pub(crate) fn get_report(py: Python<'_>) -> PyResult<String> {
     let py_part = get_py_report(py)?;
-    let rust_part = py_sync!(py, async {
-        Result::<_, PyErr>::Ok(diagnostics::get_report().await)
+    let rust_part = pyo3_async_runtimes::tokio::run(py, async {
+        PyResult::Ok(diagnostics::get_report().await)
     })?;
     Ok(format!("{py_part}\n{rust_part}"))
 }
