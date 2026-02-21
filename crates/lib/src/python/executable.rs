@@ -225,7 +225,7 @@ impl PyExecutable {
     /// Compile the program and execute it on a QPU, waiting for results.
     ///
     /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -264,7 +264,7 @@ impl PyExecutable {
     /// (async analog of `Executable.execute_on_qpu`).
     ///
     /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -304,7 +304,7 @@ impl PyExecutable {
     /// Compile the program and execute it on a QPU, without waiting for results.
     ///
     /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -344,7 +344,7 @@ impl PyExecutable {
     /// (async analog of `Executable.submit_to_qpu`).
     ///
     /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given quantum_processor_id is used.
+    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
     #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
@@ -355,7 +355,7 @@ impl PyExecutable {
         endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
-    ) -> PyResult<Awaitable<'py, ExecutionData>> {
+    ) -> PyResult<Awaitable<'py, PyJobHandle>> {
         match endpoint_id {
             Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
                 py,
