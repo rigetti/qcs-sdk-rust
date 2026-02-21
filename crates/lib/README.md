@@ -75,6 +75,17 @@ For Python consumers, please be aware of the following changes:
     but instead directly expose them as `#[pyclass]`es; in particular,
     the `from_*`, `as_*`, `to_*`, `is_*`, and `inner` methods have been removed,
     You should replace their usage with more typical Python operations (see below for examples).
+- Some Python classes that conceptually represented a collection of possible types
+    now operate as if they were simply a type alias of those possibilities:
+    - The `Register` class is now simply `list[int] | list[complex]`.
+    - The ISA `Family` enumeration is now a simple enum of known values;
+        unknown values are represented simply as their `str` name.
+    - These classes remain "Complex Enums" with different class variants,
+        but in many cases, functions and constructors have been updated
+        to accept any of the aliased varaints, and the `inner` method returns the same:
+        - `RegisterData`: `list[list[int]] | list[list[float]] | list[list[complex]]`
+        - `ReadoutValues`: `list[int] | list[float] | list[complex]`
+        - `MemoryValues`: `list[int] | list[float]`
 - `compiler.quilc.CompilationResult.program` is now a `quil.Program` instead of a `str`.
     To obtain the `str` representation, simply call `to_quil()` on the program.
 - `Service.Quilc` has been renamed `Service.QUILC` to match other Python enumeration variants.
