@@ -113,6 +113,15 @@ impl From<readout_values::Values> for ExecutionResult {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl ExecutionResult {
+    #[new]
+    fn __new__(register: Register) -> Self {
+        Self::from_register(register)
+    }
+
+    fn __getnewargs__(&self) -> (Register,) {
+        (self.data.clone(),)
+    }
+
     /// Build an `ExecutionResult` from a `Register`.
     #[staticmethod]
     fn from_register(register: Register) -> Self {
@@ -152,6 +161,7 @@ pub struct ExecutionResults {
 #[pymethods]
 impl ExecutionResults {
     #[new]
+    #[pyo3(signature = (buffers, memory, execution_duration_microseconds = None))]
     fn __new__(
         buffers: HashMap<String, ExecutionResult>,
         memory: HashMap<String, MemoryValues>,

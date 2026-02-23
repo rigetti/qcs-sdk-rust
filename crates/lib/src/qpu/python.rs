@@ -3,7 +3,10 @@
 use std::time::Duration;
 
 use numpy::Complex64;
-use pyo3::prelude::*;
+use pyo3::{
+    prelude::*,
+    types::{PyFloat, PyInt, PyList},
+};
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
@@ -40,7 +43,7 @@ enum PyReadoutValues {
 
 #[derive(FromPyObject, IntoPyObject)]
 enum PyMemoryValues {
-    Binary(Vec<u8>),
+    // In Python, Binary and Integer are both list[int], so the extraction here is just Vec<i64>.
     Integer(Vec<i64>),
     Real(Vec<f64>),
 }
@@ -48,7 +51,6 @@ enum PyMemoryValues {
 #[cfg(feature = "stubs")]
 pyo3_stub_gen::impl_stub_type!(PyReadoutValues = Vec<i64> | Vec<f64> | Vec<Complex64>);
 
-// The Python type will be the same for `Vec<u8>` as `Vec<i64>`, so only list one here.
 #[cfg(feature = "stubs")]
 pyo3_stub_gen::impl_stub_type!(PyMemoryValues = Vec<i64> | Vec<f64>);
 
@@ -77,27 +79,46 @@ impl ReadoutValues {
     }
 }
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl MemoryValues {
     #[new]
     fn __new__(values: PyMemoryValues) -> Self {
         match values {
-            PyMemoryValues::Binary(values) => Self::Binary(values),
-            PyMemoryValues::Integer(values) => Self::Integer(values),
+            PyMemoryValues::Integer(values) => {
+                if values.iter().all(|&v| v == 0 || v == 1) {
+                    #[allow(
+                        clippy::cast_sign_loss,
+                        clippy::cast_possible_truncation,
+                        reason = "we know the values are 0 or 1"
+                    )]
+                    Self::Binary(values.into_iter().map(|v| v as u8).collect())
+                } else {
+                    Self::Integer(values)
+                }
+            }
             PyMemoryValues::Real(values) => Self::Real(values),
         }
     }
 
-    fn __getnewargs__(&self) -> (PyMemoryValues,) {
-        (self.inner(),)
+    #[gen_stub(override_return_type(
+        type_repr = "tuple[builtins.list[builtins.int] | builtins.list[builtins.float]]"
+    ))]
+    fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<(Bound<'py, PyList>,)> {
+        Ok((self.inner(py)?,))
     }
 
-    fn inner(&self) -> PyMemoryValues {
+    #[gen_stub(override_return_type(
+        type_repr = "builtins.list[builtins.int] | builtins.list[builtins.float]"
+    ))]
+    fn inner<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyList>> {
+        // This is implemented manually because otherwise we'd need to clone the list twice:
+        // once to take ownership of the Rust values, and again to create the Python values.
         match self {
-            Self::Binary(values) => PyMemoryValues::Binary(values.clone()),
-            Self::Integer(values) => PyMemoryValues::Integer(values.clone()),
-            Self::Real(values) => PyMemoryValues::Real(values.clone()),
+            Self::Binary(values) => PyList::new(py, values.iter().map(|v| PyInt::new(py, *v))),
+            Self::Integer(values) => PyList::new(py, values.iter().map(|v| PyInt::new(py, *v))),
+            Self::Real(values) => PyList::new(py, values.iter().map(|v| PyFloat::new(py, *v))),
         }
     }
 }

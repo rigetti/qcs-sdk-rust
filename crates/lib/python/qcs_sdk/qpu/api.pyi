@@ -225,6 +225,8 @@ class ExecutionResult:
         r"""
         The shape of the result data.
         """
+    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.complex]]: ...
+    def __new__(cls, register: typing.Sequence[builtins.int] | typing.Sequence[builtins.complex]) -> ExecutionResult: ...
     @staticmethod
     def from_register(register: typing.Sequence[builtins.int] | typing.Sequence[builtins.complex]) -> ExecutionResult:
         r"""
@@ -255,7 +257,7 @@ class ExecutionResults:
         The final state of memory for parameters that were read from and written to during
         the execution of the program.
         """
-    def __new__(cls, buffers: typing.Mapping[builtins.str, ExecutionResult], memory: typing.Mapping[builtins.str, MemoryValues], execution_duration_microseconds: typing.Optional[builtins.int]) -> ExecutionResults: ...
+    def __new__(cls, buffers: typing.Mapping[builtins.str, ExecutionResult], memory: typing.Mapping[builtins.str, MemoryValues], execution_duration_microseconds: typing.Optional[builtins.int] = None) -> ExecutionResults: ...
 
 @typing.final
 class QpuApiDuration:
