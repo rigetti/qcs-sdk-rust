@@ -19,7 +19,7 @@ jobs:
     env:
       CXXFLAGS: "-std=c++11"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           token: ${{ secrets.PAT }}
@@ -28,9 +28,5 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '3.20.1'
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - run: cargo publish --manifest-path=crates/lib/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
-      - run: cargo publish --manifest-path=crates/python/Cargo.toml --token ${{ secrets.CRATES_IO_TOKEN }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo publish -p qcs --locked --token ${{ secrets.CRATES_IO_TOKEN }}

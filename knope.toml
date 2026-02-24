@@ -1,16 +1,11 @@
 [packages.lib]
 versioned_files = [
     "crates/lib/Cargo.toml",
+    "crates/lib/pyproject.toml",
     "Cargo.lock",
-    { path = "crates/python/Cargo.toml", dependency = "qcs" },
 ]
 changelog = "crates/lib/CHANGELOG.md"
-scopes = ["lib", "rust"]
-
-[packages.python]
-versioned_files = ["crates/python/Cargo.toml", "crates/python/pyproject.toml"]
-changelog = "crates/python/CHANGELOG.md"
-scopes = ["python"]
+scopes = ["lib", "rust", "python"]
 
 [[workflows]]
 name = "release"

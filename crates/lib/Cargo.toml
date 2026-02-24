@@ -9,71 +9,140 @@ keywords = ["pyquil", "SDK", "Rigetti", "Quil", "Quantum"]
 categories = ["api-bindings", "compilers", "science", "emulators"]
 readme = "./README.md"
 
+[lib]
+name = "qcs"
+crate-type = ["cdylib", "rlib"]
+
 [features]
 manual-tests = []
-tracing = ["dep:tracing", "qcs-api-client-common/tracing", "qcs-api-client-grpc/tracing", "qcs-api-client-openapi/tracing"]
-tracing-config = ["tracing", "qcs-api-client-common/tracing-config", "qcs-api-client-grpc/tracing-config", "qcs-api-client-openapi/tracing-config"]
+tracing = [
+    "dep:tracing",
+    "qcs-api-client-common/tracing",
+    "qcs-api-client-grpc/tracing",
+    "qcs-api-client-openapi/tracing",
+]
+tracing-config = [
+    "tracing",
+    "qcs-api-client-common/tracing-config",
+    "qcs-api-client-grpc/tracing-config",
+    "qcs-api-client-openapi/tracing-config",
+]
 libquil = ["dep:libquil-sys"]
 grpc-web = ["qcs-api-client-grpc/grpc-web"]
-tracing-opentelemetry = ["tracing-config", "qcs-api-client-grpc/tracing-opentelemetry", "qcs-api-client-openapi/tracing-opentelemetry"]
-python = ["dep:pyo3"]
+tracing-opentelemetry = [
+    "tracing-config",
+    "qcs-api-client-grpc/tracing-opentelemetry",
+    "qcs-api-client-openapi/tracing-opentelemetry",
+]
+python = [
+    "dep:futures-util",
+    "dep:numpy",
+    "dep:paste",
+    "dep:prost",
+    "dep:pyo3",
+    "dep:pyo3-async-runtimes",
+    "dep:pyo3-build-config",
+    "dep:pyo3-log",
+    "dep:pyo3-opentelemetry",
+    "dep:pyo3-tracing-subscriber",
+    "dep:rigetti-pyo3",
+    "experimental",
+    "tracing-opentelemetry",
+    "quil-rs/python",
+    "qcs-api-client-common/python",
+]
+stubs = [
+    "python",
+    "dep:pyo3-stub-gen",
+    "quil-rs/stubs",
+    "qcs-api-client-common/stubs",
+    "pyo3-tracing-subscriber/stubs",
+    "rigetti-pyo3/stubs",
+]
 experimental = []
 
+# When testing, use an internal feature to disable issuer validation.
+_insecure-issuer-validation = ["qcs-api-client-common/_insecure-issuer-validation"]
+
 [dependencies]
+async-trait = "0.1.73"
 cached = "0.44.0"
+derive_builder = "0.20.0"
 enum-as-inner = "0.5.1"
-futures = "0.3.24"
+futures = "0.3.26"
 indexmap = "2.2.6"
+itertools = "0.12.0"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
 opentelemetry = { workspace = true }
 opentelemetry_sdk = { workspace = true }
+optipy.workspace = true
 pbjson-types = "0.7.0"
-pyo3 = { workspace = true, optional = true }
-qcs-api-client-common.workspace = true
-qcs-api-client-openapi.workspace = true
-qcs-api-client-grpc.workspace = true
 quil-rs.workspace = true
 reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
-serde = { version = "1.0.145", features = ["derive"] }
-serde_json.workspace = true
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.128"
 thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 tokio-util = { workspace = true }
-toml = "0.7.3"
-tracing = { version = "0.1", optional = true, features = ["log"] }
-uuid = { version = "1.2.1", features = ["v4"] }
-tonic = { version = "0.12.3", features = ["tls", "tls-roots"] }
+toml = "0.9.8"
+tonic = { version = "0.13.1", features = ["tls-aws-lc", "tls-native-roots"] }
+uuid = { version = "1.10.0", features = ["v4"] }
 zmq = { version = "0.10.0" }
-itertools = "0.11.0"
-derive_builder = "0.12.0"
-async-trait = "0.1.73"
+
+# Enabled with the "tracing", "tracing-config", "tracing-opentelemtry", "python", or "stubs" features.
+tracing = { workspace = true, optional = true, features = ["log"] }
+qcs-api-client-common.workspace = true
+qcs-api-client-grpc.workspace = true
+qcs-api-client-openapi.workspace = true
+
+# Enabled with the "libquil" feature.
 libquil-sys = { version = "0.4.0", optional = true }
 
+# Enabled with the "tracing-opentelemetry" or "python" features.
+pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
+
+# Enabled with the "python" or "stubs" features.
+futures-util = { version = "0.3.30", optional = true }
+numpy = { workspace = true, optional = true }
+paste = { version = "1.0.15", optional = true }
+prost = { version = "0.13.3", optional = true }
+pyo3 = { workspace = true, optional = true }
+pyo3-async-runtimes = { workspace = true, optional = true }
+pyo3-log = { workspace = true, optional = true }
+pyo3-opentelemetry = { workspace = true, optional = true }
+rigetti-pyo3 = { workspace = true, optional = true, features = ["opentelemetry", "stubs", "async-tokio"] }
+
+# Enabled with the "stubs" feature.
+pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
+
+[build-dependencies]
+built = "0.6.1"
+
+# Enabled with the "python" feature.
+pyo3-build-config = { workspace = true, optional = true }
+
 [dev-dependencies]
+assert2 = "0.3.11"
 erased-serde = "0.3.23"
 float-cmp = "0.9.0"
 hex = "0.4.3"
+insta = "1.29.0"
 maplit = "1.0.2"
 # keep pinned until this crate matures
 oauth2-test-server = "=0.1.3"
 qcs-api-client-common = { workspace = true, features = ["test"] }
 qcs-api-client-grpc = { workspace = true, features = ["server"] }
+regex = "1.7.0"
+rstest = "0.26.0"
 simple_logger = { version = "4.1.0", default-features = false }
 tempfile = "3.3.0"
-tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
-warp = { version = "0.3.3", default-features = false }
-regex = "1.7.0"
 test-case = "3.1.0"
-tracing-subscriber = "0.3.17"
-rstest = "0.17.0"
-insta = "1.29.0"
-assert2 = "0.3.11"
-
-[build-dependencies]
-built = "0.6.1"
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tracing-subscriber = { workspace = true }
+warp = { version = "0.3.3", default-features = false }
 
 [[example]]
 name = "compilation-and-simulation-with-libquil"

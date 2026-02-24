@@ -8,6 +8,9 @@ use quil_rs::{
     quil::ToQuilError,
 };
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
+
 /// Hardware values are 48 bits long.
 const MAX_SEQUENCER_VALUE: u64 = 0x0000_FFFF_FFFF_FFFF;
 
@@ -76,6 +79,8 @@ pub type RandomResult<T> = Result<T, Error>;
 /// An [`ExternedCall`] that may be used to select one or more random
 /// sub-regions from a source array of real values to a destination array.
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen)]
 pub struct ChooseRandomRealSubRegions {
     destination_memory_region_name: String,
     source_memory_region_name: String,
@@ -97,6 +102,10 @@ impl ChooseRandomRealSubRegions {
     ///
     /// The values provided for `destination`, `source`, and `seed` must
     /// be declared within the Quil program where the call is made.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the data type of the destination's or source's size is not `Real`.
     pub fn try_new<T: Into<f64> + Copy>(
         destination: &quil_rs::instruction::Declaration,
         source: &quil_rs::instruction::Declaration,
@@ -150,57 +159,57 @@ impl ChooseRandomRealSubRegions {
             seed_memory_region_name: seed.name.clone(),
         })
     }
+}
 
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
+impl ChooseRandomRealSubRegions {
+    #[classattr]
+    #[pyo3(name = "NAME")]
     /// The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
     pub const EXTERN_NAME: &str = "choose_random_real_sub_regions";
+}
 
-    #[allow(clippy::doc_markdown)]
-    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions`
-    /// instruction. The signature expressed in Quil is as follows:
+impl ChooseRandomRealSubRegions {
+    #[expect(clippy::missing_panics_doc)]
+    /// Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
+    ///
+    /// The signature expressed in Quil is as follows:
     ///
     /// ```text
     /// "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
     /// ```
-    pub fn build_signature() -> RandomResult<ExternSignature> {
-        vec![
+    #[must_use]
+    pub fn build_signature() -> ExternSignature {
+        let parameters = vec![
             ExternParameter::try_new(
                 "destination".to_string(),
                 true,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ),
+            )
+            .expect("`destination` should be a valid identifier"),
             ExternParameter::try_new(
                 "source".to_string(),
                 false,
                 ExternParameterType::VariableLengthVector(quil_rs::instruction::ScalarType::Real),
-            ),
+            )
+            .expect("`source` should be a valid identifier"),
             ExternParameter::try_new(
                 "sub_region_size".to_string(),
                 false,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ),
+            )
+            .expect("`sub_region_size` should be a valid identifier"),
             ExternParameter::try_new(
                 "seed".to_string(),
                 true,
                 ExternParameterType::Scalar(quil_rs::instruction::ScalarType::Integer),
-            ),
-        ]
-        .into_iter()
-        .map(|r| r.map_err(Error::from))
-        .collect::<RandomResult<Vec<ExternParameter>>>()
-        .map(|parameters| ExternSignature::new(None, parameters))
-    }
+            )
+            .expect("`seed` should be a valid identifier"),
+        ];
 
-    /// Build a `PRAGMA EXTERN` instruction for the externed function.
-    pub(super) fn pragma_extern() -> Result<quil_rs::instruction::Pragma, Error> {
-        use quil_rs::quil::Quil;
-
-        Ok(quil_rs::instruction::Pragma::new(
-            quil_rs::instruction::RESERVED_PRAGMA_EXTERN.to_string(),
-            vec![quil_rs::instruction::PragmaArgument::Identifier(
-                Self::EXTERN_NAME.to_string(),
-            )],
-            Some(Self::build_signature()?.to_quil().map_err(Error::from)?),
-        ))
+        ExternSignature::new(None, parameters)
     }
 }
 
@@ -227,15 +236,24 @@ impl TryFrom<ChooseRandomRealSubRegions> for Call {
 /// values are in the range `[1, MAX_SEQUENCER_VALUE]` and are losslessly
 /// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen)]
 pub struct PrngSeedValue {
     u64_value: u64,
     f64_value: f64,
 }
 
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl PrngSeedValue {
     /// Attempt to create a new instance of `PrngSeedValue` from a `u64`.
-    /// The value must be in the range `[1, MAX_SEQUENCER_VALUE]` and
-    /// losslessly convertible to `f64`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::InvalidSeed`] if the value is not in range `[1, MAX_SEQUENCER_VALUE]`
+    /// or if it is not losslessly convertible to `f64`.
+    #[new]
     pub fn try_new(value: u64) -> RandomResult<Self> {
         if !(1..=MAX_SEQUENCER_VALUE).contains(&value) {
             return Err(Error::InvalidSeed(value));
@@ -270,6 +288,11 @@ fn lfsr_next(seed: u64, taps: &[u32]) -> u64 {
 /// it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
 /// The taps have been shown to produce maximal sequence lengths for 48-bit strings.
 #[must_use]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+)]
+#[pyo3::pyfunction]
 pub fn lfsr_v1_next(seed: PrngSeedValue) -> u64 {
     lfsr_next(seed.u64_value, &V1_TAPS)
 }
@@ -327,6 +350,11 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 /// let _random_indices = choose_random_real_sub_region_indices(seed, start_index, series_length, sub_region_count);
 /// ```
 #[must_use]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+)]
+#[pyo3::pyfunction]
 pub fn choose_random_real_sub_region_indices(
     seed: PrngSeedValue,
     start_index: u32,

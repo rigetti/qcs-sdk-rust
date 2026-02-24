@@ -12,7 +12,9 @@ use qcs::{
     qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
     Executable,
 };
-use qcs_api_client_common::configuration::{SECRETS_PATH_VAR, SETTINGS_PATH_VAR};
+use qcs_api_client_common::configuration::{
+    secrets::SECRETS_PATH_VAR, settings::SETTINGS_PATH_VAR,
+};
 
 const BELL_STATE: &str = r#"
 DECLARE ro BIT[2]
@@ -26,6 +28,10 @@ MEASURE 1 ro[1]
 
 const QPU_ID: &str = "Aspen-M-3";
 
+#[cfg_attr(
+    not(feature = "_insecure-issuer-validation"),
+    ignore = "uses mock auth server, requires `_insecure-issuer-validation` feature"
+)]
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn test_qcs_against_mocks() {
     // Shared setup
@@ -35,10 +41,10 @@ async fn test_qcs_against_mocks() {
     for _ in 0..3 {
         // Test direct access
         handles.push(tokio::spawn(run_bell_state(
-            ConnectionStrategy::DirectAccess,
+            ConnectionStrategy::DirectAccess(),
         )));
         // Check gateway access
-        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway)));
+        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway())));
     }
 
     // Ensure both access methods were cached

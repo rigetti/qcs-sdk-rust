@@ -28,6 +28,9 @@ pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass;
+
 /// The maximum size of a gRPC request to the translation service, in bytes.
 const MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE: usize = 50 * 1024 * 1024;
 
@@ -62,6 +65,11 @@ pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 
 /// A client providing helper functionality for accessing QCS APIs
 #[derive(Debug, Clone)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.client", name = "QCSClient", eq)
+)]
 pub struct Qcs {
     config: ClientConfiguration,
 }
@@ -128,12 +136,14 @@ impl Qcs {
         OpenApiConfiguration::with_qcs_config(self.get_config().clone())
     }
 
+    #[expect(clippy::result_large_err)]
     pub(crate) fn get_translation_client(
         &self,
     ) -> Result<TranslationClient<GrpcConnection>, GrpcError<TokenError>> {
         self.get_translation_client_with_endpoint(self.get_config().grpc_api_url())
     }
 
+    #[expect(clippy::result_large_err)]
     pub(crate) fn get_translation_client_with_endpoint(
         &self,
         translation_grpc_endpoint: &str,

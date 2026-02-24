@@ -15,34 +15,35 @@ jobs:
   publish-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
           cache: pip
+
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug cargo-make
+        uses: taiki-e/install-action@cargo-make
       - uses: syphar/restore-virtualenv@v1
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v4
+
       - name: Build qcs-sdk-python documentation
-        uses: actions-rs/cargo@v1
-        with:
-          command: make
-          args: --cwd crates/python --makefile Makefile.toml docs
+        run: cargo make --cwd crates/lib document-python-package
+
       - name: Deploy preview
         if: ${{ github.event_name == 'pull_request' }}
         uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: crates/python/build/docs
+          source-dir: crates/lib/build/docs
           preview-branch: qcs-sdk-python-docs
+
       - name: Deploy docs
         if: ${{ github.event_name == 'push' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: crates/python/build/docs
+          publish_dir: crates/lib/build/docs
           publish_branch: qcs-sdk-python-docs
 

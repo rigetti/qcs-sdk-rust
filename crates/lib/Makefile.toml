@@ -1,6 +1,6 @@
 [env]
 RUST_BACKTRACE = 0
-CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features tracing-opentelemetry,libquil"  # Disable --all-features to avoid manual tests in CI for now
+CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now
 
 [tasks.pre-test]
 command = "docker"
@@ -39,3 +39,143 @@ args = ["deny", "--exclude-dev", "--all-features", "check"]
 
 [tasks.pre-ci-flow]
 dependencies = ["deny", "lint"]
+
+[tasks.ci-flow]
+dependencies = ["test-flow"]
+
+# ----
+
+[tasks.install-python-deps]
+description = "Install python dependencies using poetry."
+command = "poetry"
+args = ["install", "--with", "dev", "--no-root"]
+
+[tasks.generate-stubs]
+description = "Generate Python stub files."
+command = "cargo"
+args = ["run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
+install_crate = false
+
+[tasks.package-python]
+description = "Build a release version of the Python package to the active virtual environment."
+dependencies = ["install-python-deps", "generate-stubs"]
+command = "poetry"
+args = ["run", "maturin", "build", "--release"]
+
+[tasks.install-python-package]
+description = "Build the Python package and install to the active virtual environment."
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "maturin", "develop"]
+
+[tasks.install-python-package-with-stubs]
+description = "Install the Python package with up-to-date stubs (not needed for testing)."
+dependencies = ["generate-stubs", "install-python-package"]
+
+[tasks.pytest]
+description = "Run Python tests."
+dependencies = ["install-python-package"]
+command = "poetry"
+args = ["run", "pytest"]
+
+[tasks.pytest-flow]
+dependencies = [
+    "pre-test",
+    "install-python-package",
+    "pytest",
+    "post-test",
+]
+
+[tasks.stubtest]
+description = "Check Python stubfiles."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+cwd = "python"
+args = [
+    "run",
+    "stubtest",
+    "--allowlist",
+    "stubtest-allowlist",
+    "--allowlist",
+    "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
+    "--ignore-disjoint-bases",
+    "--ignore-unused-allowlist",
+    "qcs_sdk",
+]
+# TODO(#475): Enable error reporting once stubtest is happy with stubgen's output.
+ignore_errors = true
+
+[tasks.stubtest-flow]
+dependencies = ["stubtest"]
+
+[tasks.lint-python-package]
+description = "Find errors in Python-related Rust code."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
+
+[tasks.show-python-package-layout]
+description = "Print the Python package layout as defined within Rust code."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
+
+[tasks.test-python-package]
+description = "Run all Python-related tests."
+dependencies = [
+    "lint-python-package",
+    "check-python-api",
+    "stubtest-flow",
+    "pytest-flow",
+]
+
+[tasks.test-all]
+description = "Run all tests."
+dependencies = ["test", "test-python-package"]
+
+[tasks.default]
+alias = "test-all"
+
+[tasks.check-python-api]
+description = "Check if Python API has breaking changes."
+dependencies = ["install-python-package-with-stubs"]
+script = { file = "./scripts/check-py-api.sh" }
+
+[tasks.document-python-package]
+description = "Generate Python package documentation."
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = [
+    "run",
+    "pdoc",
+    "-o", "build/docs",
+    "qcs_sdk",
+    "!qcs_sdk.qcs_sdk",
+    "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg",
+]
+
+# ----
+
+[tasks.format-tracing-subscriber]
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
+
+[tasks.format]
+dependencies = ["install-python-deps"]
+command = "poetry"
+args = ["run", "black", "python/qcs_sdk", "tests"]
+
+[tasks.test-session]
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "pytest", "tests_py", "--with-qcs-session"]
+
+[tasks.test-execution]
+dependencies = ["install-python-package-with-stubs"]
+command = "poetry"
+args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
+
+[tasks.dev-flow]
+dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]
+

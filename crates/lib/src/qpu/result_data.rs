@@ -6,14 +6,22 @@ use quil_rs::instruction::MemoryReference;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
+
 use qcs_api_client_grpc::models::controller::{
     self, data_value as controller_memory_value, readout_values as controller_readout_values,
     DataValue as ControllerMemoryValues, ReadoutValues as ControllerReadoutValues,
 };
 
-/// A row of readout values from the QPU. Each row contains all the values emitted to a
-/// memory reference across all shots.
+/// A row of readout values from the QPU.
+///
+/// Each row contains all the values emitted to a memory reference across all shots.
+/// There is a variant for each possible type the list of readout values could be.
+#[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu"))]
 pub enum ReadoutValues {
     /// Integer readout values
     Integer(Vec<i64>),
@@ -23,8 +31,13 @@ pub enum ReadoutValues {
     Complex(Vec<Complex64>),
 }
 
-/// A row of data containing the contents of each memory region at the end of a job.
+/// A row of data containing the contents of a memory region at the end of a job.
+///
+/// There is a variant for each possible type the memory region could be.
+#[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu", eq))]
 pub enum MemoryValues {
     /// Values that correspond to a memory region declared with the BIT or OCTET data type.
     Binary(Vec<u8>),
@@ -34,11 +47,26 @@ pub enum MemoryValues {
     Real(Vec<f64>),
 }
 
-/// This struct encapsulates data returned from the QPU after executing a job.
-#[allow(clippy::module_name_repetitions)]
+/// Encapsulates data returned from the QPU after executing a job.
+///
+/// `QpuResultData` contains "mappings", which map declared memory regions
+/// in a program (ie. "ro[0]") to that region's readout key in `QpuResultData.readout_values`.
+/// `readout_values` maps those readout keys to the values emitted for that region
+/// across all shots.
+///
+/// Read more about QPU readout data in the
+/// [QCS Documentation](https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data)
+#[expect(clippy::module_name_repetitions, clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk.qpu", name = "QPUResultData", get_all)
+)]
 pub struct QpuResultData {
+    /// Mappings of a memory region (ie. "ro[0]") to its key name in `readout_values` (ie. "q0").
     pub(crate) mappings: HashMap<String, String>,
+    /// Mapping of a readout values identifier (ie. "q0") to a set of `ReadoutValues`.
     pub(crate) readout_values: HashMap<String, ReadoutValues>,
     /// The final contents of each memory region, keyed on region name.
     pub(crate) memory_values: HashMap<String, MemoryValues>,

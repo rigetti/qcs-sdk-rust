@@ -1,0 +1,562 @@
+//! Python bindings for the QVM module.
+
+#![expect(
+    clippy::needless_pass_by_value,
+    reason = "PyO3 types often require it."
+)]
+
+use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
+use std::collections::HashMap;
+use std::time::Duration;
+
+use pyo3::{prelude::*, types::PyList, Py};
+
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyfunction, gen_stub_pymethods};
+
+use crate::{
+    python::{errors, NonZeroU16},
+    qvm::{
+        self,
+        http::{
+            AddressRequest, ExpectationRequest, HttpClient, MultishotMeasureRequest,
+            MultishotRequest, MultishotResponse, WavefunctionRequest,
+        },
+        Error, QvmOptions, QvmResultData,
+    },
+    register_data::RegisterData,
+    RegisterMap, RegisterMatrixConversionError,
+};
+
+create_init_submodule! {
+    classes: [
+        PyQvmClient,
+        QvmOptions,
+        QvmResultData,
+        RawQvmReadoutData
+    ],
+    errors: [ errors::QVMError ],
+    funcs: [ py_run, py_run_async ],
+    submodules: [ "api": api::init_submodule ],
+}
+
+impl_repr!(QvmOptions);
+impl_repr!(QvmResultData);
+impl_repr!(RawQvmReadoutData);
+
+/// Client used to communicate with QVM.
+#[derive(Clone, Debug)]
+pub enum QvmClient {
+    /// A client which uses HTTP to communicate with a QVM service.
+    Http(HttpClient),
+
+    /// A client which uses libquil to communicate with a QVM service.
+    #[cfg(feature = "libquil")]
+    Libquil(qvm::libquil::Client),
+}
+
+/// Client used to communicate with QVM.
+#[derive(Clone, Debug)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyclass(name = "QVMClient", module = "qcs_sdk.qvm")]
+pub struct PyQvmClient {
+    inner: QvmClient,
+}
+
+/// Encapsulates raw data returned from the QVM after executing a program.
+#[derive(Debug)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[pyo3::pyclass(name = "RawQVMReadoutData", module = "qcs_sdk.qvm", frozen, get_all)]
+pub struct RawQvmReadoutData {
+    /// The mapping of register names (ie. "ro") to a 2-d list containing the
+    /// values for that register.
+    memory: HashMap<String, Py<PyList>>,
+}
+
+impl PyQvmClient {
+    /// Access the underlying QVM client.
+    #[must_use]
+    pub fn as_client(&self) -> &(dyn qvm::Client + Send + Sync) {
+        match &self.inner {
+            QvmClient::Http(client) => client,
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(client) => client,
+        }
+    }
+}
+
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQvmClient {
+    #[new]
+    fn new() -> PyResult<Self> {
+        Err(errors::QuilcError::new_err(
+            #[cfg(not(feature = "libquil"))]
+            "QVMClient cannot be instantiated directly. Use QVMClient.new_http() instead.",
+            #[cfg(feature = "libquil")]
+            "QVMClient cannot be instantiated directly. Use QVMClient.new_http() and QVMClient.new_libquil().",
+        ))
+    }
+
+    /// Construct a new QVM client which uses HTTP to communicate with a QVM service.
+    #[staticmethod]
+    fn new_http(endpoint: String) -> Self {
+        let http_client = HttpClient::new(endpoint);
+        Self {
+            inner: QvmClient::Http(http_client),
+        }
+    }
+
+    /// Return the address of the client.
+    #[getter]
+    fn qvm_url(&self) -> String {
+        match &self.inner {
+            QvmClient::Http(client) => client.qvm_url.clone(),
+            #[cfg(feature = "libquil")]
+            QvmClient::Libquil(_) => "".into(),
+        }
+    }
+}
+
+// These are pulled out separately so that the feature flag won't confuse the stub generator.
+#[cfg(feature = "libquil")]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQvmClient {
+    /// Construct a new QVM client which uses libquil.
+    #[staticmethod]
+    fn new_libquil() -> Self {
+        Self {
+            inner: QvmClient::Libquil(qvm::libquil::Client {}),
+        }
+    }
+}
+
+#[cfg(not(feature = "libquil"))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl PyQvmClient {
+    #[staticmethod]
+    #[pyo3(warn(
+        message = "The installed version of qcs_sdk was built without the libquil feature. Use QVMClient.new_http() instead.",
+    ))]
+    fn new_libquil() -> PyResult<Self> {
+        Err(errors::QVMError::new_err(
+            "Cannot create a libquil QVMClient. Use QVMClient.new_http() instead.",
+        ))
+    }
+}
+
+#[async_trait::async_trait]
+impl qvm::Client for PyQvmClient {
+    /// The QVM version string. Not guaranteed to comply to the semver spec.
+    async fn get_version_info(&self, options: &QvmOptions) -> Result<String, Error> {
+        self.as_client().get_version_info(options).await
+    }
+
+    /// Execute a program on the QVM.
+    async fn run(
+        &self,
+        request: &MultishotRequest,
+        options: &QvmOptions,
+    ) -> Result<MultishotResponse, Error> {
+        self.as_client().run(request, options).await
+    }
+
+    /// Execute a program on the QVM.
+    ///
+    /// The behavior of this method is different to that of [`Self::run`]
+    /// in that [`Self::run_and_measure`] will execute the program a single
+    /// time; the resulting wavefunction is then sampled some number of times
+    /// (specified in [`MultishotMeasureRequest`]).
+    ///
+    /// This can be useful if the program is expensive to execute and does
+    /// not change per "shot".
+    async fn run_and_measure(
+        &self,
+        request: &MultishotMeasureRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<Vec<i64>>, Error> {
+        self.as_client().run_and_measure(request, options).await
+    }
+
+    /// Measure the expectation value of a program
+    async fn measure_expectation(
+        &self,
+        request: &ExpectationRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<f64>, Error> {
+        self.as_client().measure_expectation(request, options).await
+    }
+
+    /// Get the wavefunction produced by a program
+    async fn get_wavefunction(
+        &self,
+        request: &WavefunctionRequest,
+        options: &QvmOptions,
+    ) -> Result<Vec<u8>, Error> {
+        self.as_client().get_wavefunction(request, options).await
+    }
+}
+
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl QvmOptions {
+    #[new]
+    #[pyo3(signature = (timeout_seconds = None))]
+    fn __new__(timeout_seconds: Option<f64>) -> Self {
+        Self {
+            timeout: timeout_seconds.map(Duration::from_secs_f64),
+        }
+    }
+
+    /// The timeout used for requests to the QVM. If set to None, there is no timeout.
+    #[getter]
+    #[must_use]
+    pub fn timeout(&self) -> Option<f32> {
+        self.timeout.map(|duration| duration.as_secs_f32())
+    }
+
+    /// The timeout used for requests to the QVM. If set to None, there is no timeout.
+    #[setter]
+    pub fn set_timeout(&mut self, timeout_seconds: Option<f64>) {
+        self.timeout = timeout_seconds.map(Duration::from_secs_f64);
+    }
+
+    /// Get the default set of ``QVMOptions`` used for QVM requests.
+    ///
+    /// Settings:
+    ///     timeout: 30.0 seconds
+    #[staticmethod]
+    #[pyo3(name = "default")]
+    fn py_default() -> Self {
+        Self::default()
+    }
+}
+
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl QvmResultData {
+    /// Build a ``QVMResultData`` from a mapping of register names to a ``RegisterData`` matrix.
+    #[new]
+    fn __new__(memory: HashMap<String, RegisterData>) -> Self {
+        QvmResultData::from_memory_map(memory)
+    }
+
+    fn __getnewargs__(&self) -> (HashMap<String, RegisterData>,) {
+        (self.memory().clone(),)
+    }
+
+    #[expect(clippy::missing_errors_doc)]
+    /// Get a copy of this result data flattened into a ``RawQVMReadoutData``.
+    pub fn to_raw_readout_data(&self, py: Python<'_>) -> PyResult<RawQvmReadoutData> {
+        let memory = self
+            .memory()
+            .iter()
+            .map(|(register, data)| {
+                (match data {
+                    RegisterData::I8(matrix) => PyList::new(py, matrix),
+                    RegisterData::F64(matrix) => PyList::new(py, matrix),
+                    RegisterData::I16(matrix) => PyList::new(py, matrix),
+                    RegisterData::Complex32(matrix) => PyList::new(py, matrix),
+                })
+                .map(|list| (register.clone(), list.unbind()))
+            })
+            .collect::<PyResult<_>>()?;
+
+        Ok(RawQvmReadoutData { memory })
+    }
+
+    /// Convert into a [`RegisterMap`].
+    ///
+    /// The [`RegisterMatrix`] for each register will be
+    /// constructed such that each row contains all the final values in the register for a single shot.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`RegisterMatrixConversionError`] if the inner execution data for any of the
+    /// registers would result in a jagged matrix.
+    /// This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+    /// where measurements to the same memory reference might occur multiple times in a shot, or be
+    /// skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
+    /// necessitate making assumptions about the data that could skew the data in undesirable ways.
+    /// Instead, it's recommended to manually build a matrix from [`QpuResultData`] that accurately
+    /// selects the last value per-shot based on the program that was run.
+    fn to_register_map(&self) -> Result<RegisterMap, RegisterMatrixConversionError> {
+        RegisterMap::from_qvm_result_data(self)
+    }
+}
+
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl MultishotRequest {
+    /// Creates a new `MultishotRequest` with the given parameters.
+    #[new]
+    #[pyo3(signature = (program, shots, addresses, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        program: String,
+        shots: NonZeroU16,
+        addresses: HashMap<String, AddressRequest>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self::new(
+            program,
+            shots.0,
+            addresses,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+        )
+    }
+
+    #[getter]
+    fn trials(&self) -> NonZeroU16 {
+        NonZeroU16(self.trials)
+    }
+
+    #[setter]
+    fn set_trials(&mut self, trials: NonZeroU16) {
+        self.trials = trials.0;
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl MultishotMeasureRequest {
+    /// Construct a new `MultishotMeasureRequest` using the given parameters.
+    #[new]
+    #[pyo3(signature = (compiled_quil, trials, qubits, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        compiled_quil: String,
+        trials: NonZeroU16,
+        #[gen_stub(override_type(type_repr = "builtins.list[builtins.int]"))] qubits: Vec<u64>,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        Self::new(
+            compiled_quil,
+            trials.0,
+            &qubits,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+        )
+    }
+
+    #[getter]
+    fn trials(&self) -> NonZeroU16 {
+        NonZeroU16(self.trials)
+    }
+
+    #[setter]
+    fn set_trials(&mut self, trials: NonZeroU16) {
+        self.trials = trials.0;
+    }
+}
+
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl ExpectationRequest {
+    /// Creates a new `ExpectationRequest` using the given parameters.
+    #[new]
+    #[pyo3(signature = (state_preparation, operators, rng_seed=None))]
+    fn __new__(state_preparation: String, operators: Vec<String>, rng_seed: Option<i64>) -> Self {
+        ExpectationRequest::new(state_preparation, &operators, rng_seed)
+    }
+}
+
+#[cfg_attr(feature = "stubs", pyo3_stub_gen::derive::gen_stub_pymethods)]
+#[pymethods]
+impl WavefunctionRequest {
+    /// Create a new `WavefunctionRequest` with the given parameters.
+    #[new]
+    #[pyo3(signature = (compiled_quil, measurement_noise=None, gate_noise=None, rng_seed=None))]
+    fn __new__(
+        compiled_quil: String,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+    ) -> Self {
+        WavefunctionRequest::new(compiled_quil, measurement_noise, gate_noise, rng_seed)
+    }
+}
+
+py_function_sync_async! {
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm"))]
+    #[pyfunction(signature = (
+        quil, shots, addresses, params, client,
+        measurement_noise=None, gate_noise=None, rng_seed=None, options=None
+    ))]
+    #[tracing::instrument(skip_all)]
+    #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+    /// Runs the given program on the QVM.
+    ///
+    /// :param quil: A quil program as a string.
+    /// :param shots: The number of times to run the program. Should be a value greater than zero.
+    /// :param addresses: A mapping of memory region names to an ``AddressRequest`` describing what data to get back for that memory region from the QVM at the end of execution.
+    /// :param params: A mapping of memory region names to their desired values.
+    /// :param client: An optional ``QCSClient`` to use. If unset, creates one using the environemnt configuration (see https://docs.rigetti.com/qcs/references/qcs-client-configuration).
+    /// :param options: An optional ``QVMOptions`` to use. If unset, uses ``QVMOptions.default()`` for the request.
+    ///
+    /// :returns: A ``QVMResultData`` containing the final state of of memory for the requested readouts after the program finished running.
+    ///
+    /// :raises QVMError: If one of the parameters is invalid, or if there was a problem communicating with the QVM server.
+    async fn run(
+        quil: String,
+        shots: NonZeroU16,
+        addresses: HashMap<String, AddressRequest>,
+        params: HashMap<String, Vec<f64>>,
+        client: PyQvmClient,
+        measurement_noise: Option<(f64, f64, f64)>,
+        gate_noise: Option<(f64, f64, f64)>,
+        rng_seed: Option<i64>,
+        options: Option<QvmOptions>,
+    ) -> PyResult<QvmResultData> {
+        let params = params
+            .into_iter()
+            .map(|(key, value)| (key.into_boxed_str(), value))
+            .collect();
+
+        let options = options.unwrap_or_default();
+
+        qvm::run(
+            &quil,
+            shots.0,
+            addresses,
+            &params,
+            measurement_noise,
+            gate_noise,
+            rng_seed,
+            &client,
+            &options,
+        )
+        .await
+        .map_err(Into::into)
+    }
+}
+
+mod api {
+    use pyo3::prelude::*;
+    use rigetti_pyo3::{create_init_submodule, py_function_sync_async};
+
+    #[cfg(feature = "stubs")]
+    use pyo3_stub_gen::derive::gen_stub_pyfunction;
+
+    use crate::qvm::{
+        http::{
+            AddressRequest, ExpectationRequest, MultishotMeasureRequest, MultishotRequest,
+            MultishotResponse, WavefunctionRequest,
+        },
+        python::PyQvmClient,
+        Client, QvmOptions,
+    };
+
+    create_init_submodule! {
+        classes: [
+            ExpectationRequest,
+            MultishotMeasureRequest,
+            MultishotRequest,
+            MultishotResponse,
+            WavefunctionRequest
+        ],
+        complex_enums: [ AddressRequest ],
+        funcs: [
+            py_get_version_info,
+            py_get_version_info_async,
+            py_run,
+            py_run_async,
+            py_run_and_measure,
+            py_run_and_measure_async,
+            py_measure_expectation,
+            py_measure_expectation_async,
+            py_get_wavefunction,
+            py_get_wavefunction_async
+        ],
+    }
+
+    py_function_sync_async! {
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[pyfunction]
+        #[pyo3(signature = (client, options = None))]
+        async fn get_version_info(client: PyQvmClient, options: Option<QvmOptions>) -> PyResult<String> {
+            client
+                .get_version_info(&options.unwrap_or_default())
+                .await
+                .map_err(Into::into)
+        }
+    }
+
+    py_function_sync_async! {
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[pyfunction]
+        #[pyo3(signature = (request, client, options = None))]
+        #[tracing::instrument(skip_all)]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        async fn get_wavefunction(
+            request: WavefunctionRequest,
+            client: PyQvmClient,
+            options: Option<QvmOptions>
+        ) -> PyResult<Vec<u8>> {
+            client
+                .get_wavefunction(&request, &options.unwrap_or_default())
+                .await
+                .map_err(Into::into)
+        }
+    }
+
+    py_function_sync_async! {
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[pyfunction]
+        #[pyo3(signature = (request, client, options = None))]
+        #[tracing::instrument(skip_all)]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        async fn measure_expectation(
+            request: ExpectationRequest,
+            client: PyQvmClient,
+            options: Option<QvmOptions>) -> PyResult<Vec<f64>> {
+            client
+                .measure_expectation(&request, &options.unwrap_or_default())
+                .await
+                .map_err(Into::into)
+        }
+    }
+
+    py_function_sync_async! {
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[pyfunction]
+        #[pyo3(signature = (request, client, options = None))]
+        #[tracing::instrument(skip_all)]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        async fn run_and_measure(
+            request: MultishotMeasureRequest,
+            client: PyQvmClient,
+            options: Option<QvmOptions>) -> PyResult<Vec<Vec<i64>>> {
+            client
+                .run_and_measure(&request, &options.unwrap_or_default())
+                .await
+                .map_err(Into::into)
+        }
+    }
+
+    py_function_sync_async! {
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[pyfunction]
+        #[pyo3(signature = (request, client, options = None))]
+        #[tracing::instrument(skip_all)]
+        #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
+        async fn run(
+            request: MultishotRequest,
+            client: PyQvmClient,
+            options: Option<QvmOptions>,
+        ) -> PyResult<MultishotResponse> {
+            client
+                .run(&request, &options.unwrap_or_default())
+                .await
+                .map_err(Into::into)
+        }
+    }
+}

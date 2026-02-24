@@ -64,15 +64,19 @@ feature-depth = 1
 # https://embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2021-0145", reason = "introduced by atty, a transitive dependency of multiple dependencies, with no upgrade path" },
-    { id = "RUSTSEC-2024-0375", reason = "introduced by atty, a transitive dependency of multiple dependencies, with no upgrade path" },
-    { id = "RUSTSEC-2024-0006", reason = "introduced by shlex, a transitive dependency of bindgen with no upgrade path" },
-    { id = "RUSTSEC-2021-0139", reason = "ansi_term is unmaintained, but used by clap" },
     { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
     { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
-    { id = "RUSTSEC-2025-0020", reason = "PyO3 update is waiting on upstream crates: https://github.com/rigetti/rigetti-pyo3/issues/57" },
-    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update"}
+    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update" },
+    # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
+    # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
+    # We'll ignore it for now, since `pyo3-stub-gen` is effectively a build-time dependency anyway.
+    { id = "RUSTSEC-2025-0075", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
+    { id = "RUSTSEC-2025-0080", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
+    { id = "RUSTSEC-2025-0081", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
+    { id = "RUSTSEC-2025-0098", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
+    { id = "RUSTSEC-2025-0090", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
+    { id = "RUSTSEC-2025-0100", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
 ]
 yanked = "deny"
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
@@ -85,21 +89,22 @@ yanked = "deny"
 # More documentation for the licenses section can be found here:
 # https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html
 [licenses]
+unused-allowed-license = "allow"
 # List of explicitly allowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
 # [possible values: any SPDX 3.11 short identifier (+ optional exception)].
 allow = [
-    "Apache-2.0",
     "Apache-2.0 WITH LLVM-exception",
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC0-1.0",
     "CDLA-Permissive-2.0",
     "ISC",
     "MIT",
     "OpenSSL",
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "Unicode-DFS-2016",
     "Unicode-3.0",
-    "CC0-1.0",
+    "Unicode-DFS-2016",
     "Zlib",
 ]
 # The confidence threshold for detecting a license from license text.
@@ -181,7 +186,7 @@ deny = [
     { crate = "opentelemetry", deny-multiple-versions = true },
     { crate = "opentelemetry_sdk", deny-multiple-versions = true },
     { crate = "tonic", deny-multiple-versions = true },
-    # { crate = "tower", deny-multiple-versions = true },
+    { crate = "tower", deny-multiple-versions = true },
     { crate = "tracing", deny-multiple-versions = true },
     { crate = "tracing-opentelemetry", deny-multiple-versions = true },
     { crate = "tracing-subscriber", deny-multiple-versions = true },
@@ -200,11 +205,16 @@ skip-tree = [
     #"ansi_term@0.11.0", # will be skipped along with _all_ of its direct and transitive dependencies
     #{ crate = "ansi_term@0.11.0", depth = 20 },
     { crate = "toml", depth = 20 },
-    { crate = "warp", depth = 20 },       # Only used for development
-    { crate = "hermit-abi", depth = 20 }, # Only used for development
-    { crate = "itertools", depth = 20 },  # `quil-rs` and various transitive dependencies depend on different versions
-    { crate = "hashbrown", depth = 20 },  # `indexmap` and `cached` depend on different versions
+    { crate = "warp", depth = 20 },             # Only used for development
+    { crate = "hermit-abi", depth = 20 },       # Only used for development
+    { crate = "itertools", depth = 20 },        # `quil-rs` and various transitive dependencies depend on different versions
+    { crate = "hashbrown", depth = 20 },        # `indexmap` and `cached` depend on different versions
 ]
+
+[[bans.features]]
+  crate = "pyo3"
+  deny = ["extension-module"]
+  reason = "this feature is deprecated; let maturin handle it for you"
 
 # This section is considered when running `cargo deny check sources`.
 # More documentation about the 'sources' section can be found here:
@@ -224,8 +234,13 @@ allow-git = ["https://github.com/rigetti/quil-rs"]
 
 [sources.allow-org]
 # github.com organizations to allow git sources for
-github = []
+github = [
+    "rigetti",
+]
 # gitlab.com organizations to allow git sources for
-gitlab = []
+gitlab = [
+    "rigetti",
+]
 # bitbucket.org organizations to allow git sources for
 bitbucket = []
+

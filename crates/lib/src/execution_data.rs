@@ -1,3 +1,5 @@
+#![expect(clippy::unsafe_derive_deserialize)]
+
 use enum_as_inner::EnumAsInner;
 use num::complex::Complex64;
 use quil_rs::program::SyntaxError;
@@ -16,6 +18,9 @@ use crate::{
     qvm::QvmResultData,
     RegisterData,
 };
+
+#[cfg(feature = "stubs")]
+use pyo3_stub_gen::derive::gen_stub_pyclass;
 
 /// Represents the two possible types of data returned from either the QVM or a real QPU.
 /// Each variant contains the original data returned from its respective executor.
@@ -40,7 +45,7 @@ use crate::{
 /// always succeed for [`ResultData::Qvm`].
 ///
 /// The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-/// (ie. "ro\[0\]") is more like a stream than a value in memory. Every `MEASURE` to a memory
+/// (ie. "ro[0]") is more like a stream than a value in memory. Every `MEASURE` to a memory
 /// reference emits a new value to said stream. This means that the number of values per memory
 /// reference can vary per shot. For this reason, it's not always clear what the final value in
 /// each shot was for a particular reference. When this is the case, `to_register_map()` will return
@@ -49,6 +54,7 @@ use crate::{
 /// [`RegisterMatrix`] you need from the inner [`QpuResultData`] data using the knowledge of your
 /// program to choose the correct readout values for each shot.
 #[derive(Debug, Clone, PartialEq, EnumAsInner, Deserialize, Serialize)]
+#[cfg_attr(feature = "python", derive(pyo3::FromPyObject, pyo3::IntoPyObject))]
 pub enum ResultData {
     /// Data returned from the QVM, stored as [`QvmResultData`]
     Qvm(QvmResultData),
@@ -58,13 +64,18 @@ pub enum ResultData {
 
 /// The result of executing an [`Executable`](crate::Executable)
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
 pub struct ExecutionData {
     /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
+    #[pyo3(get)]
     pub result_data: ResultData,
     /// The time it took to execute the program on the QPU, not including any network or queueing
     /// time. If paying for on-demand execution, this is the amount you will be billed for.
     ///
     /// This will always be `None` for QVM execution.
+    #[pyo3(get)]
     pub duration: Option<Duration>,
 }
 
@@ -83,6 +94,8 @@ pub enum RegisterMatrix {
 /// register.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass)]
+#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", mapping))]
 pub struct RegisterMap(pub HashMap<String, RegisterMatrix>);
 
 /// Errors that may occur when trying to build a [`RegisterMatrix`] from execution data
@@ -147,7 +160,7 @@ impl RegisterMap {
     }
 
     /// Returns a [`RegisterMap`] built from [`QvmResultData`]
-    fn from_qvm_result_data(
+    pub(crate) fn from_qvm_result_data(
         result_data: &QvmResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
         #[cfg(feature = "tracing")]
@@ -186,7 +199,7 @@ impl RegisterMap {
                     }
                     .map_err(|_| {
                         RegisterMatrixConversionError::InvalidShape {
-                            register: name.to_string(),
+                            register: name.clone(),
                         }
                     })?;
                     Ok((name.clone(), register_matrix))
@@ -202,7 +215,7 @@ impl RegisterMap {
     ///
     /// This fails if the underlying [`QpuResultData`] data is jagged. See [`RegisterMap`] for more
     /// detailed explanations of why and when this occurs.
-    fn from_qpu_result_data(
+    pub(crate) fn from_qpu_result_data(
         qpu_result_data: &QpuResultData,
     ) -> Result<Self, RegisterMatrixConversionError> {
         #[cfg(feature = "tracing")]
@@ -219,8 +232,8 @@ impl RegisterMap {
                             })?,
                             qpu_result_data.readout_values.get(alias).ok_or_else(||
                                 RegisterMatrixConversionError::UnmappedAlias {
-                                    memory_reference: memory_reference.to_string(),
-                                    alias: alias.to_string(),
+                                    memory_reference: memory_reference.clone(),
+                                    alias: alias.clone(),
                                 },
                             )?,
                         ))

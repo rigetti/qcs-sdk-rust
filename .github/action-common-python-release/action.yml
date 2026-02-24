@@ -31,6 +31,10 @@ runs:
     with:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }}
+
+  - name: Install Poetry
+    uses: abatilo/actions-poetry@v4
+
   - name: Install Rust toolchain
     uses: actions-rs/toolchain@v1
     with:
@@ -44,7 +48,7 @@ runs:
     if: inputs.package-name == 'qcs-sdk-python-grpc-web'
     run: |
       pip install toml
-      python crates/python/scripts/patch_grpc_web.py
+      python crates/lib/scripts/patch_grpc_web.py
 
   # must be build or sdist
   - if: inputs.maturin-command == 'build'
@@ -55,7 +59,7 @@ runs:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: -i ${{ inputs.python-version }} --release --manifest-path crates/python/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/lib/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
       docker-options: -e CI
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
@@ -65,7 +69,7 @@ runs:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: --manifest-path crates/python/Cargo.toml --out dist
+      args: --manifest-path crates/lib/Cargo.toml --out dist
 
   # host will not be able to install wheel in this case
   - if: inputs.maturin-target != 'ppc64le' && inputs.maturin-target != 'x86_64-apple-darwin'

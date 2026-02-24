@@ -1,15 +1,17 @@
 #![deny(clippy::all)]
 #![deny(clippy::cargo)]
-#![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
-#![allow(clippy::missing_errors_doc)]
-#![allow(clippy::implicit_hasher)]
-#![allow(clippy::too_many_arguments)]
-#![warn(clippy::result_large_err)] // TODO #555: box the large variants or change the lint threshold
-#![warn(clippy::large_enum_variant)] // TODO #555: box the large variants
 #![forbid(unsafe_code)]
 #![warn(future_incompatible)]
 #![warn(rust_2018_compatibility, rust_2018_idioms)]
 #![warn(clippy::pedantic)]
+#![warn(clippy::result_large_err)] // TODO #555: box the large variants or change the lint threshold
+#![warn(clippy::large_enum_variant)] // TODO #555: box the large variants
+#![allow(clippy::multiple_crate_versions)] // This should be enforced by cargo-deny
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::implicit_hasher)]
+#![allow(clippy::too_many_arguments)]
+#![allow(clippy::unsafe_derive_deserialize)]
+#![allow(clippy::enum_variant_names)]
 #![warn(
     absolute_paths_not_starting_with_crate,
     anonymous_parameters,
@@ -69,6 +71,9 @@ mod execution_data;
 pub mod qpu;
 pub mod qvm;
 mod register_data;
+
+#[cfg(feature = "python")]
+pub mod python;
 
 /// Build information about the crate and environment in which it was built.
 pub mod build_info {

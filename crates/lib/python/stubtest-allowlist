@@ -1,0 +1,46 @@
+qcs_sdk._tracing_subscriber.*
+
+# These "__all__" exist in the package but aren't included in the generated stubs (yet).
+qcs_sdk.__all__
+qcs_sdk.client.__all__
+qcs_sdk.compiler.__all__
+qcs_sdk.compiler.quilc.__all__
+qcs_sdk.diagnostics.__all__
+qcs_sdk.qpu.__all__
+qcs_sdk.qpu.api.__all__
+qcs_sdk.qpu.experimental.__all__
+qcs_sdk.qpu.experimental.random.__all__
+qcs_sdk.qpu.isa.__all__
+qcs_sdk.qpu.translation.__all__
+qcs_sdk.qvm.__all__
+qcs_sdk.qvm.api.__all__
+
+# `mypy` detects the defaults as Ellipsis, rather than as empty lists.
+# That's sort of technically correct, but showing the empty list is way more useful for callers.
+qcs_sdk.Executable.__new__
+qcs_sdk.compiler.quilc.CompilerOpts.__new__
+
+# These constants are typed with Ellipsis, but technically have (arbitrary) values,
+# so `mypy` complains about them, too.
+qcs_sdk.Service.QCS
+qcs_sdk.Service.QPU
+qcs_sdk.Service.QUILC
+qcs_sdk.Service.QVM
+qcs_sdk.compiler.quilc.DEFAULT_COMPILER_TIMEOUT
+qcs_sdk.qpu.isa.Family.ANKAA
+qcs_sdk.qpu.isa.Family.ASPEN
+qcs_sdk.qpu.isa.Family.FULL
+qcs_sdk.qpu.isa.Family.NONE
+qcs_sdk.qpu.translation.TranslationBackend.V1
+qcs_sdk.qpu.translation.TranslationBackend.V2
+
+# These are re-exported from the qcs_api_client_common crate.
+qcs_sdk.client.AuthServer
+qcs_sdk.client.ClientCredentials
+qcs_sdk.client.ExternallyManaged
+qcs_sdk.client.RefreshToken
+qcs_sdk.client.SecretRefreshToken
+
+# Re-exported to top-level from submodules.
+qcs_sdk.QCSClient
+
