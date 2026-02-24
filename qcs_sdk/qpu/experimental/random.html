@@ -32,12 +32,6 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="class" href="#PrngSeedValue">PrngSeedValue</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#ChooseRandomRealSubRegions">ChooseRandomRealSubRegions</a>
                             <ul class="memberlist">
                         <li>
@@ -50,16 +44,25 @@
 
             </li>
             <li>
+                    <a class="class" href="#PrngSeedValue">PrngSeedValue</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#PrngSeedValue.as_f64">as_f64</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#RandomError">RandomError</a>
                             <ul class="memberlist">
                 </ul>
 
             </li>
             <li>
-                    <a class="function" href="#lfsr_v1_next">lfsr_v1_next</a>
+                    <a class="function" href="#choose_random_real_sub_region_indices">choose_random_real_sub_region_indices</a>
             </li>
             <li>
-                    <a class="function" href="#choose_random_real_sub_region_indices">choose_random_real_sub_region_indices</a>
+                    <a class="function" href="#lfsr_v1_next">lfsr_v1_next</a>
             </li>
     </ul>
 
@@ -77,28 +80,11 @@
                     <h1 class="modulename">
 <a href="./../../../qcs_sdk.html">qcs_sdk</a><wbr>.<a href="./../../qpu.html">qpu</a><wbr>.<a href="./../experimental.html">experimental</a><wbr>.random    </h1>
 
-                        <div class="docstring"><p>This module supports low-level primitives for randomization on Rigetti's QPUs.</p>
-</div>
-
+                
                 
                 
                 
             </section>
-                <section id="PrngSeedValue">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">PrngSeedValue</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#PrngSeedValue"></a>
-    
-            <div class="docstring"><p>A seed value for the Rigetti QPU PRNG.</p>
-</div>
-
-
-                </section>
                 <section id="ChooseRandomRealSubRegions">
                     <div class="attr class">
             
@@ -109,86 +95,8 @@
     </div>
     <a class="headerlink" href="#ChooseRandomRealSubRegions"></a>
     
-            <div class="docstring"><p>A class that represents a QPU extern call to pseudo-randomly choose sub-regions of
-a source memory declaration. The parameters of the call function are as follows:</p>
-
-<ul>
-<li><code>destination</code> - The destination memory region to copy the pseudo-randomly chosen
-sub-region to.</li>
-<li><code>source</code> - The source memory region to choose sub-regions from.</li>
-<li><code>sub_region_size</code> - The size of each sub-region.</li>
-<li><code>seed</code> - A memory reference to an integer value that will be used to seed the PRNG.
-This value will be mutated to the next element in the PRNG sequence, so you may
-use it to generate subsequent pseudo-random values.</li>
-</ul>
-
-<p>Note, <code>len(destination) % sub_region-size</code> and <code>len(source) % sub_region_size</code> must be 0.</p>
-
-<h1 id="example">Example</h1>
-
-<p>The following example declares a source with 12 real values, representing 4 sub-regions
-each of size 3. The destination memory region is declared with 3 real values, representing
-a single sub-region. The seed memory region is declared with a single integer value.</p>
-
-<p>The <code>Call</code> instruction will pseudo-randomly choose a sub-region of the source memory region
-and copy it to the destination memory region according to the seed value. The seed value is
-mutated to the next element in the PRNG sequence.</p>
-
-<div class="pdoc-code codehilite">
-<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">quil.program</span><span class="w"> </span><span class="kn">import</span> <span class="n">Program</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">quil.instructions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Declaration</span><span class="p">,</span>
-    <span class="n">Instruction</span><span class="p">,</span>
-    <span class="n">Pragma</span><span class="p">,</span>
-    <span class="n">Call</span><span class="p">,</span>
-    <span class="n">CallArgument</span><span class="p">,</span>
-    <span class="n">MemoryReference</span><span class="p">,</span>
-    <span class="n">Vector</span><span class="p">,</span>
-    <span class="n">ScalarType</span><span class="p">,</span>
-    <span class="n">PragmaArgument</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="">qcs_sdk.qpu.experimental.random</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">ChooseRandomRealSubRegions</span>
-
-
-<span class="n">EXPECTED_QUIL</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">PRAGMA EXTERN choose_random_real_sub_regions &quot;(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)&quot;</span>
-<span class="s2">DECLARE destination REAL[3]</span>
-<span class="s2">DECLARE source REAL[12]</span>
-<span class="s2">DECLARE seed INTEGER[1]</span>
-<span class="s2">CALL choose_random_real_sub_regions destination source 3 seed[0]</span>
-<span class="s2">&quot;&quot;&quot;</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">test_choose_random_real_subregions</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that `ChooseRandomRealSubRegions` is correctly added to a Quil progrram.&quot;&quot;&quot;</span>
-    <span class="n">program</span> <span class="o">=</span> <span class="n">Program</span><span class="p">()</span>
-    <span class="n">destination</span> <span class="o">=</span> <span class="n">Declaration</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">,</span> <span class="n">Vector</span><span class="p">(</span><span class="n">ScalarType</span><span class="o">.</span><span class="n">Real</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">Instruction</span><span class="o">.</span><span class="n">from_declaration</span><span class="p">(</span><span class="n">destination</span><span class="p">))</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">Declaration</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="n">Vector</span><span class="p">(</span><span class="n">ScalarType</span><span class="o">.</span><span class="n">Real</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">Instruction</span><span class="o">.</span><span class="n">from_declaration</span><span class="p">(</span><span class="n">source</span><span class="p">))</span>
-    <span class="n">seed</span> <span class="o">=</span> <span class="n">Declaration</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="n">Vector</span><span class="p">(</span><span class="n">ScalarType</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">Instruction</span><span class="o">.</span><span class="n">from_declaration</span><span class="p">(</span><span class="n">seed</span><span class="p">))</span>
-    <span class="n">pragma_extern</span> <span class="o">=</span> <span class="n">Pragma</span><span class="p">(</span>
-        <span class="s2">&quot;EXTERN&quot;</span><span class="p">,</span>
-        <span class="p">[</span><span class="n">PragmaArgument</span><span class="o">.</span><span class="n">from_identifier</span><span class="p">(</span><span class="n"><a href="#ChooseRandomRealSubRegions.NAME">ChooseRandomRealSubRegions.NAME</a></span><span class="p">)],</span>
-        <span class="n"><a href="#ChooseRandomRealSubRegions.build_signature">ChooseRandomRealSubRegions.build_signature</a></span><span class="p">(),</span>
-    <span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">Instruction</span><span class="o">.</span><span class="n">from_pragma</span><span class="p">(</span><span class="n">pragma_extern</span><span class="p">))</span>
-    <span class="n">call</span> <span class="o">=</span> <span class="n">Call</span><span class="p">(</span>
-        <span class="n"><a href="#ChooseRandomRealSubRegions.NAME">ChooseRandomRealSubRegions.NAME</a></span><span class="p">,</span>
-        <span class="p">[</span>
-            <span class="n">CallArgument</span><span class="o">.</span><span class="n">from_identifier</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">),</span>
-            <span class="n">CallArgument</span><span class="o">.</span><span class="n">from_identifier</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">),</span>
-            <span class="n">CallArgument</span><span class="o">.</span><span class="n">from_immediate</span><span class="p">(</span><span class="nb">complex</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
-            <span class="n">CallArgument</span><span class="o">.</span><span class="n">from_memory_reference</span><span class="p">(</span><span class="n">MemoryReference</span><span class="p">(</span><span class="s2">&quot;seed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
-        <span class="p">],</span>
-    <span class="p">)</span>
-    <span class="n">program</span><span class="o">.</span><span class="n">add_instruction</span><span class="p">(</span><span class="n">Instruction</span><span class="o">.</span><span class="n">from_call</span><span class="p">(</span><span class="n">call</span><span class="p">))</span>
-    <span class="k">assert</span> <span class="n">program</span> <span class="o">==</span> <span class="n">Program</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">EXPECTED_QUIL</span><span class="p">)</span>
-</code></pre>
-</div>
-
-<p>From there, you may reference the <code>destination</code> memory region in your pulse program.</p>
+            <div class="docstring"><p>An [<code>ExternedCall</code>] that may be used to select one or more random
+sub-regions from a source array of real values to a destination array.</p>
 </div>
 
 
@@ -196,29 +104,64 @@ mutated to the next element in the PRNG sequence.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">build_signature</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">cls</span></span><span class="return-annotation">) -> <span class="nb">str</span>:</span></span>
+        <span class="name">build_signature</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#ChooseRandomRealSubRegions.build_signature"></a>
     
-            <div class="docstring"><p>Build the Quil signature of the <code>PRAGMA EXTERN</code> instruction.</p>
+            <div class="docstring"><p>Build the signature for the <code>PRAGMA EXTERN choose_random_real_sub_regions</code> instruction.</p>
+
+<p>The signature expressed in Quil is as follows:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code>&quot;(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)&quot;
+</code></pre>
+</div>
 </div>
 
 
                             </div>
                             <div id="ChooseRandomRealSubRegions.NAME" class="classattr">
                                 <div class="attr variable">
-            <span class="name">NAME</span><span class="annotation">: str</span>        =
+            <span class="name">NAME</span>        =
 <span class="default_value">&#39;choose_random_real_sub_regions&#39;</span>
 
         
     </div>
     <a class="headerlink" href="#ChooseRandomRealSubRegions.NAME"></a>
     
-            <div class="docstring"><p>The name of the extern call function, which may be used in <code>PRAGMA EXTERN</code> and <code>CALL</code> instructions.</p>
+    
+
+                            </div>
+                </section>
+                <section id="PrngSeedValue">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">PrngSeedValue</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#PrngSeedValue"></a>
+    
+            <div class="docstring"><p>A valid seed value that may be used to initialize the PRNG. Such
+values are in the range <code>[1, MAX_SEQUENCER_VALUE]</code> and are losslessly
+convertible to <code>f64</code>.</p>
 </div>
 
+
+                            <div id="PrngSeedValue.as_f64" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">as_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#PrngSeedValue.as_f64"></a>
+    
+    
 
                             </div>
                 </section>
@@ -226,29 +169,13 @@ mutated to the next element in the PRNG sequence.</p>
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">RandomError</span><wbr>(<span class="base">builtins.ValueError</span>):
+    <span class="name">RandomError</span><wbr>(<span class="base"><a href="../../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#RandomError"></a>
     
-            <div class="docstring"><p>An error that may occur while initializing a seed value or
-generating a QPU PRNG sequence.</p>
-</div>
-
-
-                </section>
-                <section id="lfsr_v1_next">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">lfsr_v1_next</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">seed_value</span><span class="p">:</span> <span class="n"><a href="#PrngSeedValue">PrngSeedValue</a></span></span><span class="return-annotation">) -> <span class="n"><a href="#PrngSeedValue">PrngSeedValue</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#lfsr_v1_next"></a>
-    
-            <div class="docstring"><p>Given a seed value, return the next value in the LFSR v1 PRNG sequence.</p>
+            <div class="docstring"><p>Errors that may occur using the randomization primitives defined in this module.</p>
 </div>
 
 
@@ -257,16 +184,63 @@ generating a QPU PRNG sequence.</p>
                     <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">choose_random_real_sub_region_indices</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">seed</span><span class="p">:</span> <span class="n"><a href="#PrngSeedValue">PrngSeedValue</a></span>,</span><span class="param">	<span class="n">start_index</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">series_length</span><span class="p">:</span> <span class="nb">int</span>,</span><span class="param">	<span class="n">sub_region_count</span><span class="p">:</span> <span class="nb">int</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>:</span></span>
+        <span class="name">choose_random_real_sub_region_indices</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">seed</span>, </span><span class="param"><span class="n">start_index</span>, </span><span class="param"><span class="n">series_length</span>, </span><span class="param"><span class="n">sub_region_count</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#choose_random_real_sub_region_indices"></a>
     
-            <div class="docstring"><p>Given a seed value, the starting index and length of a pseudo-random series, and the number of
-sub-regions from which to choose, return a list of the sub-region indices that were chosen.</p>
+            <div class="docstring"><p>Given a seed, start index, series length, and sub-region count, this function
+will generate and return the sequence of pseudo-randomly chosen indices on
+the Rigetti control systems.</p>
 
-<p>The LFSR v1 pseudo-random number generator underlies this sequence.</p>
+<p>For instance, if the following Quil program is run for 100 shots:</p>
+
+<pre><code># presumed sub-region size is 3.
+DECLARE destination REAL[6] # prng invocations per shot = (6 / sub_region_size)  = 2
+DECLARE source REAL[12]     # implicit sub-region count = (12 / sub_region_size) = 4
+DECLARE seed INTEGER[1]
+DECLARE ro BIT[1]
+
+DELAY 0 1e-6
+
+PRAGMA EXTERN choose_random_real_sub_regions "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
+CALL choose_random_real_sub_regions destination source 3 seed
+</code></pre>
+
+<p>with a seed of 639,523, the following will provide the random sequence of sub-region indices:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="k">use</span><span class="w"> </span><span class="n">qcs</span><span class="p">::</span><span class="n">qpu</span><span class="p">::</span><span class="n">experimental</span><span class="p">::</span><span class="n">random</span><span class="p">::{</span><span class="n">choose_random_real_sub_region_indices</span><span class="p">,</span><span class="w"> </span><span class="n">PrngSeedValue</span><span class="p">};</span>
+
+<span class="kd">let</span><span class="w"> </span><span class="n">seed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PrngSeedValue</span><span class="p">::</span><span class="n">try_new</span><span class="p">(</span><span class="mi">639_523</span><span class="p">).</span><span class="n">unwrap</span><span class="p">();</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">start_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">prng_invocations_per_shot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">shot_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">series_length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">prng_invocations_per_shot</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">shot_count</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">sub_region_count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
+<span class="kd">let</span><span class="w"> </span><span class="n">_random_indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">choose_random_real_sub_region_indices</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span><span class="w"> </span><span class="n">start_index</span><span class="p">,</span><span class="w"> </span><span class="n">series_length</span><span class="p">,</span><span class="w"> </span><span class="n">sub_region_count</span><span class="p">);</span>
+</code></pre>
+</div>
+</div>
+
+
+                </section>
+                <section id="lfsr_v1_next">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">lfsr_v1_next</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">seed</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#lfsr_v1_next"></a>
+    
+            <div class="docstring"><p>This represents the <a href="https://en.wikipedia.org/wiki/Linear-feedback_shift_register">linear feedback shift
+register</a>
+currently implemented on Rigetti control systems. Specifically,
+it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
+The taps have been shown to produce maximal sequence lengths for 48-bit strings.</p>
 </div>
 
 

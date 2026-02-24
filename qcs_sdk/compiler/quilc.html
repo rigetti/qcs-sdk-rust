@@ -44,10 +44,10 @@
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#CompilationResult.program">program</a>
+                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
                         </li>
                         <li>
-                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
+                                <a class="variable" href="#CompilationResult.program">program</a>
                         </li>
                 </ul>
 
@@ -55,30 +55,6 @@
             <li>
                     <a class="class" href="#NativeQuilMetadata">NativeQuilMetadata</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_depth">gate_depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.final_rewiring">final_rewiring</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.multiqubit_gate_depth">multiqubit_gate_depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.program_fidelity">program_fidelity</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.program_duration">program_duration</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.qpu_runtime_estimation">qpu_runtime_estimation</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_volume">gate_volume</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.topological_swaps">topological_swaps</a>
-                        </li>
                 </ul>
 
             </li>
@@ -98,10 +74,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                 </ul>
 
@@ -119,13 +95,22 @@
 
             </li>
             <li>
+                    <a class="class" href="#ConjugatePauliByCliffordRequest">ConjugatePauliByCliffordRequest</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ConjugatePauliByCliffordRequest.args">args</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                 </ul>
 
@@ -134,19 +119,19 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
                         </li>
                 </ul>
 
@@ -163,6 +148,9 @@
             <li>
                     <a class="class" href="#QuilcClient">QuilcClient</a>
                             <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#QuilcClient.new_libquil">new_libquil</a>
+                        </li>
                         <li>
                                 <a class="function" href="#QuilcClient.new_rpcq">new_rpcq</a>
                         </li>
@@ -233,7 +221,9 @@
     </div>
     <a class="headerlink" href="#CompilerOpts"></a>
     
-    
+            <div class="docstring"><p>A set of options that determine the behavior of compiling programs with quilc</p>
+</div>
+
 
                             <div id="CompilerOpts.default" class="classattr">
                                 <div class="attr function">
@@ -245,7 +235,9 @@
     </div>
     <a class="headerlink" href="#CompilerOpts.default"></a>
     
-    
+            <div class="docstring"><p>Create a new instance of <code><a href="#CompilerOpts">CompilerOpts</a></code> with default values.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -259,19 +251,10 @@
     </div>
     <a class="headerlink" href="#CompilationResult"></a>
     
-    
+            <div class="docstring"><p>The result of compiling a Quil program to native quil with <code>quilc</code></p>
+</div>
 
-                            <div id="CompilationResult.program" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program</span>
 
-        
-    </div>
-    <a class="headerlink" href="#CompilationResult.program"></a>
-    
-    
-
-                            </div>
                             <div id="CompilationResult.native_quil_metadata" class="classattr">
                                 <div class="attr variable">
             <span class="name">native_quil_metadata</span>
@@ -280,7 +263,22 @@
     </div>
     <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
     
+            <div class="docstring"><p>Metadata about the compiled program</p>
+</div>
+
+
+                            </div>
+                            <div id="CompilationResult.program" class="classattr">
+                                <div class="attr variable">
+            <span class="name">program</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CompilationResult.program"></a>
     
+            <div class="docstring"><p>The compiled program</p>
+</div>
+
 
                             </div>
                 </section>
@@ -294,112 +292,10 @@
     </div>
     <a class="headerlink" href="#NativeQuilMetadata"></a>
     
-    
-
-                            <div id="NativeQuilMetadata.gate_depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gate_depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_depth"></a>
-    
-            <div class="docstring"><p>Get the gate_depth field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Metadata about a program compiled to native quil.</p>
 </div>
 
 
-                            </div>
-                            <div id="NativeQuilMetadata.final_rewiring" class="classattr">
-                                <div class="attr variable">
-            <span class="name">final_rewiring</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.final_rewiring"></a>
-    
-            <div class="docstring"><p>Get the final_rewiring field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.multiqubit_gate_depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">multiqubit_gate_depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.multiqubit_gate_depth"></a>
-    
-            <div class="docstring"><p>Get the multiqubit_gate_depth field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.program_fidelity" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program_fidelity</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.program_fidelity"></a>
-    
-            <div class="docstring"><p>Get the program_fidelity field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.program_duration" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program_duration</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.program_duration"></a>
-    
-            <div class="docstring"><p>Get the program_duration field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.qpu_runtime_estimation" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qpu_runtime_estimation</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.qpu_runtime_estimation"></a>
-    
-            <div class="docstring"><p>Get the qpu_runtime_estimation field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.gate_volume" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gate_volume</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_volume"></a>
-    
-            <div class="docstring"><p>Get the gate_volume field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.topological_swaps" class="classattr">
-                                <div class="attr variable">
-            <span class="name">topological_swaps</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.topological_swaps"></a>
-    
-            <div class="docstring"><p>Get the topological_swaps field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="TargetDevice">
                     <div class="attr class">
@@ -411,7 +307,9 @@
     </div>
     <a class="headerlink" href="#TargetDevice"></a>
     
-    
+            <div class="docstring"><p>Description of a device to compile for.</p>
+</div>
+
 
                             <div id="TargetDevice.from_isa" class="classattr">
                                 <div class="attr function">
@@ -423,7 +321,14 @@
     </div>
     <a class="headerlink" href="#TargetDevice.from_isa"></a>
     
-    
+            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] based on an [<code>InstructionSetArchitecture</code>].</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the [<code>InstructionSetArchitecture</code>]
+cannot be converted into a format that Quilc understands.</p>
+</div>
+
 
                             </div>
                             <div id="TargetDevice.from_json" class="classattr">
@@ -436,7 +341,13 @@
     </div>
     <a class="headerlink" href="#TargetDevice.from_json"></a>
     
-    
+            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] from a JSON string.</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the JSON is malformed.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -450,21 +361,10 @@
     </div>
     <a class="headerlink" href="#PauliTerm"></a>
     
-    
-
-                            <div id="PauliTerm.indices" class="classattr">
-                                <div class="attr variable">
-            <span class="name">indices</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.indices"></a>
-    
-            <div class="docstring"><p>Get the indices field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Pauli Term</p>
 </div>
 
 
-                            </div>
                             <div id="PauliTerm.symbols" class="classattr">
                                 <div class="attr variable">
             <span class="name">symbols</span>
@@ -473,7 +373,20 @@
     </div>
     <a class="headerlink" href="#PauliTerm.symbols"></a>
     
-            <div class="docstring"><p>Get the symbols field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.indices" class="classattr">
+                                <div class="attr variable">
+            <span class="name">indices</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.indices"></a>
+    
+            <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
 </div>
 
 
@@ -489,7 +402,9 @@
     </div>
     <a class="headerlink" href="#ConjugateByCliffordRequest"></a>
     
-    
+            <div class="docstring"><p>Request to conjugate a Pauli Term by a Clifford element.</p>
+</div>
+
 
                             <div id="ConjugateByCliffordRequest.clifford" class="classattr">
                                 <div class="attr variable">
@@ -499,7 +414,7 @@
     </div>
     <a class="headerlink" href="#ConjugateByCliffordRequest.clifford"></a>
     
-            <div class="docstring"><p>Get the clifford field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Clifford element.</p>
 </div>
 
 
@@ -512,9 +427,35 @@
     </div>
     <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
     
-            <div class="docstring"><p>Get the pauli field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Pauli Term to conjugate.</p>
 </div>
 
+
+                            </div>
+                </section>
+                <section id="ConjugatePauliByCliffordRequest">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConjugatePauliByCliffordRequest</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordRequest"></a>
+    
+            <div class="docstring"><p>The "outer" request shape for a <code><a href="#conjugate_pauli_by_clifford">conjugate_pauli_by_clifford</a></code> request.</p>
+</div>
+
+
+                            <div id="ConjugatePauliByCliffordRequest.args" class="classattr">
+                                <div class="attr variable">
+            <span class="name">args</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordRequest.args"></a>
+    
+    
 
                             </div>
                 </section>
@@ -528,21 +469,10 @@
     </div>
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse"></a>
     
-    
-
-                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
-                                <div class="attr variable">
-            <span class="name">phase</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
-    
-            <div class="docstring"><p>Get the phase field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Conjugate Pauli by Clifford response.</p>
 </div>
 
 
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
                                 <div class="attr variable">
             <span class="name">pauli</span>
@@ -551,7 +481,20 @@
     </div>
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
     
-            <div class="docstring"><p>Get the pauli field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Description of the encoded Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
+                                <div class="attr variable">
+            <span class="name">phase</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
+    
+            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
 </div>
 
 
@@ -567,21 +510,10 @@
     </div>
     <a class="headerlink" href="#RandomizedBenchmarkingRequest"></a>
     
-    
-
-                            <div id="RandomizedBenchmarkingRequest.seed" class="classattr">
-                                <div class="attr variable">
-            <span class="name">seed</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.seed"></a>
-    
-            <div class="docstring"><p>Get the seed field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Request to generate a randomized benchmarking sequence.</p>
 </div>
 
 
-                            </div>
                             <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
                                 <div class="attr variable">
             <span class="name">gateset</span>
@@ -590,33 +522,7 @@
     </div>
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
     
-            <div class="docstring"><p>Get the gateset field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
-                                <div class="attr variable">
-            <span class="name">interleaver</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
-    
-            <div class="docstring"><p>Get the interleaver field from Python.  Annotated with <code>@property</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qubits</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
-    
-            <div class="docstring"><p>Get the qubits field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
 </div>
 
 
@@ -629,7 +535,46 @@
     </div>
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
     
-            <div class="docstring"><p>Get the depth field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qubits</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
+    
+            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
+                                <div class="attr variable">
+            <span class="name">interleaver</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
+    
+            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.seed" class="classattr">
+                                <div class="attr variable">
+            <span class="name">seed</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.seed"></a>
+    
+            <div class="docstring"><p>PRNG seed. Set this to guarantee repeatable results.</p>
 </div>
 
 
@@ -645,7 +590,9 @@
     </div>
     <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse"></a>
     
-    
+            <div class="docstring"><p>Randomly generated benchmarking sequence response.</p>
+</div>
+
 
                             <div id="GenerateRandomizedBenchmarkingSequenceResponse.sequence" class="classattr">
                                 <div class="attr variable">
@@ -655,7 +602,7 @@
     </div>
     <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse.sequence"></a>
     
-            <div class="docstring"><p>Get the sequence field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>List of Cliffords, each expressed as a list of generator indices.</p>
 </div>
 
 
@@ -671,8 +618,23 @@
     </div>
     <a class="headerlink" href="#QuilcClient"></a>
     
+            <div class="docstring"><p>Client used to communicate with Quilc.</p>
+</div>
+
+
+                            <div id="QuilcClient.new_libquil" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">new_libquil</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcClient.new_libquil"></a>
+    
     
 
+                            </div>
                             <div id="QuilcClient.new_rpcq" class="classattr">
                                 <div class="attr function">
             
@@ -683,7 +645,9 @@
     </div>
     <a class="headerlink" href="#QuilcClient.new_rpcq"></a>
     
-    
+            <div class="docstring"><p>Construct a <code><a href="#QuilcClient">QuilcClient</a></code> that uses RPCQ to communicate with Quilc.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -703,13 +667,13 @@
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">QuilcError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">QuilcError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#QuilcError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>Errors encountered compiling a Quil program.</p>
 </div>
 
 
@@ -724,7 +688,24 @@
     </div>
     <a class="headerlink" href="#compile_program"></a>
     
-    
+            <div class="docstring"><p>Compile a quil program for a target device.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>quil</strong>:  The Quil program to compile.</li>
+<li><strong>target</strong>:  Architectural description of device to compile for.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+<li><strong>options</strong>:  Optional compiler options. If <code>None</code>, default values are used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If compilation fails.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="compile_program_async">
@@ -737,7 +718,24 @@
     </div>
     <a class="headerlink" href="#compile_program_async"></a>
     
-    
+            <div class="docstring"><p>Compile a quil program for a target device.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>quil</strong>:  The Quil program to compile.</li>
+<li><strong>target</strong>:  Architectural description of device to compile for.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+<li><strong>options</strong>:  Optional compiler options. If <code>None</code>, default values are used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If compilation fails.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="get_version_info">
@@ -750,7 +748,21 @@
     </div>
     <a class="headerlink" href="#get_version_info"></a>
     
-    
+            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="get_version_info_async">
@@ -763,7 +775,21 @@
     </div>
     <a class="headerlink" href="#get_version_info_async"></a>
     
-    
+            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="conjugate_pauli_by_clifford">
@@ -776,7 +802,23 @@
     </div>
     <a class="headerlink" href="#conjugate_pauli_by_clifford"></a>
     
-    
+            <div class="docstring"><p>Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
+In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>request</strong>:  Pauli Term conjugation request.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc or if the request is malformed.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="conjugate_pauli_by_clifford_async">
@@ -789,7 +831,23 @@
     </div>
     <a class="headerlink" href="#conjugate_pauli_by_clifford_async"></a>
     
-    
+            <div class="docstring"><p>Given a circuit that consists only of elements of the Clifford group, return its action on a PauliTerm.
+In particular, for Clifford C, and Pauli P, this returns the PauliTerm representing CPC^{\dagger}.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>request</strong>:  Pauli Term conjugation request.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc or if the request is malformed.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="generate_randomized_benchmarking_sequence">
@@ -802,7 +860,34 @@
     </div>
     <a class="headerlink" href="#generate_randomized_benchmarking_sequence"></a>
     
-    
+            <div class="docstring"><p>Construct a randomized benchmarking experiment on the given qubits, decomposing into
+gateset. If interleaver is not provided, the returned sequence will have the form</p>
+
+<pre><code>    C_1 C_2 ... C_(depth-1) C_inv ,
+</code></pre>
+
+<p>where each C is a Clifford element drawn from gateset, C_{&lt; depth} are randomly selected,
+and C_inv is selected so that the entire sequence composes to the identity. If an
+interleaver G (which must be a Clifford, and which will be decomposed into the native
+gateset) is provided, then the sequence instead takes the form</p>
+
+<pre><code>    C_1 G C_2 G ... C_(depth-1) G C_inv .
+</code></pre>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>request</strong>:  Randomized benchmarking request.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc or if the request is malformed.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="generate_randomized_benchmarking_sequence_async">
@@ -815,7 +900,34 @@
     </div>
     <a class="headerlink" href="#generate_randomized_benchmarking_sequence_async"></a>
     
-    
+            <div class="docstring"><p>Construct a randomized benchmarking experiment on the given qubits, decomposing into
+gateset. If interleaver is not provided, the returned sequence will have the form</p>
+
+<pre><code>    C_1 C_2 ... C_(depth-1) C_inv ,
+</code></pre>
+
+<p>where each C is a Clifford element drawn from gateset, C_{&lt; depth} are randomly selected,
+and C_inv is selected so that the entire sequence composes to the identity. If an
+interleaver G (which must be a Clifford, and which will be decomposed into the native
+gateset) is provided, then the sequence instead takes the form</p>
+
+<pre><code>    C_1 G C_2 G ... C_(depth-1) G C_inv .
+</code></pre>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>request</strong>:  Randomized benchmarking request.</li>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc or if the request is malformed.</li>
+</ul>
+</div>
+
 
                 </section>
     </main>

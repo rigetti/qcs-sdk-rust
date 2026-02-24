@@ -32,52 +32,19 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="class" href="#Register">Register</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#Register.from_i32">from_i32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.inner">inner</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.is_i32">is_i32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.as_i32">as_i32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.to_i32">to_i32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.is_complex32">is_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.as_complex32">as_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.to_complex32">to_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Register.from_complex32">from_complex32</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#ExecutionResult">ExecutionResult</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.data">data</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                 </ul>
 
@@ -98,36 +65,6 @@
 
             </li>
             <li>
-                    <a class="class" href="#ConnectionStrategy">ConnectionStrategy</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.default">default</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.gateway">gateway</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.is_gateway">is_gateway</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.direct_access">direct_access</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.is_direct_access">is_direct_access</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.endpoint_id">endpoint_id</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.is_endpoint_id">is_endpoint_id</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#ExecutionOptions">ExecutionOptions</a>
                             <ul class="memberlist">
                         <li>
@@ -137,13 +74,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -158,13 +95,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                 </ul>
 
@@ -197,10 +134,10 @@
                                 <a class="function" href="#APIExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
                         </li>
                 </ul>
 
@@ -218,13 +155,49 @@
 
             </li>
             <li>
+                    <a class="class" href="#ConnectionStrategy">ConnectionStrategy</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ConnectionStrategy.default">default</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a>
+                        </li>
+                        <li>
+                                <a class="class" href="#ConnectionStrategy.Gateway">ConnectionStrategy.Gateway</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#ConnectionStrategy.DirectAccess">ConnectionStrategy.DirectAccess</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#ConnectionStrategy.EndpointId">ConnectionStrategy.EndpointId</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#QpuApiError">QpuApiError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#SubmissionError">SubmissionError</a>
                             <ul class="memberlist">
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#QpuApiError">QpuApiError</a>
+                    <a class="class" href="#BuildOptionsError">BuildOptionsError</a>
                             <ul class="memberlist">
                 </ul>
 
@@ -280,154 +253,6 @@
                 
                 
             </section>
-                <section id="Register">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">Register</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#Register"></a>
-    
-    
-
-                            <div id="Register.from_i32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_i32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.from_i32"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>Register::I32</code>], creating a [<code>PyRegister</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.inner" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.inner"></a>
-    
-            <div class="docstring"><p>Directly return the Python version of the variant discriminant wrapped by this value; i.e., performs the match <code>Register::Variant(x) =&gt; x</code> for every variant constructor in [<code><a href="#Register">Register</a></code>]</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.is_i32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_i32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.is_i32"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyRegister</code>] wraps a [<code>Register::i32</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.as_i32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_i32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.as_i32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegister</code>] wraps a <code>Register::i32</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.to_i32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_i32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.to_i32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegister</code>] wraps a <code>Register::i32</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.is_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.is_complex32"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyRegister</code>] wraps a [<code>Register::complex32</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.as_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.as_complex32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegister</code>] wraps a <code>Register::complex32</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.to_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.to_complex32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegister</code>] wraps a <code>Register::complex32</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="Register.from_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Register.from_complex32"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>Register::Complex32</code>], creating a [<code>PyRegister</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                </section>
                 <section id="ExecutionResult">
                     <div class="attr class">
             
@@ -438,7 +263,7 @@
     </div>
     <a class="headerlink" href="#ExecutionResult"></a>
     
-            <div class="docstring"><p>The execution readout data from a particular memory location.</p>
+            <div class="docstring"><p>Execution readout data from a particular memory location.</p>
 </div>
 
 
@@ -452,18 +277,7 @@
     </div>
     <a class="headerlink" href="#ExecutionResult.from_register"></a>
     
-    
-
-                            </div>
-                            <div id="ExecutionResult.shape" class="classattr">
-                                <div class="attr variable">
-            <span class="name">shape</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
-    
-            <div class="docstring"><p>Describes result shape dimensions.</p>
+            <div class="docstring"><p>Build an <code><a href="#ExecutionResult">ExecutionResult</a></code> from a <code>Register</code>.</p>
 </div>
 
 
@@ -476,7 +290,7 @@
     </div>
     <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
-            <div class="docstring"><p>Name of the data type.</p>
+            <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
 </div>
 
 
@@ -489,7 +303,20 @@
     </div>
     <a class="headerlink" href="#ExecutionResult.data"></a>
     
-            <div class="docstring"><p>Register data for this result.</p>
+            <div class="docstring"><p>The result data for all shots by the particular memory location.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.shape" class="classattr">
+                                <div class="attr variable">
+            <span class="name">shape</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    
+            <div class="docstring"><p>The shape of the result data.</p>
 </div>
 
 
@@ -505,7 +332,9 @@
     </div>
     <a class="headerlink" href="#ExecutionResults"></a>
     
-    
+            <div class="docstring"><p>Execution readout data for all memory locations.</p>
+</div>
+
 
                             <div id="ExecutionResults.memory" class="classattr">
                                 <div class="attr variable">
@@ -515,7 +344,10 @@
     </div>
     <a class="headerlink" href="#ExecutionResults.memory"></a>
     
-    
+            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
+the execution of the program.</p>
+</div>
+
 
                             </div>
                             <div id="ExecutionResults.buffers" class="classattr">
@@ -526,7 +358,10 @@
     </div>
     <a class="headerlink" href="#ExecutionResults.buffers"></a>
     
-            <div class="docstring"><p>Result data buffers keyed by readout alias name.</p>
+            <div class="docstring"><p>The readout results of execution, mapping a published filter node to its data.</p>
+
+<p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
+to the name of the memory declaration in the source program.</p>
 </div>
 
 
@@ -539,126 +374,9 @@
     </div>
     <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
     
-            <div class="docstring"><p>QPU execution duration.</p>
+            <div class="docstring"><p>The time spent executing the program.</p>
 </div>
 
-
-                            </div>
-                </section>
-                <section id="ConnectionStrategy">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy"></a>
-    
-    
-
-                            <div id="ConnectionStrategy.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.default"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.gateway" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">gateway</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.gateway"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.is_gateway" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_gateway</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.is_gateway"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.direct_access" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">direct_access</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.direct_access"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.is_direct_access" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_direct_access</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.is_direct_access"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.endpoint_id" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">endpoint_id</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.endpoint_id"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.is_endpoint_id" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.is_endpoint_id"></a>
-    
-    
-
-                            </div>
-                            <div id="ConnectionStrategy.get_endpoint_id" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.get_endpoint_id"></a>
-    
-    
 
                             </div>
                 </section>
@@ -672,7 +390,12 @@
     </div>
     <a class="headerlink" href="#ExecutionOptions"></a>
     
-    
+            <div class="docstring"><p>Options available when executing a job on a QPU.</p>
+
+<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>]
+to build a custom set of options.</p>
+</div>
+
 
                             <div id="ExecutionOptions.default" class="classattr">
                                 <div class="attr function">
@@ -700,13 +423,13 @@
     
 
                             </div>
-                            <div id="ExecutionOptions.api_options" class="classattr">
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
                                 <div class="attr variable">
-            <span class="name">api_options</span>
+            <span class="name">timeout_seconds</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
     
     
 
@@ -719,16 +442,18 @@
     </div>
     <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
     
-    
+            <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
+</div>
+
 
                             </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                            <div id="ExecutionOptions.api_options" class="classattr">
                                 <div class="attr variable">
-            <span class="name">timeout_seconds</span>
+            <span class="name">api_options</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
+    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
     
     
 
@@ -744,7 +469,9 @@
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder"></a>
     
-    
+            <div class="docstring"><p>Builder for <a href="struct.ExecutionOptions.html"><code>ExecutionOptions</code></a>.</p>
+</div>
+
 
                             <div id="ExecutionOptionsBuilder.default" class="classattr">
                                 <div class="attr function">
@@ -772,6 +499,17 @@
     
 
                             </div>
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -794,17 +532,6 @@
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
-    
-    
-
-                            </div>
                 </section>
                 <section id="APIExecutionOptions">
                     <div class="attr class">
@@ -816,7 +543,14 @@
     </div>
     <a class="headerlink" href="#APIExecutionOptions"></a>
     
-    
+            <div class="docstring"><p>Options available when executing a job on a QPU, particular to the execution service's API.</p>
+
+<p>This is a conventent alias for [<code>InnerApiExecutionOptions</code>] which provides a builder.</p>
+
+<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code>ApiExecutionOptionsBuilder</code>]
+to build a custom set of options.</p>
+</div>
+
 
                             <div id="APIExecutionOptions.default" class="classattr">
                                 <div class="attr function">
@@ -841,7 +575,9 @@
     </div>
     <a class="headerlink" href="#APIExecutionOptions.builder"></a>
     
-    
+            <div class="docstring"><p>Get an [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>] that can be used to build a custom [<code><a href="#ExecutionOptions">ExecutionOptions</a></code>].</p>
+</div>
+
 
                             </div>
                             <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
@@ -852,7 +588,9 @@
     </div>
     <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
     
-    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
+</div>
+
 
                             </div>
                             <div id="APIExecutionOptions.timeout" class="classattr">
@@ -863,7 +601,18 @@
     </div>
     <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
     
-    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.timeout">timeout</a></code> value.</p>
+
+<p>Note, this is the timeout while running a job; the job will be evicted from
+the hardware once this time has elapsed.</p>
+
+<p>If unset, the job's estimated duration will be used;
+if the job does not have an estimated duration, the default
+timeout is selected by the service.</p>
+
+<p>The service may also enforce a maximum value for this field.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -877,7 +626,9 @@
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder"></a>
     
-    
+            <div class="docstring"><p>Builder for <a href="struct.ApiExecutionOptions.html"><code>ApiExecutionOptions</code></a>.</p>
+</div>
+
 
                             <div id="APIExecutionOptionsBuilder.default" class="classattr">
                                 <div class="attr function">
@@ -905,17 +656,6 @@
     
 
                             </div>
-                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
                                 <div class="attr variable">
             <span class="name">bypass_settings_protection</span>
@@ -923,6 +663,17 @@
         
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
     
     
 
@@ -938,7 +689,9 @@
     </div>
     <a class="headerlink" href="#QpuApiDuration"></a>
     
-    
+            <div class="docstring"><p>The duration of an API call.</p>
+</div>
+
 
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
@@ -963,32 +716,166 @@
 
                             </div>
                 </section>
-                <section id="SubmissionError">
+                <section id="ConnectionStrategy">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">SubmissionError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">ConnectionStrategy</span>:
 
         
     </div>
-    <a class="headerlink" href="#SubmissionError"></a>
+    <a class="headerlink" href="#ConnectionStrategy"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>The connection strategy to use when submitting and retrieving jobs from a QPU.</p>
 </div>
 
 
+                            <div id="ConnectionStrategy.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.default"></a>
+    
+    
+
+                            </div>
+                            <div id="ConnectionStrategy.get_endpoint_id" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.get_endpoint_id"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="ConnectionStrategy.Gateway">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.Gateway</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.Gateway"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
+                                <dd id="ConnectionStrategy.Gateway.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
+                <dd id="ConnectionStrategy.Gateway.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
+                <dd id="ConnectionStrategy.Gateway.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
+                <dd id="ConnectionStrategy.Gateway.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
+                <dd id="ConnectionStrategy.Gateway.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="ConnectionStrategy.DirectAccess">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.DirectAccess</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.DirectAccess"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
+                                <dd id="ConnectionStrategy.DirectAccess.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
+                <dd id="ConnectionStrategy.DirectAccess.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
+                <dd id="ConnectionStrategy.DirectAccess.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
+                <dd id="ConnectionStrategy.DirectAccess.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
+                <dd id="ConnectionStrategy.DirectAccess.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="ConnectionStrategy.EndpointId">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.EndpointId</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.EndpointId"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
+                                <dd id="ConnectionStrategy.EndpointId.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
+                <dd id="ConnectionStrategy.EndpointId.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
+                <dd id="ConnectionStrategy.EndpointId.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
+                <dd id="ConnectionStrategy.EndpointId.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
+                <dd id="ConnectionStrategy.EndpointId.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
                 </section>
                 <section id="QpuApiError">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">QpuApiError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">QpuApiError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#QpuApiError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>Errors that can occur while attempting to establish a connection to the QPU.</p>
+</div>
+
+
+                </section>
+                <section id="SubmissionError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">SubmissionError</span><wbr>(<span class="base"><a href="#QpuApiError">QpuApiError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#SubmissionError"></a>
+    
+            <div class="docstring"><p>Errors that may occur when submitting a program for execution.</p>
+</div>
+
+
+                </section>
+                <section id="BuildOptionsError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">BuildOptionsError</span><wbr>(<span class="base"><a href="#QpuApiError">QpuApiError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#BuildOptionsError"></a>
+    
+            <div class="docstring"><p>Errors building execution options.</p>
 </div>
 
 
@@ -1003,16 +890,30 @@
     </div>
     <a class="headerlink" href="#submit"></a>
     
-            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU</p>
+            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
 
-<h1 id="errors">Errors</h1>
-
-<p>May return an error if</p>
+<h6 id="parameters">Parameters</h6>
 
 <ul>
-<li>an engagement is not available</li>
-<li>an RPCQ client cannot be built</li>
-<li>the program cannot be submitted</li>
+<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
+<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.
+Creates one using environment configuration if unset.
+See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
+If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>,
+then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
+</ul>
+
+<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
 </ul>
 </div>
 
@@ -1028,16 +929,30 @@
     </div>
     <a class="headerlink" href="#submit_async"></a>
     
-            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU</p>
+            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
 
-<h1 id="errors">Errors</h1>
-
-<p>May return an error if</p>
+<h6 id="parameters">Parameters</h6>
 
 <ul>
-<li>an engagement is not available</li>
-<li>an RPCQ client cannot be built</li>
-<li>the program cannot be submitted</li>
+<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
+<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.
+Creates one using environment configuration if unset.
+See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
+If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>,
+then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
+</ul>
+
+<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
 </ul>
 </div>
 
@@ -1053,7 +968,33 @@
     </div>
     <a class="headerlink" href="#submit_with_parameter_batch"></a>
     
-    
+            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
+
+<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
+function will return a list of strings where the length and order correspond to the
+<code>patch_values</code> given. However, note that execution in the order of given patch values is not
+guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
+<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="submit_with_parameter_batch_async">
@@ -1066,7 +1007,33 @@
     </div>
     <a class="headerlink" href="#submit_with_parameter_batch_async"></a>
     
-    
+            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
+
+<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
+function will return a list of strings where the length and order correspond to the
+<code>patch_values</code> given. However, note that execution in the order of given patch values is not
+guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
+<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="cancel_job">
@@ -1079,7 +1046,25 @@
     </div>
     <a class="headerlink" href="#cancel_job"></a>
     
-    
+            <div class="docstring"><p>Cancel a job that has yet to begin executing.</p>
+
+<p>This action is <em>not</em> atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+job can be cancelled only if it has not yet started executing.</p>
+
+<p>Success response indicates only that the request was received. Cancellation is not guaranteed,
+as it is based on job state at the time of cancellation, and is completed on a best effort
+basis.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_id</strong>:  The job ID to cancel.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="cancel_job_async">
@@ -1092,7 +1077,25 @@
     </div>
     <a class="headerlink" href="#cancel_job_async"></a>
     
-    
+            <div class="docstring"><p>Cancel a job that has yet to begin executing.</p>
+
+<p>This action is <em>not</em> atomic, and will attempt to cancel a job even if it cannot be cancelled. A
+job can be cancelled only if it has not yet started executing.</p>
+
+<p>Success response indicates only that the request was received. Cancellation is not guaranteed,
+as it is based on job state at the time of cancellation, and is completed on a best effort
+basis.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_id</strong>:  The job ID to cancel.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="cancel_jobs">
@@ -1105,7 +1108,25 @@
     </div>
     <a class="headerlink" href="#cancel_jobs"></a>
     
-    
+            <div class="docstring"><p>Cancel all given jobs that have yet to begin executing.</p>
+
+<p>This action is <em>not</em> atomic, and will attempt to cancel every job even when some jobs cannot be
+cancelled. A job can be cancelled only if it has not yet started executing.</p>
+
+<p>Success response indicates only that the request was received. Cancellation is not guaranteed,
+as it is based on job state at the time of cancellation, and is completed on a best effort
+basis.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_ids</strong>:  The job IDs to cancel.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="cancel_jobs_async">
@@ -1118,7 +1139,25 @@
     </div>
     <a class="headerlink" href="#cancel_jobs_async"></a>
     
-    
+            <div class="docstring"><p>Cancel all given jobs that have yet to begin executing.</p>
+
+<p>This action is <em>not</em> atomic, and will attempt to cancel every job even when some jobs cannot be
+cancelled. A job can be cancelled only if it has not yet started executing.</p>
+
+<p>Success response indicates only that the request was received. Cancellation is not guaranteed,
+as it is based on job state at the time of cancellation, and is completed on a best effort
+basis.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_ids</strong>:  The job IDs to cancel.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="retrieve_results">
@@ -1131,7 +1170,27 @@
     </div>
     <a class="headerlink" href="#retrieve_results"></a>
     
-    
+            <div class="docstring"><p>Fetches execution results for the given QCS Job ID.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_id</strong>:  The ID of the job to retrieve results for.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: Results from execution.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>QpuApiError</strong>:  If there was a problem retrieving the results.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="retrieve_results_async">
@@ -1144,7 +1203,27 @@
     </div>
     <a class="headerlink" href="#retrieve_results_async"></a>
     
-    
+            <div class="docstring"><p>Fetches execution results for the given QCS Job ID.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>job_id</strong>:  The ID of the job to retrieve results for.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: Results from execution.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>QpuApiError</strong>:  If there was a problem retrieving the results.</li>
+</ul>
+</div>
+
 
                 </section>
     </main>

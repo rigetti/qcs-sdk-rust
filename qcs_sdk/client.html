@@ -44,19 +44,22 @@
                                 <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                                <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -77,10 +80,10 @@
                                 <a class="variable" href="#OAuthSession.access_token">access_token</a>
                         </li>
                         <li>
-                                <a class="variable" href="#OAuthSession.auth_server">auth_server</a>
+                                <a class="variable" href="#OAuthSession.payload">payload</a>
                         </li>
                         <li>
-                                <a class="variable" href="#OAuthSession.payload">payload</a>
+                                <a class="variable" href="#OAuthSession.auth_server">auth_server</a>
                         </li>
                 </ul>
 
@@ -95,6 +98,9 @@
                                 <a class="variable" href="#AuthServer.issuer">issuer</a>
                         </li>
                         <li>
+                                <a class="variable" href="#AuthServer.scopes">scopes</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                 </ul>
@@ -105,6 +111,18 @@
                             <ul class="memberlist">
                         <li>
                                 <a class="variable" href="#RefreshToken.refresh_token">refresh_token</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#SecretRefreshToken">SecretRefreshToken</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#SecretRefreshToken.secret">secret</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SecretRefreshToken.is_empty">is_empty</a>
                         </li>
                 </ul>
 
@@ -128,13 +146,31 @@
 
             </li>
             <li>
-                    <a class="class" href="#LoadClientError">LoadClientError</a>
+                    <a class="class" href="#BuildClientError">BuildClientError</a>
                             <ul class="memberlist">
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#BuildClientError">BuildClientError</a>
+                    <a class="class" href="#ClientError">ClientError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RPCQQuilcError">RPCQQuilcError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TokenError">TokenError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#LoadClientError">LoadClientError</a>
                             <ul class="memberlist">
                 </ul>
 
@@ -170,7 +206,9 @@
     </div>
     <a class="headerlink" href="#QCSClient"></a>
     
-    
+            <div class="docstring"><p>A client providing helper functionality for accessing QCS APIs</p>
+</div>
+
 
                             <div id="QCSClient.load" class="classattr">
                                 <div class="attr function">
@@ -182,7 +220,21 @@
     </div>
     <a class="headerlink" href="#QCSClient.load"></a>
     
-    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#LoadClientError">LoadClientError</a></code></strong>:  If there is an issue loading the profile details from the environment.</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="QCSClient.load_with_login" class="classattr">
@@ -195,7 +247,29 @@
     </div>
     <a class="headerlink" href="#QCSClient.load_with_login"></a>
     
-    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<p>If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+so you should not use this in environments where that is not possible,
+such as hosted <code>JupyterLab</code> sessions.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#LoadClientError">LoadClientError</a></code></strong>:  If there is an issue loading the profile details from the environment or if the PKCE login flow fails.</li>
+</ul>
+
+<p>See the <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files">QCS documentation</a>
+for more details.</p>
+</div>
+
 
                             </div>
                             <div id="QCSClient.load_with_login_async" class="classattr">
@@ -208,51 +282,44 @@
     </div>
     <a class="headerlink" href="#QCSClient.load_with_login_async"></a>
     
-    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<p>If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+so you should not use this in environments where that is not possible,
+such as hosted <code>JupyterLab</code> sessions.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code><a href="#LoadClientError">LoadClientError</a></code></strong>:  If there is an issue loading the profile details from the environment or if the PKCE login flow fails.</li>
+</ul>
+
+<p>See the <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files">QCS documentation</a>
+for more details.</p>
+</div>
+
 
                             </div>
-                            <div id="QCSClient.quilc_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">quilc_url</span>
+                            <div id="QCSClient.get_oauth_session_async" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_oauth_session_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    <a class="headerlink" href="#QCSClient.get_oauth_session_async"></a>
     
-    
+            <div class="docstring"><p>Get a copy of the OAuth session in an async context.</p>
+</div>
 
-                            </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.oauth_session" class="classattr">
-                                <div class="attr variable">
-            <span class="name">oauth_session</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.oauth_session"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">grpc_api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
-    
-    
 
                             </div>
                             <div id="QCSClient.api_url" class="classattr">
@@ -263,7 +330,61 @@
     </div>
     <a class="headerlink" href="#QCSClient.api_url"></a>
     
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.quilc_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quilc_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    
+            <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.oauth_session" class="classattr">
+                                <div class="attr variable">
+            <span class="name">oauth_session</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    
+            <div class="docstring"><p>Get a copy of the OAuth session.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -340,18 +461,9 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#OAuthSession.access_token"></a>
     
-    
+            <div class="docstring"><p>The access token that is currently in use. None if no token has been requested yet.</p>
+</div>
 
-                            </div>
-                            <div id="OAuthSession.auth_server" class="classattr">
-                                <div class="attr variable">
-            <span class="name">auth_server</span>
-
-        
-    </div>
-    <a class="headerlink" href="#OAuthSession.auth_server"></a>
-    
-    
 
                             </div>
                             <div id="OAuthSession.payload" class="classattr">
@@ -362,7 +474,22 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#OAuthSession.payload"></a>
     
+            <div class="docstring"><p>The grant type to use to request an access token.</p>
+</div>
+
+
+                            </div>
+                            <div id="OAuthSession.auth_server" class="classattr">
+                                <div class="attr variable">
+            <span class="name">auth_server</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OAuthSession.auth_server"></a>
     
+            <div class="docstring"><p>The [<code><a href="#AuthServer">AuthServer</a></code>] that issues the tokens.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -401,7 +528,31 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#AuthServer.issuer"></a>
     
-            <div class="docstring"><p>Get the Okta issuer URL.</p>
+            <div class="docstring"><p>OAuth 2.0 issuer URL.</p>
+
+<p>This is the base URL of the identity provider.
+For Okta, this usually looks like <code>https://example.okta.com/oauth2/default</code>.
+For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.com/us-west-2_example</code>.</p>
+
+<p>Note that this is technically distinct from the <code><a href="#AuthServer.issuer">issuer</a></code> field in [<code>OidcDiscovery</code>],
+which is the canonical URI that the identity provider uses to sign and validate tokens,
+but the OpenID specification requires that they match exactly,
+and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.scopes" class="classattr">
+                                <div class="attr variable">
+            <span class="name">scopes</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.scopes"></a>
+    
+            <div class="docstring"><p>OAuth 2.0 scopes to request during authorization requests.
+If not specified, <code>supported_scopes</code> from the discovery document hosted at <code><a href="#AuthServer.issuer">issuer</a></code> will be used.
+The scope <code>openid</code> is always requested, even if not present in this list.</p>
 </div>
 
 
@@ -414,7 +565,7 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#AuthServer.client_id"></a>
     
-            <div class="docstring"><p>Get the configured Okta client id.</p>
+            <div class="docstring"><p>OAuth 2.0 client id.</p>
 </div>
 
 
@@ -442,7 +593,50 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#RefreshToken.refresh_token"></a>
     
+            <div class="docstring"><p>The token used to refresh the access token.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="SecretRefreshToken">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">SecretRefreshToken</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#SecretRefreshToken"></a>
     
+            <div class="docstring"><p>An [OAuth 2.0 refresh token][<a href="https://oauth.net/2/refresh-tokens/]">https://oauth.net/2/refresh-tokens/]</a> that is used to obtain a new [<code>SecretAccessToken</code>].</p>
+</div>
+
+
+                            <div id="SecretRefreshToken.secret" class="classattr">
+                                <div class="attr variable">
+            <span class="name">secret</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SecretRefreshToken.secret"></a>
+    
+            <div class="docstring"><p>Get the inner secret contents, which removes the protection against accidentally exposing the value.</p>
+</div>
+
+
+                            </div>
+                            <div id="SecretRefreshToken.is_empty" class="classattr">
+                                <div class="attr variable">
+            <span class="name">is_empty</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SecretRefreshToken.is_empty"></a>
+    
+            <div class="docstring"><p>Check if the secret is an empty value</p>
+</div>
+
 
                             </div>
                 </section>
@@ -468,7 +662,9 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#ClientCredentials.client_id"></a>
     
-    
+            <div class="docstring"><p>The client ID</p>
+</div>
+
 
                             </div>
                             <div id="ClientCredentials.client_secret" class="classattr">
@@ -479,7 +675,9 @@ credentials or payload data.</p>
     </div>
     <a class="headerlink" href="#ClientCredentials.client_secret"></a>
     
-    
+            <div class="docstring"><p>The client secret.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -501,32 +699,77 @@ fetching or refreshing access tokens.</p>
 
 
                 </section>
-                <section id="LoadClientError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">LoadClientError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
-
-        
-    </div>
-    <a class="headerlink" href="#LoadClientError"></a>
-    
-            <div class="docstring"><p>Unspecified run-time error.</p>
-</div>
-
-
-                </section>
                 <section id="BuildClientError">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">BuildClientError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">BuildClientError</span><wbr>(<span class="base"><a href="#ClientError">ClientError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#BuildClientError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>Errors encountered while building the QCS API client configuration manually.</p>
+</div>
+
+
+                </section>
+                <section id="ClientError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ClientError</span><wbr>(<span class="base"><a href="../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ClientError"></a>
+    
+            <div class="docstring"><p>Errors encountered while interacting with a QCS API client.</p>
+</div>
+
+
+                </section>
+                <section id="RPCQQuilcError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RPCQQuilcError</span><wbr>(<span class="base"><a href="#ClientError">ClientError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RPCQQuilcError"></a>
+    
+            <div class="docstring"><p>Errors when compiling with RPCQ client.</p>
+</div>
+
+
+                </section>
+                <section id="TokenError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">TokenError</span><wbr>(<span class="base"><a href="#ClientError">ClientError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#TokenError"></a>
+    
+            <div class="docstring"><p>Errors that can occur when managing authorization tokens.</p>
+</div>
+
+
+                </section>
+                <section id="LoadClientError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">LoadClientError</span><wbr>(<span class="base"><a href="#ClientError">ClientError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#LoadClientError"></a>
+    
+            <div class="docstring"><p>Errors encountered while loading the QCS API client configuration from the environment configuration.</p>
 </div>
 
 

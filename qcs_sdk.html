@@ -16,7 +16,14 @@
     <nav class="pdoc">
         <label id="navtoggle" for="togglestate" class="pdoc-button"><svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke-linecap='round' stroke="currentColor" stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg></label>
         <input id="togglestate" type="checkbox" aria-hidden="true" tabindex="-1">
-        <div>
+        <div>            <a class="pdoc-button module-list-button" href="index.html">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-in-left" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 1 1 0v2A1.5 1.5 0 0 1 9.5 14h-8A1.5 1.5 0 0 1 0 12.5v-9A1.5 1.5 0 0 1 1.5 2h8A1.5 1.5 0 0 1 11 3.5v2a.5.5 0 0 1-1 0v-2z"/>
+  <path fill-rule="evenodd" d="M4.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H14.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3z"/>
+</svg>                &nbsp;
+                Module Index
+            </a>
+
             <img src="https://qcs.rigetti.com/static/img/rigetti-logo.svg" class="logo" alt="project logo"/>
 
             <input type="search" placeholder="Search..." role="searchbox" aria-label="search"
@@ -35,6 +42,21 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
+                    <a class="class" href="#ExeParameter">ExeParameter</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ExeParameter.value">value</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExeParameter.name">name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExeParameter.index">index</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#ExecutionData">ExecutionData</a>
                             <ul class="memberlist">
                         <li>
@@ -42,114 +64,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionData.duration">duration</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ResultData">ResultData</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#ResultData.__init__">ResultData</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.from_qvm">from_qvm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.from_qpu">from_qpu</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.inner">inner</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.is_qpu">is_qpu</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.as_qpu">as_qpu</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.to_qpu">to_qpu</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.is_qvm">is_qvm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.as_qvm">as_qvm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.to_qvm">to_qvm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.to_register_map">to_register_map</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ResultData.to_raw_readout_data">to_raw_readout_data</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#RegisterMap">RegisterMap</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#RegisterMap.get_register_matrix">get_register_matrix</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMap.keys">keys</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMap.values">values</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMap.items">items</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMap.get">get</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#RegisterMatrix">RegisterMatrix</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#RegisterMatrix.to_ndarray">to_ndarray</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.from_integer">from_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.to_integer">to_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.as_integer">as_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.is_integer">is_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.from_real">from_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.to_real">to_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.as_real">as_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.is_real">is_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.from_complex">from_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.to_complex">to_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.as_complex">as_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterMatrix.is_complex">is_complex</a>
                         </li>
                 </ul>
 
@@ -185,21 +99,6 @@
 
             </li>
             <li>
-                    <a class="class" href="#ExeParameter">ExeParameter</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#ExeParameter.name">name</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.index">index</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.value">value</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
@@ -212,10 +111,49 @@
 
             </li>
             <li>
+                    <a class="class" href="#RegisterMap">RegisterMap</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#RegisterMap.get_register_matrix">get_register_matrix</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegisterMap.keys">keys</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegisterMap.values">values</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegisterMap.items">items</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegisterMap.get">get</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RegisterMapItemsIter">RegisterMapItemsIter</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RegisterMapKeysIter">RegisterMapKeysIter</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RegisterMapValuesIter">RegisterMapValuesIter</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#Service">Service</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#Service.Quilc">Quilc</a>
+                                <a class="variable" href="#Service.QUILC">QUILC</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Service.QVM">QVM</a>
@@ -230,92 +168,71 @@
 
             </li>
             <li>
-                    <a class="class" href="#RegisterData">RegisterData</a>
+                    <a class="class" href="#RegisterMatrix">RegisterMatrix</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#RegisterData.from_f64">from_f64</a>
+                                <a class="function" href="#RegisterMatrix.to_ndarray">to_ndarray</a>
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.from_i16">from_i16</a>
+                                <a class="class" href="#RegisterMatrix.Integer">RegisterMatrix.Integer</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.from_i8">from_i8</a>
+                                <a class="class" href="#RegisterMatrix.Real">RegisterMatrix.Real</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#RegisterData.inner">inner</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.is_i8">is_i8</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.as_i8">as_i8</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.to_i8">to_i8</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.is_f64">is_f64</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.as_f64">as_f64</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.to_f64">to_f64</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.is_i16">is_i16</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.as_i16">as_i16</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.to_i16">to_i16</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.is_complex32">is_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.as_complex32">as_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.to_complex32">to_complex32</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.from_complex32">from_complex32</a>
+                                <a class="class" href="#RegisterMatrix.Complex">RegisterMatrix.Complex</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#QCSClient">QCSClient</a>
+                    <a class="class" href="#RegisterData">RegisterData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#QCSClient.load">load</a>
+                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
                         </li>
                         <li>
-                                <a class="function" href="#QCSClient.load_with_login">load_with_login</a>
+                                <a class="function" href="#RegisterData.inner">inner</a>
                         </li>
                         <li>
-                                <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
+                                <a class="class" href="#RegisterData.I8">RegisterData.I8</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                                <a class="class" href="#RegisterData.F64">RegisterData.F64</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                                <a class="class" href="#RegisterData.I16">RegisterData.I16</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="class" href="#RegisterData.Complex32">RegisterData.Complex32</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
-                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#QcsSdkError">QcsSdkError</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -340,6 +257,39 @@
             <li>
                     <a class="variable" href="#__version__">__version__</a>
             </li>
+            <li>
+                    <a class="class" href="#QCSClient">QCSClient</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#QCSClient.load">load</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.load_with_login">load_with_login</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -356,30 +306,94 @@
                     <h1 class="modulename">
 qcs_sdk    </h1>
 
-                        <div class="docstring"><p>The <code><a href="">qcs_sdk</a></code> package provides a Python interface to the Rigetti Quantum Cloud Services (QCS) platform.</p>
+                        <div class="docstring"><p>An interface to Rigetti <a href="https://docs.rigetti.com/qcs/">Quantum Cloud Services</a> (QCS).</p>
 
-<p>For more information about QCS, see <a href="https://docs.rigetti.com/qcs/">the QCS documentation</a>.</p>
+<p>These APIs allow users to compile and run Quil programs on Rigetti quantum processors.
+Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rust">QCS Rust SDK</a>.</p>
 
-<p>⚠️ This package is still in early development and breaking changes should be expected between minor versions.</p>
+<p>This package is still in development and breaking changes should be expected between minor versions.</p>
 </div>
 
                         <input id="mod-qcs_sdk-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-qcs_sdk-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos">1</span></a><span class="c1"># type: ignore</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos">2</span></a><span class="c1"># See the following documentation for why this file is necessary:</span>
-</span><span id="L-3"><a href="#L-3"><span class="linenos">3</span></a><span class="c1"># https://pyo3.rs/v0.18.0/python_typing_hints#__init__py-content</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos">4</span></a>
-</span><span id="L-5"><a href="#L-5"><span class="linenos">5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.qcs_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos">6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos">7</span></a>
-</span><span id="L-8"><a href="#L-8"><span class="linenos">8</span></a><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">qcs_sdk</span><span class="o">.</span><span class="vm">__doc__</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos">9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">qcs_sdk</span><span class="p">,</span> <span class="s2">&quot;__all__&quot;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;diagnostics&quot;</span><span class="p">]</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;An interface to Rigetti [Quantum Cloud Services](https://docs.rigetti.com/qcs/) (QCS).</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">These APIs allow users to compile and run Quil programs on Rigetti quantum processors.</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">Internally, it is powered by the [QCS Rust SDK](https://github.com/rigetti/qcs-sdk-rust).</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">This package is still in development and breaking changes should be expected between minor versions.</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_qcs_sdk</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>  <span class="c1"># noqa: re-export</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">_additional_exports</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;QCSClient&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="p">]</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="c1"># The following code exposes the package contents under the same namespace without the `_` prefix.</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">)</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="n">exec</span><span class="p">(</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="sa">f</span><span class="s2">&quot;from ._qcs_sdk import </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">)</span><span class="si">}</span><span class="s2">; &quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="sa">f</span><span class="s2">&quot;__all__ = </span><span class="si">{</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_additional_exports</span><span class="si">}</span><span class="s2">&quot;</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="k">del</span> <span class="n">_qcs_sdk</span>
 </span></pre></div>
 
 
             </section>
+                <section id="ExeParameter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExeParameter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter"></a>
+    
+            <div class="docstring"><p>Program execution parameters.</p>
+
+<p>Note: The validity of parameters is not checked until execution.</p>
+</div>
+
+
+                            <div id="ExeParameter.value" class="classattr">
+                                <div class="attr variable">
+            <span class="name">value</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.value"></a>
+    
+    
+
+                            </div>
+                            <div id="ExeParameter.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.name"></a>
+    
+    
+
+                            </div>
+                            <div id="ExeParameter.index" class="classattr">
+                                <div class="attr variable">
+            <span class="name">index</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.index"></a>
+    
+    
+
+                            </div>
+                </section>
                 <section id="ExecutionData">
                     <div class="attr class">
             
@@ -390,578 +404,37 @@ qcs_sdk    </h1>
     </div>
     <a class="headerlink" href="#ExecutionData"></a>
     
-            <div class="docstring"><p>Contains the <code><a href="#ResultData">ResultData</a></code> and the duration of the execution.</p>
+            <div class="docstring"><p>The result of executing an <a href="crate::Executable"><code>Executable</code></a></p>
 </div>
 
 
                             <div id="ExecutionData.result_data" class="classattr">
                                 <div class="attr variable">
-            <span class="name">result_data</span><span class="annotation">: <a href="#ResultData">ResultData</a></span>
+            <span class="name">result_data</span>
 
         
     </div>
     <a class="headerlink" href="#ExecutionData.result_data"></a>
     
-            <div class="docstring"><p>Get the result_data field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>The [<code>ResultData</code>] that was read from the <a href="crate::Executable"><code>Executable</code></a>.</p>
 </div>
 
 
                             </div>
                             <div id="ExecutionData.duration" class="classattr">
                                 <div class="attr variable">
-            <span class="name">duration</span><span class="annotation">: Optional[datetime.timedelta]</span>
+            <span class="name">duration</span>
 
         
     </div>
     <a class="headerlink" href="#ExecutionData.duration"></a>
     
-            <div class="docstring"><p>Get the duration field from Python.  Annotated with <code>@property</code>.</p>
+            <div class="docstring"><p>The time it took to execute the program on the QPU, not including any network or queueing
+time. If paying for on-demand execution, this is the amount you will be billed for.</p>
+
+<p>This will always be <code>None</code> for QVM execution.</p>
 </div>
 
-
-                            </div>
-                </section>
-                <section id="ResultData">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ResultData</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData"></a>
-    
-            <div class="docstring"><p>Represents the two possible types of data returned from either the QVM or a real QPU.
-Each variant contains the original data returned from its respective executor.</p>
-
-<h2 id="usage">Usage</h2>
-
-<p>Your usage of <code><a href="#ResultData">ResultData</a></code> will depend on the types of programs you are running and where.
-The <code><a href="#ResultData.to_register_map">ResultData.to_register_map()</a></code> method will attempt to build <code><a href="#RegisterMap">RegisterMap</a></code> out of the data, where each
-register name is mapped to a 2-dimensional rectangular <code><a href="#RegisterMatrix">RegisterMatrix</a></code> where each row
-represents the final values in each register index for a particular shot. This is often the
-desired form of the data and it is <em>probably</em> what you want. This transformation isn't always
-possible, in which case <code><a href="#ResultData.to_register_map">to_register_map()</a></code> will return an error.</p>
-
-<p>To understand why this transformation can fail, we need to understand a bit about how readout data is
-returned from the QVM and from a real QPU:</p>
-
-<p>The QVM treats each <code>DECLARE</code> statement as initialzing some amount of memory. This memory works
-as one might expect it to. It is zero-initalized, and subsequent writes to the same region
-overwrite the previous value. The QVM returns memory at the end of every shot. This means
-we get the last value in every memory reference for each shot, which is exactly the
-representation we want for a <code><a href="#RegisterMatrix">RegisterMatrix</a></code>. For this reason, <code><a href="#ResultData.to_register_map">to_register_map()</a></code> should
-always succeed for <code>ResultData::Qvm</code>.</p>
-
-<p>The QPU on the other hand doesn't use the same memory model as the QVM. Each memory reference
-(ie. "ro[0]") is more like a stream than a value in memory. Every <code>MEASURE</code> to a memory
-reference emits a new value to said stream. This means that the number of values per memory
-reference can vary per shot. For this reason, it's not always clear what the final value in
-each shot was for a particular reference. When this is the case, <code><a href="#ResultData.to_register_map">to_register_map()</a></code> will return
-an error as it's impossible to build a correct <code><a href="#RegisterMatrix">RegisterMatrix</a></code>  from the data without
-knowing the intent of the program that was run. Instead, it's recommended to build the
-<code><a href="#RegisterMatrix">RegisterMatrix</a></code> you need from the inner <code>QPUResultData</code> data using the knowledge of your
-program to choose the correct readout values for each shot.</p>
-
-<p>For more information on QPU readout data, refer to the
-<a href="https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data">QCS Documentation</a>.</p>
-
-<h3 id="variants">Variants:</h3>
-
-<ul>
-<li><code>qvm</code>: Data returned from the QVM, stored as <code>QVMResultData</code></li>
-<li><code>qpu</code>: Data returned from the QPU, stored as <code>QPUResultData</code></li>
-</ul>
-
-<h3 id="methods-each-per-variant">Methods (each per variant):</h3>
-
-<ul>
-<li><code>is_*</code>: if the underlying values are that type.</li>
-<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
-<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
-<li><code>from_*</code>: wrap underlying values as this enum type.</li>
-</ul>
-</div>
-
-
-                            <div id="ResultData.__init__" class="classattr">
-                                <div class="attr function">
-            
-        <span class="name">ResultData</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">QPUResultData</span><span class="p">,</span> <span class="n">QVMResultData</span><span class="p">]</span></span>)</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.__init__"></a>
-    
-            <div class="docstring"><p>Create a new ResultData from either QVM or QPU result data.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.from_qvm" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QVMResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.from_qvm"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qvm</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.from_qpu" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">QPUResultData</span></span><span class="return-annotation">) -> <span class="n"><a href="#ResultData">ResultData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.from_qpu"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ResultData::Qpu</code>], creating a [<code>PyResultData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.inner" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">QVMResultData</span><span class="p">,</span> <span class="n">QPUResultData</span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.inner"></a>
-    
-            <div class="docstring"><p>Returns the inner result data</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.is_qpu" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.is_qpu"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyResultData</code>] wraps a [<code>ResultData::qpu</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.as_qpu" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">QPUResultData</span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.as_qpu"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qpu</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.to_qpu" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_qpu</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">QPUResultData</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.to_qpu"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qpu</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.is_qvm" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.is_qvm"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyResultData</code>] wraps a [<code>ResultData::qvm</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.as_qvm" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">QVMResultData</span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.as_qvm"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qvm</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.to_qvm" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">QVMResultData</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.to_qvm"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyResultData</code>] wraps a <code>ResultData::qvm</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.to_register_map" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_register_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMap">RegisterMap</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.to_register_map"></a>
-    
-            <div class="docstring"><p>Convert <code><a href="#ResultData">ResultData</a></code> from its inner representation as <code>QVMResultData</code> or
-<code>QPUResultData</code> into a <code><a href="#RegisterMap">RegisterMap</a></code>. The <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for each register will be
-constructed such that each row contains all the final values in the register for a single shot.</p>
-
-<h2 id="errors">Errors</h2>
-
-<p>Raises a <code><a href="#RegisterMatrixConversionError">RegisterMatrixConversionError</a></code> if the inner execution data for any of the
-registers would result in a jagged matrix. <code>QPUResultData</code> data is captured per measure,
-meaning a value is returned for every measure to a memory reference, not just once per shot.
-This is often the case in programs that use mid-circuit measurement or dynamic control flow,
-where measurements to the same memory reference might occur multiple times in a shot, or be
-skipped conditionally. In these cases, building a rectangular <code><a href="#RegisterMatrix">RegisterMatrix</a></code> would
-necessitate making assumptions about the data that could skew the data in undesirable ways.
-Instead, it's recommended to manually build a matrix from <code>QPUResultData</code> that accurately
-selects the last value per-shot based on the program that was run.</p>
-</div>
-
-
-                            </div>
-                            <div id="ResultData.to_raw_readout_data" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_raw_readout_data</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">RawQPUReadoutData</span><span class="p">,</span> <span class="n">RawQVMReadoutData</span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ResultData.to_raw_readout_data"></a>
-    
-            <div class="docstring"><p>Get the raw data returned from the QVM or QPU. See <code>RawQPUReadoutData</code> and
-<code>RawQVMReadoutData</code> for more information.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="RegisterMap">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMap</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap"></a>
-    
-            <div class="docstring"><p>A map of register names (ie. "ro") to a <code><a href="#RegisterMatrix">RegisterMatrix</a></code> containing the values of the register.</p>
-</div>
-
-
-                            <div id="RegisterMap.get_register_matrix" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">register_name</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.get_register_matrix"></a>
-    
-            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for the given register. Returns <code>None</code> if the register doesn't exist.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterMap.keys" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.keys"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.values" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.values"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.items" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.items"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.get" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">key</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">default</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span><span class="p">]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.get"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="RegisterMatrix">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrix</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix"></a>
-    
-            <div class="docstring"><p>Values in a 2-dimensional <code>ndarray</code> representing the final shot value in each memory reference across all shots.
-Each variant corresponds to the possible data types a register can contain.</p>
-
-<h2 id="variants">Variants:</h2>
-
-<ul>
-<li><code>integer</code>: Corresponds to the Quil <code>BIT</code>, <code>OCTET</code>, or <code>INTEGER</code> types.</li>
-<li><code>real</code>: Corresponds to the Quil <code>REAL</code> type.</li>
-<li><code>complex</code>: Registers containing complex numbers.</li>
-</ul>
-
-<h3 id="methods-each-per-variant">Methods (each per variant):</h3>
-
-<ul>
-<li><code>is_*</code>: if the underlying values are that type.</li>
-<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
-<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
-<li><code>from_*</code>: wrap underlying values as this enum type.</li>
-</ul>
-</div>
-
-
-                            <div id="RegisterMatrix.to_ndarray" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_ndarray</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.to_ndarray"></a>
-    
-            <div class="docstring"><p>Get the RegisterMatrix as numpy <code>ndarray</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterMatrix.from_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.from_integer"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.to_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.to_integer"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.as_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.as_integer"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.is_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.is_integer"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.from_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.from_real"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.to_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.to_real"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.as_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.as_real"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.is_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.is_real"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.from_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">inner</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterMatrix">RegisterMatrix</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.from_complex"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.to_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">typing</span><span class="o">.</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.to_complex"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.as_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.as_complex"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMatrix.is_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.is_complex"></a>
-    
-    
 
                             </div>
                 </section>
@@ -975,7 +448,64 @@ Each variant corresponds to the possible data types a register can contain.</p>
     </div>
     <a class="headerlink" href="#Executable"></a>
     
-            <div class="docstring"><p>The builder interface for executing Quil programs on QVMs and QPUs.</p>
+            <div class="docstring"><p>A builder interface for executing Quil programs on QVMs and QPUs.</p>
+
+<h1 id="example">Example</h1>
+
+<p>This example executes a program on a QVM, specified by the <code>qvm_url</code> in the <code><a href="#QCSClient">QCSClient</a></code>:</p>
+
+<div class="pdoc-code codehilite">
+<pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">Executable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="qcs_sdk/client.html">qcs_sdk.client</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn"><a href="qcs_sdk/qvm.html">qcs_sdk.qvm</a></span><span class="w"> </span><span class="kn">import</span> <span class="n">QVMClient</span>
+
+<span class="n">PROGRAM</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&#39;&#39;</span>
+<span class="s1">DECLARE ro BIT[2]</span>
+
+<span class="s1">H 0</span>
+<span class="s1">CNOT 0 1</span>
+
+<span class="s1">MEASURE 0 ro[0]</span>
+<span class="s1">MEASURE 1 ro[1]</span>
+<span class="s1">&#39;&#39;&#39;</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">():</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">QVMClient</span><span class="o">.</span><span class="n">new_http</span><span class="p">(</span><span class="n"><a href="#QCSClient.load">QCSClient.load</a></span><span class="p">()</span><span class="o">.</span><span class="n">qvm_url</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Executable</span><span class="p">(</span><span class="n">PROGRAM</span><span class="p">,</span> <span class="n">shots</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">execute_on_qvm_async</span><span class="p">()</span>
+    <span class="n">let</span> <span class="n">data</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">result_data</span>
+                        <span class="o">.</span><span class="n">to_register_map</span><span class="p">()</span>
+                        <span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="s2">&quot;should convert to readout map&quot;</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">get_register_matrix</span><span class="p">(</span><span class="s2">&quot;ro&quot;</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="s2">&quot;should have data in ro&quot;</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">as_integer</span><span class="p">()</span>
+                        <span class="o">.</span><span class="n">expect</span><span class="p">(</span><span class="s2">&quot;should be integer matrix&quot;</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">to_owned</span><span class="p">();</span>
+
+    <span class="o">//</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span><span class="p">,</span> <span class="n">we</span> <span class="n">ran</span> <span class="n">the</span> <span class="n">program</span> <span class="k">for</span> <span class="mi">4</span> <span class="n">shots</span><span class="p">,</span> <span class="n">so</span> <span class="n">we</span> <span class="n">know</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">rows</span> <span class="ow">is</span> <span class="mf">4.</span>
+    <span class="n">assert_eq</span><span class="err">!</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">nrows</span><span class="p">(),</span> <span class="mi">4</span><span class="p">);</span>
+    <span class="k">for</span> <span class="n">shot</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">rows</span><span class="p">()</span> <span class="p">{</span>
+        <span class="o">//</span> <span class="n">Each</span> <span class="n">shot</span> <span class="n">will</span> <span class="n">contain</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">memory</span><span class="p">,</span> <span class="ow">in</span> <span class="n">order</span><span class="p">,</span> <span class="k">for</span> <span class="n">the</span> <span class="n">vector</span> <span class="p">(</span><span class="ow">or</span> <span class="s2">&quot;register&quot;</span><span class="p">)</span> <span class="n">we</span>
+        <span class="o">//</span> <span class="n">requested</span> <span class="n">the</span> <span class="n">results</span> <span class="n">of</span><span class="o">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span><span class="p">,</span> <span class="s2">&quot;ro&quot;</span> <span class="p">(</span><span class="n">the</span> <span class="n">default</span><span class="p">)</span><span class="o">.</span>
+        <span class="n">assert_eq</span><span class="err">!</span><span class="p">(</span><span class="n">shot</span><span class="o">.</span><span class="n">len</span><span class="p">(),</span> <span class="mi">2</span><span class="p">);</span>
+        <span class="o">//</span> <span class="n">In</span> <span class="n">the</span> <span class="n">case</span> <span class="n">of</span> <span class="n">this</span> <span class="n">particular</span> <span class="n">program</span><span class="p">,</span> <span class="n">we</span> <span class="n">know</span> <span class="n">ro</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">should</span> <span class="n">equal</span> <span class="n">ro</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">assert_eq</span><span class="err">!</span><span class="p">(</span><span class="n">shot</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shot</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run</span><span class="p">())</span>
+
+    <span class="c1"># &quot;ro&quot; is the only source read from by default if you don&#39;t specify `registers`.</span>
+
+    <span class="c1"># We first convert the readout data to a ``RegisterMap`` to get a mapping of registers</span>
+    <span class="c1"># (ie. &quot;ro&quot;) to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for</span>
+    <span class="c1"># the memory offset `index` during shot `shot`.</span>
+    <span class="c1"># There are some programs where QPU readout data does not fit into a [`RegisterMap`], in</span>
+    <span class="c1"># which case you should build the matrix you need from [`QpuResultData`] directly. See</span>
+    <span class="c1"># the [`RegisterMap`] documentation for more information on when this transformation</span>
+    <span class="c1"># might fail.</span>
+</code></pre>
+</div>
 </div>
 
 
@@ -983,7 +513,7 @@ Each variant corresponds to the possible data types a register can contain.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">execute_on_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">client</span><span class="p">:</span> <span class="n">QVMClient</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="name">execute_on_qvm</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
@@ -1003,15 +533,15 @@ Each variant corresponds to the possible data types a register can contain.</p>
                             <div id="Executable.execute_on_qvm_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">async def</span>
-        <span class="name">execute_on_qvm_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">client</span><span class="p">:</span> <span class="n">QVMClient</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="def">def</span>
+        <span class="name">execute_on_qvm_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qvm_async"></a>
     
-            <div class="docstring"><p>Execute on a QVM which is accessible via the provided client.
-(async analog of <code><a href="#Executable.execute_on_qvm">Executable.execute_on_qvm</a></code>.)</p>
+            <div class="docstring"><p>Execute on a QVM which is accessible via the provided client
+(async analog of <code><a href="#Executable.execute_on_qvm">Executable.execute_on_qvm</a></code>).</p>
 
 <h6 id="raises">Raises</h6>
 
@@ -1026,7 +556,7 @@ Each variant corresponds to the possible data types a register can contain.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">execute_on_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="name">execute_on_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
@@ -1037,8 +567,8 @@ Each variant corresponds to the possible data types a register can contain.</p>
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
-the default endpoint for the given quantum_processor_id is used.</li>
+<li><strong><code>endpoint_id</code></strong>:  execute the compiled program against an explicitly provided endpoint.
+If <code>None</code>, the default endpoint for the given <code>quantum_processor_id</code> is used.</li>
 </ul>
 
 <h6 id="raises">Raises</h6>
@@ -1053,21 +583,21 @@ the default endpoint for the given quantum_processor_id is used.</li>
                             <div id="Executable.execute_on_qpu_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">async def</span>
-        <span class="name">execute_on_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="def">def</span>
+        <span class="name">execute_on_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.execute_on_qpu_async"></a>
     
-            <div class="docstring"><p>Compile the program and execute it on a QPU, waiting for results.
-(async analog of <code><a href="#Executable.execute_on_qpu">Executable.execute_on_qpu</a></code>)</p>
+            <div class="docstring"><p>Compile the program and execute it on a QPU, waiting for results
+(async analog of <code><a href="#Executable.execute_on_qpu">Executable.execute_on_qpu</a></code>).</p>
 
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
-the default endpoint for the given quantum_processor_id is used.</li>
+<li><strong><code>endpoint_id</code></strong>:  execute the compiled program against an explicitly provided endpoint.
+If <code>None</code>, the default endpoint for the given <code>quantum_processor_id</code> is used.</li>
 </ul>
 
 <h6 id="raises">Raises</h6>
@@ -1083,7 +613,7 @@ the default endpoint for the given quantum_processor_id is used.</li>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">submit_to_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#JobHandle">JobHandle</a></span>:</span></span>
+        <span class="name">submit_to_qpu</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
@@ -1094,8 +624,8 @@ the default endpoint for the given quantum_processor_id is used.</li>
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
-the default endpoint for the given quantum_processor_id is used.</li>
+<li><strong><code>endpoint_id</code></strong>:  execute the compiled program against an explicitly provided endpoint.
+If <code>None</code>, the default endpoint for the given <code>quantum_processor_id</code> is used.</li>
 </ul>
 
 <h6 id="raises">Raises</h6>
@@ -1110,21 +640,21 @@ the default endpoint for the given quantum_processor_id is used.</li>
                             <div id="Executable.submit_to_qpu_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">async def</span>
-        <span class="name">submit_to_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TranslationOptions</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n"><a href="qcs_sdk/qpu/api.html#ExecutionOptions">qcs_sdk.qpu.api.ExecutionOptions</a></span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span><span class="return-annotation">) -> <span class="n"><a href="#JobHandle">JobHandle</a></span>:</span></span>
+        <span class="def">def</span>
+        <span class="name">submit_to_qpu_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="o">/</span>,</span><span class="param">	<span class="n">quantum_processor_id</span>,</span><span class="param">	<span class="n">endpoint_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">translation_options</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.submit_to_qpu_async"></a>
     
-            <div class="docstring"><p>Compile the program and execute it on a QPU, without waiting for results.
-(async analog of <code><a href="#Executable.execute_on_qpu">Executable.execute_on_qpu</a></code>)</p>
+            <div class="docstring"><p>Compile the program and execute it on a QPU, without waiting for results
+(async analog of <code><a href="#Executable.submit_to_qpu">Executable.submit_to_qpu</a></code>).</p>
 
 <h6 id="parameters">Parameters</h6>
 
 <ul>
-<li><strong>endpoint_id</strong>:  execute the compiled program against an explicitly provided endpoint. If <code>None</code>,
-the default endpoint for the given quantum_processor_id is used.</li>
+<li><strong><code>endpoint_id</code></strong>:  execute the compiled program against an explicitly provided endpoint.
+If <code>None</code>, the default endpoint for the given <code>quantum_processor_id</code> is used.</li>
 </ul>
 
 <h6 id="raises">Raises</h6>
@@ -1140,7 +670,7 @@ the default endpoint for the given quantum_processor_id is used.</li>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">retrieve_results</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">job_handle</span><span class="p">:</span> <span class="n"><a href="#JobHandle">JobHandle</a></span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="name">retrieve_results</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">job_handle</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
@@ -1160,15 +690,15 @@ the default endpoint for the given quantum_processor_id is used.</li>
                             <div id="Executable.retrieve_results_async" class="classattr">
                                 <div class="attr function">
             
-        <span class="def">async def</span>
-        <span class="name">retrieve_results_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">job_handle</span><span class="p">:</span> <span class="n"><a href="#JobHandle">JobHandle</a></span></span><span class="return-annotation">) -> <span class="n"><a href="#ExecutionData">ExecutionData</a></span>:</span></span>
+        <span class="def">def</span>
+        <span class="name">retrieve_results_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">job_handle</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#Executable.retrieve_results_async"></a>
     
-            <div class="docstring"><p>Wait for the results of a job to complete.
-(async analog of <code><a href="#Executable.retrieve_results">Executable.retrieve_results</a></code>)</p>
+            <div class="docstring"><p>Wait for the results of a job to complete
+(async analog of <code><a href="#Executable.retrieve_results">Executable.retrieve_results</a></code>).</p>
 
 <h6 id="raises">Raises</h6>
 
@@ -1177,56 +707,6 @@ the default endpoint for the given quantum_processor_id is used.</li>
 </ul>
 </div>
 
-
-                            </div>
-                </section>
-                <section id="ExeParameter">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ExeParameter</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter"></a>
-    
-            <div class="docstring"><p>Program execution parameters.</p>
-
-<p>Note: The validity of parameters is not checked until execution.</p>
-</div>
-
-
-                            <div id="ExeParameter.name" class="classattr">
-                                <div class="attr variable">
-            <span class="name">name</span><span class="annotation">: str</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.name"></a>
-    
-    
-
-                            </div>
-                            <div id="ExeParameter.index" class="classattr">
-                                <div class="attr variable">
-            <span class="name">index</span><span class="annotation">: int</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.index"></a>
-    
-    
-
-                            </div>
-                            <div id="ExeParameter.value" class="classattr">
-                                <div class="attr variable">
-            <span class="name">value</span><span class="annotation">: float</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.value"></a>
-    
-    
 
                             </div>
                 </section>
@@ -1248,7 +728,7 @@ the default endpoint for the given quantum_processor_id is used.</li>
 
                             <div id="JobHandle.job_id" class="classattr">
                                 <div class="attr variable">
-            <span class="name">job_id</span><span class="annotation">: str</span>
+            <span class="name">job_id</span>
 
         
     </div>
@@ -1261,18 +741,142 @@ the default endpoint for the given quantum_processor_id is used.</li>
                             </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
-            <span class="name">readout_map</span><span class="annotation">: Dict[str, str]</span>
+            <span class="name">readout_map</span>
 
         
     </div>
     <a class="headerlink" href="#JobHandle.readout_map"></a>
     
-            <div class="docstring"><p>The readout map from source readout memory locations to the filter pipeline node
-which publishes the data.</p>
+            <div class="docstring"><p>The readout map from "source readout memory locations"
+to the "filter pipeline node" which publishes the data.</p>
 </div>
 
 
                             </div>
+                </section>
+                <section id="RegisterMap">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMap</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap"></a>
+    
+            <div class="docstring"><p>A mapping of a register name (ie. "ro") to a [<code><a href="#RegisterMatrix">RegisterMatrix</a></code>] containing the values for the
+register.</p>
+</div>
+
+
+                            <div id="RegisterMap.get_register_matrix" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">register_name</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.get_register_matrix"></a>
+    
+            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for the given register.</p>
+
+<p>Returns <code>None</code> if the register doesn't exist.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterMap.keys" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.keys"></a>
+    
+    
+
+                            </div>
+                            <div id="RegisterMap.values" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.values"></a>
+    
+    
+
+                            </div>
+                            <div id="RegisterMap.items" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.items"></a>
+    
+    
+
+                            </div>
+                            <div id="RegisterMap.get" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">key</span>, </span><span class="param"><span class="n">default</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.get"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="RegisterMapItemsIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapItemsIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapItemsIter"></a>
+    
+    
+
+                </section>
+                <section id="RegisterMapKeysIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapKeysIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapKeysIter"></a>
+    
+    
+
+                </section>
+                <section id="RegisterMapValuesIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapValuesIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapValuesIter"></a>
+    
+    
+
                 </section>
                 <section id="Service">
                     <div class="attr class">
@@ -1284,16 +888,19 @@ which publishes the data.</p>
     </div>
     <a class="headerlink" href="#Service"></a>
     
-    
+            <div class="docstring"><p>The external services that this SDK may connect to. Used to differentiate between networking
+issues in [<code>Error::Connection</code>].</p>
+</div>
 
-                            <div id="Service.Quilc" class="classattr">
+
+                            <div id="Service.QUILC" class="classattr">
                                 <div class="attr variable">
-            <span class="name">Quilc</span>        =
-<span class="default_value"><a href="#Service.Quilc">Service.Quilc</a></span>
+            <span class="name">QUILC</span>        =
+<span class="default_value"><a href="#Service.QUILC">Service.QUILC</a></span>
 
         
     </div>
-    <a class="headerlink" href="#Service.Quilc"></a>
+    <a class="headerlink" href="#Service.QUILC"></a>
     
     
 
@@ -1335,6 +942,113 @@ which publishes the data.</p>
 
                             </div>
                 </section>
+                <section id="RegisterMatrix">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix"></a>
+    
+            <div class="docstring"><p>A 2-dimensional matrix of register values.</p>
+
+<p>Each variant corresponds to the possible data types a register can contain.</p>
+</div>
+
+
+                            <div id="RegisterMatrix.to_ndarray" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.to_ndarray"></a>
+    
+            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> as Numpy <code>ndarray</code>.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="RegisterMatrix.Integer">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Integer</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Integer"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
+                                <dd id="RegisterMatrix.Integer.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
+                <dd id="RegisterMatrix.Integer.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
+                <dd id="RegisterMatrix.Integer.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
+                <dd id="RegisterMatrix.Integer.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="RegisterMatrix.Real">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Real</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Real"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
+                                <dd id="RegisterMatrix.Real.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
+                <dd id="RegisterMatrix.Real.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
+                <dd id="RegisterMatrix.Real.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
+                <dd id="RegisterMatrix.Real.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="RegisterMatrix.Complex">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Complex</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Complex"></a>
+    
+    
+
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
+                                <dd id="RegisterMatrix.Complex.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
+                <dd id="RegisterMatrix.Complex.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
+                <dd id="RegisterMatrix.Complex.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
+                <dd id="RegisterMatrix.Complex.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
                 <section id="RegisterData">
                     <div class="attr class">
             
@@ -1345,69 +1059,41 @@ which publishes the data.</p>
     </div>
     <a class="headerlink" href="#RegisterData"></a>
     
-            <div class="docstring"><p>Values present in a register that are one of a set of variants.</p>
+            <div class="docstring"><p>Data resulting from <a href="code&gt;crate::Executable::execute_on_qvm&lt;/code"><code>Executable::execute_on_qvm</code></a></p>
 
-<p>Variants:</p>
+<p>This represents a single vector (or "register") of typed memory across some number of shots.
+The register corresponds to the usage of a <code>DECLARE</code> instruction in Quil, and the name of that
+register should be provided with <a href="code&gt;crate::Executable::read_from&lt;/code"><code>Executable::read_from</code></a>.</p>
 
-<ul>
-<li><code>i8</code>: Corresponds to the Quil <code>BIT</code> or <code>OCTET</code> types.</li>
-<li><code>i16</code>: Corresponds to the Quil <code>INTEGER</code> type.</li>
-<li><code>f64</code>: Corresponds to the Quil <code>REAL</code> type.</li>
-<li><code>complex32</code>: Results containing complex numbers.</li>
-</ul>
+<p>There is a variant of this enum for each type of data that a register could hold. The register
+is represented as a 2-dimensional array <code>M</code> where the value <code>M[shot_number][memory_index]</code>
+represents the value at <code>memory_index</code> for <code>shot_number</code>.</p>
 
-<p>Methods (each per variant):</p>
+<h1 id="usage">Usage</h1>
 
-<ul>
-<li><code>is_*</code>: if the underlying values are that type.</li>
-<li><code>as_*</code>: if the underlying values are that type, then those values, otherwise <code>None</code>.</li>
-<li><code>to_*</code>: the underlying values as that type, raises <code>ValueError</code> if they are not.</li>
-<li><code>from_*</code>: wrap underlying values as this enum type.</li>
-</ul>
+<p>Typically, you will be interacting with this data through the [<code>crate::ResultData</code>] of an
+[<code>crate::ExecutionData</code>] returned after running a program. In those cases, you'll probably
+want to convert it to a readout map using [<code>crate::ResultData.to_register_map()</code>]. This
+will give you each register in the form of a [<code>crate::RegisterMatrix</code>] which is similar
+but backed by an [<code>ndarray::Array2</code>] and more convenient for working with matrices.</p>
+
+<p>If you are interacting with [<code><a href="#RegisterData">RegisterData</a></code>] directly, then you should already know what type of data it _should_
+have, so you can  use the [<code>mod@enum_as_inner</code>] methods (e.g. [<code>RegisterData::into_i8</code>]) in order to
+convert any variant type to its inner data.</p>
 </div>
 
 
-                            <div id="RegisterData.from_f64" class="classattr">
+                            <div id="RegisterData.as_ndarray" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
+        <span class="name">as_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
-    <a class="headerlink" href="#RegisterData.from_f64"></a>
+    <a class="headerlink" href="#RegisterData.as_ndarray"></a>
     
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::F64</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.from_i16" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.from_i16"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I16</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.from_i8" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.from_i8"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::I8</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
+            <div class="docstring"><p>Return the inner values as a 2D Numpy <code>ndarray</code>.</p>
 </div>
 
 
@@ -1416,346 +1102,150 @@ which publishes the data.</p>
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span>:</span></span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
     <a class="headerlink" href="#RegisterData.inner"></a>
     
-            <div class="docstring"><p>Returns the inner value.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.is_i8" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.is_i8"></a>
     
-            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::i8</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.as_i8" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_i8"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i8</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.to_i8" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_i8</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.to_i8"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i8</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.is_f64" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.is_f64"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::f64</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.as_f64" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_f64"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::f64</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.to_f64" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_f64</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.to_f64"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::f64</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.is_i16" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.is_i16"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::i16</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.as_i16" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_i16"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i16</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.to_i16" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_i16</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.to_i16"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::i16</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.is_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="nb">bool</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.is_complex32"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyRegisterData</code>] wraps a [<code>RegisterData::complex32</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.as_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_complex32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::complex32</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.to_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.to_complex32"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyRegisterData</code>] wraps a <code>RegisterData::complex32</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.as_ndarray" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_ndarray</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">]],</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">complex128</span><span class="p">]]]</span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_ndarray"></a>
-    
-            <div class="docstring"><p>Returns the values as an <code>ndarray</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.from_complex32" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex32</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">complex</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="n"><a href="#RegisterData">RegisterData</a></span>:</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.from_complex32"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>RegisterData::Complex32</code>], creating a [<code>PyRegisterData</code>] and taking a Python argument.</p>
-</div>
-
 
                             </div>
                 </section>
-                <section id="QCSClient">
+                <section id="RegisterData.I8">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">QCSClient</span>:
+    <span class="name">RegisterData.I8</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#QCSClient"></a>
+    <a class="headerlink" href="#RegisterData.I8"></a>
     
     
 
-                            <div id="QCSClient.load" class="classattr">
-                                <div class="attr function">
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
+                                <dd id="RegisterData.I8.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
+                <dd id="RegisterData.I8.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
+                <dd id="RegisterData.I8.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
+                <dd id="RegisterData.I8.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
+                <dd id="RegisterData.I8.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
+                <dd id="RegisterData.I8.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
+
+            </div>
+                                </dl>
+                            </div>
+                </section>
+                <section id="RegisterData.F64">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">load</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">RegisterData.F64</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.load"></a>
+    <a class="headerlink" href="#RegisterData.F64"></a>
     
     
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
+                                <dd id="RegisterData.F64.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
+                <dd id="RegisterData.F64.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
+                <dd id="RegisterData.F64.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
+                <dd id="RegisterData.F64.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
+                <dd id="RegisterData.F64.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
+                <dd id="RegisterData.F64.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
+
+            </div>
+                                </dl>
                             </div>
-                            <div id="QCSClient.load_with_login" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="RegisterData.I16">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">load_with_login</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">RegisterData.I16</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.load_with_login"></a>
+    <a class="headerlink" href="#RegisterData.I16"></a>
     
     
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
+                                <dd id="RegisterData.I16.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
+                <dd id="RegisterData.I16.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
+                <dd id="RegisterData.I16.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
+                <dd id="RegisterData.I16.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
+                <dd id="RegisterData.I16.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
+                <dd id="RegisterData.I16.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
+
+            </div>
+                                </dl>
                             </div>
-                            <div id="QCSClient.load_with_login_async" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="RegisterData.Complex32">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">load_with_login_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">RegisterData.Complex32</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.load_with_login_async"></a>
+    <a class="headerlink" href="#RegisterData.Complex32"></a>
     
     
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
+                                <dd id="RegisterData.Complex32.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
+                <dd id="RegisterData.Complex32.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
+                <dd id="RegisterData.Complex32.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
+                <dd id="RegisterData.Complex32.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
+                <dd id="RegisterData.Complex32.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
+                <dd id="RegisterData.Complex32.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
+
+            </div>
+                                </dl>
                             </div>
-                            <div id="QCSClient.quilc_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">quilc_url</span>
+                </section>
+                <section id="QcsSdkError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">QcsSdkError</span><wbr>(<span class="base">builtins.Exception</span>):
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    <a class="headerlink" href="#QcsSdkError"></a>
     
-    
+            <div class="docstring"><p>Base exception type for errors raised by this package.</p>
+</div>
 
-                            </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
 
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.oauth_session" class="classattr">
-                                <div class="attr variable">
-            <span class="name">oauth_session</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.oauth_session"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">grpc_api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
-    
-    
-
-                            </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-    
-
-                            </div>
                 </section>
                 <section id="ExecutionError">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ExecutionError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">ExecutionError</span><wbr>(<span class="base"><a href="#QcsSdkError">QcsSdkError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#ExecutionError"></a>
     
-            <div class="docstring"><p>Error encountered when executing a program.</p>
+            <div class="docstring"><p>Errors which can occur when executing a program.</p>
 </div>
 
 
@@ -1764,7 +1254,7 @@ which publishes the data.</p>
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">RegisterMatrixConversionError</span><wbr>(<span class="base">builtins.ValueError</span>):
+    <span class="name">RegisterMatrixConversionError</span><wbr>(<span class="base"><a href="#QcsSdkError">QcsSdkError</a></span>):
 
         
     </div>
@@ -1785,8 +1275,8 @@ which publishes the data.</p>
     </div>
     <a class="headerlink" href="#reset_logging"></a>
     
-            <div class="docstring"><p>Reset all caches for logging configuration within this library, allowing the most recent Python-side
-changes to be applied.</p>
+            <div class="docstring"><p>Reset all caches for logging configuration within this library,
+allowing the most recent Python-side changes to be applied.</p>
 
 <p>See <a href="https://docs.rs/pyo3-log/latest/pyo3_log/">https://docs.rs/pyo3-log/latest/pyo3_log/</a> for more information.</p>
 </div>
@@ -1808,8 +1298,8 @@ changes to be applied.</p>
                 </section>
                 <section id="__version__">
                     <div class="attr variable">
-            <span class="name">__version__</span><span class="annotation">: str</span>        =
-<span class="default_value">&#39;0.21.22&#39;</span>
+            <span class="name">__version__</span>        =
+<span class="default_value">$CARGO_MAKE_PROJECT_VERSION</span>
 
         
     </div>
@@ -1817,6 +1307,198 @@ changes to be applied.</p>
     
     
 
+                </section>
+                <section id="QCSClient">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">QCSClient</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient"></a>
+    
+            <div class="docstring"><p>A client providing helper functionality for accessing QCS APIs</p>
+</div>
+
+
+                            <div id="QCSClient.load" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">load</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.load"></a>
+    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code>LoadClientError</code></strong>:  If there is an issue loading the profile details from the environment.</li>
+</ul>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.load_with_login" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">load_with_login</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.load_with_login"></a>
+    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<p>If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+so you should not use this in environments where that is not possible,
+such as hosted <code>JupyterLab</code> sessions.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code>LoadClientError</code></strong>:  If there is an issue loading the profile details from the environment or if the PKCE login flow fails.</li>
+</ul>
+
+<p>See the <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files">QCS documentation</a>
+for more details.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.load_with_login_async" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">load_with_login_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">profile_name</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.load_with_login_async"></a>
+    
+            <div class="docstring"><p>Create a <code><a href="#QCSClient">QCSClient</a></code> configuration using an environment-based configuration.</p>
+
+<p>If credentials are not found or stale, a PKCE login redirect flow will be initialized.
+Note that this opens up a TCP port on your system to accept a browser HTTP redirect,
+so you should not use this in environments where that is not possible,
+such as hosted <code>JupyterLab</code> sessions.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong><code>profile_name</code></strong>:  The QCS setting's profile name to use. If <code>None</code>, the default value configured in your environment is used.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong><code>LoadClientError</code></strong>:  If there is an issue loading the profile details from the environment or if the PKCE login flow fails.</li>
+</ul>
+
+<p>See the <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration#environment-variables-and-configuration-files">QCS documentation</a>
+for more details.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.get_oauth_session_async" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_oauth_session_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.get_oauth_session_async"></a>
+    
+            <div class="docstring"><p>Get a copy of the OAuth session in an async context.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.quilc_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quilc_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    
+            <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.oauth_session" class="classattr">
+                                <div class="attr variable">
+            <span class="name">oauth_session</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    
+            <div class="docstring"><p>Get a copy of the OAuth session.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
+</div>
+
+
+                            </div>
                 </section>
     </main>
 <script>

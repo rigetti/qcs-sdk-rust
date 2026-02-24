@@ -31,9 +31,9 @@
             <h2>Submodules</h2>
             <ul>
                     <li><a href="qpu/api.html">api</a></li>
+                    <li><a href="qpu/experimental.html">experimental</a></li>
                     <li><a href="qpu/isa.html">isa</a></li>
                     <li><a href="qpu/translation.html">translation</a></li>
-                    <li><a href="qpu/experimental.html">experimental</a></li>
             </ul>
 
             <h2>API Documentation</h2>
@@ -43,6 +43,9 @@
                             <ul class="memberlist">
                         <li>
                                 <a class="function" href="#QPUResultData.to_raw_readout_data">to_raw_readout_data</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QPUResultData.to_register_map">to_register_map</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QPUResultData.mappings">mappings</a>
@@ -60,13 +63,13 @@
                     <a class="class" href="#RawQPUReadoutData">RawQPUReadoutData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
+                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
+                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
                         </li>
                 </ul>
 
@@ -75,43 +78,25 @@
                     <a class="class" href="#ReadoutValues">ReadoutValues</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#ReadoutValues.from_integer">from_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.from_complex">from_complex</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#ReadoutValues.inner">inner</a>
                         </li>
                         <li>
-                                <a class="function" href="#ReadoutValues.is_integer">is_integer</a>
+                                <a class="class" href="#ReadoutValues.Integer">ReadoutValues.Integer</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#ReadoutValues.as_integer">as_integer</a>
+                                <a class="class" href="#ReadoutValues.Real">ReadoutValues.Real</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#ReadoutValues.to_integer">to_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.is_real">is_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.as_real">as_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.to_real">to_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.is_complex">is_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.as_complex">as_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.to_complex">to_complex</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ReadoutValues.from_real">from_real</a>
+                                <a class="class" href="#ReadoutValues.Complex">ReadoutValues.Complex</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                 </ul>
 
@@ -120,43 +105,25 @@
                     <a class="class" href="#MemoryValues">MemoryValues</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#MemoryValues.from_binary">from_binary</a>
-                        </li>
-                        <li>
                                 <a class="function" href="#MemoryValues.inner">inner</a>
                         </li>
                         <li>
-                                <a class="function" href="#MemoryValues.is_binary">is_binary</a>
+                                <a class="class" href="#MemoryValues.Binary">MemoryValues.Binary</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#MemoryValues.as_binary">as_binary</a>
+                                <a class="class" href="#MemoryValues.Integer">MemoryValues.Integer</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                         <li>
-                                <a class="function" href="#MemoryValues.to_binary">to_binary</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.is_integer">is_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.as_integer">as_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.to_integer">to_integer</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.is_real">is_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.as_real">as_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.to_real">to_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.from_real">from_real</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#MemoryValues.from_integer">from_integer</a>
+                                <a class="class" href="#MemoryValues.Real">MemoryValues.Real</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                 </ul>
 
@@ -204,7 +171,17 @@
     </div>
     <a class="headerlink" href="#QPUResultData"></a>
     
-    
+            <div class="docstring"><p>Encapsulates data returned from the QPU after executing a job.</p>
+
+<p><code>QpuResultData</code> contains "mappings", which map declared memory regions
+in a program (ie. "ro[0]") to that region's readout key in <code>QpuResultData.readout_values</code>.
+<code><a href="#QPUResultData.readout_values">readout_values</a></code> maps those readout keys to the values emitted for that region
+across all shots.</p>
+
+<p>Read more about QPU readout data in the
+<a href="https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data">QCS Documentation</a></p>
+</div>
+
 
                             <div id="QPUResultData.to_raw_readout_data" class="classattr">
                                 <div class="attr function">
@@ -216,7 +193,41 @@
     </div>
     <a class="headerlink" href="#QPUResultData.to_raw_readout_data"></a>
     
+            <div class="docstring"><p>Get the raw readout data as a flattened structure.</p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.to_register_map" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_register_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.to_register_map"></a>
     
+            <div class="docstring"><p>Convert into a [<code>RegisterMap</code>].</p>
+
+<p>The [<code>RegisterMatrix</code>] for each register will be
+constructed such that each row contains all the final values in the register for a single shot.</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code>RegisterMatrixConversionError</code>] if the execution data for any of the
+registers would result in a jagged matrix.
+[<code>QpuResultData</code>] data is captured per measure,
+meaning a value is returned for every measure to a memory reference, not just once per shot.</p>
+
+<p>This is often the case in programs that use mid-circuit measurement or dynamic control flow,
+where measurements to the same memory reference might occur multiple times in a shot, or be
+skipped conditionally. In these cases, building a rectangular [<code>RegisterMatrix</code>] would
+necessitate making assumptions about the data that could skew the data in undesirable ways.
+Instead, it's recommended to manually build a matrix from [<code>QpuResultData</code>] that accurately
+selects the last value per-shot based on the program that was run.</p>
+</div>
+
 
                             </div>
                             <div id="QPUResultData.mappings" class="classattr">
@@ -227,7 +238,9 @@
     </div>
     <a class="headerlink" href="#QPUResultData.mappings"></a>
     
-    
+            <div class="docstring"><p>Mappings of a memory region (ie. "ro[0]") to its key name in <code><a href="#QPUResultData.readout_values">readout_values</a></code> (ie. "q0").</p>
+</div>
+
 
                             </div>
                             <div id="QPUResultData.readout_values" class="classattr">
@@ -238,7 +251,9 @@
     </div>
     <a class="headerlink" href="#QPUResultData.readout_values"></a>
     
-    
+            <div class="docstring"><p>Mapping of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code>.</p>
+</div>
+
 
                             </div>
                             <div id="QPUResultData.memory_values" class="classattr">
@@ -249,7 +264,9 @@
     </div>
     <a class="headerlink" href="#QPUResultData.memory_values"></a>
     
-    
+            <div class="docstring"><p>The final contents of each memory region, keyed on region name.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -264,19 +281,19 @@
     <a class="headerlink" href="#RawQPUReadoutData"></a>
     
             <div class="docstring"><p>A wrapper type for data returned by the QPU in a more flat structure than
-[<code>PyQpuResultData</code>] offers. This makes it more convenient to work with
+[<code>QpuResultData</code>] offers. This makes it more convenient to work with
 the data if you don't care what type of number the readout values for
 each register contains.</p>
 </div>
 
 
-                            <div id="RawQPUReadoutData.readout_values" class="classattr">
+                            <div id="RawQPUReadoutData.mappings" class="classattr">
                                 <div class="attr variable">
-            <span class="name">readout_values</span>
+            <span class="name">mappings</span>
 
         
     </div>
-    <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
+    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
     
     
 
@@ -292,13 +309,13 @@ each register contains.</p>
     
 
                             </div>
-                            <div id="RawQPUReadoutData.mappings" class="classattr">
+                            <div id="RawQPUReadoutData.readout_values" class="classattr">
                                 <div class="attr variable">
-            <span class="name">mappings</span>
+            <span class="name">readout_values</span>
 
         
     </div>
-    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
+    <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
     
     
 
@@ -314,38 +331,13 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues"></a>
     
-    
+            <div class="docstring"><p>A row of readout values from the QPU.</p>
 
-                            <div id="ReadoutValues.from_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.from_integer"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Integer</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
+<p>Each row contains all the values emitted to a memory reference across all shots.
+There is a variant for each possible type the list of readout values could be.</p>
 </div>
 
 
-                            </div>
-                            <div id="ReadoutValues.from_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.from_complex"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Complex</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
                             <div id="ReadoutValues.inner" class="classattr">
                                 <div class="attr function">
             
@@ -356,160 +348,83 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#ReadoutValues.inner"></a>
     
-            <div class="docstring"><p>Directly return the Python version of the variant discriminant wrapped by this value; i.e., performs the match <code>ReadoutValues::Variant(x) =&gt; x</code> for every variant constructor in [<code><a href="#ReadoutValues">ReadoutValues</a></code>]</p>
-</div>
-
+    
 
                             </div>
-                            <div id="ReadoutValues.is_integer" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="ReadoutValues.Integer">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">ReadoutValues.Integer</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#ReadoutValues.is_integer"></a>
+    <a class="headerlink" href="#ReadoutValues.Integer"></a>
     
-            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::integer</code>] value</p>
-</div>
+    
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
+                                <dd id="ReadoutValues.Integer.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
+                <dd id="ReadoutValues.Integer.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
+                <dd id="ReadoutValues.Integer.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
+                <dd id="ReadoutValues.Integer.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
 
+            </div>
+                                </dl>
                             </div>
-                            <div id="ReadoutValues.as_integer" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="ReadoutValues.Real">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">ReadoutValues.Real</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#ReadoutValues.as_integer"></a>
+    <a class="headerlink" href="#ReadoutValues.Real"></a>
     
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::integer</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
+    
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
+                                <dd id="ReadoutValues.Real.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
+                <dd id="ReadoutValues.Real.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
+                <dd id="ReadoutValues.Real.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
+                <dd id="ReadoutValues.Real.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
 
+            </div>
+                                </dl>
                             </div>
-                            <div id="ReadoutValues.to_integer" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="ReadoutValues.Complex">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">ReadoutValues.Complex</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#ReadoutValues.to_integer"></a>
+    <a class="headerlink" href="#ReadoutValues.Complex"></a>
     
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::integer</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.is_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.is_real"></a>
     
-            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::real</code>] value</p>
-</div>
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
+                                <dd id="ReadoutValues.Complex.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
+                <dd id="ReadoutValues.Complex.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
+                <dd id="ReadoutValues.Complex.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
+                <dd id="ReadoutValues.Complex.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
 
-                            </div>
-                            <div id="ReadoutValues.as_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.as_real"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::real</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.to_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.to_real"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::real</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.is_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.is_complex"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyReadoutValues</code>] wraps a [<code>ReadoutValues::complex</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.as_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.as_complex"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::complex</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.to_complex" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_complex</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.to_complex"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyReadoutValues</code>] wraps a <code>ReadoutValues::complex</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="ReadoutValues.from_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ReadoutValues.from_real"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>ReadoutValues::Real</code>], creating a [<code>PyReadoutValues</code>] and taking a Python argument.</p>
-</div>
-
-
+            </div>
+                                </dl>
                             </div>
                 </section>
                 <section id="MemoryValues">
@@ -522,23 +437,12 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#MemoryValues"></a>
     
-    
+            <div class="docstring"><p>A row of data containing the contents of a memory region at the end of a job.</p>
 
-                            <div id="MemoryValues.from_binary" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.from_binary"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Binary</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
+<p>There is a variant for each possible type the memory region could be.</p>
 </div>
 
 
-                            </div>
                             <div id="MemoryValues.inner" class="classattr">
                                 <div class="attr function">
             
@@ -549,188 +453,96 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#MemoryValues.inner"></a>
     
-            <div class="docstring"><p>Directly return the Python version of the variant discriminant wrapped by this value; i.e., performs the match <code>MemoryValues::Variant(x) =&gt; x</code> for every variant constructor in [<code><a href="#MemoryValues">MemoryValues</a></code>]</p>
-</div>
-
+    
 
                             </div>
-                            <div id="MemoryValues.is_binary" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="MemoryValues.Binary">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">is_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Binary</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#MemoryValues.is_binary"></a>
+    <a class="headerlink" href="#MemoryValues.Binary"></a>
     
-            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::binary</code>] value</p>
-</div>
+    
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
+                                <dd id="MemoryValues.Binary.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
+                <dd id="MemoryValues.Binary.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
+                <dd id="MemoryValues.Binary.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
+                <dd id="MemoryValues.Binary.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
 
+            </div>
+                                </dl>
                             </div>
-                            <div id="MemoryValues.as_binary" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="MemoryValues.Integer">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">as_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Integer</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#MemoryValues.as_binary"></a>
+    <a class="headerlink" href="#MemoryValues.Integer"></a>
     
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::binary</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
+    
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
+                                <dd id="MemoryValues.Integer.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
+                <dd id="MemoryValues.Integer.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
+                <dd id="MemoryValues.Integer.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
+                <dd id="MemoryValues.Integer.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
 
+            </div>
+                                </dl>
                             </div>
-                            <div id="MemoryValues.to_binary" class="classattr">
-                                <div class="attr function">
+                </section>
+                <section id="MemoryValues.Real">
+                    <div class="attr class">
             
-        <span class="def">def</span>
-        <span class="name">to_binary</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Real</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#MemoryValues.to_binary"></a>
+    <a class="headerlink" href="#MemoryValues.Real"></a>
     
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::binary</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.is_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.is_integer"></a>
     
-            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::integer</code>] value</p>
-</div>
 
+                            <div class="inherited">
+                                <h5>Inherited Members</h5>
+                                <dl>
+                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
+                                <dd id="MemoryValues.Real.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
+                <dd id="MemoryValues.Real.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
+                <dd id="MemoryValues.Real.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
+                <dd id="MemoryValues.Real.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
 
-                            </div>
-                            <div id="MemoryValues.as_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.as_integer"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::integer</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.to_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.to_integer"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::integer</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.is_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">is_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.is_real"></a>
-    
-            <div class="docstring"><p>Tests if this [<code>PyMemoryValues</code>] wraps a [<code>MemoryValues::real</code>] value</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.as_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.as_real"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::real</code>(x); otherwise returns (Python) <code>None</code>.  On the Rust side, this corresponds to either <code>Some(x)</code> or [<code>None</code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.to_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.to_real"></a>
-    
-            <div class="docstring"><p>Returns <code>x</code> if this [<code>PyMemoryValues</code>] wraps a <code>MemoryValues::real</code>(x); otherwise raises a <code>ValueError</code>.  On the Rust side, this corresponds to either <code>Ok(x)</code> or <code>Err(...)</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.from_real" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_real</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.from_real"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Real</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
-</div>
-
-
-                            </div>
-                            <div id="MemoryValues.from_integer" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_integer</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">inner</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.from_integer"></a>
-    
-            <div class="docstring"><p>The Python wrapper for [<code>MemoryValues::Integer</code>], creating a [<code>PyMemoryValues</code>] and taking a Python argument.</p>
-</div>
-
-
+            </div>
+                                </dl>
                             </div>
                 </section>
                 <section id="ListQuantumProcessorsError">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ListQuantumProcessorsError</span><wbr>(<span class="base">builtins.RuntimeError</span>):
+    <span class="name">ListQuantumProcessorsError</span><wbr>(<span class="base"><a href="../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#ListQuantumProcessorsError"></a>
     
-            <div class="docstring"><p>Unspecified run-time error.</p>
+            <div class="docstring"><p>API Errors encountered when trying to list available quantum processors.</p>
 </div>
 
 
@@ -745,7 +557,22 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#list_quantum_processors"></a>
     
-    
+            <div class="docstring"><p>Returns all available Quantum Processor (QPU) IDs.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>timeout</strong>:  Maximum duration to wait for API calls to complete, in seconds.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ListQuantumProcessorsError</strong>:  If the request to list available QPU IDs failed.</li>
+</ul>
+</div>
+
 
                 </section>
                 <section id="list_quantum_processors_async">
@@ -758,7 +585,22 @@ each register contains.</p>
     </div>
     <a class="headerlink" href="#list_quantum_processors_async"></a>
     
-    
+            <div class="docstring"><p>Returns all available Quantum Processor (QPU) IDs.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>timeout</strong>:  Maximum duration to wait for API calls to complete, in seconds.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>ListQuantumProcessorsError</strong>:  If the request to list available QPU IDs failed.</li>
+</ul>
+</div>
+
 
                 </section>
     </main>
