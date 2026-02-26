@@ -530,6 +530,9 @@ pub enum ConnectionStrategy {
     DirectAccess(),
     /// Connect directly to a specific endpoint using its ID.
     EndpointId(String),
+    /// Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.
+    /// Should only be used when you have direct network access.
+    DirectEndpointAddress(String),
 }
 
 impl Default for ConnectionStrategy {
@@ -559,11 +562,11 @@ pub trait ExecutionTarget<'a> {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 execute_controller_job_request::Target::EndpointId(endpoint_id.clone()),
             ),
-            ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
-                quantum_processor_id
-                    .map(String::from)
-                    .map(execute_controller_job_request::Target::QuantumProcessorId)
-            }
+            ConnectionStrategy::Gateway()
+            | ConnectionStrategy::DirectAccess()
+            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+                .map(String::from)
+                .map(execute_controller_job_request::Target::QuantumProcessorId),
         }
     }
 
@@ -576,11 +579,11 @@ pub trait ExecutionTarget<'a> {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 get_controller_job_results_request::Target::EndpointId(endpoint_id.clone()),
             ),
-            ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
-                quantum_processor_id
-                    .map(String::from)
-                    .map(get_controller_job_results_request::Target::QuantumProcessorId)
-            }
+            ConnectionStrategy::Gateway()
+            | ConnectionStrategy::DirectAccess()
+            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+                .map(String::from)
+                .map(get_controller_job_results_request::Target::QuantumProcessorId),
         }
     }
 
@@ -593,11 +596,11 @@ pub trait ExecutionTarget<'a> {
             ConnectionStrategy::EndpointId(endpoint_id) => Some(
                 cancel_controller_jobs_request::Target::EndpointId(endpoint_id.clone()),
             ),
-            ConnectionStrategy::Gateway() | ConnectionStrategy::DirectAccess() => {
-                quantum_processor_id
-                    .map(String::from)
-                    .map(cancel_controller_jobs_request::Target::QuantumProcessorId)
-            }
+            ConnectionStrategy::Gateway()
+            | ConnectionStrategy::DirectAccess()
+            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+                .map(String::from)
+                .map(cancel_controller_jobs_request::Target::QuantumProcessorId),
         }
     }
 
@@ -645,6 +648,7 @@ pub trait ExecutionTarget<'a> {
                 )
                 .await?
             }
+            ConnectionStrategy::DirectEndpointAddress(address) => address.clone(),
         };
         self.grpc_address_to_channel(&address, client)
     }

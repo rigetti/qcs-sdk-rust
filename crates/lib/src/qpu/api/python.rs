@@ -442,7 +442,9 @@ impl ConnectionStrategy {
     #[gen_stub(override_return_type(type_repr = "tuple[str] | tuple[()]"))]
     fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
         match self {
-            Self::EndpointId(id) => (id.clone(),).into_pyobject(py),
+            Self::EndpointId(id) | Self::DirectEndpointAddress(id) => {
+                (id.clone(),).into_pyobject(py)
+            }
             Self::Gateway() | Self::DirectAccess() => Ok(PyTuple::empty(py)),
         }
     }
