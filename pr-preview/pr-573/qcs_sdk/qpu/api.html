@@ -53,10 +53,10 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.buffers">buffers</a>
@@ -74,13 +74,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -95,13 +95,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -116,10 +116,10 @@
                                 <a class="function" href="#APIExecutionOptions.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -134,10 +134,10 @@
                                 <a class="function" href="#APIExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -146,10 +146,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -182,7 +182,7 @@
 
                         </li>
                         <li>
-                                <a class="class" href="#ConnectionStrategy.DirectEndpointAddress">ConnectionStrategy.DirectEndpointAddress</a>
+                                <a class="class" href="#ConnectionStrategy.EndpointAddress">ConnectionStrategy.EndpointAddress</a>
                                         <ul class="memberlist">
                             </ul>
 
@@ -342,19 +342,6 @@
 </div>
 
 
-                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">execution_duration_microseconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
-    
-            <div class="docstring"><p>The time spent executing the program.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.memory" class="classattr">
                                 <div class="attr variable">
             <span class="name">memory</span>
@@ -365,6 +352,19 @@
     
             <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
 the execution of the program.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">execution_duration_microseconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
+    
+            <div class="docstring"><p>The time spent executing the program.</p>
 </div>
 
 
@@ -429,17 +429,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptions.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptions.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -460,6 +449,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptions.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
     
     
 
@@ -505,17 +505,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -534,6 +523,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
@@ -586,19 +586,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
-    
-            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
-</div>
-
-
-                            </div>
                             <div id="APIExecutionOptions.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -617,6 +604,19 @@ if the job does not have an estimated duration, the default
 timeout is selected by the service.</p>
 
 <p>The service may also enforce a maximum value for this field.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
+    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
 </div>
 
 
@@ -662,17 +662,6 @@ timeout is selected by the service.</p>
     
 
                             </div>
-                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -680,6 +669,17 @@ timeout is selected by the service.</p>
         
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
     
     
 
@@ -699,17 +699,6 @@ timeout is selected by the service.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -717,6 +706,17 @@ timeout is selected by the service.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
@@ -784,7 +784,7 @@ timeout is selected by the service.</p>
                 <dd id="ConnectionStrategy.Gateway.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
                 <dd id="ConnectionStrategy.Gateway.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
                 <dd id="ConnectionStrategy.Gateway.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.Gateway.DirectEndpointAddress" class="class"><a href="#ConnectionStrategy.DirectEndpointAddress">DirectEndpointAddress</a></dd>
+                <dd id="ConnectionStrategy.Gateway.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
 
             </div>
                                 </dl>
@@ -811,7 +811,7 @@ timeout is selected by the service.</p>
                 <dd id="ConnectionStrategy.DirectAccess.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
                 <dd id="ConnectionStrategy.DirectAccess.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
                 <dd id="ConnectionStrategy.DirectAccess.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.DirectEndpointAddress" class="class"><a href="#ConnectionStrategy.DirectEndpointAddress">DirectEndpointAddress</a></dd>
+                <dd id="ConnectionStrategy.DirectAccess.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
 
             </div>
                                 </dl>
@@ -838,21 +838,21 @@ timeout is selected by the service.</p>
                 <dd id="ConnectionStrategy.EndpointId.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
                 <dd id="ConnectionStrategy.EndpointId.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
                 <dd id="ConnectionStrategy.EndpointId.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.DirectEndpointAddress" class="class"><a href="#ConnectionStrategy.DirectEndpointAddress">DirectEndpointAddress</a></dd>
+                <dd id="ConnectionStrategy.EndpointId.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
 
             </div>
                                 </dl>
                             </div>
                 </section>
-                <section id="ConnectionStrategy.DirectEndpointAddress">
+                <section id="ConnectionStrategy.EndpointAddress">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ConnectionStrategy.DirectEndpointAddress</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
+    <span class="name">ConnectionStrategy.EndpointAddress</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
 
         
     </div>
-    <a class="headerlink" href="#ConnectionStrategy.DirectEndpointAddress"></a>
+    <a class="headerlink" href="#ConnectionStrategy.EndpointAddress"></a>
     
     
 
@@ -860,12 +860,12 @@ timeout is selected by the service.</p>
                                 <h5>Inherited Members</h5>
                                 <dl>
                                     <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
-                                <dd id="ConnectionStrategy.DirectEndpointAddress.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
-                <dd id="ConnectionStrategy.DirectEndpointAddress.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
-                <dd id="ConnectionStrategy.DirectEndpointAddress.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
-                <dd id="ConnectionStrategy.DirectEndpointAddress.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
-                <dd id="ConnectionStrategy.DirectEndpointAddress.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.DirectEndpointAddress.DirectEndpointAddress" class="class"><a href="#ConnectionStrategy.DirectEndpointAddress">DirectEndpointAddress</a></dd>
+                                <dd id="ConnectionStrategy.EndpointAddress.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
+                <dd id="ConnectionStrategy.EndpointAddress.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
+                <dd id="ConnectionStrategy.EndpointAddress.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
+                <dd id="ConnectionStrategy.EndpointAddress.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
+                <dd id="ConnectionStrategy.EndpointAddress.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
+                <dd id="ConnectionStrategy.EndpointAddress.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
 
             </div>
                                 </dl>
@@ -934,12 +934,14 @@ timeout is selected by the service.</p>
 <li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
 <li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
 <li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
-This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
+or <code>ConnectionStrategy.direct_endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.
 Creates one using environment configuration if unset.
 See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
 If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>,
+or <code>ConnectionStrategy.direct_endpoint_address("http://some_endpoint_address")</code>,
 then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
 </ul>
 
@@ -973,12 +975,14 @@ then direct access to "endpoint_id" overrides the <code>quantum_processor_id</co
 <li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
 <li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
 <li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
-This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
+or <code>ConnectionStrategy.direct_endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.
 Creates one using environment configuration if unset.
 See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
 If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>,
+or <code>ConnectionStrategy.direct_endpoint_address("http://some_endpoint_address")</code>,
 then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
 </ul>
 
@@ -1016,7 +1020,7 @@ guaranteed. If there is a failure to queue any of the jobs, then none will be qu
 <ul>
 <li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
 <li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.direct_endpoint_address()</code> execution option.</li>
 <li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1055,7 +1059,7 @@ guaranteed. If there is a failure to queue any of the jobs, then none will be qu
 <ul>
 <li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
 <li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.direct_endpoint_address()</code> execution option.</li>
 <li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1095,7 +1099,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_id</strong>:  The job ID to cancel.</li>
-<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1126,7 +1130,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_id</strong>:  The job ID to cancel.</li>
-<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1157,7 +1161,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_ids</strong>:  The job IDs to cancel.</li>
-<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1188,7 +1192,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_ids</strong>:  The job IDs to cancel.</li>
-<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The quantum processor to execute the job on. This parameter is required unless using the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client</strong>:  The <code>Qcs</code> client to use.</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1212,7 +1216,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_id</strong>:  The ID of the job to retrieve results for.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
@@ -1245,7 +1249,7 @@ basis.</p>
 
 <ul>
 <li><strong>job_id</strong>:  The ID of the job to retrieve results for.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> execution option.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor the job ran on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
 <li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
 <li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
 </ul>
