@@ -557,13 +557,13 @@ py_function_sync_async! {
     /// :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
     /// :param quantum_processor_id: The ID of the quantum processor to run the executable on.
     ///     This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()``
-    ///     or ``ConnectionStrategy.direct_endpoint_address()`` execution option.
+    ///     or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     ///     Creates one using environment configuration if unset.
     ///     See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
     /// :param execution_options: The ``ExecutionOptions`` to use.
-    ///     If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
-    ///     or ``ConnectionStrategy.direct_endpoint_address("http://some_endpoint_address")``,
+    ///     If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``
+    ///     or ``ConnectionStrategy.endpoint_address("http://some_endpoint_address")``,
     ///     then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     ///
     /// :returns: The ID of the submitted job which can be used to fetch results.
@@ -621,7 +621,7 @@ py_function_sync_async! {
     ///
     /// :param program: An executable program (see ``translate``).
     /// :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
-    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.direct_endpoint_address()`` execution option.
+    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     /// :param execution_options: The ``ExecutionOptions`` to use.
     ///
