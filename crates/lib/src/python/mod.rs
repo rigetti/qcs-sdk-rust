@@ -94,18 +94,19 @@ mod stubs {
     #[derive(pyo3::IntoPyObject)]
     struct Final<T>(T);
 
-    impl<T> pyo3_stub_gen::PyStubType for Final<T> {
+    impl<T> pyo3_stub_gen::PyStubType for Final<T>
+    where
+        T: pyo3_stub_gen::PyStubType,
+    {
         fn type_output() -> pyo3_stub_gen::TypeInfo {
-            pyo3_stub_gen::TypeInfo::with_module("typing.Final", "typing".into())
+            let mut inner = T::type_output();
+            inner.import.insert("typing".into());
+            inner.name = format!("typing.Final[{}]", inner.name);
+            inner
         }
     }
 
-    pyo3_stub_gen::module_variable!(
-        "qcs_sdk",
-        "__version__",
-        Final<&str>,
-        Final(env!("CARGO_PKG_VERSION"))
-    );
+    pyo3_stub_gen::module_variable!("qcs_sdk", "__version__", Final<&str>);
 
     define_stub_info_gatherer!(internal_stub_info);
 
