@@ -113,6 +113,19 @@ class ConnectionStrategy:
         def __new__(cls) -> ConnectionStrategy.DirectAccess: ...
     
     @typing.final
+    class DirectEndpointAddress(ConnectionStrategy):
+        r"""
+        Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.
+        Should only be used when you have direct network access.
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> builtins.str: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: builtins.str) -> ConnectionStrategy.DirectEndpointAddress: ...
+
+    @typing.final
     class EndpointId(ConnectionStrategy):
         r"""
         Connect directly to a specific endpoint using its ID.
