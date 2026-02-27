@@ -532,7 +532,7 @@ pub enum ConnectionStrategy {
     EndpointId(String),
     /// Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.
     /// Should only be used when you have direct network access.
-    DirectEndpointAddress(String),
+    EndpointAddress(String),
 }
 
 impl Default for ConnectionStrategy {
