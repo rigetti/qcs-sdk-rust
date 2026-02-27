@@ -565,7 +565,7 @@ pub trait ExecutionTarget<'a> {
             ),
             ConnectionStrategy::Gateway()
             | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
                 .map(String::from)
                 .map(execute_controller_job_request::Target::QuantumProcessorId),
         }
@@ -582,7 +582,7 @@ pub trait ExecutionTarget<'a> {
             ),
             ConnectionStrategy::Gateway()
             | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
                 .map(String::from)
                 .map(get_controller_job_results_request::Target::QuantumProcessorId),
         }
@@ -599,7 +599,7 @@ pub trait ExecutionTarget<'a> {
             ),
             ConnectionStrategy::Gateway()
             | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::DirectEndpointAddress(_) => quantum_processor_id
+            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
                 .map(String::from)
                 .map(cancel_controller_jobs_request::Target::QuantumProcessorId),
         }
@@ -649,7 +649,7 @@ pub trait ExecutionTarget<'a> {
                 )
                 .await?
             }
-            ConnectionStrategy::DirectEndpointAddress(address) => address.clone(),
+            ConnectionStrategy::EndpointAddress(address) => address.clone(),
         };
         self.grpc_address_to_channel(&address, client)
     }

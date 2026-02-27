@@ -50,6 +50,9 @@ description = "Install python dependencies using poetry."
 command = "poetry"
 args = ["install", "--with", "dev", "--no-root"]
 
+# NOTE: if using `uv`, you may need to set `PYTHONHOME` to the root of the virtual environment:
+#
+#   export PYTHONHOME=$(python3 -c "import sys; print(sys.base_prefix)")
 [tasks.generate-stubs]
 description = "Generate Python stub files."
 command = "cargo"
