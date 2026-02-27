@@ -473,7 +473,8 @@ impl<'execution> Executable<'_, 'execution> {
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
     /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
-    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] or
+    ///    [`crate::qpu::api::ConnectionStrategy::EndpointAddress`] then direct access to that endpoint
     ///    overrides the `quantum_processor_id` parameter.
     ///
     /// # Warning
@@ -531,7 +532,8 @@ impl<'execution> Executable<'_, 'execution> {
     /// 2. `translation_options`: An optional [`TranslationOptions`] that is used to configure how
     ///    the program in translated.
     /// 3. `execution_options`: The [`ExecutionOptions`] to use. If the connection strategy used
-    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] then direct access to that endpoint
+    ///    is [`crate::qpu::api::ConnectionStrategy::EndpointId`] or
+    ///    [`crate::qpu::api::ConnectionStrategy::EndpointAddress`] then direct access to that endpoint
     ///    overrides the `quantum_processor_id` parameter.
     ///
     /// # Errors

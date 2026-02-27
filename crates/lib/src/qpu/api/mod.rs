@@ -96,15 +96,16 @@ impl From<String> for JobId {
 /// # Arguments
 ///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///   is required unless using [`ConnectionStrategy::EndpointId`] or
+///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
 ///   to target a specific endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution. See [`submit_with_parameter_batch`]
 ///   if you need to execute with multiple sets of parameters.
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
-///   overrides the `quantum_processor_id` parameter.
+///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`] then direct
+///   access to that endpoint overrides the `quantum_processor_id` parameter.
 pub async fn submit(
     quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
@@ -132,15 +133,16 @@ pub async fn submit(
 /// # Arguments
 ///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///   is required unless using [`ConnectionStrategy::EndpointId`] or
+///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
 ///   to target a specific endpoint ID.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution. The job will be run once for each
 ///   given set of [`Parameters`].
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
-///   overrides the `quantum_processor_id` parameter.
+///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
+///   then direct access to that endpoint overrides the `quantum_processor_id` parameter.
 ///
 /// # Errors
 ///
@@ -204,12 +206,13 @@ where
 /// # Arguments
 ///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///   is required unless using [`ConnectionStrategy::EndpointId`] or
+///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
 ///   to target a specific endpoint ID.
 /// * `job_ids` - The [`JobId`]s to cancel.
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
+///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
 ///   overrides the `quantum_processor_id` parameter.
 ///
 /// # Errors
@@ -250,12 +253,14 @@ pub async fn cancel_jobs(
 /// # Arguments
 ///
 /// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter is
-///   required unless using [`ConnectionStrategy::EndpointId`] in `execution_options` to target
+///   required unless using [`ConnectionStrategy::EndpointId`] or
+///   [`ConnectionStrategy::EndpointAddress`] in `execution_options` to target
 ///   a specific endpoint ID.
 /// * `job_ids` - The [`JobId`]s to cancel.
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used is
-///   [`ConnectionStrategy::EndpointId`] then direct access to that endpoint overrides the
+///   [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
+///   then direct access to that endpoint overrides the
 ///   `quantum_processor_id` parameter.
 ///
 /// # Errors
@@ -284,12 +289,13 @@ pub async fn cancel_job(
 ///
 /// * `job_id` - The [`JobId`] to retrieve results for.
 /// * `quantum_processor_id` - The quantum processor the job was run on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] in `execution_options`
+///   is required unless using [`ConnectionStrategy::EndpointId`] or
+///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
 ///   to target a specific endpoint ID.
 /// * `client` - The [`Qcs`] client to use.
 /// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] then direct access to that endpoint
-///   overrides the `quantum_processor_id` parameter.
+///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
+///   then direct access to that endpoint overrides the `quantum_processor_id` parameter.
 pub async fn retrieve_results(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
@@ -838,7 +844,7 @@ pub enum QpuApiError {
     GrpcClientError(#[from] GrpcClientError),
 
     /// Error due to missing quantum processor ID and endpoint ID.
-    #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId")]
+    #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId or ConnectionStrategy::EndpointAddress")]
     MissingQpuId,
 
     /// Error due to user not providing patch values
