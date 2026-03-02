@@ -1,3 +1,14 @@
+## 0.26.0-rc.1 (2026-03-02)
+
+### Breaking Changes
+
+- merge python crate into lib (#571)
+
+### Fixes
+
+- update qcs-api-client dependencies to 0.12.12, (0.13.13 grpc) (#570)
+- elide version value from python stub files (#575)
+
 ## 0.26.0-rc.0 (2026-02-24)
 
 ### Breaking Changes
