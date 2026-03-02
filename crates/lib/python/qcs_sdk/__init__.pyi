@@ -19,7 +19,7 @@ from . import diagnostics
 from . import qpu
 from . import qvm
 
-__version__: typing.Final = '0.25.18-rc.0'
+__version__: typing.Final[builtins.str]
 @typing.final
 class ExeParameter:
     r"""
