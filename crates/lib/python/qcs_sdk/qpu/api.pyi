@@ -113,6 +113,20 @@ class ConnectionStrategy:
         def __new__(cls) -> ConnectionStrategy.DirectAccess: ...
     
     @typing.final
+    class EndpointAddress(ConnectionStrategy):
+        r"""
+        Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.
+        
+        Should only be used when you have direct network access.
+        """
+        __match_args__ = ("_0",)
+        @property
+        def _0(self) -> builtins.str: ...
+        def __getitem__(self, key: builtins.int) -> typing.Any: ...
+        def __len__(self) -> builtins.int: ...
+        def __new__(cls, _0: builtins.str) -> ConnectionStrategy.EndpointAddress: ...
+        
+    @typing.final
     class EndpointId(ConnectionStrategy):
         r"""
         Connect directly to a specific endpoint using its ID.
@@ -294,7 +308,7 @@ def cancel_job(job_id: builtins.str, quantum_processor_id: typing.Optional[built
     basis.
     
     :param job_id: The job ID to cancel.
-    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
     :param execution_options: The ``ExecutionOptions`` to use.
     """
@@ -311,7 +325,7 @@ def cancel_job_async(job_id: builtins.str, quantum_processor_id: typing.Optional
     basis.
     
     :param job_id: The job ID to cancel.
-    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
     :param execution_options: The ``ExecutionOptions`` to use.
     """
@@ -328,7 +342,7 @@ def cancel_jobs(job_ids: typing.Sequence[builtins.str], quantum_processor_id: ty
     basis.
     
     :param job_ids: The job IDs to cancel.
-    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
     :param execution_options: The ``ExecutionOptions`` to use.
     """
@@ -345,7 +359,7 @@ def cancel_jobs_async(job_ids: typing.Sequence[builtins.str], quantum_processor_
     basis.
     
     :param job_ids: The job IDs to cancel.
-    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
     :param execution_options: The ``ExecutionOptions`` to use.
     """
@@ -355,7 +369,7 @@ def retrieve_results(job_id: builtins.str, quantum_processor_id: typing.Optional
     Fetches execution results for the given QCS Job ID.
     
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use.
     
@@ -370,7 +384,7 @@ def retrieve_results_async(job_id: builtins.str, quantum_processor_id: typing.Op
     Fetches execution results for the given QCS Job ID.
     
     :param job_id: The ID of the job to retrieve results for.
-    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use.
     
@@ -387,12 +401,14 @@ def submit(program: builtins.str, patch_values: typing.Mapping[builtins.str, typ
     :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
-        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()``
+        or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
         Creates one using environment configuration if unset.
         See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
     :param execution_options: The ``ExecutionOptions`` to use.
-        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``
+        or ``ConnectionStrategy.endpoint_address("http://some_endpoint_address")``,
         then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
     :returns: The ID of the submitted job which can be used to fetch results.
@@ -408,12 +424,14 @@ def submit_async(program: builtins.str, patch_values: typing.Mapping[builtins.st
     :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
     :param quantum_processor_id: The ID of the quantum processor to run the executable on.
-        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+        This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()``
+        or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use.
         Creates one using environment configuration if unset.
         See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
     :param execution_options: The ``ExecutionOptions`` to use.
-        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+        If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``
+        or ``ConnectionStrategy.endpoint_address("http://some_endpoint_address")``,
         then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     
     :returns: The ID of the submitted job which can be used to fetch results.
@@ -433,7 +451,7 @@ def submit_with_parameter_batch(program: builtins.str, patch_values: typing.Sequ
     
     :param program: An executable program (see ``translate``).
     :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use.
     
@@ -454,7 +472,7 @@ def submit_with_parameter_batch_async(program: builtins.str, patch_values: typin
     
     :param program: An executable program (see ``translate``).
     :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
-    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param execution_options: The ``ExecutionOptions`` to use.
     

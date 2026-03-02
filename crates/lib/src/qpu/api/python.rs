@@ -442,7 +442,7 @@ impl ConnectionStrategy {
     #[gen_stub(override_return_type(type_repr = "tuple[str] | tuple[()]"))]
     fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
         match self {
-            Self::EndpointId(id) => (id.clone(),).into_pyobject(py),
+            Self::EndpointId(id) | Self::EndpointAddress(id) => (id.clone(),).into_pyobject(py),
             Self::Gateway() | Self::DirectAccess() => Ok(PyTuple::empty(py)),
         }
     }
@@ -556,12 +556,14 @@ py_function_sync_async! {
     /// :param program: An executable program (see ``qcs_sdk.qpu.translation.translate``).
     /// :param patch_values: A mapping of symbols to their desired values (see ``build_patch_values``).
     /// :param quantum_processor_id: The ID of the quantum processor to run the executable on.
-    ///     This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    ///     This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()``
+    ///     or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     ///     Creates one using environment configuration if unset.
     ///     See https://docs.rigetti.com/qcs/references/qcs-client-configuration for more information.
     /// :param execution_options: The ``ExecutionOptions`` to use.
-    ///     If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``,
+    ///     If the connection strategy option used is ``ConnectionStrategy.endpoint_id("endpoint_id")``
+    ///     or ``ConnectionStrategy.endpoint_address("http://some_endpoint_address")``,
     ///     then direct access to "endpoint_id" overrides the ``quantum_processor_id`` parameter.
     ///
     /// :returns: The ID of the submitted job which can be used to fetch results.
@@ -619,7 +621,7 @@ py_function_sync_async! {
     ///
     /// :param program: An executable program (see ``translate``).
     /// :param patch_values: An iterable containing one or more mapping of symbols to their desired values.
-    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param quantum_processor_id: The ID of the quantum processor to run the executable on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     /// :param execution_options: The ``ExecutionOptions`` to use.
     ///
@@ -672,7 +674,7 @@ py_function_sync_async! {
     /// basis.
     ///
     /// :param job_ids: The job IDs to cancel.
-    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     /// :param execution_options: The ``ExecutionOptions`` to use.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
@@ -706,7 +708,7 @@ py_function_sync_async! {
     /// basis.
     ///
     /// :param job_id: The job ID to cancel.
-    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     /// :param execution_options: The ``ExecutionOptions`` to use.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
@@ -733,7 +735,7 @@ py_function_sync_async! {
     /// Fetches execution results for the given QCS Job ID.
     ///
     /// :param job_id: The ID of the job to retrieve results for.
-    /// :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` execution option.
+    /// :param quantum_processor_id: The ID of the quantum processor the job ran on. This field is required, unless being used with the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     /// :param execution_options: The ``ExecutionOptions`` to use.
     ///

@@ -31,7 +31,7 @@ def test_submit_retrieve(quantum_processor_id: str, execution_options: Execution
     assert results is not None
 
 class TestPickle():
-    @pytest.mark.parametrize("strategy", [ConnectionStrategy.Gateway(), ConnectionStrategy.DirectAccess(), ConnectionStrategy.EndpointId("endpoint_id")])
+    @pytest.mark.parametrize("strategy", [ConnectionStrategy.Gateway(), ConnectionStrategy.DirectAccess(), ConnectionStrategy.EndpointId("endpoint_id"), ConnectionStrategy.EndpointAddress("http://localhost:8080")])
     def test_connection_strategy(self, strategy: ConnectionStrategy):
         pickled = pickle.dumps(strategy)
         unpickled = pickle.loads(pickled)
