@@ -1,3 +1,19 @@
+## 0.26.0-rc.3 (2026-03-13)
+
+### Breaking Changes
+
+- merge python crate into lib (#571)
+
+### Features
+
+- allow direct endpoint connection strategy (#573)
+
+### Fixes
+
+- update qcs-api-client dependencies to 0.12.12, (0.13.13 grpc) (#570)
+- elide version value from python stub files (#575)
+- bump qcs-api-client versions to support gateway (#576)
+
 ## 0.26.0-rc.2 (2026-03-02)
 
 ### Breaking Changes
