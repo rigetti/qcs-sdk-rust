@@ -28,9 +28,9 @@ tracing-subscriber = { version = "0.3.19" }
 optipy = "0.1.0"
 pyo3-opentelemetry = "0.6.0"
 pyo3-tracing-subscriber = { version = "0.4.0", default-features = false }
-qcs-api-client-common = "0.15.0" 
-qcs-api-client-grpc = "0.15.0"
-qcs-api-client-openapi = "0.16.0"
+qcs-api-client-common = "0.15.3" 
+qcs-api-client-grpc = "0.15.3"
+qcs-api-client-openapi = "0.16.3"
 quil-rs = "0.35.0" 
 rigetti-pyo3 = "0.5.0"
 
