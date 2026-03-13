@@ -3188,7 +3188,7 @@ dependencies = [
 
 [[package]]
 name = "qcs"
-version = "0.26.0-rc.3"
+version = "0.26.0"
 dependencies = [
  "assert2",
  "async-trait",
