@@ -30,16 +30,19 @@ use qcs_api_client_grpc::{
     tonic::{parse_uri, wrap_channel_with, wrap_channel_with_retry},
 };
 pub use qcs_api_client_openapi::apis::Error as OpenApiError;
-use qcs_api_client_openapi::apis::{
-    endpoints_api::{
-        get_default_endpoint as api_get_default_endpoint, get_endpoint, GetDefaultEndpointError,
-        GetEndpointError,
-    },
-    quantum_processors_api::{
-        list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
-    },
-};
 use qcs_api_client_openapi::models::QuantumProcessorAccessorType;
+use qcs_api_client_openapi::{
+    apis::{
+        endpoints_api::{
+            get_default_endpoint as api_get_default_endpoint, get_endpoint,
+            GetDefaultEndpointError, GetEndpointError,
+        },
+        quantum_processors_api::{
+            list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
+        },
+    },
+    models::QuantumProcessorAccessor,
+};
 
 use crate::executable::Parameters;
 
@@ -755,19 +758,7 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
         )
         .await?;
 
-        let accessor = accessors
-            .accessors
-            .into_iter()
-            .filter(|acc| {
-                acc.live
-                // `as_deref` needed to work around the `Option<Box<_>>` type.
-                && acc.access_type.as_deref() == Some(&QuantumProcessorAccessorType::GatewayV1)
-            })
-            .min_by_key(|acc| acc.rank.unwrap_or(i64::MAX));
-
-        min = std::cmp::min_by_key(min, accessor, |acc| {
-            acc.as_ref().and_then(|acc| acc.rank).unwrap_or(i64::MAX)
-        });
+        min = select_min_accessor(min, accessors.accessors);
 
         next_page_token.clone_from(&accessors.next_page_token);
         if next_page_token.is_none() {
@@ -776,6 +767,28 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
     }
     min.map(|accessor| accessor.url)
         .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
+}
+
+/// Select the accessor with the lowest rank from a list of accessors.
+/// - Prefer `Some({ rank: None })` to `None`.
+/// - Prefer the first accessor encountered among those with the same rank value.
+fn select_min_accessor(
+    min: Option<QuantumProcessorAccessor>,
+    accessors: Vec<QuantumProcessorAccessor>,
+) -> Option<QuantumProcessorAccessor> {
+    accessors
+        .into_iter()
+        // Adds nothing if min == None,
+        // avoiding that footgun entirely
+        .chain(min)
+        .filter(|accessor| accessor.live)
+        .filter(|accessor| {
+            accessor
+                .access_type
+                .as_ref()
+                .is_some_and(|t| **t == QuantumProcessorAccessorType::GatewayV1)
+        })
+        .min_by_key(|accessor| accessor.rank.unwrap_or(i64::MAX))
 }
 
 #[cached(
@@ -877,9 +890,7 @@ pub enum QpuApiError {
 
 #[cfg(test)]
 mod test {
-    use crate::qpu::api::ExecutionOptions;
-
-    use super::ExecutionOptionsBuilder;
+    use super::*;
 
     #[test]
     fn test_default_execution_options() {
@@ -887,5 +898,21 @@ mod test {
             ExecutionOptions::default(),
             ExecutionOptionsBuilder::default().build().unwrap(),
         );
+    }
+
+    #[test]
+    fn test_select_min_accessor_prefers_some_to_none() {
+        let min = None;
+        let expected = QuantumProcessorAccessor {
+            live: true,
+            access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
+            rank: None,
+            url: "url".to_string(),
+            id: Some("id".to_string()),
+        };
+
+        let accessors = vec![expected.clone()];
+        let actual = select_min_accessor(min, accessors);
+        assert_eq!(expected, actual.expect("expected Some accessor"));
     }
 }
