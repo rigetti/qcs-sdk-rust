@@ -770,7 +770,8 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
 }
 
 /// Select the accessor with the lowest rank from a list of accessors.
-/// Alwayss prefer `Some({ rank: None })` to `None`.
+/// - Prefer `Some({ rank: None })` to `None`.
+/// - Prefer the first accessor encountered among those with the same rank value.
 fn select_min_accessor(
     mut min: Option<QuantumProcessorAccessor>,
     accessors: Vec<QuantumProcessorAccessor>,
