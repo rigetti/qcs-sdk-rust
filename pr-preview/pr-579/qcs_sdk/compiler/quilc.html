@@ -44,10 +44,10 @@
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#CompilationResult.program">program</a>
+                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
                         </li>
                         <li>
-                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
+                                <a class="variable" href="#CompilationResult.program">program</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                 </ul>
 
@@ -119,16 +119,16 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
@@ -255,19 +255,6 @@
 </div>
 
 
-                            <div id="CompilationResult.program" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program</span>
-
-        
-    </div>
-    <a class="headerlink" href="#CompilationResult.program"></a>
-    
-            <div class="docstring"><p>The compiled program</p>
-</div>
-
-
-                            </div>
                             <div id="CompilationResult.native_quil_metadata" class="classattr">
                                 <div class="attr variable">
             <span class="name">native_quil_metadata</span>
@@ -277,6 +264,19 @@
     <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
     
             <div class="docstring"><p>Metadata about the compiled program</p>
+</div>
+
+
+                            </div>
+                            <div id="CompilationResult.program" class="classattr">
+                                <div class="attr variable">
+            <span class="name">program</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CompilationResult.program"></a>
+    
+            <div class="docstring"><p>The compiled program</p>
 </div>
 
 
@@ -473,19 +473,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
-                                <div class="attr variable">
-            <span class="name">phase</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
-    
-            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
                                 <div class="attr variable">
             <span class="name">pauli</span>
@@ -495,6 +482,19 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
     
             <div class="docstring"><p>Description of the encoded Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
+                                <div class="attr variable">
+            <span class="name">phase</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
+    
+            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
 </div>
 
 
@@ -514,28 +514,15 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
                                 <div class="attr variable">
-            <span class="name">gateset</span>
+            <span class="name">depth</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
     
-            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
-                                <div class="attr variable">
-            <span class="name">interleaver</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
-    
-            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
 </div>
 
 
@@ -553,15 +540,28 @@ cannot be converted into a format that Quilc understands.</p>
 
 
                             </div>
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
                                 <div class="attr variable">
-            <span class="name">depth</span>
+            <span class="name">interleaver</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
     
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gateset</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
 </div>
 
 
