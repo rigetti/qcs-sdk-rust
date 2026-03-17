@@ -773,23 +773,22 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
 /// - Prefer `Some({ rank: None })` to `None`.
 /// - Prefer the first accessor encountered among those with the same rank value.
 fn select_min_accessor(
-    mut min: Option<QuantumProcessorAccessor>,
+    min: Option<QuantumProcessorAccessor>,
     accessors: Vec<QuantumProcessorAccessor>,
 ) -> Option<QuantumProcessorAccessor> {
-    for accessor in accessors {
-        if accessor.live
-            && accessor
+    accessors
+        .into_iter()
+        // Adds nothing if min == None,
+        // avoiding that footgun entirely
+        .chain(min)
+        .filter(|accessor| accessor.live)
+        .filter(|accessor| {
+            accessor
                 .access_type
                 .as_ref()
                 .is_some_and(|t| **t == QuantumProcessorAccessorType::GatewayV1)
-            && min
-                .as_ref()
-                .is_none_or(|min| accessor.rank.unwrap_or(i64::MAX) < min.rank.unwrap_or(i64::MAX))
-        {
-            min = Some(accessor);
-        }
-    }
-    min
+        })
+        .min_by_key(|accessor| accessor.rank.unwrap_or(i64::MAX))
 }
 
 #[cached(
