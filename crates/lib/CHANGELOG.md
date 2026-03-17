@@ -1,3 +1,9 @@
+## 0.26.1-rc.0 (2026-03-17)
+
+### Fixes
+
+- selecting an accessor should not prefer None to Some({ rank: None }) (#579)
+
 ## 0.26.0 (2026-03-13)
 
 ### Breaking Changes
