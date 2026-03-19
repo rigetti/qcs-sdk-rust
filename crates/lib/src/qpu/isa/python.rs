@@ -315,7 +315,7 @@ impl From<models::Architecture> for Architecture {
                     node_ids: e.node_ids,
                 })
                 .collect(),
-            family: Some(arch.family.into()),
+            family: Some(PyFamily::from(models::Family::from(arch.family))),
             nodes: convert_vec(arch.nodes),
         }
     }
