@@ -888,7 +888,7 @@ mod test {
         };
 
         let accessors = vec![expected.clone()];
-        let actual = select_min_accessor(min, accessors);
+        let actual = select_min_accessor(accessors);
         assert_eq!(expected, actual.expect("expected Some accessor"));
     }
 }

@@ -271,7 +271,7 @@ struct Operation {
     pub name: String,
     /// The number of nodes that this operation applies to. None if unspecified.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub node_count: Option<i64>,
+    pub node_count: Option<u64>,
     /// The list of parameters. Each parameter must be uniquely named. May be empty.
     pub parameters: Vec<Parameter>,
     /// The list of sites at which this operation can be applied, together with its site-dependent characteristics.
@@ -286,7 +286,7 @@ pub struct SerializeIsaError(#[from] serde_json::Error);
 impl From<models::InstructionSetArchitecture> for InstructionSetArchitecture {
     fn from(isa: models::InstructionSetArchitecture) -> Self {
         Self {
-            architecture: (*isa.architecture).into(),
+            architecture: isa.architecture.into(),
             benchmarks: convert_vec(isa.benchmarks),
             instructions: convert_vec(isa.instructions),
             name: isa.name,
@@ -297,7 +297,7 @@ impl From<models::InstructionSetArchitecture> for InstructionSetArchitecture {
 impl From<InstructionSetArchitecture> for models::InstructionSetArchitecture {
     fn from(isa: InstructionSetArchitecture) -> Self {
         Self {
-            architecture: Box::new(isa.architecture.into()),
+            architecture: isa.architecture.into(),
             benchmarks: convert_vec(isa.benchmarks),
             instructions: convert_vec(isa.instructions),
             name: isa.name,
@@ -315,7 +315,7 @@ impl From<models::Architecture> for Architecture {
                     node_ids: e.node_ids,
                 })
                 .collect(),
-            family: arch.family.as_ref().map(Into::into),
+            family: arch.family.map(Into::into),
             nodes: convert_vec(arch.nodes),
         }
     }
@@ -331,7 +331,7 @@ impl From<Architecture> for models::Architecture {
                     node_ids: e.node_ids,
                 })
                 .collect(),
-            family: arch.family.map(|f| Box::new(f.into())),
+            family: arch.family.map(Into::into).unwrap_or_default(),
             nodes: convert_vec(arch.nodes),
         }
     }
