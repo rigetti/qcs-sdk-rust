@@ -38,7 +38,7 @@ use qcs_api_client_openapi::{
             GetDefaultEndpointError, GetEndpointError,
         },
         quantum_processors_api::{
-            list_quantum_processor_accessors, ListQuantumProcessorAccessorsError,
+            get_quantum_processor_accessors, GetQuantumProcessorAccessorsError,
         },
     },
     models::QuantumProcessorAccessor,
@@ -747,24 +747,11 @@ async fn get_accessor_with_cache(
 }
 
 async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String, QpuApiError> {
-    let mut min = None;
-    let mut next_page_token = None;
-    loop {
-        let accessors = list_quantum_processor_accessors(
-            &client.get_openapi_client(),
-            quantum_processor_id,
-            Some(100),
-            next_page_token.as_deref(),
-        )
-        .await?;
+    let accessors =
+        get_quantum_processor_accessors(&client.get_openapi_client(), quantum_processor_id).await?;
 
-        min = select_min_accessor(min, accessors.accessors);
+    let min = select_min_accessor(accessors.accessors);
 
-        next_page_token.clone_from(&accessors.next_page_token);
-        if next_page_token.is_none() {
-            break;
-        }
-    }
     min.map(|accessor| accessor.url)
         .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
 }
@@ -773,21 +760,12 @@ async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String
 /// - Prefer `Some({ rank: None })` to `None`.
 /// - Prefer the first accessor encountered among those with the same rank value.
 fn select_min_accessor(
-    min: Option<QuantumProcessorAccessor>,
     accessors: Vec<QuantumProcessorAccessor>,
 ) -> Option<QuantumProcessorAccessor> {
     accessors
         .into_iter()
-        // Adds nothing if min == None,
-        // avoiding that footgun entirely
-        .chain(min)
         .filter(|accessor| accessor.live)
-        .filter(|accessor| {
-            accessor
-                .access_type
-                .as_ref()
-                .is_some_and(|t| **t == QuantumProcessorAccessorType::GatewayV1)
-        })
+        .filter(|accessor| accessor.access_type == QuantumProcessorAccessorType::GatewayV1)
         .min_by_key(|accessor| accessor.rank.unwrap_or(i64::MAX))
 }
 
@@ -814,11 +792,10 @@ async fn get_default_endpoint(
 ) -> Result<String, QpuApiError> {
     let default_endpoint =
         api_get_default_endpoint(&client.get_openapi_client(), quantum_processor_id).await?;
-    let addresses = default_endpoint.addresses.as_ref();
-    let grpc_address = addresses.grpc.as_ref();
-    grpc_address
+    default_endpoint
+        .addresses
+        .grpc
         .ok_or_else(|| QpuApiError::QpuEndpointNotFound(quantum_processor_id.into()))
-        .cloned()
 }
 
 /// Errors that can occur while attempting to establish a connection to the QPU.
@@ -842,7 +819,7 @@ pub enum QpuApiError {
 
     /// Error due to failure to get accessors for quantum processor
     #[error("Failed to get accessors for quantum processor: {0}")]
-    AccessorRequestFailed(#[from] OpenApiError<ListQuantumProcessorAccessorsError>),
+    AccessorRequestFailed(#[from] OpenApiError<GetQuantumProcessorAccessorsError>),
 
     /// Error due to failure to find gateway for quantum processor
     #[error("No gateway found for quantum processor: {0}")]
@@ -905,10 +882,9 @@ mod test {
         let min = None;
         let expected = QuantumProcessorAccessor {
             live: true,
-            access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
+            access_type: QuantumProcessorAccessorType::GatewayV1,
             rank: None,
             url: "url".to_string(),
-            id: Some("id".to_string()),
         };
 
         let accessors = vec![expected.clone()];

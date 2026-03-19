@@ -81,7 +81,7 @@ pub enum Error {
         "The number of nodes for an operation and site_operation must be (1, 1) or (2, 2). \
                         Got {0:?} while parsing operation {1} at site {2:?}"
     )]
-    IncorrectNodes((Option<i64>, usize), String, Vec<i64>),
+    IncorrectNodes((Option<u64>, usize), String, Vec<i64>),
     #[error(transparent)]
     Qubit(#[from] qubit::Error),
     #[error(transparent)]
