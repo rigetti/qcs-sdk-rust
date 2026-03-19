@@ -159,7 +159,7 @@ impl<T: AsRef<models::Family>> From<T> for PyFamily {
             models::Family::Full => PyFamily::Known(Family::Full),
             models::Family::Aspen => PyFamily::Known(Family::Aspen),
             models::Family::Ankaa => PyFamily::Known(Family::Ankaa),
-            models::Family::Unknown(s) => PyFamily::Unknown(s.clone()),
+            models::Family::UnrecognizedValue(s) => PyFamily::Unknown(s.clone()),
         }
     }
 }
@@ -168,7 +168,7 @@ impl From<PyFamily> for models::Family {
     fn from(family: PyFamily) -> Self {
         match family {
             PyFamily::Known(f) => f.into(),
-            PyFamily::Unknown(s) => models::Family::Unknown(s),
+            PyFamily::Unknown(s) => models::Family::UnrecognizedValue(s),
         }
     }
 }
@@ -315,7 +315,7 @@ impl From<models::Architecture> for Architecture {
                     node_ids: e.node_ids,
                 })
                 .collect(),
-            family: arch.family.map(Into::into),
+            family: Some(arch.family.into()),
             nodes: convert_vec(arch.nodes),
         }
     }

@@ -879,7 +879,6 @@ mod test {
 
     #[test]
     fn test_select_min_accessor_prefers_some_to_none() {
-        let min = None;
         let expected = QuantumProcessorAccessor {
             live: true,
             access_type: QuantumProcessorAccessorType::GatewayV1,
