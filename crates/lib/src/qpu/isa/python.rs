@@ -152,9 +152,9 @@ impl Default for PyFamily {
     }
 }
 
-impl<T: AsRef<models::Family>> From<T> for PyFamily {
-    fn from(family: T) -> Self {
-        match family.as_ref() {
+impl From<models::Family> for PyFamily {
+    fn from(family: models::Family) -> Self {
+        match family {
             models::Family::None => PyFamily::Known(Family::None),
             models::Family::Full => PyFamily::Known(Family::Full),
             models::Family::Aspen => PyFamily::Known(Family::Aspen),
@@ -315,7 +315,7 @@ impl From<models::Architecture> for Architecture {
                     node_ids: e.node_ids,
                 })
                 .collect(),
-            family: Some(PyFamily::from(models::Family::from(arch.family))),
+            family: Some(arch.family.into()),
             nodes: convert_vec(arch.nodes),
         }
     }
