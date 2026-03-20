@@ -240,10 +240,9 @@ mod mock_qcs {
                 ACCESSORS_CALL_COUNT.fetch_add(1, SeqCst);
                 let rsp = ListQuantumProcessorAccessorsResponse {
                     accessors: vec![QuantumProcessorAccessor {
-                        access_type: Some(Box::new(QuantumProcessorAccessorType::GatewayV1)),
+                        access_type: QuantumProcessorAccessorType::GatewayV1,
                         live: true,
                         rank: Some(0),
-                        id: Some(QPU_ID.to_string()),
                         url: MOCK_QPU_ADDRESS.into(),
                     }],
                     next_page_token: None,
