@@ -185,13 +185,11 @@ where
         options: execution_options.api_options().copied(),
     };
 
-    let controller_client = execution_options
+    let mut controller_client = execution_options
         .get_controller_client(client, quantum_processor_id)
         .await?;
 
     Ok(controller_client
-        .send_compressed(CompressionEncoding::Gzip)
-        .accept_compressed(CompressionEncoding::Gzip)
         .execute_controller_job(request)
         .await
         .map_err(GrpcClientError::RequestFailed)?
@@ -631,7 +629,9 @@ pub trait ExecutionTarget<'a> {
             .max_encoding_message_size(MAX_CONTROLLER_OUTBOUND_REQUEST_SIZE)
             // do not limit the received response size, although practically the limit is 4Gb due
             // to the frame_length of the message being a u32.
-            .max_decoding_message_size(u32::MAX as usize))
+            .max_decoding_message_size(u32::MAX as usize)
+            .accept_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip))
     }
 
     /// Get a GRPC connection to a QPU, without specifying the API to use.
