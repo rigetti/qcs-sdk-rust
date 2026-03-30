@@ -272,6 +272,7 @@ mod translation {
         TranslateQuilToEncryptedControllerJobRequest,
         TranslateQuilToEncryptedControllerJobResponse,
     };
+    use tonic::codec::CompressionEncoding;
     use tonic::{transport::Server, Request};
     use tonic::{Response, Status};
 
@@ -315,7 +316,11 @@ mod translation {
     pub(crate) async fn run() {
         let service = TranslationService::default();
         Server::builder()
-            .add_service(TranslationServer::new(service))
+            .add_service(
+                TranslationServer::new(service)
+                    .accept_compressed(CompressionEncoding::Gzip)
+                    .send_compressed(CompressionEncoding::Gzip),
+            )
             .serve("127.0.0.1:8003".parse().expect("address can be parsed"))
             .await
             .expect("service runs without errors");
@@ -339,7 +344,7 @@ mod qpu {
             GetControllerJobStatusResponse,
         },
     };
-    use tonic::{transport::Server, Request, Response, Status};
+    use tonic::{codec::CompressionEncoding, transport::Server, Request, Response, Status};
 
     #[derive(Default, Debug)]
     pub struct ControllerService {}
@@ -412,7 +417,11 @@ mod qpu {
     pub(crate) async fn run() {
         let service = ControllerService::default();
         Server::builder()
-            .add_service(ControllerServer::new(service))
+            .add_service(
+                ControllerServer::new(service)
+                    .accept_compressed(CompressionEncoding::Gzip)
+                    .send_compressed(CompressionEncoding::Gzip),
+            )
             // port must match MOCK_QPU_ADDRESS
             .serve("127.0.0.1:8002".parse().expect("address can be parsed"))
             .await
