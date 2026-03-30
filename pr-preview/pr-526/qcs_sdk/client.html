@@ -47,19 +47,19 @@
                                 <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                 </ul>
 
@@ -95,13 +95,13 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.client_id">client_id</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#AuthServer.scopes">scopes</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AuthServer.issuer">issuer</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                 </ul>
 
@@ -119,10 +119,10 @@
                     <a class="class" href="#SecretRefreshToken">SecretRefreshToken</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#SecretRefreshToken.is_empty">is_empty</a>
+                                <a class="variable" href="#SecretRefreshToken.secret">secret</a>
                         </li>
                         <li>
-                                <a class="variable" href="#SecretRefreshToken.secret">secret</a>
+                                <a class="variable" href="#SecretRefreshToken.is_empty">is_empty</a>
                         </li>
                 </ul>
 
@@ -322,15 +322,15 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.oauth_session" class="classattr">
+                            <div id="QCSClient.grpc_api_url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">oauth_session</span>
+            <span class="name">grpc_api_url</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
-            <div class="docstring"><p>Get a copy of the OAuth session.</p>
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
 </div>
 
 
@@ -348,6 +348,19 @@ for more details.</p>
 
 
                             </div>
+                            <div id="QCSClient.api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
                             <div id="QCSClient.qvm_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">qvm_url</span>
@@ -361,28 +374,15 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
+                            <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
-            <span class="name">grpc_api_url</span>
+            <span class="name">oauth_session</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    <a class="headerlink" href="#QCSClient.oauth_session"></a>
     
-            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS API.</p>
+            <div class="docstring"><p>Get a copy of the OAuth session.</p>
 </div>
 
 
@@ -520,19 +520,6 @@ credentials or payload data.</p>
     
 
                             </div>
-                            <div id="AuthServer.client_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">client_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.client_id"></a>
-    
-            <div class="docstring"><p>OAuth 2.0 client id.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.scopes" class="classattr">
                                 <div class="attr variable">
             <span class="name">scopes</span>
@@ -566,6 +553,19 @@ For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.co
 which is the canonical URI that the identity provider uses to sign and validate tokens,
 but the OpenID specification requires that they match exactly,
 and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.client_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.client_id"></a>
+    
+            <div class="docstring"><p>OAuth 2.0 client id.</p>
 </div>
 
 
@@ -613,19 +613,6 @@ and that they match the <code>iss</code> claim in Tokens issued by this identity
 </div>
 
 
-                            <div id="SecretRefreshToken.is_empty" class="classattr">
-                                <div class="attr variable">
-            <span class="name">is_empty</span>
-
-        
-    </div>
-    <a class="headerlink" href="#SecretRefreshToken.is_empty"></a>
-    
-            <div class="docstring"><p>Check if the secret is an empty value</p>
-</div>
-
-
-                            </div>
                             <div id="SecretRefreshToken.secret" class="classattr">
                                 <div class="attr variable">
             <span class="name">secret</span>
@@ -635,6 +622,19 @@ and that they match the <code>iss</code> claim in Tokens issued by this identity
     <a class="headerlink" href="#SecretRefreshToken.secret"></a>
     
             <div class="docstring"><p>Get the inner secret contents, which removes the protection against accidentally exposing the value.</p>
+</div>
+
+
+                            </div>
+                            <div id="SecretRefreshToken.is_empty" class="classattr">
+                                <div class="attr variable">
+            <span class="name">is_empty</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SecretRefreshToken.is_empty"></a>
+    
+            <div class="docstring"><p>Check if the secret is an empty value</p>
 </div>
 
 
