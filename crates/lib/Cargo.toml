@@ -88,7 +88,7 @@ thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 tokio-util = { workspace = true }
 toml = "0.9.8"
-tonic = { version = "0.13.1", features = ["tls-aws-lc", "tls-native-roots"] }
+tonic = { version = "0.13.1", features = ["tls-aws-lc", "tls-native-roots", "gzip"] }
 uuid = { version = "1.10.0", features = ["v4"] }
 zmq = { version = "0.10.0" }
 
