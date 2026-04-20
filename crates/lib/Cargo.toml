@@ -142,7 +142,7 @@ tempfile = "3.3.0"
 test-case = "3.1.0"
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 tracing-subscriber = { workspace = true }
-warp = { version = "0.3.3", default-features = false }
+warp = { version = "0.4.2", default-features = false }
 
 [[example]]
 name = "compilation-and-simulation-with-libquil"
