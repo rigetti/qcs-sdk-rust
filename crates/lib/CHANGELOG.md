@@ -1,3 +1,13 @@
+## 0.26.2-rc.1 (2026-04-22)
+
+### Features
+
+- increase quil upper bound (#583)
+
+### Fixes
+
+- expose list_isas and use it in Python tests (#585)
+
 ## 0.26.2-rc.0 (2026-04-22)
 
 ### Fixes
