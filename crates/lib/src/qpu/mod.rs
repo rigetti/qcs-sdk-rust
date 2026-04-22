@@ -107,3 +107,55 @@ pub async fn list_quantum_processors(
     })
     .await?
 }
+
+/// API Errors encountered when trying to list available ISAs.
+#[derive(Debug, thiserror::Error)]
+pub enum ListISAsError {
+    /// Failed the http call
+    #[error("Failed to list processors via API: {0}")]
+    ApiError(#[from] OpenApiError<quantum_processors_api::ListInstructionSetArchitecturesError>),
+
+    /// Pagination did not finish before timeout
+    #[error("API pagination did not finish before timeout.")]
+    TimeoutError(#[from] Elapsed),
+}
+
+/// Query QCS for the names of all available ISAs.
+pub async fn list_isas(
+    client: &Qcs,
+    timeout: Option<Duration>,
+) -> Result<Vec<String>, ListISAsError> {
+    #[cfg(feature = "tracing")]
+    tracing::debug!("listing instruction set architectures");
+
+    let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
+
+    tokio::time::timeout(timeout, async move {
+        let mut quantum_processors = vec![];
+        let mut page_token = None;
+
+        loop {
+            let result = quantum_processors_api::list_instruction_set_architectures(
+                &client.get_openapi_client(),
+                Some(5),
+                page_token.as_deref(),
+            )
+            .await?;
+
+            let mut data = result
+                .instruction_set_architectures
+                .into_iter()
+                .map(|isa| isa.name)
+                .collect::<Vec<_>>();
+            quantum_processors.append(&mut data);
+
+            page_token = result.next_page_token;
+            if page_token.is_none() {
+                break;
+            }
+        }
+
+        Ok(quantum_processors)
+    })
+    .await?
+}

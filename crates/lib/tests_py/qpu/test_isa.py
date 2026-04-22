@@ -34,8 +34,15 @@ def test_instruction_set_architecture_serialization_error():
         InstructionSetArchitecture.from_raw('{ "fail": true }')
 
 
-def test_get_instruction_set_actitecture_public(quantum_processor_id: str):
+def test_get_instruction_set_architecture_public(quantum_processor_id: str):
     """Successfully get a known public ISA without authentication."""
     isa = get_instruction_set_architecture(quantum_processor_id, client=QCSClient())
+    assert type(isa) is InstructionSetArchitecture
+
+
+@pytest.mark.asyncio
+async def test_get_instruction_set_architecture_public_async(quantum_processor_id: str):
+    """Successfully get a known public ISA without authentication."""
+    isa = await get_instruction_set_architecture_async(quantum_processor_id, client=QCSClient())
     assert type(isa) is InstructionSetArchitecture
 
