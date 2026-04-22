@@ -38,13 +38,13 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                 </ul>
 
@@ -74,13 +74,13 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                 </ul>
 
@@ -95,10 +95,10 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
@@ -110,10 +110,10 @@
                     <a class="class" href="#APIExecutionOptions">APIExecutionOptions</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#APIExecutionOptions.builder">builder</a>
+                                <a class="function" href="#APIExecutionOptions.default">default</a>
                         </li>
                         <li>
-                                <a class="function" href="#APIExecutionOptions.default">default</a>
+                                <a class="function" href="#APIExecutionOptions.builder">builder</a>
                         </li>
                         <li>
                                 <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
@@ -134,10 +134,10 @@
                                 <a class="function" href="#APIExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptionsBuilder.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptionsBuilder.timeout">timeout</a>
                         </li>
                 </ul>
 
@@ -146,10 +146,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -288,6 +288,19 @@
 
 
                             </div>
+                            <div id="ExecutionResult.data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">data</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.data"></a>
+    
+            <div class="docstring"><p>The result data for all shots by the particular memory location.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
             <span class="name">shape</span>
@@ -310,19 +323,6 @@
     <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
             <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
-</div>
-
-
-                            </div>
-                            <div id="ExecutionResult.data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">data</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.data"></a>
-    
-            <div class="docstring"><p>The result data for all shots by the particular memory location.</p>
 </div>
 
 
@@ -429,6 +429,19 @@ to build a custom set of options.</p>
     
 
                             </div>
+                            <div id="ExecutionOptions.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
+    
+            <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionOptions.timeout_seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout_seconds</span>
@@ -449,19 +462,6 @@ to build a custom set of options.</p>
     <a class="headerlink" href="#ExecutionOptions.api_options"></a>
     
     
-
-                            </div>
-                            <div id="ExecutionOptions.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
-    
-            <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
-</div>
-
 
                             </div>
                 </section>
@@ -505,17 +505,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout_seconds</span>
@@ -523,6 +512,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
     
     
 
@@ -558,6 +558,19 @@ to build a custom set of options.</p>
 </div>
 
 
+                            <div id="APIExecutionOptions.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.default"></a>
+    
+    
+
+                            </div>
                             <div id="APIExecutionOptions.builder" class="classattr">
                                 <div class="attr function">
             
@@ -571,19 +584,6 @@ to build a custom set of options.</p>
             <div class="docstring"><p>Get an [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>] that can be used to build a custom [<code><a href="#ExecutionOptions">ExecutionOptions</a></code>].</p>
 </div>
 
-
-                            </div>
-                            <div id="APIExecutionOptions.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.default"></a>
-    
-    
 
                             </div>
                             <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
@@ -662,17 +662,6 @@ timeout is selected by the service.</p>
     
 
                             </div>
-                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
-    
-    
-
-                            </div>
                             <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
                                 <div class="attr variable">
             <span class="name">bypass_settings_protection</span>
@@ -680,6 +669,17 @@ timeout is selected by the service.</p>
         
     </div>
     <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
     
     
 
@@ -699,17 +699,6 @@ timeout is selected by the service.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -717,6 +706,17 @@ timeout is selected by the service.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
