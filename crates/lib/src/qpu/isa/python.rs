@@ -28,7 +28,11 @@ create_init_submodule! {
         OperationSite,
         Parameter
     ],
-    errors: [ errors::SerializeISAError, errors::GetISAError ],
+    errors: [
+        errors::SerializeISAError,
+        errors::GetISAError,
+        errors::ListISAsError
+    ],
     funcs: [
         py_get_instruction_set_architecture,
         py_get_instruction_set_architecture_async,
@@ -638,7 +642,7 @@ py_function_sync_async! {
     /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     ///
     /// :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
-    /// :raises GetISAsError: If there was an issue fetching the ISAs from the QCS API.
+    /// :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
     #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
     #[pyfunction]
     #[pyo3(signature = (client = None))]

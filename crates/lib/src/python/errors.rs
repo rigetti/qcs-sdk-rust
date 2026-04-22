@@ -110,14 +110,6 @@ exception!(
     "API Errors encountered when trying to list available quantum processors."
 );
 
-exception!(
-    crate::qpu::ListISAsError,
-    qcs_sdk.qpu,
-    ListISAsError,
-    QcsSdkError,
-    "API Errors encountered when trying to list available ISAs."
-);
-
 #[cfg(feature = "experimental")]
 exception!(
     crate::qpu::experimental::random::Error,
@@ -157,6 +149,14 @@ exception!(
     GetISAError,
     QcsSdkError,
     "Errors raised due to failure to get an ISA."
+);
+
+exception!(
+    crate::qpu::ListISAsError,
+    qcs_sdk.qpu.isa,
+    ListISAsError,
+    QcsSdkError,
+    "API Errors encountered when trying to list available ISAs."
 );
 
 exception!(
