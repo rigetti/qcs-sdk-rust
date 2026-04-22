@@ -10,7 +10,11 @@ use pyo3_stub_gen::{
 
 use qcs_api_client_openapi::models;
 
-use crate::{client::Qcs, python::errors, qpu::get_isa};
+use crate::{
+    client::Qcs,
+    python::errors,
+    qpu::{get_isa, list_isas},
+};
 
 create_init_submodule! {
     classes: [
@@ -25,7 +29,12 @@ create_init_submodule! {
         Parameter
     ],
     errors: [ errors::SerializeISAError, errors::GetISAError ],
-    funcs: [ py_get_instruction_set_architecture, py_get_instruction_set_architecture_async ],
+    funcs: [
+        py_get_instruction_set_architecture,
+        py_get_instruction_set_architecture_async,
+        py_list_instruction_set_architectures,
+        py_list_instruction_set_architectures_async
+    ],
 }
 
 impl_repr!(Architecture);
@@ -619,6 +628,25 @@ py_function_sync_async! {
         get_isa(&quantum_processor_id, &client)
             .await
             .map(Into::into)
+            .map_err(Into::into)
+    }
+}
+
+py_function_sync_async! {
+    /// Fetch the names of available ``InstructionSetArchitecture``s (ISAs) from the QCS API.
+    ///
+    /// :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    ///
+    /// :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    /// :raises GetISAsError: If there was an issue fetching the ISAs from the QCS API.
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
+    #[pyfunction]
+    #[pyo3(signature = (client = None))]
+    async fn list_instruction_set_architectures(client: Option<Qcs>) -> PyResult<Vec<String>> {
+        let client = client.unwrap_or_else(Qcs::load);
+
+        list_isas(&client, None)
+            .await
             .map_err(Into::into)
     }
 }

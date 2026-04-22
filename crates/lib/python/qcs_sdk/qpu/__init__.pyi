@@ -11,6 +11,12 @@ from . import experimental
 from . import isa
 from . import translation
 
+class ListISAsError(QcsSdkError):
+    r"""
+    API Errors encountered when trying to list available ISAs.
+    """
+    ...
+
 class ListQuantumProcessorsError(QcsSdkError):
     r"""
     API Errors encountered when trying to list available quantum processors.
