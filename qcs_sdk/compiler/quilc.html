@@ -74,10 +74,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                 </ul>
 
@@ -86,10 +86,10 @@
                     <a class="class" href="#ConjugateByCliffordRequest">ConjugateByCliffordRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                 </ul>
 
@@ -119,19 +119,19 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
                         </li>
                 </ul>
 
@@ -149,10 +149,10 @@
                     <a class="class" href="#QuilcClient">QuilcClient</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#QuilcClient.new_rpcq">new_rpcq</a>
+                                <a class="function" href="#QuilcClient.new_libquil">new_libquil</a>
                         </li>
                         <li>
-                                <a class="function" href="#QuilcClient.new_libquil">new_libquil</a>
+                                <a class="function" href="#QuilcClient.new_rpcq">new_rpcq</a>
                         </li>
                 </ul>
 
@@ -365,19 +365,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
                             <div id="PauliTerm.indices" class="classattr">
                                 <div class="attr variable">
             <span class="name">indices</span>
@@ -387,6 +374,19 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#PauliTerm.indices"></a>
     
             <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
 </div>
 
 
@@ -406,19 +406,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="ConjugateByCliffordRequest.clifford" class="classattr">
-                                <div class="attr variable">
-            <span class="name">clifford</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugateByCliffordRequest.clifford"></a>
-    
-            <div class="docstring"><p>Clifford element.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugateByCliffordRequest.pauli" class="classattr">
                                 <div class="attr variable">
             <span class="name">pauli</span>
@@ -428,6 +415,19 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
     
             <div class="docstring"><p>Pauli Term to conjugate.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugateByCliffordRequest.clifford" class="classattr">
+                                <div class="attr variable">
+            <span class="name">clifford</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugateByCliffordRequest.clifford"></a>
+    
+            <div class="docstring"><p>Clifford element.</p>
 </div>
 
 
@@ -473,19 +473,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
-                                <div class="attr variable">
-            <span class="name">phase</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
-    
-            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
                                 <div class="attr variable">
             <span class="name">pauli</span>
@@ -495,6 +482,19 @@ cannot be converted into a format that Quilc understands.</p>
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
     
             <div class="docstring"><p>Description of the encoded Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
+                                <div class="attr variable">
+            <span class="name">phase</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
+    
+            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
 </div>
 
 
@@ -514,19 +514,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
-    
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
                             <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
                                 <div class="attr variable">
             <span class="name">interleaver</span>
@@ -540,15 +527,28 @@ cannot be converted into a format that Quilc understands.</p>
 
 
                             </div>
-                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
                                 <div class="attr variable">
-            <span class="name">qubits</span>
+            <span class="name">gateset</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
     
-            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                                <div class="attr variable">
+            <span class="name">depth</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
 </div>
 
 
@@ -566,15 +566,15 @@ cannot be converted into a format that Quilc understands.</p>
 
 
                             </div>
-                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
                                 <div class="attr variable">
-            <span class="name">gateset</span>
+            <span class="name">qubits</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
     
-            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
+            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
 </div>
 
 
@@ -622,6 +622,19 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
+                            <div id="QuilcClient.new_libquil" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">new_libquil</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcClient.new_libquil"></a>
+    
+    
+
+                            </div>
                             <div id="QuilcClient.new_rpcq" class="classattr">
                                 <div class="attr function">
             
@@ -635,19 +648,6 @@ cannot be converted into a format that Quilc understands.</p>
             <div class="docstring"><p>Construct a <code><a href="#QuilcClient">QuilcClient</a></code> that uses RPCQ to communicate with Quilc.</p>
 </div>
 
-
-                            </div>
-                            <div id="QuilcClient.new_libquil" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">new_libquil</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#QuilcClient.new_libquil"></a>
-    
-    
 
                             </div>
                 </section>
