@@ -152,6 +152,14 @@ exception!(
 );
 
 exception!(
+    crate::qpu::ListISAsError,
+    qcs_sdk.qpu.isa,
+    ListISAsError,
+    QcsSdkError,
+    "API Errors encountered when trying to list available ISAs."
+);
+
+exception!(
     crate::qpu::isa::python::SerializeIsaError,
     qcs_sdk.qpu.isa,
     SerializeISAError,

@@ -1,3 +1,4 @@
+import asyncio
 import datetime
 import os
 from typing import List
@@ -8,11 +9,13 @@ from _pytest.config.argparsing import Parser
 from _pytest.nodes import Item
 
 from qcs_sdk.client import QCSClient
-from qcs_sdk.qpu.api import APIExecutionOptions, APIExecutionOptionsBuilder, ExecutionOptions
-from qcs_sdk.qpu.isa import InstructionSetArchitecture
+from qcs_sdk.qpu.api import APIExecutionOptions, ExecutionOptions
+from qcs_sdk.qpu.isa import (
+    list_instruction_set_architectures_async,
+    InstructionSetArchitecture
+)
 from qcs_sdk.qvm import QVMClient
 from qcs_sdk.compiler.quilc import QuilcClient
-
 
 TEST_ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 TEST_CONFIG_DIR = os.path.join(TEST_ROOT_DIR, "./_qcs_config")
@@ -61,9 +64,17 @@ def _read_fixture(relpath: str) -> str:
     return contents
 
 
+@pytest.fixture(scope="session")
+def available_ids() -> list[str]:
+    async def _list_isas():
+        return await list_instruction_set_architectures_async(client=QCSClient())
+    return asyncio.run(_list_isas())
+
+
 @pytest.fixture
-def quantum_processor_id() -> str:
-    return os.getenv("TEST_LIVE_QUANTUM_PROCESSOR_ID", "Ankaa-3")
+def quantum_processor_id(available_ids: list[str]) -> str:
+    default = "Cepheus-1-108Q" if len(available_ids) == 0 else available_ids[0]
+    return os.getenv("TEST_LIVE_QUANTUM_PROCESSOR_ID", default)
 
 
 @pytest.fixture

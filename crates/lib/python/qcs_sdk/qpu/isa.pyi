@@ -263,6 +263,12 @@ class InstructionSetArchitecture:
         Returns [`SerializeIsaError`] if the ISA could not be serialized.
         """
 
+class ListISAsError(QcsSdkError):
+    r"""
+    API Errors encountered when trying to list available ISAs.
+    """
+    ...
+
 @typing.final
 class Node:
     r"""
@@ -468,5 +474,25 @@ def get_instruction_set_architecture_async(quantum_processor_id: builtins.str, c
     
     :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
+    """
+
+def list_instruction_set_architectures(client: typing.Optional[QCSClient] = None) -> builtins.list[builtins.str]:
+    r"""
+    Fetch the names of available ``InstructionSetArchitecture``s (ISAs) from the QCS API.
+    
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    
+    :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
+    """
+
+def list_instruction_set_architectures_async(client: typing.Optional[QCSClient] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
+    r"""
+    Fetch the names of available ``InstructionSetArchitecture``s (ISAs) from the QCS API.
+    
+    :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
+    
+    :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
+    :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
     """
 
