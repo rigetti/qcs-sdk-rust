@@ -1,3 +1,9 @@
+## 0.26.2-rc.0 (2026-04-22)
+
+### Fixes
+
+- expose list_isas and use it in Python tests (#585)
+
 ## 0.26.1 (2026-03-30)
 
 ### Features
