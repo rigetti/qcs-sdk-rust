@@ -119,7 +119,7 @@ rigetti-pyo3 = { workspace = true, optional = true, features = ["opentelemetry",
 pyo3-stub-gen = { workspace = true, features = ["numpy"], optional = true }
 
 [build-dependencies]
-built = "0.6.1"
+built = "0.6.1, ||, ^0"
 
 # Enabled with the "python" feature.
 pyo3-build-config = { workspace = true, optional = true }
