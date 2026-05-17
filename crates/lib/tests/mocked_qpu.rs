@@ -240,6 +240,7 @@ mod mock_qcs {
                 ACCESSORS_CALL_COUNT.fetch_add(1, SeqCst);
                 let rsp = ListQuantumProcessorAccessorsResponse {
                     accessors: vec![QuantumProcessorAccessor {
+                        id: None,
                         access_type: QuantumProcessorAccessorType::GatewayV1,
                         live: true,
                         rank: Some(0),
@@ -272,14 +273,14 @@ mod translation {
         TranslateQuilToEncryptedControllerJobRequest,
         TranslateQuilToEncryptedControllerJobResponse,
     };
-    use tonic::codec::CompressionEncoding;
-    use tonic::{transport::Server, Request};
-    use tonic::{Response, Status};
+    use qcs_dependencies_client::tonic::codec::CompressionEncoding;
+    use qcs_dependencies_client::tonic::{transport::Server, Request};
+    use qcs_dependencies_client::tonic::{Response, Status};
 
     #[derive(Default, Debug)]
     pub struct TranslationService {}
 
-    #[tonic::async_trait]
+    #[qcs_dependencies_client::tonic::codegen::async_trait]
     impl Translation for TranslationService {
         async fn translate_quil_to_encrypted_controller_job(
             &self,
@@ -344,12 +345,14 @@ mod qpu {
             GetControllerJobStatusResponse,
         },
     };
-    use tonic::{codec::CompressionEncoding, transport::Server, Request, Response, Status};
+    use qcs_dependencies_client::tonic::{
+        codec::CompressionEncoding, transport::Server, Request, Response, Status,
+    };
 
     #[derive(Default, Debug)]
     pub struct ControllerService {}
 
-    #[tonic::async_trait]
+    #[qcs_dependencies_client::tonic::codegen::async_trait]
     impl Controller for ControllerService {
         async fn execute_controller_job(
             &self,

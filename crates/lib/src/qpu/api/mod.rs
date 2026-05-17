@@ -1,13 +1,13 @@
 //! This module provides access to the QCS QPU API
 use std::{convert::TryFrom, fmt, time::Duration};
 
-use tonic::codec::CompressionEncoding;
+use qcs_dependencies_client::tonic::codec::CompressionEncoding;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
 #[deny(clippy::module_name_repetitions)]
-pub use ::pbjson_types::Duration as QpuApiDuration;
+pub use ::qcs_dependencies_client::pbjson_types::Duration as QpuApiDuration;
 use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
@@ -183,6 +183,7 @@ where
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
         options: execution_options.api_options().copied(),
+        idempotency_key: None,
     };
 
     let mut controller_client = execution_options
@@ -468,7 +469,7 @@ impl ApiExecutionOptions {
     ///
     /// The service may also enforce a maximum value for this field.
     #[must_use]
-    pub fn timeout(&self) -> Option<::pbjson_types::Duration> {
+    pub fn timeout(&self) -> Option<::qcs_dependencies_client::pbjson_types::Duration> {
         self.inner.timeout
     }
 }
@@ -495,7 +496,10 @@ impl ApiExecutionOptionsBuilder {
     }
 
     /// Set the `timeout` value. See [`ApiExecutionOptions::timeout`] for more information.
-    pub fn timeout(&mut self, timeout: Option<::pbjson_types::Duration>) -> &mut Self {
+    pub fn timeout(
+        &mut self,
+        timeout: Option<::qcs_dependencies_client::pbjson_types::Duration>,
+    ) -> &mut Self {
         self.inner
             .get_or_insert(InnerApiExecutionOptions::default())
             .timeout = timeout;
@@ -884,6 +888,7 @@ mod test {
     #[test]
     fn test_select_min_accessor_prefers_some_to_none() {
         let expected = QuantumProcessorAccessor {
+            id: None,
             live: true,
             access_type: QuantumProcessorAccessorType::GatewayV1,
             rank: None,

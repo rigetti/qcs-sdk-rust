@@ -10,8 +10,7 @@ resolver = "2"
 # and need to be updated together.
 ndarray = { version = "0.17.2", features = ["serde"] }
 numpy = "0.27.1"
-opentelemetry = { version = "0.30.0" }
-opentelemetry_sdk = { version = "0.30.0" }
+qcs-dependencies-client = { version = "0.3.1" }
 pyo3 = { version = "0.27.2", features = ["num-complex", "multiple-pymethods"] }
 pyo3-async-runtimes = { version = "0.27", features = ["attributes", "tokio-runtime"] }
 pyo3-build-config = "0.27.2"
@@ -28,9 +27,9 @@ tracing-subscriber = { version = "0.3.19" }
 optipy = "0.1.0"
 pyo3-opentelemetry = "0.6.0"
 pyo3-tracing-subscriber = { version = "0.4.0", default-features = false }
-qcs-api-client-common = "0.17.0"
-qcs-api-client-grpc = "0.17.0"
-qcs-api-client-openapi = "0.18.0"
+qcs-api-client-common = "0.18.1"
+qcs-api-client-grpc = "0.18.1"
+qcs-api-client-openapi = "0.19.1"
 quil-rs = "0.35.0" 
 rigetti-pyo3 = "0.5.0"
 
