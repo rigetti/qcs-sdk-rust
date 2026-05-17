@@ -1,6 +1,9 @@
 # Cargo / rustc artifacts
 /target
 
+# QCS infrastructure (fetched at build time)
+.qcs-infrastructure/
+
 # Local config
 .env
 .envrc

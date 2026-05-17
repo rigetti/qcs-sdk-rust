@@ -108,7 +108,7 @@ struct QcsApiDiagnostics {
 enum QcsApiAuthenticationResult {
     Success(User),
     Failure {
-        status_code: Option<reqwest::StatusCode>,
+        status_code: Option<qcs_dependencies_client::reqwest::StatusCode>,
         error: String,
     },
 }
@@ -146,7 +146,9 @@ impl QcsApiDiagnostics {
         let configuration = client.get_config();
         let address = configuration.api_url().to_string();
 
-        let network_reachable = reqwest::get(&address).await.is_ok();
+        let network_reachable = qcs_dependencies_client::reqwest::get(&address)
+            .await
+            .is_ok();
         let client = qcs_api_client_openapi::apis::configuration::Configuration::with_qcs_config(
             configuration.clone(),
         );

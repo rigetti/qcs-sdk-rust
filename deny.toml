@@ -177,6 +177,12 @@ allow = [
 ]
 # List of crates to deny
 deny = [
+    # Standard qcs-infrastructure deny-list:
+    { crate = "qcs-dependencies-client", deny-multiple-versions = true },
+    { crate = "qcs-dependencies-grpc-server", deny-multiple-versions = true },
+    { crate = "qcs-dependencies-http-server", deny-multiple-versions = true },
+    { crate = "tracing-core", deny-multiple-versions = true },
+    # Repo-specific entries:
     # Multiple versions of these crates (and possibly others?) are known to cause
     # compilation and subtle unit test failures. We deny multiple versions to make
     # the cause of those failures more explicit. If the deny check fails, perhaps,

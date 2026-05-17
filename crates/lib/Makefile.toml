@@ -1,3 +1,12 @@
+extend = [
+    { path = "/etc/rust-ci/defaults/Makefile.toml", optional = true },
+    { path = ".qcs-infrastructure/configuration/cargo-make/Makefile.toml", optional = true },
+]
+
+[config]
+default_to_workspace = false
+load_script = "$(git rev-parse --show-toplevel)/scripts/update-qcs-infrastructure"
+
 [env]
 RUST_BACKTRACE = 0
 CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now

@@ -38,7 +38,6 @@ python = [
     "dep:futures-util",
     "dep:numpy",
     "dep:paste",
-    "dep:prost",
     "dep:pyo3",
     "dep:pyo3-async-runtimes",
     "dep:pyo3-build-config",
@@ -75,12 +74,9 @@ itertools = "0.12.0"
 lazy_static = "1.4.0"
 ndarray.workspace = true
 num = { version = "0.4.0", features = ["serde"] }
-opentelemetry = { workspace = true }
-opentelemetry_sdk = { workspace = true }
 optipy.workspace = true
-pbjson-types = "0.7.0"
+qcs-dependencies-client = { workspace = true, features = ["grpc", "http"] }
 quil-rs.workspace = true
-reqwest = { version = "0.12.8", default-features = false, features = ["rustls-tls", "json"] }
 rmp-serde = "1.1.1"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.128"
@@ -88,7 +84,6 @@ thiserror.workspace = true
 tokio = { workspace = true, features = ["fs", "rt-multi-thread"] }
 tokio-util = { workspace = true }
 toml = "0.9.8"
-tonic = { version = "0.13.1", features = ["tls-aws-lc", "tls-native-roots", "gzip"] }
 uuid = { version = "1.10.0", features = ["v4"] }
 zmq = { version = "0.10.0" }
 
@@ -108,7 +103,7 @@ pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3
 futures-util = { version = "0.3.30", optional = true }
 numpy = { workspace = true, optional = true }
 paste = { version = "1.0.15", optional = true }
-prost = { version = "0.13.3", optional = true }
+
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { workspace = true, optional = true }
 pyo3-log = { workspace = true, optional = true }

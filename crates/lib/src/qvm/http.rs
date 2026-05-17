@@ -6,7 +6,7 @@ use std::{collections::HashMap, num::NonZeroU16};
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum};
 
-use reqwest::Response;
+use qcs_dependencies_client::reqwest::Response;
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
 use crate::{client::Qcs, RegisterData};
@@ -289,7 +289,7 @@ impl WavefunctionRequest {
 #[derive(Debug, Clone)]
 #[allow(clippy::module_name_repetitions)]
 pub struct HttpClient {
-    client: reqwest::Client,
+    client: qcs_dependencies_client::reqwest::Client,
     /// Address used to connect to the QVM
     pub qvm_url: String,
 }
@@ -298,7 +298,7 @@ impl HttpClient {
     /// Build a new [`HttpClient`] to connect to a QVM server at `qvm_url`.
     #[must_use]
     pub fn new(qvm_url: String) -> Self {
-        let client = reqwest::Client::new();
+        let client = qcs_dependencies_client::reqwest::Client::new();
         Self { client, qvm_url }
     }
 }

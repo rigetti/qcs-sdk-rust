@@ -19,10 +19,10 @@ use qcs_api_client_grpc::{
     },
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
-use tokio_util::sync::CancellationToken;
 #[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
-use tonic::transport::Channel;
-use tonic::Status;
+use qcs_dependencies_client::tonic::transport::Channel;
+use qcs_dependencies_client::tonic::Status;
+use tokio_util::sync::CancellationToken;
 
 pub use qcs_api_client_common::configuration::LoadError;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;

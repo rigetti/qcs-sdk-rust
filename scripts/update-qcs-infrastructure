@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo "Updating ${QCS_INFRASTRUCTURE_LOCAL:=$(git rev-parse --show-toplevel)/.qcs-infrastructure}"
+echo "using qcs-infrastructure@${QCS_INFRASTRUCTURE_REF:=main}"
+if [[ ! -d "$QCS_INFRASTRUCTURE_LOCAL" ]]; then
+    git clone --depth=1 --branch ${QCS_INFRASTRUCTURE_REF} https://gitlab.com/rigetti/qcs/utilities/qcs-infrastructure.git ${QCS_INFRASTRUCTURE_LOCAL}
+else
+    git -C "$QCS_INFRASTRUCTURE_LOCAL" fetch --depth=1 origin "$QCS_INFRASTRUCTURE_REF"
+    git -c advice.detachedHead=false -C "$QCS_INFRASTRUCTURE_LOCAL" checkout FETCH_HEAD
+fi
+
+# For use when sourcing this script
+export QCS_INFRASTRUCTURE_LOCAL
