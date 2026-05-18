@@ -3327,7 +3327,7 @@ dependencies = [
  "numpy",
  "oauth2-test-server",
  "optipy",
- "paste",
+ "pastey",
  "pyo3",
  "pyo3-async-runtimes",
  "pyo3-build-config",

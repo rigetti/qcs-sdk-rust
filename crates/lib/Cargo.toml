@@ -37,7 +37,7 @@ tracing-opentelemetry = [
 python = [
     "dep:futures-util",
     "dep:numpy",
-    "dep:paste",
+    "dep:pastey",
     "dep:pyo3",
     "dep:pyo3-async-runtimes",
     "dep:pyo3-build-config",
@@ -102,7 +102,7 @@ pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3
 # Enabled with the "python" or "stubs" features.
 futures-util = { workspace = true, optional = true }
 numpy = { workspace = true, optional = true }
-paste = { workspace = true, optional = true }
+pastey = { workspace = true, optional = true }
 
 pyo3 = { workspace = true, optional = true }
 pyo3-async-runtimes = { workspace = true, optional = true }

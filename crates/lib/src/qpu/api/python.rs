@@ -499,7 +499,7 @@ mod stubs {
         }
     }
 
-    use paste::paste;
+    use pastey::paste;
 
     /// Generate stubs for write-only properites.
     ///
