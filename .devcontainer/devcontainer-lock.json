@@ -1,0 +1,29 @@
+{
+  "features": {
+    "ghcr.io/devcontainers-extra/features/curl-apt-get:1": {
+      "version": "1.0.18",
+      "resolved": "ghcr.io/devcontainers-extra/features/curl-apt-get@sha256:7fb32e4ebdd440369a598e7a27b1ed56c9e73eb6b4f595d30969862d2fc68e40",
+      "integrity": "sha256:7fb32e4ebdd440369a598e7a27b1ed56c9e73eb6b4f595d30969862d2fc68e40"
+    },
+    "ghcr.io/devcontainers-extra/features/poetry:2": {
+      "version": "2.0.18",
+      "resolved": "ghcr.io/devcontainers-extra/features/poetry@sha256:7b5f2c66d25d8b3cc5d601af6b81b720c77dd315f24d5e6f84b342cccc3c9228",
+      "integrity": "sha256:7b5f2c66d25d8b3cc5d601af6b81b720c77dd315f24d5e6f84b342cccc3c9228"
+    },
+    "ghcr.io/devcontainers-extra/features/protoc:1": {
+      "version": "1.0.3",
+      "resolved": "ghcr.io/devcontainers-extra/features/protoc@sha256:57ec0b9c074c3c764d5b43386f5fd219586b2548d5a99da8c3307f29fc1deafc",
+      "integrity": "sha256:57ec0b9c074c3c764d5b43386f5fd219586b2548d5a99da8c3307f29fc1deafc"
+    },
+    "ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {
+      "version": "0.1.8",
+      "resolved": "ghcr.io/lee-orr/rusty-dev-containers/cargo-deny@sha256:89315be238ac13b0db1221bfe680f42af470063a7fab2287594d24a38c6b02eb",
+      "integrity": "sha256:89315be238ac13b0db1221bfe680f42af470063a7fab2287594d24a38c6b02eb"
+    },
+    "ghcr.io/lee-orr/rusty-dev-containers/cargo-make:0": {
+      "version": "0.1.8",
+      "resolved": "ghcr.io/lee-orr/rusty-dev-containers/cargo-make@sha256:abff1e41abe3f0a93b7771c34da3c3ee284d7177d1db93ce655e736fa549d7bb",
+      "integrity": "sha256:abff1e41abe3f0a93b7771c34da3c3ee284d7177d1db93ce655e736fa549d7bb"
+    }
+  }
+}
