@@ -67,7 +67,6 @@ ignore = [
     { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
     { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
-    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update" },
     # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
     # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
     # We'll ignore it for now, since `pyo3-stub-gen` is effectively a build-time dependency anyway.
@@ -79,6 +78,8 @@ ignore = [
     { id = "RUSTSEC-2025-0100", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
 ]
 yanked = "deny"
+unused-ignored-advisory = "deny"
+
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
 # If this is false, then it uses a built-in git library.
 # Setting this to true can be helpful if you have special authentication requirements that cargo-deny does not support.
@@ -102,7 +103,6 @@ allow = [
     "CDLA-Permissive-2.0",
     "ISC",
     "MIT",
-    "OpenSSL",
     "Unicode-3.0",
     "Unicode-DFS-2016",
     "Zlib",
