@@ -22,15 +22,15 @@
 # this list would mean the nix crate, as well as any of its exclusive
 # dependencies not shared by any other crates, would be ignored, as the target
 # list here is effectively saying which targets you are building for.
+# These are all supported targets for this crate.
 targets = [
-    # The triple can be any string, but only the target triples built in to
-    # rustc (as of 1.40) can be checked against actual config expressions
-    #"x86_64-unknown-linux-musl",
-    # You can also specify which target_features you promise are enabled for a
-    # particular target. target_features are currently not validated against
-    # the actual valid features supported by the target architecture.
-    #{ triple = "wasm32-unknown-unknown", features = ["atomics"] },
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "aarch64-unknown-linux-musl",
+    "x86_64-unknown-linux-musl",
+    "x86_64-pc-windows-msvc",
 ]
+exclude-dev = true
 # When creating the dependency graph used as the source of truth when checks are
 # executed, this field can be used to prune crates from the graph, removing them
 # from the view of cargo-deny. This is an extremely heavy hammer, as if a crate
@@ -177,25 +177,30 @@ allow = [
 ]
 # List of crates to deny
 deny = [
-    # Standard qcs-infrastructure deny-list:
     { crate = "qcs-dependencies-client", deny-multiple-versions = true },
-    { crate = "qcs-dependencies-grpc-server", deny-multiple-versions = true },
-    { crate = "qcs-dependencies-http-server", deny-multiple-versions = true },
-    { crate = "tracing-core", deny-multiple-versions = true },
-    # Repo-specific entries:
-    # Multiple versions of these crates (and possibly others?) are known to cause
-    # compilation and subtle unit test failures. We deny multiple versions to make
-    # the cause of those failures more explicit. If the deny check fails, perhaps,
-    # because a dependency depends on one of these crates that do not affect the
-    # APIs used in this workspace, then we can disable the deny check if, otherwise,
-    # there's no trivial solution.
+    { crate = "http", deny-multiple-versions = true },
     { crate = "opentelemetry", deny-multiple-versions = true },
+    { crate = "opentelemetry-http", deny-multiple-versions = true },
+    { crate = "opentelemetry-otlp", deny-multiple-versions = true },
     { crate = "opentelemetry_sdk", deny-multiple-versions = true },
+    { crate = "pbjson", deny-multiple-versions = true },
+    { crate = "pbjson-types", deny-multiple-versions = true },
+    { crate = "poem", deny-multiple-versions = true },
+    { crate = "poem-openapi", deny-multiple-versions = true },
+    { crate = "prost", deny-multiple-versions = true },
+    { crate = "prost-types", deny-multiple-versions = true },
+    { crate = "reqwest", deny-multiple-versions = true },
+    { crate = "reqwest-middleware", deny-multiple-versions = true },
+    { crate = "reqwest-tracing", deny-multiple-versions = true },
+    { crate = "sentry-tower", deny-multiple-versions = true },
     { crate = "tonic", deny-multiple-versions = true },
+    { crate = "tonic-health", deny-multiple-versions = true },
+    { crate = "tonic-prost", deny-multiple-versions = true },
+    { crate = "tonic-web", deny-multiple-versions = true },
     { crate = "tower", deny-multiple-versions = true },
-    { crate = "tracing", deny-multiple-versions = true },
+    { crate = "tower-http", deny-multiple-versions = true },
+    { crate = "tracing-core", deny-multiple-versions = true },
     { crate = "tracing-opentelemetry", deny-multiple-versions = true },
-    { crate = "tracing-subscriber", deny-multiple-versions = true },
 ]
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
