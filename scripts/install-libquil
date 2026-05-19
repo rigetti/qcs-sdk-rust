@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 0 ]]; then
+    echo "Usage: $0"
+    echo "Installs quilc, the Quil compiler."
+    exit 0
+fi
+
+if [[ -f /usr/local/lib/libquil.so && -e /usr/local/include/libquil ]]; then
+    echo "libquil is already installed. Skipping installation."
+    exit 0
+fi
+
+set -x
+
+sudo apt update
+sudo apt install -y unzip libffi-dev libblas\* liblapack\* curl
+# libquil binaries link against libffi.so.7; Bookworm ships libffi8, so create a compat symlink
+MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+if [ ! -e "/usr/lib/$MULTIARCH/libffi.so.7" ]; then
+    sudo ln -sf "/usr/lib/$MULTIARCH/libffi.so.8" "/usr/lib/$MULTIARCH/libffi.so.7"
+    sudo ldconfig
+fi
+
+curl https://raw.githubusercontent.com/rigetti/libquil/main/install.sh | bash -s 0.3.0

@@ -1,9 +1,9 @@
-FROM rigetti/quilc
+FROM rust:latest
 
-# Install GCC 10 to work around the memcmp bug in GCC 9.3
-# aws-lc-sys (used by cargo-binstall) rejects GCC 9.x due to this bug:
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95189
+# cmake and pkg-config are needed by Rust build scripts (e.g. aws-lc-sys).
+# sudo allows install-libquil to re-exec as root when the container user is not root.
+COPY scripts/install-libquil /tmp/install-libquil
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends gcc-10 && \
-    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends cmake pkg-config sudo && \
+    /tmp/install-libquil && \
+    rm -rf /var/lib/apt/lists/* /tmp/install-libquil
