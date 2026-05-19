@@ -37,11 +37,15 @@ install_crate = "cargo-deny"
 command = "cargo"
 args = ["deny", "--exclude-dev", "--all-features", "check"]
 
+[tasks.check]
+command = "cargo"
+args = ["check", "--all-features", "--all-targets"]
+
 [tasks.pre-ci-flow]
-dependencies = ["deny", "lint"]
+dependencies = ["deny", "lint", "check"]
 
 [tasks.ci-flow]
-dependencies = ["test-flow"]
+dependencies = ["pre-ci-flow", "test-flow"]
 
 # ----
 
