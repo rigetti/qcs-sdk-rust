@@ -38,13 +38,13 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.data">data</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                 </ul>
 
@@ -53,13 +53,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                 </ul>
 
@@ -95,13 +95,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -288,19 +288,6 @@
 
 
                             </div>
-                            <div id="ExecutionResult.shape" class="classattr">
-                                <div class="attr variable">
-            <span class="name">shape</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
-    
-            <div class="docstring"><p>The shape of the result data.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.dtype" class="classattr">
                                 <div class="attr variable">
             <span class="name">dtype</span>
@@ -327,6 +314,19 @@
 
 
                             </div>
+                            <div id="ExecutionResult.shape" class="classattr">
+                                <div class="attr variable">
+            <span class="name">shape</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    
+            <div class="docstring"><p>The shape of the result data.</p>
+</div>
+
+
+                            </div>
                 </section>
                 <section id="ExecutionResults">
                     <div class="attr class">
@@ -342,20 +342,6 @@
 </div>
 
 
-                            <div id="ExecutionResults.memory" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
-    
-            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
-the execution of the program.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">execution_duration_microseconds</span>
@@ -381,6 +367,20 @@ the execution of the program.</p>
 
 <p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
 to the name of the memory declaration in the source program.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResults.memory" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
+    
+            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
+the execution of the program.</p>
 </div>
 
 
@@ -505,17 +505,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -534,6 +523,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
     
     
 
