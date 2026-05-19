@@ -77,10 +77,10 @@
                                 <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -98,10 +98,10 @@
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -146,10 +146,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                 </ul>
 
@@ -440,17 +440,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptions.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptions.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -462,6 +451,17 @@ to build a custom set of options.</p>
             <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
 </div>
 
+
+                            </div>
+                            <div id="ExecutionOptions.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    
+    
 
                             </div>
                 </section>
@@ -516,17 +516,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -534,6 +523,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
@@ -699,17 +699,6 @@ timeout is selected by the service.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.seconds"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.nanos" class="classattr">
                                 <div class="attr variable">
             <span class="name">nanos</span>
@@ -717,6 +706,17 @@ timeout is selected by the service.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.nanos"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.seconds"></a>
     
     
 
