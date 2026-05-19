@@ -24,14 +24,14 @@ tracing = { version = "0.1", features = ["log"] }
 tracing-subscriber = { version = "0.3.19" }
 
 # These dependencies we manage.
-optipy = "0.1.0"
+optipy = "0.1"
 pyo3-opentelemetry = "0.6.0"
 pyo3-tracing-subscriber = { version = "0.4.0", default-features = false }
 qcs-api-client-common = "0.18.1"
 qcs-api-client-grpc = "0.18.1"
 qcs-api-client-openapi = "0.19.1"
 quil-rs = "0.35.0" 
-rigetti-pyo3 = "0.5.0"
+rigetti-pyo3 = "0.5"
 assert2 = "0.3.11"
 async-trait = "0.1.73"
 built = "0.6.1"
