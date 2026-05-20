@@ -41,7 +41,7 @@ args = ["deny", "--exclude-dev", "--all-features", "check"]
 dependencies = ["deny", "lint"]
 
 [tasks.ci-flow]
-dependencies = ["test-flow"]
+dependencies = ["pre-ci-flow", "test-flow"]
 
 # ----
 
