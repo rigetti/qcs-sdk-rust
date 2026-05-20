@@ -14,7 +14,7 @@ fi
 set -x
 
 sudo apt update
-sudo apt install -y unzip libffi-dev libblas\* liblapack\* curl
+sudo apt install -y unzip libclang-dev libffi-dev libblas\* liblapack\* curl
 # libquil binaries link against libffi.so.7; Bookworm ships libffi8, so create a compat symlink
 MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
 if [ ! -e "/usr/lib/$MULTIARCH/libffi.so.7" ]; then
