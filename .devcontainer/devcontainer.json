@@ -4,10 +4,17 @@
 
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": ".."
+		"context": "..",
+		"options": ["--platform=linux/amd64"]
 	},
 
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	"mounts": [
+		"source=${localEnv:HOME},target=/dev-home,type=bind,consistency=cached"
+	],
+
+	"runArgs": ["--platform=linux/amd64"],
 
 	"features": {
 		"ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {},
