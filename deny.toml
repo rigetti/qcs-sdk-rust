@@ -213,13 +213,12 @@ skip = [
 # dependencies starting at the specified crate, up to a certain depth, which is
 # by default infinite.
 skip-tree = [
-    #"ansi_term@0.11.0", # will be skipped along with _all_ of its direct and transitive dependencies
-    #{ crate = "ansi_term@0.11.0", depth = 20 },
-    { crate = "toml", depth = 20 },
-    { crate = "warp", depth = 20 },             # Only used for development
-    { crate = "hermit-abi", depth = 20 },       # Only used for development
-    { crate = "itertools", depth = 20 },        # `quil-rs` and various transitive dependencies depend on different versions
-    { crate = "hashbrown", depth = 20 },        # `indexmap` and `cached` depend on different versions
+    { crate = "toml" },
+    { crate = "warp" },             # Only used for development
+    { crate = "hermit-abi" },       # Only used for development
+    { crate = "itertools" },        # `quil-rs` and various transitive dependencies depend on different versions
+    { crate = "hashbrown" },        # `indexmap` and `cached` depend on different versions
+    { crate = "oauth2" }            # uses a different version of `reqwest`
 ]
 
 [[bans.features]]
