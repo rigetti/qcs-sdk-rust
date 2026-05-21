@@ -97,7 +97,7 @@ qcs-api-client-openapi.workspace = true
 libquil-sys = { workspace = true, optional = true }
 
 # Enabled with the "tracing-opentelemetry" or "python" features.
-pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["pyo3", "layer-otel-otlp-file", "layer-otel-otlp"] }
+pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["layer-otel-otlp-file", "layer-otel-otlp"] }
 
 # Enabled with the "python" or "stubs" features.
 futures-util = { workspace = true, optional = true }
