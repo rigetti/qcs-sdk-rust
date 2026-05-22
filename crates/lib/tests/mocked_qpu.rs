@@ -280,7 +280,7 @@ mod translation {
     #[derive(Default, Debug)]
     pub struct TranslationService {}
 
-    #[qcs_dependencies_client::tonic::codegen::async_trait]
+    #[async_trait::async_trait]
     impl Translation for TranslationService {
         async fn translate_quil_to_encrypted_controller_job(
             &self,
@@ -352,7 +352,7 @@ mod qpu {
     #[derive(Default, Debug)]
     pub struct ControllerService {}
 
-    #[qcs_dependencies_client::tonic::codegen::async_trait]
+    #[async_trait::async_trait]
     impl Controller for ControllerService {
         async fn execute_controller_job(
             &self,
