@@ -41,11 +41,8 @@ args = ["deny", "--exclude-dev", "--all-features", "check"]
 command = "cargo"
 args = ["check", "--all-features", "--all-targets"]
 
-[tasks.pre-ci-flow]
-dependencies = ["deny", "lint", "check"]
-
 [tasks.ci-flow]
-dependencies = ["pre-ci-flow", "test-flow"]
+dependencies = ["deny", "lint", "check", "test-flow"]
 
 # ----
 
