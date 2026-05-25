@@ -59,6 +59,12 @@ pub type GrpcConnection =
 #[cfg(all(not(feature = "grpc-web"), feature = "tracing"))]
 pub type GrpcConnection = RetryService<RefreshService<CustomTraceService, ClientConfiguration>>;
 
+/// XXX really? Seriously?
+#[cfg(all(feature = "grpc-web", feature = "tracing"))]
+pub type GrpcConnection = GrpcWebWrapperLayerService<
+    RetryService<RefreshService<CustomTraceService, ClientConfiguration>>,
+>;
+
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
 pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
