@@ -55,7 +55,7 @@ stubs = [
     "dep:pyo3-stub-gen",
     "quil-rs/stubs",
     "qcs-api-client-common/stubs",
-    "pyo3-tracing-subscriber/stubs",
+    "pyo3-tracing-subscriber-build",
     "rigetti-pyo3/stubs",
 ]
 experimental = []
@@ -98,6 +98,9 @@ libquil-sys = { workspace = true, optional = true }
 
 # Enabled with the "tracing-opentelemetry" or "python" features.
 pyo3-tracing-subscriber = { workspace = true, optional = true, features = ["layer-otel-otlp-file", "layer-otel-otlp"] }
+
+# Enabled with the "stubs" feature.
+pyo3-tracing-subscriber-build = { workspace = true, optional = true, features = ["layer-otel-otlp-file", "layer-otel-otlp"] }
 
 # Enabled with the "python" or "stubs" features.
 futures-util = { workspace = true, optional = true }

@@ -28,9 +28,9 @@ mod generate {
 
     fn tracing_subscriber(
         python_root: &PathBuf,
-    ) -> Result<(), pyo3_tracing_subscriber::stubs::Error> {
+    ) -> Result<(), pyo3_tracing_subscriber_build::Error> {
         let tracing_subscriber_path = python_root.join("qcs_sdk/_tracing_subscriber");
-        pyo3_tracing_subscriber::stubs::write_stub_files(
+        pyo3_tracing_subscriber_build::write_stub_files(
             "qcs_sdk",
             "_tracing_subscriber",
             &tracing_subscriber_path,
