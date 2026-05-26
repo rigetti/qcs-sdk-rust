@@ -25,11 +25,6 @@ jobs:
       - name: Install libquil
         run: |
           sudo ./scripts/install-libquil
-      - name: Install cargo-make
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug cargo-make
       - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
@@ -73,11 +68,6 @@ jobs:
       - name: Install libquil
         run: |
           sudo ./scripts/install-libquil
-      - name: Install cargo-make
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug cargo-make
       - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder

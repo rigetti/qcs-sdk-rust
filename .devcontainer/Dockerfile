@@ -9,4 +9,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/install-libquil
 
 RUN cargo install cargo-binstall
-RUN cargo binstall --no-confirm cargo-make cargo-deny
+RUN cargo binstall --no-confirm cargo-make cargo-deny ripgrep knope
+
+# The user is assumed to own the repo, even though the container is run with a different user.
+RUN git config --global --add safe.directory /workspaces/qcs-sdk-rust

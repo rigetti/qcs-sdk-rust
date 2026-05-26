@@ -7,9 +7,20 @@
 
 set -u
 
-# `griffe` needs to run at the project root.
+# `griffe` and `knope` need to run at the project root.
 pushd "$(git rev-parse --show-toplevel)" || exit
-trap popd EXIT
+# Tempdir is used for any "scratch" files
+tmpdir=$(mktemp -d)
+cleanup() {
+  popd
+  rm -rf "$tmpdir"
+  # The `griffe` check command creates a branch (and worktree), but does not clean them up.
+  git worktree list --porcelain \
+    | awk '/^worktree /{wt=$2} /^branch refs\/heads\/griffe-lib-v/{print wt}' \
+    | xargs -r -I{} git worktree remove --force {}
+  git show-branch --list 'griffe-lib-v*' 2>/dev/null | awk -F'[][]' '{print $2}' | xargs -r git branch -D
+}
+trap cleanup EXIT
 
 # The Python package name to check.
 PY_PACKAGE="qcs_sdk"
@@ -24,20 +35,13 @@ poetry run -P crates/lib -- \
     "${PY_PACKAGE}"
 api_break=$?
 
-# Now check if `knope` knows this has "Breaking Changes".
-#
-# This just looks for a line mentioning what will get added to the `CHANGELOG.md`,
-# and if it exists, looks for the line `### Breaking Changes`.
-# If it finds both, it should be a breaking change for $KNOPE_PACKAGE.
-# If it doesn't find the one of those lines, or finds other changes before `Breaking Changes`,
-# then either there are no breaking changes, or they aren't breaking changes for $KNOPE_PACKAGE.
-knope --dry-run release | awk -v KNOPE_PACKAGE="$KNOPE_PACKAGE" -f <(cat <<-'EOF'
-  BEGIN { is_breaking = 0; }
-  /^Would add the following to .*\/CHANGELOG.md: *$/ { is_scope = ($6 ~ KNOPE_PACKAGE); }
-  /^### Breaking Changes$/ && is_scope { is_breaking = 1; }
-  END { exit is_breaking; }
-EOF
-)
+# Now check if `knope` knows this has "Breaking Changes". (Invert the "success" exit code for a match.)
+knope --dry-run --verbose release > "$tmpdir/knope-dry-run.txt" 2>&1
+if [[ $? -ne 0 ]] ; then
+  echo "FATAL: knope failed to run" >&2
+  exit 1
+fi
+! grep -q -E '^\s+implies rule MAJOR' "$tmpdir/knope-dry-run.txt"
 marked_break=$?
 
 if [[ $api_break == $marked_break ]]; then
