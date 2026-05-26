@@ -66,13 +66,13 @@
                     <a class="class" href="#QVMResultData">QVMResultData</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#QVMResultData.from_memory_map">from_memory_map</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#QVMResultData.to_raw_readout_data">to_raw_readout_data</a>
                         </li>
                         <li>
                                 <a class="function" href="#QVMResultData.to_register_map">to_register_map</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#QVMResultData.from_memory_map">from_memory_map</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QVMResultData.memory">memory</a>
@@ -238,6 +238,21 @@
 </div>
 
 
+                            <div id="QVMResultData.from_memory_map" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">from_memory_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">memory</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QVMResultData.from_memory_map"></a>
+    
+            <div class="docstring"><p>Build a [<code>QvmResultData</code>] from a mapping of register names to a [<code>RegisterData</code>]</p>
+</div>
+
+
+                            </div>
                             <div id="QVMResultData.to_raw_readout_data" class="classattr">
                                 <div class="attr function">
             
@@ -278,21 +293,6 @@ skipped conditionally. In these cases, building a rectangular [<code>RegisterMat
 necessitate making assumptions about the data that could skew the data in undesirable ways.
 Instead, it's recommended to manually build a matrix from [<code>QpuResultData</code>] that accurately
 selects the last value per-shot based on the program that was run.</p>
-</div>
-
-
-                            </div>
-                            <div id="QVMResultData.from_memory_map" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_memory_map</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">memory</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#QVMResultData.from_memory_map"></a>
-    
-            <div class="docstring"><p>Build a [<code>QvmResultData</code>] from a mapping of register names to a [<code>RegisterData</code>]</p>
 </div>
 
 
