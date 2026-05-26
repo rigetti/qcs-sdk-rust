@@ -155,7 +155,6 @@ pub async fn run<C: Client + Send + Sync + ?Sized>(
     client: &C,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
-    #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
     run_program(
@@ -185,7 +184,6 @@ pub async fn run_program<C: Client + ?Sized>(
     client: &C,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         %shots,
         ?addresses,

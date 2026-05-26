@@ -12,9 +12,6 @@ use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::TokenError;
-#[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::tonic::wrap_channel_with_grpc_web;
-#[cfg(feature = "tracing")]
 use qcs_api_client_grpc::tonic::wrap_channel_with_tracing;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 use qcs_api_client_grpc::{
@@ -164,7 +161,6 @@ pub async fn submit_with_parameter_batch<'a, I>(
 where
     I: IntoIterator<Item = &'a Parameters>,
 {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         "submitting job to {:?} using options {:?}",
         quantum_processor_id,
@@ -308,7 +304,6 @@ pub async fn retrieve_results(
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         "retrieving job results for {} on {:?} using options {:?}",
         job_id,
@@ -682,8 +677,6 @@ pub trait ExecutionTarget<'a> {
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
 
-        // First add tracing if enabled
-        #[cfg(feature = "tracing")]
         let channel = wrap_channel_with_tracing(
             channel,
             address.to_string(),
@@ -697,10 +690,6 @@ pub trait ExecutionTarget<'a> {
         // Then wrap with refresh and retry
         let channel = wrap_channel_with(channel, client.get_config().clone());
         let channel = wrap_channel_with_retry(channel);
-
-        // Add grpc-web if enabled
-        #[cfg(feature = "grpc-web")]
-        let channel = wrap_channel_with_grpc_web(channel);
 
         Ok(channel)
     }
@@ -749,7 +738,6 @@ async fn get_accessor_with_cache(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::info!(quantum_processor_id=%quantum_processor_id, "get_accessor cache miss");
     get_accessor(quantum_processor_id, client).await
 }
@@ -789,7 +777,6 @@ async fn get_default_endpoint_with_cache(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::info!(quantum_processor_id=%quantum_processor_id, "get_default_endpoint cache miss");
     get_default_endpoint(quantum_processor_id, client).await
 }

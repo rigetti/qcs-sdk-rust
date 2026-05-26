@@ -14,15 +14,14 @@ This crate is documented primarily via [rustdoc] comments and examples, which ar
 
 The crate supports several features, and some of them imply others, forming a DAG:
 
-| Feature                   | Description                                                           | Implied Features |
-| ------------------------- | --------------------------------------------------------------------- | ---------------- |
-| `manual-tests`            | Used to run tests that require some manual setup.                     |                  |
-| `experimental`            | Enables experimental features specific to Rigetti QPUs.               |                  |
-| `tracing`                 | Enables the `tracing` features in `qcs-api-client-*` crates.          |                  |
-| `tracing-config`          | Enables the `tracing-config` features in `qcs-api-client-*` crates.   | `tracing`        |
-| `tracing-opentelemetry`   | Enables tracing with OpenTelemetry.                                   | `tracing-config` |
-| `python`                  | Exposes Python bindings via PyO3.               | `experimental`, `tracing-opentelemtry` |
-| `stubs`                   | Enables Python typing for stub generation.                            | `python`         |
+| Feature                   | Description                                                                  | Implied Features                       |
+| ------------------------- | ---------------------------------------------------------------------        | ----------------                       |
+| `manual-tests`            | Used to run tests that require some manual setup.                            |                                        |
+| `experimental`            | Enables experimental features specific to Rigetti QPUs.                      |                                        |
+| `libquil`                 | Links against the `libquil` dynamic library. Not supported on all platforms. |                                        |
+| `tracing-opentelemetry`   | Enables tracing with OpenTelemetry.                                          |                                        |
+| `python`                  | Exposes Python bindings via PyO3.                                            | `experimental`, `tracing-opentelemtry` |
+| `stubs`                   | Enables Python typing for stub generation.                                   | `python`                               |
 
 In addition, there currently exists the feature `_insecure-issuer-validation`
 which enables a feature of the same name in the `qcs-api-client-common` crate.

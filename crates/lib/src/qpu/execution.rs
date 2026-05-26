@@ -10,7 +10,6 @@ use quil_rs::program::ProgramError;
 use quil_rs::quil::{Quil, ToQuilError};
 
 use quil_rs::Program;
-#[cfg(feature = "tracing")]
 use tracing::trace;
 
 use crate::compiler::rpcq;
@@ -125,7 +124,6 @@ impl<'a> Execution<'a> {
         quilc_client: Option<Arc<dyn quilc::Client + Send + Sync>>,
         compiler_options: CompilerOpts,
     ) -> Result<Execution<'a>, Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots=%shots,
             %quantum_processor_id,
@@ -137,7 +135,6 @@ impl<'a> Execution<'a> {
         let target_device = TargetDevice::try_from(isa)?;
 
         let program = if let Some(client) = quilc_client {
-            #[cfg(feature = "tracing")]
             trace!("Converting to Native Quil");
             client
                 .compile_program(&quil, target_device, compiler_options)
@@ -146,7 +143,6 @@ impl<'a> Execution<'a> {
                 })?
                 .program
         } else {
-            #[cfg(feature = "tracing")]
             trace!("Skipping conversion to Native Quil");
             quil.parse().map_err(Error::Quil)?
         };
@@ -182,7 +178,6 @@ impl<'a> Execution<'a> {
         translation_options: Option<TranslationOptions>,
         execution_options: &ExecutionOptions,
     ) -> Result<JobHandle<'a>, Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
         self.submit_to_target(
@@ -266,7 +261,6 @@ impl<'a> Execution<'a> {
         &self,
         job_handle: JobHandle<'a>,
     ) -> Result<ExecutionData, Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!(
             job_id=%job_handle.job_id(),
             num_shots = %self.shots,

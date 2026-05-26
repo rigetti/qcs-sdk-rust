@@ -5,12 +5,8 @@
 use std::time::Duration;
 
 use qcs_api_client_common::configuration::{ClientConfiguration, TokenError};
-#[cfg(feature = "tracing")]
 use qcs_api_client_grpc::tonic::wrap_channel_with_tracing;
-#[cfg(feature = "tracing")]
 use qcs_api_client_grpc::tonic::CustomTraceService;
-#[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::tonic::{wrap_channel_with_grpc_web, GrpcWebWrapperLayerService};
 use qcs_api_client_grpc::{
     services::translation::translation_client::TranslationClient,
     tonic::{
@@ -19,8 +15,6 @@ use qcs_api_client_grpc::{
     },
 };
 use qcs_api_client_openapi::apis::configuration::Configuration as OpenApiConfiguration;
-#[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
-use qcs_dependencies_client::tonic::transport::Channel;
 use qcs_dependencies_client::tonic::Status;
 use tokio_util::sync::CancellationToken;
 
@@ -38,17 +32,6 @@ const MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE: usize = 50 * 1024 * 1024;
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
 /// matches what this library uses.
-#[cfg(not(any(feature = "grpc-web", feature = "tracing")))]
-pub type GrpcConnection = RetryService<RefreshService<Channel, ClientConfiguration>>;
-
-/// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
-/// It is public so that users can create gRPC clients with different APIs using a "raw" connection
-/// initialized by this library. This ensures that the exact Tonic version used for such clients
-/// matches what this library uses.
-#[cfg(all(feature = "grpc-web", not(feature = "tracing")))]
-pub type GrpcConnection =
-    GrpcWebWrapperLayerService<RetryService<RefreshService<Channel, ClientConfiguration>>>;
-
 /// A type alias for the underlying gRPC connection used by all gRPC clients within this library.
 /// It is public so that users can create gRPC clients with different APIs using a "raw" connection
 /// initialized by this library. This ensures that the exact Tonic version used for such clients
@@ -56,14 +39,7 @@ pub type GrpcConnection =
 ///
 /// The underlying [`tonic::transport::Channel`] is wrapped by [`CustomTraceService`],
 /// [`RefreshService`], and [`RetryService`] to provide tracing, token refresh, and retry.
-#[cfg(all(not(feature = "grpc-web"), feature = "tracing"))]
 pub type GrpcConnection = RetryService<RefreshService<CustomTraceService, ClientConfiguration>>;
-
-/// XXX really? Seriously?
-#[cfg(all(feature = "grpc-web", feature = "tracing"))]
-pub type GrpcConnection = GrpcWebWrapperLayerService<
-    RetryService<RefreshService<CustomTraceService, ClientConfiguration>>,
->;
 
 /// TODO: make configurable at the client level.
 /// <https://github.com/rigetti/qcs-sdk-rust/issues/239>
@@ -87,7 +63,6 @@ impl Qcs {
         if let Ok(config) = ClientConfiguration::load_default() {
             Self::with_config(config)
         } else {
-            #[cfg(feature = "tracing")]
             tracing::info!(
                 "No QCS client configuration found. QPU data and QCS will be inaccessible and only generic QVMs will be available for execution"
             );
@@ -157,8 +132,6 @@ impl Qcs {
         let uri = parse_uri(translation_grpc_endpoint)?;
         let channel = get_channel(uri)?;
 
-        // First add tracing if enabled
-        #[cfg(feature = "tracing")]
         let channel = wrap_channel_with_tracing(
             channel,
             translation_grpc_endpoint.to_string(),
@@ -172,8 +145,6 @@ impl Qcs {
         let channel = wrap_channel_with(channel, self.get_config().clone());
         let channel = wrap_channel_with_retry(channel);
 
-        #[cfg(feature = "grpc-web")]
-        let channel = wrap_channel_with_grpc_web(service);
         Ok(TranslationClient::new(channel)
             .max_encoding_message_size(MAX_TRANSLATION_OUTBOUND_REQUEST_SIZE)
             // do not limit the received response size, although practically the limit is 4Gb due

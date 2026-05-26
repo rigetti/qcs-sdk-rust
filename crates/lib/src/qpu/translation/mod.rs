@@ -15,7 +15,6 @@ use qcs_api_client_grpc::{
     },
 };
 use tokio::time::error::Elapsed;
-#[cfg(feature = "tracing")]
 use tracing::instrument;
 
 use crate::client::{GrpcClientError, Qcs, DEFAULT_HTTP_API_TIMEOUT};
@@ -49,10 +48,7 @@ pub struct EncryptedTranslationResult {
 }
 
 /// Translate a program, returning an encrypted and translated program.
-#[cfg_attr(
-    feature = "tracing",
-    instrument(skip(quil_program, client, translation_options))
-)]
+#[instrument(skip(quil_program, client, translation_options))]
 pub async fn translate<TO>(
     quantum_processor_id: &str,
     quil_program: &str,
@@ -63,7 +59,6 @@ pub async fn translate<TO>(
 where
     TO: Into<ApiTranslationOptions>,
 {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         %num_shots,
         "translating program for {}",
@@ -105,7 +100,6 @@ pub async fn get_quilt_calibrations(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<String, Error> {
-    #[cfg(feature = "tracing")]
     tracing::debug!("getting Quil-T calibrations for {}", quantum_processor_id);
 
     let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
