@@ -17,8 +17,6 @@
 	"runArgs": ["--platform=linux/amd64"],
 
 	"features": {
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {},
-		"ghcr.io/lee-orr/rusty-dev-containers/cargo-make:0": {},
 		"ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
 		"ghcr.io/devcontainers-extra/features/protoc:1": {},
 		"ghcr.io/devcontainers-extra/features/poetry:2": {}

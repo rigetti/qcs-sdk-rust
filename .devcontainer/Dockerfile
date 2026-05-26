@@ -7,3 +7,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake pkg-config sudo && \
     /tmp/install-libquil && \
     rm -rf /var/lib/apt/lists/* /tmp/install-libquil
+
+RUN cargo install cargo-binstall
+RUN cargo binstall --no-confirm cargo-make cargo-deny

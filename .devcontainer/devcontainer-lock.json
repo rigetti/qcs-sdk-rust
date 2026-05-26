@@ -14,16 +14,6 @@
       "version": "1.0.3",
       "resolved": "ghcr.io/devcontainers-extra/features/protoc@sha256:57ec0b9c074c3c764d5b43386f5fd219586b2548d5a99da8c3307f29fc1deafc",
       "integrity": "sha256:57ec0b9c074c3c764d5b43386f5fd219586b2548d5a99da8c3307f29fc1deafc"
-    },
-    "ghcr.io/lee-orr/rusty-dev-containers/cargo-deny:0": {
-      "version": "0.1.8",
-      "resolved": "ghcr.io/lee-orr/rusty-dev-containers/cargo-deny@sha256:89315be238ac13b0db1221bfe680f42af470063a7fab2287594d24a38c6b02eb",
-      "integrity": "sha256:89315be238ac13b0db1221bfe680f42af470063a7fab2287594d24a38c6b02eb"
-    },
-    "ghcr.io/lee-orr/rusty-dev-containers/cargo-make:0": {
-      "version": "0.1.8",
-      "resolved": "ghcr.io/lee-orr/rusty-dev-containers/cargo-make@sha256:abff1e41abe3f0a93b7771c34da3c3ee284d7177d1db93ce655e736fa549d7bb",
-      "integrity": "sha256:abff1e41abe3f0a93b7771c34da3c3ee284d7177d1db93ce655e736fa549d7bb"
     }
   }
 }
