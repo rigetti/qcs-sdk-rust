@@ -47,19 +47,19 @@
                                 <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                 </ul>
 
@@ -95,13 +95,13 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.issuer">issuer</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#AuthServer.scopes">scopes</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AuthServer.client_id">client_id</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#AuthServer.issuer">issuer</a>
                         </li>
                 </ul>
 
@@ -131,10 +131,10 @@
                     <a class="class" href="#ClientCredentials">ClientCredentials</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ClientCredentials.client_id">client_id</a>
+                                <a class="variable" href="#ClientCredentials.client_secret">client_secret</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ClientCredentials.client_secret">client_secret</a>
+                                <a class="variable" href="#ClientCredentials.client_id">client_id</a>
                         </li>
                 </ul>
 
@@ -322,32 +322,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-            <div class="docstring"><p>URL to access the QVM.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS API.</p>
-</div>
-
-
-                            </div>
                             <div id="QCSClient.oauth_session" class="classattr">
                                 <div class="attr variable">
             <span class="name">oauth_session</span>
@@ -357,6 +331,19 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.oauth_session"></a>
     
             <div class="docstring"><p>Get a copy of the OAuth session.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.grpc_api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">grpc_api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
 </div>
 
 
@@ -374,15 +361,28 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.grpc_api_url" class="classattr">
+                            <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">grpc_api_url</span>
+            <span class="name">api_url</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
     
-            <div class="docstring"><p>URL to access the QCS gRPC API.</p>
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
 </div>
 
 
@@ -520,28 +520,6 @@ credentials or payload data.</p>
     
 
                             </div>
-                            <div id="AuthServer.issuer" class="classattr">
-                                <div class="attr variable">
-            <span class="name">issuer</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.issuer"></a>
-    
-            <div class="docstring"><p>OAuth 2.0 issuer URL.</p>
-
-<p>This is the base URL of the identity provider.
-For Okta, this usually looks like <code>https://example.okta.com/oauth2/default</code>.
-For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.com/us-west-2_example</code>.</p>
-
-<p>Note that this is technically distinct from the <code><a href="#AuthServer.issuer">issuer</a></code> field in [<code>OidcDiscovery</code>],
-which is the canonical URI that the identity provider uses to sign and validate tokens,
-but the OpenID specification requires that they match exactly,
-and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.scopes" class="classattr">
                                 <div class="attr variable">
             <span class="name">scopes</span>
@@ -566,6 +544,28 @@ The scope <code>openid</code> is always requested, even if not present in this l
     <a class="headerlink" href="#AuthServer.client_id"></a>
     
             <div class="docstring"><p>OAuth 2.0 client id.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.issuer" class="classattr">
+                                <div class="attr variable">
+            <span class="name">issuer</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.issuer"></a>
+    
+            <div class="docstring"><p>OAuth 2.0 issuer URL.</p>
+
+<p>This is the base URL of the identity provider.
+For Okta, this usually looks like <code>https://example.okta.com/oauth2/default</code>.
+For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.com/us-west-2_example</code>.</p>
+
+<p>Note that this is technically distinct from the <code><a href="#AuthServer.issuer">issuer</a></code> field in [<code>OidcDiscovery</code>],
+which is the canonical URI that the identity provider uses to sign and validate tokens,
+but the OpenID specification requires that they match exactly,
+and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
 </div>
 
 
@@ -654,19 +654,6 @@ The scope <code>openid</code> is always requested, even if not present in this l
 </div>
 
 
-                            <div id="ClientCredentials.client_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">client_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ClientCredentials.client_id"></a>
-    
-            <div class="docstring"><p>The client ID</p>
-</div>
-
-
-                            </div>
                             <div id="ClientCredentials.client_secret" class="classattr">
                                 <div class="attr variable">
             <span class="name">client_secret</span>
@@ -676,6 +663,19 @@ The scope <code>openid</code> is always requested, even if not present in this l
     <a class="headerlink" href="#ClientCredentials.client_secret"></a>
     
             <div class="docstring"><p>The client secret.</p>
+</div>
+
+
+                            </div>
+                            <div id="ClientCredentials.client_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ClientCredentials.client_id"></a>
+    
+            <div class="docstring"><p>The client ID</p>
 </div>
 
 
