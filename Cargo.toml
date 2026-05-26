@@ -25,11 +25,9 @@ tracing-subscriber = { version = "0.3.19" }
 
 # These dependencies we manage.
 optipy = "0.1"
-# XXX use release
-pyo3-opentelemetry = "0.7.0-rc.2"
-# XXX use release
-pyo3-tracing-subscriber = "0.5.0-rc.2"
-pyo3-tracing-subscriber-build = "0.4.0"
+pyo3-opentelemetry = "0.7.0"
+pyo3-tracing-subscriber = "0.5.0"
+pyo3-tracing-subscriber-build = "0.5.0"
 qcs-api-client-common = "0.18.1"
 qcs-api-client-grpc = "0.18.1"
 qcs-api-client-openapi = "0.19.1"

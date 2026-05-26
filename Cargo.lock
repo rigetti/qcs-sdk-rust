@@ -3149,9 +3149,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-opentelemetry"
-version = "0.7.0-rc.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d9f30545f1fffedf047887713cbaa40a2beb0ce90919bf4a93b0800f5db51bbf"
+checksum = "3d7d1e83566a3d349671a417dbde37b76fde16a6f5893de038dc897db071c46c"
 dependencies = [
  "pyo3",
  "pyo3-opentelemetry-macros",
@@ -3160,9 +3160,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-opentelemetry-macros"
-version = "0.7.0-rc.2"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d41ce32f4cdbb9c017f0c7f3d2d15a0c60fcb042cb1050b0ec51756984d944c8"
+checksum = "d6e0e861730227d0b1f08f4dc4641d787ae4627653ceae7624d43e4190bc68b2"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3208,9 +3208,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber"
-version = "0.5.0-rc.2"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "819b560e2d303b795ed78fb1584b90b990b10320c413e7384a2fb9b57e835119"
+checksum = "4b5001efbec2c29b8c89834447ea2328b8d9bf8ed864f8a3ebeab3484ec1c9f7"
 dependencies = [
  "futures-core",
  "pyo3",
@@ -3227,9 +3227,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber-build"
-version = "0.4.0"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f47be5519731144e7c909e3c5e26f48a6a5b8f043423a91cc9d7097d74c95e98"
+checksum = "4cf575aa55922da7d8fceb3e2f27f4eb609135b67d84a17c65d70246de3997e5"
 dependencies = [
  "handlebars",
  "serde",
