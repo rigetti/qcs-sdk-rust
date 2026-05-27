@@ -118,7 +118,6 @@ float-cmp = { workspace = true }
 hex = { workspace = true }
 insta = { workspace = true }
 maplit = { workspace = true }
-# keep pinned until this crate matures
 oauth2-test-server = { workspace = true }
 qcs-api-client-common = { workspace = true, features = ["test"] }
 qcs-api-client-grpc = { workspace = true, features = ["server"] }
