@@ -1,3 +1,9 @@
+## 0.26.3 (2026-05-27)
+
+### Features
+
+- use QCS "core dependencies" crate (#588)
+
 ## 0.26.3-rc.0 (2026-05-27)
 
 ### Features
