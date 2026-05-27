@@ -11,7 +11,10 @@ class ChooseRandomRealSubRegions:
     An [`ExternedCall`] that may be used to select one or more random
     sub-regions from a source array of real values to a destination array.
     """
-    NAME: builtins.str
+    NAME: builtins.str = 'choose_random_real_sub_regions'
+    r"""
+    The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
+    """
     @staticmethod
     def build_signature() -> builtins.str:
         r"""

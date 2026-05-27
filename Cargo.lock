@@ -2564,9 +2564,9 @@ dependencies = [
 
 [[package]]
 name = "optipy"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6fed75e15db73936af0b0168069a3bf7a212cd2ef5385b6bbde84b1eed2f79c4"
+checksum = "8f0b56d0b41dc7b5b69e9133418df44a4b41a2700c7ee922176cb3d9801d5c51"
 dependencies = [
  "proc-macro2",
  "quote",

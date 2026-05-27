@@ -161,21 +161,15 @@ impl ChooseRandomRealSubRegions {
     }
 }
 
-impl ChooseRandomRealSubRegions {
-    /// The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
-    pub const EXTERN_NAME: &str = "choose_random_real_sub_regions";
-}
-
-#[cfg(feature = "python")]
-#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
+#[cfg_attr(all(feature = "python", not(feature = "stubs")), optipy::strip_pyo3(only_stubs))]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
-#[pyo3::pymethods]
+#[cfg_attr(feature = "python", pyo3::pymethods)]
 impl ChooseRandomRealSubRegions {
     #[classattr]
     #[pyo3(name = "NAME")]
-    fn py_extern_name() -> &'static str {
-        Self::EXTERN_NAME
-    }
+    /// The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
+    pub const EXTERN_NAME: &str = "choose_random_real_sub_regions";
 }
 
 impl ChooseRandomRealSubRegions {
