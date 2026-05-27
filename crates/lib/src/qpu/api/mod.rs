@@ -1,20 +1,17 @@
 //! This module provides access to the QCS QPU API
 use std::{convert::TryFrom, fmt, time::Duration};
 
-use tonic::codec::CompressionEncoding;
+use qcs_dependencies_client::tonic::codec::CompressionEncoding;
 
 #[cfg(feature = "stubs")]
 use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
 
 #[deny(clippy::module_name_repetitions)]
-pub use ::pbjson_types::Duration as QpuApiDuration;
+pub use ::qcs_dependencies_client::pbjson_types::Duration as QpuApiDuration;
 use async_trait::async_trait;
 use cached::proc_macro::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::TokenError;
-#[cfg(feature = "grpc-web")]
-use qcs_api_client_grpc::tonic::wrap_channel_with_grpc_web;
-#[cfg(feature = "tracing")]
 use qcs_api_client_grpc::tonic::wrap_channel_with_tracing;
 pub use qcs_api_client_grpc::tonic::Error as GrpcError;
 use qcs_api_client_grpc::{
@@ -164,7 +161,6 @@ pub async fn submit_with_parameter_batch<'a, I>(
 where
     I: IntoIterator<Item = &'a Parameters>,
 {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         "submitting job to {:?} using options {:?}",
         quantum_processor_id,
@@ -183,6 +179,7 @@ where
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
         target: execution_options.get_job_target(quantum_processor_id),
         options: execution_options.api_options().copied(),
+        idempotency_key: None,
     };
 
     let mut controller_client = execution_options
@@ -307,7 +304,6 @@ pub async fn retrieve_results(
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         "retrieving job results for {} on {:?} using options {:?}",
         job_id,
@@ -468,7 +464,7 @@ impl ApiExecutionOptions {
     ///
     /// The service may also enforce a maximum value for this field.
     #[must_use]
-    pub fn timeout(&self) -> Option<::pbjson_types::Duration> {
+    pub fn timeout(&self) -> Option<::qcs_dependencies_client::pbjson_types::Duration> {
         self.inner.timeout
     }
 }
@@ -495,7 +491,10 @@ impl ApiExecutionOptionsBuilder {
     }
 
     /// Set the `timeout` value. See [`ApiExecutionOptions::timeout`] for more information.
-    pub fn timeout(&mut self, timeout: Option<::pbjson_types::Duration>) -> &mut Self {
+    pub fn timeout(
+        &mut self,
+        timeout: Option<::qcs_dependencies_client::pbjson_types::Duration>,
+    ) -> &mut Self {
         self.inner
             .get_or_insert(InnerApiExecutionOptions::default())
             .timeout = timeout;
@@ -678,8 +677,6 @@ pub trait ExecutionTarget<'a> {
         let channel = get_channel_with_timeout(uri, self.timeout())
             .map_err(|err| QpuApiError::GrpcError(err.into()))?;
 
-        // First add tracing if enabled
-        #[cfg(feature = "tracing")]
         let channel = wrap_channel_with_tracing(
             channel,
             address.to_string(),
@@ -693,10 +690,6 @@ pub trait ExecutionTarget<'a> {
         // Then wrap with refresh and retry
         let channel = wrap_channel_with(channel, client.get_config().clone());
         let channel = wrap_channel_with_retry(channel);
-
-        // Add grpc-web if enabled
-        #[cfg(feature = "grpc-web")]
-        let channel = wrap_channel_with_grpc_web(channel);
 
         Ok(channel)
     }
@@ -745,7 +738,6 @@ async fn get_accessor_with_cache(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::info!(quantum_processor_id=%quantum_processor_id, "get_accessor cache miss");
     get_accessor(quantum_processor_id, client).await
 }
@@ -785,7 +777,6 @@ async fn get_default_endpoint_with_cache(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    #[cfg(feature = "tracing")]
     tracing::info!(quantum_processor_id=%quantum_processor_id, "get_default_endpoint cache miss");
     get_default_endpoint(quantum_processor_id, client).await
 }
@@ -884,6 +875,7 @@ mod test {
     #[test]
     fn test_select_min_accessor_prefers_some_to_none() {
         let expected = QuantumProcessorAccessor {
+            id: None,
             live: true,
             access_type: QuantumProcessorAccessorType::GatewayV1,
             rank: None,

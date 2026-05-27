@@ -1,6 +1,6 @@
 use std::{collections::HashMap, sync::Arc};
 
-use opentelemetry::trace::FutureExt;
+use qcs_dependencies_client::opentelemetry::trace::FutureExt;
 use tokio::sync::Mutex;
 
 use pyo3::prelude::*;

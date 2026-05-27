@@ -202,8 +202,8 @@ mod mock_qcs {
     }
 
     pub(crate) async fn run() {
-        let isa = warp::path(QPU_ID)
-            .and(warp::path("instructionSetArchitecture"))
+        let isa = warp::path(QPU_ID.to_string())
+            .and(warp::path("instructionSetArchitecture".to_string()))
             .and(warp::get())
             .map(|| {
                 let isa = std::fs::read_to_string("tests/aspen_9_isa.json")
@@ -214,8 +214,8 @@ mod mock_qcs {
             });
 
         use std::sync::atomic::Ordering::SeqCst;
-        let default_endpoint = warp::path(QPU_ID)
-            .and(warp::path("endpoints:getDefault"))
+        let default_endpoint = warp::path(QPU_ID.to_string())
+            .and(warp::path("endpoints:getDefault".to_string()))
             .and(warp::get())
             .map(|| {
                 DEFAULT_ENDPOINT_CALL_COUNT.fetch_add(1, SeqCst);
@@ -233,13 +233,14 @@ mod mock_qcs {
                 warp::reply::json(&endpoint)
             });
 
-        let accessors = warp::path(QPU_ID)
-            .and(warp::path("accessors"))
+        let accessors = warp::path(QPU_ID.to_string())
+            .and(warp::path("accessors".to_string()))
             .and(warp::get())
             .map(|| {
                 ACCESSORS_CALL_COUNT.fetch_add(1, SeqCst);
                 let rsp = ListQuantumProcessorAccessorsResponse {
                     accessors: vec![QuantumProcessorAccessor {
+                        id: None,
                         access_type: QuantumProcessorAccessorType::GatewayV1,
                         live: true,
                         rank: Some(0),
@@ -251,9 +252,9 @@ mod mock_qcs {
             });
 
         let quantum_processors =
-            warp::path("quantumProcessors").and(isa.or(default_endpoint).or(accessors));
+            warp::path("quantumProcessors".to_string()).and(isa.or(default_endpoint).or(accessors));
 
-        warp::serve(warp::path("v1").and(quantum_processors))
+        warp::serve(warp::path("v1".to_string()).and(quantum_processors))
             .run(([127, 0, 0, 1], 8000))
             .await;
     }
@@ -272,14 +273,14 @@ mod translation {
         TranslateQuilToEncryptedControllerJobRequest,
         TranslateQuilToEncryptedControllerJobResponse,
     };
-    use tonic::codec::CompressionEncoding;
-    use tonic::{transport::Server, Request};
-    use tonic::{Response, Status};
+    use qcs_dependencies_client::tonic::codec::CompressionEncoding;
+    use qcs_dependencies_client::tonic::{transport::Server, Request};
+    use qcs_dependencies_client::tonic::{Response, Status};
 
     #[derive(Default, Debug)]
     pub struct TranslationService {}
 
-    #[tonic::async_trait]
+    #[async_trait::async_trait]
     impl Translation for TranslationService {
         async fn translate_quil_to_encrypted_controller_job(
             &self,
@@ -344,12 +345,14 @@ mod qpu {
             GetControllerJobStatusResponse,
         },
     };
-    use tonic::{codec::CompressionEncoding, transport::Server, Request, Response, Status};
+    use qcs_dependencies_client::tonic::{
+        codec::CompressionEncoding, transport::Server, Request, Response, Status,
+    };
 
     #[derive(Default, Debug)]
     pub struct ControllerService {}
 
-    #[tonic::async_trait]
+    #[async_trait::async_trait]
     impl Controller for ControllerService {
         async fn execute_controller_job(
             &self,

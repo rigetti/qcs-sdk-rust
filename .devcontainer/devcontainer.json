@@ -1,0 +1,24 @@
+// For format details, see https://aka.ms/devcontainer.json.
+{
+	"name": "qcs-sdk-rust",
+
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "..",
+		"options": ["--platform=linux/amd64"]
+	},
+
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	"mounts": [
+		"source=${localEnv:HOME},target=/dev-home,type=bind,consistency=cached"
+	],
+
+	"runArgs": ["--platform=linux/amd64"],
+
+	"features": {
+		"ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
+		"ghcr.io/devcontainers-extra/features/protoc:1": {},
+		"ghcr.io/devcontainers-extra/features/poetry:2": {}
+	}
+}

@@ -1,0 +1,9 @@
+/target
+.jj/
+.git/
+.github/
+.venv/
+venv/
+*.dSYM
+*.o
+*.dylib

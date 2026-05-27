@@ -41,7 +41,6 @@ pub async fn get_isa(
     quantum_processor_id: &str,
     client: &Qcs,
 ) -> Result<InstructionSetArchitecture, GetIsaError> {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         "getting instruction set architecture for {}",
         quantum_processor_id
@@ -73,7 +72,6 @@ pub async fn list_quantum_processors(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<Vec<String>, ListQuantumProcessorsError> {
-    #[cfg(feature = "tracing")]
     tracing::debug!("listing quantum processors");
 
     let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);
@@ -125,7 +123,6 @@ pub async fn list_isas(
     client: &Qcs,
     timeout: Option<Duration>,
 ) -> Result<Vec<String>, ListISAsError> {
-    #[cfg(feature = "tracing")]
     tracing::debug!("listing instruction set architectures");
 
     let timeout = timeout.unwrap_or(DEFAULT_HTTP_API_TIMEOUT);

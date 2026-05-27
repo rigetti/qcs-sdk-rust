@@ -4,10 +4,10 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use futures_util::TryFutureExt;
-use opentelemetry::trace::FutureExt;
-use prost::Message;
 use pyo3::prelude::*;
 use pyo3::types::PyBytes;
+use qcs_dependencies_client::opentelemetry::trace::FutureExt;
+use qcs_dependencies_client::prost::Message;
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]

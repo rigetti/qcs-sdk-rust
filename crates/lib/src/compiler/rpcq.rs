@@ -154,14 +154,13 @@ impl Client {
 }
 
 impl quilc::Client for Client {
-    #[cfg_attr(feature = "tracing", tracing::instrument(level = "trace"))]
+    #[tracing::instrument(level = "trace")]
     fn compile_program(
         &self,
         quil: &str,
         isa: quilc::TargetDevice,
         options: quilc::CompilerOpts,
     ) -> Result<quilc::CompilationResult, quilc::Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!(compiler_options=?options, "compiling quil program with quilc (RPCQ)",);
         let params = quilc::QuilcParams::new(quil, isa).with_protoquil(options.protoquil);
         let request = RPCRequest::new("quil_to_native_quil", &params).with_timeout(options.timeout);
@@ -175,7 +174,6 @@ impl quilc::Client for Client {
     }
 
     fn get_version_info(&self) -> Result<String, quilc::Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!("requesting quilc version information");
 
         // todo check this hashmap type
@@ -191,7 +189,6 @@ impl quilc::Client for Client {
         &self,
         request: quilc::ConjugateByCliffordRequest,
     ) -> Result<quilc::ConjugatePauliByCliffordResponse, quilc::Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!("requesting quilc conjugate_pauli_by_clifford");
 
         let request: quilc::ConjugatePauliByCliffordRequest = request.into();
@@ -206,7 +203,6 @@ impl quilc::Client for Client {
         &self,
         request: quilc::RandomizedBenchmarkingRequest,
     ) -> Result<quilc::GenerateRandomizedBenchmarkingSequenceResponse, quilc::Error> {
-        #[cfg(feature = "tracing")]
         tracing::debug!("requesting quilc generate_randomized_benchmarking_sequence");
 
         let request: quilc::GenerateRandomizedBenchmarkingSequenceRequest = request.into();

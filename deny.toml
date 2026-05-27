@@ -22,15 +22,15 @@
 # this list would mean the nix crate, as well as any of its exclusive
 # dependencies not shared by any other crates, would be ignored, as the target
 # list here is effectively saying which targets you are building for.
+# These are all supported targets for this crate.
 targets = [
-    # The triple can be any string, but only the target triples built in to
-    # rustc (as of 1.40) can be checked against actual config expressions
-    #"x86_64-unknown-linux-musl",
-    # You can also specify which target_features you promise are enabled for a
-    # particular target. target_features are currently not validated against
-    # the actual valid features supported by the target architecture.
-    #{ triple = "wasm32-unknown-unknown", features = ["atomics"] },
+    "aarch64-apple-darwin",
+    "x86_64-apple-darwin",
+    "aarch64-unknown-linux-musl",
+    "x86_64-unknown-linux-musl",
+    "x86_64-pc-windows-msvc",
 ]
+exclude-dev = true
 # When creating the dependency graph used as the source of truth when checks are
 # executed, this field can be used to prune crates from the graph, removing them
 # from the view of cargo-deny. This is an extremely heavy hammer, as if a crate
@@ -67,7 +67,6 @@ ignore = [
     { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
     { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
-    { id = "RUSTSEC-2025-0134", reason = "Upgrade path for rustls-pemfile requires hyper-proxy2 update" },
     # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
     # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
     # We'll ignore it for now, since `pyo3-stub-gen` is effectively a build-time dependency anyway.
@@ -79,6 +78,8 @@ ignore = [
     { id = "RUSTSEC-2025-0100", reason = "rust-unic is unmaintained, but a transitive dependency of pyo3-stub-gen" },
 ]
 yanked = "deny"
+unused-ignored-advisory = "deny"
+
 # If this is true, then cargo deny will use the git executable to fetch advisory database.
 # If this is false, then it uses a built-in git library.
 # Setting this to true can be helpful if you have special authentication requirements that cargo-deny does not support.
@@ -102,7 +103,6 @@ allow = [
     "CDLA-Permissive-2.0",
     "ISC",
     "MIT",
-    "OpenSSL",
     "Unicode-3.0",
     "Unicode-DFS-2016",
     "Zlib",
@@ -177,19 +177,30 @@ allow = [
 ]
 # List of crates to deny
 deny = [
-    # Multiple versions of these crates (and possibly others?) are known to cause
-    # compilation and subtle unit test failures. We deny multiple versions to make
-    # the cause of those failures more explicit. If the deny check fails, perhaps,
-    # because a dependency depends on one of these crates that do not affect the
-    # APIs used in this workspace, then we can disable the deny check if, otherwise,
-    # there's no trivial solution.
+    { crate = "qcs-dependencies-client", deny-multiple-versions = true },
+    { crate = "http", deny-multiple-versions = true },
     { crate = "opentelemetry", deny-multiple-versions = true },
+    { crate = "opentelemetry-http", deny-multiple-versions = true },
+    { crate = "opentelemetry-otlp", deny-multiple-versions = true },
     { crate = "opentelemetry_sdk", deny-multiple-versions = true },
+    { crate = "pbjson", deny-multiple-versions = true },
+    { crate = "pbjson-types", deny-multiple-versions = true },
+    { crate = "poem", deny-multiple-versions = true },
+    { crate = "poem-openapi", deny-multiple-versions = true },
+    { crate = "prost", deny-multiple-versions = true },
+    { crate = "prost-types", deny-multiple-versions = true },
+    { crate = "reqwest", deny-multiple-versions = true },
+    { crate = "reqwest-middleware", deny-multiple-versions = true },
+    { crate = "reqwest-tracing", deny-multiple-versions = true },
+    { crate = "sentry-tower", deny-multiple-versions = true },
     { crate = "tonic", deny-multiple-versions = true },
+    { crate = "tonic-health", deny-multiple-versions = true },
+    { crate = "tonic-prost", deny-multiple-versions = true },
+    { crate = "tonic-web", deny-multiple-versions = true },
     { crate = "tower", deny-multiple-versions = true },
-    { crate = "tracing", deny-multiple-versions = true },
+    { crate = "tower-http", deny-multiple-versions = true },
+    { crate = "tracing-core", deny-multiple-versions = true },
     { crate = "tracing-opentelemetry", deny-multiple-versions = true },
-    { crate = "tracing-subscriber", deny-multiple-versions = true },
 ]
 
 # Certain crates/versions that will be skipped when doing duplicate detection.
@@ -202,13 +213,12 @@ skip = [
 # dependencies starting at the specified crate, up to a certain depth, which is
 # by default infinite.
 skip-tree = [
-    #"ansi_term@0.11.0", # will be skipped along with _all_ of its direct and transitive dependencies
-    #{ crate = "ansi_term@0.11.0", depth = 20 },
-    { crate = "toml", depth = 20 },
-    { crate = "warp", depth = 20 },             # Only used for development
-    { crate = "hermit-abi", depth = 20 },       # Only used for development
-    { crate = "itertools", depth = 20 },        # `quil-rs` and various transitive dependencies depend on different versions
-    { crate = "hashbrown", depth = 20 },        # `indexmap` and `cached` depend on different versions
+    { crate = "toml" },
+    { crate = "warp" },             # Only used for development
+    { crate = "hermit-abi" },       # Only used for development
+    { crate = "itertools" },        # `quil-rs` and various transitive dependencies depend on different versions
+    { crate = "hashbrown" },        # `indexmap` and `cached` depend on different versions
+    { crate = "oauth2" }            # uses a different version of `reqwest`
 ]
 
 [[bans.features]]

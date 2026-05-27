@@ -201,7 +201,6 @@ impl<'executable> Executable<'executable, '_> {
         S: Into<Cow<'executable, str>>,
     {
         let register = register.into();
-        #[cfg(feature = "tracing")]
         tracing::trace!("reading from register {:?}", register);
         let mut readouts = self.readout_memory_region_names.take().unwrap_or_default();
         readouts.push(register);
@@ -276,7 +275,6 @@ impl<'executable> Executable<'executable, '_> {
     ) -> &mut Self {
         let param_name = param_name.into();
 
-        #[cfg(feature = "tracing")]
         tracing::trace!("setting parameter {}[{}] to {}", param_name, index, value);
 
         let mut values = self
@@ -367,7 +365,6 @@ impl Executable<'_, '_> {
     ///
     /// See [`Error`].
     pub async fn execute_on_qvm<V: qvm::Client + ?Sized>(&mut self, client: &V) -> ExecutionResult {
-        #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots = %self.shots,
             "running Executable on QVM",
@@ -507,7 +504,6 @@ impl<'execution> Executable<'_, 'execution> {
     {
         let quantum_processor_id = quantum_processor_id.into();
 
-        #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots = %self.shots,
             %quantum_processor_id,
@@ -550,7 +546,6 @@ impl<'execution> Executable<'_, 'execution> {
     {
         let quantum_processor_id = quantum_processor_id.into();
 
-        #[cfg(feature = "tracing")]
         tracing::debug!(
             num_shots = %self.shots,
             %quantum_processor_id,

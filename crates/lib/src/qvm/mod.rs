@@ -155,7 +155,6 @@ pub async fn run<C: Client + Send + Sync + ?Sized>(
     client: &C,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
-    #[cfg(feature = "tracing")]
     tracing::debug!("parsing a program to be executed on the qvm");
     let program = Program::from_str(quil).map_err(Error::Parsing)?;
     run_program(
@@ -185,7 +184,6 @@ pub async fn run_program<C: Client + ?Sized>(
     client: &C,
     options: &QvmOptions,
 ) -> Result<QvmResultData, Error> {
-    #[cfg(feature = "tracing")]
     tracing::debug!(
         %shots,
         ?addresses,
@@ -320,7 +318,7 @@ pub enum Error {
         /// The URL of the QVM that we tried to communicate with.
         qvm_url: String,
         /// The error that occurred when trying to communicate with the QVM.
-        source: reqwest::Error,
+        source: qcs_dependencies_client::reqwest::Error,
     },
     /// Returned when the QVM returns an error.
     #[error("QVM reported a problem running your program: {message}")]
@@ -330,7 +328,7 @@ pub enum Error {
     },
     /// Returned when the client fails to make the request.
     #[error("The client failed to make the request: {0}")]
-    Client(#[from] reqwest::Error),
+    Client(#[from] qcs_dependencies_client::reqwest::Error),
 }
 
 #[cfg(test)]
