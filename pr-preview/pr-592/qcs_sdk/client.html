@@ -47,6 +47,9 @@
                                 <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
@@ -57,9 +60,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                 </ul>
 
@@ -119,10 +119,10 @@
                     <a class="class" href="#SecretRefreshToken">SecretRefreshToken</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#SecretRefreshToken.secret">secret</a>
+                                <a class="variable" href="#SecretRefreshToken.is_empty">is_empty</a>
                         </li>
                         <li>
-                                <a class="variable" href="#SecretRefreshToken.is_empty">is_empty</a>
+                                <a class="variable" href="#SecretRefreshToken.secret">secret</a>
                         </li>
                 </ul>
 
@@ -322,6 +322,19 @@ for more details.</p>
 
 
                             </div>
+                            <div id="QCSClient.api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
                             <div id="QCSClient.grpc_api_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">grpc_api_url</span>
@@ -370,19 +383,6 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.quilc_url"></a>
     
             <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS API.</p>
 </div>
 
 
@@ -613,19 +613,6 @@ The scope <code>openid</code> is always requested, even if not present in this l
 </div>
 
 
-                            <div id="SecretRefreshToken.secret" class="classattr">
-                                <div class="attr variable">
-            <span class="name">secret</span>
-
-        
-    </div>
-    <a class="headerlink" href="#SecretRefreshToken.secret"></a>
-    
-            <div class="docstring"><p>Get the inner secret contents, which removes the protection against accidentally exposing the value.</p>
-</div>
-
-
-                            </div>
                             <div id="SecretRefreshToken.is_empty" class="classattr">
                                 <div class="attr variable">
             <span class="name">is_empty</span>
@@ -635,6 +622,19 @@ The scope <code>openid</code> is always requested, even if not present in this l
     <a class="headerlink" href="#SecretRefreshToken.is_empty"></a>
     
             <div class="docstring"><p>Check if the secret is an empty value</p>
+</div>
+
+
+                            </div>
+                            <div id="SecretRefreshToken.secret" class="classattr">
+                                <div class="attr variable">
+            <span class="name">secret</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SecretRefreshToken.secret"></a>
+    
+            <div class="docstring"><p>Get the inner secret contents, which removes the protection against accidentally exposing the value.</p>
 </div>
 
 
