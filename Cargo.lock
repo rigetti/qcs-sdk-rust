@@ -613,9 +613,9 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-epoch"
-version = "0.9.18"
+version = "0.9.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5b82ac4a3c2ca9c3460964f020e1402edd5753411d7737aa39c3714ad1b5420e"
+checksum = "2d6914041f254d6e9176c01941b21115dcfb7089e55135a35411081bd106ef3f"
 dependencies = [
  "crossbeam-utils",
 ]
@@ -3155,7 +3155,7 @@ checksum = "3d7d1e83566a3d349671a417dbde37b76fde16a6f5893de038dc897db071c46c"
 dependencies = [
  "pyo3",
  "pyo3-opentelemetry-macros",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
 ]
 
 [[package]]
@@ -3215,7 +3215,7 @@ dependencies = [
  "futures-core",
  "pyo3",
  "pyo3-async-runtimes",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
  "rigetti-pyo3",
  "serde",
  "serde_json",
@@ -3274,7 +3274,7 @@ dependencies = [
  "qcs-api-client-common",
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.4.1",
  "quil-rs",
  "regex",
  "rigetti-pyo3",
@@ -3319,7 +3319,7 @@ dependencies = [
  "pyo3-async-runtimes",
  "pyo3-build-config",
  "pyo3-stub-gen",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
  "rigetti-pyo3",
  "serde",
  "serde_json",
@@ -3350,7 +3350,7 @@ dependencies = [
  "hyper-socks2",
  "hyper-util",
  "qcs-api-client-common",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
  "rigetti-hyper-proxy",
  "serde",
  "thiserror 2.0.18",
@@ -3370,7 +3370,7 @@ dependencies = [
  "anyhow",
  "http",
  "qcs-api-client-common",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
  "serde",
  "serde_json",
  "serde_path_to_error",
@@ -3410,6 +3410,31 @@ dependencies = [
  "tonic-prost-build",
  "tower",
  "tower-http 0.6.8",
+ "tracing-opentelemetry",
+]
+
+[[package]]
+name = "qcs-dependencies-client"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cda80cb6e14f8a08cd4c0e5e3b84aba22c0069e85421429c2375471bd4dc0bb"
+dependencies = [
+ "http",
+ "opentelemetry",
+ "opentelemetry-http",
+ "opentelemetry-otlp",
+ "opentelemetry-proto",
+ "opentelemetry_sdk",
+ "pbjson",
+ "pbjson-types",
+ "prost",
+ "prost-types",
+ "reqwest 0.13.3",
+ "reqwest-middleware",
+ "reqwest-tracing",
+ "tonic",
+ "tonic-prost",
+ "tower",
  "tracing-opentelemetry",
 ]
 
@@ -3838,7 +3863,7 @@ dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
  "pyo3-stub-gen",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.3.2",
  "tokio",
 ]
 

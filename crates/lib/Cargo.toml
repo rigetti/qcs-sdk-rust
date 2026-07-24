@@ -64,7 +64,7 @@ lazy_static = { workspace = true }
 ndarray.workspace = true
 num = { workspace = true, features = ["serde"] }
 optipy.workspace = true
-qcs-dependencies-client = { workspace = true, features = ["grpc", "http"] }
+qcs-dependencies-client = { workspace = true, features = ["grpc", "openapi"] }
 quil-rs.workspace = true
 rmp-serde = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
