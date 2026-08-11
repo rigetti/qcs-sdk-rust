@@ -24,10 +24,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
         uses: taiki-e/install-action@cargo-make
-      - uses: syphar/restore-virtualenv@v1
 
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: crates/lib/uv.lock
 
       - name: Build qcs-sdk-python documentation
         run: cargo make --cwd crates/lib document-python-package

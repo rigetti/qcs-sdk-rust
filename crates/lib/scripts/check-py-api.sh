@@ -3,7 +3,7 @@
 # Exits with status 1 if `griffe` says it's a breaking change, but `knope` doesn't know that.
 # Exits with status 0 if they both or only `knope` reports this is a breaking change.
 #
-# This uses `poetry` to run `griffe`, and must be executed from the project's root directory.
+# This uses `uv` to run `griffe`, and must be executed from the project's root directory.
 
 set -u
 
@@ -28,7 +28,7 @@ PY_PACKAGE="qcs_sdk"
 KNOPE_PACKAGE="crates/lib"
 
 # Check if `griffe` says this is a breaking change.
-poetry run -P crates/lib -- \
+uv run --active --project crates/lib -- \
   griffe check \
     --search crates/python \
     --search crates/lib/python \

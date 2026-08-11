@@ -1,6 +1,15 @@
 [env]
 RUST_BACKTRACE = 0
 CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now
+# Python tooling follows the `uv` conventions shared across QCS repos. This project is public
+# and so cannot extend `qcs-infrastructure`'s `pytasks.toml`; `scripts/ensure-venv` is vendored
+# from that project instead, and the tasks below mirror its recipes.
+PYTHON_VERSION = { value = "3.13", condition = { env_not_set = ["PYTHON_VERSION"] } }
+# One virtual environment for the whole workspace, so every task shares it. Exporting
+# `VIRTUAL_ENV` is what lets `uv run --active` find it without sourcing an activate script.
+VENV_PATH = { value = "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/.venv", condition = { env_not_set = ["VENV_PATH"] } }
+VIRTUAL_ENV = "${VENV_PATH}"
+UV_CACHE_DIR = { value = "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/.uv-cache", condition = { env_not_set = ["UV_CACHE_DIR", "CI"] } }
 
 [tasks.pre-test]
 command = "docker"
@@ -47,13 +56,18 @@ dependencies = ["deny", "lint", "check", "test-flow"]
 # ----
 
 [tasks.install-python-deps]
-description = "Install python dependencies using poetry."
-command = "poetry"
-args = ["install", "--with", "dev", "--no-root"]
+description = "Ensure a virtual environment exists, and sync Python dependencies with uv."
+script_runner = "bash"
+script = '''
+. "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/scripts/ensure-venv"
+# Sanity-check, so that a stale venv elsewhere in the tree can't be picked up silently.
+if [ "$(readlink -f "$VIRTUAL_ENV")" != "$(readlink -f "$VENV_PATH")" ]; then
+    echo "Error: virtual env path mismatch: VIRTUAL_ENV=${VIRTUAL_ENV:-<unset>} vs VENV_PATH=${VENV_PATH}" >&2
+    exit 1
+fi
+uv sync --active --group dev
+'''
 
-# NOTE: if using `uv`, you may need to set `PYTHONHOME` to the root of the virtual environment:
-#
-#   export PYTHONHOME=$(python3 -c "import sys; print(sys.base_prefix)")
 [tasks.generate-stubs]
 description = "Generate Python stub files."
 command = "cargo"
@@ -83,8 +97,8 @@ echo "Generated Python files are up to date."
 [tasks.package-python]
 description = "Build a release version of the Python package to the active virtual environment."
 dependencies = ["install-python-deps", "generate-stubs"]
-command = "poetry"
-args = ["run", "maturin", "build", "--release"]
+command = "uv"
+args = ["run", "--active", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
 # `generate-stubs` also writes the package's `__init__.py` files, which are what expose the
@@ -92,8 +106,8 @@ args = ["run", "maturin", "build", "--release"]
 # input now, not just a convenience for type checkers.
 description = "Build the Python package and install to the active virtual environment."
 dependencies = ["install-python-deps", "generate-stubs"]
-command = "poetry"
-args = ["run", "maturin", "develop"]
+command = "uv"
+args = ["run", "--active", "maturin", "develop", "--uv"]
 
 [tasks.install-python-package-with-stubs]
 description = "Deprecated alias of `install-python-package`, which now always generates stubs."
@@ -102,8 +116,8 @@ dependencies = ["install-python-package"]
 [tasks.pytest]
 description = "Run Python tests."
 dependencies = ["install-python-package"]
-command = "poetry"
-args = ["run", "pytest"]
+command = "uv"
+args = ["run", "--active", "pytest"]
 
 [tasks.pytest-flow]
 dependencies = [
@@ -116,10 +130,10 @@ dependencies = [
 [tasks.stubtest]
 description = "Check Python stubfiles."
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
+command = "uv"
 cwd = "python"
 args = [
-    "run",
+    "run", "--active",
     "stubtest",
     "--allowlist",
     "stubtest-allowlist",
@@ -138,14 +152,14 @@ dependencies = ["stubtest"]
 [tasks.lint-python-package]
 description = "Find errors in Python-related Rust code."
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
+command = "uv"
+args = ["run", "--active", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
 description = "Print the Python package layout as defined within Rust code."
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
+command = "uv"
+args = ["run", "--active", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
 [tasks.test-python-package]
 description = "Run all Python-related tests."
@@ -172,9 +186,9 @@ script = { file = "./scripts/check-py-api.sh" }
 [tasks.document-python-package]
 description = "Generate Python package documentation."
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
+command = "uv"
 args = [
-    "run",
+    "run", "--active",
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
@@ -186,23 +200,26 @@ args = [
 
 [tasks.format-tracing-subscriber]
 dependencies = ["install-python-deps"]
-command = "poetry"
-args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
+command = "uv"
+args = ["run", "--active", "black", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
+# Only hand-written Python. Everything under `python/qcs_sdk` is generated — reformatting it
+# makes `check-generated-python-files` fail until the next `generate-stubs` run.
+# (`tests` is the Rust integration-test directory and contains no Python.)
 dependencies = ["install-python-deps"]
-command = "poetry"
-args = ["run", "black", "python/qcs_sdk", "tests"]
+command = "uv"
+args = ["run", "--active", "black", "tests_py", "scripts"]
 
 [tasks.test-session]
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "pytest", "tests_py", "--with-qcs-session"]
+command = "uv"
+args = ["run", "--active", "pytest", "tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
 dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
+command = "uv"
+args = ["run", "--active", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]

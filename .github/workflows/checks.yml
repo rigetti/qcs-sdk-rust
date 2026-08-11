@@ -25,7 +25,6 @@ jobs:
       - name: Install libquil
         run: |
           sudo ./scripts/install-libquil
-      - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -41,7 +40,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - uses: abatilo/actions-poetry@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: crates/lib/uv.lock
 
       - name: Run CI Flow
         env:
@@ -68,7 +71,6 @@ jobs:
       - name: Install libquil
         run: |
           sudo ./scripts/install-libquil
-      - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -84,7 +86,11 @@ jobs:
         with:
           python-version: '3.13'
 
-      - uses: abatilo/actions-poetry@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: crates/lib/uv.lock
 
       # Also a dependency of `test-python-package`, but run first so that stale generated
       # files are reported before the longer test run, and as a named step of their own.

@@ -56,25 +56,30 @@ include = '\.pyi?$'
 # necessarily the case for a pure Rust pyo3 module, so disabling it.
 reportMissingModuleSource = false
 
-[tool.poetry]
-package-mode = false
+[dependency-groups]
+dev = [
+    "griffe >= 1.14.0, < 2",
+    "black >= 24.8.0",
+    "opentelemetry-sdk == 1.25.0",
+    "pytest >= 8.1.1",
+    "pytest-asyncio >= 0.23.6",
+    "pytest-mock >= 3.14.0",
+    "pytest-sugar >= 1.0.0",
+    "pytest-clarity >= 1.0.1",
+    "syrupy >= 4.0.0",
+    "maturin >= 1.9.4", # TODO coordinate this with .github/workflows/release-python.yml
+    "numpy >= 1.24.1",
+    "pdoc >= 16.0.0",
+    "ruff >= 0.3.5",
+    "mypy >= 1.14.1",
+    "pyo3_linter @ git+https://github.com/rigetti/rigetti-pyo3.git@feat-pyo3-linter#subdirectory=pyo3_linter",
+]
 
-[tool.poetry.group.dev.dependencies]
-griffe = "^1.14.0"
-black = ">=24.8.0"
-opentelemetry-sdk = "1.25.0"
-pytest = ">=8.1.1"
-pytest-asyncio = ">=0.23.6"
-pytest-mock = ">=3.14.0"
-pytest-sugar = ">=1.0.0"
-pytest-clarity = ">=1.0.1"
-syrupy = ">=4.0.0"
-maturin = ">=1.9.4" # TODO coordinate this with .github/workflows/release-python.yml
-numpy = ">=1.24.1"
-pdoc = ">=16.0.0"
-ruff = ">=0.3.5"
-mypy = ">=1.14.1"
-pyo3_linter = { git = "https://github.com/rigetti/rigetti-pyo3.git", branch = "feat-pyo3-linter", subdirectory = "pyo3_linter" }
+[tool.uv]
+# The extension module is installed by `maturin develop` (see the `install-python-package`
+# task), not by `uv sync` — building it twice would mean two full Rust builds. This is the
+# equivalent of the `poetry install --no-root` this project used previously.
+package = false
 
 [tool.pytest.ini_options]
 addopts = [
