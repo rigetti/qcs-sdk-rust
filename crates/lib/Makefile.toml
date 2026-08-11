@@ -60,6 +60,26 @@ command = "cargo"
 args = ["run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
 install_crate = false
 
+[tasks.check-generated-python-files]
+# The generated `__init__.py` files are what expose the compiled `qcs_sdk._qcs_sdk` modules
+# under their public `qcs_sdk` names, and release wheels are built straight from the committed
+# tree (see `.github/workflows/release-python.yml`, which does not run `cargo make`). So if
+# they go stale, a release can silently omit a class — or a whole submodule — with nothing else
+# to catch it.
+description = "Check that the committed stubs and `__init__.py` files are up to date."
+dependencies = ["generate-stubs"]
+cwd = "python"
+script = '''
+if [ -n "$(git status --porcelain .)" ]; then
+    echo "error: the generated Python files are out of date." >&2
+    echo "Run 'cargo make --cwd crates/lib generate-stubs' and commit the result:" >&2
+    git status --porcelain . >&2
+    git --no-pager diff . >&2
+    exit 1
+fi
+echo "Generated Python files are up to date."
+'''
+
 [tasks.package-python]
 description = "Build a release version of the Python package to the active virtual environment."
 dependencies = ["install-python-deps", "generate-stubs"]
@@ -67,14 +87,17 @@ command = "poetry"
 args = ["run", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
+# `generate-stubs` also writes the package's `__init__.py` files, which are what expose the
+# compiled `qcs_sdk._qcs_sdk` modules under their public `qcs_sdk` names — so it is a build
+# input now, not just a convenience for type checkers.
 description = "Build the Python package and install to the active virtual environment."
-dependencies = ["install-python-deps"]
+dependencies = ["install-python-deps", "generate-stubs"]
 command = "poetry"
 args = ["run", "maturin", "develop"]
 
 [tasks.install-python-package-with-stubs]
-description = "Install the Python package with up-to-date stubs (not needed for testing)."
-dependencies = ["generate-stubs", "install-python-package"]
+description = "Deprecated alias of `install-python-package`, which now always generates stubs."
+dependencies = ["install-python-package"]
 
 [tasks.pytest]
 description = "Run Python tests."
@@ -128,6 +151,7 @@ args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-
 description = "Run all Python-related tests."
 dependencies = [
     "lint-python-package",
+    "check-generated-python-files",
     "check-python-api",
     "stubtest-flow",
     "pytest-flow",
@@ -154,7 +178,7 @@ args = [
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
-    "!qcs_sdk.qcs_sdk",
+    "!qcs_sdk._qcs_sdk",
     "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg",
 ]
 

@@ -58,7 +58,7 @@ pub enum QvmClient {
 /// Client used to communicate with QVM.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "QVMClient", module = "qcs_sdk.qvm")]
+#[pyclass(name = "QVMClient", module = "qcs_sdk._qcs_sdk.qvm", from_py_object)]
 pub struct PyQvmClient {
     inner: QvmClient,
 }
@@ -66,7 +66,12 @@ pub struct PyQvmClient {
 /// Encapsulates raw data returned from the QVM after executing a program.
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyo3::pyclass(name = "RawQVMReadoutData", module = "qcs_sdk.qvm", frozen, get_all)]
+#[pyo3::pyclass(
+    name = "RawQVMReadoutData",
+    module = "qcs_sdk._qcs_sdk.qvm",
+    frozen,
+    get_all
+)]
 pub struct RawQvmReadoutData {
     /// The mapping of register names (ie. "ro") to a 2-d list containing the
     /// values for that register.
@@ -386,7 +391,7 @@ impl WavefunctionRequest {
 }
 
 py_function_sync_async! {
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm"))]
     #[pyfunction(signature = (
         quil, shots, addresses, params, client,
         measurement_noise=None, gate_noise=None, rng_seed=None, options=None
@@ -479,7 +484,7 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (client, options = None))]
         async fn get_version_info(client: PyQvmClient, options: Option<QvmOptions>) -> PyResult<String> {
@@ -491,7 +496,7 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
@@ -509,7 +514,7 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
@@ -526,7 +531,7 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]
@@ -543,7 +548,7 @@ mod api {
     }
 
     py_function_sync_async! {
-        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qvm.api"))]
+        #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qvm.api"))]
         #[pyfunction]
         #[pyo3(signature = (request, client, options = None))]
         #[tracing::instrument(skip_all)]

@@ -55,7 +55,7 @@ py_function_sync_async! {
     ///
     /// :raises `LoadClientError`: If there is an issue loading the QCS Client configuration.
     /// :raises `TranslationError`: If there was a problem fetching Quil-T calibrations.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None, timeout = None))]
     #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
@@ -88,10 +88,11 @@ pub enum TranslationError {
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
 #[pyclass(
-    module = "qcs_sdk.qpu.translation",
+    module = "qcs_sdk._qcs_sdk.qpu.translation",
     name = "TranslationBackend",
     rename_all = "SCREAMING_SNAKE_CASE",
-    eq
+    eq,
+    from_py_object
 )]
 pub enum PyTranslationBackend {
     /// The first-generation translation backend available on QCS since 2018.
@@ -219,7 +220,12 @@ impl TranslationOptions {
 /// Options here are specially authorized and are not generally available to the client.
 #[derive(Clone, Copy, Default, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "QCtrl", module = "qcs_sdk.qpu.translation", frozen)]
+#[pyclass(
+    name = "QCtrl",
+    module = "qcs_sdk._qcs_sdk.qpu.translation",
+    frozen,
+    from_py_object
+)]
 pub struct PyQCtrl(translation_options::QCtrl);
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
@@ -243,7 +249,12 @@ impl PyQCtrl {
 /// Options here are specially authorized and are not generally available to the client.
 #[derive(Clone, Default, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "Riverlane", module = "qcs_sdk.qpu.translation", frozen)]
+#[pyclass(
+    name = "Riverlane",
+    module = "qcs_sdk._qcs_sdk.qpu.translation",
+    frozen,
+    from_py_object
+)]
 pub struct PyRiverlane(Riverlane);
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
@@ -266,7 +277,7 @@ impl PyRiverlane {
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[pyclass(
-    module = "qcs_sdk.qpu.translation",
+    module = "qcs_sdk._qcs_sdk.qpu.translation",
     name = "TranslationResult",
     get_all,
     frozen
@@ -290,7 +301,7 @@ py_function_sync_async! {
     ///
     /// :raises `LoadClientError`: If there is an issue loading the QCS Client configuration.
     /// :raises `TranslationError`: If the `native_quil` program could not be translated.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.translation"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.translation"))]
     #[pyfunction]
     #[pyo3(signature = (native_quil, num_shots, quantum_processor_id, client = None, translation_options = None))]
     #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]

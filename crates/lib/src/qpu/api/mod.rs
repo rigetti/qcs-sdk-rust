@@ -377,8 +377,8 @@ pub type QpuConnectionOptionsBuilder = ExecutionOptionsBuilder;
 )]
 #[cfg_attr(
     feature = "python",
-    builder_struct_attr(pyo3::pyclass(module = "qcs_sdk.qpu.api")),
-    pyo3::pyclass(module = "qcs_sdk.qpu.api", eq)
+    builder_struct_attr(pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu.api", from_py_object)),
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu.api", eq, from_py_object)
 )]
 pub struct ExecutionOptions {
     #[pyo3(get)]
@@ -421,9 +421,14 @@ impl Eq for ExecutionOptions {}
     feature = "python",
     builder_struct_attr(pyo3::pyclass(
         name = "APIExecutionOptionsBuilder",
-        module = "qcs_sdk.qpu.api"
+        module = "qcs_sdk._qcs_sdk.qpu.api",
+        from_py_object
     )),
-    pyo3::pyclass(name = "APIExecutionOptions", module = "qcs_sdk.qpu.api")
+    pyo3::pyclass(
+        name = "APIExecutionOptions",
+        module = "qcs_sdk._qcs_sdk.qpu.api",
+        from_py_object
+    )
 )]
 #[allow(clippy::module_name_repetitions)]
 pub struct ApiExecutionOptions {
@@ -531,7 +536,10 @@ impl ExecutionOptions {
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
 #[derive(Clone, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.api", eq))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu.api", eq, from_py_object)
+)]
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
     Gateway(),

@@ -80,7 +80,14 @@ pub type RandomResult<T> = Result<T, Error>;
 /// sub-regions from a source array of real values to a destination array.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu.experimental.random",
+        frozen,
+        from_py_object
+    )
+)]
 pub struct ChooseRandomRealSubRegions {
     destination_memory_region_name: String,
     source_memory_region_name: String,
@@ -162,7 +169,10 @@ impl ChooseRandomRealSubRegions {
 }
 
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
-#[cfg_attr(all(feature = "python", not(feature = "stubs")), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(
+    all(feature = "python", not(feature = "stubs")),
+    optipy::strip_pyo3(only_stubs)
+)]
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[cfg_attr(feature = "python", pyo3::pymethods)]
 impl ChooseRandomRealSubRegions {
@@ -238,7 +248,14 @@ impl TryFrom<ChooseRandomRealSubRegions> for Call {
 /// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu.experimental.random",
+        frozen,
+        from_py_object
+    )
+)]
 pub struct PrngSeedValue {
     u64_value: u64,
     f64_value: f64,
@@ -291,7 +308,7 @@ fn lfsr_next(seed: u64, taps: &[u32]) -> u64 {
 #[must_use]
 #[cfg_attr(
     feature = "stubs",
-    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+    gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.experimental.random")
 )]
 #[cfg_attr(feature = "python", pyo3::pyfunction)]
 pub fn lfsr_v1_next(seed: PrngSeedValue) -> u64 {
@@ -353,7 +370,7 @@ fn prng_value_to_sub_region_index(value: u64, sub_region_count: u8) -> u8 {
 #[must_use]
 #[cfg_attr(
     feature = "stubs",
-    gen_stub_pyfunction(module = "qcs_sdk.qpu.experimental.random")
+    gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.experimental.random")
 )]
 #[cfg_attr(feature = "python", pyo3::pyfunction)]
 pub fn choose_random_real_sub_region_indices(
