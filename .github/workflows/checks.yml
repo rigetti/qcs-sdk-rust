@@ -86,5 +86,10 @@ jobs:
 
       - uses: abatilo/actions-poetry@v4
 
+      # Also a dependency of `test-python-package`, but run first so that stale generated
+      # files are reported before the longer test run, and as a named step of their own.
+      - name: Check Generated Python Files
+        run: cargo make --cwd crates/lib --makefile Makefile.toml check-generated-python-files
+
       - name: Test Python Package
         run: cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
