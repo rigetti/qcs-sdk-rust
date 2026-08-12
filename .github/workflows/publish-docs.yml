@@ -16,10 +16,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
 
       - uses: Swatinem/rust-cache@v2
       - name: Install cargo-make
@@ -30,6 +26,16 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
+
+      # See the note in checks.yml: libpython has to be discoverable for the cargo builds.
+      - name: Set up Python virtual environment
+        shell: bash
+        run: |
+          . scripts/ensure-venv
+          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
+          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
 
       - name: Build qcs-sdk-python documentation
         run: cargo make --cwd crates/lib document-python-package

@@ -37,14 +37,23 @@ jobs:
       - uses: knope-dev/action@v2.1.0
         with:
           version: 0.21.3
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
+
+      # Rust builds of this crate link against libpython (the `stubs`/`python` features), so
+      # the interpreter and its `LIBDIR` have to be on the environment for every later step —
+      # not just the Python ones. `ensure-venv` exports both; publish them job-wide.
+      - name: Set up Python virtual environment
+        shell: bash
+        run: |
+          . scripts/ensure-venv
+          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
+          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
 
       - name: Run CI Flow
         env:
@@ -82,15 +91,23 @@ jobs:
         with:
           version: 0.21.3
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.13'
-
       - name: Install uv
         uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
+
+      # Rust builds of this crate link against libpython (the `stubs`/`python` features), so
+      # the interpreter and its `LIBDIR` have to be on the environment for every later step —
+      # not just the Python ones. `ensure-venv` exports both; publish them job-wide.
+      - name: Set up Python virtual environment
+        shell: bash
+        run: |
+          . scripts/ensure-venv
+          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
+          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
 
       # Also a dependency of `test-python-package`, but run first so that stale generated
       # files are reported before the longer test run, and as a named step of their own.
