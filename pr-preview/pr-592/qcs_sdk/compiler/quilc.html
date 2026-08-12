@@ -35,10 +35,10 @@
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#CompilationResult.program">program</a>
+                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
                         </li>
                         <li>
-                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
+                                <a class="variable" href="#CompilationResult.program">program</a>
                         </li>
                 </ul>
 
@@ -77,10 +77,10 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                 </ul>
 
@@ -137,13 +137,13 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
@@ -256,19 +256,6 @@
 </div>
 
 
-                            <div id="CompilationResult.program" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program</span>
-
-        
-    </div>
-    <a class="headerlink" href="#CompilationResult.program"></a>
-    
-            <div class="docstring"><p>The compiled program</p>
-</div>
-
-
-                            </div>
                             <div id="CompilationResult.native_quil_metadata" class="classattr">
                                 <div class="attr variable">
             <span class="name">native_quil_metadata</span>
@@ -278,6 +265,19 @@
     <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
     
             <div class="docstring"><p>Metadata about the compiled program</p>
+</div>
+
+
+                            </div>
+                            <div id="CompilationResult.program" class="classattr">
+                                <div class="attr variable">
+            <span class="name">program</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CompilationResult.program"></a>
+    
+            <div class="docstring"><p>The compiled program</p>
 </div>
 
 
@@ -394,19 +394,6 @@
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
-                                <div class="attr variable">
-            <span class="name">phase</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
-    
-            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
                                 <div class="attr variable">
             <span class="name">pauli</span>
@@ -416,6 +403,19 @@
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
     
             <div class="docstring"><p>Description of the encoded Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
+                                <div class="attr variable">
+            <span class="name">phase</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
+    
+            <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
 </div>
 
 
@@ -490,19 +490,6 @@
 </div>
 
 
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
                             <div id="PauliTerm.indices" class="classattr">
                                 <div class="attr variable">
             <span class="name">indices</span>
@@ -512,6 +499,19 @@
     <a class="headerlink" href="#PauliTerm.indices"></a>
     
             <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
 </div>
 
 
@@ -591,6 +591,19 @@
 </div>
 
 
+                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gateset</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
+</div>
+
+
+                            </div>
                             <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
                                 <div class="attr variable">
             <span class="name">interleaver</span>
@@ -613,19 +626,6 @@
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
     
             <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gateset</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
-    
-            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
 </div>
 
 
