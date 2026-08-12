@@ -32,15 +32,6 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="class" href="#CompilerOpts">CompilerOpts</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#CompilerOpts.default">default</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
@@ -53,31 +44,10 @@
 
             </li>
             <li>
-                    <a class="class" href="#NativeQuilMetadata">NativeQuilMetadata</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#TargetDevice">TargetDevice</a>
+                    <a class="class" href="#CompilerOpts">CompilerOpts</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="function" href="#TargetDevice.from_isa">from_isa</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#TargetDevice.from_json">from_json</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#PauliTerm">PauliTerm</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="function" href="#CompilerOpts.default">default</a>
                         </li>
                 </ul>
 
@@ -107,40 +77,40 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                 </ul>
 
             </li>
             <li>
-                    <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
-                        </li>
-                </ul>
-
+                    <a class="variable" href="#DEFAULT_COMPILER_TIMEOUT">DEFAULT_COMPILER_TIMEOUT</a>
             </li>
             <li>
                     <a class="class" href="#GenerateRandomizedBenchmarkingSequenceResponse">GenerateRandomizedBenchmarkingSequenceResponse</a>
                             <ul class="memberlist">
                         <li>
                                 <a class="variable" href="#GenerateRandomizedBenchmarkingSequenceResponse.sequence">sequence</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#NativeQuilMetadata">NativeQuilMetadata</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#PauliTerm">PauliTerm</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                 </ul>
 
@@ -158,11 +128,41 @@
 
             </li>
             <li>
-                    <a class="variable" href="#DEFAULT_COMPILER_TIMEOUT">DEFAULT_COMPILER_TIMEOUT</a>
-            </li>
-            <li>
                     <a class="class" href="#QuilcError">QuilcError</a>
                             <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#TargetDevice">TargetDevice</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#TargetDevice.from_isa">from_isa</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#TargetDevice.from_json">from_json</a>
+                        </li>
                 </ul>
 
             </li>
@@ -171,12 +171,6 @@
             </li>
             <li>
                     <a class="function" href="#compile_program_async">compile_program_async</a>
-            </li>
-            <li>
-                    <a class="function" href="#get_version_info">get_version_info</a>
-            </li>
-            <li>
-                    <a class="function" href="#get_version_info_async">get_version_info_async</a>
             </li>
             <li>
                     <a class="function" href="#conjugate_pauli_by_clifford">conjugate_pauli_by_clifford</a>
@@ -189,6 +183,12 @@
             </li>
             <li>
                     <a class="function" href="#generate_randomized_benchmarking_sequence_async">generate_randomized_benchmarking_sequence_async</a>
+            </li>
+            <li>
+                    <a class="function" href="#get_version_info">get_version_info</a>
+            </li>
+            <li>
+                    <a class="function" href="#get_version_info_async">get_version_info_async</a>
             </li>
     </ul>
 
@@ -207,40 +207,41 @@
 <a href="./../../qcs_sdk.html">qcs_sdk</a><wbr>.<a href="./../compiler.html">compiler</a><wbr>.quilc    </h1>
 
                 
-                
-                
-                
+                        <input id="mod-quilc-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-quilc-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.compiler.quilc</span><span class="w"> </span><span class="kn">import</span> <span class="n">CompilationResult</span><span class="p">,</span> <span class="n">CompilerOpts</span><span class="p">,</span> <span class="n">ConjugateByCliffordRequest</span><span class="p">,</span> <span class="n">ConjugatePauliByCliffordRequest</span><span class="p">,</span> <span class="n">ConjugatePauliByCliffordResponse</span><span class="p">,</span> <span class="n">DEFAULT_COMPILER_TIMEOUT</span><span class="p">,</span> <span class="n">GenerateRandomizedBenchmarkingSequenceResponse</span><span class="p">,</span> <span class="n">NativeQuilMetadata</span><span class="p">,</span> <span class="n">PauliTerm</span><span class="p">,</span> <span class="n">QuilcClient</span><span class="p">,</span> <span class="n">QuilcError</span><span class="p">,</span> <span class="n">RandomizedBenchmarkingRequest</span><span class="p">,</span> <span class="n">TargetDevice</span><span class="p">,</span> <span class="n">compile_program</span><span class="p">,</span> <span class="n">compile_program_async</span><span class="p">,</span> <span class="n">conjugate_pauli_by_clifford</span><span class="p">,</span> <span class="n">conjugate_pauli_by_clifford_async</span><span class="p">,</span> <span class="n">generate_randomized_benchmarking_sequence</span><span class="p">,</span> <span class="n">generate_randomized_benchmarking_sequence_async</span><span class="p">,</span> <span class="n">get_version_info</span><span class="p">,</span> <span class="n">get_version_info_async</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="s2">&quot;CompilationResult&quot;</span><span class="p">,</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="s2">&quot;CompilerOpts&quot;</span><span class="p">,</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="s2">&quot;ConjugateByCliffordRequest&quot;</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;ConjugatePauliByCliffordRequest&quot;</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;ConjugatePauliByCliffordResponse&quot;</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;DEFAULT_COMPILER_TIMEOUT&quot;</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;GenerateRandomizedBenchmarkingSequenceResponse&quot;</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;NativeQuilMetadata&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;PauliTerm&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;QuilcClient&quot;</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;QuilcError&quot;</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;RandomizedBenchmarkingRequest&quot;</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="s2">&quot;TargetDevice&quot;</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="s2">&quot;compile_program&quot;</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="s2">&quot;compile_program_async&quot;</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="s2">&quot;conjugate_pauli_by_clifford&quot;</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="s2">&quot;conjugate_pauli_by_clifford_async&quot;</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="s2">&quot;generate_randomized_benchmarking_sequence&quot;</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="s2">&quot;generate_randomized_benchmarking_sequence_async&quot;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="s2">&quot;get_version_info&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;get_version_info_async&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="p">]</span>
+</span></pre></div>
+
+
             </section>
-                <section id="CompilerOpts">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">CompilerOpts</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#CompilerOpts"></a>
-    
-            <div class="docstring"><p>A set of options that determine the behavior of compiling programs with quilc</p>
-</div>
-
-
-                            <div id="CompilerOpts.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#CompilerOpts.default"></a>
-    
-            <div class="docstring"><p>Create a new instance of <code><a href="#CompilerOpts">CompilerOpts</a></code> with default values.</p>
-</div>
-
-
-                            </div>
-                </section>
                 <section id="CompilationResult">
                     <div class="attr class">
             
@@ -282,111 +283,31 @@
 
                             </div>
                 </section>
-                <section id="NativeQuilMetadata">
+                <section id="CompilerOpts">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">NativeQuilMetadata</span>:
+    <span class="name">CompilerOpts</span>:
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata"></a>
+    <a class="headerlink" href="#CompilerOpts"></a>
     
-            <div class="docstring"><p>Metadata about a program compiled to native quil.</p>
+            <div class="docstring"><p>A set of options that determine the behavior of compiling programs with quilc</p>
 </div>
 
 
-                </section>
-                <section id="TargetDevice">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">TargetDevice</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#TargetDevice"></a>
-    
-            <div class="docstring"><p>Description of a device to compile for.</p>
-</div>
-
-
-                            <div id="TargetDevice.from_isa" class="classattr">
+                            <div id="CompilerOpts.default" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">from_isa</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">isa</span></span><span class="return-annotation">):</span></span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
 
         
     </div>
-    <a class="headerlink" href="#TargetDevice.from_isa"></a>
+    <a class="headerlink" href="#CompilerOpts.default"></a>
     
-            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] based on an [<code>InstructionSetArchitecture</code>].</p>
-
-<h1 id="errors">Errors</h1>
-
-<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the [<code>InstructionSetArchitecture</code>]
-cannot be converted into a format that Quilc understands.</p>
-</div>
-
-
-                            </div>
-                            <div id="TargetDevice.from_json" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">from_json</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">value</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#TargetDevice.from_json"></a>
-    
-            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] from a JSON string.</p>
-
-<h1 id="errors">Errors</h1>
-
-<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the JSON is malformed.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="PauliTerm">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">PauliTerm</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm"></a>
-    
-            <div class="docstring"><p>Pauli Term</p>
-</div>
-
-
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
-                            <div id="PauliTerm.indices" class="classattr">
-                                <div class="attr variable">
-            <span class="name">indices</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.indices"></a>
-    
-            <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+            <div class="docstring"><p>Create a new instance of <code><a href="#CompilerOpts">CompilerOpts</a></code> with default values.</p>
 </div>
 
 
@@ -473,19 +394,6 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
-                                <div class="attr variable">
-            <span class="name">pauli</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
-    
-            <div class="docstring"><p>Description of the encoded Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
                                 <div class="attr variable">
             <span class="name">phase</span>
@@ -499,6 +407,175 @@ cannot be converted into a format that Quilc understands.</p>
 
 
                             </div>
+                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pauli</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
+    
+            <div class="docstring"><p>Description of the encoded Pauli.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="DEFAULT_COMPILER_TIMEOUT">
+                    <div class="attr variable">
+            <span class="name">DEFAULT_COMPILER_TIMEOUT</span>        =
+<span class="default_value">30.0</span>
+
+        
+    </div>
+    <a class="headerlink" href="#DEFAULT_COMPILER_TIMEOUT"></a>
+    
+    
+
+                </section>
+                <section id="GenerateRandomizedBenchmarkingSequenceResponse">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">GenerateRandomizedBenchmarkingSequenceResponse</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse"></a>
+    
+            <div class="docstring"><p>Randomly generated benchmarking sequence response.</p>
+</div>
+
+
+                            <div id="GenerateRandomizedBenchmarkingSequenceResponse.sequence" class="classattr">
+                                <div class="attr variable">
+            <span class="name">sequence</span>
+
+        
+    </div>
+    <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse.sequence"></a>
+    
+            <div class="docstring"><p>List of Cliffords, each expressed as a list of generator indices.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="NativeQuilMetadata">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">NativeQuilMetadata</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata"></a>
+    
+            <div class="docstring"><p>Metadata about a program compiled to native quil.</p>
+</div>
+
+
+                </section>
+                <section id="PauliTerm">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">PauliTerm</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm"></a>
+    
+            <div class="docstring"><p>Pauli Term</p>
+</div>
+
+
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.indices" class="classattr">
+                                <div class="attr variable">
+            <span class="name">indices</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.indices"></a>
+    
+            <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="QuilcClient">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">QuilcClient</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcClient"></a>
+    
+            <div class="docstring"><p>Client used to communicate with Quilc.</p>
+</div>
+
+
+                            <div id="QuilcClient.new_libquil" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">new_libquil</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcClient.new_libquil"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="QuilcClient.new_rpcq" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">new_rpcq</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">endpoint</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcClient.new_rpcq"></a>
+    
+            <div class="docstring"><p>Construct a <code><a href="#QuilcClient">QuilcClient</a></code> that uses RPCQ to communicate with Quilc.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="QuilcError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">QuilcError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#QuilcError"></a>
+    
+            <div class="docstring"><p>Errors encountered compiling a Quil program.</p>
+</div>
+
+
                 </section>
                 <section id="RandomizedBenchmarkingRequest">
                     <div class="attr class">
@@ -514,15 +591,15 @@ cannot be converted into a format that Quilc understands.</p>
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
                                 <div class="attr variable">
-            <span class="name">depth</span>
+            <span class="name">interleaver</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
     
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
 </div>
 
 
@@ -566,117 +643,73 @@ cannot be converted into a format that Quilc understands.</p>
 
 
                             </div>
-                            <div id="RandomizedBenchmarkingRequest.interleaver" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
                                 <div class="attr variable">
-            <span class="name">interleaver</span>
+            <span class="name">depth</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
     
-            <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
 </div>
 
 
                             </div>
                 </section>
-                <section id="GenerateRandomizedBenchmarkingSequenceResponse">
+                <section id="TargetDevice">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">GenerateRandomizedBenchmarkingSequenceResponse</span>:
+    <span class="name">TargetDevice</span>:
 
         
     </div>
-    <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse"></a>
+    <a class="headerlink" href="#TargetDevice"></a>
     
-            <div class="docstring"><p>Randomly generated benchmarking sequence response.</p>
+            <div class="docstring"><p>Description of a device to compile for.</p>
 </div>
 
 
-                            <div id="GenerateRandomizedBenchmarkingSequenceResponse.sequence" class="classattr">
-                                <div class="attr variable">
-            <span class="name">sequence</span>
-
-        
-    </div>
-    <a class="headerlink" href="#GenerateRandomizedBenchmarkingSequenceResponse.sequence"></a>
-    
-            <div class="docstring"><p>List of Cliffords, each expressed as a list of generator indices.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="QuilcClient">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">QuilcClient</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#QuilcClient"></a>
-    
-            <div class="docstring"><p>Client used to communicate with Quilc.</p>
-</div>
-
-
-                            <div id="QuilcClient.new_libquil" class="classattr">
+                            <div id="TargetDevice.from_isa" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">new_libquil</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+        <span class="name">from_isa</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">isa</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
-    <a class="headerlink" href="#QuilcClient.new_libquil"></a>
+    <a class="headerlink" href="#TargetDevice.from_isa"></a>
     
-    
+            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] based on an [<code>InstructionSetArchitecture</code>].</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the [<code>InstructionSetArchitecture</code>]
+cannot be converted into a format that Quilc understands.</p>
+</div>
+
 
                             </div>
-                            <div id="QuilcClient.new_rpcq" class="classattr">
+                            <div id="TargetDevice.from_json" class="classattr">
                                 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">new_rpcq</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">endpoint</span></span><span class="return-annotation">):</span></span>
+        <span class="name">from_json</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">value</span></span><span class="return-annotation">):</span></span>
 
         
     </div>
-    <a class="headerlink" href="#QuilcClient.new_rpcq"></a>
+    <a class="headerlink" href="#TargetDevice.from_json"></a>
     
-            <div class="docstring"><p>Construct a <code><a href="#QuilcClient">QuilcClient</a></code> that uses RPCQ to communicate with Quilc.</p>
+            <div class="docstring"><p>Create a [<code><a href="#TargetDevice">TargetDevice</a></code>] from a JSON string.</p>
+
+<h1 id="errors">Errors</h1>
+
+<p>Returns a [<code><a href="#QuilcError">QuilcError</a></code>] if the JSON is malformed.</p>
 </div>
 
 
                             </div>
-                </section>
-                <section id="DEFAULT_COMPILER_TIMEOUT">
-                    <div class="attr variable">
-            <span class="name">DEFAULT_COMPILER_TIMEOUT</span>        =
-<span class="default_value">30.0</span>
-
-        
-    </div>
-    <a class="headerlink" href="#DEFAULT_COMPILER_TIMEOUT"></a>
-    
-    
-
-                </section>
-                <section id="QuilcError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">QuilcError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#QuilcError"></a>
-    
-            <div class="docstring"><p>Errors encountered compiling a Quil program.</p>
-</div>
-
-
                 </section>
                 <section id="compile_program">
                     <div class="attr function">
@@ -733,60 +766,6 @@ cannot be converted into a format that Quilc understands.</p>
 
 <ul>
 <li><strong>QuilcError</strong>:  If compilation fails.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="get_version_info">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_version_info</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#get_version_info"></a>
-    
-            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
-</ul>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="get_version_info_async">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_version_info_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#get_version_info_async"></a>
-    
-            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
-</ul>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
 </ul>
 </div>
 
@@ -925,6 +904,60 @@ gateset) is provided, then the sequence instead takes the form</p>
 
 <ul>
 <li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc or if the request is malformed.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="get_version_info">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_version_info</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#get_version_info"></a>
+    
+            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="get_version_info_async">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_version_info_async</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">client</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#get_version_info_async"></a>
+    
+            <div class="docstring"><p>Fetch the version information from the running Quilc service.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>client</strong>:  Client used to send compilation requests to Quilc.</li>
+</ul>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>QuilcError</strong>:  If there is a failure connecting to Quilc.</li>
 </ul>
 </div>
 

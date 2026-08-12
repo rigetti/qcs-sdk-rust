@@ -32,94 +32,19 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
-                    <a class="class" href="#ExecutionResult">ExecutionResult</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#ExecutionResult.from_register">from_register</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ExecutionResults">ExecutionResults</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ExecutionOptions">ExecutionOptions</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#ExecutionOptions.default">default</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ExecutionOptions.builder">builder</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#ExecutionOptionsBuilder.default">default</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#APIExecutionOptions">APIExecutionOptions</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#APIExecutionOptions.builder">builder</a>
-                        </li>
                         <li>
                                 <a class="function" href="#APIExecutionOptions.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="function" href="#APIExecutionOptions.builder">builder</a>
                         </li>
                         <li>
                                 <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -143,14 +68,8 @@
 
             </li>
             <li>
-                    <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
+                    <a class="class" href="#BuildOptionsError">BuildOptionsError</a>
                             <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
-                        </li>
                 </ul>
 
             </li>
@@ -191,6 +110,93 @@
 
             </li>
             <li>
+                    <a class="class" href="#ExecutionOptions">ExecutionOptions</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ExecutionOptions.default">default</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ExecutionOptions.builder">builder</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ExecutionOptionsBuilder.default">default</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ExecutionResult">ExecutionResult</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#ExecutionResult.from_register">from_register</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ExecutionResults">ExecutionResults</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#QpuApiError">QpuApiError</a>
                             <ul class="memberlist">
                 </ul>
@@ -201,24 +207,6 @@
                             <ul class="memberlist">
                 </ul>
 
-            </li>
-            <li>
-                    <a class="class" href="#BuildOptionsError">BuildOptionsError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
-                    <a class="function" href="#submit">submit</a>
-            </li>
-            <li>
-                    <a class="function" href="#submit_async">submit_async</a>
-            </li>
-            <li>
-                    <a class="function" href="#submit_with_parameter_batch">submit_with_parameter_batch</a>
-            </li>
-            <li>
-                    <a class="function" href="#submit_with_parameter_batch_async">submit_with_parameter_batch_async</a>
             </li>
             <li>
                     <a class="function" href="#cancel_job">cancel_job</a>
@@ -238,6 +226,18 @@
             <li>
                     <a class="function" href="#retrieve_results_async">retrieve_results_async</a>
             </li>
+            <li>
+                    <a class="function" href="#submit">submit</a>
+            </li>
+            <li>
+                    <a class="function" href="#submit_async">submit_async</a>
+            </li>
+            <li>
+                    <a class="function" href="#submit_with_parameter_batch">submit_with_parameter_batch</a>
+            </li>
+            <li>
+                    <a class="function" href="#submit_with_parameter_batch_async">submit_with_parameter_batch_async</a>
+            </li>
     </ul>
 
 
@@ -255,10 +255,477 @@
 <a href="./../../qcs_sdk.html">qcs_sdk</a><wbr>.<a href="./../qpu.html">qpu</a><wbr>.api    </h1>
 
                 
-                
-                
-                
+                        <input id="mod-api-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-api-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.qpu.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIExecutionOptions</span><span class="p">,</span> <span class="n">APIExecutionOptionsBuilder</span><span class="p">,</span> <span class="n">BuildOptionsError</span><span class="p">,</span> <span class="n">ConnectionStrategy</span><span class="p">,</span> <span class="n">ExecutionOptions</span><span class="p">,</span> <span class="n">ExecutionOptionsBuilder</span><span class="p">,</span> <span class="n">ExecutionResult</span><span class="p">,</span> <span class="n">ExecutionResults</span><span class="p">,</span> <span class="n">QpuApiDuration</span><span class="p">,</span> <span class="n">QpuApiError</span><span class="p">,</span> <span class="n">SubmissionError</span><span class="p">,</span> <span class="n">cancel_job</span><span class="p">,</span> <span class="n">cancel_job_async</span><span class="p">,</span> <span class="n">cancel_jobs</span><span class="p">,</span> <span class="n">cancel_jobs_async</span><span class="p">,</span> <span class="n">retrieve_results</span><span class="p">,</span> <span class="n">retrieve_results_async</span><span class="p">,</span> <span class="n">submit</span><span class="p">,</span> <span class="n">submit_async</span><span class="p">,</span> <span class="n">submit_with_parameter_batch</span><span class="p">,</span> <span class="n">submit_with_parameter_batch_async</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="s2">&quot;APIExecutionOptions&quot;</span><span class="p">,</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="s2">&quot;APIExecutionOptionsBuilder&quot;</span><span class="p">,</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="s2">&quot;BuildOptionsError&quot;</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;ConnectionStrategy&quot;</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;ExecutionOptions&quot;</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;ExecutionOptionsBuilder&quot;</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;ExecutionResult&quot;</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;ExecutionResults&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;QpuApiDuration&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;QpuApiError&quot;</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;SubmissionError&quot;</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;cancel_job&quot;</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="s2">&quot;cancel_job_async&quot;</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="s2">&quot;cancel_jobs&quot;</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="s2">&quot;cancel_jobs_async&quot;</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="s2">&quot;retrieve_results&quot;</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="s2">&quot;retrieve_results_async&quot;</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="s2">&quot;submit&quot;</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="s2">&quot;submit_async&quot;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="s2">&quot;submit_with_parameter_batch&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;submit_with_parameter_batch_async&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="p">]</span>
+</span></pre></div>
+
+
             </section>
+                <section id="APIExecutionOptions">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">APIExecutionOptions</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions"></a>
+    
+            <div class="docstring"><p>Options available when executing a job on a QPU, particular to the execution service's API.</p>
+
+<p>This is a conventent alias for [<code>InnerApiExecutionOptions</code>] which provides a builder.</p>
+
+<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code>ApiExecutionOptionsBuilder</code>]
+to build a custom set of options.</p>
+</div>
+
+
+                            <div id="APIExecutionOptions.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.default"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptions.builder" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">builder</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.builder"></a>
+    
+            <div class="docstring"><p>Get an [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>] that can be used to build a custom [<code><a href="#ExecutionOptions">ExecutionOptions</a></code>].</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptions.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
+    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.timeout">timeout</a></code> value.</p>
+
+<p>Note, this is the timeout while running a job; the job will be evicted from
+the hardware once this time has elapsed.</p>
+
+<p>If unset, the job's estimated duration will be used;
+if the job does not have an estimated duration, the default
+timeout is selected by the service.</p>
+
+<p>The service may also enforce a maximum value for this field.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
+    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="APIExecutionOptionsBuilder">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">APIExecutionOptionsBuilder</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder"></a>
+    
+            <div class="docstring"><p>Builder for <a href="struct.ApiExecutionOptions.html"><code>ApiExecutionOptions</code></a>.</p>
+</div>
+
+
+                            <div id="APIExecutionOptionsBuilder.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.default"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.build" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.build"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
+    
+    
+
+                            </div>
+                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="BuildOptionsError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">BuildOptionsError</span><wbr>(<span class="base"><a href="#QpuApiError">qcs_sdk.qpu.api.QpuApiError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#BuildOptionsError"></a>
+    
+            <div class="docstring"><p>Errors building execution options.</p>
+</div>
+
+
+                </section>
+                <section id="ConnectionStrategy">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy"></a>
+    
+            <div class="docstring"><p>The connection strategy to use when submitting and retrieving jobs from a QPU.</p>
+</div>
+
+
+                            <div id="ConnectionStrategy.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.default"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConnectionStrategy.get_endpoint_id" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.get_endpoint_id"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="ConnectionStrategy.Gateway">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.Gateway</span><wbr>(<span class="base"><a href="#ConnectionStrategy">qcs_sdk.qpu.api.ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.Gateway"></a>
+    
+            <div class="docstring"><p>Connect through the publicly accessible gateway.</p>
+</div>
+
+
+                </section>
+                <section id="ConnectionStrategy.DirectAccess">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.DirectAccess</span><wbr>(<span class="base"><a href="#ConnectionStrategy">qcs_sdk.qpu.api.ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.DirectAccess"></a>
+    
+            <div class="docstring"><p>Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
+have direct network access and an active reservation.</p>
+</div>
+
+
+                </section>
+                <section id="ConnectionStrategy.EndpointId">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.EndpointId</span><wbr>(<span class="base"><a href="#ConnectionStrategy">qcs_sdk.qpu.api.ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.EndpointId"></a>
+    
+            <div class="docstring"><p>Connect directly to a specific endpoint using its ID.</p>
+</div>
+
+
+                </section>
+                <section id="ConnectionStrategy.EndpointAddress">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ConnectionStrategy.EndpointAddress</span><wbr>(<span class="base"><a href="#ConnectionStrategy">qcs_sdk.qpu.api.ConnectionStrategy</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.EndpointAddress"></a>
+    
+            <div class="docstring"><p>Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.</p>
+
+<p>Should only be used when you have direct network access.</p>
+</div>
+
+
+                </section>
+                <section id="ExecutionOptions">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExecutionOptions</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions"></a>
+    
+            <div class="docstring"><p>Options available when executing a job on a QPU.</p>
+
+<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>]
+to build a custom set of options.</p>
+</div>
+
+
+                            <div id="ExecutionOptions.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.default"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionOptions.builder" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">builder</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.builder"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptions.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptions.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
+    
+            <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="ExecutionOptionsBuilder">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExecutionOptionsBuilder</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder"></a>
+    
+            <div class="docstring"><p>Builder for <a href="struct.ExecutionOptions.html"><code>ExecutionOptions</code></a>.</p>
+</div>
+
+
+                            <div id="ExecutionOptionsBuilder.default" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.default"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.build" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.build"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
+    
+    
+
+                            </div>
+                </section>
                 <section id="ExecutionResult">
                     <div class="attr class">
             
@@ -342,20 +809,6 @@
 </div>
 
 
-                            <div id="ExecutionResults.memory" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
-    
-            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
-the execution of the program.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
             <span class="name">buffers</span>
@@ -385,303 +838,18 @@ to the name of the memory declaration in the source program.</p>
 
 
                             </div>
-                </section>
-                <section id="ExecutionOptions">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ExecutionOptions</span>:
+                            <div id="ExecutionResults.memory" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionOptions"></a>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
     
-            <div class="docstring"><p>Options available when executing a job on a QPU.</p>
-
-<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>]
-to build a custom set of options.</p>
+            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
+the execution of the program.</p>
 </div>
 
-
-                            <div id="ExecutionOptions.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.default"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptions.builder" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">builder</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.builder"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptions.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.api_options"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptions.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.connection_strategy"></a>
-    
-            <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
-</div>
-
-
-                            </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="ExecutionOptionsBuilder">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ExecutionOptionsBuilder</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder"></a>
-    
-            <div class="docstring"><p>Builder for <a href="struct.ExecutionOptions.html"><code>ExecutionOptions</code></a>.</p>
-</div>
-
-
-                            <div id="ExecutionOptionsBuilder.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.default"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.build" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.build"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="APIExecutionOptions">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">APIExecutionOptions</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions"></a>
-    
-            <div class="docstring"><p>Options available when executing a job on a QPU, particular to the execution service's API.</p>
-
-<p>This is a conventent alias for [<code>InnerApiExecutionOptions</code>] which provides a builder.</p>
-
-<p>Use [<code>Default</code>] to get a reasonable set of defaults, or start with [<code>ApiExecutionOptionsBuilder</code>]
-to build a custom set of options.</p>
-</div>
-
-
-                            <div id="APIExecutionOptions.builder" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">builder</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.builder"></a>
-    
-            <div class="docstring"><p>Get an [<code><a href="#ExecutionOptionsBuilder">ExecutionOptionsBuilder</a></code>] that can be used to build a custom [<code><a href="#ExecutionOptions">ExecutionOptions</a></code>].</p>
-</div>
-
-
-                            </div>
-                            <div id="APIExecutionOptions.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.default"></a>
-    
-    
-
-                            </div>
-                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
-    
-            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
-</div>
-
-
-                            </div>
-                            <div id="APIExecutionOptions.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.timeout"></a>
-    
-            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.timeout">timeout</a></code> value.</p>
-
-<p>Note, this is the timeout while running a job; the job will be evicted from
-the hardware once this time has elapsed.</p>
-
-<p>If unset, the job's estimated duration will be used;
-if the job does not have an estimated duration, the default
-timeout is selected by the service.</p>
-
-<p>The service may also enforce a maximum value for this field.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="APIExecutionOptionsBuilder">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">APIExecutionOptionsBuilder</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder"></a>
-    
-            <div class="docstring"><p>Builder for <a href="struct.ApiExecutionOptions.html"><code>ApiExecutionOptions</code></a>.</p>
-</div>
-
-
-                            <div id="APIExecutionOptionsBuilder.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.default"></a>
-    
-    
-
-                            </div>
-                            <div id="APIExecutionOptionsBuilder.build" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">build</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.build"></a>
-    
-    
-
-                            </div>
-                            <div id="APIExecutionOptionsBuilder.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.bypass_settings_protection"></a>
-    
-    
-
-                            </div>
-                            <div id="APIExecutionOptionsBuilder.timeout" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptionsBuilder.timeout"></a>
-    
-    
 
                             </div>
                 </section>
@@ -699,17 +867,6 @@ timeout is selected by the service.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -721,161 +878,23 @@ timeout is selected by the service.</p>
     
 
                             </div>
-                </section>
-                <section id="ConnectionStrategy">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy</span>:
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
 
         
     </div>
-    <a class="headerlink" href="#ConnectionStrategy"></a>
-    
-            <div class="docstring"><p>The connection strategy to use when submitting and retrieving jobs from a QPU.</p>
-</div>
-
-
-                            <div id="ConnectionStrategy.default" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">default</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.default"></a>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
-                            </div>
-                            <div id="ConnectionStrategy.get_endpoint_id" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_endpoint_id</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.get_endpoint_id"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="ConnectionStrategy.Gateway">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy.Gateway</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.Gateway"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
-                                <dd id="ConnectionStrategy.Gateway.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
-                <dd id="ConnectionStrategy.Gateway.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
-                <dd id="ConnectionStrategy.Gateway.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
-                <dd id="ConnectionStrategy.Gateway.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
-                <dd id="ConnectionStrategy.Gateway.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.Gateway.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="ConnectionStrategy.DirectAccess">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy.DirectAccess</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.DirectAccess"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
-                                <dd id="ConnectionStrategy.DirectAccess.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.DirectAccess.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="ConnectionStrategy.EndpointId">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy.EndpointId</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.EndpointId"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
-                                <dd id="ConnectionStrategy.EndpointId.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.EndpointId.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="ConnectionStrategy.EndpointAddress">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ConnectionStrategy.EndpointAddress</span><wbr>(<span class="base"><a href="#ConnectionStrategy">ConnectionStrategy</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ConnectionStrategy.EndpointAddress"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ConnectionStrategy">ConnectionStrategy</a></dt>
-                                <dd id="ConnectionStrategy.EndpointAddress.default" class="function"><a href="#ConnectionStrategy.default">default</a></dd>
-                <dd id="ConnectionStrategy.EndpointAddress.get_endpoint_id" class="function"><a href="#ConnectionStrategy.get_endpoint_id">get_endpoint_id</a></dd>
-                <dd id="ConnectionStrategy.EndpointAddress.Gateway" class="class"><a href="#ConnectionStrategy.Gateway">Gateway</a></dd>
-                <dd id="ConnectionStrategy.EndpointAddress.DirectAccess" class="class"><a href="#ConnectionStrategy.DirectAccess">DirectAccess</a></dd>
-                <dd id="ConnectionStrategy.EndpointAddress.EndpointId" class="class"><a href="#ConnectionStrategy.EndpointId">EndpointId</a></dd>
-                <dd id="ConnectionStrategy.EndpointAddress.EndpointAddress" class="class"><a href="#ConnectionStrategy.EndpointAddress">EndpointAddress</a></dd>
-
-            </div>
-                                </dl>
                             </div>
                 </section>
                 <section id="QpuApiError">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">QpuApiError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
+    <span class="name">QpuApiError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
 
         
     </div>
@@ -890,188 +909,13 @@ timeout is selected by the service.</p>
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">SubmissionError</span><wbr>(<span class="base"><a href="#QpuApiError">QpuApiError</a></span>):
+    <span class="name">SubmissionError</span><wbr>(<span class="base"><a href="#QpuApiError">qcs_sdk.qpu.api.QpuApiError</a></span>):
 
         
     </div>
     <a class="headerlink" href="#SubmissionError"></a>
     
             <div class="docstring"><p>Errors that may occur when submitting a program for execution.</p>
-</div>
-
-
-                </section>
-                <section id="BuildOptionsError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">BuildOptionsError</span><wbr>(<span class="base"><a href="#QpuApiError">QpuApiError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#BuildOptionsError"></a>
-    
-            <div class="docstring"><p>Errors building execution options.</p>
-</div>
-
-
-                </section>
-                <section id="submit">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">submit</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#submit"></a>
-    
-            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
-<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
-This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
-or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
-<li><strong>client</strong>:  The <code>Qcs</code> client to use.
-Creates one using environment configuration if unset.
-See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
-<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
-If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>
-or <code>ConnectionStrategy.endpoint_address("http://some_endpoint_address")</code>,
-then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
-</ul>
-
-<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
-<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="submit_async">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">submit_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#submit_async"></a>
-    
-            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
-<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
-This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
-or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
-<li><strong>client</strong>:  The <code>Qcs</code> client to use.
-Creates one using environment configuration if unset.
-See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
-<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
-If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>
-or <code>ConnectionStrategy.endpoint_address("http://some_endpoint_address")</code>,
-then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
-</ul>
-
-<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
-<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="submit_with_parameter_batch">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">submit_with_parameter_batch</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#submit_with_parameter_batch"></a>
-    
-            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
-
-<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
-function will return a list of strings where the length and order correspond to the
-<code>patch_values</code> given. However, note that execution in the order of given patch values is not
-guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
-<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
-<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
-<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
-</ul>
-
-<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
-<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
-</ul>
-</div>
-
-
-                </section>
-                <section id="submit_with_parameter_batch_async">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">submit_with_parameter_batch_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#submit_with_parameter_batch_async"></a>
-    
-            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
-
-<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
-function will return a list of strings where the length and order correspond to the
-<code>patch_values</code> given. However, note that execution in the order of given patch values is not
-guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
-
-<h6 id="parameters">Parameters</h6>
-
-<ul>
-<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
-<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
-<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
-<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
-<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
-</ul>
-
-<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
-
-<h6 id="raises">Raises</h6>
-
-<ul>
-<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
-<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
-</ul>
 </div>
 
 
@@ -1261,6 +1105,166 @@ basis.</p>
 <ul>
 <li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
 <li><strong>QpuApiError</strong>:  If there was a problem retrieving the results.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="submit">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">submit</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#submit"></a>
+    
+            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
+<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
+or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.
+Creates one using environment configuration if unset.
+See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
+If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>
+or <code>ConnectionStrategy.endpoint_address("http://some_endpoint_address")</code>,
+then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
+</ul>
+
+<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="submit_async">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">submit_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#submit_async"></a>
+    
+            <div class="docstring"><p>Submits an executable <code>program</code> to be run on the specified QPU.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code><a href="translation.html#translate">qcs_sdk.qpu.translation.translate</a></code>).</li>
+<li><strong>patch_values</strong>:  A mapping of symbols to their desired values (see <code>build_patch_values</code>).</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on.
+This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code>
+or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
+<li><strong>client</strong>:  The <code>Qcs</code> client to use.
+Creates one using environment configuration if unset.
+See <a href="https://docs.rigetti.com/qcs/references/qcs-client-configuration">https://docs.rigetti.com/qcs/references/qcs-client-configuration</a> for more information.</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.
+If the connection strategy option used is <code>ConnectionStrategy.endpoint_id("endpoint_id")</code>
+or <code>ConnectionStrategy.endpoint_address("http://some_endpoint_address")</code>,
+then direct access to "endpoint_id" overrides the <code>quantum_processor_id</code> parameter.</li>
+</ul>
+
+<p>:returns: The ID of the submitted job which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting the program for execution.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="submit_with_parameter_batch">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">submit_with_parameter_batch</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#submit_with_parameter_batch"></a>
+    
+            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
+
+<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
+function will return a list of strings where the length and order correspond to the
+<code>patch_values</code> given. However, note that execution in the order of given patch values is not
+guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
+<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
+</ul>
+</div>
+
+
+                </section>
+                <section id="submit_with_parameter_batch_async">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">submit_with_parameter_batch_async</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">program</span>,</span><span class="param">	<span class="n">patch_values</span>,</span><span class="param">	<span class="n">quantum_processor_id</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">client</span><span class="o">=</span><span class="kc">None</span>,</span><span class="param">	<span class="n">execution_options</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#submit_with_parameter_batch_async"></a>
+    
+            <div class="docstring"><p>Execute a compiled program on a QPU with multiple sets of <code>patch_values</code>.</p>
+
+<p>This action is <em>atomic</em> in that all jobs will be queued, or none of them will. On success, this
+function will return a list of strings where the length and order correspond to the
+<code>patch_values</code> given. However, note that execution in the order of given patch values is not
+guaranteed. If there is a failure to queue any of the jobs, then none will be queued.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>program</strong>:  An executable program (see <code>translate</code>).</li>
+<li><strong>patch_values</strong>:  An iterable containing one or more mapping of symbols to their desired values.</li>
+<li><strong>quantum_processor_id</strong>:  The ID of the quantum processor to run the executable on. This field is required, unless being used with the <code>ConnectionStrategy.endpoint_id()</code> or <code>ConnectionStrategy.endpoint_address()</code> execution option.</li>
+<li><strong>client: The <code>Qcs</code> client to use. Creates one using environment configuration if unset - see https</strong>: //docs.rigetti.com/qcs/references/qcs-client-configuration</li>
+<li><strong>execution_options</strong>:  The <code><a href="#ExecutionOptions">ExecutionOptions</a></code> to use.</li>
+</ul>
+
+<p>:returns: The IDs of the submitted jobs which can be used to fetch results.</p>
+
+<h6 id="raises">Raises</h6>
+
+<ul>
+<li><strong>LoadClientError</strong>:  If there is an issue loading the QCS Client configuration.</li>
+<li><strong>SubmissionError</strong>:  If there was a problem submitting any of the jobs for execution, or if no <code>patch_values</code> are given.</li>
 </ul>
 </div>
 

@@ -39,6 +39,39 @@
             <h2>API Documentation</h2>
                 <ul class="memberlist">
             <li>
+                    <a class="class" href="#ListQuantumProcessorsError">ListQuantumProcessorsError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#MemoryValues">MemoryValues</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#MemoryValues.inner">inner</a>
+                        </li>
+                        <li>
+                                <a class="class" href="#MemoryValues.Binary">MemoryValues.Binary</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#MemoryValues.Integer">MemoryValues.Integer</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#MemoryValues.Real">MemoryValues.Real</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#QPUResultData">QPUResultData</a>
                             <ul class="memberlist">
                         <li>
@@ -51,10 +84,10 @@
                                 <a class="variable" href="#QPUResultData.mappings">mappings</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
+                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QPUResultData.memory_values">memory_values</a>
+                                <a class="variable" href="#QPUResultData.readout_values">readout_values</a>
                         </li>
                 </ul>
 
@@ -63,10 +96,10 @@
                     <a class="class" href="#RawQPUReadoutData">RawQPUReadoutData</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
+                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RawQPUReadoutData.readout_values">readout_values</a>
+                                <a class="variable" href="#RawQPUReadoutData.mappings">mappings</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RawQPUReadoutData.memory_values">memory_values</a>
@@ -102,39 +135,6 @@
 
             </li>
             <li>
-                    <a class="class" href="#MemoryValues">MemoryValues</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#MemoryValues.inner">inner</a>
-                        </li>
-                        <li>
-                                <a class="class" href="#MemoryValues.Binary">MemoryValues.Binary</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                        <li>
-                                <a class="class" href="#MemoryValues.Integer">MemoryValues.Integer</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                        <li>
-                                <a class="class" href="#MemoryValues.Real">MemoryValues.Real</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ListQuantumProcessorsError">ListQuantumProcessorsError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
                     <a class="function" href="#list_quantum_processors">list_quantum_processors</a>
             </li>
             <li>
@@ -157,10 +157,123 @@
 <a href="./../qcs_sdk.html">qcs_sdk</a><wbr>.qpu    </h1>
 
                 
-                
-                
-                
+                        <input id="mod-qpu-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-qpu-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.qpu</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListQuantumProcessorsError</span><span class="p">,</span> <span class="n">MemoryValues</span><span class="p">,</span> <span class="n">QPUResultData</span><span class="p">,</span> <span class="n">RawQPUReadoutData</span><span class="p">,</span> <span class="n">ReadoutValues</span><span class="p">,</span> <span class="n">api</span><span class="p">,</span> <span class="n">experimental</span><span class="p">,</span> <span class="n">isa</span><span class="p">,</span> <span class="n">list_quantum_processors</span><span class="p">,</span> <span class="n">list_quantum_processors_async</span><span class="p">,</span> <span class="n">translation</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="s2">&quot;ListQuantumProcessorsError&quot;</span><span class="p">,</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="s2">&quot;MemoryValues&quot;</span><span class="p">,</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="s2">&quot;QPUResultData&quot;</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;RawQPUReadoutData&quot;</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;ReadoutValues&quot;</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;api&quot;</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;experimental&quot;</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;isa&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;list_quantum_processors&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;list_quantum_processors_async&quot;</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;translation&quot;</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="p">]</span>
+</span></pre></div>
+
+
             </section>
+                <section id="ListQuantumProcessorsError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ListQuantumProcessorsError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ListQuantumProcessorsError"></a>
+    
+            <div class="docstring"><p>API Errors encountered when trying to list available quantum processors.</p>
+</div>
+
+
+                </section>
+                <section id="MemoryValues">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">MemoryValues</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues"></a>
+    
+            <div class="docstring"><p>A row of data containing the contents of a memory region at the end of a job.</p>
+
+<p>There is a variant for each possible type the memory region could be.</p>
+</div>
+
+
+                            <div id="MemoryValues.inner" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.inner"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="MemoryValues.Binary">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Binary</span><wbr>(<span class="base"><a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.Binary"></a>
+    
+            <div class="docstring"><p>Values that correspond to a memory region declared with the BIT or OCTET data type.</p>
+</div>
+
+
+                </section>
+                <section id="MemoryValues.Integer">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Integer</span><wbr>(<span class="base"><a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.Integer"></a>
+    
+            <div class="docstring"><p>Values that correspond to a memory region declared with the INTEGER data type.</p>
+</div>
+
+
+                </section>
+                <section id="MemoryValues.Real">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">MemoryValues.Real</span><wbr>(<span class="base"><a href="#MemoryValues">qcs_sdk.qpu.MemoryValues</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#MemoryValues.Real"></a>
+    
+            <div class="docstring"><p>Values that correspond to a memory region declared with the REAL data type.</p>
+</div>
+
+
+                </section>
                 <section id="QPUResultData">
                     <div class="attr class">
             
@@ -243,19 +356,6 @@ selects the last value per-shot based on the program that was run.</p>
 
 
                             </div>
-                            <div id="QPUResultData.readout_values" class="classattr">
-                                <div class="attr variable">
-            <span class="name">readout_values</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QPUResultData.readout_values"></a>
-    
-            <div class="docstring"><p>Mapping of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code>.</p>
-</div>
-
-
-                            </div>
                             <div id="QPUResultData.memory_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">memory_values</span>
@@ -265,6 +365,19 @@ selects the last value per-shot based on the program that was run.</p>
     <a class="headerlink" href="#QPUResultData.memory_values"></a>
     
             <div class="docstring"><p>The final contents of each memory region, keyed on region name.</p>
+</div>
+
+
+                            </div>
+                            <div id="QPUResultData.readout_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">readout_values</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QPUResultData.readout_values"></a>
+    
+            <div class="docstring"><p>Mapping of a readout values identifier (ie. "q0") to a set of <code><a href="#ReadoutValues">ReadoutValues</a></code>.</p>
 </div>
 
 
@@ -287,17 +400,6 @@ each register contains.</p>
 </div>
 
 
-                            <div id="RawQPUReadoutData.mappings" class="classattr">
-                                <div class="attr variable">
-            <span class="name">mappings</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
-    
-    
-
-                            </div>
                             <div id="RawQPUReadoutData.readout_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_values</span>
@@ -305,6 +407,17 @@ each register contains.</p>
         
     </div>
     <a class="headerlink" href="#RawQPUReadoutData.readout_values"></a>
+    
+    
+
+                            </div>
+                            <div id="RawQPUReadoutData.mappings" class="classattr">
+                                <div class="attr variable">
+            <span class="name">mappings</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RawQPUReadoutData.mappings"></a>
     
     
 
@@ -348,7 +461,9 @@ There is a variant for each possible type the list of readout values could be.</
     </div>
     <a class="headerlink" href="#ReadoutValues.inner"></a>
     
-    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -356,193 +471,43 @@ There is a variant for each possible type the list of readout values could be.</
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ReadoutValues.Integer</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
+    <span class="name">ReadoutValues.Integer</span><wbr>(<span class="base"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>):
 
         
     </div>
     <a class="headerlink" href="#ReadoutValues.Integer"></a>
     
-    
+            <div class="docstring"><p>Integer readout values</p>
+</div>
 
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
-                                <dd id="ReadoutValues.Integer.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
-                <dd id="ReadoutValues.Integer.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
-                <dd id="ReadoutValues.Integer.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
-                <dd id="ReadoutValues.Integer.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
 
-            </div>
-                                </dl>
-                            </div>
                 </section>
                 <section id="ReadoutValues.Real">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ReadoutValues.Real</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
+    <span class="name">ReadoutValues.Real</span><wbr>(<span class="base"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>):
 
         
     </div>
     <a class="headerlink" href="#ReadoutValues.Real"></a>
     
-    
+            <div class="docstring"><p>Real numbered readout values</p>
+</div>
 
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
-                                <dd id="ReadoutValues.Real.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
-                <dd id="ReadoutValues.Real.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
-                <dd id="ReadoutValues.Real.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
-                <dd id="ReadoutValues.Real.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
 
-            </div>
-                                </dl>
-                            </div>
                 </section>
                 <section id="ReadoutValues.Complex">
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">ReadoutValues.Complex</span><wbr>(<span class="base"><a href="#ReadoutValues">ReadoutValues</a></span>):
+    <span class="name">ReadoutValues.Complex</span><wbr>(<span class="base"><a href="#ReadoutValues">qcs_sdk.qpu.ReadoutValues</a></span>):
 
         
     </div>
     <a class="headerlink" href="#ReadoutValues.Complex"></a>
     
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#ReadoutValues">ReadoutValues</a></dt>
-                                <dd id="ReadoutValues.Complex.inner" class="function"><a href="#ReadoutValues.inner">inner</a></dd>
-                <dd id="ReadoutValues.Complex.Integer" class="class"><a href="#ReadoutValues.Integer">Integer</a></dd>
-                <dd id="ReadoutValues.Complex.Real" class="class"><a href="#ReadoutValues.Real">Real</a></dd>
-                <dd id="ReadoutValues.Complex.Complex" class="class"><a href="#ReadoutValues.Complex">Complex</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="MemoryValues">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">MemoryValues</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues"></a>
-    
-            <div class="docstring"><p>A row of data containing the contents of a memory region at the end of a job.</p>
-
-<p>There is a variant for each possible type the memory region could be.</p>
-</div>
-
-
-                            <div id="MemoryValues.inner" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.inner"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="MemoryValues.Binary">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">MemoryValues.Binary</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.Binary"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
-                                <dd id="MemoryValues.Binary.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
-                <dd id="MemoryValues.Binary.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
-                <dd id="MemoryValues.Binary.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
-                <dd id="MemoryValues.Binary.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="MemoryValues.Integer">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">MemoryValues.Integer</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.Integer"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
-                                <dd id="MemoryValues.Integer.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
-                <dd id="MemoryValues.Integer.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
-                <dd id="MemoryValues.Integer.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
-                <dd id="MemoryValues.Integer.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="MemoryValues.Real">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">MemoryValues.Real</span><wbr>(<span class="base"><a href="#MemoryValues">MemoryValues</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#MemoryValues.Real"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#MemoryValues">MemoryValues</a></dt>
-                                <dd id="MemoryValues.Real.inner" class="function"><a href="#MemoryValues.inner">inner</a></dd>
-                <dd id="MemoryValues.Real.Binary" class="class"><a href="#MemoryValues.Binary">Binary</a></dd>
-                <dd id="MemoryValues.Real.Integer" class="class"><a href="#MemoryValues.Integer">Integer</a></dd>
-                <dd id="MemoryValues.Real.Real" class="class"><a href="#MemoryValues.Real">Real</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="ListQuantumProcessorsError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ListQuantumProcessorsError</span><wbr>(<span class="base"><a href="../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ListQuantumProcessorsError"></a>
-    
-            <div class="docstring"><p>API Errors encountered when trying to list available quantum processors.</p>
+            <div class="docstring"><p>Complex readout values</p>
 </div>
 
 

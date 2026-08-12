@@ -34,9 +34,9 @@
             <ul>
                     <li><a href="qcs_sdk/client.html">client</a></li>
                     <li><a href="qcs_sdk/compiler.html">compiler</a></li>
+                    <li><a href="qcs_sdk/diagnostics.html">diagnostics</a></li>
                     <li><a href="qcs_sdk/qpu.html">qpu</a></li>
                     <li><a href="qcs_sdk/qvm.html">qvm</a></li>
-                    <li><a href="qcs_sdk/diagnostics.html">diagnostics</a></li>
             </ul>
 
             <h2>API Documentation</h2>
@@ -45,25 +45,13 @@
                     <a class="class" href="#ExeParameter">ExeParameter</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExeParameter.value">value</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExeParameter.index">index</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExeParameter.name">name</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExeParameter.value">value</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ExecutionData">ExecutionData</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#ExecutionData.duration">duration</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
                         </li>
                 </ul>
 
@@ -99,13 +87,106 @@
 
             </li>
             <li>
+                    <a class="class" href="#ExecutionData">ExecutionData</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#ExecutionData.duration">duration</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionData.result_data">result_data</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ExecutionError">ExecutionError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#JobHandle">JobHandle</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                                <a class="variable" href="#JobHandle.job_id">job_id</a>
                         </li>
                         <li>
-                                <a class="variable" href="#JobHandle.job_id">job_id</a>
+                                <a class="variable" href="#JobHandle.readout_map">readout_map</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#QCSClient">QCSClient</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#QCSClient.load">load</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.load_with_login">load_with_login</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#QcsSdkError">QcsSdkError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#RegisterData">RegisterData</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#RegisterData.inner">inner</a>
+                        </li>
+                        <li>
+                                <a class="class" href="#RegisterData.I8">RegisterData.I8</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#RegisterData.F64">RegisterData.F64</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#RegisterData.I16">RegisterData.I16</a>
+                                        <ul class="memberlist">
+                            </ul>
+
+                        </li>
+                        <li>
+                                <a class="class" href="#RegisterData.Complex32">RegisterData.Complex32</a>
+                                        <ul class="memberlist">
+                            </ul>
+
                         </li>
                 </ul>
 
@@ -150,24 +231,6 @@
 
             </li>
             <li>
-                    <a class="class" href="#Service">Service</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="variable" href="#Service.QUILC">QUILC</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Service.QVM">QVM</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Service.QCS">QCS</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Service.QPU">QPU</a>
-                        </li>
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#RegisterMatrix">RegisterMatrix</a>
                             <ul class="memberlist">
                         <li>
@@ -195,100 +258,34 @@
 
             </li>
             <li>
-                    <a class="class" href="#RegisterData">RegisterData</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#RegisterData.as_ndarray">as_ndarray</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#RegisterData.inner">inner</a>
-                        </li>
-                        <li>
-                                <a class="class" href="#RegisterData.I8">RegisterData.I8</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                        <li>
-                                <a class="class" href="#RegisterData.F64">RegisterData.F64</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                        <li>
-                                <a class="class" href="#RegisterData.I16">RegisterData.I16</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                        <li>
-                                <a class="class" href="#RegisterData.Complex32">RegisterData.Complex32</a>
-                                        <ul class="memberlist">
-                            </ul>
-
-                        </li>
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#QcsSdkError">QcsSdkError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ExecutionError">ExecutionError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
                     <a class="class" href="#RegisterMatrixConversionError">RegisterMatrixConversionError</a>
                             <ul class="memberlist">
                 </ul>
 
             </li>
             <li>
-                    <a class="function" href="#reset_logging">reset_logging</a>
-            </li>
-            <li>
-                    <a class="function" href="#_gather_diagnostics">_gather_diagnostics</a>
+                    <a class="class" href="#Service">Service</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#Service.QUILC">QUILC</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Service.QVM">QVM</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Service.QCS">QCS</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Service.QPU">QPU</a>
+                        </li>
+                </ul>
+
             </li>
             <li>
                     <a class="variable" href="#__version__">__version__</a>
             </li>
             <li>
-                    <a class="class" href="#QCSClient">QCSClient</a>
-                            <ul class="memberlist">
-                        <li>
-                                <a class="function" href="#QCSClient.load">load</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#QCSClient.load_with_login">load_with_login</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#QCSClient.load_with_login_async">load_with_login_async</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
-                        </li>
-                </ul>
-
+                    <a class="function" href="#reset_logging">reset_logging</a>
             </li>
     </ul>
 
@@ -318,28 +315,38 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 
                         <label class="view-source-button" for="mod-qcs_sdk-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;An interface to Rigetti [Quantum Cloud Services](https://docs.rigetti.com/qcs/) (QCS).</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">These APIs allow users to compile and run Quil programs on Rigetti quantum processors.</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">Internally, it is powered by the [QCS Rust SDK](https://github.com/rigetti/qcs-sdk-rust).</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">This package is still in development and breaking changes should be expected between minor versions.</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_qcs_sdk</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>  <span class="c1"># noqa: re-export</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="n">_additional_exports</span> <span class="o">=</span> <span class="p">[</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">_tracing_subscriber</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExeParameter</span><span class="p">,</span> <span class="n">Executable</span><span class="p">,</span> <span class="n">ExecutionData</span><span class="p">,</span> <span class="n">ExecutionError</span><span class="p">,</span> <span class="n">JobHandle</span><span class="p">,</span> <span class="n">QcsSdkError</span><span class="p">,</span> <span class="n">RegisterData</span><span class="p">,</span> <span class="n">RegisterMap</span><span class="p">,</span> <span class="n">RegisterMapItemsIter</span><span class="p">,</span> <span class="n">RegisterMapKeysIter</span><span class="p">,</span> <span class="n">RegisterMapValuesIter</span><span class="p">,</span> <span class="n">RegisterMatrix</span><span class="p">,</span> <span class="n">RegisterMatrixConversionError</span><span class="p">,</span> <span class="n">Service</span><span class="p">,</span> <span class="vm">__doc__</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">compiler</span><span class="p">,</span> <span class="n">diagnostics</span><span class="p">,</span> <span class="n">qpu</span><span class="p">,</span> <span class="n">qvm</span><span class="p">,</span> <span class="n">reset_logging</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">QCSClient</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="s2">&quot;ExeParameter&quot;</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;Executable&quot;</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;ExecutionData&quot;</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;ExecutionError&quot;</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;JobHandle&quot;</span><span class="p">,</span>
 </span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;QCSClient&quot;</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="p">]</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="c1"># The following code exposes the package contents under the same namespace without the `_` prefix.</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">)</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="n">exec</span><span class="p">(</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="sa">f</span><span class="s2">&quot;from ._qcs_sdk import </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="p">)</span><span class="si">}</span><span class="s2">; &quot;</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="sa">f</span><span class="s2">&quot;__all__ = </span><span class="si">{</span><span class="n">_qcs_sdk</span><span class="o">.</span><span class="n">__all__</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_additional_exports</span><span class="si">}</span><span class="s2">&quot;</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="p">)</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="k">del</span> <span class="n">_qcs_sdk</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;QcsSdkError&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;RegisterData&quot;</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;RegisterMap&quot;</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;RegisterMapItemsIter&quot;</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="s2">&quot;RegisterMapKeysIter&quot;</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="s2">&quot;RegisterMapValuesIter&quot;</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="s2">&quot;RegisterMatrix&quot;</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="s2">&quot;RegisterMatrixConversionError&quot;</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="s2">&quot;Service&quot;</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="s2">&quot;__doc__&quot;</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="s2">&quot;__version__&quot;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="s2">&quot;_tracing_subscriber&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;client&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="s2">&quot;compiler&quot;</span><span class="p">,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="s2">&quot;diagnostics&quot;</span><span class="p">,</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="s2">&quot;qpu&quot;</span><span class="p">,</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;qvm&quot;</span><span class="p">,</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;reset_logging&quot;</span><span class="p">,</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="p">]</span>
 </span></pre></div>
 
 
@@ -360,6 +367,17 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
 </div>
 
 
+                            <div id="ExeParameter.value" class="classattr">
+                                <div class="attr variable">
+            <span class="name">value</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExeParameter.value"></a>
+    
+    
+
+                            </div>
                             <div id="ExeParameter.index" class="classattr">
                                 <div class="attr variable">
             <span class="name">index</span>
@@ -380,61 +398,6 @@ Internally, it is powered by the <a href="https://github.com/rigetti/qcs-sdk-rus
     <a class="headerlink" href="#ExeParameter.name"></a>
     
     
-
-                            </div>
-                            <div id="ExeParameter.value" class="classattr">
-                                <div class="attr variable">
-            <span class="name">value</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExeParameter.value"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="ExecutionData">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ExecutionData</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData"></a>
-    
-            <div class="docstring"><p>The result of executing an <a href="crate::Executable"><code>Executable</code></a></p>
-</div>
-
-
-                            <div id="ExecutionData.duration" class="classattr">
-                                <div class="attr variable">
-            <span class="name">duration</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData.duration"></a>
-    
-            <div class="docstring"><p>The time it took to execute the program on the QPU, not including any network or queueing
-time. If paying for on-demand execution, this is the amount you will be billed for.</p>
-
-<p>This will always be <code>None</code> for QVM execution.</p>
-</div>
-
-
-                            </div>
-                            <div id="ExecutionData.result_data" class="classattr">
-                                <div class="attr variable">
-            <span class="name">result_data</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionData.result_data"></a>
-    
-            <div class="docstring"><p>The [<code>ResultData</code>] that was read from the <a href="crate::Executable"><code>Executable</code></a>.</p>
-</div>
-
 
                             </div>
                 </section>
@@ -710,6 +673,65 @@ If <code>None</code>, the default endpoint for the given <code>quantum_processor
 
                             </div>
                 </section>
+                <section id="ExecutionData">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExecutionData</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData"></a>
+    
+            <div class="docstring"><p>The result of executing an <a href="crate::Executable"><code>Executable</code></a></p>
+</div>
+
+
+                            <div id="ExecutionData.duration" class="classattr">
+                                <div class="attr variable">
+            <span class="name">duration</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData.duration"></a>
+    
+            <div class="docstring"><p>The time it took to execute the program on the QPU, not including any network or queueing
+time. If paying for on-demand execution, this is the amount you will be billed for.</p>
+
+<p>This will always be <code>None</code> for QVM execution.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionData.result_data" class="classattr">
+                                <div class="attr variable">
+            <span class="name">result_data</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionData.result_data"></a>
+    
+            <div class="docstring"><p>The [<code>ResultData</code>] that was read from the <a href="crate::Executable"><code>Executable</code></a>.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="ExecutionError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ExecutionError</span><wbr>(<span class="base"><a href="#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionError"></a>
+    
+            <div class="docstring"><p>Errors which can occur when executing a program.</p>
+</div>
+
+
+                </section>
                 <section id="JobHandle">
                     <div class="attr class">
             
@@ -726,6 +748,19 @@ If <code>None</code>, the default endpoint for the given <code>quantum_processor
 </div>
 
 
+                            <div id="JobHandle.job_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">job_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#JobHandle.job_id"></a>
+    
+            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
+</div>
+
+
+                            </div>
                             <div id="JobHandle.readout_map" class="classattr">
                                 <div class="attr variable">
             <span class="name">readout_map</span>
@@ -740,573 +775,6 @@ to the "filter pipeline node" which publishes the data.</p>
 
 
                             </div>
-                            <div id="JobHandle.job_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">job_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#JobHandle.job_id"></a>
-    
-            <div class="docstring"><p>Unique ID associated with a single job execution.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="RegisterMap">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMap</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap"></a>
-    
-            <div class="docstring"><p>A mapping of a register name (ie. "ro") to a [<code><a href="#RegisterMatrix">RegisterMatrix</a></code>] containing the values for the
-register.</p>
-</div>
-
-
-                            <div id="RegisterMap.get_register_matrix" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">register_name</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.get_register_matrix"></a>
-    
-            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for the given register.</p>
-
-<p>Returns <code>None</code> if the register doesn't exist.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterMap.keys" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.keys"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.values" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.values"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.items" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.items"></a>
-    
-    
-
-                            </div>
-                            <div id="RegisterMap.get" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">get</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">key</span>, </span><span class="param"><span class="n">default</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMap.get"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="RegisterMapItemsIter">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMapItemsIter</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMapItemsIter"></a>
-    
-    
-
-                </section>
-                <section id="RegisterMapKeysIter">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMapKeysIter</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMapKeysIter"></a>
-    
-    
-
-                </section>
-                <section id="RegisterMapValuesIter">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMapValuesIter</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMapValuesIter"></a>
-    
-    
-
-                </section>
-                <section id="Service">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">Service</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#Service"></a>
-    
-            <div class="docstring"><p>The external services that this SDK may connect to. Used to differentiate between networking
-issues in [<code>Error::Connection</code>].</p>
-</div>
-
-
-                            <div id="Service.QUILC" class="classattr">
-                                <div class="attr variable">
-            <span class="name">QUILC</span>        =
-<span class="default_value"><a href="#Service.QUILC">Service.QUILC</a></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Service.QUILC"></a>
-    
-    
-
-                            </div>
-                            <div id="Service.QVM" class="classattr">
-                                <div class="attr variable">
-            <span class="name">QVM</span>        =
-<span class="default_value"><a href="#Service.QVM">Service.QVM</a></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Service.QVM"></a>
-    
-    
-
-                            </div>
-                            <div id="Service.QCS" class="classattr">
-                                <div class="attr variable">
-            <span class="name">QCS</span>        =
-<span class="default_value"><a href="#Service.QCS">Service.QCS</a></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Service.QCS"></a>
-    
-    
-
-                            </div>
-                            <div id="Service.QPU" class="classattr">
-                                <div class="attr variable">
-            <span class="name">QPU</span>        =
-<span class="default_value"><a href="#Service.QPU">Service.QPU</a></span>
-
-        
-    </div>
-    <a class="headerlink" href="#Service.QPU"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="RegisterMatrix">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrix</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix"></a>
-    
-            <div class="docstring"><p>A 2-dimensional matrix of register values.</p>
-
-<p>Each variant corresponds to the possible data types a register can contain.</p>
-</div>
-
-
-                            <div id="RegisterMatrix.to_ndarray" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">to_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.to_ndarray"></a>
-    
-            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> as Numpy <code>ndarray</code>.</p>
-</div>
-
-
-                            </div>
-                </section>
-                <section id="RegisterMatrix.Integer">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrix.Integer</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.Integer"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
-                                <dd id="RegisterMatrix.Integer.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
-                <dd id="RegisterMatrix.Integer.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
-                <dd id="RegisterMatrix.Integer.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
-                <dd id="RegisterMatrix.Integer.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterMatrix.Real">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrix.Real</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.Real"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
-                                <dd id="RegisterMatrix.Real.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
-                <dd id="RegisterMatrix.Real.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
-                <dd id="RegisterMatrix.Real.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
-                <dd id="RegisterMatrix.Real.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterMatrix.Complex">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrix.Complex</span><wbr>(<span class="base"><a href="#RegisterMatrix">RegisterMatrix</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrix.Complex"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterMatrix">RegisterMatrix</a></dt>
-                                <dd id="RegisterMatrix.Complex.to_ndarray" class="function"><a href="#RegisterMatrix.to_ndarray">to_ndarray</a></dd>
-                <dd id="RegisterMatrix.Complex.Integer" class="class"><a href="#RegisterMatrix.Integer">Integer</a></dd>
-                <dd id="RegisterMatrix.Complex.Real" class="class"><a href="#RegisterMatrix.Real">Real</a></dd>
-                <dd id="RegisterMatrix.Complex.Complex" class="class"><a href="#RegisterMatrix.Complex">Complex</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterData">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterData</span>:
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData"></a>
-    
-            <div class="docstring"><p>Data resulting from <a href="code&gt;crate::Executable::execute_on_qvm&lt;/code"><code>Executable::execute_on_qvm</code></a></p>
-
-<p>This represents a single vector (or "register") of typed memory across some number of shots.
-The register corresponds to the usage of a <code>DECLARE</code> instruction in Quil, and the name of that
-register should be provided with <a href="code&gt;crate::Executable::read_from&lt;/code"><code>Executable::read_from</code></a>.</p>
-
-<p>There is a variant of this enum for each type of data that a register could hold. The register
-is represented as a 2-dimensional array <code>M</code> where the value <code>M[shot_number][memory_index]</code>
-represents the value at <code>memory_index</code> for <code>shot_number</code>.</p>
-
-<h1 id="usage">Usage</h1>
-
-<p>Typically, you will be interacting with this data through the [<code>crate::ResultData</code>] of an
-[<code>crate::ExecutionData</code>] returned after running a program. In those cases, you'll probably
-want to convert it to a readout map using [<code>crate::ResultData.to_register_map()</code>]. This
-will give you each register in the form of a [<code>crate::RegisterMatrix</code>] which is similar
-but backed by an [<code>ndarray::Array2</code>] and more convenient for working with matrices.</p>
-
-<p>If you are interacting with [<code><a href="#RegisterData">RegisterData</a></code>] directly, then you should already know what type of data it _should_
-have, so you can  use the [<code>mod@enum_as_inner</code>] methods (e.g. [<code>RegisterData::into_i8</code>]) in order to
-convert any variant type to its inner data.</p>
-</div>
-
-
-                            <div id="RegisterData.as_ndarray" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">as_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.as_ndarray"></a>
-    
-            <div class="docstring"><p>Return the inner values as a 2D Numpy <code>ndarray</code>.</p>
-</div>
-
-
-                            </div>
-                            <div id="RegisterData.inner" class="classattr">
-                                <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.inner"></a>
-    
-    
-
-                            </div>
-                </section>
-                <section id="RegisterData.I8">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterData.I8</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.I8"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
-                                <dd id="RegisterData.I8.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
-                <dd id="RegisterData.I8.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
-                <dd id="RegisterData.I8.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
-                <dd id="RegisterData.I8.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
-                <dd id="RegisterData.I8.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
-                <dd id="RegisterData.I8.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterData.F64">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterData.F64</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.F64"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
-                                <dd id="RegisterData.F64.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
-                <dd id="RegisterData.F64.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
-                <dd id="RegisterData.F64.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
-                <dd id="RegisterData.F64.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
-                <dd id="RegisterData.F64.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
-                <dd id="RegisterData.F64.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterData.I16">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterData.I16</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.I16"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
-                                <dd id="RegisterData.I16.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
-                <dd id="RegisterData.I16.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
-                <dd id="RegisterData.I16.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
-                <dd id="RegisterData.I16.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
-                <dd id="RegisterData.I16.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
-                <dd id="RegisterData.I16.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="RegisterData.Complex32">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterData.Complex32</span><wbr>(<span class="base"><a href="#RegisterData">RegisterData</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterData.Complex32"></a>
-    
-    
-
-                            <div class="inherited">
-                                <h5>Inherited Members</h5>
-                                <dl>
-                                    <div><dt><a href="#RegisterData">RegisterData</a></dt>
-                                <dd id="RegisterData.Complex32.as_ndarray" class="function"><a href="#RegisterData.as_ndarray">as_ndarray</a></dd>
-                <dd id="RegisterData.Complex32.inner" class="function"><a href="#RegisterData.inner">inner</a></dd>
-                <dd id="RegisterData.Complex32.I8" class="class"><a href="#RegisterData.I8">I8</a></dd>
-                <dd id="RegisterData.Complex32.F64" class="class"><a href="#RegisterData.F64">F64</a></dd>
-                <dd id="RegisterData.Complex32.I16" class="class"><a href="#RegisterData.I16">I16</a></dd>
-                <dd id="RegisterData.Complex32.Complex32" class="class"><a href="#RegisterData.Complex32">Complex32</a></dd>
-
-            </div>
-                                </dl>
-                            </div>
-                </section>
-                <section id="QcsSdkError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">QcsSdkError</span><wbr>(<span class="base">builtins.Exception</span>):
-
-        
-    </div>
-    <a class="headerlink" href="#QcsSdkError"></a>
-    
-            <div class="docstring"><p>Base exception type for errors raised by this package.</p>
-</div>
-
-
-                </section>
-                <section id="ExecutionError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ExecutionError</span><wbr>(<span class="base"><a href="#QcsSdkError">QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionError"></a>
-    
-            <div class="docstring"><p>Errors which can occur when executing a program.</p>
-</div>
-
-
-                </section>
-                <section id="RegisterMatrixConversionError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">RegisterMatrixConversionError</span><wbr>(<span class="base"><a href="#QcsSdkError">QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#RegisterMatrixConversionError"></a>
-    
-            <div class="docstring"><p>Error that may occur when building a <code><a href="#RegisterMatrix">RegisterMatrix</a></code> from execution data.</p>
-</div>
-
-
-                </section>
-                <section id="reset_logging">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">reset_logging</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#reset_logging"></a>
-    
-            <div class="docstring"><p>Reset all caches for logging configuration within this library,
-allowing the most recent Python-side changes to be applied.</p>
-
-<p>See <a href="https://docs.rs/pyo3-log/latest/pyo3_log/">https://docs.rs/pyo3-log/latest/pyo3_log/</a> for more information.</p>
-</div>
-
-
-                </section>
-                <section id="_gather_diagnostics">
-                    <div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">_gather_diagnostics</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
-
-        
-    </div>
-    <a class="headerlink" href="#_gather_diagnostics"></a>
-    
-    
-
-                </section>
-                <section id="__version__">
-                    <div class="attr variable">
-            <span class="name">__version__</span>        =
-<span class="default_value">&#39;0.26.3&#39;</span>
-
-        
-    </div>
-    <a class="headerlink" href="#__version__"></a>
-    
-    
-
                 </section>
                 <section id="QCSClient">
                     <div class="attr class">
@@ -1434,19 +902,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS API.</p>
-</div>
-
-
-                            </div>
                             <div id="QCSClient.grpc_api_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">grpc_api_url</span>
@@ -1456,32 +911,6 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
             <div class="docstring"><p>URL to access the QCS gRPC API.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.qvm_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qvm_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.qvm_url"></a>
-    
-            <div class="docstring"><p>URL to access the QVM.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.oauth_session" class="classattr">
-                                <div class="attr variable">
-            <span class="name">oauth_session</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.oauth_session"></a>
-    
-            <div class="docstring"><p>Get a copy of the OAuth session.</p>
 </div>
 
 
@@ -1499,6 +928,503 @@ for more details.</p>
 
 
                             </div>
+                            <div id="QCSClient.qvm_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qvm_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.qvm_url"></a>
+    
+            <div class="docstring"><p>URL to access the QVM.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.api_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
+    
+            <div class="docstring"><p>URL to access the QCS API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.oauth_session" class="classattr">
+                                <div class="attr variable">
+            <span class="name">oauth_session</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    
+            <div class="docstring"><p>Get a copy of the OAuth session.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="QcsSdkError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">QcsSdkError</span><wbr>(<span class="base">builtins.Exception</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#QcsSdkError"></a>
+    
+            <div class="docstring"><p>Base exception type for errors raised by this package.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterData">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterData</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData"></a>
+    
+            <div class="docstring"><p>Data resulting from <a href="code&gt;crate::Executable::execute_on_qvm&lt;/code"><code>Executable::execute_on_qvm</code></a></p>
+
+<p>This represents a single vector (or "register") of typed memory across some number of shots.
+The register corresponds to the usage of a <code>DECLARE</code> instruction in Quil, and the name of that
+register should be provided with <a href="code&gt;crate::Executable::read_from&lt;/code"><code>Executable::read_from</code></a>.</p>
+
+<p>There is a variant of this enum for each type of data that a register could hold. The register
+is represented as a 2-dimensional array <code>M</code> where the value <code>M[shot_number][memory_index]</code>
+represents the value at <code>memory_index</code> for <code>shot_number</code>.</p>
+
+<h1 id="usage">Usage</h1>
+
+<p>Typically, you will be interacting with this data through the [<code>crate::ResultData</code>] of an
+[<code>crate::ExecutionData</code>] returned after running a program. In those cases, you'll probably
+want to convert it to a readout map using [<code>crate::ResultData.to_register_map()</code>]. This
+will give you each register in the form of a [<code>crate::RegisterMatrix</code>] which is similar
+but backed by an [<code>ndarray::Array2</code>] and more convenient for working with matrices.</p>
+
+<p>If you are interacting with [<code><a href="#RegisterData">RegisterData</a></code>] directly, then you should already know what type of data it _should_
+have, so you can  use the [<code>mod@enum_as_inner</code>] methods (e.g. [<code>RegisterData::into_i8</code>]) in order to
+convert any variant type to its inner data.</p>
+</div>
+
+
+                            <div id="RegisterData.as_ndarray" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">as_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.as_ndarray"></a>
+    
+            <div class="docstring"><p>Return the inner values as a 2D Numpy <code>ndarray</code>.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterData.inner" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">inner</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.inner"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="RegisterData.I8">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterData.I8</span><wbr>(<span class="base"><a href="#RegisterData">qcs_sdk.RegisterData</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.I8"></a>
+    
+            <div class="docstring"><p>Corresponds to the Quil <code>BIT</code> or <code>OCTET</code> types.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterData.F64">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterData.F64</span><wbr>(<span class="base"><a href="#RegisterData">qcs_sdk.RegisterData</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.F64"></a>
+    
+            <div class="docstring"><p>Corresponds to the Quil <code>REAL</code> type.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterData.I16">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterData.I16</span><wbr>(<span class="base"><a href="#RegisterData">qcs_sdk.RegisterData</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.I16"></a>
+    
+            <div class="docstring"><p>Corresponds to the Quil <code>INTEGER</code> type.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterData.Complex32">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterData.Complex32</span><wbr>(<span class="base"><a href="#RegisterData">qcs_sdk.RegisterData</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterData.Complex32"></a>
+    
+            <div class="docstring"><p>Results containing complex numbers.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterMap">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMap</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap"></a>
+    
+            <div class="docstring"><p>A mapping of a register name (ie. "ro") to a [<code><a href="#RegisterMatrix">RegisterMatrix</a></code>] containing the values for the
+register.</p>
+</div>
+
+
+                            <div id="RegisterMap.get_register_matrix" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get_register_matrix</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">register_name</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.get_register_matrix"></a>
+    
+            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> for the given register.</p>
+
+<p>Returns <code>None</code> if the register doesn't exist.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterMap.keys" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">keys</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.keys"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterMap.values" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">values</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.values"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterMap.items" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">items</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.items"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                            <div id="RegisterMap.get" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">get</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span>, </span><span class="param"><span class="n">key</span>, </span><span class="param"><span class="n">default</span><span class="o">=</span><span class="kc">None</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMap.get"></a>
+    
+            <div class="docstring"><p>The type of the None singleton.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="RegisterMapItemsIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapItemsIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapItemsIter"></a>
+    
+    
+
+                </section>
+                <section id="RegisterMapKeysIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapKeysIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapKeysIter"></a>
+    
+    
+
+                </section>
+                <section id="RegisterMapValuesIter">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMapValuesIter</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMapValuesIter"></a>
+    
+    
+
+                </section>
+                <section id="RegisterMatrix">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix"></a>
+    
+            <div class="docstring"><p>A 2-dimensional matrix of register values.</p>
+
+<p>Each variant corresponds to the possible data types a register can contain.</p>
+</div>
+
+
+                            <div id="RegisterMatrix.to_ndarray" class="classattr">
+                                <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">to_ndarray</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="o">/</span></span><span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.to_ndarray"></a>
+    
+            <div class="docstring"><p>Get the <code><a href="#RegisterMatrix">RegisterMatrix</a></code> as Numpy <code>ndarray</code>.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="RegisterMatrix.Integer">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Integer</span><wbr>(<span class="base"><a href="#RegisterMatrix">qcs_sdk.RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Integer"></a>
+    
+            <div class="docstring"><p>Integer register.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterMatrix.Real">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Real</span><wbr>(<span class="base"><a href="#RegisterMatrix">qcs_sdk.RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Real"></a>
+    
+            <div class="docstring"><p>Real numbered register.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterMatrix.Complex">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrix.Complex</span><wbr>(<span class="base"><a href="#RegisterMatrix">qcs_sdk.RegisterMatrix</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrix.Complex"></a>
+    
+            <div class="docstring"><p>Complex numbered register.</p>
+</div>
+
+
+                </section>
+                <section id="RegisterMatrixConversionError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">RegisterMatrixConversionError</span><wbr>(<span class="base"><a href="#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
+
+        
+    </div>
+    <a class="headerlink" href="#RegisterMatrixConversionError"></a>
+    
+            <div class="docstring"><p>Error that may occur when building a <code><a href="#RegisterMatrix">RegisterMatrix</a></code> from execution data.</p>
+</div>
+
+
+                </section>
+                <section id="Service">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">Service</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#Service"></a>
+    
+            <div class="docstring"><p>The external services that this SDK may connect to. Used to differentiate between networking
+issues in [<code>Error::Connection</code>].</p>
+</div>
+
+
+                            <div id="Service.QUILC" class="classattr">
+                                <div class="attr variable">
+            <span class="name">QUILC</span>        =
+<span class="default_value"><a href="#Service.QUILC">Service.QUILC</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#Service.QUILC"></a>
+    
+    
+
+                            </div>
+                            <div id="Service.QVM" class="classattr">
+                                <div class="attr variable">
+            <span class="name">QVM</span>        =
+<span class="default_value"><a href="#Service.QVM">Service.QVM</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#Service.QVM"></a>
+    
+    
+
+                            </div>
+                            <div id="Service.QCS" class="classattr">
+                                <div class="attr variable">
+            <span class="name">QCS</span>        =
+<span class="default_value"><a href="#Service.QCS">Service.QCS</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#Service.QCS"></a>
+    
+    
+
+                            </div>
+                            <div id="Service.QPU" class="classattr">
+                                <div class="attr variable">
+            <span class="name">QPU</span>        =
+<span class="default_value"><a href="#Service.QPU">Service.QPU</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#Service.QPU"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="__version__">
+                    <div class="attr variable">
+            <span class="name">__version__</span>        =
+<span class="default_value">&#39;0.26.3&#39;</span>
+
+        
+    </div>
+    <a class="headerlink" href="#__version__"></a>
+    
+    
+
+                </section>
+                <section id="reset_logging">
+                    <div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">reset_logging</span><span class="signature pdoc-code condensed">(<span class="return-annotation">):</span></span>
+
+        
+    </div>
+    <a class="headerlink" href="#reset_logging"></a>
+    
+            <div class="docstring"><p>Reset all caches for logging configuration within this library,
+allowing the most recent Python-side changes to be applied.</p>
+
+<p>See <a href="https://docs.rs/pyo3-log/latest/pyo3_log/">https://docs.rs/pyo3-log/latest/pyo3_log/</a> for more information.</p>
+</div>
+
+
                 </section>
     </main>
 <script>
