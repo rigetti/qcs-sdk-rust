@@ -24,11 +24,18 @@ jobs:
     - uses: actions/checkout@v5
       with:
         fetch-depth: 0
+        # Release from the ref this was dispatched on, so a prerelease cut from a
+        # branch tags that branch rather than the default one.
+        ref: ${{ github.ref }}
         token: ${{ secrets.PAT }}
     - name: Install Knope
-      uses: knope-dev/action@v2.1.0
+      uses: knope-dev/action@v2.1.2
       with:
-        version: 0.21.3 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
+        # 0.23 tags the ref being released. Older versions created the release
+        # against the default branch, so a prerelease cut from a branch produced a
+        # tag pointing at main's version, and the publish job then tried to
+        # republish that already-released version.
+        version: 0.23.0 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
     - run: |
         git config --global user.name "${{ github.triggering_actor }}"
         git config --global user.email "${{ github.triggering_actor}}@users.noreply.github.com"
