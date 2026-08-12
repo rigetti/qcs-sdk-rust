@@ -22,6 +22,7 @@ from pyo3_linter import (
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger()
 
+
 def main():
     args = parser.get_parser().parse_args()
 

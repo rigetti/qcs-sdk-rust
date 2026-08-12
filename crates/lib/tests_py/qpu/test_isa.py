@@ -9,6 +9,7 @@ from qcs_sdk.qpu.isa import (
     get_instruction_set_architecture_async,
 )
 
+
 @pytest.mark.qcs_session
 def test_get_instruction_set_architecture(quantum_processor_id: str):
     """Successfully get a known public ISA."""
@@ -22,6 +23,7 @@ async def test_get_instruction_set_architecture_async(quantum_processor_id: str)
     """Successfully get a known public ISA."""
     isa = await get_instruction_set_architecture_async(quantum_processor_id)
     assert type(isa) is InstructionSetArchitecture
+
 
 @pytest.mark.qcs_session
 def test_get_instruction_set_architecture_error():
@@ -45,4 +47,3 @@ async def test_get_instruction_set_architecture_public_async(quantum_processor_i
     """Successfully get a known public ISA without authentication."""
     isa = await get_instruction_set_architecture_async(quantum_processor_id, client=QCSClient())
     assert type(isa) is InstructionSetArchitecture
-
