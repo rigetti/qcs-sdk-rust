@@ -63,9 +63,8 @@ scripts/install-libquil and install the latest release instead. -->
 it needs a libquil that installs that runtime and its headers (`sbcl_librarian.h`)
 alongside `libquil.h`. Releases up to and including 0.3.2 ship neither, and building
 against one of those fails in `libquil-sys`'s build script. That runtime is so far
-published only as a prerelease from a fork, so `scripts/install-libquil` pins both the
-version and the repository it comes from; override them with `LIBQUIL_VERSION` and
-`LIBQUIL_RELEASE_REPO` if you need a different build.
+published only as a prerelease, so `scripts/install-libquil` pins the version; override
+it with `LIBQUIL_VERSION` if you need a different build.
 
 To build against a libquil source tree instead of an installed one, set
 `LIBQUIL_SRC_PATH` to that directory; `libquil-sys` searches it before the system
