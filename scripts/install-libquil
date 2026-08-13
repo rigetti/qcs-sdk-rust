@@ -13,13 +13,11 @@ err() {
     exit 1
 }
 
-# TODO(github.com/rigetti/libquil#57): drop LIBQUIL_RELEASE_REPO and the pinned version
-# once the sbcl-librarian runtime work is released from rigetti/libquil, and install the
-# latest release instead. libquil-sys 0.5 links against that runtime, which is published
-# so far only as a prerelease from a fork; rigetti/libquil's latest release (0.3.2) does
-# not ship the runtime or its headers.
-LIBQUIL_VERSION="${LIBQUIL_VERSION:-0.4.0-rc.1}"
-export LIBQUIL_RELEASE_REPO="${LIBQUIL_RELEASE_REPO:-BatmanAoD/libquil}"
+# TODO(github.com/rigetti/libquil#57): drop the pinned version once the sbcl-librarian
+# runtime work is released as a stable version, and install the latest release instead.
+# libquil-sys 0.5 links against that runtime, which is so far published only as a
+# prerelease; libquil's latest stable release (0.3.2) ships neither it nor its headers.
+LIBQUIL_VERSION="${LIBQUIL_VERSION:-0.4.0-rc.0}"
 
 OS="$(uname -s)"
 case "${OS}" in
@@ -73,6 +71,6 @@ fi
 # Hand off to libquil's own installer, taken from the tag being installed rather than
 # from a branch: only that version installs the sbcl-librarian runtime and its headers.
 INSTALLER="$(mktemp)"
-curl -fsSL "https://raw.githubusercontent.com/${LIBQUIL_RELEASE_REPO}/v${LIBQUIL_VERSION}/install.sh" -o "${INSTALLER}"
+curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/install.sh" -o "${INSTALLER}"
 bash "${INSTALLER}" "${LIBQUIL_VERSION}"
 rm -f "${INSTALLER}"
