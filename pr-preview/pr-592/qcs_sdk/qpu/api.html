@@ -119,10 +119,10 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
@@ -140,13 +140,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
                         </li>
                 </ul>
 
@@ -158,10 +158,10 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.data">data</a>
@@ -173,13 +173,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.memory">memory</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                 </ul>
 
@@ -188,10 +188,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -612,6 +612,17 @@ to build a custom set of options.</p>
 
 
                             </div>
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptions.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -623,17 +634,6 @@ to build a custom set of options.</p>
             <div class="docstring"><p>The [<code><a href="#ConnectionStrategy">ConnectionStrategy</a></code>] to use to establish a connection to the QPU.</p>
 </div>
 
-
-                            </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
-    
-    
 
                             </div>
                             <div id="ExecutionOptions.api_options" class="classattr">
@@ -692,6 +692,17 @@ to build a custom set of options.</p>
 
 
                             </div>
+                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -710,17 +721,6 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
     
     
 
@@ -755,19 +755,6 @@ to build a custom set of options.</p>
 
 
                             </div>
-                            <div id="ExecutionResult.shape" class="classattr">
-                                <div class="attr variable">
-            <span class="name">shape</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
-    
-            <div class="docstring"><p>The shape of the result data.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.dtype" class="classattr">
                                 <div class="attr variable">
             <span class="name">dtype</span>
@@ -777,6 +764,19 @@ to build a custom set of options.</p>
     <a class="headerlink" href="#ExecutionResult.dtype"></a>
     
             <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.shape" class="classattr">
+                                <div class="attr variable">
+            <span class="name">shape</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    
+            <div class="docstring"><p>The shape of the result data.</p>
 </div>
 
 
@@ -809,6 +809,22 @@ to build a custom set of options.</p>
 </div>
 
 
+                            <div id="ExecutionResults.buffers" class="classattr">
+                                <div class="attr variable">
+            <span class="name">buffers</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.buffers"></a>
+    
+            <div class="docstring"><p>The readout results of execution, mapping a published filter node to its data.</p>
+
+<p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
+to the name of the memory declaration in the source program.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">execution_duration_microseconds</span>
@@ -836,22 +852,6 @@ the execution of the program.</p>
 
 
                             </div>
-                            <div id="ExecutionResults.buffers" class="classattr">
-                                <div class="attr variable">
-            <span class="name">buffers</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.buffers"></a>
-    
-            <div class="docstring"><p>The readout results of execution, mapping a published filter node to its data.</p>
-
-<p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
-to the name of the memory declaration in the source program.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="QpuApiDuration">
                     <div class="attr class">
@@ -867,17 +867,6 @@ to the name of the memory declaration in the source program.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -885,6 +874,17 @@ to the name of the memory declaration in the source program.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
