@@ -1,11 +1,13 @@
 #!/bin/bash
 
+# TODO(https://gitlab.com/rigetti/qcs/utilities/qcs-infrastructure/-/work_items/49):
+# This script is copied from `qcs-infrastructure`,
+# an internal Rigetti GitLab repo.
+# If a public mirror is created, use that instead.
+
 # Source this file to ensure that the current shell is using a Python virtual environment.
 # If not sourced, the script will still create a virtual env.
 #
-# VENDORED from `qcs-infrastructure` (scripts/cli-tools-base-image/ensure-venv). This repo is
-# public and cannot reference that project, so changes made there should be copied here.
-
 # `set -euo pipefail` is not used because this script is intended to be sourced.
 
 if [ -z "$BASH_VERSION" ]; then
