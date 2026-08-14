@@ -1,17 +1,7 @@
 [env]
 RUST_BACKTRACE = 0
 CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now
-# Python tooling follows the `uv` conventions shared across QCS repos. This project is public
-# and so cannot extend `qcs-infrastructure`'s `pytasks.toml`; `scripts/ensure-venv` is vendored
-# from that project instead, and the tasks below mirror its recipes.
 PYTHON_VERSION = { value = "3.13", condition = { env_not_set = ["PYTHON_VERSION"] } }
-# One virtual environment for the whole workspace, so every task shares it.
-#
-# `VIRTUAL_ENV` is deliberately NOT set here: PyO3's build script reads it, so a global value
-# would break every `cargo` build that happens before the venv exists — including the pure-Rust
-# `ci-flow`, which compiles with the `stubs` feature. It is set per-task instead (which is what
-# lets `uv run --active` find the venv), on tasks that first ensure the venv exists.
-VENV_PATH = { value = "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/.venv", condition = { env_not_set = ["VENV_PATH"] } }
 
 [tasks.pre-test]
 command = "docker"
@@ -61,21 +51,13 @@ dependencies = ["deny", "lint", "check", "test-flow"]
 description = "Ensure a virtual environment exists, and sync Python dependencies with uv."
 script_runner = "bash"
 script = '''
-. "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/scripts/ensure-venv"
-# Sanity-check, so that a stale venv elsewhere in the tree can't be picked up silently.
-if [ "$(readlink -f "$VIRTUAL_ENV")" != "$(readlink -f "$VENV_PATH")" ]; then
-    echo "Error: virtual env path mismatch: VIRTUAL_ENV=${VIRTUAL_ENV:-<unset>} vs VENV_PATH=${VENV_PATH}" >&2
-    exit 1
-fi
-uv sync --active --group dev
+uv sync --group dev
 '''
 
 [tasks.generate-stubs]
 # `stub_gen` is a binary rather than an `extension-module` cdylib, so it links against
 # libpython and needs to find it at load time. Sourcing `ensure-venv` here (rather than only
-# setting `VIRTUAL_ENV`) is what puts the interpreter's `LIBDIR` on `LD_LIBRARY_PATH`; that
-# export does not survive from the `install-python-deps` task, since each task is its own
-# process.
+# setting `VIRTUAL_ENV`) is what puts the interpreter's `LIBDIR` on `LD_LIBRARY_PATH`.
 dependencies = ["install-python-deps"]
 description = "Generate Python stub files."
 script_runner = "bash"
@@ -105,32 +87,25 @@ echo "Generated Python files are up to date."
 '''
 
 [tasks.package-python]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Build a release version of the Python package to the active virtual environment."
 dependencies = ["install-python-deps", "generate-stubs"]
 command = "uv"
-args = ["run", "--active", "maturin", "build", "--release"]
+args = ["run", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 # `generate-stubs` also writes the package's `__init__.py` files, which are what expose the
 # compiled `qcs_sdk._qcs_sdk` modules under their public `qcs_sdk` names — so it is a build
 # input now, not just a convenience for type checkers.
 description = "Build the Python package and install to the active virtual environment."
 dependencies = ["install-python-deps", "generate-stubs"]
 command = "uv"
-args = ["run", "--active", "maturin", "develop", "--uv"]
-
-[tasks.install-python-package-with-stubs]
-description = "Deprecated alias of `install-python-package`, which now always generates stubs."
-dependencies = ["install-python-package"]
+args = ["run", "maturin", "develop", "--uv"]
 
 [tasks.pytest]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Run Python tests."
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "--active", "pytest"]
+args = ["run", "pytest"]
 
 [tasks.pytest-flow]
 dependencies = [
@@ -141,13 +116,12 @@ dependencies = [
 ]
 
 [tasks.stubtest]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Check Python stubfiles."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
 cwd = "python"
 args = [
-    "run", "--active",
+    "run",
     "stubtest",
     "--allowlist",
     "stubtest-allowlist",
@@ -162,18 +136,16 @@ args = [
 dependencies = ["stubtest"]
 
 [tasks.lint-python-package]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Find errors in Python-related Rust code."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "--active", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Print the Python package layout as defined within Rust code."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "--active", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
+args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
 [tasks.test-python-package]
 description = "Run all Python-related tests."
@@ -193,18 +165,16 @@ dependencies = ["test", "test-python-package"]
 alias = "test-all"
 
 [tasks.check-python-api]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Check if Python API has breaking changes."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 script = { file = "./scripts/check-py-api.sh" }
 
 [tasks.document-python-package]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 description = "Generate Python package documentation."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
 args = [
-    "run", "--active",
+    "run",
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
@@ -215,31 +185,27 @@ args = [
 # ----
 
 [tasks.format-tracing-subscriber]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "--active", "black", "python/qcs_sdk/_tracing_subscriber"]
+args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
 # Only hand-written Python. Everything under `python/qcs_sdk` is generated — reformatting it
 # makes `check-generated-python-files` fail until the next `generate-stubs` run.
 # (`tests` is the Rust integration-test directory and contains no Python.)
 dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "--active", "black", "tests_py", "scripts"]
+args = ["run", "black", "tests_py", "scripts"]
 
 [tasks.test-session]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "--active", "pytest", "tests_py", "--with-qcs-session"]
+args = ["run", "pytest", "tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
-env = { VIRTUAL_ENV = "${VENV_PATH}" }
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "--active", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
+args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]
