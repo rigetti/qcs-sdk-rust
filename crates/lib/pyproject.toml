@@ -18,7 +18,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "quil>=0.35.0,<0.37.0",
+    "quil>=0.37.0,<0.38.0",
     "qcs-api-client-common>=0.15.0,<0.16.0",
 ]
 

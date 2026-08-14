@@ -12,7 +12,6 @@ PYTHON_VERSION = { value = "3.13", condition = { env_not_set = ["PYTHON_VERSION"
 # `ci-flow`, which compiles with the `stubs` feature. It is set per-task instead (which is what
 # lets `uv run --active` find the venv), on tasks that first ensure the venv exists.
 VENV_PATH = { value = "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/.venv", condition = { env_not_set = ["VENV_PATH"] } }
-UV_CACHE_DIR = { value = "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/.uv-cache", condition = { env_not_set = ["UV_CACHE_DIR", "CI"] } }
 
 [tasks.pre-test]
 command = "docker"
