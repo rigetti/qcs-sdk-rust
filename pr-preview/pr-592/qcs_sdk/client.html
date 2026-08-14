@@ -38,13 +38,13 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.client_id">client_id</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#AuthServer.scopes">scopes</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AuthServer.issuer">issuer</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                 </ul>
 
@@ -98,10 +98,10 @@
                                 <a class="function" href="#OAuthSession.request_access_token_async">request_access_token_async</a>
                         </li>
                         <li>
-                                <a class="variable" href="#OAuthSession.payload">payload</a>
+                                <a class="variable" href="#OAuthSession.auth_server">auth_server</a>
                         </li>
                         <li>
-                                <a class="variable" href="#OAuthSession.auth_server">auth_server</a>
+                                <a class="variable" href="#OAuthSession.payload">payload</a>
                         </li>
                         <li>
                                 <a class="variable" href="#OAuthSession.access_token">access_token</a>
@@ -125,6 +125,9 @@
                                 <a class="function" href="#QCSClient.get_oauth_session_async">get_oauth_session_async</a>
                         </li>
                         <li>
+                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
@@ -135,9 +138,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                 </ul>
 
@@ -247,19 +247,6 @@
 
 
                             </div>
-                            <div id="AuthServer.client_id" class="classattr">
-                                <div class="attr variable">
-            <span class="name">client_id</span>
-
-        
-    </div>
-    <a class="headerlink" href="#AuthServer.client_id"></a>
-    
-            <div class="docstring"><p>OAuth 2.0 client id.</p>
-</div>
-
-
-                            </div>
                             <div id="AuthServer.scopes" class="classattr">
                                 <div class="attr variable">
             <span class="name">scopes</span>
@@ -293,6 +280,19 @@ For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.co
 which is the canonical URI that the identity provider uses to sign and validate tokens,
 but the OpenID specification requires that they match exactly,
 and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
+</div>
+
+
+                            </div>
+                            <div id="AuthServer.client_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">client_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#AuthServer.client_id"></a>
+    
+            <div class="docstring"><p>OAuth 2.0 client id.</p>
 </div>
 
 
@@ -473,19 +473,6 @@ credentials or payload data.</p>
 
 
                             </div>
-                            <div id="OAuthSession.payload" class="classattr">
-                                <div class="attr variable">
-            <span class="name">payload</span>
-
-        
-    </div>
-    <a class="headerlink" href="#OAuthSession.payload"></a>
-    
-            <div class="docstring"><p>The grant type to use to request an access token.</p>
-</div>
-
-
-                            </div>
                             <div id="OAuthSession.auth_server" class="classattr">
                                 <div class="attr variable">
             <span class="name">auth_server</span>
@@ -495,6 +482,19 @@ credentials or payload data.</p>
     <a class="headerlink" href="#OAuthSession.auth_server"></a>
     
             <div class="docstring"><p>The [<code><a href="#AuthServer">AuthServer</a></code>] that issues the tokens.</p>
+</div>
+
+
+                            </div>
+                            <div id="OAuthSession.payload" class="classattr">
+                                <div class="attr variable">
+            <span class="name">payload</span>
+
+        
+    </div>
+    <a class="headerlink" href="#OAuthSession.payload"></a>
+    
+            <div class="docstring"><p>The grant type to use to request an access token.</p>
 </div>
 
 
@@ -639,6 +639,19 @@ for more details.</p>
 
 
                             </div>
+                            <div id="QCSClient.quilc_url" class="classattr">
+                                <div class="attr variable">
+            <span class="name">quilc_url</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.quilc_url"></a>
+    
+            <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
+</div>
+
+
+                            </div>
                             <div id="QCSClient.qvm_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">qvm_url</span>
@@ -687,19 +700,6 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
             <div class="docstring"><p>URL to access the QCS gRPC API.</p>
-</div>
-
-
-                            </div>
-                            <div id="QCSClient.quilc_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">quilc_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.quilc_url"></a>
-    
-            <div class="docstring"><p>URL to access the <code>quilc</code> compiler.</p>
 </div>
 
 
