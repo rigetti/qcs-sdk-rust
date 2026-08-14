@@ -861,7 +861,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "qcs-api-client-common", specifier = ">=0.19.0,<0.20.0" },
-    { name = "quil", specifier = ">=0.37.1rc2,<0.38.0" },
+    { name = "quil", specifier = ">=0.37.1,<0.38.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -885,12 +885,34 @@ dev = [
 
 [[package]]
 name = "quil"
-version = "0.37.1rc2"
+version = "0.37.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4a/cb/30f26fd4f483b553668e7e9a835693a8fc6fe118a383813224541492ce19/quil-0.37.1rc2.tar.gz", hash = "sha256:e6b5d0ef9893179257afc8814d04fa3bf6c65f75e9c345dd676d16595adf19db", size = 491340, upload-time = "2026-08-14T21:46:21.79Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/a8/632f13756ae9fe7431eb17390ae61eb99280421164fa29562aa4e891d4cf/quil-0.37.1.tar.gz", hash = "sha256:a86feea4f2a7fac4068ce37cc2c89948ac773fbdf2db86905a5d45d8ca7dd60b", size = 491319, upload-time = "2026-08-17T22:56:37.166Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/01/93a609c9a018b48200f1f50b975eedab9996343ff7e5d5d90f9dd718382c/quil-0.37.1-cp310-cp310-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:f814c9d349b9bc543dbfcbef0308b0af61043f6c33dd5f3789e843b1f0acb0a5", size = 3852264, upload-time = "2026-08-17T22:56:09.049Z" },
+    { url = "https://files.pythonhosted.org/packages/15/58/1eb8d5419aade81bf80eee2173ed261c81cf80e8425f8f8ca93303fa2bf4/quil-0.37.1-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:5c250e9fc20a8b607d0e6fc5fcf9fbe5ac0182f7573a257a1b150de82e686148", size = 2040184, upload-time = "2026-08-17T22:56:10.794Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/7c/1873c6cac23647cda83f2cbfdf4bca92be184a3312ae4d7e0ae34912977f/quil-0.37.1-cp310-cp310-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:331e4078eff3c1e5f1048126905c10cdb3997bd54544775d2f2a85b03642e523", size = 2236449, upload-time = "2026-08-17T22:56:12.064Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/1b/89ca4bb448790c565433f1df600615c9057b63e68e6784357c76f4cbe1c0/quil-0.37.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6414df52145be1960f7cc201b20fddd0d79076a1f082fd49580db2030a10e749", size = 2093368, upload-time = "2026-08-17T22:56:13.345Z" },
+    { url = "https://files.pythonhosted.org/packages/cd/ea/e91f621fc191dab9ecc4734d1619c8f87a50323c91d3adb285f08ab74dd9/quil-0.37.1-cp310-cp310-win_amd64.whl", hash = "sha256:12a5e8272f8ca7b415f5e962605455731fafb71a9ee6786448104df1ac6757d1", size = 1947278, upload-time = "2026-08-17T22:56:14.561Z" },
+    { url = "https://files.pythonhosted.org/packages/54/7c/92acf422785540ce26144ebba16f5537b1824f25f027975ffd746226935b/quil-0.37.1-cp311-cp311-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:d70c18b4c19e0b3a02fb053320912c9912bd45325e53e35aba829bc9585d3c9f", size = 3852406, upload-time = "2026-08-17T22:56:16.158Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/01/0d686ae2a211b1e76a247f686e95276d3afebac5d010f96b10ed938ce7a8/quil-0.37.1-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:0d35773c9b3b5588c42caa6b495b59197546bfafa5d8902847cc2d8ccbe12a53", size = 2039650, upload-time = "2026-08-17T22:56:17.438Z" },
+    { url = "https://files.pythonhosted.org/packages/76/b5/3c6b082d8cb0c94a42d9436be0e3ca9dbb4939940b158483c5cafb0e487d/quil-0.37.1-cp311-cp311-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:8569452d1337c6ec2198fd7fd41801cfcb40a9daf586b15a87b932c6f5d60b42", size = 2236365, upload-time = "2026-08-17T22:56:18.775Z" },
+    { url = "https://files.pythonhosted.org/packages/85/76/235b9e72202a8d34a75bc29692c76c0098bee74b0c1418069282fc0acf5a/quil-0.37.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c5794e713cb1285d034233c854124c1bdd5e17f85d6c6ef7413e0f288bcae4ed", size = 2092996, upload-time = "2026-08-17T22:56:20.587Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/2b/ffbaa779ee1be3fab5ca3bac324e19d3ca15d75570cd7e2b856ca47cc072/quil-0.37.1-cp311-cp311-win_amd64.whl", hash = "sha256:de000b97a80ec4a54a54ccdb4107cd0fd1d064ada98e57cea1046d2c1f8712d0", size = 1947526, upload-time = "2026-08-17T22:56:22.065Z" },
+    { url = "https://files.pythonhosted.org/packages/d1/da/fef69b4182ac81944809226601f5996794cb21c9ebf5514a81f1f4284943/quil-0.37.1-cp312-cp312-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:09e305358c58c0adee7b8de824a2a83da7c6264c4d4f42d4fe8971a56d2139cc", size = 3885635, upload-time = "2026-08-17T22:56:23.363Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/fb/c94af6a6268d7ac03b44c5e23d00bf6740677537757486f426169fac38fe/quil-0.37.1-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:dac96d2af093a28e147ecaf9ddf0e3bedff6ecf11933d75f727f42d80e20f000", size = 2033515, upload-time = "2026-08-17T22:56:24.603Z" },
+    { url = "https://files.pythonhosted.org/packages/4c/29/91f7f932c5880c9c3f166f8bfb8ab66fbc11454d62aa5d829dc5be944033/quil-0.37.1-cp312-cp312-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:623bfa85d5d5edbf3329e0a335d53caf3891950ae4263a55628a71471f9adf6c", size = 2223674, upload-time = "2026-08-17T22:56:25.989Z" },
+    { url = "https://files.pythonhosted.org/packages/30/cf/6067026ea21db0f96d70909e88969cc3e30124c80ca20faf99067ed7a5b1/quil-0.37.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:7e7db024b3e80cab3fb80452fe8e7ce21017268761d70f64db6391b31de7d4b9", size = 2087365, upload-time = "2026-08-17T22:56:27.235Z" },
+    { url = "https://files.pythonhosted.org/packages/9f/b5/2ae0d601694dc557a1ec47df0a481478cc9059e8ff27f2d7450cad217d2d/quil-0.37.1-cp312-cp312-win_amd64.whl", hash = "sha256:d317a0be302fc584bf5661ccb8fac550dd7ea8b2766249a6ad33f53108b2a75f", size = 1939826, upload-time = "2026-08-17T22:56:28.731Z" },
+    { url = "https://files.pythonhosted.org/packages/63/7a/465b89903bdad45d93a580821a50b95eee1c6fdeed0f444b57d16cbc5142/quil-0.37.1-cp313-cp313-macosx_10_12_x86_64.macosx_11_0_arm64.macosx_10_12_universal2.whl", hash = "sha256:8dc6959047657f08f42fb18910517006d7dc1bc181e6693876aeeba1aaa0fbfa", size = 3889840, upload-time = "2026-08-17T22:56:30.033Z" },
+    { url = "https://files.pythonhosted.org/packages/c9/84/6ec6c8b9ed03299e977d1c90ec6b5600b63735f95af12406e5f5f97aba69/quil-0.37.1-cp313-cp313-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:7196cfaf6dcfd7455d7be2d9653ef52f2d7fb381b4b1b9a81558abe9adc5f4ac", size = 2034564, upload-time = "2026-08-17T22:56:31.488Z" },
+    { url = "https://files.pythonhosted.org/packages/95/eb/0a62f303f84b39b809a1b2274fff40218403bd42c7c8286fadd5c57715db/quil-0.37.1-cp313-cp313-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:40a65ebb2aa5c7263a9360be463a52d132b17923c73ecc4924cc75e89e24173a", size = 2224930, upload-time = "2026-08-17T22:56:32.809Z" },
+    { url = "https://files.pythonhosted.org/packages/f8/17/b4265d8353909883be2b6ba4f5e9a738249b8d03a1ecb4935394fb7c6273/quil-0.37.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:731463db92d7a4ca8b89bab3a75e0726edb675d42539b26b2726fa936e435e88", size = 2089153, upload-time = "2026-08-17T22:56:34.196Z" },
+    { url = "https://files.pythonhosted.org/packages/b4/f5/c8fff3e52b345308a7b608538e0918b757e48d7f505ec2724913d1ed839b/quil-0.37.1-cp313-cp313-win_amd64.whl", hash = "sha256:67d2adc00a34b6d154eb26d47a8b6504d786b5dc181f2af12d9c650640760675", size = 1941421, upload-time = "2026-08-17T22:56:35.838Z" },
+]
 
 [[package]]
 name = "rich"
