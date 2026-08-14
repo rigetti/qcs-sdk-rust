@@ -157,8 +157,6 @@ args = [
     "--ignore-unused-allowlist",
     "qcs_sdk",
 ]
-# TODO(#475): Enable error reporting once stubtest is happy with stubgen's output.
-ignore_errors = true
 
 [tasks.stubtest-flow]
 dependencies = ["stubtest"]
