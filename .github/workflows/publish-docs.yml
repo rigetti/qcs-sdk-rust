@@ -27,18 +27,10 @@ jobs:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
 
-      # See the note in checks.yml: libpython has to be discoverable for the cargo builds.
-      - name: Set up Python virtual environment
-        shell: bash
+      - name: Build qcs-sdk-python documentation
         run: |
           . scripts/ensure-venv
-          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
-          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
-          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
-
-      - name: Build qcs-sdk-python documentation
-        run: cargo make --cwd crates/lib document-python-package
+          cargo make --cwd crates/lib document-python-package
 
       - name: Deploy preview
         if: ${{ github.event_name == 'pull_request' }}

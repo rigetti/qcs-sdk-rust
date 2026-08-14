@@ -43,24 +43,15 @@ jobs:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
 
-      # Rust builds of this crate link against libpython (the `stubs`/`python` features), so
-      # the interpreter and its `LIBDIR` have to be on the environment for every later step —
-      # not just the Python ones. `ensure-venv` exports both; publish them job-wide.
-      - name: Set up Python virtual environment
-        shell: bash
-        run: |
-          . scripts/ensure-venv
-          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
-          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
-          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
-
       - name: Run CI Flow
         env:
           CARGO_MAKE_RUN_CHECK_FORMAT: true
           CARGO_MAKE_RUN_CLIPPY: true
           CARGO_MAKE_BUILD_EXAMPLES: true
-        run: cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
+        run: |
+          # A Python environment is required when using PyO3, even when not running Python checks.
+          . scripts/ensure-venv
+          cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
 
   check-python:
     name: Run Python Checks
@@ -97,22 +88,8 @@ jobs:
           enable-cache: true
           cache-dependency-glob: crates/lib/uv.lock
 
-      # Rust builds of this crate link against libpython (the `stubs`/`python` features), so
-      # the interpreter and its `LIBDIR` have to be on the environment for every later step —
-      # not just the Python ones. `ensure-venv` exports both; publish them job-wide.
-      - name: Set up Python virtual environment
+      - name: Test Python Package
         shell: bash
         run: |
           . scripts/ensure-venv
-          echo "VIRTUAL_ENV=${VIRTUAL_ENV}" >> "$GITHUB_ENV"
-          echo "VENV_PATH=${VENV_PATH}" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
-          echo "${VIRTUAL_ENV}/bin" >> "$GITHUB_PATH"
-
-      # Also a dependency of `test-python-package`, but run first so that stale generated
-      # files are reported before the longer test run, and as a named step of their own.
-      - name: Check Generated Python Files
-        run: cargo make --cwd crates/lib --makefile Makefile.toml check-generated-python-files
-
-      - name: Test Python Package
-        run: cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
+          cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
