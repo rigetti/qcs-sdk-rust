@@ -21,8 +21,6 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          # v3 matches against protobuf's post-3.20 release names, so '3.20.1' no longer
-          # resolves. 21.0 is its immediate successor, and matches release-python.yml.
           version: '21.0'
       - name: Install libquil
         run: |
@@ -78,8 +76,6 @@ jobs:
         uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          # v3 matches against protobuf's post-3.20 release names, so '3.20.1' no longer
-          # resolves. 21.0 is its immediate successor, and matches release-python.yml.
           version: '21.0'
       - name: Install libquil
         run: |
