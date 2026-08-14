@@ -35,13 +35,13 @@
                     <a class="class" href="#Architecture">Architecture</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#Architecture.edges">edges</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Architecture.nodes">nodes</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Architecture.family">family</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Architecture.edges">edges</a>
                         </li>
                 </ul>
 
@@ -50,22 +50,22 @@
                     <a class="class" href="#Characteristic">Characteristic</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#Characteristic.name">name</a>
+                                <a class="variable" href="#Characteristic.error">error</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Characteristic.node_ids">node_ids</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.error">error</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#Characteristic.parameter_values">parameter_values</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.timestamp">timestamp</a>
+                                <a class="variable" href="#Characteristic.value">value</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.value">value</a>
+                                <a class="variable" href="#Characteristic.name">name</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Characteristic.timestamp">timestamp</a>
                         </li>
                 </ul>
 
@@ -146,9 +146,6 @@
                     <a class="class" href="#Operation">Operation</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#Operation.parameters">parameters</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#Operation.characteristics">characteristics</a>
                         </li>
                         <li>
@@ -159,6 +156,9 @@
                         </li>
                         <li>
                                 <a class="variable" href="#Operation.node_count">node_count</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Operation.parameters">parameters</a>
                         </li>
                 </ul>
 
@@ -288,6 +288,19 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 </div>
 
 
+                            <div id="Architecture.edges" class="classattr">
+                                <div class="attr variable">
+            <span class="name">edges</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Architecture.edges"></a>
+    
+            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
+</div>
+
+
+                            </div>
                             <div id="Architecture.nodes" class="classattr">
                                 <div class="attr variable">
             <span class="name">nodes</span>
@@ -314,19 +327,6 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Architecture.edges" class="classattr">
-                                <div class="attr variable">
-            <span class="name">edges</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Architecture.edges"></a>
-    
-            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="Characteristic">
                     <div class="attr class">
@@ -342,15 +342,15 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 </div>
 
 
-                            <div id="Characteristic.name" class="classattr">
+                            <div id="Characteristic.error" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span>
+            <span class="name">error</span>
 
         
     </div>
-    <a class="headerlink" href="#Characteristic.name"></a>
+    <a class="headerlink" href="#Characteristic.error"></a>
     
-            <div class="docstring"><p>The name of the characteristic.</p>
+            <div class="docstring"><p>The error in the characteristic value, or None otherwise.</p>
 </div>
 
 
@@ -368,19 +368,6 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Characteristic.error" class="classattr">
-                                <div class="attr variable">
-            <span class="name">error</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Characteristic.error"></a>
-    
-            <div class="docstring"><p>The error in the characteristic value, or None otherwise.</p>
-</div>
-
-
-                            </div>
                             <div id="Characteristic.parameter_values" class="classattr">
                                 <div class="attr variable">
             <span class="name">parameter_values</span>
@@ -394,19 +381,6 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Characteristic.timestamp" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timestamp</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Characteristic.timestamp"></a>
-    
-            <div class="docstring"><p>The date and time at which the characteristic was measured.</p>
-</div>
-
-
-                            </div>
                             <div id="Characteristic.value" class="classattr">
                                 <div class="attr variable">
             <span class="name">value</span>
@@ -416,6 +390,32 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
     <a class="headerlink" href="#Characteristic.value"></a>
     
             <div class="docstring"><p>The characteristic value measured.</p>
+</div>
+
+
+                            </div>
+                            <div id="Characteristic.name" class="classattr">
+                                <div class="attr variable">
+            <span class="name">name</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Characteristic.name"></a>
+    
+            <div class="docstring"><p>The name of the characteristic.</p>
+</div>
+
+
+                            </div>
+                            <div id="Characteristic.timestamp" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timestamp</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Characteristic.timestamp"></a>
+    
+            <div class="docstring"><p>The date and time at which the characteristic was measured.</p>
 </div>
 
 
@@ -719,19 +719,6 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
 </div>
 
 
-                            <div id="Operation.parameters" class="classattr">
-                                <div class="attr variable">
-            <span class="name">parameters</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Operation.parameters"></a>
-    
-            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
-</div>
-
-
-                            </div>
                             <div id="Operation.characteristics" class="classattr">
                                 <div class="attr variable">
             <span class="name">characteristics</span>
@@ -780,6 +767,19 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
     <a class="headerlink" href="#Operation.node_count"></a>
     
             <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
+</div>
+
+
+                            </div>
+                            <div id="Operation.parameters" class="classattr">
+                                <div class="attr variable">
+            <span class="name">parameters</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Operation.parameters"></a>
+    
+            <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
 </div>
 
 
