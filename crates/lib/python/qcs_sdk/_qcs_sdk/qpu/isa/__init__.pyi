@@ -7,6 +7,7 @@ import enum
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk import client
 import typing
+
 __all__ = [
     "Architecture",
     "Characteristic",
@@ -30,19 +31,19 @@ __all__ = [
 class Architecture:
     r"""
     Represents the logical underlying architecture of a quantum processor.
-    
+
     The architecture is defined in detail by the nodes and edges that constitute the quantum
     processor. This defines the set of all nodes that could be operated upon, and indicates to
     some approximation their physical layout. The main purpose of this is to support geometry
     calculations that are independent of the available operations, and rendering ISA-based
     information. Architecture layouts are defined by the `family`, as follows.
-    
+
     The "Aspen" family of quantum processor indicates a 2D planar grid layout of octagon unit
     cells. The `node_id` in this architecture is computed as :math:`100 p_y + 10 p_x + p_u` where
     :math:`p_y` is the zero-based Y position in the unit cell grid, :math:`p_x` is the zero-based
     X position in the unit cell grid, and :math:`p_u` is the zero-based position in the octagon
     unit cell and always ranges from 0 to 7.
-    
+
     The "Ankaa" architecture is based on a grid topology; having, in "vertical" orientation,
     qubits numbered starting from 0 at the top-left and increasing from left to right,
     then top to bottom, so the final qubit is in the bottom-right. Each qubit is connected
@@ -51,7 +52,7 @@ class Architecture:
     alternating with vertical rows. Ankaa chips are, in vertical orientation,
     7 qubits wide and 12 tall. This architecture may also be presented in "landscape"
     orientation, which is a simple 90-degree clockwise rotation of the vertical orientation.
-    
+
     Note that the operations that are actually available are defined entirely by ``Operation``
     instances. The presence of a node or edge in the ``Architecture`` model provides no guarantee
     that any 1Q or 2Q operation will be available to users writing QUIL programs.
@@ -67,12 +68,12 @@ class Architecture:
         A list of all computational edges in the instruction set architecture.
         """
     @property
-    def family(self) -> typing.Optional[Family  |  builtins.str]:
+    def family(self) -> typing.Optional[Family | builtins.str]:
         r"""
         The architecture family. The nodes and edges conform to this family.
         """
     @family.setter
-    def family(self, value: typing.Optional[Family  |  builtins.str]) -> None:
+    def family(self, value: typing.Optional[Family | builtins.str]) -> None:
         r"""
         The architecture family. The nodes and edges conform to this family.
         """
@@ -87,7 +88,9 @@ class Architecture:
         A list of all computational nodes in the instruction set architecture.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, edges: typing.Sequence[Edge], family: typing.Optional[Family  |  builtins.str], nodes: typing.Sequence[Node]) -> Architecture: ...
+    def __new__(
+        cls, edges: typing.Sequence[Edge], family: typing.Optional[Family | builtins.str], nodes: typing.Sequence[Node]
+    ) -> Architecture: ...
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
@@ -174,11 +177,11 @@ class Characteristic:
 class Edge:
     r"""
     A degree-two logical connection in the quantum processor's architecture.
-    
+
     The existence of an edge in the ISA ``Architecture`` does not necessarily mean that a given 2Q
     operation will be available on the edge. This information is conveyed by the presence of the
     two `node_id` values in instances of ``Instruction``.
-    
+
     Note that edges are undirected in this model. Thus edge :math:`(a, b)` is equivalent to edge
     :math:`(b, a)`.
     """
@@ -206,17 +209,18 @@ class GetISAError(_qcs_sdk.QcsSdkError):
     r"""
     Errors raised due to failure to get an ISA.
     """
+
     ...
 
 @typing.final
 class InstructionSetArchitecture:
     r"""
     The native instruction set architecture (ISA) of a quantum processor, annotated with characteristics.
-    
+
     The operations described by the `instructions` field are named by their QUIL instruction name,
     while the operation described by the `benchmarks` field are named by their benchmark routine
     and are a future extension point.
-    
+
     The characteristics that annotate both instructions and benchmarks assist the user to generate
     the best native QUIL program for a desired task, and so are provided as part of the native ISA.
     """
@@ -255,7 +259,13 @@ class InstructionSetArchitecture:
         The name of the quantum processor.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, architecture: Architecture, benchmarks: typing.Sequence[Operation], instructions: typing.Sequence[Operation], name: builtins.str) -> InstructionSetArchitecture: ...
+    def __new__(
+        cls,
+        architecture: Architecture,
+        benchmarks: typing.Sequence[Operation],
+        instructions: typing.Sequence[Operation],
+        name: builtins.str,
+    ) -> InstructionSetArchitecture: ...
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
@@ -265,19 +275,19 @@ class InstructionSetArchitecture:
     def from_raw(json: builtins.str) -> InstructionSetArchitecture:
         r"""
         Deserialize an `InstructionSetArchitecture` from a json representation.
-        
+
         # Errors
-        
+
         Returns [`SerializeIsaError`] if the input string was not deserialized correctly.
         """
     def json(self, pretty: builtins.bool = False) -> builtins.str:
         r"""
         Serialize the `InstructionSetArchitecture` to a json string, optionally pretty-printed.
-        
+
         If `pretty` is true, the json output should be pretty-printed with newlines and indents.
-        
+
         # Errors
-        
+
         Returns [`SerializeIsaError`] if the ISA could not be serialized.
         """
 
@@ -285,13 +295,14 @@ class ListISAsError(_qcs_sdk.QcsSdkError):
     r"""
     API Errors encountered when trying to list available ISAs.
     """
+
     ...
 
 @typing.final
 class Node:
     r"""
     A logical node in the quantum processor's architecture.
-    
+
     The existence of a node in the ISA ``Architecture`` does not necessarily mean that a given 1Q
     operation will be available on the node. This information is conveyed by the presence of the
     specific `node_id` in instances of ``Instruction``.
@@ -300,14 +311,14 @@ class Node:
     def node_id(self) -> builtins.int:
         r"""
         An integer id assigned to the computational node.
-        
+
         The ids may not be contiguous and will be assigned based on the architecture family.
         """
     @node_id.setter
     def node_id(self, value: builtins.int) -> None:
         r"""
         An integer id assigned to the computational node.
-        
+
         The ids may not be contiguous and will be assigned based on the architecture family.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
@@ -374,7 +385,13 @@ class Operation:
         The list of sites at which this operation can be applied, together with its site-dependent characteristics.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, characteristics: typing.Sequence[Characteristic], name: builtins.str, parameters: typing.Sequence[Parameter], sites: typing.Sequence[OperationSite]) -> Operation:
+    def __new__(
+        cls,
+        characteristics: typing.Sequence[Characteristic],
+        name: builtins.str,
+        parameters: typing.Sequence[Parameter],
+        sites: typing.Sequence[OperationSite],
+    ) -> Operation:
         r"""
         An operation, with its sites and site-independent characteristics.
         """
@@ -403,18 +420,20 @@ class OperationSite:
     def node_ids(self) -> builtins.list[builtins.int]:
         r"""
         The list of architecture node ids for the site.
-        
+
         The order of these node ids obey the definition of node symmetry from the enclosing operation.
         """
     @node_ids.setter
     def node_ids(self, value: typing.Sequence[builtins.int]) -> None:
         r"""
         The list of architecture node ids for the site.
-        
+
         The order of these node ids obey the definition of node symmetry from the enclosing operation.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, characteristics: typing.Sequence[Characteristic], node_ids: typing.Sequence[builtins.int]) -> OperationSite:
+    def __new__(
+        cls, characteristics: typing.Sequence[Characteristic], node_ids: typing.Sequence[builtins.int]
+    ) -> OperationSite:
         r"""
         A site for an operation, with its site-dependent characteristics.
         """
@@ -451,45 +470,51 @@ class SerializeISAError(_qcs_sdk.QcsSdkError):
     r"""
     Errors raised due to failure to serialize an ISA.
     """
+
     ...
 
 @typing.final
 class Family(enum.Enum):
     r"""
     The architecture family identifier of an ``InstructionSetArchitecture``.
-    
+
     Value 'NONE' implies the architecture has no specific layout topology.
     Value 'FULL' implies that each node is connected to every other (a fully-connected architecture).
     For other values based on deployed architecture layouts (e.g. `Aspen` and `Ankaa`),
     refer to the architecture classes themselves for more details.
-    
+
     Note: Within an ``InstructionSetArchitecture``, the `family` may be one of these,
     or may be a `str` for an unknown family, or may be `None` if the `family` is not specified.
     The latter in particular is distinct from the `NONE` value within this enumeration.
     """
+
     NONE = ...
     FULL = ...
     ASPEN = ...
     ANKAA = ...
 
-def get_instruction_set_architecture(quantum_processor_id: builtins.str, client: typing.Optional[client.QCSClient] = None) -> InstructionSetArchitecture:
+def get_instruction_set_architecture(
+    quantum_processor_id: builtins.str, client: typing.Optional[client.QCSClient] = None
+) -> InstructionSetArchitecture:
     r"""
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
-    
+
     :param quantum_processor_id: The ID of the quantum processor.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
+
     :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     """
 
-def get_instruction_set_architecture_async(quantum_processor_id: builtins.str, client: typing.Optional[client.QCSClient] = None) -> collections.abc.Awaitable[InstructionSetArchitecture]:
+def get_instruction_set_architecture_async(
+    quantum_processor_id: builtins.str, client: typing.Optional[client.QCSClient] = None
+) -> collections.abc.Awaitable[InstructionSetArchitecture]:
     r"""
     Fetch the ``InstructionSetArchitecture`` (ISA) for a given `quantum_processor_id` from the QCS API.
-    
+
     :param quantum_processor_id: The ID of the quantum processor.
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
+
     :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
     """
@@ -497,20 +522,21 @@ def get_instruction_set_architecture_async(quantum_processor_id: builtins.str, c
 def list_instruction_set_architectures(client: typing.Optional[client.QCSClient] = None) -> builtins.list[builtins.str]:
     r"""
     Fetch the names of available ``InstructionSetArchitecture``s (ISAs) from the QCS API.
-    
+
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
+
     :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
     """
 
-def list_instruction_set_architectures_async(client: typing.Optional[client.QCSClient] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
+def list_instruction_set_architectures_async(
+    client: typing.Optional[client.QCSClient] = None,
+) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
     r"""
     Fetch the names of available ``InstructionSetArchitecture``s (ISAs) from the QCS API.
-    
+
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
-    
+
     :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
     """
-

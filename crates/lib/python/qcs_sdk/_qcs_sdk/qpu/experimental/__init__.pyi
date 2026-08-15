@@ -2,7 +2,7 @@
 # ruff: noqa: E501, F401, F403, F405
 
 from . import random
+
 __all__ = [
     "random",
 ]
-

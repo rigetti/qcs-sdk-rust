@@ -3,6 +3,7 @@
 
 import builtins
 import collections.abc
+
 __all__ = [
     "get_report",
     "get_report_async",
@@ -11,30 +12,29 @@ __all__ = [
 def get_report() -> builtins.str:
     r"""
     Return a string describing the package and its environment for use in bug reporting and diagnosis.
-    
+
     This is a synchronous wrapper around `get_report_async`.
     Use that version in async environments.
-    
+
     Note: this format is not stable and its content may change between versions.
     """
 
 def get_report_async() -> collections.abc.Awaitable[builtins.str]:
     r"""
     Return a string describing the package and its environment for use in bug reporting and diagnosis.
-    
+
     Note: this format is not stable and its content may change between versions.
-    
+
     # Python Usage
-    
+
     ```python
     import asyncio
     from qcs_sdk import diagnostics
-    
+
     async def main():
         return await diagnostics.get_report_async()
-    
+
     report = asyncio.run(main())
     print(report)
     ```
     """
-

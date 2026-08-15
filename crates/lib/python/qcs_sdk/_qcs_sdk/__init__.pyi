@@ -24,6 +24,7 @@ from . import compiler
 from . import diagnostics
 from . import qpu
 from . import qvm
+
 __all__ = [
     "ExeParameter",
     "Executable",
@@ -48,11 +49,12 @@ __all__ = [
 ]
 
 __version__: typing.Final[builtins.str]
+
 @typing.final
 class ExeParameter:
     r"""
     Program execution parameters.
-    
+
     Note: The validity of parameters is not checked until execution.
     """
     @property
@@ -73,26 +75,26 @@ class ExeParameter:
 class Executable:
     r"""
     A builder interface for executing Quil programs on QVMs and QPUs.
-    
+
     # Example
-    
+
     This example executes a program on a QVM, specified by the `qvm_url` in the `QCSClient`:
-    
+
     ```python
     from qcs_sdk import Executable
     from qcs_sdk.client import QCSClient
     from qcs_sdk.qvm import QVMClient
-    
+
     PROGRAM = r'''
     DECLARE ro BIT[2]
-    
+
     H 0
     CNOT 0 1
-    
+
     MEASURE 0 ro[0]
     MEASURE 1 ro[1]
     '''
-    
+
     async def run():
         client = QVMClient.new_http(QCSClient.load().qvm_url)
         result = await Executable(PROGRAM, shots=4).execute_on_qvm_async()
@@ -104,7 +106,7 @@ class Executable:
                             .as_integer()
                             .expect("should be integer matrix")
                             .to_owned();
-    
+
         // In this case, we ran the program for 4 shots, so we know the number of rows is 4.
         assert_eq!(data.nrows(), 4);
         for shot in data.rows() {
@@ -114,13 +116,13 @@ class Executable:
             // In the case of this particular program, we know ro[0] should equal ro[1]
             assert_eq!(shot[0], shot[1]);
         }
-    
+
     def main():
         import asyncio
         asyncio.run(run())
-    
+
         # "ro" is the only source read from by default if you don't specify `registers`.
-    
+
         # We first convert the readout data to a ``RegisterMap`` to get a mapping of registers
         # (ie. "ro") to a [`RegisterMatrix`], `M`, where M[`shot`][`index`] is the value for
         # the memory offset `index` during shot `shot`.
@@ -130,69 +132,102 @@ class Executable:
         # might fail.
     ```
     """
-    def __new__(cls, quil: builtins.str, /, registers: typing.Sequence[builtins.str] = [], parameters: typing.Sequence[ExeParameter] = [], shots: typing.Optional[builtins.int] = None, quilc_client: typing.Optional[quilc.QuilcClient] = None, compiler_options: typing.Optional[quilc.CompilerOpts] = None) -> Executable: ...
-    def execute_on_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[translation.TranslationOptions] = None, execution_options: typing.Optional[api.ExecutionOptions] = None) -> ExecutionData:
+    def __new__(
+        cls,
+        quil: builtins.str,
+        /,
+        registers: typing.Sequence[builtins.str] = [],
+        parameters: typing.Sequence[ExeParameter] = [],
+        shots: typing.Optional[builtins.int] = None,
+        quilc_client: typing.Optional[quilc.QuilcClient] = None,
+        compiler_options: typing.Optional[quilc.CompilerOpts] = None,
+    ) -> Executable: ...
+    def execute_on_qpu(
+        self,
+        quantum_processor_id: builtins.str,
+        endpoint_id: typing.Optional[builtins.str] = None,
+        translation_options: typing.Optional[translation.TranslationOptions] = None,
+        execution_options: typing.Optional[api.ExecutionOptions] = None,
+    ) -> ExecutionData:
         r"""
         Compile the program and execute it on a QPU, waiting for results.
-        
+
         :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
             If `None`, the default endpoint for the given `quantum_processor_id` is used.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
-    def execute_on_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[translation.TranslationOptions] = None, execution_options: typing.Optional[api.ExecutionOptions] = None) -> collections.abc.Awaitable[ExecutionData]:
+    def execute_on_qpu_async(
+        self,
+        quantum_processor_id: builtins.str,
+        endpoint_id: typing.Optional[builtins.str] = None,
+        translation_options: typing.Optional[translation.TranslationOptions] = None,
+        execution_options: typing.Optional[api.ExecutionOptions] = None,
+    ) -> collections.abc.Awaitable[ExecutionData]:
         r"""
         Compile the program and execute it on a QPU, waiting for results
         (async analog of `Executable.execute_on_qpu`).
-        
+
         :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
             If `None`, the default endpoint for the given `quantum_processor_id` is used.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
     def execute_on_qvm(self, client: qvm.QVMClient) -> ExecutionData:
         r"""
         Execute on a QVM which is accessible via the provided client.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
     def execute_on_qvm_async(self, client: qvm.QVMClient) -> collections.abc.Awaitable[ExecutionData]:
         r"""
         Execute on a QVM which is accessible via the provided client
         (async analog of ``Executable.execute_on_qvm``).
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
     def retrieve_results(self, job_handle: JobHandle) -> ExecutionData:
         r"""
         Wait for the results of a job to complete.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
     def retrieve_results_async(self, job_handle: JobHandle) -> collections.abc.Awaitable[ExecutionData]:
         r"""
         Wait for the results of a job to complete
         (async analog of `Executable.retrieve_results`).
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
-    def submit_to_qpu(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[translation.TranslationOptions] = None, execution_options: typing.Optional[api.ExecutionOptions] = None) -> JobHandle:
+    def submit_to_qpu(
+        self,
+        quantum_processor_id: builtins.str,
+        endpoint_id: typing.Optional[builtins.str] = None,
+        translation_options: typing.Optional[translation.TranslationOptions] = None,
+        execution_options: typing.Optional[api.ExecutionOptions] = None,
+    ) -> JobHandle:
         r"""
         Compile the program and execute it on a QPU, without waiting for results.
-        
+
         :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
             If `None`, the default endpoint for the given `quantum_processor_id` is used.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
-    def submit_to_qpu_async(self, quantum_processor_id: builtins.str, endpoint_id: typing.Optional[builtins.str] = None, translation_options: typing.Optional[translation.TranslationOptions] = None, execution_options: typing.Optional[api.ExecutionOptions] = None) -> collections.abc.Awaitable[JobHandle]:
+    def submit_to_qpu_async(
+        self,
+        quantum_processor_id: builtins.str,
+        endpoint_id: typing.Optional[builtins.str] = None,
+        translation_options: typing.Optional[translation.TranslationOptions] = None,
+        execution_options: typing.Optional[api.ExecutionOptions] = None,
+    ) -> collections.abc.Awaitable[JobHandle]:
         r"""
         Compile the program and execute it on a QPU, without waiting for results
         (async analog of `Executable.submit_to_qpu`).
-        
+
         :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
             If `None`, the default endpoint for the given `quantum_processor_id` is used.
-        
+
         :raises `ExecutionError`: If the job fails to execute.
         """
 
@@ -206,17 +241,19 @@ class ExecutionData:
         r"""
         The time it took to execute the program on the QPU, not including any network or queueing
         time. If paying for on-demand execution, this is the amount you will be billed for.
-        
+
         This will always be `None` for QVM execution.
         """
     @property
-    def result_data(self) -> qvm.QVMResultData  |  qpu.QPUResultData:
+    def result_data(self) -> qvm.QVMResultData | qpu.QPUResultData:
         r"""
         The [`ResultData`] that was read from the [`Executable`](crate::Executable).
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __getnewargs__(self) -> tuple[qvm.QVMResultData  |  qpu.QPUResultData, typing.Optional[datetime.timedelta]]: ...
-    def __new__(cls, result_data: qvm.QVMResultData  |  qpu.QPUResultData, duration: typing.Optional[datetime.timedelta] = None) -> ExecutionData:
+    def __getnewargs__(self) -> tuple[qvm.QVMResultData | qpu.QPUResultData, typing.Optional[datetime.timedelta]]: ...
+    def __new__(
+        cls, result_data: qvm.QVMResultData | qpu.QPUResultData, duration: typing.Optional[datetime.timedelta] = None
+    ) -> ExecutionData:
         r"""
         Create `ExecutionData` from `ResultData` and an optional `duration`.
         """
@@ -225,13 +262,14 @@ class ExecutionError(QcsSdkError):
     r"""
     Errors which can occur when executing a program.
     """
+
     ...
 
 @typing.final
 class JobHandle:
     r"""
     The result of submitting a job to a QPU.
-    
+
     Used to retrieve the results of a job.
     """
     @property
@@ -250,87 +288,108 @@ class QcsSdkError(builtins.Exception):
     r"""
     Base exception type for errors raised by this package.
     """
+
     ...
 
 class RegisterData:
     r"""
     Data resulting from [`Executable::execute_on_qvm`](`crate::Executable::execute_on_qvm`)
-    
+
     This represents a single vector (or "register") of typed memory across some number of shots.
     The register corresponds to the usage of a `DECLARE` instruction in Quil, and the name of that
     register should be provided with [`Executable::read_from`](`crate::Executable::read_from`).
-    
+
     There is a variant of this enum for each type of data that a register could hold. The register
     is represented as a 2-dimensional array `M` where the value `M[shot_number][memory_index]`
     represents the value at `memory_index` for `shot_number`.
-    
+
     # Usage
-    
+
     Typically, you will be interacting with this data through the [`crate::ResultData`] of an
     [`crate::ExecutionData`] returned after running a program. In those cases, you'll probably
     want to convert it to a readout map using [`crate::ResultData.to_register_map()`]. This
     will give you each register in the form of a [`crate::RegisterMatrix`] which is similar
     but backed by an [`ndarray::Array2`] and more convenient for working with matrices.
-    
+
     If you are interacting with [`RegisterData`] directly, then you should already know what type of data it _should_
     have, so you can  use the [`mod@enum_as_inner`] methods (e.g. [`RegisterData::into_i8`]) in order to
     convert any variant type to its inner data.
     """
-    def __getnewargs__(self) -> tuple[builtins.list[builtins.list[builtins.int]] | builtins.list[builtins.list[builtins.float]] | builtins.list[builtins.list[builtins.complex]]]: ...
-    def __new__(cls, inner: typing.Sequence[typing.Sequence[builtins.int]] | typing.Sequence[typing.Sequence[builtins.float]] | typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData: ...
+    def __getnewargs__(
+        self,
+    ) -> tuple[
+        builtins.list[builtins.list[builtins.int]]
+        | builtins.list[builtins.list[builtins.float]]
+        | builtins.list[builtins.list[builtins.complex]]
+    ]: ...
+    def __new__(
+        cls,
+        inner: typing.Sequence[typing.Sequence[builtins.int]]
+        | typing.Sequence[typing.Sequence[builtins.float]]
+        | typing.Sequence[typing.Sequence[builtins.complex]],
+    ) -> RegisterData: ...
     def as_ndarray(self) -> numpy.ndarray:
         r"""
         Return the inner values as a 2D Numpy ``ndarray``.
         """
-    def inner(self) -> builtins.list[builtins.list[builtins.int]] | builtins.list[builtins.list[builtins.float]] | builtins.list[builtins.list[builtins.complex]]: ...
+    def inner(
+        self,
+    ) -> (
+        builtins.list[builtins.list[builtins.int]]
+        | builtins.list[builtins.list[builtins.float]]
+        | builtins.list[builtins.list[builtins.complex]]
+    ): ...
     @typing.final
     class Complex32(RegisterData):
         r"""
         Results containing complex numbers.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.complex]]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.complex]]) -> RegisterData.Complex32: ...
-    
+
     @typing.final
     class F64(RegisterData):
         r"""
         Corresponds to the Quil `REAL` type.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.float]]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.float]]) -> RegisterData.F64: ...
-    
+
     @typing.final
     class I16(RegisterData):
         r"""
         Corresponds to the Quil `INTEGER` type.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.int]]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I16: ...
-    
+
     @typing.final
     class I8(RegisterData):
         r"""
         Corresponds to the Quil `BIT` or `OCTET` types.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.list[builtins.int]]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[typing.Sequence[builtins.int]]) -> RegisterData.I8: ...
-    
 
 @typing.final
 class RegisterMap:
@@ -342,11 +401,13 @@ class RegisterMap:
     def __getitem__(self, item: builtins.str) -> RegisterMatrix: ...
     def __iter__(self) -> RegisterMapKeysIter: ...
     def __len__(self) -> builtins.int: ...
-    def get(self, key: builtins.str, default: typing.Optional[RegisterMatrix] = None) -> typing.Optional[RegisterMatrix]: ...
+    def get(
+        self, key: builtins.str, default: typing.Optional[RegisterMatrix] = None
+    ) -> typing.Optional[RegisterMatrix]: ...
     def get_register_matrix(self, register_name: builtins.str) -> typing.Optional[RegisterMatrix]:
         r"""
         Get the `RegisterMatrix` for the given register.
-        
+
         Returns `None` if the register doesn't exist.
         """
     def items(self) -> RegisterMapItemsIter: ...
@@ -371,7 +432,7 @@ class RegisterMapValuesIter:
 class RegisterMatrix:
     r"""
     A 2-dimensional matrix of register values.
-    
+
     Each variant corresponds to the possible data types a register can contain.
     """
     def to_ndarray(self) -> typing.Any:
@@ -383,42 +444,45 @@ class RegisterMatrix:
         r"""
         Complex numbered register.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> numpy.typing.NDArray[numpy.complex128]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: numpy.typing.NDArray[numpy.complex128]) -> RegisterMatrix.Complex: ...
-    
+
     @typing.final
     class Integer(RegisterMatrix):
         r"""
         Integer register.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> numpy.typing.NDArray[numpy.int64]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: numpy.typing.NDArray[numpy.int64]) -> RegisterMatrix.Integer: ...
-    
+
     @typing.final
     class Real(RegisterMatrix):
         r"""
         Real numbered register.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> numpy.typing.NDArray[numpy.float64]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: numpy.typing.NDArray[numpy.float64]) -> RegisterMatrix.Real: ...
-    
 
 class RegisterMatrixConversionError(QcsSdkError):
     r"""
     Error that may occur when building a `RegisterMatrix` from execution data.
     """
+
     ...
 
 @typing.final
@@ -427,6 +491,7 @@ class Service(enum.Enum):
     The external services that this SDK may connect to. Used to differentiate between networking
     issues in [`Error::Connection`].
     """
+
     QUILC = ...
     r"""
     The open source [`quilc`](https://github.com/quil-lang/quilc) compiler.
@@ -458,12 +523,10 @@ class Service(enum.Enum):
     """
 
 def _gather_diagnostics() -> builtins.str: ...
-
 def reset_logging() -> None:
     r"""
     Reset all caches for logging configuration within this library,
     allowing the most recent Python-side changes to be applied.
-    
+
     See <https://docs.rs/pyo3-log/latest/pyo3_log/> for more information.
     """
-

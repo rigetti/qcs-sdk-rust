@@ -2,7 +2,7 @@
 # ruff: noqa: E501, F401, F403, F405
 
 from . import quilc
+
 __all__ = [
     "quilc",
 ]
-

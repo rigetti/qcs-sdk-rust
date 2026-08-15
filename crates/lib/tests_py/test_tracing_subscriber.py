@@ -373,9 +373,9 @@ def _verify_expected_spans(rust_trace_file: str, expected_spans: list[_ExpectedS
                             duration = timedelta(microseconds=duration_ns / 1000)
                             assert duration >= expected.minimum_expected_duration
 
-        assert (
-            counter[expected.span_name] == expected.count
-        ), f'Expected {expected.count} spans with name {expected.span_name} within parent "{expected.parent_span_name}", but found {counter[expected.span_name]}. Added by {expected.added_by}. See {rust_trace_file} trace {hex(expected.trace_id)}'
+        assert counter[expected.span_name] == expected.count, (
+            f'Expected {expected.count} spans with name {expected.span_name} within parent "{expected.parent_span_name}", but found {counter[expected.span_name]}. Added by {expected.added_by}. See {rust_trace_file} trace {hex(expected.trace_id)}'
+        )
 
 
 @pytest.fixture(scope="module")

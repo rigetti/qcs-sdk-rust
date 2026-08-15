@@ -2,6 +2,7 @@
 # ruff: noqa: F401
 
 from qcs_sdk._qcs_sdk.diagnostics import get_report, get_report_async
+
 __all__ = [
     "get_report",
     "get_report_async",

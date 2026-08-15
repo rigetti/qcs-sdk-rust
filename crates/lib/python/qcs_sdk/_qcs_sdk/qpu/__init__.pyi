@@ -10,6 +10,7 @@ from . import api
 from . import experimental
 from . import isa
 from . import translation
+
 __all__ = [
     "ListQuantumProcessorsError",
     "MemoryValues",
@@ -28,12 +29,13 @@ class ListQuantumProcessorsError(_qcs_sdk.QcsSdkError):
     r"""
     API Errors encountered when trying to list available quantum processors.
     """
+
     ...
 
 class MemoryValues:
     r"""
     A row of data containing the contents of a memory region at the end of a job.
-    
+
     There is a variant for each possible type the memory region could be.
     """
     def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.float]]: ...
@@ -44,48 +46,50 @@ class MemoryValues:
         r"""
         Values that correspond to a memory region declared with the BIT or OCTET data type.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.int]) -> MemoryValues.Binary: ...
-    
+
     @typing.final
     class Integer(MemoryValues):
         r"""
         Values that correspond to a memory region declared with the INTEGER data type.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.int]) -> MemoryValues.Integer: ...
-    
+
     @typing.final
     class Real(MemoryValues):
         r"""
         Values that correspond to a memory region declared with the REAL data type.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.float]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.float]) -> MemoryValues.Real: ...
-    
 
 @typing.final
 class QPUResultData:
     r"""
     Encapsulates data returned from the QPU after executing a job.
-    
+
     `QpuResultData` contains "mappings", which map declared memory regions
     in a program (ie. "ro[0]") to that region's readout key in `QpuResultData.readout_values`.
     `readout_values` maps those readout keys to the values emitted for that region
     across all shots.
-    
+
     Read more about QPU readout data in the
     [QCS Documentation](https://docs.rigetti.com/qcs/guides/qpus-vs-qvms#qpu-readout-data)
     """
@@ -104,8 +108,19 @@ class QPUResultData:
         r"""
         Mapping of a readout values identifier (ie. "q0") to a set of `ReadoutValues`.
         """
-    def __getnewargs__(self) -> tuple[builtins.dict[builtins.str, builtins.str], builtins.dict[builtins.str, ReadoutValues], builtins.dict[builtins.str, MemoryValues]]: ...
-    def __new__(cls, mappings: typing.Mapping[builtins.str, builtins.str], readout_values: typing.Mapping[builtins.str, ReadoutValues], memory_values: typing.Mapping[builtins.str, MemoryValues]) -> QPUResultData:
+    def __getnewargs__(
+        self,
+    ) -> tuple[
+        builtins.dict[builtins.str, builtins.str],
+        builtins.dict[builtins.str, ReadoutValues],
+        builtins.dict[builtins.str, MemoryValues],
+    ]: ...
+    def __new__(
+        cls,
+        mappings: typing.Mapping[builtins.str, builtins.str],
+        readout_values: typing.Mapping[builtins.str, ReadoutValues],
+        memory_values: typing.Mapping[builtins.str, MemoryValues],
+    ) -> QPUResultData:
         r"""
         Construct a new `QPUResultData` from mappings and values.
         """
@@ -121,17 +136,17 @@ class QPUResultData:
     def to_register_map(self) -> _qcs_sdk.RegisterMap:
         r"""
         Convert into a [`RegisterMap`].
-        
+
         The [`RegisterMatrix`] for each register will be
         constructed such that each row contains all the final values in the register for a single shot.
-        
+
         # Errors
-        
+
         Returns a [`RegisterMatrixConversionError`] if the execution data for any of the
         registers would result in a jagged matrix.
         [`QpuResultData`] data is captured per measure,
         meaning a value is returned for every measure to a memory reference, not just once per shot.
-        
+
         This is often the case in programs that use mid-circuit measurement or dynamic control flow,
         where measurements to the same memory reference might occur multiple times in a shot, or be
         skipped conditionally. In these cases, building a rectangular [`RegisterMatrix`] would
@@ -163,67 +178,78 @@ class RawQPUReadoutData:
 class ReadoutValues:
     r"""
     A row of readout values from the QPU.
-    
+
     Each row contains all the values emitted to a memory reference across all shots.
     There is a variant for each possible type the list of readout values could be.
     """
-    def __getnewargs__(self) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]]: ...
-    def __new__(cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.float] | typing.Sequence[builtins.complex]) -> ReadoutValues: ...
-    def inner(self) -> builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]: ...
+    def __getnewargs__(
+        self,
+    ) -> tuple[builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]]: ...
+    def __new__(
+        cls, values: typing.Sequence[builtins.int] | typing.Sequence[builtins.float] | typing.Sequence[builtins.complex]
+    ) -> ReadoutValues: ...
+    def inner(
+        self,
+    ) -> builtins.list[builtins.int] | builtins.list[builtins.float] | builtins.list[builtins.complex]: ...
     @typing.final
     class Complex(ReadoutValues):
         r"""
         Complex readout values
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.complex]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.complex]) -> ReadoutValues.Complex: ...
-    
+
     @typing.final
     class Integer(ReadoutValues):
         r"""
         Integer readout values
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.int]) -> ReadoutValues.Integer: ...
-    
+
     @typing.final
     class Real(ReadoutValues):
         r"""
         Real numbered readout values
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.float]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.float]) -> ReadoutValues.Real: ...
-    
 
-def list_quantum_processors(client: typing.Optional[client.QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> builtins.list[builtins.str]:
+def list_quantum_processors(
+    client: typing.Optional[client.QCSClient] = None, timeout: typing.Optional[builtins.float] = None
+) -> builtins.list[builtins.str]:
     r"""
     Returns all available Quantum Processor (QPU) IDs.
-    
+
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param timeout: Maximum duration to wait for API calls to complete, in seconds.
-    
+
     :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     """
 
-def list_quantum_processors_async(client: typing.Optional[client.QCSClient] = None, timeout: typing.Optional[builtins.float] = None) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
+def list_quantum_processors_async(
+    client: typing.Optional[client.QCSClient] = None, timeout: typing.Optional[builtins.float] = None
+) -> collections.abc.Awaitable[builtins.list[builtins.str]]:
     r"""
     Returns all available Quantum Processor (QPU) IDs.
-    
+
     :param client: The ``Qcs`` client to use. Creates one using environment configuration if unset - see https://docs.rigetti.com/qcs/references/qcs-client-configuration
     :param timeout: Maximum duration to wait for API calls to complete, in seconds.
-    
+
     :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
     """
-

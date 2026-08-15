@@ -4,6 +4,7 @@
 import builtins
 from qcs_sdk import _qcs_sdk
 import typing
+
 __all__ = [
     "ChooseRandomRealSubRegions",
     "PrngSeedValue",
@@ -18,7 +19,8 @@ class ChooseRandomRealSubRegions:
     An [`ExternedCall`] that may be used to select one or more random
     sub-regions from a source array of real values to a destination array.
     """
-    NAME: builtins.str = 'choose_random_real_sub_regions'
+
+    NAME: builtins.str = "choose_random_real_sub_regions"
     r"""
     The name of the function referenced by the `PRAGMA EXTERN` and `CALL` instructions.
     """
@@ -26,9 +28,9 @@ class ChooseRandomRealSubRegions:
     def build_signature() -> builtins.str:
         r"""
         Build the signature for the `PRAGMA EXTERN choose_random_real_sub_regions` instruction.
-        
+
         The signature expressed in Quil is as follows:
-        
+
         ```text
         "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
         ```
@@ -44,9 +46,9 @@ class PrngSeedValue:
     def __new__(cls, value: builtins.int) -> PrngSeedValue:
         r"""
         Attempt to create a new instance of `PrngSeedValue` from a `u64`.
-        
+
         # Errors
-        
+
         Returns [`Error::InvalidSeed`] if the value is not in range `[1, MAX_SEQUENCER_VALUE]`
         or if it is not losslessly convertible to `f64`.
         """
@@ -56,34 +58,37 @@ class RandomError(_qcs_sdk.QcsSdkError):
     r"""
     Errors that may occur using the randomization primitives defined in this module.
     """
+
     ...
 
-def choose_random_real_sub_region_indices(seed: PrngSeedValue, start_index: builtins.int, series_length: builtins.int, sub_region_count: builtins.int) -> builtins.list[builtins.int]:
+def choose_random_real_sub_region_indices(
+    seed: PrngSeedValue, start_index: builtins.int, series_length: builtins.int, sub_region_count: builtins.int
+) -> builtins.list[builtins.int]:
     r"""
     Given a seed, start index, series length, and sub-region count, this function
     will generate and return the sequence of pseudo-randomly chosen indices on
     the Rigetti control systems.
-    
+
     For instance, if the following Quil program is run for 100 shots:
-    
+
     ```quil
     # presumed sub-region size is 3.
     DECLARE destination REAL[6] # prng invocations per shot = (6 / sub_region_size)  = 2
     DECLARE source REAL[12]     # implicit sub-region count = (12 / sub_region_size) = 4
     DECLARE seed INTEGER[1]
     DECLARE ro BIT[1]
-    
+
     DELAY 0 1e-6
-    
+
     PRAGMA EXTERN choose_random_real_sub_regions "(destination : mut REAL[], source : REAL[], sub_region_size : INTEGER, seed : mut INTEGER)"
     CALL choose_random_real_sub_regions destination source 3 seed
     ```
-    
+
     with a seed of 639,523, the following will provide the random sequence of sub-region indices:
-    
+
     ```rust
     use qcs::qpu::experimental::random::{choose_random_real_sub_region_indices, PrngSeedValue};
-    
+
     let seed = PrngSeedValue::try_new(639_523).unwrap();
     let start_index = 0;
     let prng_invocations_per_shot = 2;
@@ -102,4 +107,3 @@ def lfsr_v1_next(seed: PrngSeedValue) -> builtins.int:
     it implements a 48-bit LFSR with taps at 0-based indices 47, 46, 20, and 19.
     The taps have been shown to produce maximal sequence lengths for 48-bit strings.
     """
-

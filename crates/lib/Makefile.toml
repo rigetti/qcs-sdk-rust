@@ -59,6 +59,10 @@ description = "Generate Python stub files."
 script_runner = "bash"
 script = '''
 cargo run -p qcs --features stubs --bin stub_gen
+# The generators emit unformatted output and the result is committed, so format it here.
+# `[tool.ruff.lint] exclude` (rather than a top-level `exclude`) is what lets `ruff format`
+# reach these files while they stay unlinted.
+uv run ruff format python/qcs_sdk
 '''
 
 [tasks.check-generated-python-files]
@@ -182,7 +186,7 @@ args = [
 [tasks.format-tracing-subscriber]
 dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
+args = ["run", "ruff", "format", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
 # Only hand-written Python. Everything under `python/qcs_sdk` is generated — reformatting it
@@ -190,7 +194,7 @@ args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
 # (`tests` is the Rust integration-test directory and contains no Python.)
 dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "black", "tests_py", "scripts"]
+args = ["run", "ruff", "format", "tests_py", "scripts"]
 
 [tasks.test-session]
 dependencies = ["install-python-package"]

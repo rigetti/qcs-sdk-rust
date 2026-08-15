@@ -6,6 +6,7 @@ import collections.abc
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk import qvm
 import typing
+
 __all__ = [
     "AddressRequest",
     "ExpectationRequest",
@@ -34,33 +35,36 @@ class AddressRequest:
         r"""
         Exclude all values for the address.
         """
+
         __match_args__ = ()
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls) -> AddressRequest.ExcludeAll: ...
-    
+
     @typing.final
     class IncludeAll(AddressRequest):
         r"""
         Get all values for the address.
         """
+
         __match_args__ = ()
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls) -> AddressRequest.IncludeAll: ...
-    
+
     @typing.final
     class Indices(AddressRequest):
         r"""
         A list of specific indices to get back for the address.
         """
+
         __match_args__ = ("_0",)
         @property
         def _0(self) -> builtins.list[builtins.int]: ...
         def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
         def __len__(self) -> builtins.int: ...
         def __new__(cls, _0: typing.Sequence[builtins.int]) -> AddressRequest.Indices: ...
-    
+
     ...
 
 @typing.final
@@ -83,7 +87,12 @@ class ExpectationRequest:
         r"""
         A Quil program defining the state.
         """
-    def __new__(cls, state_preparation: builtins.str, operators: typing.Sequence[builtins.str], rng_seed: typing.Optional[builtins.int] = None) -> ExpectationRequest:
+    def __new__(
+        cls,
+        state_preparation: builtins.str,
+        operators: typing.Sequence[builtins.str],
+        rng_seed: typing.Optional[builtins.int] = None,
+    ) -> ExpectationRequest:
         r"""
         Creates a new `ExpectationRequest` using the given parameters.
         """
@@ -122,7 +131,15 @@ class MultishotMeasureRequest:
     def trials(self) -> builtins.int: ...
     @trials.setter
     def trials(self, value: builtins.int) -> None: ...
-    def __new__(cls, compiled_quil: builtins.str, trials: builtins.int, qubits: builtins.list[builtins.int], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotMeasureRequest:
+    def __new__(
+        cls,
+        compiled_quil: builtins.str,
+        trials: builtins.int,
+        qubits: builtins.list[builtins.int],
+        measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        rng_seed: typing.Optional[builtins.int] = None,
+    ) -> MultishotMeasureRequest:
         r"""
         Construct a new `MultishotMeasureRequest` using the given parameters.
         """
@@ -186,7 +203,15 @@ class MultishotRequest:
     def trials(self) -> builtins.int: ...
     @trials.setter
     def trials(self, value: builtins.int) -> None: ...
-    def __new__(cls, program: builtins.str, shots: builtins.int, addresses: typing.Mapping[builtins.str, AddressRequest], measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> MultishotRequest:
+    def __new__(
+        cls,
+        program: builtins.str,
+        shots: builtins.int,
+        addresses: typing.Mapping[builtins.str, AddressRequest],
+        measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        rng_seed: typing.Optional[builtins.int] = None,
+    ) -> MultishotRequest:
         r"""
         Creates a new `MultishotRequest` with the given parameters.
         """
@@ -227,28 +252,42 @@ class WavefunctionRequest:
         r"""
         An optional seed for the random number generator.
         """
-    def __new__(cls, compiled_quil: builtins.str, measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None, rng_seed: typing.Optional[builtins.int] = None) -> WavefunctionRequest:
+    def __new__(
+        cls,
+        compiled_quil: builtins.str,
+        measurement_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        gate_noise: typing.Optional[tuple[builtins.float, builtins.float, builtins.float]] = None,
+        rng_seed: typing.Optional[builtins.int] = None,
+    ) -> WavefunctionRequest:
         r"""
         Create a new `WavefunctionRequest` with the given parameters.
         """
 
 def get_version_info(client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> builtins.str: ...
-
-def get_version_info_async(client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> collections.abc.Awaitable[builtins.str]: ...
-
-def get_wavefunction(request: WavefunctionRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> builtins.list[builtins.int]: ...
-
-def get_wavefunction_async(request: WavefunctionRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.int]]: ...
-
-def measure_expectation(request: ExpectationRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> builtins.list[builtins.float]: ...
-
-def measure_expectation_async(request: ExpectationRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.float]]: ...
-
-def run(request: MultishotRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> MultishotResponse: ...
-
-def run_and_measure(request: MultishotMeasureRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> builtins.list[builtins.list[builtins.int]]: ...
-
-def run_and_measure_async(request: MultishotMeasureRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> collections.abc.Awaitable[builtins.list[builtins.list[builtins.int]]]: ...
-
-def run_async(request: MultishotRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None) -> collections.abc.Awaitable[MultishotResponse]: ...
-
+def get_version_info_async(
+    client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> collections.abc.Awaitable[builtins.str]: ...
+def get_wavefunction(
+    request: WavefunctionRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> builtins.list[builtins.int]: ...
+def get_wavefunction_async(
+    request: WavefunctionRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> collections.abc.Awaitable[builtins.list[builtins.int]]: ...
+def measure_expectation(
+    request: ExpectationRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> builtins.list[builtins.float]: ...
+def measure_expectation_async(
+    request: ExpectationRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> collections.abc.Awaitable[builtins.list[builtins.float]]: ...
+def run(
+    request: MultishotRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> MultishotResponse: ...
+def run_and_measure(
+    request: MultishotMeasureRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> builtins.list[builtins.list[builtins.int]]: ...
+def run_and_measure_async(
+    request: MultishotMeasureRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> collections.abc.Awaitable[builtins.list[builtins.list[builtins.int]]]: ...
+def run_async(
+    request: MultishotRequest, client: qvm.QVMClient, options: typing.Optional[qvm.QVMOptions] = None
+) -> collections.abc.Awaitable[MultishotResponse]: ...
