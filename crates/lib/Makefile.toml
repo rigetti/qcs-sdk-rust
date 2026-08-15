@@ -1,7 +1,6 @@
 [env]
 RUST_BACKTRACE = 0
 CARGO_MAKE_CARGO_BUILD_TEST_FLAGS = "--features libquil,_insecure-issuer-validation,stubs"  # Disable --all-features to avoid manual tests in CI for now
-PYTHON_VERSION = { value = "3.13", condition = { env_not_set = ["PYTHON_VERSION"] } }
 
 [tasks.pre-test]
 command = "docker"
