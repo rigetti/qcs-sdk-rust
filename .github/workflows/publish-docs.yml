@@ -29,7 +29,6 @@ jobs:
 
       - name: Build qcs-sdk-python documentation
         run: |
-          . scripts/ensure-venv
           cargo make --cwd crates/lib document-python-package
 
       - name: Deploy preview

@@ -49,8 +49,6 @@ jobs:
           CARGO_MAKE_RUN_CLIPPY: true
           CARGO_MAKE_BUILD_EXAMPLES: true
         run: |
-          # A Python environment is required when using PyO3, even when not running Python checks.
-          . scripts/ensure-venv
           cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
 
   check-python:
@@ -91,5 +89,4 @@ jobs:
       - name: Test Python Package
         shell: bash
         run: |
-          . scripts/ensure-venv
           cargo make --cwd crates/lib --makefile Makefile.toml test-python-package

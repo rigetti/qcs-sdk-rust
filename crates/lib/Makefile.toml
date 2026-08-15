@@ -55,14 +55,10 @@ uv sync --group dev
 '''
 
 [tasks.generate-stubs]
-# `stub_gen` is a binary rather than an `extension-module` cdylib, so it links against
-# libpython and needs to find it at load time. Sourcing `ensure-venv` here (rather than only
-# setting `VIRTUAL_ENV`) is what puts the interpreter's `LIBDIR` on `LD_LIBRARY_PATH`.
 dependencies = ["install-python-deps"]
 description = "Generate Python stub files."
 script_runner = "bash"
 script = '''
-. "${CARGO_MAKE_WORKSPACE_WORKING_DIRECTORY}/scripts/ensure-venv"
 cargo run -p qcs --features stubs --bin stub_gen
 '''
 
