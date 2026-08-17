@@ -59,13 +59,13 @@
                     <a class="class" href="#ExpectationRequest">ExpectationRequest</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExpectationRequest.state_preparation">state_preparation</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExpectationRequest.operators">operators</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExpectationRequest.rng_seed">rng_seed</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExpectationRequest.state_preparation">state_preparation</a>
                         </li>
                 </ul>
 
@@ -74,22 +74,22 @@
                     <a class="class" href="#MultishotMeasureRequest">MultishotMeasureRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.trials">trials</a>
+                                <a class="variable" href="#MultishotMeasureRequest.qubits">qubits</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotMeasureRequest.compiled_quil">compiled_quil</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.qubits">qubits</a>
+                                <a class="variable" href="#MultishotMeasureRequest.trials">trials</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotMeasureRequest.gate_noise">gate_noise</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.rng_seed">rng_seed</a>
+                                <a class="variable" href="#MultishotMeasureRequest.measurement_noise">measurement_noise</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotMeasureRequest.measurement_noise">measurement_noise</a>
+                                <a class="variable" href="#MultishotMeasureRequest.rng_seed">rng_seed</a>
                         </li>
                 </ul>
 
@@ -98,22 +98,22 @@
                     <a class="class" href="#MultishotRequest">MultishotRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#MultishotRequest.trials">trials</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#MultishotRequest.measurement_noise">measurement_noise</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#MultishotRequest.rng_seed">rng_seed</a>
                         </li>
                         <li>
                                 <a class="variable" href="#MultishotRequest.compiled_quil">compiled_quil</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotRequest.addresses">addresses</a>
+                                <a class="variable" href="#MultishotRequest.gate_noise">gate_noise</a>
                         </li>
                         <li>
-                                <a class="variable" href="#MultishotRequest.gate_noise">gate_noise</a>
+                                <a class="variable" href="#MultishotRequest.rng_seed">rng_seed</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MultishotRequest.trials">trials</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#MultishotRequest.addresses">addresses</a>
                         </li>
                 </ul>
 
@@ -131,16 +131,16 @@
                     <a class="class" href="#WavefunctionRequest">WavefunctionRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#WavefunctionRequest.compiled_quil">compiled_quil</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#WavefunctionRequest.measurement_noise">measurement_noise</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#WavefunctionRequest.rng_seed">rng_seed</a>
                         </li>
                         <li>
+                                <a class="variable" href="#WavefunctionRequest.compiled_quil">compiled_quil</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#WavefunctionRequest.gate_noise">gate_noise</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#WavefunctionRequest.measurement_noise">measurement_noise</a>
                         </li>
                 </ul>
 
@@ -199,25 +199,43 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.qvm.api</span><span class="w"> </span><span class="kn">import</span> <span class="n">AddressRequest</span><span class="p">,</span> <span class="n">ExpectationRequest</span><span class="p">,</span> <span class="n">MultishotMeasureRequest</span><span class="p">,</span> <span class="n">MultishotRequest</span><span class="p">,</span> <span class="n">MultishotResponse</span><span class="p">,</span> <span class="n">WavefunctionRequest</span><span class="p">,</span> <span class="n">get_version_info</span><span class="p">,</span> <span class="n">get_version_info_async</span><span class="p">,</span> <span class="n">get_wavefunction</span><span class="p">,</span> <span class="n">get_wavefunction_async</span><span class="p">,</span> <span class="n">measure_expectation</span><span class="p">,</span> <span class="n">measure_expectation_async</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span> <span class="n">run_and_measure</span><span class="p">,</span> <span class="n">run_and_measure_async</span><span class="p">,</span> <span class="n">run_async</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="s2">&quot;AddressRequest&quot;</span><span class="p">,</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="s2">&quot;ExpectationRequest&quot;</span><span class="p">,</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="s2">&quot;MultishotMeasureRequest&quot;</span><span class="p">,</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="s2">&quot;MultishotRequest&quot;</span><span class="p">,</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;MultishotResponse&quot;</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;WavefunctionRequest&quot;</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;get_version_info&quot;</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;get_version_info_async&quot;</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;get_wavefunction&quot;</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="s2">&quot;get_wavefunction_async&quot;</span><span class="p">,</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="s2">&quot;measure_expectation&quot;</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="s2">&quot;measure_expectation_async&quot;</span><span class="p">,</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="s2">&quot;run&quot;</span><span class="p">,</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="s2">&quot;run_and_measure&quot;</span><span class="p">,</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="s2">&quot;run_and_measure_async&quot;</span><span class="p">,</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="s2">&quot;run_async&quot;</span><span class="p">,</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="p">]</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.qvm.api</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>    <span class="n">AddressRequest</span><span class="p">,</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="n">ExpectationRequest</span><span class="p">,</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="n">MultishotMeasureRequest</span><span class="p">,</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="n">MultishotRequest</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="n">MultishotResponse</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">WavefunctionRequest</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">get_version_info</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">get_version_info_async</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">get_wavefunction</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">get_wavefunction_async</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">measure_expectation</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">measure_expectation_async</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">run</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">run_and_measure</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">run_and_measure_async</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">run_async</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="s2">&quot;AddressRequest&quot;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="s2">&quot;ExpectationRequest&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;MultishotMeasureRequest&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="s2">&quot;MultishotRequest&quot;</span><span class="p">,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="s2">&quot;MultishotResponse&quot;</span><span class="p">,</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="s2">&quot;WavefunctionRequest&quot;</span><span class="p">,</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;get_version_info&quot;</span><span class="p">,</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;get_version_info_async&quot;</span><span class="p">,</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="s2">&quot;get_wavefunction&quot;</span><span class="p">,</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="s2">&quot;get_wavefunction_async&quot;</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="s2">&quot;measure_expectation&quot;</span><span class="p">,</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="s2">&quot;measure_expectation_async&quot;</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="s2">&quot;run&quot;</span><span class="p">,</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="s2">&quot;run_and_measure&quot;</span><span class="p">,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="s2">&quot;run_and_measure_async&quot;</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="s2">&quot;run_async&quot;</span><span class="p">,</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="p">]</span>
 </span></pre></div>
 
 
@@ -296,6 +314,19 @@
 </div>
 
 
+                            <div id="ExpectationRequest.state_preparation" class="classattr">
+                                <div class="attr variable">
+            <span class="name">state_preparation</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExpectationRequest.state_preparation"></a>
+    
+            <div class="docstring"><p>A Quil program defining the state.</p>
+</div>
+
+
+                            </div>
                             <div id="ExpectationRequest.operators" class="classattr">
                                 <div class="attr variable">
             <span class="name">operators</span>
@@ -322,19 +353,6 @@
 
 
                             </div>
-                            <div id="ExpectationRequest.state_preparation" class="classattr">
-                                <div class="attr variable">
-            <span class="name">state_preparation</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExpectationRequest.state_preparation"></a>
-    
-            <div class="docstring"><p>A Quil program defining the state.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="MultishotMeasureRequest">
                     <div class="attr class">
@@ -350,15 +368,17 @@
 </div>
 
 
-                            <div id="MultishotMeasureRequest.trials" class="classattr">
+                            <div id="MultishotMeasureRequest.qubits" class="classattr">
                                 <div class="attr variable">
-            <span class="name">trials</span>
+            <span class="name">qubits</span>
 
         
     </div>
-    <a class="headerlink" href="#MultishotMeasureRequest.trials"></a>
+    <a class="headerlink" href="#MultishotMeasureRequest.qubits"></a>
     
-    
+            <div class="docstring"><p>Qubits to measure</p>
+</div>
+
 
                             </div>
                             <div id="MultishotMeasureRequest.compiled_quil" class="classattr">
@@ -374,17 +394,15 @@
 
 
                             </div>
-                            <div id="MultishotMeasureRequest.qubits" class="classattr">
+                            <div id="MultishotMeasureRequest.trials" class="classattr">
                                 <div class="attr variable">
-            <span class="name">qubits</span>
+            <span class="name">trials</span>
 
         
     </div>
-    <a class="headerlink" href="#MultishotMeasureRequest.qubits"></a>
+    <a class="headerlink" href="#MultishotMeasureRequest.trials"></a>
     
-            <div class="docstring"><p>Qubits to measure</p>
-</div>
-
+    
 
                             </div>
                             <div id="MultishotMeasureRequest.gate_noise" class="classattr">
@@ -400,19 +418,6 @@
 
 
                             </div>
-                            <div id="MultishotMeasureRequest.rng_seed" class="classattr">
-                                <div class="attr variable">
-            <span class="name">rng_seed</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotMeasureRequest.rng_seed"></a>
-    
-            <div class="docstring"><p>An optional seed for the random number generator.</p>
-</div>
-
-
-                            </div>
                             <div id="MultishotMeasureRequest.measurement_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">measurement_noise</span>
@@ -422,6 +427,19 @@
     <a class="headerlink" href="#MultishotMeasureRequest.measurement_noise"></a>
     
             <div class="docstring"><p>Simulated measurement noise for the X, Y, and Z axes.</p>
+</div>
+
+
+                            </div>
+                            <div id="MultishotMeasureRequest.rng_seed" class="classattr">
+                                <div class="attr variable">
+            <span class="name">rng_seed</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotMeasureRequest.rng_seed"></a>
+    
+            <div class="docstring"><p>An optional seed for the random number generator.</p>
 </div>
 
 
@@ -441,17 +459,6 @@
 </div>
 
 
-                            <div id="MultishotRequest.trials" class="classattr">
-                                <div class="attr variable">
-            <span class="name">trials</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotRequest.trials"></a>
-    
-    
-
-                            </div>
                             <div id="MultishotRequest.measurement_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">measurement_noise</span>
@@ -461,19 +468,6 @@
     <a class="headerlink" href="#MultishotRequest.measurement_noise"></a>
     
             <div class="docstring"><p>Simulated measurement noise for the X, Y, and Z axes.</p>
-</div>
-
-
-                            </div>
-                            <div id="MultishotRequest.rng_seed" class="classattr">
-                                <div class="attr variable">
-            <span class="name">rng_seed</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotRequest.rng_seed"></a>
-    
-            <div class="docstring"><p>An optional seed for the random number generator.</p>
 </div>
 
 
@@ -491,19 +485,6 @@
 
 
                             </div>
-                            <div id="MultishotRequest.addresses" class="classattr">
-                                <div class="attr variable">
-            <span class="name">addresses</span>
-
-        
-    </div>
-    <a class="headerlink" href="#MultishotRequest.addresses"></a>
-    
-            <div class="docstring"><p>The memory regions to include in the response.</p>
-</div>
-
-
-                            </div>
                             <div id="MultishotRequest.gate_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">gate_noise</span>
@@ -513,6 +494,43 @@
     <a class="headerlink" href="#MultishotRequest.gate_noise"></a>
     
             <div class="docstring"><p>Simulated gate noise for the X, Y, and Z axes.</p>
+</div>
+
+
+                            </div>
+                            <div id="MultishotRequest.rng_seed" class="classattr">
+                                <div class="attr variable">
+            <span class="name">rng_seed</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotRequest.rng_seed"></a>
+    
+            <div class="docstring"><p>An optional seed for the random number generator.</p>
+</div>
+
+
+                            </div>
+                            <div id="MultishotRequest.trials" class="classattr">
+                                <div class="attr variable">
+            <span class="name">trials</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotRequest.trials"></a>
+    
+    
+
+                            </div>
+                            <div id="MultishotRequest.addresses" class="classattr">
+                                <div class="attr variable">
+            <span class="name">addresses</span>
+
+        
+    </div>
+    <a class="headerlink" href="#MultishotRequest.addresses"></a>
+    
+            <div class="docstring"><p>The memory regions to include in the response.</p>
 </div>
 
 
@@ -560,32 +578,6 @@
 </div>
 
 
-                            <div id="WavefunctionRequest.compiled_quil" class="classattr">
-                                <div class="attr variable">
-            <span class="name">compiled_quil</span>
-
-        
-    </div>
-    <a class="headerlink" href="#WavefunctionRequest.compiled_quil"></a>
-    
-            <div class="docstring"><p>The Quil program to run.</p>
-</div>
-
-
-                            </div>
-                            <div id="WavefunctionRequest.measurement_noise" class="classattr">
-                                <div class="attr variable">
-            <span class="name">measurement_noise</span>
-
-        
-    </div>
-    <a class="headerlink" href="#WavefunctionRequest.measurement_noise"></a>
-    
-            <div class="docstring"><p>Simulated measurement noise for the X, Y, and Z axes.</p>
-</div>
-
-
-                            </div>
                             <div id="WavefunctionRequest.rng_seed" class="classattr">
                                 <div class="attr variable">
             <span class="name">rng_seed</span>
@@ -599,6 +591,19 @@
 
 
                             </div>
+                            <div id="WavefunctionRequest.compiled_quil" class="classattr">
+                                <div class="attr variable">
+            <span class="name">compiled_quil</span>
+
+        
+    </div>
+    <a class="headerlink" href="#WavefunctionRequest.compiled_quil"></a>
+    
+            <div class="docstring"><p>The Quil program to run.</p>
+</div>
+
+
+                            </div>
                             <div id="WavefunctionRequest.gate_noise" class="classattr">
                                 <div class="attr variable">
             <span class="name">gate_noise</span>
@@ -608,6 +613,19 @@
     <a class="headerlink" href="#WavefunctionRequest.gate_noise"></a>
     
             <div class="docstring"><p>Simulated gate noise for the X, Y, and Z axes.</p>
+</div>
+
+
+                            </div>
+                            <div id="WavefunctionRequest.measurement_noise" class="classattr">
+                                <div class="attr variable">
+            <span class="name">measurement_noise</span>
+
+        
+    </div>
+    <a class="headerlink" href="#WavefunctionRequest.measurement_noise"></a>
+    
+            <div class="docstring"><p>Simulated measurement noise for the X, Y, and Z axes.</p>
 </div>
 
 
