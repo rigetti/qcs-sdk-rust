@@ -46,15 +46,7 @@ dependencies = ["deny", "lint", "check", "test-flow"]
 
 # ----
 
-[tasks.install-python-deps]
-description = "Ensure a virtual environment exists, and sync Python dependencies with uv."
-script_runner = "bash"
-script = '''
-uv sync --group dev
-'''
-
 [tasks.generate-stubs]
-dependencies = ["install-python-deps"]
 description = "Generate Python stub files."
 script_runner = "bash"
 script = '''
@@ -62,7 +54,7 @@ cargo run -p qcs --features stubs --bin stub_gen
 # The generators emit unformatted output and the result is committed, so format it here.
 # `[tool.ruff.lint] exclude` (rather than a top-level `exclude`) is what lets `ruff format`
 # reach these files while they stay unlinted.
-uv run ruff format python/qcs_sdk
+uv run --group dev ruff format python/qcs_sdk
 '''
 
 [tasks.check-generated-python-files]
@@ -86,25 +78,25 @@ echo "Generated Python files are up to date."
 '''
 
 [tasks.package-python]
-description = "Build a release version of the Python package to the active virtual environment."
-dependencies = ["install-python-deps", "generate-stubs"]
+description = "Build a release version of the Python package and install in the virtual environment."
+dependencies = ["generate-stubs"]
 command = "uv"
-args = ["run", "maturin", "build", "--release"]
+args = ["run", "--group", "dev", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
 # `generate-stubs` also writes the package's `__init__.py` files, which are what expose the
 # compiled `qcs_sdk._qcs_sdk` modules under their public `qcs_sdk` names — so it is a build
 # input now, not just a convenience for type checkers.
 description = "Build the Python package and install to the active virtual environment."
-dependencies = ["install-python-deps", "generate-stubs"]
+dependencies = ["generate-stubs"]
 command = "uv"
-args = ["run", "maturin", "develop", "--uv"]
+args = ["run", "--group", "dev", "maturin", "develop"]
 
 [tasks.pytest]
 description = "Run Python tests."
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "pytest"]
+args = ["run", "--group", "dev", "pytest"]
 
 [tasks.pytest-flow]
 dependencies = [
@@ -121,6 +113,8 @@ command = "uv"
 cwd = "python"
 args = [
     "run",
+    "--group",
+    "dev",
     "stubtest",
     "--allowlist",
     "stubtest-allowlist",
@@ -138,13 +132,13 @@ dependencies = ["stubtest"]
 description = "Find errors in Python-related Rust code."
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
+args = ["run", "--group", "dev", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
 description = "Print the Python package layout as defined within Rust code."
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
+args = ["run", "--group", "dev", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
 [tasks.test-python-package]
 description = "Run all Python-related tests."
@@ -174,6 +168,8 @@ dependencies = ["install-python-package"]
 command = "uv"
 args = [
     "run",
+    "--group",
+    "dev", 
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
@@ -184,27 +180,25 @@ args = [
 # ----
 
 [tasks.format-tracing-subscriber]
-dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "ruff", "format", "python/qcs_sdk/_tracing_subscriber"]
+args = ["run", "--group", "dev", "ruff", "format", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
 # Only hand-written Python. Everything under `python/qcs_sdk` is generated — reformatting it
 # makes `check-generated-python-files` fail until the next `generate-stubs` run.
 # (`tests` is the Rust integration-test directory and contains no Python.)
-dependencies = ["install-python-deps"]
 command = "uv"
-args = ["run", "ruff", "format", "tests_py", "scripts"]
+args = ["run", "--group", "dev", "ruff", "format", "tests_py", "scripts"]
 
 [tasks.test-session]
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "pytest", "tests_py", "--with-qcs-session"]
+args = ["run", "--group", "dev", "pytest", "tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
 dependencies = ["install-python-package"]
 command = "uv"
-args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
+args = ["run", "--group", "dev", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]
