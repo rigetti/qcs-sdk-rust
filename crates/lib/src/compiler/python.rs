@@ -61,6 +61,31 @@ mod pyquilc {
 impl_repr!(NativeQuilMetadata);
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[pymethods]
+impl CompilationResult {
+    /// The compiled program
+    // `quil`'s modules are not re-homed into our stub tree (see `FOREIGN_MODULE_ROOTS`), so
+    // this reference is to a foreign module, which `pyo3_stub_gen` imports as
+    // `import quil._quil.program` — binding only `quil`. Naming the type in full keeps the
+    // reference valid under that import.
+    #[gen_stub(override_return_type(
+        type_repr = "quil._quil.program.Program",
+        imports = ("quil._quil.program"),
+    ))]
+    #[getter]
+    fn program(&self) -> quil_rs::program::Program {
+        self.program.clone()
+    }
+
+    /// Metadata about the compiled program
+    #[getter]
+    fn native_quil_metadata(&self) -> Option<NativeQuilMetadata> {
+        self.native_quil_metadata.clone()
+    }
+}
+
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl CompilerOpts {
     /// Create a new instance of `CompilerOpts`.

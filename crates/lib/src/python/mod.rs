@@ -77,7 +77,13 @@ create_init_submodule! {
         "compiler": compiler::python::init_submodule,
         "qpu": qpu::python::init_submodule,
         "qvm": qvm::python::init_submodule,
-        "diagnostics": diagnostics::python::init_submodule
+        "diagnostics": diagnostics::python::init_submodule,
+        // Types we borrow from these crates are part of our API surface, but each extension
+        // module builds its own copy of their pyclasses: the `Program` we hand back is not the
+        // installed `quil` package's `Program`. Registering them here gives our copies a name
+        // under `qcs_sdk`, so users have a coherent set of classes to work with.
+        "quil": quil_rs::quilpy::init_submodule,
+        "common": qcs_api_client_common::init_submodule
     ],
 }
 
@@ -109,8 +115,9 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(feature = "stubs")]
 mod stubs {
     use pyo3_stub_gen::{
-        define_stub_info_gatherer, generate::Module, module_doc, reexport_module_members, Result,
-        StubInfo,
+        define_stub_info_gatherer,
+        generate::{ClassDef as Module_ClassDef, Module},
+        module_doc, reexport_module_members, ImportRef, ModuleRef, Result, StubInfo, TypeInfo,
     };
     use std::path::Path;
 
@@ -232,6 +239,215 @@ mod stubs {
         }
     }
 
+
+    /// Foreign module trees that `init_module` re-registers under our own package, paired with
+    /// the module path they are registered as. See [`rehome_module_tree`].
+    ///
+    /// `quil._quil` is deliberately absent: `quil-rs` post-processes its own generated stubs in
+    /// its `stub_gen` binary — resolving `$SELF` and parameterizing generic `self` types — and
+    /// that pass is not reachable from here, so a relocated `quil` tree would carry unresolved
+    /// placeholders. Its one reference site is handled by a `gen_stub` type override instead.
+    const FOREIGN_MODULE_ROOTS: [(&str, &str); 1] = [(
+        "qcs_api_client_common._qcs_api_client_common",
+        "qcs_sdk._qcs_sdk.common",
+    )];
+
+    /// Move every module under `foreign_root` to the same position under `local_root`, and
+    /// retarget every reference to those modules across the whole stub tree.
+    ///
+    /// Each extension module builds its own copy of a linked crate's `#[pyclass]`es, so the
+    /// `Program` we return is not the installed `quil` package's `Program` — it is ours, and
+    /// `init_module` gives it a name under `qcs_sdk`. Relocating the declarations makes the
+    /// stubs say the same thing. It also makes the modules internal, so `pyo3_stub_gen` writes
+    /// `from qcs_sdk._qcs_sdk.quil import program` instead of the `import quil._quil.program`
+    /// form it uses for foreign modules — which binds only `quil`, leaving the `program.Program`
+    /// references it emits undefined.
+    fn rehome_module_tree(stubs: &mut StubInfo, foreign_root: &str, local_root: &str) {
+        let rehomed = |name: &str| -> Option<String> {
+            if name == foreign_root {
+                Some(local_root.to_string())
+            } else {
+                name.strip_prefix(&format!("{foreign_root}."))
+                    .map(|rest| format!("{local_root}.{rest}"))
+            }
+        };
+
+        let moved: Vec<(String, String)> = stubs
+            .modules
+            .keys()
+            .filter_map(|name| rehomed(name).map(|local| (name.clone(), local)))
+            .collect();
+
+        for (foreign, local) in moved {
+            let Some(mut module) = stubs.modules.remove(&foreign) else {
+                continue;
+            };
+
+            // `name` is the module's own path; `default_module_name` is the package root that
+            // `ModuleRef::Default` resolves to, which is ours now.
+            local.clone_into(&mut module.name);
+            module.default_module_name = "qcs_sdk._qcs_sdk".to_string();
+            for class in module.class.values_mut() {
+                rehome_class(class, &local);
+            }
+            for enum_ in module.enum_.values_mut() {
+                enum_.module = Some(leak(local.clone()));
+            }
+
+            stubs.modules.insert(local.clone(), module);
+            ensure_submod(stubs, &local);
+        }
+
+        // A type is named by its module's last component — `configuration.OAuthSession` — so
+        // where re-homing changes that component, the references have to be renamed too:
+        // `qcs_api_client_common._qcs_api_client_common` becomes `common`.
+        let renamed_leaf = leaf(foreign_root) != leaf(local_root);
+
+        // References live in every module, not just the relocated ones: `Qcs` sits in
+        // `qcs_sdk._qcs_sdk.client` and returns a `qcs_api_client_common` type.
+        for module in stubs.modules.values_mut() {
+            retarget_module_refs(module, &rehomed, renamed_leaf.then(|| (leaf(foreign_root), leaf(local_root))));
+        }
+    }
+
+    /// Point a class, its nested classes, and its members at `module`.
+    fn rehome_class(class: &mut Module_ClassDef, module: &str) {
+        class.module = Some(leak(module.to_string()));
+        for nested in &mut class.classes {
+            rehome_class(nested, module);
+        }
+    }
+
+    /// Rewrite every module path a type reference names, using `rehomed` to map old to new.
+    fn retarget_module_refs(
+        module: &mut Module,
+        rehomed: &impl Fn(&str) -> Option<String>,
+        renamed_leaf: Option<(&str, &str)>,
+    ) {
+        let mut retarget =
+            |type_info: &mut TypeInfo| retarget_type_info(type_info, rehomed, renamed_leaf);
+
+        for class in module.class.values_mut() {
+            visit_class_types(class, &mut retarget);
+        }
+        for enum_ in module.enum_.values_mut() {
+            for method in &mut enum_.methods {
+                visit_method_types(method, &mut retarget);
+            }
+            for member in enum_
+                .attrs
+                .iter_mut()
+                .chain(&mut enum_.getters)
+                .chain(&mut enum_.setters)
+            {
+                retarget(&mut member.r#type);
+            }
+        }
+        for function in module.function.values_mut().flatten() {
+            visit_parameter_types(&mut function.parameters, &mut retarget);
+            retarget(&mut function.r#return);
+        }
+        for variable in module.variables.values_mut() {
+            retarget(&mut variable.type_);
+        }
+        for alias in module.type_aliases.values_mut() {
+            retarget(&mut alias.type_);
+        }
+    }
+
+    fn visit_class_types(class: &mut Module_ClassDef, retarget: &mut impl FnMut(&mut TypeInfo)) {
+        for base in &mut class.bases {
+            retarget(base);
+        }
+        for member in &mut class.attrs {
+            retarget(&mut member.r#type);
+        }
+        for (getter, setter) in class.getter_setters.values_mut() {
+            for member in getter.iter_mut().chain(setter.iter_mut()) {
+                retarget(&mut member.r#type);
+            }
+        }
+        for method in class.methods.values_mut().flatten() {
+            visit_method_types(method, retarget);
+        }
+        for nested in &mut class.classes {
+            visit_class_types(nested, retarget);
+        }
+    }
+
+    fn visit_method_types(
+        method: &mut pyo3_stub_gen::generate::MethodDef,
+        retarget: &mut impl FnMut(&mut TypeInfo),
+    ) {
+        visit_parameter_types(&mut method.parameters, retarget);
+        retarget(&mut method.r#return);
+    }
+
+    fn visit_parameter_types(
+        parameters: &mut pyo3_stub_gen::generate::Parameters,
+        retarget: &mut impl FnMut(&mut TypeInfo),
+    ) {
+        for parameter in parameters
+            .positional_only
+            .iter_mut()
+            .chain(&mut parameters.positional_or_keyword)
+            .chain(&mut parameters.keyword_only)
+            .chain(&mut parameters.varargs)
+            .chain(&mut parameters.varkw)
+        {
+            retarget(&mut parameter.type_info);
+        }
+    }
+
+    /// Rewrite the module paths in a single type reference: where the type is declared, what has
+    /// to be imported to name it, and the per-identifier map the generator uses to qualify it.
+    fn retarget_type_info(
+        type_info: &mut TypeInfo,
+        rehomed: &impl Fn(&str) -> Option<String>,
+        renamed_leaf: Option<(&str, &str)>,
+    ) {
+        let retarget_module_ref = |module: &mut ModuleRef| {
+            if let ModuleRef::Named(name) = module {
+                if let Some(local) = rehomed(name) {
+                    *name = local;
+                }
+            }
+        };
+
+        if let Some(source_module) = type_info.source_module.as_mut() {
+            retarget_module_ref(source_module);
+        }
+        type_info.import = type_info
+            .import
+            .drain()
+            .map(|mut import| {
+                if let ImportRef::Module(module) = &mut import {
+                    retarget_module_ref(module);
+                }
+                import
+            })
+            .collect();
+        for type_ref in type_info.type_refs.values_mut() {
+            retarget_module_ref(&mut type_ref.module);
+        }
+        if let Some((foreign_leaf, local_leaf)) = renamed_leaf {
+            type_info.name = type_info
+                .name
+                .replace(&format!("{foreign_leaf}."), &format!("{local_leaf}."));
+        }
+    }
+
+    /// The last component of a dotted module path, which is how types from that module are named.
+    fn leaf(module: &str) -> &str {
+        module.rsplit('.').next().unwrap_or(module)
+    }
+
+    /// `ClassDef::module` and `EnumDef::module` are `&'static str`, so a computed path has to
+    /// outlive the generation run. It does — this is a one-shot binary.
+    fn leak(value: String) -> &'static str {
+        Box::leak(value.into_boxed_str())
+    }
+
     /// Gather stub information to generate stub files.
     pub fn stub_info() -> Result<StubInfo> {
         let manifest_dir: &Path = env!("CARGO_MANIFEST_DIR").as_ref();
@@ -239,11 +455,18 @@ mod stubs {
 
         // `pyo3_stub_gen` gathers declarations from every linked crate, so dependencies that
         // define their own Python packages — `quil-rs`, `qcs-api-client-common` — contribute
-        // their modules here too. Generation rejects any non-empty module outside this
-        // package's module path, and writing files for them would shadow the real, installed
-        // packages, so drop them. The cost is that our stubs refer to foreign types by their
-        // private paths (`quil._quil.program.Program`), since resolving the public alias needs
-        // the foreign module to still be present at generation time.
+        // their modules here too. `init_module` registers those crates' classes under
+        // `qcs_sdk._qcs_sdk.quil` and `qcs_sdk._qcs_sdk.common`, because the class objects our
+        // extension module creates are its own, distinct from the ones the installed `quil` and
+        // `qcs_api_client_common` packages create. Move their declarations to match, so the
+        // stubs describe the classes we actually hand out rather than the other packages'.
+        for (foreign_root, local_root) in FOREIGN_MODULE_ROOTS {
+            rehome_module_tree(&mut stubs, foreign_root, local_root);
+        }
+
+        // Anything still outside our module path is a foreign module we do not re-export.
+        // Generation rejects any non-empty module outside this package's module path, and
+        // writing files for them would shadow the real, installed packages, so drop them.
         stubs
             .modules
             .retain(|name, _| name == "qcs_sdk" || name.starts_with("qcs_sdk."));

@@ -63,14 +63,12 @@ pub trait Client {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(
-        module = "qcs_sdk._qcs_sdk.compiler.quilc",
-        get_all,
-        frozen,
-        from_py_object
-    )
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", frozen, from_py_object)
 )]
 pub struct CompilationResult {
+    // Both fields are exposed through explicit getters in `crate::compiler::python` rather than
+    // `get_all`: `Program` comes from `quil`, and only a getter can carry the `gen_stub` type
+    // override that keeps its stub reference fully qualified (struct fields have no such hook).
     /// The compiled program
     pub program: Program,
     /// Metadata about the compiled program

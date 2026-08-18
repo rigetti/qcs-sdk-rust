@@ -5,7 +5,7 @@ import builtins
 import collections.abc
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk.qpu import isa
-from quil._quil import program
+import quil._quil.program
 import typing
 
 __all__ = [
@@ -45,7 +45,7 @@ class CompilationResult:
         Metadata about the compiled program
         """
     @property
-    def program(self) -> program.Program:
+    def program(self) -> quil._quil.program.Program:
         r"""
         The compiled program
         """

@@ -4,6 +4,12 @@
 qcs_sdk._tracing_subscriber.*
 qcs_sdk._qcs_sdk._tracing_subscriber
 
+# `init_module` registers `quil`'s classes here, but their stubs are not re-homed into our tree:
+# `quil-rs` post-processes its own generated stubs (resolving `$SELF`, parameterizing generic
+# `self` types) in a binary we cannot call, so the relocated tree would carry unresolved
+# placeholders. `common` has no such pass and is re-homed normally.
+qcs_sdk._qcs_sdk.quil
+
 # The generated stubs don't (yet) carry an `__all__` for the private extension module.
 qcs_sdk._qcs_sdk.__all__
 

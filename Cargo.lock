@@ -457,7 +457,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -982,7 +982,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2231,7 +2231,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3249,15 +3249,15 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber"
-version = "0.9.0"
+version = "0.9.1-kjs.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8eef7a29520a43da6e6b6a021d3faf81c2b5464b170fb524ec0ebc25137cad7"
+checksum = "3b493fc08910331ccf3d6a4d7a3a59cc3bb6b3fa931f3ab1ae539b0e6f4f1ec4"
 dependencies = [
  "futures-core",
  "pyo3",
  "pyo3-async-runtimes",
  "qcs-dependencies-client",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
@@ -3268,9 +3268,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber-build"
-version = "0.9.0"
+version = "0.9.1-kjs.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fa1d2d8629e327274fb0688b4e89d91c3a2dd1f0d5751400826b511a63915102"
+checksum = "926a7722539b47c18f1d7a95e390168a94b54766552946a8d32fa76d22c15bbc"
 dependencies = [
  "handlebars",
  "serde",
@@ -3318,7 +3318,7 @@ dependencies = [
  "qcs-dependencies-client",
  "quil-rs",
  "regex",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "rmp-serde",
  "rstest",
  "serde",
@@ -3339,9 +3339,7 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b18ee6da7075796d52a4955a5627ae15b2ca4e05f5925370844279f5b2c6d57"
+version = "0.19.1"
 dependencies = [
  "async-tempfile",
  "async-trait",
@@ -3361,7 +3359,7 @@ dependencies = [
  "pyo3-build-config",
  "pyo3-stub-gen",
  "qcs-dependencies-client",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "serde",
  "serde_json",
  "shellexpand",
@@ -3456,9 +3454,7 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.37.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40079ddd1cbcb7a38fac4e1b010fa8a4949c9a1e0d9ab79406e6964805b71185"
+version = "0.37.1-rc.1"
 dependencies = [
  "anyhow",
  "approx",
@@ -3481,7 +3477,7 @@ dependencies = [
  "pyo3-build-config",
  "pyo3-stub-gen",
  "regex",
- "rigetti-pyo3 0.7.1",
+ "rigetti-pyo3",
  "serde",
  "statrs",
  "strum",
@@ -3871,23 +3867,9 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.7.1"
+version = "0.8.2-kjs.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "213e90a6c913d2826aa2b14c0a267c0bd784e586f108319066fdd42834abf325"
-dependencies = [
- "indexmap 2.13.0",
- "itertools 0.14.0",
- "optipy 0.1.4",
- "pastey",
- "pyo3",
- "pyo3-stub-gen",
-]
-
-[[package]]
-name = "rigetti-pyo3"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54283d7a88051a30fd1d508c22a1c5bca9b74ef9572d1e43ee707c5f8417e3d0"
+checksum = "2fe2d65c3b7db188335803e9cacb8f400d67b3f09682292664981522fc1efaf2"
 dependencies = [
  "indexmap 2.13.0",
  "itertools 0.14.0",
@@ -4013,7 +3995,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4072,7 +4054,7 @@ dependencies = [
  "security-framework 3.5.1",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -4730,7 +4712,7 @@ dependencies = [
  "getrandom 0.3.4",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5758,7 +5740,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.48.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]

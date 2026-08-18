@@ -20,6 +20,7 @@ from qcs_sdk._qcs_sdk.qpu import api
 from qcs_sdk._qcs_sdk.qpu import translation
 import typing
 from . import client
+from . import common
 from . import compiler
 from . import diagnostics
 from . import qpu
@@ -41,6 +42,7 @@ __all__ = [
     "RegisterMatrixConversionError",
     "Service",
     "client",
+    "common",
     "compiler",
     "diagnostics",
     "qpu",
