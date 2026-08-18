@@ -5,7 +5,7 @@ import builtins
 import collections.abc
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk.qpu import isa
-from quil._quil import program
+import quil._quil.program
 import typing
 
 __all__ = [

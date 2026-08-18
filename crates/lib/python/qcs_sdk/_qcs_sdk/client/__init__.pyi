@@ -3,7 +3,7 @@
 
 import builtins
 import collections.abc
-from qcs_api_client_common._qcs_api_client_common import configuration
+import qcs_api_client_common._qcs_api_client_common.configuration
 from qcs_sdk import _qcs_sdk
 import typing
 from typing import TypeAlias
