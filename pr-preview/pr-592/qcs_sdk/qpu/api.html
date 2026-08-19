@@ -41,10 +41,10 @@
                                 <a class="function" href="#APIExecutionOptions.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                 </ul>
 
@@ -140,13 +140,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                 </ul>
 
@@ -158,10 +158,10 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.dtype">dtype</a>
@@ -176,10 +176,10 @@
                                 <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                                <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                 </ul>
 
@@ -360,19 +360,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
-    
-            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
-</div>
-
-
-                            </div>
                             <div id="APIExecutionOptions.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -391,6 +378,19 @@ if the job does not have an estimated duration, the default
 timeout is selected by the service.</p>
 
 <p>The service may also enforce a maximum value for this field.</p>
+</div>
+
+
+                            </div>
+                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
+    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
 </div>
 
 
@@ -697,6 +697,17 @@ to build a custom set of options.</p>
     
 
                             </div>
+                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
+                                <div class="attr variable">
+            <span class="name">api_options</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
+    
+    
+
+                            </div>
                             <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
                                 <div class="attr variable">
             <span class="name">connection_strategy</span>
@@ -715,17 +726,6 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
-    
-    
-
-                            </div>
-                            <div id="ExecutionOptionsBuilder.api_options" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_options</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.api_options"></a>
     
     
 
@@ -760,19 +760,6 @@ to build a custom set of options.</p>
 
 
                             </div>
-                            <div id="ExecutionResult.shape" class="classattr">
-                                <div class="attr variable">
-            <span class="name">shape</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.shape"></a>
-    
-            <div class="docstring"><p>The shape of the result data.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.data" class="classattr">
                                 <div class="attr variable">
             <span class="name">data</span>
@@ -782,6 +769,19 @@ to build a custom set of options.</p>
     <a class="headerlink" href="#ExecutionResult.data"></a>
     
             <div class="docstring"><p>The result data for all shots by the particular memory location.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.shape" class="classattr">
+                                <div class="attr variable">
+            <span class="name">shape</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.shape"></a>
+    
+            <div class="docstring"><p>The shape of the result data.</p>
 </div>
 
 
@@ -830,19 +830,6 @@ to the name of the memory declaration in the source program.</p>
 
 
                             </div>
-                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">execution_duration_microseconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
-    
-            <div class="docstring"><p>The time spent executing the program.</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResults.memory" class="classattr">
                                 <div class="attr variable">
             <span class="name">memory</span>
@@ -853,6 +840,19 @@ to the name of the memory declaration in the source program.</p>
     
             <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
 the execution of the program.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResults.execution_duration_microseconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">execution_duration_microseconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.execution_duration_microseconds"></a>
+    
+            <div class="docstring"><p>The time spent executing the program.</p>
 </div>
 
 
