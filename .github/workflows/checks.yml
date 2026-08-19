@@ -87,6 +87,5 @@ jobs:
           cache-dependency-glob: crates/lib/uv.lock
 
       - name: Test Python Package
-        shell: bash
         run: |
           cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
