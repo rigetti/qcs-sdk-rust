@@ -144,8 +144,6 @@ mod stubs {
     gen_type_alias_from_python!(
         "qcs_sdk._qcs_sdk.client",
         r#"
-        from qcs_api_client_common._qcs_api_client_common import configuration
-
         AuthServer: TypeAlias = configuration.AuthServer
         ClientCredentials: TypeAlias = configuration.ClientCredentials
         ExternallyManaged: TypeAlias = configuration.ExternallyManaged
@@ -155,7 +153,7 @@ mod stubs {
         "#
     );
 
-    reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk");
+    reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk"; *, "__doc__", "__version__");
     reexport_module_members!("qcs_sdk.client" from "qcs_sdk._qcs_sdk.client");
     reexport_module_members!("qcs_sdk.compiler" from "qcs_sdk._qcs_sdk.compiler");
     reexport_module_members!("qcs_sdk.compiler.quilc" from "qcs_sdk._qcs_sdk.compiler.quilc");
@@ -192,12 +190,12 @@ mod stubs {
         let mut stubs = StubInfo::from_pyproject_toml(manifest_dir.join("pyproject.toml"))?;
 
         // `pyo3_stub_gen` gathers declarations from every linked crate, so dependencies that
-        // define their own Python packages — `quil-rs`, `qcs-api-client-common` — contribute
+        // define their own Python packages (`quil-rs` and `qcs-api-client-common`) contribute
         // their modules here too. Generation rejects any non-empty module outside this
         // package's module path, and writing files for them would shadow the real, installed
-        // packages, so drop them. The cost is that our stubs refer to foreign types by their
-        // private paths (`quil._quil.program.Program`), since resolving the public alias needs
-        // the foreign module to still be present at generation time.
+        // packages, so drop them. The stubs refer to foreign types by their private paths
+        // (`quil._quil.program.Program`), since resolving the public alias needs the foreign
+        // module to still be present at generation time.
         stubs
             .modules
             .retain(|name, _| name == "qcs_sdk" || name.starts_with("qcs_sdk."));

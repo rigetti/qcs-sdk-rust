@@ -2,10 +2,6 @@
 # once in the compiled extension (`qcs_sdk._qcs_sdk.*`) and once under the public name it is
 # re-exported as (`qcs_sdk.*`), so both forms need allowing — hence the `(_qcs_sdk\.)?` prefix.
 qcs_sdk._tracing_subscriber.*
-qcs_sdk._qcs_sdk._tracing_subscriber
-
-# The generated stubs don't (yet) carry an `__all__` for the private extension module.
-qcs_sdk._qcs_sdk.__all__
 
 # `mypy` detects the defaults as Ellipsis, rather than as empty lists.
 # That's sort of technically correct, but showing the empty list is way more useful for callers.

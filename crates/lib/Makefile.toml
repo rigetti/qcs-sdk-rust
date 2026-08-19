@@ -121,7 +121,6 @@ args = [
     "--allowlist",
     "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
     "--ignore-disjoint-bases",
-    "--ignore-unused-allowlist",
     "qcs_sdk",
 ]
 
