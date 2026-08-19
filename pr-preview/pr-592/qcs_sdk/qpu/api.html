@@ -158,10 +158,10 @@
                                 <a class="function" href="#ExecutionResult.from_register">from_register</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.shape">shape</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResult.data">data</a>
@@ -173,13 +173,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                 </ul>
 
@@ -188,10 +188,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -760,19 +760,6 @@ to build a custom set of options.</p>
 
 
                             </div>
-                            <div id="ExecutionResult.dtype" class="classattr">
-                                <div class="attr variable">
-            <span class="name">dtype</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.dtype"></a>
-    
-            <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.shape" class="classattr">
                                 <div class="attr variable">
             <span class="name">shape</span>
@@ -782,6 +769,19 @@ to build a custom set of options.</p>
     <a class="headerlink" href="#ExecutionResult.shape"></a>
     
             <div class="docstring"><p>The shape of the result data.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.dtype" class="classattr">
+                                <div class="attr variable">
+            <span class="name">dtype</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.dtype"></a>
+    
+            <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
 </div>
 
 
@@ -814,6 +814,20 @@ to build a custom set of options.</p>
 </div>
 
 
+                            <div id="ExecutionResults.memory" class="classattr">
+                                <div class="attr variable">
+            <span class="name">memory</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
+    
+            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
+the execution of the program.</p>
+</div>
+
+
+                            </div>
                             <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
             <span class="name">buffers</span>
@@ -843,20 +857,6 @@ to the name of the memory declaration in the source program.</p>
 
 
                             </div>
-                            <div id="ExecutionResults.memory" class="classattr">
-                                <div class="attr variable">
-            <span class="name">memory</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
-    
-            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
-the execution of the program.</p>
-</div>
-
-
-                            </div>
                 </section>
                 <section id="QpuApiDuration">
                     <div class="attr class">
@@ -872,17 +872,6 @@ the execution of the program.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -890,6 +879,17 @@ the execution of the program.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
