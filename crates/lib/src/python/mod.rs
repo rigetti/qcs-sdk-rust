@@ -109,7 +109,9 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(feature = "stubs")]
 mod stubs {
     use pyo3_stub_gen::{
-        define_stub_info_gatherer, generate::Module, module_doc, reexport_module_members, Result,
+        define_stub_info_gatherer, export_verbatim, exclude_from_all,
+        derive::gen_type_alias_from_python,
+        generate::Module, module_doc, reexport_module_members, Result,
         StubInfo,
     };
     use std::path::Path;
@@ -139,98 +141,50 @@ mod stubs {
 
     pyo3_stub_gen::module_doc!("qcs_sdk._qcs_sdk", "{}", super::PACKAGE_DOC);
 
-    // `client::init_submodule` adds these `qcs_api_client_common` types to `qcs_sdk.client`,
-    // but they carry that crate's own module annotation, so nothing declares them as members of
-    // ours: they would be missing from the generated `__init__.py` and undefined in the stubs.
-    // Aliasing them here registers them as members of the module that actually exposes them.
-    // (`scripts/lint-bindings.py` keeps a matching list, for the same reason.)
-    mod client_reexports {
-        use pyo3_stub_gen::type_alias;
-        use qcs_api_client_common::configuration::{
-            secrets::SecretRefreshToken as CommonSecretRefreshToken,
-            settings::AuthServer as CommonAuthServer,
-            tokens::{
-                ClientCredentials as CommonClientCredentials,
-                ExternallyManaged as CommonExternallyManaged, OAuthSession as CommonOAuthSession,
-                RefreshToken as CommonRefreshToken,
-            },
-        };
+    gen_type_alias_from_python!(
+        "qcs_sdk._qcs_sdk.client",
+        r#"
+        from qcs_api_client_common._qcs_api_client_common import configuration
 
-        type_alias!("qcs_sdk._qcs_sdk.client", AuthServer = CommonAuthServer);
-        type_alias!("qcs_sdk._qcs_sdk.client", ClientCredentials = CommonClientCredentials);
-        type_alias!("qcs_sdk._qcs_sdk.client", ExternallyManaged = CommonExternallyManaged);
-        type_alias!("qcs_sdk._qcs_sdk.client", OAuthSession = CommonOAuthSession);
-        type_alias!("qcs_sdk._qcs_sdk.client", RefreshToken = CommonRefreshToken);
-        type_alias!("qcs_sdk._qcs_sdk.client", SecretRefreshToken = CommonSecretRefreshToken);
-    }
+        AuthServer: TypeAlias = configuration.AuthServer
+        ClientCredentials: TypeAlias = configuration.ClientCredentials
+        ExternallyManaged: TypeAlias = configuration.ExternallyManaged
+        OAuthSession: TypeAlias = configuration.OAuthSession
+        RefreshToken: TypeAlias = configuration.RefreshToken
+        SecretRefreshToken: TypeAlias = configuration.SecretRefreshToken
+        "#
+    );
 
-    // During stub generation, these `qcs_sdk._qcs_sdk` modules and their contents are
-    // re-exported into the public `qcs_sdk` namespace, and the corresponding `__init__.py`
-    // files are generated. Every module in the tree built by `create_init_submodule!` needs an
-    // entry here: the compiled modules register themselves under `qcs_sdk._qcs_sdk.*`, so the
-    // public `qcs_sdk.*` import paths exist only by way of these generated packages.
-    reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk"; *, "__doc__", "__version__");
+    reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk");
     reexport_module_members!("qcs_sdk.client" from "qcs_sdk._qcs_sdk.client");
     reexport_module_members!("qcs_sdk.compiler" from "qcs_sdk._qcs_sdk.compiler");
-    // `DEFAULT_COMPILER_TIMEOUT` is a `consts:` entry in `create_init_submodule!`, which the
-    // wildcard doesn't see; `module_variable!` below gives it a type in the stubs.
-    reexport_module_members!(
-        "qcs_sdk.compiler.quilc" from "qcs_sdk._qcs_sdk.compiler.quilc";
-        *,
-        "DEFAULT_COMPILER_TIMEOUT"
-    );
+    reexport_module_members!("qcs_sdk.compiler.quilc" from "qcs_sdk._qcs_sdk.compiler.quilc");
     reexport_module_members!("qcs_sdk.diagnostics" from "qcs_sdk._qcs_sdk.diagnostics");
     reexport_module_members!("qcs_sdk.qpu" from "qcs_sdk._qcs_sdk.qpu");
     reexport_module_members!("qcs_sdk.qpu.api" from "qcs_sdk._qcs_sdk.qpu.api");
     reexport_module_members!("qcs_sdk.qpu.experimental" from "qcs_sdk._qcs_sdk.qpu.experimental");
-    reexport_module_members!(
-        "qcs_sdk.qpu.experimental.random" from "qcs_sdk._qcs_sdk.qpu.experimental.random"
-    );
+    reexport_module_members!("qcs_sdk.qpu.experimental.random" from "qcs_sdk._qcs_sdk.qpu.experimental.random");
     reexport_module_members!("qcs_sdk.qpu.isa" from "qcs_sdk._qcs_sdk.qpu.isa");
     reexport_module_members!("qcs_sdk.qpu.translation" from "qcs_sdk._qcs_sdk.qpu.translation");
     reexport_module_members!("qcs_sdk.qvm" from "qcs_sdk._qcs_sdk.qvm");
     reexport_module_members!("qcs_sdk.qvm.api" from "qcs_sdk._qcs_sdk.qvm.api");
 
-    // `QCSClient` has always been available at the top level, in addition to `qcs_sdk.client`.
+    reexport_module_members!("qcs_sdk._qcs_sdk.client" from "qcs_api_client_common._qcs_api_client_common"; "configuration");
+    reexport_module_members!("qcs_sdk._qcs_sdk.compiler.quilc" from "quil._quil"; "program");
+    exclude_from_all!("qcs_sdk._qcs_sdk.client", "configuration");
+    exclude_from_all!("qcs_sdk._qcs_sdk.compiler.quilc", "program");
+
     reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk.client"; "QCSClient");
 
-    // `_tracing_subscriber` is generated by `pyo3_tracing_subscriber_build` rather than by
-    // `pyo3_stub_gen`, so it has to be named explicitly. Sourcing it from the package itself
-    // generates `from qcs_sdk import _tracing_subscriber`, which resolves the generated
-    // subpackage through the partially-initialized package in `sys.modules`.
     reexport_module_members!("qcs_sdk" from "qcs_sdk"; "_tracing_subscriber");
+    reexport_module_members!("qcs_sdk._qcs_sdk" from "qcs_sdk"; "_tracing_subscriber");
+    export_verbatim!("qcs_sdk._qcs_sdk", "_tracing_subscriber");
+    export_verbatim!("qcs_sdk._qcs_sdk", "_gather_diagnostics");
+    export_verbatim!("qcs_sdk._qcs_sdk", "__version__");
 
-    // `StubInfo` resolves every wildcard re-export it can see, including those declared by our
-    // dependencies, and fails if a source module has no registered members. `quil-rs` declares
-    // `quil.validation` from `quil._quil.validation`, whose only content is a submodule, so it
-    // registers that module imperatively in its own `stub_gen` binary — meaning it does not
-    // exist here and resolution fails. Declaring the module (with no docstring) registers it,
-    // after which `stub_info` drops it along with the rest of the foreign modules.
     module_doc!("quil._quil.validation", "");
 
     define_stub_info_gatherer!(internal_stub_info);
-
-    /// Ensures modules exist in the stubs, even if they don't have any members.
-    fn ensure_submod(stubs: &mut StubInfo, module: &str) {
-        stubs.modules.entry(module.to_string()).or_insert(Module {
-            name: module.to_string(),
-            ..Default::default()
-        });
-
-        if let Some((parent, child)) = module.rsplit_once('.') {
-            stubs
-                .modules
-                .entry(parent.to_string())
-                .or_insert(Module {
-                    name: parent.to_string(),
-                    ..Default::default()
-                })
-                .submodules
-                .insert(child.to_string());
-
-            ensure_submod(stubs, parent);
-        }
-    }
 
     /// Gather stub information to generate stub files.
     pub fn stub_info() -> Result<StubInfo> {
@@ -247,17 +201,6 @@ mod stubs {
         stubs
             .modules
             .retain(|name, _| name == "qcs_sdk" || name.starts_with("qcs_sdk."));
-
-        // Add otherwise empty modules, as they aren't found automatically.
-        let module_leaves = [
-            "qcs_sdk._qcs_sdk.compiler.quilc",
-            "qcs_sdk._qcs_sdk.qpu.experimental.random",
-            "qcs_sdk._qcs_sdk.qvm",
-        ];
-
-        for mod_name in module_leaves {
-            ensure_submod(&mut stubs, mod_name);
-        }
 
         Ok(stubs)
     }

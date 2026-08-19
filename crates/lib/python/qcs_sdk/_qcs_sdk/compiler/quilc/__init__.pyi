@@ -7,6 +7,7 @@ from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk.qpu import isa
 import quil._quil.program
 import typing
+from quil._quil import program
 
 __all__ = [
     "CompilationResult",

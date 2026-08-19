@@ -19,6 +19,7 @@ from qcs_sdk._qcs_sdk.compiler import quilc
 from qcs_sdk._qcs_sdk.qpu import api
 from qcs_sdk._qcs_sdk.qpu import translation
 import typing
+from qcs_sdk import _tracing_subscriber
 from . import client
 from . import compiler
 from . import diagnostics
@@ -40,6 +41,9 @@ __all__ = [
     "RegisterMatrix",
     "RegisterMatrixConversionError",
     "Service",
+    "__version__",
+    "_gather_diagnostics",
+    "_tracing_subscriber",
     "client",
     "compiler",
     "diagnostics",

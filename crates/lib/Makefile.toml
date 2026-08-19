@@ -122,10 +122,6 @@ args = [
     "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
     "--ignore-disjoint-bases",
     "--ignore-unused-allowlist",
-    # Silences the undefined foreign-module references in the generated stubs; an allowlist
-    # cannot, since those are `mypy` build errors and abort the run before it is consulted.
-    "--mypy-config-file",
-    "stubtest-mypy.ini",
     "qcs_sdk",
 ]
 

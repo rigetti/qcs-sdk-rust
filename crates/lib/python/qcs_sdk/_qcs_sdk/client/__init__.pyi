@@ -3,10 +3,12 @@
 
 import builtins
 import collections.abc
+import qcs_api_client_common._qcs_api_client_common
 import qcs_api_client_common._qcs_api_client_common.configuration
 from qcs_sdk import _qcs_sdk
 import typing
 from typing import TypeAlias
+from qcs_api_client_common._qcs_api_client_common import configuration
 
 __all__ = [
     "AuthServer",
