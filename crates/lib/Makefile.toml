@@ -48,14 +48,18 @@ dependencies = ["deny", "lint", "check", "test-flow"]
 
 [tasks.generate-stubs]
 description = "Generate Python stub files."
-script_runner = "bash"
-script = '''
-cargo run -p qcs --features stubs --bin stub_gen
-# The generators emit unformatted output and the result is committed, so format it here.
-# `[tool.ruff.lint] exclude` (rather than a top-level `exclude`) is what lets `ruff format`
-# reach these files while they stay unlinted.
-uv run --group dev ruff format python/qcs_sdk
-'''
+dependencies = ["generate-stubs-impl", "format-stubs"]
+
+# The task to actually run the stub generator
+[tasks.generate-stubs-impl]
+private = true
+command = "uv"
+args = ["run", "cargo", "run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
+
+[tasks.format-stubs]
+description = "Format Python stubs."
+command = "uv"
+args = ["run", "--group", "dev", "ruff", "format", "python/qcs_sdk"]
 
 [tasks.check-generated-python-files]
 # The generated `__init__.py` files are what expose the compiled `qcs_sdk._qcs_sdk` modules
@@ -78,7 +82,7 @@ echo "Generated Python files are up to date."
 '''
 
 [tasks.package-python]
-description = "Build a release version of the Python package and install in the virtual environment."
+description = "Build a release version of the Python package."
 dependencies = ["generate-stubs"]
 command = "uv"
 args = ["run", "--group", "dev", "maturin", "build", "--release"]
