@@ -1,3 +1,13 @@
+## 0.26.4-pyo3update.0 (2026-08-20)
+
+### Features
+
+- update dependencies
+
+### Fixes
+
+- use 'uv run --group dev' consistently
+
 ## 0.26.4-rc.0 (2026-08-19)
 
 ### Features
