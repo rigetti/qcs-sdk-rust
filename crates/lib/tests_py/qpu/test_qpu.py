@@ -27,7 +27,11 @@ def test_readout_values():
 def test_qpu_result_data():
     mappings = {"a": "_q0"}
     readout_values = {"a": ReadoutValues.Integer([0, 1])}
-    memory_values = { "int": MemoryValues.Integer([2, 3]), "real": MemoryValues.Real([3.0, 4.0]), "binary": MemoryValues.Binary([0, 1]) }
+    memory_values = {
+        "int": MemoryValues.Integer([2, 3]),
+        "real": MemoryValues.Real([3.0, 4.0]),
+        "binary": MemoryValues.Binary([0, 1]),
+    }
     result_data = QPUResultData(mappings, readout_values, memory_values)
 
     assert result_data.mappings == mappings

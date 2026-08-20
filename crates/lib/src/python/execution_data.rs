@@ -60,7 +60,7 @@ impl ExecutionData {
 /// Each variant corresponds to the possible data types a register can contain.
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[pyclass(name = "RegisterMatrix", module = "qcs_sdk")]
+#[pyclass(name = "RegisterMatrix", module = "qcs_sdk._qcs_sdk")]
 pub(crate) enum PyRegisterMatrix {
     /// Integer register.
     Integer(Py<PyArray2<i64>>),
@@ -191,7 +191,7 @@ impl RegisterMap {
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk")]
+#[pyclass(module = "qcs_sdk._qcs_sdk")]
 pub(crate) struct RegisterMapItemsIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
@@ -216,7 +216,7 @@ impl RegisterMapItemsIter {
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk")]
+#[pyclass(module = "qcs_sdk._qcs_sdk")]
 pub(crate) struct RegisterMapKeysIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
@@ -236,7 +236,7 @@ impl RegisterMapKeysIter {
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk")]
+#[pyclass(module = "qcs_sdk._qcs_sdk")]
 pub(crate) struct RegisterMapValuesIter {
     inner: std::collections::hash_map::IntoIter<String, RegisterMatrix>,
 }
@@ -344,7 +344,7 @@ impl QpuResultData {
 /// each register contains.
 #[derive(Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu", name = "RawQPUReadoutData", get_all)]
+#[pyclass(module = "qcs_sdk._qcs_sdk.qpu", name = "RawQPUReadoutData", get_all)]
 pub(crate) struct RawQpuReadoutData {
     pub mappings: HashMap<String, String>,
     pub readout_values: HashMap<String, Py<PyList>>,

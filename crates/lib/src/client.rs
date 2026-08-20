@@ -50,7 +50,12 @@ pub(crate) static DEFAULT_HTTP_API_TIMEOUT: Duration = Duration::from_secs(10);
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.client", name = "QCSClient", eq)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.client",
+        name = "QCSClient",
+        eq,
+        from_py_object
+    )
 )]
 pub struct Qcs {
     config: ClientConfiguration,

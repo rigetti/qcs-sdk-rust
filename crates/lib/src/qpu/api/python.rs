@@ -78,7 +78,7 @@ impl_stub_type!(Register = Vec<i32> | Vec<Complex32>);
 /// Execution readout data from a particular memory location.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.api", frozen, get_all)]
+#[pyclass(module = "qcs_sdk._qcs_sdk.qpu.api", frozen, get_all, from_py_object)]
 pub struct ExecutionResult {
     /// The shape of the result data.
     pub shape: [usize; 2],
@@ -143,7 +143,7 @@ impl ExecutionResult {
 /// Execution readout data for all memory locations.
 #[derive(Clone, Debug)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.api", frozen, get_all)]
+#[pyclass(module = "qcs_sdk._qcs_sdk.qpu.api", frozen, get_all, from_py_object)]
 pub struct ExecutionResults {
     /// The readout results of execution, mapping a published filter node to its data.
     ///
@@ -210,7 +210,12 @@ impl From<ControllerJobExecutionResult> for ExecutionResults {
 /// The duration of an API call.
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(name = "QpuApiDuration", module = "qcs_sdk.qpu.api", frozen)]
+#[pyclass(
+    name = "QpuApiDuration",
+    module = "qcs_sdk._qcs_sdk.qpu.api",
+    frozen,
+    from_py_object
+)]
 pub struct PyQpuApiDuration {
     inner: QpuApiDuration,
 }
@@ -570,7 +575,7 @@ py_function_sync_async! {
     ///
     /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     /// :raises SubmissionError: If there was a problem submitting the program for execution.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
@@ -629,7 +634,7 @@ py_function_sync_async! {
     ///
     /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     /// :raises SubmissionError: If there was a problem submitting any of the jobs for execution, or if no ``patch_values`` are given.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (program, patch_values, quantum_processor_id = None, client = None, execution_options = None))]
     #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]
@@ -677,7 +682,7 @@ py_function_sync_async! {
     /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     /// :param execution_options: The ``ExecutionOptions`` to use.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_ids, quantum_processor_id = None, client = None, execution_options = None))]
     async fn cancel_jobs(
@@ -711,7 +716,7 @@ py_function_sync_async! {
     /// :param quantum_processor_id: The quantum processor to execute the job on. This parameter is required unless using the ``ConnectionStrategy.endpoint_id()`` or ``ConnectionStrategy.endpoint_address()`` execution option.
     /// :param client: The ``Qcs`` client to use.
     /// :param execution_options: The ``ExecutionOptions`` to use.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     async fn cancel_job(
@@ -743,7 +748,7 @@ py_function_sync_async! {
     ///
     /// :raises LoadClientError: If there is an issue loading the QCS Client configuration.
     /// :raises QpuApiError: If there was a problem retrieving the results.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.api"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.api"))]
     #[pyfunction]
     #[pyo3(signature = (job_id, quantum_processor_id = None, client = None, execution_options = None))]
     #[pyo3_opentelemetry::pypropagate(on_context_extraction_failure="ignore")]

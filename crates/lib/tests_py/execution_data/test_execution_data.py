@@ -78,13 +78,16 @@ class TestResultData:
     [
         ("integer", np.array([[0, 1, 2], [1, 2, 3]]), RegisterMatrix.Integer),
         ("real", np.array([[0.0, 1.1, 2.2], [1.1, 2.2, 3.3]]), RegisterMatrix.Real),
-        ("complex",
-         np.array([[complex(0, 1), complex(1, 2), complex(2, 3)],
-                   [complex(1, 2), complex(2, 3), complex(3, 4)]]),
-         RegisterMatrix.Complex),
-    ]
+        (
+            "complex",
+            np.array([[complex(0, 1), complex(1, 2), complex(2, 3)], [complex(1, 2), complex(2, 3), complex(3, 4)]]),
+            RegisterMatrix.Complex,
+        ),
+    ],
 )
-def test_register_matrix(name: str, m: np.ndarray, cls: RegisterMatrix.Integer | RegisterMatrix.Real | RegisterMatrix.Complex):
+def test_register_matrix(
+    name: str, m: np.ndarray, cls: RegisterMatrix.Integer | RegisterMatrix.Real | RegisterMatrix.Complex
+):
     register_matrix = cls(m)
     match (name, register_matrix):
         case ("integer", RegisterMatrix.Integer(register_matrix)):
@@ -98,6 +101,7 @@ def test_register_matrix(name: str, m: np.ndarray, cls: RegisterMatrix.Integer |
 
     assert register_matrix is not None, f"register_matrix should be an {name} matrix"
     assert_array_equal(register_matrix, m)
+
 
 class TestRegisterMap:
     def test_iter(self):

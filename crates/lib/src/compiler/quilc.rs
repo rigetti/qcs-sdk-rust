@@ -63,7 +63,12 @@ pub trait Client {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", get_all, frozen)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        get_all,
+        frozen,
+        from_py_object
+    )
 )]
 pub struct CompilationResult {
     /// The compiled program
@@ -77,7 +82,7 @@ pub struct CompilationResult {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen)
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", frozen, from_py_object)
 )]
 pub struct CompilerOpts {
     /// The number of seconds to wait before timing out. If `None`, there is no timeout.
@@ -133,7 +138,12 @@ impl Default for CompilerOpts {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct PauliTerm {
     /// Qubit indices onto which the factors of the Pauli term are applied.
@@ -149,7 +159,12 @@ pub struct PauliTerm {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct ConjugateByCliffordRequest {
     /// Pauli Term to conjugate.
@@ -164,7 +179,12 @@ pub struct ConjugateByCliffordRequest {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub(crate) struct ConjugatePauliByCliffordRequest {
     #[serde(rename = "*args")]
@@ -182,7 +202,12 @@ impl From<ConjugateByCliffordRequest> for ConjugatePauliByCliffordRequest {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct ConjugatePauliByCliffordResponse {
     /// Encoded global phase factor on the emitted Pauli.
@@ -198,7 +223,12 @@ pub struct ConjugatePauliByCliffordResponse {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct RandomizedBenchmarkingRequest {
     /// Depth of the benchmarking sequence.
@@ -235,7 +265,12 @@ impl From<RandomizedBenchmarkingRequest> for GenerateRandomizedBenchmarkingSeque
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen, get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        frozen,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct GenerateRandomizedBenchmarkingSequenceResponse {
     /// List of Cliffords, each expressed as a list of generator indices.
@@ -299,7 +334,7 @@ where
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", eq)
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", eq, from_py_object)
 )]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.
@@ -369,7 +404,7 @@ impl NativeQuilRequest {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.compiler.quilc", frozen)
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", frozen, from_py_object)
 )]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(tag = "_type")]

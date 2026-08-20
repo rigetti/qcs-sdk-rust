@@ -1,19 +1,18 @@
 name: Prepare Release
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
   workflow_dispatch:
     inputs:
-      type:
-        description: Bump versions and trigger a new release.
-        type: choice
-        required: true
-        default: release
-        options:
-          - release
-          - prerelease
+      prerelease-label:
+        description: "Prerelease label; defaults to 'rc'."
+        required: false
+        default: ""
 
 jobs:
   prepare-release:
@@ -21,20 +20,42 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.PAT }}
     steps:
+
     - uses: actions/checkout@v5
       with:
         fetch-depth: 0
+        # Release from the ref this was dispatched on, so a prerelease cut from a
+        # branch tags that branch rather than the default one.
+        ref: ${{ github.ref }}
         token: ${{ secrets.PAT }}
+
     - name: Install Knope
-      uses: knope-dev/action@v2.1.0
+      uses: knope-dev/action@v2.1.2
       with:
-        version: 0.21.3 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
+        version: 0.23.0 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
+
+    - name: Dry-run Release
+      run: knope release --verbose --dry-run
+      if: github.event_name == 'pull_request'
+
     - run: |
         git config --global user.name "${{ github.triggering_actor }}"
         git config --global user.email "${{ github.triggering_actor}}@users.noreply.github.com"
-    - name: Prepare Prerelease
-      run: knope release --verbose --prerelease-label rc
-      if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.type == 'prerelease') }}
-    - name: Prepare Release
-      run: knope release --verbose
-      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.type == 'release' }}
+      if: github.event_name != 'pull_request'
+
+    - name: Run Release
+      if: github.event_name != 'pull_request'
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
+        PRERELEASE_LABEL: ${{ inputs.prerelease-label }}
+      run: |
+        set -euo pipefail
+
+        if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+          echo "Running full release for main"
+          knope release --verbose
+        else
+          label="${PRERELEASE_LABEL:-rc}"
+          echo "Running prerelease with label '$label'"
+          knope release --verbose "--prerelease-label=$label"
+        fi

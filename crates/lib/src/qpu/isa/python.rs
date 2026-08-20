@@ -60,7 +60,13 @@ impl_repr!(Parameter);
 /// the best native QUIL program for a desired task, and so are provided as part of the native ISA.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 pub(crate) struct InstructionSetArchitecture {
     architecture: Architecture,
     /// The list of benchmarks that have characterized the quantum processor.
@@ -99,7 +105,13 @@ pub(crate) struct InstructionSetArchitecture {
 /// that any 1Q or 2Q operation will be available to users writing QUIL programs.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Architecture {
     /// A list of all computational edges in the instruction set architecture.
     pub edges: Vec<Edge>,
@@ -125,7 +137,12 @@ struct Architecture {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.qpu.isa", eq, rename_all = "SCREAMING_SNAKE_CASE")
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu.isa",
+        eq,
+        rename_all = "SCREAMING_SNAKE_CASE",
+        from_py_object
+    )
 )]
 enum Family {
     #[default]
@@ -207,7 +224,13 @@ impl From<Family> for models::Family {
 /// :math:`(b, a)`.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Edge {
     /// The integer ids of the computational nodes at the two ends of the edge.
     /// Order is not important; an architecture edge is treated as undirected.
@@ -221,7 +244,13 @@ struct Edge {
 /// specific `node_id` in instances of ``Instruction``.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Node {
     /// An integer id assigned to the computational node.
     ///
@@ -232,7 +261,13 @@ struct Node {
 /// A measured characteristic of an operation.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Characteristic {
     /// The error in the characteristic value, or None otherwise.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -254,7 +289,13 @@ struct Characteristic {
 /// A parameter to an operation.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Parameter {
     /// The name of the parameter, such as the name of a mathematical symbol.
     pub name: String,
@@ -263,7 +304,13 @@ struct Parameter {
 /// A site for an operation, with its site-dependent characteristics.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct OperationSite {
     /// The list of site-dependent characteristics of this operation.
     pub characteristics: Vec<Characteristic>,
@@ -276,7 +323,13 @@ struct OperationSite {
 /// An operation, with its sites and site-independent characteristics.
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.qpu.isa", eq, get_all, set_all)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.qpu.isa",
+    eq,
+    get_all,
+    set_all,
+    from_py_object
+)]
 struct Operation {
     /// The list of site-independent characteristics of this operation.
     pub characteristics: Vec<Characteristic>,
@@ -620,7 +673,7 @@ py_function_sync_async! {
     ///
     /// :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     /// :raises GetISAError: If there was an issue fetching the ISA from the QCS API.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.isa"))]
     #[pyfunction]
     #[pyo3(signature = (quantum_processor_id, client = None))]
     async fn get_instruction_set_architecture(
@@ -643,7 +696,7 @@ py_function_sync_async! {
     ///
     /// :raises LoadClientError: If ``client`` was not provided to the function, and failed to load internally.
     /// :raises ListISAsError: If there was an issue fetching the ISAs from the QCS API.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu.isa"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu.isa"))]
     #[pyfunction]
     #[pyo3(signature = (client = None))]
     async fn list_instruction_set_architectures(client: Option<Qcs>) -> PyResult<Vec<String>> {

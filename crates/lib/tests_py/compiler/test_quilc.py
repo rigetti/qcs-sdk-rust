@@ -43,9 +43,7 @@ def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
     """TargetDevice cannot be built when ISA lacks ``randomized_benchmark_simultaneous_1q`` benchmark."""
     isa = InstructionSetArchitecture.from_raw(aspen_m_3_isa.json())
     isa.benchmarks = [
-        benchmark
-        for benchmark in isa.benchmarks
-        if benchmark.name != "randomized_benchmark_simultaneous_1q"
+        benchmark for benchmark in isa.benchmarks if benchmark.name != "randomized_benchmark_simultaneous_1q"
     ]
     with pytest.raises(QuilcError):
         TargetDevice.from_isa(isa)
@@ -58,7 +56,9 @@ def test_compile_program(
     quilc_rpcq_client: QuilcClient,
 ):
     """A simple program should compile successfully."""
-    result = compile_program(bell_program, target_device, client=quilc_rpcq_client, options=CompilerOpts(protoquil=True))
+    result = compile_program(
+        bell_program, target_device, client=quilc_rpcq_client, options=CompilerOpts(protoquil=True)
+    )
     assert result.program.to_quil() == snapshot
     assert result.native_quil_metadata == snapshot
 
@@ -89,9 +89,7 @@ async def test_get_version_info_async(quilc_rpcq_client: QuilcClient):
 
 def test_conjugate_pauli_by_clifford(quilc_rpcq_client: QuilcClient):
     """Pauli should be conjugated by clifford."""
-    request = ConjugateByCliffordRequest(
-        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
-    )
+    request = ConjugateByCliffordRequest(pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0")
     response = conjugate_pauli_by_clifford(request, client=quilc_rpcq_client)
     assert type(response) == ConjugatePauliByCliffordResponse
     assert response.pauli == "Z"
@@ -101,9 +99,7 @@ def test_conjugate_pauli_by_clifford(quilc_rpcq_client: QuilcClient):
 @pytest.mark.asyncio
 async def test_conjugate_pauli_by_clifford_async(quilc_rpcq_client: QuilcClient):
     """Pauli should be conjugated by clifford."""
-    request = ConjugateByCliffordRequest(
-        pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0"
-    )
+    request = ConjugateByCliffordRequest(pauli=PauliTerm(indices=[0], symbols=["X"]), clifford="H 0")
     response = await conjugate_pauli_by_clifford_async(request, client=quilc_rpcq_client)
     assert type(response) == ConjugatePauliByCliffordResponse
     assert response.pauli == "Z"

@@ -46,41 +46,61 @@ dependencies = ["deny", "lint", "check", "test-flow"]
 
 # ----
 
-[tasks.install-python-deps]
-description = "Install python dependencies using poetry."
-command = "poetry"
-args = ["install", "--with", "dev", "--no-root"]
-
-# NOTE: if using `uv`, you may need to set `PYTHONHOME` to the root of the virtual environment:
-#
-#   export PYTHONHOME=$(python3 -c "import sys; print(sys.base_prefix)")
 [tasks.generate-stubs]
 description = "Generate Python stub files."
-command = "cargo"
-args = ["run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
-install_crate = false
+dependencies = ["generate-stubs-impl", "format-stubs"]
+
+# The task to actually run the stub generator
+[tasks.generate-stubs-impl]
+private = true
+command = "uv"
+args = ["run", "cargo", "run", "-p", "qcs", "--features", "stubs", "--bin", "stub_gen"]
+
+[tasks.format-stubs]
+description = "Format Python stubs."
+command = "uv"
+args = ["run", "--group", "dev", "ruff", "format", "python/qcs_sdk"]
+
+[tasks.check-generated-python-files]
+# The generated `__init__.py` files are what expose the compiled `qcs_sdk._qcs_sdk` modules
+# under their public `qcs_sdk` names, and release wheels are built straight from the committed
+# tree (see `.github/workflows/release-python.yml`, which does not run `cargo make`). So if
+# they go stale, a release can silently omit a class — or a whole submodule — with nothing else
+# to catch it.
+description = "Check that the committed stubs and `__init__.py` files are up to date."
+dependencies = ["generate-stubs"]
+cwd = "python"
+script = '''
+if [ -n "$(git status --porcelain .)" ]; then
+    echo "error: the generated Python files are out of date." >&2
+    echo "Run 'cargo make --cwd crates/lib generate-stubs' and commit the result:" >&2
+    git status --porcelain . >&2
+    git --no-pager diff . >&2
+    exit 1
+fi
+echo "Generated Python files are up to date."
+'''
 
 [tasks.package-python]
-description = "Build a release version of the Python package to the active virtual environment."
-dependencies = ["install-python-deps", "generate-stubs"]
-command = "poetry"
-args = ["run", "maturin", "build", "--release"]
+description = "Build a release version of the Python package."
+dependencies = ["generate-stubs"]
+command = "uv"
+args = ["run", "--group", "dev", "maturin", "build", "--release"]
 
 [tasks.install-python-package]
+# `generate-stubs` also writes the package's `__init__.py` files, which are what expose the
+# compiled `qcs_sdk._qcs_sdk` modules under their public `qcs_sdk` names — so it is a build
+# input now, not just a convenience for type checkers.
 description = "Build the Python package and install to the active virtual environment."
-dependencies = ["install-python-deps"]
-command = "poetry"
-args = ["run", "maturin", "develop"]
-
-[tasks.install-python-package-with-stubs]
-description = "Install the Python package with up-to-date stubs (not needed for testing)."
-dependencies = ["generate-stubs", "install-python-package"]
+dependencies = ["generate-stubs"]
+command = "uv"
+args = ["run", "--group", "dev", "maturin", "develop"]
 
 [tasks.pytest]
 description = "Run Python tests."
 dependencies = ["install-python-package"]
-command = "poetry"
-args = ["run", "pytest"]
+command = "uv"
+args = ["run", "--group", "dev", "pytest"]
 
 [tasks.pytest-flow]
 dependencies = [
@@ -92,42 +112,42 @@ dependencies = [
 
 [tasks.stubtest]
 description = "Check Python stubfiles."
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
+dependencies = ["install-python-package"]
+command = "uv"
 cwd = "python"
 args = [
     "run",
+    "--group",
+    "dev",
     "stubtest",
     "--allowlist",
     "stubtest-allowlist",
     "--allowlist",
     "./qcs_sdk/_tracing_subscriber/.stubtest-allowlist",
     "--ignore-disjoint-bases",
-    "--ignore-unused-allowlist",
     "qcs_sdk",
 ]
-# TODO(#475): Enable error reporting once stubtest is happy with stubgen's output.
-ignore_errors = true
 
 [tasks.stubtest-flow]
 dependencies = ["stubtest"]
 
 [tasks.lint-python-package]
 description = "Find errors in Python-related Rust code."
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
+dependencies = ["install-python-package"]
+command = "uv"
+args = ["run", "--group", "dev", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-mistakes"]
 
 [tasks.show-python-package-layout]
 description = "Print the Python package layout as defined within Rust code."
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
+dependencies = ["install-python-package"]
+command = "uv"
+args = ["run", "--group", "dev", "python", "./scripts/lint-bindings.py", "--base", "src", "--show-package"]
 
 [tasks.test-python-package]
 description = "Run all Python-related tests."
 dependencies = [
     "lint-python-package",
+    "check-generated-python-files",
     "check-python-api",
     "stubtest-flow",
     "pytest-flow",
@@ -142,43 +162,46 @@ alias = "test-all"
 
 [tasks.check-python-api]
 description = "Check if Python API has breaking changes."
-dependencies = ["install-python-package-with-stubs"]
+dependencies = ["install-python-package"]
 script = { file = "./scripts/check-py-api.sh" }
 
 [tasks.document-python-package]
 description = "Generate Python package documentation."
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
+dependencies = ["install-python-package"]
+command = "uv"
 args = [
     "run",
+    "--group",
+    "dev", 
     "pdoc",
     "-o", "build/docs",
     "qcs_sdk",
-    "!qcs_sdk.qcs_sdk",
+    "!qcs_sdk._qcs_sdk",
     "--logo", "https://qcs.rigetti.com/static/img/rigetti-logo.svg",
 ]
 
 # ----
 
 [tasks.format-tracing-subscriber]
-dependencies = ["install-python-deps"]
-command = "poetry"
-args = ["run", "black", "python/qcs_sdk/_tracing_subscriber"]
+command = "uv"
+args = ["run", "--group", "dev", "ruff", "format", "python/qcs_sdk/_tracing_subscriber"]
 
 [tasks.format]
-dependencies = ["install-python-deps"]
-command = "poetry"
-args = ["run", "black", "python/qcs_sdk", "tests"]
+# Only hand-written Python. Everything under `python/qcs_sdk` is generated — reformatting it
+# makes `check-generated-python-files` fail until the next `generate-stubs` run.
+# (`tests` is the Rust integration-test directory and contains no Python.)
+command = "uv"
+args = ["run", "--group", "dev", "ruff", "format", "tests_py", "scripts"]
 
 [tasks.test-session]
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "pytest", "tests_py", "--with-qcs-session"]
+dependencies = ["install-python-package"]
+command = "uv"
+args = ["run", "--group", "dev", "pytest", "tests_py", "--with-qcs-session"]
 
 [tasks.test-execution]
-dependencies = ["install-python-package-with-stubs"]
-command = "poetry"
-args = ["run", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
+dependencies = ["install-python-package"]
+command = "uv"
+args = ["run", "--group", "dev", "pytest", "tests_py", "--with-qcs-session", "--with-qcs-execution"]
 
 [tasks.dev-flow]
 dependencies = ["dev-test-flow", "pytest-flow", "stubtest-flow"]

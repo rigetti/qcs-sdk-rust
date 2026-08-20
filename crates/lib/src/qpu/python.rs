@@ -130,7 +130,7 @@ py_function_sync_async! {
     /// :param timeout: Maximum duration to wait for API calls to complete, in seconds.
     ///
     /// :raises ListQuantumProcessorsError: If the request to list available QPU IDs failed.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.qpu"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.qpu"))]
     #[pyfunction]
     #[pyo3(signature = (client = None, timeout = None))]
     async fn list_quantum_processors(
