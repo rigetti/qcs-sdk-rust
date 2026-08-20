@@ -28,8 +28,12 @@ PY_PACKAGE="qcs_sdk"
 KNOPE_PACKAGE="crates/lib"
 
 # Check if `griffe` says this is a breaking change.
-uv run --active --project crates/lib -- \
+# Don't inspect binary `.so` files:
+# discrepancies for those are expected in PyO3 projects,
+# and we use `stubtest` to ensure that the stubs are correct.
+uv run --project crates/lib -- \
   griffe check \
+    --no-inspection \
     --search crates/python \
     --search crates/lib/python \
     "${PY_PACKAGE}"

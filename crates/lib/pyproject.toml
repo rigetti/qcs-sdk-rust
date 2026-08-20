@@ -24,7 +24,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "griffe>=1.14.0,<2",
+    "griffe>=2,<=3",
     "black>=24.8.0",
     "opentelemetry-sdk==1.25.0",
     "pytest>=8.1.1",
