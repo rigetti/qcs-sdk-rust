@@ -1,3 +1,9 @@
+## 0.27.0 (2026-08-20)
+
+### Breaking Changes
+
+- update dependencies (including PyO3) (#592)
+
 ## 0.26.3 (2026-05-27)
 
 ### Features
