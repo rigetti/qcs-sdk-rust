@@ -52,7 +52,9 @@ elif [[ $api_break == 0 ]] ; then
   echo "knope knows about breaking changes, but griffe doesn't report breaking changes for $PY_PACKAGE"
   exit 0
 else
-  echo "griffe says this is a breaking change for the $PY_PACKAGE API, but knope does not know that!"
+  echo "griffe says this is a breaking change for the $PY_PACKAGE API, but knope does not know that!" >&2
+  echo "Knope output:" >&2
+  cat "$tmpdir/knope-dry-run.txt" >&2
   exit 1
 fi
 
