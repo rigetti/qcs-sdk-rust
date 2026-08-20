@@ -56,10 +56,10 @@
                     <a class="class" href="#ConjugateByCliffordRequest">ConjugateByCliffordRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugateByCliffordRequest.clifford">clifford</a>
+                                <a class="variable" href="#ConjugateByCliffordRequest.pauli">pauli</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                 </ul>
 
@@ -137,19 +137,19 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                 </ul>
 
@@ -350,19 +350,6 @@
 </div>
 
 
-                            <div id="ConjugateByCliffordRequest.pauli" class="classattr">
-                                <div class="attr variable">
-            <span class="name">pauli</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
-    
-            <div class="docstring"><p>Pauli Term to conjugate.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugateByCliffordRequest.clifford" class="classattr">
                                 <div class="attr variable">
             <span class="name">clifford</span>
@@ -372,6 +359,19 @@
     <a class="headerlink" href="#ConjugateByCliffordRequest.clifford"></a>
     
             <div class="docstring"><p>Clifford element.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugateByCliffordRequest.pauli" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pauli</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugateByCliffordRequest.pauli"></a>
+    
+            <div class="docstring"><p>Pauli Term to conjugate.</p>
 </div>
 
 
@@ -513,19 +513,6 @@
 </div>
 
 
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
                             <div id="PauliTerm.indices" class="classattr">
                                 <div class="attr variable">
             <span class="name">indices</span>
@@ -535,6 +522,19 @@
     <a class="headerlink" href="#PauliTerm.indices"></a>
     
             <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
 </div>
 
 
@@ -612,19 +612,6 @@
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
-                                <div class="attr variable">
-            <span class="name">qubits</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
-    
-            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
                             <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
                                 <div class="attr variable">
             <span class="name">depth</span>
@@ -634,19 +621,6 @@
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
     
             <div class="docstring"><p>Depth of the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
-                                <div class="attr variable">
-            <span class="name">gateset</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
-    
-            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
 </div>
 
 
@@ -673,6 +647,32 @@
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.interleaver"></a>
     
             <div class="docstring"><p>Fixed Clifford, specified as a Quil string, to interleave through an RB sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
+                                <div class="attr variable">
+            <span class="name">qubits</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
+    
+            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
+</div>
+
+
+                            </div>
+                            <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
+                                <div class="attr variable">
+            <span class="name">gateset</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
+    
+            <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
 </div>
 
 
