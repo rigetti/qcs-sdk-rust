@@ -26,6 +26,32 @@ trap cleanup EXIT
 PY_PACKAGE="qcs_sdk"
 # The name of the CHANGELOG that `knope` adds change logs for.
 KNOPE_PACKAGE="crates/lib"
+# The prefix of the git tags marking releases of the Python package.
+TAG_PREFIX="lib/v"
+
+# Check if `knope` knows this has "Breaking Changes". (Invert the "success" exit code for a match.)
+knope --dry-run --verbose release > "$tmpdir/knope-dry-run.txt" 2>&1
+if [[ $? -ne 0 ]] ; then
+  echo "FATAL: knope failed to run" >&2
+  exit 1
+fi
+! grep -q -E '^\s+implies rule MAJOR' "$tmpdir/knope-dry-run.txt"
+marked_break=$?
+
+# `griffe` has no way to filter the tags it considers, and by default compares against the most
+# recent one, which may be a prerelease made from this branch. Take the release `knope` is comparing
+# against instead, so both tools reason about the same range of commits.
+against=$(
+  sed -n -E "s/^Using commits since tag (${TAG_PREFIX//\//\\/}.*)$/\1/p" "$tmpdir/knope-dry-run.txt" \
+    | head -1
+)
+if [[ -z $against ]] ; then
+  echo "FATAL: could not determine which ${TAG_PREFIX}* release knope is comparing against" >&2
+  echo "Knope output:" >&2
+  cat "$tmpdir/knope-dry-run.txt" >&2
+  exit 1
+fi
+echo "Comparing the ${PY_PACKAGE} API against ${against}"
 
 # Check if `griffe` says this is a breaking change.
 # Don't inspect binary `.so` files:
@@ -34,19 +60,11 @@ KNOPE_PACKAGE="crates/lib"
 uv run --project crates/lib -- \
   griffe check \
     --no-inspection \
+    --against "${against}" \
     --search crates/python \
     --search crates/lib/python \
     "${PY_PACKAGE}"
 api_break=$?
-
-# Now check if `knope` knows this has "Breaking Changes". (Invert the "success" exit code for a match.)
-knope --dry-run --verbose release > "$tmpdir/knope-dry-run.txt" 2>&1
-if [[ $? -ne 0 ]] ; then
-  echo "FATAL: knope failed to run" >&2
-  exit 1
-fi
-! grep -q -E '^\s+implies rule MAJOR' "$tmpdir/knope-dry-run.txt"
-marked_break=$?
 
 if [[ $api_break == $marked_break ]]; then
   # Both tools report success (0) when they find *no* breaking changes.
