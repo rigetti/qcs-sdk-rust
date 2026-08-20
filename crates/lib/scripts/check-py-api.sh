@@ -45,11 +45,18 @@ fi
 marked_break=$?
 
 if [[ $api_break == $marked_break ]]; then
-  echo "griffe and knope agree about breaking changes"
+  # Both tools report success (0) when they find *no* breaking changes.
+  if [[ $api_break == 0 ]] ; then
+    echo "There are no breaking changes according to both griffe and knope."
+  else
+    echo "griffe and knope both know that there are breaking changes."
+  fi
   exit 0
 elif [[ $api_break == 0 ]] ; then
   # This isn't an error, but it might be a surprise.
   echo "knope knows about breaking changes, but griffe doesn't report breaking changes for $PY_PACKAGE"
+  echo "Knope output:"
+  cat "$tmpdir/knope-dry-run.txt"
   exit 0
 else
   echo "griffe says this is a breaking change for the $PY_PACKAGE API, but knope does not know that!" >&2
