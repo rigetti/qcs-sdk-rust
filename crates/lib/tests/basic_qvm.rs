@@ -1,9 +1,12 @@
 //! These are the integration tests for [`qcs::Executable::execute_on_qvm`].
-//! In order to run them, QVM's web server must be running at localhost:5000.
+//!
+//! The HTTP cases require quilc and QVM's web servers to be running, at localhost:5555
+//! and localhost:5000 respectively. The libquil cases, built with the `libquil` feature,
+//! call the linked library instead and need no servers.
 
 use std::num::NonZeroU16;
 
-use qcs::{client::Qcs, compiler::rpcq, qvm, Executable};
+use qcs::{client::Qcs, compiler::quilc, compiler::rpcq, qvm, Executable};
 
 const PROGRAM: &str = r##"
 DECLARE first BIT
@@ -16,28 +19,43 @@ MEASURE 0 first
 MEASURE 1 second
 "##;
 
-async fn quilc_client() -> rpcq::Client {
+fn rpcq_quilc_client() -> rpcq::Client {
     let qcs = Qcs::load();
     let endpoint = qcs.get_config().quilc_url();
     rpcq::Client::new(endpoint).unwrap()
 }
 
-async fn qvm_client() -> qvm::http::HttpClient {
+fn http_qvm_client() -> qvm::http::HttpClient {
     let qcs = Qcs::load();
     qvm::http::HttpClient::from(&qcs)
 }
 
+#[cfg(feature = "libquil")]
+fn libquil_quilc_client() -> qcs::compiler::libquil::Client {
+    qcs::compiler::libquil::Client {}
+}
+
+#[cfg(feature = "libquil")]
+fn libquil_qvm_client() -> qvm::libquil::Client {
+    qvm::libquil::Client {}
+}
+
+#[cfg_attr(feature = "libquil", test_case::test_case(libquil_quilc_client(), libquil_qvm_client() ; "with libquil clients"))]
+#[test_case::test_case(rpcq_quilc_client(), http_qvm_client() ; "with server clients")]
 #[tokio::test]
-async fn test_bell_state() {
+async fn test_bell_state<Q: quilc::Client + Send + Sync + 'static, V: qvm::Client>(
+    quilc_client: Q,
+    qvm_client: V,
+) {
     let shots: NonZeroU16 = NonZeroU16::new(10).expect("value is non-zero");
 
     let data = Executable::from_quil(PROGRAM)
-        .with_quilc_client(Some(quilc_client().await))
+        .with_quilc_client(Some(quilc_client))
         .with_qcs_client(Qcs::load())
         .with_shots(shots)
         .read_from("first")
         .read_from("second")
-        .execute_on_qvm(&qvm_client().await)
+        .execute_on_qvm(&qvm_client)
         .await
         .expect("Could not run on QVM");
 

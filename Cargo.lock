@@ -1995,9 +1995,9 @@ checksum = "b6d2cec3eae94f9f509c767b45932f1ada8350c4bdb85af2fcab4a3c14807981"
 
 [[package]]
 name = "libquil-sys"
-version = "0.4.2"
+version = "0.5.0-rc.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e68ddbf7529ee219c8a1d83fc28b9048a888d3174960a05721805137904363ee"
+checksum = "291fe4c75eebbc75f9ddfca20bb94051ff8aecb60c9c7129ab0326ee78453928"
 dependencies = [
  "bindgen",
  "cc",
