@@ -1,12 +1,8 @@
-## 0.26.4-rc.0 (2026-08-12)
+## 0.27.0 (2026-08-20)
 
-### Features
+### Breaking Changes
 
-#### Build against libquil-sys 0.5, which requires a libquil built on modern sbcl-librarian
-
-The `libquil` feature now needs a libquil that installs the sbcl-librarian runtime and
-its headers alongside `libquil.h`. Releases up to and including 0.3.2 ship neither; see
-the `libquil` section of the README for how to install a version that does.
+- update dependencies (including PyO3) (#592)
 
 ## 0.26.3 (2026-05-27)
 

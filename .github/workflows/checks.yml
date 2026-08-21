@@ -18,13 +18,12 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Install protoc
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: '3.20.1'
+          version: '21.0'
       - name: Install libquil
         run: ./scripts/install-libquil
-      - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -34,20 +33,22 @@ jobs:
       - uses: taiki-e/install-action@cargo-make
 
       # Knope is used as part of the Python API check.
-      - uses: knope-dev/action@v2.1.0
+      - uses: knope-dev/action@v2.1.2
         with:
-          version: 0.21.3
-      - uses: actions/setup-python@v5
+          version: 0.23.0 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13'
-      - uses: abatilo/actions-poetry@v4
+          enable-cache: true
+          cache-dependency-glob: crates/lib/uv.lock
 
       - name: Run CI Flow
         env:
           CARGO_MAKE_RUN_CHECK_FORMAT: true
           CARGO_MAKE_RUN_CLIPPY: true
           CARGO_MAKE_BUILD_EXAMPLES: true
-        run: cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
+        run: |
+          cargo make --cwd crates/lib --makefile Makefile.toml ci-flow
 
   check-python:
     name: Run Python Checks
@@ -60,12 +61,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
 
       - name: Install protoc
-        uses: arduino/setup-protoc@v1
+        uses: arduino/setup-protoc@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          version: '3.20.1'
+          version: '21.0'
       - name: Install libquil
-        run: ./scripts/install-libquil
+        run: |
+          sudo ./scripts/install-libquil
       - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
@@ -74,15 +76,16 @@ jobs:
       - uses: taiki-e/install-action@cargo-make
 
       # Knope is used as part of the Python API check.
-      - uses: knope-dev/action@v2.1.0
+      - uses: knope-dev/action@v2.1.2
         with:
-          version: 0.21.3
+          version: 0.23.0 # Test before updating, breaking changes likely: https://github.com/knope-dev/action#install-latest-version
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.13'
-
-      - uses: abatilo/actions-poetry@v4
+          enable-cache: true
+          cache-dependency-glob: crates/lib/uv.lock
 
       - name: Test Python Package
-        run: cargo make --cwd crates/lib --makefile Makefile.toml test-python-package
+        run: |
+          cargo make --cwd crates/lib --makefile Makefile.toml test-python-package

@@ -5,6 +5,7 @@ from qcs_sdk.compiler.quilc import QuilcClient
 from qcs_sdk.qpu import QPUResultData
 from qcs_sdk.qvm import QVMClient, QVMResultData
 
+
 @pytest.mark.qcs_session
 @pytest.mark.qcs_execution
 def test_execute_qpu(
@@ -21,7 +22,7 @@ def test_execute_qpu(
     shots = results.readout_values[key].inner()
     shot_value = shots[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]
 
 
 @pytest.mark.asyncio
@@ -41,7 +42,7 @@ async def test_execute_qpu_async(
     shots = results.readout_values[key].inner()
     shot_value = shots[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]
 
 
 @pytest.mark.qcs_session
@@ -65,7 +66,7 @@ def test_submit_and_retrieve_qpu(
     shots = results.readout_values[key].inner()
     shot_value = shots[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]
 
 
 @pytest.mark.asyncio
@@ -90,7 +91,7 @@ async def test_submit_and_retrieve_qpu_async(
     shots = results.readout_values[key].inner()
     shot_value = shots[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]
 
 
 def test_execute_qvm(
@@ -105,7 +106,7 @@ def test_execute_qvm(
     shot = vals.inner()[0]
     shot_value = shot[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]
 
 
 @pytest.mark.asyncio
@@ -121,4 +122,4 @@ async def test_execute_qvm_async(
     shot = vals.inner()[0]
     shot_value = shot[0]
 
-    assert shot_value in [ 0, 1 ]
+    assert shot_value in [0, 1]

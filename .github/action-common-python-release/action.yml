@@ -32,9 +32,6 @@ runs:
       python-version: ${{ inputs.python-version }}
       architecture: ${{ inputs.python-architecture }}
 
-  - name: Install Poetry
-    uses: abatilo/actions-poetry@v4
-
   - name: Install Rust toolchain
     uses: actions-rs/toolchain@v1
     with:

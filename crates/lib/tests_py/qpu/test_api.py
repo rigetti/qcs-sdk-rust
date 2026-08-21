@@ -18,7 +18,7 @@ def test_submit_retrieve(quantum_processor_id: str, execution_options: Execution
     """
 
     program = "DECLARE theta REAL; RZ(theta) 0"
-    memory = { "theta": [0.5] }
+    memory = {"theta": [0.5]}
 
     translated = translate(program, 1, quantum_processor_id)
 
@@ -30,8 +30,17 @@ def test_submit_retrieve(quantum_processor_id: str, execution_options: Execution
     )
     assert results is not None
 
-class TestPickle():
-    @pytest.mark.parametrize("strategy", [ConnectionStrategy.Gateway(), ConnectionStrategy.DirectAccess(), ConnectionStrategy.EndpointId("endpoint_id"), ConnectionStrategy.EndpointAddress("http://localhost:8080")])
+
+class TestPickle:
+    @pytest.mark.parametrize(
+        "strategy",
+        [
+            ConnectionStrategy.Gateway(),
+            ConnectionStrategy.DirectAccess(),
+            ConnectionStrategy.EndpointId("endpoint_id"),
+            ConnectionStrategy.EndpointAddress("http://localhost:8080"),
+        ],
+    )
     def test_connection_strategy(self, strategy: ConnectionStrategy):
         pickled = pickle.dumps(strategy)
         unpickled = pickle.loads(pickled)

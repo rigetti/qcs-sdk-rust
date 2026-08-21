@@ -83,7 +83,12 @@ use crate::{
 /// ```
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk", name = "Executable", frozen)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk",
+    name = "Executable",
+    frozen,
+    from_py_object
+)]
 pub(crate) struct PyExecutable(Arc<Mutex<Executable<'static, 'static>>>);
 
 /// The result of submitting a job to a QPU.
@@ -91,7 +96,12 @@ pub(crate) struct PyExecutable(Arc<Mutex<Executable<'static, 'static>>>);
 /// Used to retrieve the results of a job.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk", name = "JobHandle", frozen)]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk",
+    name = "JobHandle",
+    frozen,
+    from_py_object
+)]
 pub(crate) struct PyJobHandle(JobHandle<'static>);
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
@@ -417,7 +427,7 @@ impl PyExecutable {
 /// Note: The validity of parameters is not checked until execution.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk", get_all, set_all)]
+#[pyclass(module = "qcs_sdk._qcs_sdk", get_all, set_all, from_py_object)]
 pub(crate) struct ExeParameter {
     name: String,
     index: usize,

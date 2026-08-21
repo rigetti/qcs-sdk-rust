@@ -2,7 +2,7 @@
 versioned_files = [
     "crates/lib/Cargo.toml",
     "crates/lib/pyproject.toml",
-    "Cargo.lock",
+    { path = "Cargo.lock", dependency = "qcs" },
 ]
 changelog = "crates/lib/CHANGELOG.md"
 scopes = ["lib", "rust", "python"]
@@ -27,3 +27,11 @@ type = "Release"
 [github]
 owner = "rigetti"
 repo = "qcs-sdk-rust"
+
+[[workflows]]
+name = "get-version"
+help_text = "Get the current version of the project"
+
+[[workflows.steps]]
+type = "Command"
+command = 'echo "$version"'

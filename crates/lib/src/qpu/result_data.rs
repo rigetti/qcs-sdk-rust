@@ -21,7 +21,10 @@ use qcs_api_client_grpc::models::controller::{
 #[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu", from_py_object)
+)]
 pub enum ReadoutValues {
     /// Integer readout values
     Integer(Vec<i64>),
@@ -37,7 +40,10 @@ pub enum ReadoutValues {
 #[expect(clippy::unsafe_derive_deserialize)]
 #[derive(Debug, Clone, EnumAsInner, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu", eq))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu", eq, from_py_object)
+)]
 pub enum MemoryValues {
     /// Values that correspond to a memory region declared with the BIT or OCTET data type.
     Binary(Vec<u8>),
@@ -61,7 +67,12 @@ pub enum MemoryValues {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.qpu", name = "QPUResultData", get_all)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu",
+        name = "QPUResultData",
+        get_all,
+        from_py_object
+    )
 )]
 pub struct QpuResultData {
     /// Mappings of a memory region (ie. "ro[0]") to its key name in `readout_values` (ie. "q0").

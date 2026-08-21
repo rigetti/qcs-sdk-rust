@@ -114,7 +114,11 @@ pub(crate) enum QuilcClient {
 /// Client used to communicate with Quilc.
 #[derive(Clone)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[pyclass(module = "qcs_sdk.compiler.quilc", name = "QuilcClient")]
+#[pyclass(
+    module = "qcs_sdk._qcs_sdk.compiler.quilc",
+    name = "QuilcClient",
+    from_py_object
+)]
 pub(crate) struct PyQuilcClient {
     pub inner: QuilcClient,
 }
@@ -220,7 +224,7 @@ py_function_sync_async! {
     /// :param options: Optional compiler options. If ``None``, default values are used.
     ///
     /// :raises QuilcError: If compilation fails.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     #[pyo3(signature = (quil, target, client, options = None))]
     #[tracing::instrument(skip_all)]
@@ -303,7 +307,7 @@ py_function_sync_async! {
     /// :param client: Client used to send compilation requests to Quilc.
     ///
     /// :raises QuilcError: If there is a failure connecting to Quilc.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn get_version_info(client: PyQuilcClient) -> PyResult<String> {
         client.inner.as_client().get_version_info().map_err(Into::into)
@@ -336,7 +340,7 @@ py_function_sync_async! {
     /// :param client: Client used to send compilation requests to Quilc.
     ///
     /// :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn conjugate_pauli_by_clifford(
         request: ConjugateByCliffordRequest,
@@ -390,7 +394,7 @@ py_function_sync_async! {
     /// :param client: Client used to send compilation requests to Quilc.
     ///
     /// :raises QuilcError: If there is a failure connecting to Quilc or if the request is malformed.
-    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.compiler.quilc"))]
+    #[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.compiler.quilc"))]
     #[pyfunction]
     async fn generate_randomized_benchmarking_sequence(
         request: RandomizedBenchmarkingRequest,

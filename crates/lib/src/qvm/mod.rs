@@ -114,7 +114,13 @@ impl<T: Client + Sync + Send> Client for Arc<T> {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMResultData", get_all, frozen)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qvm",
+        name = "QVMResultData",
+        get_all,
+        frozen,
+        from_py_object
+    )
 )]
 pub struct QvmResultData {
     /// A map of register names (ie. "ro") to a `RegisterData` containing their values.
@@ -257,7 +263,7 @@ pub fn apply_parameters_to_program(
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk.qvm", name = "QVMOptions")
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm", name = "QVMOptions", from_py_object)
 )]
 pub struct QvmOptions {
     /// The timeout to use for requests to the QVM. If set to [`None`], there is no timeout.

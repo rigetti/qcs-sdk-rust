@@ -28,7 +28,10 @@ create_init_submodule! {
 /// report = asyncio.run(main())
 /// print(report)
 /// ```
-#[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.diagnostics"))]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.diagnostics")
+)]
 #[pyfunction]
 pub(crate) fn get_report_async(py: Python<'_>) -> PyResult<Awaitable<'_, String>> {
     let py_part = get_py_report(py)?;
@@ -46,7 +49,10 @@ pub(crate) fn get_report_async(py: Python<'_>) -> PyResult<Awaitable<'_, String>
 /// Use that version in async environments.
 ///
 /// Note: this format is not stable and its content may change between versions.
-#[cfg_attr(feature = "stubs", gen_stub_pyfunction(module = "qcs_sdk.diagnostics"))]
+#[cfg_attr(
+    feature = "stubs",
+    gen_stub_pyfunction(module = "qcs_sdk._qcs_sdk.diagnostics")
+)]
 #[pyfunction]
 pub(crate) fn get_report(py: Python<'_>) -> PyResult<String> {
     let py_part = get_py_report(py)?;

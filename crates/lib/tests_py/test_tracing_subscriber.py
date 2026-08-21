@@ -16,6 +16,7 @@ which is also unwieldy.
 If the environment variable `QCS_SDK_TESTS_KEEP_RUST_TRACES` is set to `1`,
 the traces will not be deleted after the test completes.
 """
+
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -145,12 +146,7 @@ def test_qvm_tracing_sync(
 
     python_spans = []
     multishot_request = MultishotRequest(
-        program=native_bitflip_program,
-        shots=10,
-        addresses={},
-        measurement_noise=None,
-        gate_noise=None,
-        rng_seed=None
+        program=native_bitflip_program, shots=10, addresses={}, measurement_noise=None, gate_noise=None, rng_seed=None
     )
     with tracer.start_as_current_span("test_qvm_tracing") as span:
         python_spans.append(span)
@@ -188,12 +184,7 @@ async def test_qvm_tracing_async(
 
     python_spans = []
     multishot_request = MultishotRequest(
-        program=native_bitflip_program,
-        shots=10,
-        addresses={},
-        measurement_noise=None,
-        gate_noise=None,
-        rng_seed=None
+        program=native_bitflip_program, shots=10, addresses={}, measurement_noise=None, gate_noise=None, rng_seed=None
     )
     with tracer.start_as_current_span("test_qvm_tracing_async") as span:
         python_spans.append(span)
@@ -278,6 +269,8 @@ def test_translate_submit_retrieve_sync(
                     parent_span_name=span.name,
                 )
             )
+
+
 @pytest.mark.qcs_session
 @pytest.mark.asyncio
 async def test_translate_submit_retrieve_async(
@@ -380,9 +373,9 @@ def _verify_expected_spans(rust_trace_file: str, expected_spans: list[_ExpectedS
                             duration = timedelta(microseconds=duration_ns / 1000)
                             assert duration >= expected.minimum_expected_duration
 
-        assert (
-            counter[expected.span_name] == expected.count
-        ), f'Expected {expected.count} spans with name {expected.span_name} within parent "{expected.parent_span_name}", but found {counter[expected.span_name]}. Added by {expected.added_by}. See {rust_trace_file} trace {hex(expected.trace_id)}'
+        assert counter[expected.span_name] == expected.count, (
+            f'Expected {expected.count} spans with name {expected.span_name} within parent "{expected.parent_span_name}", but found {counter[expected.span_name]}. Added by {expected.added_by}. See {rust_trace_file} trace {hex(expected.trace_id)}'
+        )
 
 
 @pytest.fixture(scope="module")
@@ -438,6 +431,7 @@ def tracer() -> Generator[trace.Tracer, None, None]:
         finally:
             provider.force_flush()
 
+
 @pytest.fixture(scope="module", autouse=True)
 def tracing_environment_variables() -> Generator[None, None, None]:
     """
@@ -452,5 +446,3 @@ def tracing_environment_variables() -> Generator[None, None, None]:
         },
     ):
         yield
-
-

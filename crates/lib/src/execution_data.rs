@@ -66,7 +66,10 @@ pub enum ResultData {
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", eq))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk", eq, from_py_object)
+)]
 pub struct ExecutionData {
     /// The [`ResultData`] that was read from the [`Executable`](crate::Executable).
     #[pyo3(get)]
@@ -95,7 +98,10 @@ pub enum RegisterMatrix {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[repr(transparent)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk", mapping))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk", mapping, from_py_object)
+)]
 pub struct RegisterMap(pub HashMap<String, RegisterMatrix>);
 
 /// Errors that may occur when trying to build a [`RegisterMatrix`] from execution data

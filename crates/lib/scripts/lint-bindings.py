@@ -22,6 +22,7 @@ from pyo3_linter import (
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger()
 
+
 def main():
     args = parser.get_parser().parse_args()
 
@@ -41,7 +42,7 @@ def main():
         "ClientCredentials",
         "ExternallyManaged",
     }
-    client_mod = exported["qcs_sdk.client"]
+    client_mod = exported["qcs_sdk._qcs_sdk.client"]
     to_remove = {item for item in client_mod if item.rust_name in reexports}
     for export in to_remove:
         client_mod.discard(export)
