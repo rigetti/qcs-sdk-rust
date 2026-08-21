@@ -31,7 +31,7 @@ use pyo3_stub_gen::derive::gen_stub_pyclass_complex_enum;
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk", eq, frozen, get_all)
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk", eq, frozen, get_all, from_py_object)
 )]
 pub enum RegisterData {
     /// Corresponds to the Quil `BIT` or `OCTET` types.

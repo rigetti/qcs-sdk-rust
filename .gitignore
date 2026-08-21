@@ -6,6 +6,8 @@
 .envrc
 venv/
 .venv
+# Local `uv` cache; see `UV_CACHE_DIR` in crates/lib/Makefile.toml.
+.uv-cache
 
 # IDEs
 .idea

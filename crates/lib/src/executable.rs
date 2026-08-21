@@ -681,7 +681,12 @@ pub enum Error {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk", rename_all = "SCREAMING_SNAKE_CASE", eq)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk",
+        rename_all = "SCREAMING_SNAKE_CASE",
+        eq,
+        from_py_object
+    )
 )]
 /// The external services that this SDK may connect to. Used to differentiate between networking
 /// issues in [`Error::Connection`].

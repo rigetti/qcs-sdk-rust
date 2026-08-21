@@ -47,9 +47,7 @@ def test_client_default_profile_is_not_empty(default_client: QCSClient):
 @pytest.mark.not_qcs_session
 def test_client_broken_raises():
     """Using a profile with broken configuration should surface the underlying error."""
-    with pytest.raises(
-        LoadClientError, match=r"Expected auth server .* but it does not exist"
-    ):
+    with pytest.raises(LoadClientError, match=r"Expected auth server .* but it does not exist"):
         QCSClient.load(profile_name="broken")
 
 

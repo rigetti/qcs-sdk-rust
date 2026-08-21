@@ -61,7 +61,10 @@ impl<T: DeserializeOwned> QvmResponse<T> {
 #[serde(rename_all = "kebab-case")]
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", from_py_object)
+)]
 pub struct MultishotRequest {
     /// The Quil program to run.
     #[pyo3(get, set)]
@@ -92,7 +95,10 @@ pub struct MultishotRequest {
 #[derive(Serialize, Debug, Clone, PartialEq, Eq)]
 #[serde(untagged)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api", eq))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", eq, from_py_object)
+)]
 pub enum AddressRequest {
     /// Get all values for the address.
     #[serde(serialize_with = "serialize_true")]
@@ -144,7 +150,10 @@ impl MultishotRequest {
 /// The response body returned by the QVM after a multishot [`run`] request.
 #[derive(Debug, Deserialize, Clone, PartialEq)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api", get_all))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", get_all, from_py_object)
+)]
 pub struct MultishotResponse {
     /// The requested readout registers and their final values for each shot.
     #[serde(flatten)]
@@ -156,7 +165,10 @@ pub struct MultishotResponse {
 #[serde(rename_all = "kebab-case")]
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", from_py_object)
+)]
 pub struct MultishotMeasureRequest {
     /// The Quil program to run.
     #[pyo3(get)]
@@ -211,7 +223,10 @@ impl MultishotMeasureRequest {
 #[serde(rename_all = "kebab-case")]
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", from_py_object)
+)]
 pub struct ExpectationRequest {
     /// A Quil program defining the state.
     #[pyo3(get)]
@@ -245,7 +260,10 @@ impl ExpectationRequest {
 #[serde(rename_all = "kebab-case")]
 #[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qvm.api"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qvm.api", from_py_object)
+)]
 pub struct WavefunctionRequest {
     /// The Quil program to run.
     #[pyo3(get)]

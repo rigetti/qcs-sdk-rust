@@ -4,6 +4,7 @@ import pytest
 
 from qcs_sdk import diagnostics
 
+
 @pytest.mark.qcs_session
 def test_get_report():
     """The async and sync reports are the same, and are generated without panicing."""

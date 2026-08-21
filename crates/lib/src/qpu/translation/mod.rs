@@ -142,7 +142,10 @@ pub enum TranslationBackendMismatch {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Clone, Debug, Default)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.translation"))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.qpu.translation", from_py_object)
+)]
 pub struct TranslationOptions {
     inner: ApiTranslationOptions,
 }

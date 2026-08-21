@@ -10,10 +10,7 @@ from _pytest.nodes import Item
 
 from qcs_sdk.client import QCSClient
 from qcs_sdk.qpu.api import APIExecutionOptions, ExecutionOptions
-from qcs_sdk.qpu.isa import (
-    list_instruction_set_architectures_async,
-    InstructionSetArchitecture
-)
+from qcs_sdk.qpu.isa import list_instruction_set_architectures_async, InstructionSetArchitecture
 from qcs_sdk.qvm import QVMClient
 from qcs_sdk.compiler.quilc import QuilcClient
 
@@ -23,8 +20,15 @@ TEST_FIXTURE_DIR = os.path.join(TEST_ROOT_DIR, "./_fixtures")
 
 
 def pytest_addoption(parser: Parser):
-    parser.addoption("--with-qcs-session", action="store_true", default=False, help="Run tests that require proper user config authentication.")
-    parser.addoption("--with-qcs-execution", action="store_true", default=False, help="Run tests that require qpu execution.")
+    parser.addoption(
+        "--with-qcs-session",
+        action="store_true",
+        default=False,
+        help="Run tests that require proper user config authentication.",
+    )
+    parser.addoption(
+        "--with-qcs-execution", action="store_true", default=False, help="Run tests that require qpu execution."
+    )
 
 
 def pytest_configure(config: Config):
@@ -68,6 +72,7 @@ def _read_fixture(relpath: str) -> str:
 def available_ids() -> list[str]:
     async def _list_isas():
         return await list_instruction_set_architectures_async(client=QCSClient())
+
     return asyncio.run(_list_isas())
 
 
@@ -137,11 +142,6 @@ def api_execution_options(execution_timeout: datetime.timedelta) -> APIExecution
 
 @pytest.fixture
 def execution_options(
-    execution_timeout: datetime.timedelta,
-    api_execution_options: APIExecutionOptions
+    execution_timeout: datetime.timedelta, api_execution_options: APIExecutionOptions
 ) -> ExecutionOptions:
-    return ExecutionOptions(
-        timeout=execution_timeout,
-        api_options=api_execution_options
-    )
-
+    return ExecutionOptions(timeout=execution_timeout, api_options=api_execution_options)
