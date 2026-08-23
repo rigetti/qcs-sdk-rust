@@ -23,7 +23,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '21.0'
       - name: Install libquil
-        run: ./scripts/install-libquil
+        run: |
+          sudo ./scripts/install-libquil
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -68,7 +69,6 @@ jobs:
       - name: Install libquil
         run: |
           sudo ./scripts/install-libquil
-      - uses: syphar/restore-virtualenv@v1
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache

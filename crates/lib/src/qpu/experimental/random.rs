@@ -248,7 +248,14 @@ impl TryFrom<ChooseRandomRealSubRegions> for Call {
 /// convertible to `f64`.
 #[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
-#[cfg_attr(feature = "python", pyo3::pyclass(module = "qcs_sdk.qpu.experimental.random", frozen))]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu.experimental.random",
+        frozen,
+        from_py_object
+    )
+)]
 pub struct PrngSeedValue {
     u64_value: u64,
     f64_value: f64,
