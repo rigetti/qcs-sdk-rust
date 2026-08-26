@@ -5,7 +5,7 @@ FROM rust:latest
 # installer needs to fetch and unpack a release.
 # TODO(github.com/rigetti/libquil#58): drop the pin once the sbcl-librarian runtime work
 # is released as a stable version, and install the latest release instead.
-ARG LIBQUIL_VERSION=0.4.0-rc.1
+ARG LIBQUIL_VERSION=0.4.0
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cmake pkg-config unzip curl libclang-dev && \
     curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
