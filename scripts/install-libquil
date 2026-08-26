@@ -71,6 +71,6 @@ fi
 # Hand off to libquil's own installer, taken from the tag being installed rather than
 # from a branch: only that version installs the sbcl-librarian runtime and its headers.
 INSTALLER="$(mktemp)"
-curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/install.sh" -o "${INSTALLER}"
+curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" -o "${INSTALLER}"
 bash "${INSTALLER}" "${LIBQUIL_VERSION}"
 rm -f "${INSTALLER}"
