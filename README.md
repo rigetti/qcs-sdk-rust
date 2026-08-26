@@ -62,16 +62,7 @@ present, pointing at [libquil's
 requirements](https://github.com/rigetti/libquil#requirements) so you can install them
 with your own package manager. libquil publishes no Windows build.
 
-<!-- TODO(github.com/rigetti/libquil#58): once the sbcl-librarian runtime work is
-released as a stable version, drop LIBQUIL_VERSION from the commands above and from
-CI, and install the latest release instead. -->
-
-`libquil-sys` 0.5 links against the sbcl-librarian runtime that libquil is built on, so
-it needs a libquil that installs that runtime and its headers (`sbcl_librarian.h`)
-alongside `libquil.h`. Releases up to and including 0.3.2 ship neither, and building
-against one of those fails in `libquil-sys`'s build script. That runtime is so far
-released in libquil 0.4.0, which the commands above pin with `LIBQUIL_VERSION`; set it
-to whichever build you need.
+`LIBQUIL_VERSION` must be at least `0.4.1`.
 
 To build against a libquil source tree instead of an installed one, set
 `LIBQUIL_SRC_PATH` to that directory; `libquil-sys` searches it before the system

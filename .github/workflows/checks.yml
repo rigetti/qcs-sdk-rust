@@ -23,10 +23,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '21.0'
       - name: Install libquil
-        # TODO(github.com/rigetti/libquil#58): drop the pin once the sbcl-librarian
-        # runtime work is released as a stable version.
         env:
-          LIBQUIL_VERSION: "0.4.0"
+          LIBQUIL_VERSION: "0.4.1"
         run: |
           sudo apt-get update && sudo apt-get install -y unzip curl libclang-dev
           curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
@@ -73,10 +71,8 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '21.0'
       - name: Install libquil
-        # TODO(github.com/rigetti/libquil#58): drop the pin once the sbcl-librarian
-        # runtime work is released as a stable version.
         env:
-          LIBQUIL_VERSION: "0.4.0"
+          LIBQUIL_VERSION: "0.4.1"
         run: |
           sudo apt-get update && sudo apt-get install -y unzip curl libclang-dev
           curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
