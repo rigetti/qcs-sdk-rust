@@ -23,8 +23,14 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '21.0'
       - name: Install libquil
+        # TODO(github.com/rigetti/libquil#58): drop the pin once the sbcl-librarian
+        # runtime work is released as a stable version.
+        env:
+          LIBQUIL_VERSION: "0.4.0-rc.1"
         run: |
-          sudo ./scripts/install-libquil
+          sudo apt-get update && sudo apt-get install -y unzip curl libclang-dev
+          curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
+            | sudo -E bash -s -- --install-deps "${LIBQUIL_VERSION}"
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache
@@ -67,8 +73,14 @@ jobs:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           version: '21.0'
       - name: Install libquil
+        # TODO(github.com/rigetti/libquil#58): drop the pin once the sbcl-librarian
+        # runtime work is released as a stable version.
+        env:
+          LIBQUIL_VERSION: "0.4.0-rc.1"
         run: |
-          sudo ./scripts/install-libquil
+          sudo apt-get update && sudo apt-get install -y unzip curl libclang-dev
+          curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
+            | sudo -E bash -s -- --install-deps "${LIBQUIL_VERSION}"
       # may protect against linking failure: no space left on device
       - name: Delete huge unnecessary tools folder
         run: rm -rf /opt/hostedtoolcache

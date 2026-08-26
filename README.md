@@ -44,27 +44,35 @@ Any tests which cannot be run in CI should be run with `makers manual`. These te
 [`libquil`](https://github.com/rigetti/libquil) provides [quilc](https://github.com/quil-lang/quilc) and [QVM](https://github.com/quil-lang/qvm) as a shared library, which can be used by `qcs-sdk-rust` as an alternative client for those tools.
 
 To use `libquil`:
-* install the library with `scripts/install-libquil`, which installs the prerequisite
-  packages and then hands off to [libquil's own
-  installer](https://github.com/rigetti/libquil#automated-installation)
+* install the library with [libquil's own
+  installer](https://github.com/rigetti/libquil#automated-installation), which
+  `--install-deps` tells to install the prerequisite packages too:
+
+  ```
+  curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
+    | sudo bash -s -- --install-deps "${LIBQUIL_VERSION}"
+  ```
+
+* also install `libclang`, which bindgen needs to generate `libquil-sys`'s bindings.
+  It ships with the Xcode command line tools on macOS; on Debian it is `libclang-dev`
 * enable the feature with `--features libquil`
 
-The script installs prerequisites with `apt` on Linux and Homebrew on macOS; on a Linux
-distribution without `apt` it stops and points at [libquil's
-requirements](https://github.com/rigetti/libquil#requirements), which you can install
-with your own package manager before running libquil's installer directly. libquil
-publishes no Windows build.
+`--install-deps` uses `apt` on Linux and Homebrew on macOS, and stops if neither is
+present, pointing at [libquil's
+requirements](https://github.com/rigetti/libquil#requirements) so you can install them
+with your own package manager. libquil publishes no Windows build.
 
-<!-- TODO(github.com/rigetti/libquil#57): once the sbcl-librarian runtime work is
-released from rigetti/libquil, drop the version and repository pinned in
-scripts/install-libquil and install the latest release instead. -->
+<!-- TODO(github.com/rigetti/libquil#58): once the sbcl-librarian runtime work is
+released as a stable version, drop LIBQUIL_VERSION from the commands above and from
+CI, and install the latest release instead. -->
 
 `libquil-sys` 0.5 links against the sbcl-librarian runtime that libquil is built on, so
 it needs a libquil that installs that runtime and its headers (`sbcl_librarian.h`)
 alongside `libquil.h`. Releases up to and including 0.3.2 ship neither, and building
 against one of those fails in `libquil-sys`'s build script. That runtime is so far
-published only as a prerelease, so `scripts/install-libquil` pins the version; override
-it with `LIBQUIL_VERSION` if you need a different build.
+published only as a prerelease, so the commands above pin `LIBQUIL_VERSION`; set it to
+whichever build you need. Omitting the version entirely installs libquil's *latest*
+release, which is 0.3.2 and will not work.
 
 To build against a libquil source tree instead of an installed one, set
 `LIBQUIL_SRC_PATH` to that directory; `libquil-sys` searches it before the system
