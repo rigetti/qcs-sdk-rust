@@ -1,6 +1,6 @@
 [project]
 name = "qcs-sdk-python"
-version = "0.27.0"
+version = "0.27.1-lq.0"
 description = "Python interface for the QCS Rust SDK"
 authors = [
     { name = "Rigetti QPU Software", email = "qpu-software@rigetti.com" },
