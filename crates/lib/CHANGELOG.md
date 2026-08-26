@@ -1,15 +1,3 @@
-## 0.27.1-rc.0 (2026-08-26)
-
-### Fixes
-
-- drop two merge artifacts from the main merge
-
-## 0.27.1-lq.0 (2026-08-26)
-
-### Fixes
-
-- drop two merge artifacts from the main merge
-
 ## 0.27.0 (2026-08-20)
 
 ### Breaking Changes
