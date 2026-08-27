@@ -65,7 +65,6 @@ feature-depth = 1
 [advisories]
 ignore = [
     { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
-    { id = "RUSTSEC-2024-0436", reason = "paste is unmaintained" },
     { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
     # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
     # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
@@ -239,18 +238,3 @@ unknown-git = "deny"
 # List of URLs for allowed crate registries. Defaults to the crates.io index
 # if not specified. If it is specified but empty, no registries are allowed.
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-# List of URLs for allowed Git repositories
-allow-git = ["https://github.com/rigetti/quil-rs"]
-
-[sources.allow-org]
-# github.com organizations to allow git sources for
-github = [
-    "rigetti",
-]
-# gitlab.com organizations to allow git sources for
-gitlab = [
-    "rigetti",
-]
-# bitbucket.org organizations to allow git sources for
-bitbucket = []
-
