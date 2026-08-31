@@ -9,7 +9,7 @@ resolver = "2"
 ndarray = { version = "0.17.2", features = ["serde"] }
 qcs-dependencies-client = { version = "0.5" }
 serde_json = "1.0.86"
-thiserror = "2.0.17"
+thiserror = "2.0"
 tokio = "1.36.0"
 tokio-util = "0.7"
 tracing = { version = "0.1", features = ["log"] }
@@ -47,7 +47,7 @@ indexmap = "2.2.6"
 insta = "1.29.0"
 itertools = "0.12.0"
 lazy_static = "1.4.0"
-libquil-sys = "0.4.2"
+libquil-sys = "0.5.0"
 maplit = "1.0.2"
 num = "0.4.0"
 # keep pinned until this crate matures

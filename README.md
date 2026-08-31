@@ -44,8 +44,29 @@ Any tests which cannot be run in CI should be run with `makers manual`. These te
 [`libquil`](https://github.com/rigetti/libquil) provides [quilc](https://github.com/quil-lang/quilc) and [QVM](https://github.com/quil-lang/qvm) as a shared library, which can be used by `qcs-sdk-rust` as an alternative client for those tools.
 
 To use `libquil`:
-* install the library (see [installation instructions](https://github.com/rigetti/libquil#automated-installation))
+* install the library with [libquil's own
+  installer](https://github.com/rigetti/libquil#automated-installation), which
+  `--install-deps` tells to install the prerequisite packages too:
+
+  ```
+  curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
+    | sudo bash -s -- --install-deps "${LIBQUIL_VERSION}"
+  ```
+
+* also install `libclang`, which bindgen needs to generate `libquil-sys`'s bindings.
+  It ships with the Xcode command line tools on macOS; on Debian it is `libclang-dev`
 * enable the feature with `--features libquil`
+
+`--install-deps` uses `apt` on Linux and Homebrew on macOS, and stops if neither is
+present, pointing at [libquil's
+requirements](https://github.com/rigetti/libquil#requirements) so you can install them
+with your own package manager. libquil publishes no Windows build.
+
+`LIBQUIL_VERSION` must be at least `0.4.1`.
+
+To build against a libquil source tree instead of an installed one, set
+`LIBQUIL_SRC_PATH` to that directory; `libquil-sys` searches it before the system
+locations.
 
 ### Linting
 

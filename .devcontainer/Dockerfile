@@ -1,12 +1,14 @@
 FROM rust:latest
 
-# cmake and pkg-config are needed by Rust build scripts (e.g. aws-lc-sys).
-# sudo allows install-libquil to re-exec as root when the container user is not root.
-COPY scripts/install-libquil /tmp/install-libquil
+# cmake and pkg-config are needed by Rust build scripts (e.g. aws-lc-sys). libclang is
+# for bindgen, which generates libquil-sys's bindings; unzip and curl are what libquil's
+# installer needs to fetch and unpack a release.
+ARG LIBQUIL_VERSION=0.4.1
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends cmake pkg-config sudo && \
-    /tmp/install-libquil && \
-    rm -rf /var/lib/apt/lists/* /tmp/install-libquil
+    apt-get install -y --no-install-recommends cmake pkg-config unzip curl libclang-dev && \
+    curl -fsSL "https://raw.githubusercontent.com/rigetti/libquil/v${LIBQUIL_VERSION}/scripts/install.sh" \
+        | bash -s -- --install-deps "${LIBQUIL_VERSION}" && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN cargo install cargo-binstall
 RUN cargo binstall --no-confirm cargo-make cargo-deny ripgrep knope
