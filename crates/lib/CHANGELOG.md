@@ -1,3 +1,9 @@
+## 0.27.2-rc.0 (2026-08-31)
+
+### Fixes
+
+- Python releases cannot use the 'grpc-web' feature any more, since it no longer exists
+
 ## 0.27.1 (2026-08-31)
 
 ### Features

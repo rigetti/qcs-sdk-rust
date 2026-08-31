@@ -2,10 +2,6 @@ name: "Base Python Release"
 description: "Common tasks required to release python wheels on any platform"
 
 inputs:
-  package-name:
-    required: true
-    description: "Either `qcs-sdk-python` or `qcs-sdk-python-grpc-web`"
-
   artifact-key:
     description: "Unique upload-artifact key. Example: 'macos' or 'linux-x86_64'"
   python-version:
@@ -40,13 +36,6 @@ runs:
       profile: minimal
       default: true
 
-  - name: Patch package metadata for grpc-web
-    shell: bash
-    if: inputs.package-name == 'qcs-sdk-python-grpc-web'
-    run: |
-      pip install toml
-      python crates/lib/scripts/patch_grpc_web.py
-
   # must be build or sdist
   - if: inputs.maturin-command == 'build'
     name: Maturin - Build
@@ -56,7 +45,7 @@ runs:
       command: ${{ inputs.maturin-command }}
       target: ${{ inputs.maturin-target }}
       container: ${{ inputs.maturin-container }}
-      args: -i ${{ inputs.python-version }} --release --manifest-path crates/lib/Cargo.toml --out dist ${{ inputs.package-name == 'qcs-sdk-python-grpc-web' && '-F grpc-web' || '' }} --auditwheel repair -v
+      args: -i ${{ inputs.python-version }} --release --manifest-path crates/lib/Cargo.toml --out dist --auditwheel repair -v
       docker-options: -e CI
   - if: inputs.maturin-command == 'sdist'
     name: Maturin - Source Distribution
@@ -77,7 +66,7 @@ runs:
   - name: Upload wheels
     uses: actions/upload-artifact@v4
     with:
-      name: wheels_${{ inputs.package-name }}__${{ inputs.python-version }}-${{ inputs.maturin-target }}-${{ inputs.artifact-key }}
+      name: wheels_qcs-sdk-python__${{ inputs.python-version }}-${{ inputs.maturin-target }}-${{ inputs.artifact-key }}
       path: dist/
       compression-level: 0
 

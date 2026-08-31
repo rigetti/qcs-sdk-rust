@@ -7,7 +7,7 @@ on:
     description: "Manually publish release"
     inputs:
       publishWheels:
-        description: "Build and publish both qcs-sdk-python and qcs-sdk-python-grpc-web wheels to PyPI"
+        description: "Build and publish qcs-sdk-python wheels to PyPI"
         type: boolean
         default: false
 
@@ -31,7 +31,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
         target: [x86_64-apple-darwin, aarch64-apple-darwin]
     steps:
@@ -44,7 +43,6 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         artifact-key: macos
-        package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
         maturin-target: ${{ matrix.target }}
 
@@ -67,7 +65,6 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         artifact-key: linux-x86_64
-        package-name: qcs-sdk-python
         python-version: ${{ matrix.python-version }}
         maturin-target: x86_64
 
@@ -90,55 +87,8 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         artifact-key: linux-aarch64
-        package-name: qcs-sdk-python
         python-version: ${{ matrix.python-version }}
         maturin-target: aarch64
-
-  linux-grpc-web-x86_64:
-    runs-on: ubuntu-latest
-    needs: [is-python-release, should-publish-wheels]
-    env:
-      CXXFLAGS: "-std=c++11"
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install protoc
-      uses: arduino/setup-protoc@v3
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        version: '21.0'
-    - uses: ./.github/action-common-python-release
-      with:
-        artifact-key: linux-grpc-web-x86_64
-        package-name: qcs-sdk-python-grpc-web
-        python-version: ${{ matrix.python-version }}
-        maturin-target: x86_64
-
-  linux-grpc-web-ppc64le:
-    runs-on: ubuntu-latest
-    needs: [is-python-release, should-publish-wheels]
-    env:
-      CXXFLAGS: "-std=c++11"
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-    steps:
-    - uses: actions/checkout@v4
-    - name: Install protoc
-      uses: arduino/setup-protoc@v3
-      with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        version: '21.0'
-    - uses: ./.github/action-common-python-release
-      with:
-        artifact-key: linux-grpc-web-ppc64le
-        package-name: qcs-sdk-python-grpc-web
-        python-version: ${{ matrix.python-version }}
-        maturin-target: ppc64le
 
   windows:
     runs-on: windows-latest
@@ -146,7 +96,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - name: Enable long path support
@@ -162,7 +111,6 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         artifact-key: windows
-        package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
         python-architecture: x64
         rust-target: x86_64-pc-windows-msvc
@@ -175,7 +123,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
     - uses: actions/checkout@v4
@@ -187,7 +134,6 @@ jobs:
     - uses: ./.github/action-common-python-release
       with:
         artifact-key: sdist
-        package-name: ${{ matrix.package-name }}
         python-version: ${{ matrix.python-version }}
         maturin-command: sdist
 
@@ -200,19 +146,17 @@ jobs:
     # finish, regardless of their outcome. In this case, we
     # still make sure that at least a source distribution
     # can be published.
-    needs: [ macos, linux-x86_64, linux-aarch64, linux-grpc-web-x86_64, linux-grpc-web-ppc64le, windows, sdist ]
+    needs: [ macos, linux-x86_64, linux-aarch64, windows, sdist ]
     if: always() && needs.sdist.result == 'success'
     permissions:
       id-token: write
     strategy:
       fail-fast: false
-      matrix:
-        package-name: [qcs-sdk-python, qcs-sdk-python-grpc-web]
     steps:
     - uses: actions/download-artifact@v4
       with:
         path: wheels
-        pattern: wheels_${{ matrix.package-name }}__*
+        pattern: wheels_qcs-sdk-python__*
         merge-multiple: true
     - name: List wheels to upload
       run: ls -R wheels
