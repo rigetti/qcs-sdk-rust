@@ -1,3 +1,9 @@
+## 0.27.1 (2026-08-31)
+
+### Features
+
+- libquil update (working on Mac OS aarch64) (#594)
+
 ## 0.27.0 (2026-08-20)
 
 ### Breaking Changes
