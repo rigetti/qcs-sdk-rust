@@ -792,6 +792,13 @@ impl<'a> JobHandle<'a> {
         &self.quantum_processor_id
     }
 
+    /// The ID of the endpoint to which the job was submitted, if it was submitted to a specific
+    /// endpoint (see [`Executable::submit_to_qpu_with_endpoint`]) rather than a quantum processor.
+    #[must_use]
+    pub fn endpoint_id(&self) -> Option<&str> {
+        self.endpoint_id.as_deref()
+    }
+
     /// The readout map from source readout memory locations to the
     /// filter pipeline node which publishes the data.
     #[must_use]

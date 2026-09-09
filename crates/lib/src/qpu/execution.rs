@@ -182,6 +182,7 @@ impl<'a> Execution<'a> {
 
         self.submit_to_target(
             params,
+            None,
             Some(&self.quantum_processor_id.clone()),
             translation_options,
             execution_options,
@@ -199,14 +200,15 @@ impl<'a> Execution<'a> {
     where
         S: Into<Cow<'a, str>>,
     {
+        let endpoint_id: Cow<'a, str> = endpoint_id.into();
+        let connection_strategy = ConnectionStrategy::EndpointId(endpoint_id.clone().into_owned());
         self.submit_to_target(
             params,
+            Some(&endpoint_id),
             None,
             translation_options,
             &ExecutionOptionsBuilder::default()
-                .connection_strategy(ConnectionStrategy::EndpointId(
-                    endpoint_id.into().to_string(),
-                ))
+                .connection_strategy(connection_strategy)
                 .build()
                 .expect("valid execution options"),
         )
@@ -216,6 +218,7 @@ impl<'a> Execution<'a> {
     async fn submit_to_target(
         &mut self,
         params: &Parameters,
+        endpoint_id: Option<&str>,
         quantum_processor_id: Option<&str>,
         translation_options: Option<TranslationOptions>,
         execution_options: &ExecutionOptions,
@@ -232,15 +235,10 @@ impl<'a> Execution<'a> {
         )
         .await?;
 
-        let endpoint_id = match execution_options.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Some(endpoint_id),
-            _ => None,
-        };
-
         Ok(JobHandle::new(
             job_id,
             self.quantum_processor_id.to_string(),
-            endpoint_id.cloned(),
+            endpoint_id.map(ToOwned::to_owned),
             readout_map,
             execution_options.clone(),
         ))

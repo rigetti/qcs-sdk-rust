@@ -22,7 +22,7 @@ use crate::{
     qpu::{
         api::{
             self, ApiExecutionOptions, ApiExecutionOptionsBuilder, ApiExecutionOptionsBuilderError,
-            ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
+            ConnectionStrategy, EndpointLiveness, ExecutionOptions, ExecutionOptionsBuilder,
             ExecutionOptionsBuilderError, JobId, QpuApiDuration, QpuApiError,
         },
         result_data::MemoryValues,
@@ -37,7 +37,8 @@ create_init_submodule! {
         ExecutionOptionsBuilder,
         ApiExecutionOptions,
         ApiExecutionOptionsBuilder,
-        PyQpuApiDuration
+        PyQpuApiDuration,
+        EndpointLiveness
     ],
     complex_enums: [ ConnectionStrategy ],
     errors: [
@@ -435,20 +436,18 @@ impl ConnectionStrategy {
         Self::default()
     }
 
-    fn get_endpoint_id(&self) -> PyResult<String> {
-        match self {
-            ConnectionStrategy::EndpointId(id) => Ok(id.clone()),
-            _ => Err(errors::QpuApiError::new_err(
-                "ConnectionStrategy is not an EndpointId",
-            )),
-        }
-    }
-
-    #[gen_stub(override_return_type(type_repr = "tuple[str] | tuple[()]"))]
+    #[gen_stub(override_return_type(
+        type_repr = "tuple[str] | tuple[EndpointLiveness, str | None] | tuple[()]"
+    ))]
     fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
         match self {
-            Self::EndpointId(id) | Self::EndpointAddress(id) => (id.clone(),).into_pyobject(py),
-            Self::Gateway() | Self::DirectAccess() => Ok(PyTuple::empty(py)),
+            Self::EndpointAddress(address) => (address.clone(),).into_pyobject(py),
+            Self::EndpointId(endpoint_id) => (endpoint_id.clone(),).into_pyobject(py),
+            Self::Gateway {
+                liveness,
+                endpoint_id,
+            } => (*liveness, endpoint_id.clone()).into_pyobject(py),
+            Self::DirectAccess() => Ok(PyTuple::empty(py)),
         }
     }
 }
