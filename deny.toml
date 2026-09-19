@@ -64,8 +64,6 @@ feature-depth = 1
 # https://embarkstudios.github.io/cargo-deny/checks/advisories/cfg.html
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2024-0384", reason = "instant is unmaintained, dependency of \"backoff\", which also appears to be unmaintained" },
-    { id = "RUSTSEC-2025-0012", reason = "backoff is unmaintained" },
     # `pyo3-stub-gen` uses `rustpython-parser` which uses `rust-unic` crates, which are now unmaintained.
     # Hopefully `pyo3-stub-gen` will switch to `ruff_python_parser`: https://github.com/Jij-Inc/pyo3-stub-gen/issues/359
     # We'll ignore it for now, since `pyo3-stub-gen` is effectively a build-time dependency anyway.
