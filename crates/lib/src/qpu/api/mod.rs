@@ -9,7 +9,7 @@ use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen
 #[deny(clippy::module_name_repetitions)]
 pub use ::qcs_dependencies_client::pbjson_types::Duration as QpuApiDuration;
 use async_trait::async_trait;
-use cached::proc_macro::cached;
+use cached::macros::cached;
 use derive_builder::Builder;
 use qcs_api_client_common::configuration::TokenError;
 use qcs_api_client_grpc::tonic::wrap_channel_with_tracing;
@@ -735,10 +735,9 @@ impl<'a> ExecutionTarget<'a> for ExecutionOptions {
 }
 
 #[cached(
-    result = true,
-    time = 60,
-    time_refresh = true,
-    sync_writes = true,
+    ttl_secs = 60,
+    refresh = true,
+    sync_writes = "by_key",
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]
@@ -774,10 +773,9 @@ fn select_min_accessor(
 }
 
 #[cached(
-    result = true,
-    time = 60,
-    time_refresh = true,
-    sync_writes = true,
+    ttl_secs = 60,
+    refresh = true,
+    sync_writes = "by_key",
     key = "String",
     convert = r"{ String::from(quantum_processor_id)}"
 )]

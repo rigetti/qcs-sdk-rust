@@ -35,7 +35,7 @@ quil-rs = "0.37.0"
 assert2 = "0.3.11"
 async-trait = "0.1.73"
 built = "0.6.1"
-cached = "0.44.0"
+cached = { version = "4.0.0", features = ["async"] }
 derive_builder = "0.20.0"
 enum-as-inner = "0.5.1"
 erased-serde = "0.3.23"
