@@ -222,14 +222,16 @@ mod describe_rx_gates {
                 error: Some(0.000_699_235_5),
                 node_ids: Some(vec![0]),
                 parameter_values: None,
-                timestamp: "1970-01-01T00:00:00+00:00".to_string(),
+                timestamp: chrono::DateTime::parse_from_rfc3339("1970-01-01T00:00:00+00:00")
+                    .expect("valid RFC3339 timestamp"),
             },
             Characteristic {
                 name: "fRB".to_string(),
                 value: 0.996_832_6,
                 error: Some(0.000_100_896_78),
                 node_ids: Some(vec![1]),
-                timestamp: "1970-01-01T00:00:00+00:00".to_string(),
+                timestamp: chrono::DateTime::parse_from_rfc3339("1970-01-01T00:00:00+00:00")
+                    .expect("valid RFC3339 timestamp"),
                 parameter_values: None,
             },
         ]);
@@ -393,7 +395,8 @@ mod describe_measure {
             name: String::from("fRO"),
             node_ids: None,
             parameter_values: None,
-            timestamp: "1970-01-01T00:00:00+00:00".to_string(),
+            timestamp: chrono::DateTime::parse_from_rfc3339("1970-01-01T00:00:00+00:00")
+                .expect("valid RFC3339 timestamp"),
             value: 0.981,
         }];
         let result = measure(0, &characteristics);

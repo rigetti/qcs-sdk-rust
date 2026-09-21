@@ -6,6 +6,7 @@ resolver = "2"
 # ndarray is used by the `qcs` crate, but it is also used in the `python` crate via a
 # re-export through the numpy crate. They should be updated as a pair to keep both
 # crates' versions of ndarray in sync.
+chrono = "0.4"
 ndarray = { version = "0.17.2", features = ["serde"] }
 qcs-dependencies-client = { version = "0.5" }
 serde_json = "1.0.86"
@@ -17,7 +18,7 @@ tracing-subscriber = { version = "0.3.19" }
 
 # PyO3-related versions all need to be kept synchronized. Mismatches will fail to build.
 numpy = "0.29"
-pyo3 = { version = "0.29", features = ["num-complex", "multiple-pymethods"] }
+pyo3 = { version = "0.29", features = ["num-complex", "multiple-pymethods", "chrono"] }
 pyo3-async-runtimes = { version = "0.29", features = ["attributes", "tokio-runtime"] }
 pyo3-build-config = "0.29"
 pyo3-log = { version = "0.13" }
