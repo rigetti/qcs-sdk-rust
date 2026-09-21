@@ -38,13 +38,13 @@
                                 <a class="function" href="#AuthServer.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.issuer">issuer</a>
+                                <a class="variable" href="#AuthServer.client_id">client_id</a>
                         </li>
                         <li>
                                 <a class="variable" href="#AuthServer.scopes">scopes</a>
                         </li>
                         <li>
-                                <a class="variable" href="#AuthServer.client_id">client_id</a>
+                                <a class="variable" href="#AuthServer.issuer">issuer</a>
                         </li>
                 </ul>
 
@@ -128,16 +128,16 @@
                                 <a class="variable" href="#QCSClient.quilc_url">quilc_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
+                                <a class="variable" href="#QCSClient.api_url">api_url</a>
                         </li>
                         <li>
                                 <a class="variable" href="#QCSClient.qvm_url">qvm_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.api_url">api_url</a>
+                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QCSClient.grpc_api_url">grpc_api_url</a>
+                                <a class="variable" href="#QCSClient.oauth_session">oauth_session</a>
                         </li>
                 </ul>
 
@@ -259,24 +259,15 @@
     
 
                             </div>
-                            <div id="AuthServer.issuer" class="classattr">
+                            <div id="AuthServer.client_id" class="classattr">
                                 <div class="attr variable">
-            <span class="name">issuer</span>
+            <span class="name">client_id</span>
 
         
     </div>
-    <a class="headerlink" href="#AuthServer.issuer"></a>
+    <a class="headerlink" href="#AuthServer.client_id"></a>
     
-            <div class="docstring"><p>OAuth 2.0 issuer URL.</p>
-
-<p>This is the base URL of the identity provider.
-For Okta, this usually looks like <code>https://example.okta.com/oauth2/default</code>.
-For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.com/us-west-2_example</code>.</p>
-
-<p>Note that this is technically distinct from the <code><a href="#AuthServer.issuer">issuer</a></code> field in [<code>OidcDiscovery</code>],
-which is the canonical URI that the identity provider uses to sign and validate tokens,
-but the OpenID specification requires that they match exactly,
-and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
+            <div class="docstring"><p>OAuth 2.0 client id.</p>
 </div>
 
 
@@ -295,15 +286,24 @@ See [<code>resolve_scopes</code>][super::login::resolve_scopes] for more defails
 
 
                             </div>
-                            <div id="AuthServer.client_id" class="classattr">
+                            <div id="AuthServer.issuer" class="classattr">
                                 <div class="attr variable">
-            <span class="name">client_id</span>
+            <span class="name">issuer</span>
 
         
     </div>
-    <a class="headerlink" href="#AuthServer.client_id"></a>
+    <a class="headerlink" href="#AuthServer.issuer"></a>
     
-            <div class="docstring"><p>OAuth 2.0 client id.</p>
+            <div class="docstring"><p>OAuth 2.0 issuer URL.</p>
+
+<p>This is the base URL of the identity provider.
+For Okta, this usually looks like <code>https://example.okta.com/oauth2/default</code>.
+For Cognito, it might look like <code>https://cognito-idp.us-west-2.amazonaws.com/us-west-2_example</code>.</p>
+
+<p>Note that this is technically distinct from the <code><a href="#AuthServer.issuer">issuer</a></code> field in [<code>OidcDiscovery</code>],
+which is the canonical URI that the identity provider uses to sign and validate tokens,
+but the OpenID specification requires that they match exactly,
+and that they match the <code>iss</code> claim in Tokens issued by this identity provider.</p>
 </div>
 
 
@@ -657,15 +657,15 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.oauth_session" class="classattr">
+                            <div id="QCSClient.api_url" class="classattr">
                                 <div class="attr variable">
-            <span class="name">oauth_session</span>
+            <span class="name">api_url</span>
 
         
     </div>
-    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    <a class="headerlink" href="#QCSClient.api_url"></a>
     
-            <div class="docstring"><p>Get a copy of the OAuth session.</p>
+            <div class="docstring"><p>URL to access the QCS API.</p>
 </div>
 
 
@@ -683,19 +683,6 @@ for more details.</p>
 
 
                             </div>
-                            <div id="QCSClient.api_url" class="classattr">
-                                <div class="attr variable">
-            <span class="name">api_url</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QCSClient.api_url"></a>
-    
-            <div class="docstring"><p>URL to access the QCS API.</p>
-</div>
-
-
-                            </div>
                             <div id="QCSClient.grpc_api_url" class="classattr">
                                 <div class="attr variable">
             <span class="name">grpc_api_url</span>
@@ -705,6 +692,19 @@ for more details.</p>
     <a class="headerlink" href="#QCSClient.grpc_api_url"></a>
     
             <div class="docstring"><p>URL to access the QCS gRPC API.</p>
+</div>
+
+
+                            </div>
+                            <div id="QCSClient.oauth_session" class="classattr">
+                                <div class="attr variable">
+            <span class="name">oauth_session</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QCSClient.oauth_session"></a>
+    
+            <div class="docstring"><p>Get a copy of the OAuth session.</p>
 </div>
 
 
