@@ -3,6 +3,7 @@
 
 import builtins
 import collections.abc
+import datetime
 import enum
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk import client
@@ -143,12 +144,12 @@ class Characteristic:
         The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.
         """
     @property
-    def timestamp(self) -> builtins.str:
+    def timestamp(self) -> datetime.datetime:
         r"""
         The date and time at which the characteristic was measured.
         """
     @timestamp.setter
-    def timestamp(self, value: builtins.str) -> None:
+    def timestamp(self, value: datetime.datetime) -> None:
         r"""
         The date and time at which the characteristic was measured.
         """
@@ -163,7 +164,7 @@ class Characteristic:
         The characteristic value measured.
         """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
-    def __new__(cls, name: builtins.str, timestamp: builtins.str, value: builtins.float) -> Characteristic:
+    def __new__(cls, name: builtins.str, timestamp: datetime.datetime, value: builtins.float) -> Characteristic:
         r"""
         A measured characteristic of an operation.
         """
