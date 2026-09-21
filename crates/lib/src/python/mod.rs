@@ -110,7 +110,7 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 mod stubs {
     use pyo3_stub_gen::{
         define_stub_info_gatherer, derive::gen_type_alias_from_python, exclude_from_all,
-        export_verbatim, generate::Module, module_doc, reexport_module_members, Result, StubInfo,
+        export_verbatim, module_doc, reexport_module_members, Result, StubInfo,
     };
     use std::path::Path;
 

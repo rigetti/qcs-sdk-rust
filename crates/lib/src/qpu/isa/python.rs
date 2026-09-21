@@ -442,7 +442,7 @@ impl From<models::Characteristic> for Characteristic {
             name: characteristic.name,
             node_ids: characteristic.node_ids,
             parameter_values: characteristic.parameter_values,
-            timestamp: characteristic.timestamp,
+            timestamp: characteristic.timestamp.to_string(),
             value: characteristic.value,
         }
     }
@@ -455,7 +455,10 @@ impl From<Characteristic> for models::Characteristic {
             name: characteristic.name,
             node_ids: characteristic.node_ids,
             parameter_values: characteristic.parameter_values,
-            timestamp: characteristic.timestamp,
+            timestamp: characteristic
+                .timestamp
+                .parse()
+                .expect("timestamp should be a valid RFC3339 datetime"),
             value: characteristic.value,
         }
     }
