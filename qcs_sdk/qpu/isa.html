@@ -35,10 +35,10 @@
                     <a class="class" href="#Architecture">Architecture</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#Architecture.edges">edges</a>
+                                <a class="variable" href="#Architecture.family">family</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Architecture.family">family</a>
+                                <a class="variable" href="#Architecture.edges">edges</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Architecture.nodes">nodes</a>
@@ -50,19 +50,19 @@
                     <a class="class" href="#Characteristic">Characteristic</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#Characteristic.parameter_values">parameter_values</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Characteristic.error">error</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.name">name</a>
+                                <a class="variable" href="#Characteristic.timestamp">timestamp</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Characteristic.value">value</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Characteristic.parameter_values">parameter_values</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Characteristic.timestamp">timestamp</a>
+                                <a class="variable" href="#Characteristic.name">name</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Characteristic.node_ids">node_ids</a>
@@ -98,6 +98,12 @@
 
             </li>
             <li>
+                    <a class="class" href="#GetISAError">GetISAError</a>
+                            <ul class="memberlist">
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#InstructionSetArchitecture">InstructionSetArchitecture</a>
                             <ul class="memberlist">
                         <li>
@@ -105,9 +111,6 @@
                         </li>
                         <li>
                                 <a class="function" href="#InstructionSetArchitecture.json">json</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#InstructionSetArchitecture.architecture">architecture</a>
                         </li>
                         <li>
                                 <a class="variable" href="#InstructionSetArchitecture.benchmarks">benchmarks</a>
@@ -118,6 +121,15 @@
                         <li>
                                 <a class="variable" href="#InstructionSetArchitecture.name">name</a>
                         </li>
+                        <li>
+                                <a class="variable" href="#InstructionSetArchitecture.architecture">architecture</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
+                    <a class="class" href="#ListISAsError">ListISAsError</a>
+                            <ul class="memberlist">
                 </ul>
 
             </li>
@@ -134,19 +146,19 @@
                     <a class="class" href="#Operation">Operation</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#Operation.node_count">node_count</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#Operation.sites">sites</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Operation.characteristics">characteristics</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Operation.name">name</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Operation.sites">sites</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#Operation.parameters">parameters</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#Operation.node_count">node_count</a>
                         </li>
                 </ul>
 
@@ -174,18 +186,6 @@
             </li>
             <li>
                     <a class="class" href="#SerializeISAError">SerializeISAError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#GetISAError">GetISAError</a>
-                            <ul class="memberlist">
-                </ul>
-
-            </li>
-            <li>
-                    <a class="class" href="#ListISAsError">ListISAsError</a>
                             <ul class="memberlist">
                 </ul>
 
@@ -219,9 +219,53 @@
 <a href="./../../qcs_sdk.html">qcs_sdk</a><wbr>.<a href="./../qpu.html">qpu</a><wbr>.isa    </h1>
 
                 
-                
-                
-                
+                        <input id="mod-isa-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+
+                        <label class="view-source-button" for="mod-isa-view-source"><span>View Source</span></label>
+
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1"># This file is automatically generated by pyo3_stub_gen</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="c1"># ruff: noqa: F401</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">qcs_sdk._qcs_sdk.qpu.isa</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>    <span class="n">Architecture</span><span class="p">,</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="n">Characteristic</span><span class="p">,</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="n">Edge</span><span class="p">,</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="n">Family</span><span class="p">,</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="n">GetISAError</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">InstructionSetArchitecture</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">ListISAsError</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">Node</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">Operation</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">OperationSite</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">Parameter</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">SerializeISAError</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">get_instruction_set_architecture</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">get_instruction_set_architecture_async</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">list_instruction_set_architectures</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">list_instruction_set_architectures_async</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="p">)</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="s2">&quot;Architecture&quot;</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="s2">&quot;Characteristic&quot;</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="s2">&quot;Edge&quot;</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>    <span class="s2">&quot;Family&quot;</span><span class="p">,</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="s2">&quot;GetISAError&quot;</span><span class="p">,</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="s2">&quot;InstructionSetArchitecture&quot;</span><span class="p">,</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;ListISAsError&quot;</span><span class="p">,</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;Node&quot;</span><span class="p">,</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="s2">&quot;Operation&quot;</span><span class="p">,</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="s2">&quot;OperationSite&quot;</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="s2">&quot;Parameter&quot;</span><span class="p">,</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="s2">&quot;SerializeISAError&quot;</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="s2">&quot;get_instruction_set_architecture&quot;</span><span class="p">,</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="s2">&quot;get_instruction_set_architecture_async&quot;</span><span class="p">,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="s2">&quot;list_instruction_set_architectures&quot;</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="s2">&quot;list_instruction_set_architectures_async&quot;</span><span class="p">,</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="p">]</span>
+</span></pre></div>
+
+
             </section>
                 <section id="Architecture">
                     <div class="attr class">
@@ -262,19 +306,6 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 </div>
 
 
-                            <div id="Architecture.edges" class="classattr">
-                                <div class="attr variable">
-            <span class="name">edges</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Architecture.edges"></a>
-    
-            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
-</div>
-
-
-                            </div>
                             <div id="Architecture.family" class="classattr">
                                 <div class="attr variable">
             <span class="name">family</span>
@@ -284,6 +315,19 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
     <a class="headerlink" href="#Architecture.family"></a>
     
             <div class="docstring"><p>The architecture family. The nodes and edges conform to this family.</p>
+</div>
+
+
+                            </div>
+                            <div id="Architecture.edges" class="classattr">
+                                <div class="attr variable">
+            <span class="name">edges</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Architecture.edges"></a>
+    
+            <div class="docstring"><p>A list of all computational edges in the instruction set architecture.</p>
 </div>
 
 
@@ -316,6 +360,19 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 </div>
 
 
+                            <div id="Characteristic.parameter_values" class="classattr">
+                                <div class="attr variable">
+            <span class="name">parameter_values</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Characteristic.parameter_values"></a>
+    
+            <div class="docstring"><p>The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.</p>
+</div>
+
+
+                            </div>
                             <div id="Characteristic.error" class="classattr">
                                 <div class="attr variable">
             <span class="name">error</span>
@@ -329,15 +386,15 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Characteristic.name" class="classattr">
+                            <div id="Characteristic.timestamp" class="classattr">
                                 <div class="attr variable">
-            <span class="name">name</span>
+            <span class="name">timestamp</span>
 
         
     </div>
-    <a class="headerlink" href="#Characteristic.name"></a>
+    <a class="headerlink" href="#Characteristic.timestamp"></a>
     
-            <div class="docstring"><p>The name of the characteristic.</p>
+            <div class="docstring"><p>The date and time at which the characteristic was measured.</p>
 </div>
 
 
@@ -355,28 +412,15 @@ that any 1Q or 2Q operation will be available to users writing QUIL programs.</p
 
 
                             </div>
-                            <div id="Characteristic.parameter_values" class="classattr">
+                            <div id="Characteristic.name" class="classattr">
                                 <div class="attr variable">
-            <span class="name">parameter_values</span>
+            <span class="name">name</span>
 
         
     </div>
-    <a class="headerlink" href="#Characteristic.parameter_values"></a>
+    <a class="headerlink" href="#Characteristic.name"></a>
     
-            <div class="docstring"><p>The optional ordered list of parameter values used to generate the characteristic. The order matches the parameters in the enclosing operation, and so the lengths of these two lists must match.</p>
-</div>
-
-
-                            </div>
-                            <div id="Characteristic.timestamp" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timestamp</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Characteristic.timestamp"></a>
-    
-            <div class="docstring"><p>The date and time at which the characteristic was measured.</p>
+            <div class="docstring"><p>The name of the characteristic.</p>
 </div>
 
 
@@ -503,6 +547,21 @@ The latter in particular is distinct from the <code><a href="#Family.NONE">NONE<
 
                             </div>
                 </section>
+                <section id="GetISAError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">GetISAError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#GetISAError"></a>
+    
+            <div class="docstring"><p>Errors raised due to failure to get an ISA.</p>
+</div>
+
+
+                </section>
                 <section id="InstructionSetArchitecture">
                     <div class="attr class">
             
@@ -564,17 +623,6 @@ the best native QUIL program for a desired task, and so are provided as part of 
 
 
                             </div>
-                            <div id="InstructionSetArchitecture.architecture" class="classattr">
-                                <div class="attr variable">
-            <span class="name">architecture</span>
-
-        
-    </div>
-    <a class="headerlink" href="#InstructionSetArchitecture.architecture"></a>
-    
-    
-
-                            </div>
                             <div id="InstructionSetArchitecture.benchmarks" class="classattr">
                                 <div class="attr variable">
             <span class="name">benchmarks</span>
@@ -614,6 +662,32 @@ the best native QUIL program for a desired task, and so are provided as part of 
 
 
                             </div>
+                            <div id="InstructionSetArchitecture.architecture" class="classattr">
+                                <div class="attr variable">
+            <span class="name">architecture</span>
+
+        
+    </div>
+    <a class="headerlink" href="#InstructionSetArchitecture.architecture"></a>
+    
+    
+
+                            </div>
+                </section>
+                <section id="ListISAsError">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">ListISAsError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
+
+        
+    </div>
+    <a class="headerlink" href="#ListISAsError"></a>
+    
+            <div class="docstring"><p>API Errors encountered when trying to list available ISAs.</p>
+</div>
+
+
                 </section>
                 <section id="Node">
                     <div class="attr class">
@@ -663,6 +737,32 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
 </div>
 
 
+                            <div id="Operation.node_count" class="classattr">
+                                <div class="attr variable">
+            <span class="name">node_count</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Operation.node_count"></a>
+    
+            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
+</div>
+
+
+                            </div>
+                            <div id="Operation.sites" class="classattr">
+                                <div class="attr variable">
+            <span class="name">sites</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Operation.sites"></a>
+    
+            <div class="docstring"><p>The list of sites at which this operation can be applied, together with its site-dependent characteristics.</p>
+</div>
+
+
+                            </div>
                             <div id="Operation.characteristics" class="classattr">
                                 <div class="attr variable">
             <span class="name">characteristics</span>
@@ -689,19 +789,6 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
 
 
                             </div>
-                            <div id="Operation.sites" class="classattr">
-                                <div class="attr variable">
-            <span class="name">sites</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Operation.sites"></a>
-    
-            <div class="docstring"><p>The list of sites at which this operation can be applied, together with its site-dependent characteristics.</p>
-</div>
-
-
-                            </div>
                             <div id="Operation.parameters" class="classattr">
                                 <div class="attr variable">
             <span class="name">parameters</span>
@@ -711,19 +798,6 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
     <a class="headerlink" href="#Operation.parameters"></a>
     
             <div class="docstring"><p>The list of parameters. Each parameter must be uniquely named. May be empty.</p>
-</div>
-
-
-                            </div>
-                            <div id="Operation.node_count" class="classattr">
-                                <div class="attr variable">
-            <span class="name">node_count</span>
-
-        
-    </div>
-    <a class="headerlink" href="#Operation.node_count"></a>
-    
-            <div class="docstring"><p>The number of nodes that this operation applies to. None if unspecified.</p>
 </div>
 
 
@@ -804,43 +878,13 @@ specific <code><a href="#Node.node_id">node_id</a></code> in instances of <code>
                     <div class="attr class">
             
     <span class="def">class</span>
-    <span class="name">SerializeISAError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
+    <span class="name">SerializeISAError</span><wbr>(<span class="base">qcs_sdk._qcs_sdk.QcsSdkError</span>):
 
         
     </div>
     <a class="headerlink" href="#SerializeISAError"></a>
     
             <div class="docstring"><p>Errors raised due to failure to serialize an ISA.</p>
-</div>
-
-
-                </section>
-                <section id="GetISAError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">GetISAError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#GetISAError"></a>
-    
-            <div class="docstring"><p>Errors raised due to failure to get an ISA.</p>
-</div>
-
-
-                </section>
-                <section id="ListISAsError">
-                    <div class="attr class">
-            
-    <span class="def">class</span>
-    <span class="name">ListISAsError</span><wbr>(<span class="base"><a href="../../qcs_sdk.html#QcsSdkError">qcs_sdk.QcsSdkError</a></span>):
-
-        
-    </div>
-    <a class="headerlink" href="#ListISAsError"></a>
-    
-            <div class="docstring"><p>API Errors encountered when trying to list available ISAs.</p>
 </div>
 
 
