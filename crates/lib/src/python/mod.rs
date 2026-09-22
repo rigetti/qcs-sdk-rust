@@ -109,10 +109,8 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 #[cfg(feature = "stubs")]
 mod stubs {
     use pyo3_stub_gen::{
-        define_stub_info_gatherer, export_verbatim, exclude_from_all,
-        derive::gen_type_alias_from_python,
-        generate::Module, module_doc, reexport_module_members, Result,
-        StubInfo,
+        define_stub_info_gatherer, derive::gen_type_alias_from_python, exclude_from_all,
+        export_verbatim, module_doc, reexport_module_members, Result, StubInfo,
     };
     use std::path::Path;
 

@@ -281,7 +281,7 @@ struct Characteristic {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parameter_values: Option<Vec<f64>>,
     /// The date and time at which the characteristic was measured.
-    pub timestamp: String,
+    pub timestamp: chrono::DateTime<chrono::FixedOffset>,
     /// The characteristic value measured.
     pub value: f64,
 }
@@ -622,7 +622,7 @@ impl Parameter {
 impl Characteristic {
     #[new]
     /// A measured characteristic of an operation.
-    fn __new__(name: String, timestamp: String, value: f64) -> Self {
+    fn __new__(name: String, timestamp: chrono::DateTime<chrono::FixedOffset>, value: f64) -> Self {
         Self {
             error: None,
             name,
