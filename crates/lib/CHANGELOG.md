@@ -1,3 +1,9 @@
+## 0.28.0 (2026-09-22)
+
+### Breaking Changes
+
+- use strongly typed 'Characteristic::timestamp' field; update qcs-api (switching from backoff to backon) (#599)
+
 ## 0.27.2 (2026-08-31)
 
 ### Fixes
