@@ -1,3 +1,9 @@
+## 0.29.0-rc.0 (2026-09-23)
+
+### Breaking Changes
+
+- put endpoint-ID in the connection-strategy itself; explicitly add the ability to connect to simulated endpoints via gateway; use endpoint-ID for Gateway-bound jobs, when possible
+
 ## 0.28.0 (2026-09-22)
 
 ### Breaking Changes
