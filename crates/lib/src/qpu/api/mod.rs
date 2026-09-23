@@ -273,7 +273,13 @@ pub async fn cancel_job(
     client: &Qcs,
     execution_options: &ExecutionOptions,
 ) -> Result<(), QpuApiError> {
-    cancel_jobs(vec![job_id], quantum_processor_id, client, execution_options).await
+    cancel_jobs(
+        vec![job_id],
+        quantum_processor_id,
+        client,
+        execution_options,
+    )
+    .await
 }
 
 #[expect(clippy::missing_errors_doc)]
@@ -554,6 +560,7 @@ pub enum EndpointLiveness {
 
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[cfg_attr(
     feature = "python",
@@ -561,6 +568,7 @@ pub enum EndpointLiveness {
 )]
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
+    #[pyo3(constructor = (liveness=EndpointLiveness::default(), endpoint_id=None))]
     Gateway {
         /// Whether the gateway should route to live hardware, simulated hardware, or either.
         liveness: EndpointLiveness,
@@ -698,7 +706,9 @@ pub trait ExecutionTarget<'a> {
         client: &Qcs,
         quantum_processor_id: Option<&str>,
     ) -> Result<ControllerClient<GrpcConnection>, QpuApiError> {
-        let service = self.get_qpu_grpc_connection(client, quantum_processor_id).await?;
+        let service = self
+            .get_qpu_grpc_connection(client, quantum_processor_id)
+            .await?;
         Ok(ControllerClient::new(service)
             .max_encoding_message_size(MAX_CONTROLLER_OUTBOUND_REQUEST_SIZE)
             // do not limit the received response size, although practically the limit is 4Gb due

@@ -190,7 +190,9 @@ class ConnectionStrategy:
             Whether the gateway should route to live hardware, simulated hardware, or either.
             """
         def __new__(
-            cls, liveness: EndpointLiveness, endpoint_id: typing.Optional[builtins.str]
+            cls,
+            liveness: EndpointLiveness = EndpointLiveness.LIVE_ONLY,
+            endpoint_id: typing.Optional[builtins.str] = None,
         ) -> ConnectionStrategy.Gateway: ...
 
 @typing.final
