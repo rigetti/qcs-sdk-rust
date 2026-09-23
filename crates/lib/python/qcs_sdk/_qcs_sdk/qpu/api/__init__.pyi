@@ -129,6 +129,7 @@ class ConnectionStrategy:
         """
     @staticmethod
     def default() -> ConnectionStrategy: ...
+    def get_endpoint_id(self) -> builtins.str: ...
     @typing.final
     class DirectAccess(ConnectionStrategy):
         r"""

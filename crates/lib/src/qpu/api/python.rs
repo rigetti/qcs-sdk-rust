@@ -436,6 +436,19 @@ impl ConnectionStrategy {
         Self::default()
     }
 
+    fn get_endpoint_id(&self) -> PyResult<String> {
+        match self {
+            ConnectionStrategy::EndpointId(id) => Ok(id.clone()),
+            ConnectionStrategy::Gateway {
+                endpoint_id: Some(id),
+                ..
+            } => Ok(id.clone()),
+            _ => Err(errors::QpuApiError::new_err(
+                "ConnectionStrategy does not have an endpoint ID",
+            )),
+        }
+    }
+
     #[gen_stub(override_return_type(
         type_repr = "tuple[str] | tuple[EndpointLiveness, str | None] | tuple[()]"
     ))]
