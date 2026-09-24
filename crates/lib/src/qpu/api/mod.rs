@@ -586,6 +586,18 @@ pub enum ConnectionStrategy {
     EndpointAddress(String),
 }
 
+impl ConnectionStrategy {
+    /// The endpoint ID carried by this strategy, if any.
+    #[must_use]
+    pub fn endpoint_id(&self) -> Option<&str> {
+        match self {
+            Self::EndpointId(endpoint_id) => Some(endpoint_id),
+            Self::Gateway { endpoint_id, .. } => endpoint_id.as_deref(),
+            Self::DirectAccess() | Self::EndpointAddress(_) => None,
+        }
+    }
+}
+
 impl Default for ConnectionStrategy {
     fn default() -> Self {
         Self::Gateway {
@@ -607,13 +619,8 @@ fn resolve_target<T>(
     by_endpoint_id: impl FnOnce(String) -> T,
     by_quantum_processor_id: impl FnOnce(String) -> T,
 ) -> Result<Option<T>, QpuApiError> {
-    let strategy_endpoint_id = match connection_strategy {
-        ConnectionStrategy::EndpointId(endpoint_id) => Some(endpoint_id),
-        ConnectionStrategy::Gateway { endpoint_id, .. } => endpoint_id.as_ref(),
-        ConnectionStrategy::DirectAccess() | ConnectionStrategy::EndpointAddress(_) => None,
-    };
-    if let Some(endpoint_id) = strategy_endpoint_id {
-        return Ok(Some(by_endpoint_id(endpoint_id.clone())));
+    if let Some(endpoint_id) = connection_strategy.endpoint_id() {
+        return Ok(Some(by_endpoint_id(endpoint_id.to_owned())));
     }
     if let Some(quantum_processor_id) = quantum_processor_id {
         return Ok(Some(by_quantum_processor_id(

@@ -13,3 +13,4 @@ qcs_sdk\.(_qcs_sdk\.)?compiler\.quilc\.CompilerOpts\.__new__
 qcs_sdk\.(_qcs_sdk\.)?Service\.(QCS|QPU|QUILC|QVM)
 qcs_sdk\.(_qcs_sdk\.)?qpu\.isa\.Family\.(ANKAA|ASPEN|FULL|NONE)
 qcs_sdk\.(_qcs_sdk\.)?qpu\.translation\.TranslationBackend\.(V1|V2)
+qcs_sdk\.(_qcs_sdk\.)?qpu\.api\.EndpointLiveness\.(LIVE_ONLY|LIVE_OR_SIMULATED|SIMULATED_ONLY)
