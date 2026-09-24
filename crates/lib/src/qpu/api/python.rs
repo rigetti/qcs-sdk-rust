@@ -3,7 +3,10 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use numpy::Complex32;
-use pyo3::{prelude::*, types::PyTuple};
+use pyo3::{
+    prelude::*,
+    types::{PyTuple, PyType},
+};
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
@@ -455,6 +458,26 @@ impl ConnectionStrategy {
             } => (*liveness, endpoint_id.clone()).into_pyobject(py),
             Self::DirectAccess() => Ok(PyTuple::empty(py)),
         }
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl EndpointLiveness {
+    // pyo3 enums have no by-value constructor, so pickle by name,
+    // like the standard library's `enum.pickle_by_enum_name`.
+    fn __reduce__<'py>(
+        &self,
+        py: Python<'py>,
+    ) -> PyResult<(Bound<'py, PyAny>, (Bound<'py, PyType>, &'static str))> {
+        let name = match self {
+            Self::LiveOnly => "LIVE_ONLY",
+            Self::LiveOrSimulated => "LIVE_OR_SIMULATED",
+            Self::SimulatedOnly => "SIMULATED_ONLY",
+        };
+        let getattr = py.import("builtins")?.getattr("getattr")?;
+        Ok((getattr, (py.get_type::<Self>(), name)))
     }
 }
 

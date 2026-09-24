@@ -380,6 +380,8 @@ class EndpointLiveness(enum.Enum):
     Only connect to an accessor attached to simulated hardware.
     """
 
+    def __reduce__(self) -> tuple[typing.Any, tuple[type, builtins.str]]: ...
+
 def cancel_job(
     job_id: builtins.str,
     quantum_processor_id: typing.Optional[builtins.str] = None,
