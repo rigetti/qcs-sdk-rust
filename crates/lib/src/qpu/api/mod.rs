@@ -536,7 +536,7 @@ impl ExecutionOptions {
 
 /// Whether a [`ConnectionStrategy::Gateway`] connection should route to live hardware,
 /// simulated hardware, or either.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
 #[cfg_attr(
     feature = "python",
@@ -544,6 +544,8 @@ impl ExecutionOptions {
         module = "qcs_sdk._qcs_sdk.qpu.api",
         rename_all = "SCREAMING_SNAKE_CASE",
         eq,
+        hash,
+        frozen,
         from_py_object
     )
 )]
