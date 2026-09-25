@@ -41,10 +41,10 @@
                                 <a class="function" href="#APIExecutionOptions.default">default</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
+                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
                         </li>
                         <li>
-                                <a class="variable" href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a>
+                                <a class="variable" href="#APIExecutionOptions.timeout">timeout</a>
                         </li>
                 </ul>
 
@@ -85,6 +85,12 @@
                         <li>
                                 <a class="class" href="#ConnectionStrategy.Gateway">ConnectionStrategy.Gateway</a>
                                         <ul class="memberlist">
+                                    <li>
+                                            <a class="variable" href="#ConnectionStrategy.Gateway.liveness">liveness</a>
+                                    </li>
+                                    <li>
+                                            <a class="variable" href="#ConnectionStrategy.Gateway.endpoint_id">endpoint_id</a>
+                                    </li>
                             </ul>
 
                         </li>
@@ -110,6 +116,21 @@
 
             </li>
             <li>
+                    <a class="class" href="#EndpointLiveness">EndpointLiveness</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="variable" href="#EndpointLiveness.LIVE_ONLY">LIVE_ONLY</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#EndpointLiveness.LIVE_OR_SIMULATED">LIVE_OR_SIMULATED</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#EndpointLiveness.SIMULATED_ONLY">SIMULATED_ONLY</a>
+                        </li>
+                </ul>
+
+            </li>
+            <li>
                     <a class="class" href="#ExecutionOptions">ExecutionOptions</a>
                             <ul class="memberlist">
                         <li>
@@ -119,10 +140,10 @@
                                 <a class="function" href="#ExecutionOptions.builder">builder</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
+                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptions.api_options">api_options</a>
+                                <a class="variable" href="#ExecutionOptions.timeout_seconds">timeout_seconds</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptions.connection_strategy">connection_strategy</a>
@@ -140,13 +161,13 @@
                                 <a class="function" href="#ExecutionOptionsBuilder.build">build</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
-                        </li>
-                        <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.api_options">api_options</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionOptionsBuilder.timeout_seconds">timeout_seconds</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#ExecutionOptionsBuilder.connection_strategy">connection_strategy</a>
                         </li>
                 </ul>
 
@@ -161,10 +182,10 @@
                                 <a class="variable" href="#ExecutionResult.shape">shape</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
+                                <a class="variable" href="#ExecutionResult.data">data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResult.data">data</a>
+                                <a class="variable" href="#ExecutionResult.dtype">dtype</a>
                         </li>
                 </ul>
 
@@ -173,13 +194,13 @@
                     <a class="class" href="#ExecutionResults">ExecutionResults</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ExecutionResults.memory">memory</a>
+                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
                         </li>
                         <li>
                                 <a class="variable" href="#ExecutionResults.execution_duration_microseconds">execution_duration_microseconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ExecutionResults.buffers">buffers</a>
+                                <a class="variable" href="#ExecutionResults.memory">memory</a>
                         </li>
                 </ul>
 
@@ -188,10 +209,10 @@
                     <a class="class" href="#QpuApiDuration">QpuApiDuration</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
+                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
                         </li>
                         <li>
-                                <a class="variable" href="#QpuApiDuration.seconds">seconds</a>
+                                <a class="variable" href="#QpuApiDuration.nanos">nanos</a>
                         </li>
                 </ul>
 
@@ -267,48 +288,50 @@
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="n">APIExecutionOptionsBuilder</span><span class="p">,</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>    <span class="n">BuildOptionsError</span><span class="p">,</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>    <span class="n">ConnectionStrategy</span><span class="p">,</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="n">ExecutionOptions</span><span class="p">,</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">ExecutionOptionsBuilder</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">ExecutionResult</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">ExecutionResults</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">QpuApiDuration</span><span class="p">,</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">QpuApiError</span><span class="p">,</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">SubmissionError</span><span class="p">,</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">cancel_job</span><span class="p">,</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">cancel_job_async</span><span class="p">,</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">cancel_jobs</span><span class="p">,</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">cancel_jobs_async</span><span class="p">,</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">retrieve_results</span><span class="p">,</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">retrieve_results_async</span><span class="p">,</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">submit</span><span class="p">,</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">submit_async</span><span class="p">,</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">submit_with_parameter_batch</span><span class="p">,</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">submit_with_parameter_batch_async</span><span class="p">,</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="p">)</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="s2">&quot;APIExecutionOptions&quot;</span><span class="p">,</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;APIExecutionOptionsBuilder&quot;</span><span class="p">,</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;BuildOptionsError&quot;</span><span class="p">,</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="s2">&quot;ConnectionStrategy&quot;</span><span class="p">,</span>
-</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="s2">&quot;ExecutionOptions&quot;</span><span class="p">,</span>
-</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="s2">&quot;ExecutionOptionsBuilder&quot;</span><span class="p">,</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="s2">&quot;ExecutionResult&quot;</span><span class="p">,</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="s2">&quot;ExecutionResults&quot;</span><span class="p">,</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="s2">&quot;QpuApiDuration&quot;</span><span class="p">,</span>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="s2">&quot;QpuApiError&quot;</span><span class="p">,</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="s2">&quot;SubmissionError&quot;</span><span class="p">,</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="s2">&quot;cancel_job&quot;</span><span class="p">,</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="s2">&quot;cancel_job_async&quot;</span><span class="p">,</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="s2">&quot;cancel_jobs&quot;</span><span class="p">,</span>
-</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="s2">&quot;cancel_jobs_async&quot;</span><span class="p">,</span>
-</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="s2">&quot;retrieve_results&quot;</span><span class="p">,</span>
-</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="s2">&quot;retrieve_results_async&quot;</span><span class="p">,</span>
-</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="s2">&quot;submit&quot;</span><span class="p">,</span>
-</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="s2">&quot;submit_async&quot;</span><span class="p">,</span>
-</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="s2">&quot;submit_with_parameter_batch&quot;</span><span class="p">,</span>
-</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="s2">&quot;submit_with_parameter_batch_async&quot;</span><span class="p">,</span>
-</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a><span class="p">]</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="n">EndpointLiveness</span><span class="p">,</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="n">ExecutionOptions</span><span class="p">,</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="n">ExecutionOptionsBuilder</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="n">ExecutionResult</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="n">ExecutionResults</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="n">QpuApiDuration</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>    <span class="n">QpuApiError</span><span class="p">,</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>    <span class="n">SubmissionError</span><span class="p">,</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a>    <span class="n">cancel_job</span><span class="p">,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">cancel_job_async</span><span class="p">,</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>    <span class="n">cancel_jobs</span><span class="p">,</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="n">cancel_jobs_async</span><span class="p">,</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">retrieve_results</span><span class="p">,</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="n">retrieve_results_async</span><span class="p">,</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="n">submit</span><span class="p">,</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">submit_async</span><span class="p">,</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="n">submit_with_parameter_batch</span><span class="p">,</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="n">submit_with_parameter_batch_async</span><span class="p">,</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="p">)</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="s2">&quot;APIExecutionOptions&quot;</span><span class="p">,</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>    <span class="s2">&quot;APIExecutionOptionsBuilder&quot;</span><span class="p">,</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a>    <span class="s2">&quot;BuildOptionsError&quot;</span><span class="p">,</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>    <span class="s2">&quot;ConnectionStrategy&quot;</span><span class="p">,</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>    <span class="s2">&quot;EndpointLiveness&quot;</span><span class="p">,</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a>    <span class="s2">&quot;ExecutionOptions&quot;</span><span class="p">,</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a>    <span class="s2">&quot;ExecutionOptionsBuilder&quot;</span><span class="p">,</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>    <span class="s2">&quot;ExecutionResult&quot;</span><span class="p">,</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a>    <span class="s2">&quot;ExecutionResults&quot;</span><span class="p">,</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>    <span class="s2">&quot;QpuApiDuration&quot;</span><span class="p">,</span>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a>    <span class="s2">&quot;QpuApiError&quot;</span><span class="p">,</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>    <span class="s2">&quot;SubmissionError&quot;</span><span class="p">,</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>    <span class="s2">&quot;cancel_job&quot;</span><span class="p">,</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>    <span class="s2">&quot;cancel_job_async&quot;</span><span class="p">,</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>    <span class="s2">&quot;cancel_jobs&quot;</span><span class="p">,</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>    <span class="s2">&quot;cancel_jobs_async&quot;</span><span class="p">,</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>    <span class="s2">&quot;retrieve_results&quot;</span><span class="p">,</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>    <span class="s2">&quot;retrieve_results_async&quot;</span><span class="p">,</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>    <span class="s2">&quot;submit&quot;</span><span class="p">,</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="s2">&quot;submit_async&quot;</span><span class="p">,</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="s2">&quot;submit_with_parameter_batch&quot;</span><span class="p">,</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>    <span class="s2">&quot;submit_with_parameter_batch_async&quot;</span><span class="p">,</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="p">]</span>
 </span></pre></div>
 
 
@@ -360,6 +383,19 @@ to build a custom set of options.</p>
     
 
                             </div>
+                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
+                                <div class="attr variable">
+            <span class="name">bypass_settings_protection</span>
+
+        
+    </div>
+    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
+    
+            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
+</div>
+
+
+                            </div>
                             <div id="APIExecutionOptions.timeout" class="classattr">
                                 <div class="attr variable">
             <span class="name">timeout</span>
@@ -378,19 +414,6 @@ if the job does not have an estimated duration, the default
 timeout is selected by the service.</p>
 
 <p>The service may also enforce a maximum value for this field.</p>
-</div>
-
-
-                            </div>
-                            <div id="APIExecutionOptions.bypass_settings_protection" class="classattr">
-                                <div class="attr variable">
-            <span class="name">bypass_settings_protection</span>
-
-        
-    </div>
-    <a class="headerlink" href="#APIExecutionOptions.bypass_settings_protection"></a>
-    
-            <div class="docstring"><p>Get the configured <code><a href="#APIExecutionOptions.bypass_settings_protection">bypass_settings_protection</a></code> value.</p>
 </div>
 
 
@@ -529,6 +552,32 @@ timeout is selected by the service.</p>
 </div>
 
 
+                            <div id="ConnectionStrategy.Gateway.liveness" class="classattr">
+                                <div class="attr variable">
+            <span class="name">liveness</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.Gateway.liveness"></a>
+    
+            <div class="docstring"><p>Whether the gateway should route to live hardware, simulated hardware, or either.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConnectionStrategy.Gateway.endpoint_id" class="classattr">
+                                <div class="attr variable">
+            <span class="name">endpoint_id</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConnectionStrategy.Gateway.endpoint_id"></a>
+    
+            <div class="docstring"><p>If given, used as the request's target instead of the quantum processor ID.</p>
+</div>
+
+
+                            </div>
                 </section>
                 <section id="ConnectionStrategy.DirectAccess">
                     <div class="attr class">
@@ -556,7 +605,7 @@ have direct network access and an active reservation.</p>
     </div>
     <a class="headerlink" href="#ConnectionStrategy.EndpointId"></a>
     
-            <div class="docstring"><p>Connect directly to a specific endpoint using its ID.</p>
+            <div class="docstring"><p>Connect directly to a specific endpoint, identified by the given endpoint ID.</p>
 </div>
 
 
@@ -577,6 +626,58 @@ have direct network access and an active reservation.</p>
 </div>
 
 
+                </section>
+                <section id="EndpointLiveness">
+                    <div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">EndpointLiveness</span>:
+
+        
+    </div>
+    <a class="headerlink" href="#EndpointLiveness"></a>
+    
+            <div class="docstring"><p>Whether a [<code>ConnectionStrategy::Gateway</code>] connection should route to live hardware,
+simulated hardware, or either.</p>
+</div>
+
+
+                            <div id="EndpointLiveness.LIVE_ONLY" class="classattr">
+                                <div class="attr variable">
+            <span class="name">LIVE_ONLY</span>        =
+<span class="default_value"><a href="#EndpointLiveness.LIVE_ONLY">EndpointLiveness.LIVE_ONLY</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#EndpointLiveness.LIVE_ONLY"></a>
+    
+    
+
+                            </div>
+                            <div id="EndpointLiveness.LIVE_OR_SIMULATED" class="classattr">
+                                <div class="attr variable">
+            <span class="name">LIVE_OR_SIMULATED</span>        =
+<span class="default_value"><a href="#EndpointLiveness.LIVE_OR_SIMULATED">EndpointLiveness.LIVE_OR_SIMULATED</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#EndpointLiveness.LIVE_OR_SIMULATED"></a>
+    
+    
+
+                            </div>
+                            <div id="EndpointLiveness.SIMULATED_ONLY" class="classattr">
+                                <div class="attr variable">
+            <span class="name">SIMULATED_ONLY</span>        =
+<span class="default_value"><a href="#EndpointLiveness.SIMULATED_ONLY">EndpointLiveness.SIMULATED_ONLY</a></span>
+
+        
+    </div>
+    <a class="headerlink" href="#EndpointLiveness.SIMULATED_ONLY"></a>
+    
+    
+
+                            </div>
                 </section>
                 <section id="ExecutionOptions">
                     <div class="attr class">
@@ -621,17 +722,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
-                                <div class="attr variable">
-            <span class="name">timeout_seconds</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptions.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -639,6 +729,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptions.api_options"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptions.timeout_seconds" class="classattr">
+                                <div class="attr variable">
+            <span class="name">timeout_seconds</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptions.timeout_seconds"></a>
     
     
 
@@ -697,17 +798,6 @@ to build a custom set of options.</p>
     
 
                             </div>
-                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
-                                <div class="attr variable">
-            <span class="name">connection_strategy</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
-    
-    
-
-                            </div>
                             <div id="ExecutionOptionsBuilder.api_options" class="classattr">
                                 <div class="attr variable">
             <span class="name">api_options</span>
@@ -726,6 +816,17 @@ to build a custom set of options.</p>
         
     </div>
     <a class="headerlink" href="#ExecutionOptionsBuilder.timeout_seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="ExecutionOptionsBuilder.connection_strategy" class="classattr">
+                                <div class="attr variable">
+            <span class="name">connection_strategy</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionOptionsBuilder.connection_strategy"></a>
     
     
 
@@ -773,19 +874,6 @@ to build a custom set of options.</p>
 
 
                             </div>
-                            <div id="ExecutionResult.dtype" class="classattr">
-                                <div class="attr variable">
-            <span class="name">dtype</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ExecutionResult.dtype"></a>
-    
-            <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
-</div>
-
-
-                            </div>
                             <div id="ExecutionResult.data" class="classattr">
                                 <div class="attr variable">
             <span class="name">data</span>
@@ -795,6 +883,19 @@ to build a custom set of options.</p>
     <a class="headerlink" href="#ExecutionResult.data"></a>
     
             <div class="docstring"><p>The result data for all shots by the particular memory location.</p>
+</div>
+
+
+                            </div>
+                            <div id="ExecutionResult.dtype" class="classattr">
+                                <div class="attr variable">
+            <span class="name">dtype</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ExecutionResult.dtype"></a>
+    
+            <div class="docstring"><p>The type of the result data (as a <code>numpy</code> <code><a href="#ExecutionResult.dtype">dtype</a></code>).</p>
 </div>
 
 
@@ -814,16 +915,18 @@ to build a custom set of options.</p>
 </div>
 
 
-                            <div id="ExecutionResults.memory" class="classattr">
+                            <div id="ExecutionResults.buffers" class="classattr">
                                 <div class="attr variable">
-            <span class="name">memory</span>
+            <span class="name">buffers</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.memory"></a>
+    <a class="headerlink" href="#ExecutionResults.buffers"></a>
     
-            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
-the execution of the program.</p>
+            <div class="docstring"><p>The readout results of execution, mapping a published filter node to its data.</p>
+
+<p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
+to the name of the memory declaration in the source program.</p>
 </div>
 
 
@@ -841,18 +944,16 @@ the execution of the program.</p>
 
 
                             </div>
-                            <div id="ExecutionResults.buffers" class="classattr">
+                            <div id="ExecutionResults.memory" class="classattr">
                                 <div class="attr variable">
-            <span class="name">buffers</span>
+            <span class="name">memory</span>
 
         
     </div>
-    <a class="headerlink" href="#ExecutionResults.buffers"></a>
+    <a class="headerlink" href="#ExecutionResults.memory"></a>
     
-            <div class="docstring"><p>The readout results of execution, mapping a published filter node to its data.</p>
-
-<p>See <code>TranslationResult.ro_sources</code> which provides the mapping from the filter node name
-to the name of the memory declaration in the source program.</p>
+            <div class="docstring"><p>The final state of memory for parameters that were read from and written to during
+the execution of the program.</p>
 </div>
 
 
@@ -872,17 +973,6 @@ to the name of the memory declaration in the source program.</p>
 </div>
 
 
-                            <div id="QpuApiDuration.nanos" class="classattr">
-                                <div class="attr variable">
-            <span class="name">nanos</span>
-
-        
-    </div>
-    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
-    
-    
-
-                            </div>
                             <div id="QpuApiDuration.seconds" class="classattr">
                                 <div class="attr variable">
             <span class="name">seconds</span>
@@ -890,6 +980,17 @@ to the name of the memory declaration in the source program.</p>
         
     </div>
     <a class="headerlink" href="#QpuApiDuration.seconds"></a>
+    
+    
+
+                            </div>
+                            <div id="QpuApiDuration.nanos" class="classattr">
+                                <div class="attr variable">
+            <span class="name">nanos</span>
+
+        
+    </div>
+    <a class="headerlink" href="#QpuApiDuration.nanos"></a>
     
     
 
