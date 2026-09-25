@@ -4,6 +4,7 @@
 import builtins
 import collections.abc
 import datetime
+import enum
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk import client
 from qcs_sdk._qcs_sdk import qpu
@@ -14,6 +15,7 @@ __all__ = [
     "APIExecutionOptionsBuilder",
     "BuildOptionsError",
     "ConnectionStrategy",
+    "EndpointLiveness",
     "ExecutionOptions",
     "ExecutionOptionsBuilder",
     "ExecutionResult",
@@ -119,7 +121,7 @@ class ConnectionStrategy:
     r"""
     The connection strategy to use when submitting and retrieving jobs from a QPU.
     """
-    def __getnewargs__(self) -> tuple[str] | tuple[()]: ...
+    def __getnewargs__(self) -> tuple[str] | tuple[EndpointLiveness, str | None] | tuple[()]: ...
     def __repr__(self) -> builtins.str:
         r"""
         Implements `__repr__` for Python in terms of the Rust
@@ -158,7 +160,7 @@ class ConnectionStrategy:
     @typing.final
     class EndpointId(ConnectionStrategy):
         r"""
-        Connect directly to a specific endpoint using its ID.
+        Connect directly to a specific endpoint, identified by the given endpoint ID.
         """
 
         __match_args__ = ("_0",)
@@ -174,10 +176,25 @@ class ConnectionStrategy:
         Connect through the publicly accessible gateway.
         """
 
-        __match_args__ = ()
-        def __getitem__(self, key: builtins.int, /) -> typing.Any: ...
-        def __len__(self) -> builtins.int: ...
-        def __new__(cls) -> ConnectionStrategy.Gateway: ...
+        __match_args__ = (
+            "liveness",
+            "endpoint_id",
+        )
+        @property
+        def endpoint_id(self) -> typing.Optional[builtins.str]:
+            r"""
+            If given, used as the request's target instead of the quantum processor ID.
+            """
+        @property
+        def liveness(self) -> EndpointLiveness:
+            r"""
+            Whether the gateway should route to live hardware, simulated hardware, or either.
+            """
+        def __new__(
+            cls,
+            liveness: EndpointLiveness = EndpointLiveness.LIVE_ONLY,
+            endpoint_id: typing.Optional[builtins.str] = None,
+        ) -> ConnectionStrategy.Gateway: ...
 
 @typing.final
 class ExecutionOptions:
@@ -341,6 +358,30 @@ class SubmissionError(QpuApiError):
     """
 
     ...
+
+@typing.final
+class EndpointLiveness(enum.Enum):
+    r"""
+    Whether a [`ConnectionStrategy::Gateway`] connection should route to live hardware,
+    simulated hardware, or either.
+    """
+
+    LIVE_ONLY = ...
+    r"""
+    Only connect to an accessor attached to live hardware.
+    """
+    LIVE_OR_SIMULATED = ...
+    r"""
+    Connect to an accessor attached to either live or simulated hardware, with no preference
+    between the two.
+    """
+    SIMULATED_ONLY = ...
+    r"""
+    Only connect to an accessor attached to simulated hardware.
+    """
+
+    def __getnewargs__(self) -> tuple[builtins.int]: ...
+    def __new__(cls, value: builtins.int) -> EndpointLiveness: ...
 
 def cancel_job(
     job_id: builtins.str,

@@ -22,7 +22,7 @@ use crate::{
     qpu::{
         api::{
             self, ApiExecutionOptions, ApiExecutionOptionsBuilder, ApiExecutionOptionsBuilderError,
-            ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
+            ConnectionStrategy, EndpointLiveness, ExecutionOptions, ExecutionOptionsBuilder,
             ExecutionOptionsBuilderError, JobId, QpuApiDuration, QpuApiError,
         },
         result_data::MemoryValues,
@@ -37,7 +37,8 @@ create_init_submodule! {
         ExecutionOptionsBuilder,
         ApiExecutionOptions,
         ApiExecutionOptionsBuilder,
-        PyQpuApiDuration
+        PyQpuApiDuration,
+        EndpointLiveness
     ],
     complex_enums: [ ConnectionStrategy ],
     errors: [
@@ -436,20 +437,47 @@ impl ConnectionStrategy {
     }
 
     fn get_endpoint_id(&self) -> PyResult<String> {
+        self.endpoint_id().map(ToOwned::to_owned).ok_or_else(|| {
+            errors::QpuApiError::new_err("ConnectionStrategy does not have an endpoint ID")
+        })
+    }
+
+    #[gen_stub(override_return_type(
+        type_repr = "tuple[str] | tuple[EndpointLiveness, str | None] | tuple[()]"
+    ))]
+    fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
         match self {
-            ConnectionStrategy::EndpointId(id) => Ok(id.clone()),
-            _ => Err(errors::QpuApiError::new_err(
-                "ConnectionStrategy is not an EndpointId",
-            )),
+            Self::EndpointAddress(address) => (address.clone(),).into_pyobject(py),
+            Self::EndpointId(endpoint_id) => (endpoint_id.clone(),).into_pyobject(py),
+            Self::Gateway {
+                liveness,
+                endpoint_id,
+            } => (*liveness, endpoint_id.clone()).into_pyobject(py),
+            Self::DirectAccess() => Ok(PyTuple::empty(py)),
+        }
+    }
+}
+
+#[cfg_attr(not(feature = "stubs"), optipy::strip_pyo3(only_stubs))]
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl EndpointLiveness {
+    // pyo3 enums have no by-value constructor, so pickle by discriminant,
+    // constructing via a `#[new]` that maps `isize` back to a variant.
+    #[new]
+    fn __new__(value: isize) -> PyResult<Self> {
+        match value {
+            val if val == Self::LiveOnly as isize => Ok(Self::LiveOnly),
+            val if val == Self::LiveOrSimulated as isize => Ok(Self::LiveOrSimulated),
+            val if val == Self::SimulatedOnly as isize => Ok(Self::SimulatedOnly),
+            _ => Err(errors::QpuApiError::new_err(format!(
+                "unknown EndpointLiveness discriminant: {value}"
+            ))),
         }
     }
 
-    #[gen_stub(override_return_type(type_repr = "tuple[str] | tuple[()]"))]
-    fn __getnewargs__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyTuple>> {
-        match self {
-            Self::EndpointId(id) | Self::EndpointAddress(id) => (id.clone(),).into_pyobject(py),
-            Self::Gateway() | Self::DirectAccess() => Ok(PyTuple::empty(py)),
-        }
+    fn __getnewargs__(&self) -> (isize,) {
+        (*self as isize,)
     }
 }
 

@@ -149,22 +149,20 @@ class Executable:
     def execute_on_qpu(
         self,
         quantum_processor_id: builtins.str,
-        endpoint_id: typing.Optional[builtins.str] = None,
         translation_options: typing.Optional[translation.TranslationOptions] = None,
         execution_options: typing.Optional[api.ExecutionOptions] = None,
     ) -> ExecutionData:
         r"""
         Compile the program and execute it on a QPU, waiting for results.
 
-        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-            If `None`, the default endpoint for the given `quantum_processor_id` is used.
+        :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+            that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
 
         :raises `ExecutionError`: If the job fails to execute.
         """
     def execute_on_qpu_async(
         self,
         quantum_processor_id: builtins.str,
-        endpoint_id: typing.Optional[builtins.str] = None,
         translation_options: typing.Optional[translation.TranslationOptions] = None,
         execution_options: typing.Optional[api.ExecutionOptions] = None,
     ) -> collections.abc.Awaitable[ExecutionData]:
@@ -172,8 +170,8 @@ class Executable:
         Compile the program and execute it on a QPU, waiting for results
         (async analog of `Executable.execute_on_qpu`).
 
-        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-            If `None`, the default endpoint for the given `quantum_processor_id` is used.
+        :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+            that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
 
         :raises `ExecutionError`: If the job fails to execute.
         """
@@ -206,22 +204,20 @@ class Executable:
     def submit_to_qpu(
         self,
         quantum_processor_id: builtins.str,
-        endpoint_id: typing.Optional[builtins.str] = None,
         translation_options: typing.Optional[translation.TranslationOptions] = None,
         execution_options: typing.Optional[api.ExecutionOptions] = None,
     ) -> JobHandle:
         r"""
         Compile the program and execute it on a QPU, without waiting for results.
 
-        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-            If `None`, the default endpoint for the given `quantum_processor_id` is used.
+        :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+            that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
 
         :raises `ExecutionError`: If the job fails to execute.
         """
     def submit_to_qpu_async(
         self,
         quantum_processor_id: builtins.str,
-        endpoint_id: typing.Optional[builtins.str] = None,
         translation_options: typing.Optional[translation.TranslationOptions] = None,
         execution_options: typing.Optional[api.ExecutionOptions] = None,
     ) -> collections.abc.Awaitable[JobHandle]:
@@ -229,8 +225,8 @@ class Executable:
         Compile the program and execute it on a QPU, without waiting for results
         (async analog of `Executable.submit_to_qpu`).
 
-        :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-            If `None`, the default endpoint for the given `quantum_processor_id` is used.
+        :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+            that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
 
         :raises `ExecutionError`: If the job fails to execute.
         """

@@ -18,9 +18,7 @@ use crate::execution_data::{MemoryReferenceParseError, ResultData};
 use crate::qpu::translation::translate;
 use crate::{ExecutionData, JobHandle};
 
-use super::api::{
-    retrieve_results, submit, ConnectionStrategy, ExecutionOptions, ExecutionOptionsBuilder,
-};
+use super::api::{retrieve_results, submit, ExecutionOptions};
 use super::translation::{EncryptedTranslationResult, TranslationOptions};
 use super::QpuResultData;
 use super::{get_isa, GetIsaError};
@@ -180,51 +178,11 @@ impl<'a> Execution<'a> {
     ) -> Result<JobHandle<'a>, Error> {
         tracing::debug!(quantum_processor_id=%self.quantum_processor_id, "submitting job to QPU");
 
-        self.submit_to_target(
-            params,
-            Some(&self.quantum_processor_id.clone()),
-            translation_options,
-            execution_options,
-        )
-        .await
-    }
-
-    /// Run on specific QCS endpoint and wait for the results.
-    pub(crate) async fn submit_to_endpoint_id<S>(
-        &mut self,
-        params: &Parameters,
-        endpoint_id: S,
-        translation_options: Option<TranslationOptions>,
-    ) -> Result<JobHandle<'a>, Error>
-    where
-        S: Into<Cow<'a, str>>,
-    {
-        self.submit_to_target(
-            params,
-            None,
-            translation_options,
-            &ExecutionOptionsBuilder::default()
-                .connection_strategy(ConnectionStrategy::EndpointId(
-                    endpoint_id.into().to_string(),
-                ))
-                .build()
-                .expect("valid execution options"),
-        )
-        .await
-    }
-
-    async fn submit_to_target(
-        &mut self,
-        params: &Parameters,
-        quantum_processor_id: Option<&str>,
-        translation_options: Option<TranslationOptions>,
-        execution_options: &ExecutionOptions,
-    ) -> Result<JobHandle<'a>, Error> {
         let EncryptedTranslationResult { job, readout_map } =
             self.translate(translation_options).await?;
 
         let job_id = submit(
-            quantum_processor_id,
+            Some(&self.quantum_processor_id),
             job,
             params,
             self.client.as_ref(),
@@ -232,15 +190,9 @@ impl<'a> Execution<'a> {
         )
         .await?;
 
-        let endpoint_id = match execution_options.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Some(endpoint_id),
-            _ => None,
-        };
-
         Ok(JobHandle::new(
             job_id,
             self.quantum_processor_id.to_string(),
-            endpoint_id.cloned(),
             readout_map,
             execution_options.clone(),
         ))

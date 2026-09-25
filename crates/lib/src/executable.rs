@@ -420,47 +420,6 @@ impl<'execution> Executable<'_, 'execution> {
         .map_err(Error::from)
     }
 
-    /// Compile the program and execute it on a QPU, waiting for results.
-    ///
-    /// # Arguments
-    /// 1. `quantum_processor_id`: The name of the QPU to run on. This parameter affects the
-    ///    lifetime of the [`Executable`]. The [`Executable`] will only live as long as the last
-    ///    parameter passed into this function.
-    ///
-    /// # Warning
-    ///
-    /// This function uses [`tokio::task::spawn_blocking`] internally. See the docs for that function
-    /// to avoid blocking shutdown of the runtime.
-    ///
-    /// # Returns
-    ///
-    /// An [`ExecutionResult`].
-    ///
-    /// # Errors
-    /// All errors are human readable by way of [`mod@thiserror`]. Some common errors are:
-    ///
-    /// 1. You are not authenticated for QCS
-    /// 1. Your credentials don't have an active reservation for the QPU you requested
-    /// 1. [quilc] was not running.
-    /// 1. The `quil` that this [`Executable`] was constructed with was invalid.
-    /// 1. Missing parameters that should be filled with [`Executable::with_parameter`]
-    ///
-    /// [quilc]: https://github.com/quil-lang/quilc
-    pub async fn execute_on_qpu_with_endpoint<S>(
-        &mut self,
-        quantum_processor_id: S,
-        endpoint_id: S,
-        translation_options: Option<TranslationOptions>,
-    ) -> ExecutionResult
-    where
-        S: Into<Cow<'execution, str>>,
-    {
-        let job_handle = self
-            .submit_to_qpu_with_endpoint(quantum_processor_id, endpoint_id, translation_options)
-            .await?;
-        self.retrieve_results(job_handle).await
-    }
-
     /// Compile the program and execute it on a QCS endpoint, waiting for results.
     ///
     /// # Arguments
@@ -556,31 +515,6 @@ impl<'execution> Executable<'_, 'execution> {
             .qpu_for_id(quantum_processor_id)
             .await?
             .submit(&self.params, translation_options, execution_options)
-            .await?;
-        Ok(job_handle)
-    }
-
-    /// Compile and submit the program to a QCS endpoint, but do not wait for execution to complete.
-    ///
-    /// Call [`Executable::retrieve_results`] to wait for execution to complete and retrieve the
-    /// results.
-    ///
-    /// # Errors
-    ///
-    /// See [`Executable::execute_on_qpu`].
-    pub async fn submit_to_qpu_with_endpoint<S>(
-        &mut self,
-        quantum_processor_id: S,
-        endpoint_id: S,
-        translation_options: Option<TranslationOptions>,
-    ) -> Result<JobHandle<'execution>, Error>
-    where
-        S: Into<Cow<'execution, str>>,
-    {
-        let job_handle = self
-            .qpu_for_id(quantum_processor_id)
-            .await?
-            .submit_to_endpoint_id(&self.params, endpoint_id.into(), translation_options)
             .await?;
         Ok(job_handle)
     }
@@ -754,7 +688,6 @@ impl From<qvm::Error> for Error {
 pub struct JobHandle<'executable> {
     job_id: JobId,
     quantum_processor_id: Cow<'executable, str>,
-    endpoint_id: Option<Cow<'executable, str>>,
     readout_map: HashMap<String, String>,
     execution_options: ExecutionOptions,
 }
@@ -764,7 +697,6 @@ impl<'a> JobHandle<'a> {
     pub(crate) fn new<S>(
         job_id: JobId,
         quantum_processor_id: S,
-        endpoint_id: Option<S>,
         readout_map: HashMap<String, String>,
         execution_options: ExecutionOptions,
     ) -> Self
@@ -774,7 +706,6 @@ impl<'a> JobHandle<'a> {
         Self {
             job_id,
             quantum_processor_id: quantum_processor_id.into(),
-            endpoint_id: endpoint_id.map(Into::into),
             readout_map,
             execution_options,
         }
@@ -790,6 +721,13 @@ impl<'a> JobHandle<'a> {
     #[must_use]
     pub fn quantum_processor_id(&self) -> &str {
         &self.quantum_processor_id
+    }
+
+    /// The ID of the endpoint to which the job was submitted, if the job's
+    /// [`ConnectionStrategy`](crate::qpu::api::ConnectionStrategy) specified one.
+    #[must_use]
+    pub fn endpoint_id(&self) -> Option<&str> {
+        self.execution_options.connection_strategy().endpoint_id()
     }
 
     /// The readout map from source readout memory locations to the

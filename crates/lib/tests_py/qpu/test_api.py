@@ -5,6 +5,7 @@ from qcs_sdk.qpu.translation import translate
 
 from qcs_sdk.qpu.api import (
     ConnectionStrategy,
+    EndpointLiveness,
     ExecutionOptions,
     retrieve_results,
     submit,
@@ -36,6 +37,7 @@ class TestPickle:
         "strategy",
         [
             ConnectionStrategy.Gateway(),
+            ConnectionStrategy.Gateway(EndpointLiveness.SIMULATED_ONLY, "endpoint_id"),
             ConnectionStrategy.DirectAccess(),
             ConnectionStrategy.EndpointId("endpoint_id"),
             ConnectionStrategy.EndpointAddress("http://localhost:8080"),
@@ -45,6 +47,19 @@ class TestPickle:
         pickled = pickle.dumps(strategy)
         unpickled = pickle.loads(pickled)
         assert unpickled == strategy
+
+    @pytest.mark.parametrize(
+        "liveness",
+        [
+            EndpointLiveness.LIVE_ONLY,
+            EndpointLiveness.LIVE_OR_SIMULATED,
+            EndpointLiveness.SIMULATED_ONLY,
+        ],
+    )
+    def test_endpoint_liveness(self, liveness: EndpointLiveness):
+        pickled = pickle.dumps(liveness)
+        unpickled = pickle.loads(pickled)
+        assert unpickled == liveness
 
     def test_execution_options(self):
         options = ExecutionOptions.default()

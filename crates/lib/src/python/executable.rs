@@ -234,160 +234,108 @@ impl PyExecutable {
 
     /// Compile the program and execute it on a QPU, waiting for results.
     ///
-    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
+    /// :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+    ///     that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
-    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[pyo3(signature = (quantum_processor_id, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu(
         &self,
         py: Python<'_>,
         quantum_processor_id: String,
-        endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<ExecutionData> {
-        match endpoint_id {
-            Some(endpoint_id) => py_sync!(
-                py,
-                py_executable_data!(
-                    self,
-                    execute_on_qpu_with_endpoint,
-                    quantum_processor_id,
-                    endpoint_id,
-                    translation_options,
-                )
-            ),
-            None => py_sync!(
-                py,
-                py_executable_data!(
-                    self,
-                    execute_on_qpu,
-                    quantum_processor_id,
-                    translation_options,
-                    &execution_options.unwrap_or_default(),
-                )
-            ),
-        }
+        py_sync!(
+            py,
+            py_executable_data!(
+                self,
+                execute_on_qpu,
+                quantum_processor_id,
+                translation_options,
+                &execution_options.unwrap_or_default(),
+            )
+        )
     }
     /// Compile the program and execute it on a QPU, waiting for results
     /// (async analog of `Executable.execute_on_qpu`).
     ///
-    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
+    /// :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+    ///     that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
-    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[pyo3(signature = (quantum_processor_id, translation_options = None, execution_options = None))]
     pub fn execute_on_qpu_async<'py>(
         &self,
         py: Python<'py>,
         quantum_processor_id: String,
-        endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<Awaitable<'py, ExecutionData>> {
-        match endpoint_id {
-            Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
-                py,
-                py_executable_data!(
-                    self,
-                    execute_on_qpu_with_endpoint,
-                    quantum_processor_id,
-                    endpoint_id,
-                    translation_options,
-                ),
+        pyo3_async_runtimes::tokio::future_into_py(
+            py,
+            py_executable_data!(
+                self,
+                execute_on_qpu,
+                quantum_processor_id,
+                translation_options,
+                &execution_options.unwrap_or_default(),
             ),
-            None => pyo3_async_runtimes::tokio::future_into_py(
-                py,
-                py_executable_data!(
-                    self,
-                    execute_on_qpu,
-                    quantum_processor_id,
-                    translation_options,
-                    &execution_options.unwrap_or_default(),
-                ),
-            ),
-        }
+        )
         .map(Into::into)
     }
 
     /// Compile the program and execute it on a QPU, without waiting for results.
     ///
-    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
+    /// :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+    ///     that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
-    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[pyo3(signature = (quantum_processor_id, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu(
         &self,
         py: Python<'_>,
         quantum_processor_id: String,
-        endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<PyJobHandle> {
-        match endpoint_id {
-            Some(endpoint_id) => py_sync!(
-                py,
-                py_job_handle!(
-                    self,
-                    submit_to_qpu_with_endpoint,
-                    quantum_processor_id,
-                    endpoint_id,
-                    translation_options,
-                )
-            ),
-            None => py_sync!(
-                py,
-                py_job_handle!(
-                    self,
-                    submit_to_qpu,
-                    quantum_processor_id,
-                    translation_options,
-                    &execution_options.unwrap_or_default(),
-                )
-            ),
-        }
+        py_sync!(
+            py,
+            py_job_handle!(
+                self,
+                submit_to_qpu,
+                quantum_processor_id,
+                translation_options,
+                &execution_options.unwrap_or_default(),
+            )
+        )
     }
 
     /// Compile the program and execute it on a QPU, without waiting for results
     /// (async analog of `Executable.submit_to_qpu`).
     ///
-    /// :param `endpoint_id`: execute the compiled program against an explicitly provided endpoint.
-    ///     If `None`, the default endpoint for the given `quantum_processor_id` is used.
+    /// :param `execution_options`: To target a specific endpoint, use a ``ConnectionStrategy``
+    ///     that carries an endpoint ID, e.g. ``ConnectionStrategy.EndpointId(...)``.
     ///
     /// :raises `ExecutionError`: If the job fails to execute.
-    #[pyo3(signature = (quantum_processor_id, endpoint_id = None, translation_options = None, execution_options = None))]
+    #[pyo3(signature = (quantum_processor_id, translation_options = None, execution_options = None))]
     pub fn submit_to_qpu_async<'py>(
         &self,
         py: Python<'py>,
         quantum_processor_id: String,
-        endpoint_id: Option<String>,
         translation_options: Option<TranslationOptions>,
         execution_options: Option<ExecutionOptions>,
     ) -> PyResult<Awaitable<'py, PyJobHandle>> {
-        match endpoint_id {
-            Some(endpoint_id) => pyo3_async_runtimes::tokio::future_into_py(
-                py,
-                py_job_handle!(
-                    self,
-                    submit_to_qpu_with_endpoint,
-                    quantum_processor_id,
-                    endpoint_id,
-                    translation_options,
-                ),
+        pyo3_async_runtimes::tokio::future_into_py(
+            py,
+            py_job_handle!(
+                self,
+                submit_to_qpu,
+                quantum_processor_id,
+                translation_options,
+                &execution_options.unwrap_or_default(),
             ),
-            None => pyo3_async_runtimes::tokio::future_into_py(
-                py,
-                py_job_handle!(
-                    self,
-                    submit_to_qpu,
-                    quantum_processor_id,
-                    translation_options,
-                    &execution_options.unwrap_or_default(),
-                ),
-            ),
-        }
+        )
         .map(Into::into)
     }
 

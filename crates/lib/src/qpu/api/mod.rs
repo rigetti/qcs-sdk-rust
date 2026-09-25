@@ -4,7 +4,9 @@ use std::{convert::TryFrom, fmt, time::Duration};
 use qcs_dependencies_client::tonic::codec::CompressionEncoding;
 
 #[cfg(feature = "stubs")]
-use pyo3_stub_gen::derive::{gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pymethods};
+use pyo3_stub_gen::derive::{
+    gen_stub_pyclass, gen_stub_pyclass_complex_enum, gen_stub_pyclass_enum, gen_stub_pymethods,
+};
 
 #[deny(clippy::module_name_repetitions)]
 pub use ::qcs_dependencies_client::pbjson_types::Duration as QpuApiDuration;
@@ -97,17 +99,14 @@ impl From<String> for JobId {
 ///
 /// # Arguments
 ///
-/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] or
-///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
-///   to target a specific endpoint ID.
+/// * `quantum_processor_id` - The quantum processor to execute the job on. Used as the request's
+///   target unless the connection strategy is [`ConnectionStrategy::EndpointId`], in which case
+///   its endpoint ID is used instead.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution. See [`submit_with_parameter_batch`]
 ///   if you need to execute with multiple sets of parameters.
 /// * `client` - The [`Qcs`] client to use.
-/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`] then direct
-///   access to that endpoint overrides the `quantum_processor_id` parameter.
+/// * `execution_options` - The [`ExecutionOptions`] to use.
 pub async fn submit(
     quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
@@ -134,23 +133,23 @@ pub async fn submit(
 ///
 /// # Arguments
 ///
-/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] or
-///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
-///   to target a specific endpoint ID.
+/// * `quantum_processor_id` - The quantum processor to execute the job on. Used as the request's
+///   target unless the connection strategy is [`ConnectionStrategy::EndpointId`], in which case
+///   its endpoint ID is used instead.
 /// * `program` - The compiled program as an [`EncryptedControllerJob`]
 /// * `patch_values` - The parameters to use for the execution. The job will be run once for each
 ///   given set of [`Parameters`].
 /// * `client` - The [`Qcs`] client to use.
-/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
-///   then direct access to that endpoint overrides the `quantum_processor_id` parameter.
+/// * `execution_options` - The [`ExecutionOptions`] to use.
 ///
 /// # Errors
 ///
 /// Returns a [`QpuApiError`] if:
 /// * Any of the jobs fail to be queued.
 /// * The provided `patch_values` iterator is empty.
+/// * `quantum_processor_id` is not provided, the connection strategy is not
+///   [`ConnectionStrategy::EndpointId`], and the connection strategy is not
+///   [`ConnectionStrategy::EndpointAddress`].
 pub async fn submit_with_parameter_batch<'a, I>(
     quantum_processor_id: Option<&str>,
     program: EncryptedControllerJob,
@@ -162,7 +161,7 @@ where
     I: IntoIterator<Item = &'a Parameters>,
 {
     tracing::debug!(
-        "submitting job to {:?} using options {:?}",
+        "submitting job to quantum processor {:?} using options {:?}",
         quantum_processor_id,
         execution_options
     );
@@ -177,7 +176,7 @@ where
             .map(params_into_job_execution_configuration)
             .collect(),
         job: Some(execute_controller_job_request::Job::Encrypted(program)),
-        target: execution_options.get_job_target(quantum_processor_id),
+        target: execution_options.get_job_target(quantum_processor_id)?,
         options: execution_options.api_options().copied(),
         idempotency_key: None,
     };
@@ -207,20 +206,20 @@ where
 ///
 /// # Arguments
 ///
-/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] or
-///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
-///   to target a specific endpoint ID.
 /// * `job_ids` - The [`JobId`]s to cancel.
+/// * `quantum_processor_id` - The quantum processor the jobs were run on. Used as the request's
+///   target unless the connection strategy is [`ConnectionStrategy::EndpointId`], in which case
+///   its endpoint ID is used instead.
 /// * `client` - The [`Qcs`] client to use.
-/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
-///   overrides the `quantum_processor_id` parameter.
+/// * `execution_options` - The [`ExecutionOptions`] to use.
 ///
 /// # Errors
 ///
 /// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if any of
 ///   the jobs could not be cancelled.
+/// * Returns [`QpuApiError::MissingTarget`] if `quantum_processor_id` is not provided, the
+///   connection strategy is not [`ConnectionStrategy::EndpointId`], and the connection strategy is
+///   not [`ConnectionStrategy::EndpointAddress`].
 pub async fn cancel_jobs(
     job_ids: Vec<JobId>,
     quantum_processor_id: Option<&str>,
@@ -233,7 +232,7 @@ pub async fn cancel_jobs(
 
     let request = CancelControllerJobsRequest {
         job_ids: job_ids.into_iter().map(|id| id.0).collect(),
-        target: execution_options.get_cancel_target(quantum_processor_id),
+        target: execution_options.get_cancel_target(quantum_processor_id)?,
     };
 
     controller_client
@@ -254,21 +253,20 @@ pub async fn cancel_jobs(
 ///
 /// # Arguments
 ///
-/// * `quantum_processor_id` - The quantum processor to execute the job on. This parameter is
-///   required unless using [`ConnectionStrategy::EndpointId`] or
-///   [`ConnectionStrategy::EndpointAddress`] in `execution_options` to target
-///   a specific endpoint ID.
-/// * `job_ids` - The [`JobId`]s to cancel.
+/// * `job_id` - The [`JobId`] to cancel.
+/// * `quantum_processor_id` - The quantum processor the job was run on. Used as the request's
+///   target unless the connection strategy is [`ConnectionStrategy::EndpointId`], in which case
+///   its endpoint ID is used instead.
 /// * `client` - The [`Qcs`] client to use.
-/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used is
-///   [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
-///   then direct access to that endpoint overrides the
-///   `quantum_processor_id` parameter.
+/// * `execution_options` - The [`ExecutionOptions`] to use.
 ///
 /// # Errors
 ///
 /// * Returns [`QpuApiError::GrpcClientError`] with [`GrpcClientError::RequestFailed`] if the
 ///   job could not be cancelled.
+/// * Returns [`QpuApiError::MissingTarget`] if `quantum_processor_id` is not provided, the
+///   connection strategy is not [`ConnectionStrategy::EndpointId`], and the connection strategy is
+///   not [`ConnectionStrategy::EndpointAddress`].
 pub async fn cancel_job(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
@@ -290,14 +288,17 @@ pub async fn cancel_job(
 /// # Arguments
 ///
 /// * `job_id` - The [`JobId`] to retrieve results for.
-/// * `quantum_processor_id` - The quantum processor the job was run on. This parameter
-///   is required unless using [`ConnectionStrategy::EndpointId`] or
-///   [`ConnectionStrategy::EndpointAddress`] in `execution_options`
-///   to target a specific endpoint ID.
+/// * `quantum_processor_id` - The quantum processor the job was run on. Used as the request's
+///   target unless the connection strategy is [`ConnectionStrategy::EndpointId`], in which case
+///   its endpoint ID is used instead.
 /// * `client` - The [`Qcs`] client to use.
-/// * `execution_options` - The [`ExecutionOptions`] to use. If the connection strategy used
-///   is [`ConnectionStrategy::EndpointId`] or [`ConnectionStrategy::EndpointAddress`]
-///   then direct access to that endpoint overrides the `quantum_processor_id` parameter.
+/// * `execution_options` - The [`ExecutionOptions`] to use.
+///
+/// # Errors
+///
+/// Returns [`QpuApiError::MissingTarget`] if `quantum_processor_id` is not provided, the
+/// connection strategy is not [`ConnectionStrategy::EndpointId`], and the connection strategy is
+/// not [`ConnectionStrategy::EndpointAddress`].
 pub async fn retrieve_results(
     job_id: JobId,
     quantum_processor_id: Option<&str>,
@@ -305,7 +306,7 @@ pub async fn retrieve_results(
     execution_options: &ExecutionOptions,
 ) -> Result<ControllerJobExecutionResult, QpuApiError> {
     tracing::debug!(
-        "retrieving job results for {} on {:?} using options {:?}",
+        "retrieving job results for {} on quantum processor {:?} using options {:?}",
         job_id,
         quantum_processor_id,
         execution_options,
@@ -313,7 +314,7 @@ pub async fn retrieve_results(
 
     let request = GetControllerJobResultsRequest {
         job_execution_id: job_id.0,
-        target: execution_options.get_results_target(quantum_processor_id),
+        target: execution_options.get_results_target(quantum_processor_id)?,
     };
 
     let mut controller_client = execution_options
@@ -533,8 +534,35 @@ impl ExecutionOptions {
     }
 }
 
+/// Whether a [`ConnectionStrategy::Gateway`] connection should route to live hardware,
+/// simulated hardware, or either.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "stubs", gen_stub_pyclass_enum)]
+#[cfg_attr(
+    feature = "python",
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.qpu.api",
+        rename_all = "SCREAMING_SNAKE_CASE",
+        eq,
+        hash,
+        frozen,
+        from_py_object
+    )
+)]
+pub enum EndpointLiveness {
+    /// Only connect to an accessor attached to live hardware.
+    #[default]
+    LiveOnly = 0,
+    /// Connect to an accessor attached to either live or simulated hardware, with no preference
+    /// between the two.
+    LiveOrSimulated = 1,
+    /// Only connect to an accessor attached to simulated hardware.
+    SimulatedOnly = 2,
+}
+
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass_complex_enum)]
 #[cfg_attr(
     feature = "python",
@@ -542,11 +570,17 @@ impl ExecutionOptions {
 )]
 pub enum ConnectionStrategy {
     /// Connect through the publicly accessible gateway.
-    Gateway(),
+    #[pyo3(constructor = (liveness=EndpointLiveness::default(), endpoint_id=None))]
+    Gateway {
+        /// Whether the gateway should route to live hardware, simulated hardware, or either.
+        liveness: EndpointLiveness,
+        /// If given, used as the request's target instead of the quantum processor ID.
+        endpoint_id: Option<String>,
+    },
     /// Connect directly to the default endpoint, bypassing the gateway. Should only be used when you
     /// have direct network access and an active reservation.
     DirectAccess(),
-    /// Connect directly to a specific endpoint using its ID.
+    /// Connect directly to a specific endpoint, identified by the given endpoint ID.
     EndpointId(String),
     /// Connect directly to a specific endpoint by its gRPC address, bypassing the gateway.
     ///
@@ -554,10 +588,55 @@ pub enum ConnectionStrategy {
     EndpointAddress(String),
 }
 
+impl ConnectionStrategy {
+    /// The endpoint ID carried by this strategy, if any.
+    #[must_use]
+    pub fn endpoint_id(&self) -> Option<&str> {
+        match self {
+            Self::EndpointId(endpoint_id) => Some(endpoint_id),
+            Self::Gateway { endpoint_id, .. } => endpoint_id.as_deref(),
+            Self::DirectAccess() | Self::EndpointAddress(_) => None,
+        }
+    }
+}
+
 impl Default for ConnectionStrategy {
     fn default() -> Self {
-        Self::Gateway()
+        Self::Gateway {
+            liveness: EndpointLiveness::default(),
+            endpoint_id: None,
+        }
     }
+}
+
+/// Shared implementation backing [`ExecutionTarget::get_job_target`],
+/// [`ExecutionTarget::get_results_target`], and [`ExecutionTarget::get_cancel_target`]: prefers
+/// the endpoint ID carried by [`ConnectionStrategy::EndpointId`] or
+/// [`ConnectionStrategy::Gateway`] over `quantum_processor_id`, and only errors on having neither
+/// when the connection strategy is not [`ConnectionStrategy::EndpointAddress`] (in which case the
+/// address alone is enough to route the request, so a missing target is not fatal, only unusual).
+fn resolve_target<T>(
+    connection_strategy: &ConnectionStrategy,
+    quantum_processor_id: Option<&str>,
+    by_endpoint_id: impl FnOnce(String) -> T,
+    by_quantum_processor_id: impl FnOnce(String) -> T,
+) -> Result<Option<T>, QpuApiError> {
+    if let Some(endpoint_id) = connection_strategy.endpoint_id() {
+        return Ok(Some(by_endpoint_id(endpoint_id.to_owned())));
+    }
+    if let Some(quantum_processor_id) = quantum_processor_id {
+        return Ok(Some(by_quantum_processor_id(
+            quantum_processor_id.to_owned(),
+        )));
+    }
+    if matches!(connection_strategy, ConnectionStrategy::EndpointAddress(_)) {
+        tracing::warn!(
+            "connecting directly by gRPC address with neither an endpoint ID nor a quantum \
+             processor ID; proceeding without a request target"
+        );
+        return Ok(None);
+    }
+    Err(QpuApiError::MissingTarget)
 }
 
 /// An `ExecutionTarget` provides methods to establish the appropriate connection to the execution
@@ -572,58 +651,65 @@ pub trait ExecutionTarget<'a> {
     /// The timeout to use for requests to the target.
     fn timeout(&self) -> Option<Duration>;
 
-    /// Get the [`execute_controller_job_request::Target`] for the given quantum processor ID.
+    /// Get the [`execute_controller_job_request::Target`] to use, preferring the endpoint ID
+    /// carried by [`ConnectionStrategy::EndpointId`] over `quantum_processor_id`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`QpuApiError::MissingTarget`] if the connection strategy is not
+    /// [`ConnectionStrategy::EndpointId`], `quantum_processor_id` is not provided, and the
+    /// connection strategy is not [`ConnectionStrategy::EndpointAddress`]. If the connection
+    /// strategy *is* [`ConnectionStrategy::EndpointAddress`], connecting directly by address makes
+    /// a target unnecessary for routing, so this instead logs a warning and returns `Ok(None)`.
     fn get_job_target(
         &'a self,
         quantum_processor_id: Option<&str>,
-    ) -> Option<execute_controller_job_request::Target> {
-        match self.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                execute_controller_job_request::Target::EndpointId(endpoint_id.clone()),
-            ),
-            ConnectionStrategy::Gateway()
-            | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
-                .map(String::from)
-                .map(execute_controller_job_request::Target::QuantumProcessorId),
-        }
+    ) -> Result<Option<execute_controller_job_request::Target>, QpuApiError> {
+        resolve_target(
+            self.connection_strategy(),
+            quantum_processor_id,
+            execute_controller_job_request::Target::EndpointId,
+            execute_controller_job_request::Target::QuantumProcessorId,
+        )
     }
 
-    /// Get the [`get_controller_job_results_request::Target`] for the given quantum processor ID.
+    /// Get the [`get_controller_job_results_request::Target`] to use, preferring the endpoint ID
+    /// carried by [`ConnectionStrategy::EndpointId`] over `quantum_processor_id`.
+    ///
+    /// # Errors
+    ///
+    /// See [`ExecutionTarget::get_job_target`].
     fn get_results_target(
         &'a self,
         quantum_processor_id: Option<&str>,
-    ) -> Option<get_controller_job_results_request::Target> {
-        match self.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                get_controller_job_results_request::Target::EndpointId(endpoint_id.clone()),
-            ),
-            ConnectionStrategy::Gateway()
-            | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
-                .map(String::from)
-                .map(get_controller_job_results_request::Target::QuantumProcessorId),
-        }
+    ) -> Result<Option<get_controller_job_results_request::Target>, QpuApiError> {
+        resolve_target(
+            self.connection_strategy(),
+            quantum_processor_id,
+            get_controller_job_results_request::Target::EndpointId,
+            get_controller_job_results_request::Target::QuantumProcessorId,
+        )
     }
 
-    /// Get the [`cancel_controller_jobs_request::Target`] for the given quantum processor ID.
+    /// Get the [`cancel_controller_jobs_request::Target`] to use, preferring the endpoint ID
+    /// carried by [`ConnectionStrategy::EndpointId`] over `quantum_processor_id`.
+    ///
+    /// # Errors
+    ///
+    /// See [`ExecutionTarget::get_job_target`].
     fn get_cancel_target(
         &'a self,
         quantum_processor_id: Option<&str>,
-    ) -> Option<cancel_controller_jobs_request::Target> {
-        match self.connection_strategy() {
-            ConnectionStrategy::EndpointId(endpoint_id) => Some(
-                cancel_controller_jobs_request::Target::EndpointId(endpoint_id.clone()),
-            ),
-            ConnectionStrategy::Gateway()
-            | ConnectionStrategy::DirectAccess()
-            | ConnectionStrategy::EndpointAddress(_) => quantum_processor_id
-                .map(String::from)
-                .map(cancel_controller_jobs_request::Target::QuantumProcessorId),
-        }
+    ) -> Result<Option<cancel_controller_jobs_request::Target>, QpuApiError> {
+        resolve_target(
+            self.connection_strategy(),
+            quantum_processor_id,
+            cancel_controller_jobs_request::Target::EndpointId,
+            cancel_controller_jobs_request::Target::QuantumProcessorId,
+        )
     }
 
-    /// Get a controller client for the given quantum processor ID.
+    /// Get a controller client for the given endpoint/quantum processor ID.
     async fn get_controller_client(
         &'a self,
         client: &Qcs,
@@ -653,11 +739,12 @@ pub trait ExecutionTarget<'a> {
                 endpoint
                     .addresses
                     .grpc
-                    .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.into()))?
+                    .ok_or_else(|| QpuApiError::EndpointNotFound(endpoint_id.clone()))?
             }
-            ConnectionStrategy::Gateway() => {
+            ConnectionStrategy::Gateway { liveness, .. } => {
                 self.get_gateway_address(
                     quantum_processor_id.ok_or(QpuApiError::MissingQpuId)?,
+                    *liveness,
                     client,
                 )
                 .await?
@@ -706,9 +793,10 @@ pub trait ExecutionTarget<'a> {
     async fn get_gateway_address(
         &self,
         quantum_processor_id: &str,
+        liveness: EndpointLiveness,
         client: &Qcs,
     ) -> Result<String, QpuApiError> {
-        get_accessor_with_cache(quantum_processor_id, client).await
+        get_accessor_with_cache(quantum_processor_id, liveness, client).await
     }
 
     /// Get the default endpoint address for the given quantum processor ID.
@@ -739,35 +827,46 @@ impl<'a> ExecutionTarget<'a> for ExecutionOptions {
     refresh = true,
     sync_writes = "by_key",
     key = "String",
-    convert = r"{ String::from(quantum_processor_id)}"
+    convert = r#"{ format!("{quantum_processor_id}:{liveness:?}") }"#
 )]
 async fn get_accessor_with_cache(
     quantum_processor_id: &str,
+    liveness: EndpointLiveness,
     client: &Qcs,
 ) -> Result<String, QpuApiError> {
-    tracing::info!(quantum_processor_id=%quantum_processor_id, "get_accessor cache miss");
-    get_accessor(quantum_processor_id, client).await
+    tracing::info!(quantum_processor_id=%quantum_processor_id, ?liveness, "get_accessor cache miss");
+    get_accessor(quantum_processor_id, liveness, client).await
 }
 
-async fn get_accessor(quantum_processor_id: &str, client: &Qcs) -> Result<String, QpuApiError> {
+async fn get_accessor(
+    quantum_processor_id: &str,
+    liveness: EndpointLiveness,
+    client: &Qcs,
+) -> Result<String, QpuApiError> {
     let accessors =
         get_quantum_processor_accessors(&client.get_openapi_client(), quantum_processor_id).await?;
 
-    let min = select_min_accessor(accessors.accessors);
+    let min = select_min_accessor(accessors.accessors, liveness);
 
     min.map(|accessor| accessor.url)
         .ok_or_else(|| QpuApiError::GatewayNotFound(quantum_processor_id.to_string()))
 }
 
-/// Select the accessor with the lowest rank from a list of accessors.
+/// Select the accessor with the lowest rank from a list of accessors, restricted to those
+/// matching the requested [`EndpointLiveness`].
 /// - Prefer `Some({ rank: None })` to `None`.
 /// - Prefer the first accessor encountered among those with the same rank value.
 fn select_min_accessor(
     accessors: Vec<QuantumProcessorAccessor>,
+    liveness: EndpointLiveness,
 ) -> Option<QuantumProcessorAccessor> {
     accessors
         .into_iter()
-        .filter(|accessor| accessor.live)
+        .filter(|accessor| match liveness {
+            EndpointLiveness::LiveOnly => accessor.live,
+            EndpointLiveness::LiveOrSimulated => true,
+            EndpointLiveness::SimulatedOnly => !accessor.live,
+        })
         .filter(|accessor| accessor.access_type == QuantumProcessorAccessorType::GatewayV1)
         .min_by_key(|accessor| accessor.rank.unwrap_or(i64::MAX))
 }
@@ -838,6 +937,14 @@ pub enum QpuApiError {
     #[error("A quantum processor ID must be provided if not connecting directly to an endpoint ID with ConnectionStrategy::EndpointId or ConnectionStrategy::EndpointAddress")]
     MissingQpuId,
 
+    /// Error due to missing both an endpoint ID and a quantum processor ID when determining the
+    /// request target.
+    #[error(
+        "An endpoint ID or a quantum processor ID must be provided as a request target, unless \
+         connecting directly via ConnectionStrategy::EndpointAddress"
+    )]
+    MissingTarget,
+
     /// Error due to user not providing patch values
     #[error("Submitting a job requires at least one set of patch values")]
     EmptyPatchValues,
@@ -889,7 +996,7 @@ mod test {
         };
 
         let accessors = vec![expected.clone()];
-        let actual = select_min_accessor(accessors);
+        let actual = select_min_accessor(accessors, EndpointLiveness::LiveOnly);
         assert_eq!(expected, actual.expect("expected Some accessor"));
     }
 }

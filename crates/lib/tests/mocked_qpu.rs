@@ -9,7 +9,7 @@ use ndarray::arr2;
 use qcs::{
     client::Qcs,
     compiler::rpcq,
-    qpu::api::{ConnectionStrategy, ExecutionOptionsBuilder},
+    qpu::api::{ConnectionStrategy, EndpointLiveness, ExecutionOptionsBuilder},
     Executable,
 };
 use qcs_api_client_common::configuration::{
@@ -44,7 +44,10 @@ async fn test_qcs_against_mocks() {
             ConnectionStrategy::DirectAccess(),
         )));
         // Check gateway access
-        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway())));
+        handles.push(tokio::spawn(run_bell_state(ConnectionStrategy::Gateway {
+            liveness: EndpointLiveness::LiveOnly,
+            endpoint_id: None,
+        })));
     }
 
     // Ensure both access methods were cached
