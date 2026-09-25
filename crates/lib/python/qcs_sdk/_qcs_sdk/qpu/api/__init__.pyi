@@ -380,7 +380,8 @@ class EndpointLiveness(enum.Enum):
     Only connect to an accessor attached to simulated hardware.
     """
 
-    def __reduce__(self) -> tuple[typing.Any, tuple[type, builtins.str]]: ...
+    def __getnewargs__(self) -> tuple[builtins.int]: ...
+    def __new__(cls, value: builtins.int) -> EndpointLiveness: ...
 
 def cancel_job(
     job_id: builtins.str,
