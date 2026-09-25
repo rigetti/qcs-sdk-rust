@@ -35,10 +35,10 @@
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
+                                <a class="variable" href="#CompilationResult.program">program</a>
                         </li>
                         <li>
-                                <a class="variable" href="#CompilationResult.program">program</a>
+                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
                         </li>
                 </ul>
 
@@ -107,10 +107,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                 </ul>
 
@@ -140,6 +140,9 @@
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
                         </li>
                         <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
                         </li>
                         <li>
@@ -147,9 +150,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                 </ul>
 
@@ -279,19 +279,6 @@
 </div>
 
 
-                            <div id="CompilationResult.native_quil_metadata" class="classattr">
-                                <div class="attr variable">
-            <span class="name">native_quil_metadata</span>
-
-        
-    </div>
-    <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
-    
-            <div class="docstring"><p>Metadata about the compiled program</p>
-</div>
-
-
-                            </div>
                             <div id="CompilationResult.program" class="classattr">
                                 <div class="attr variable">
             <span class="name">program</span>
@@ -301,6 +288,19 @@
     <a class="headerlink" href="#CompilationResult.program"></a>
     
             <div class="docstring"><p>The compiled program</p>
+</div>
+
+
+                            </div>
+                            <div id="CompilationResult.native_quil_metadata" class="classattr">
+                                <div class="attr variable">
+            <span class="name">native_quil_metadata</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
+    
+            <div class="docstring"><p>Metadata about the compiled program</p>
 </div>
 
 
@@ -513,19 +513,6 @@
 </div>
 
 
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
                             <div id="PauliTerm.indices" class="classattr">
                                 <div class="attr variable">
             <span class="name">indices</span>
@@ -535,6 +522,19 @@
     <a class="headerlink" href="#PauliTerm.indices"></a>
     
             <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
 </div>
 
 
@@ -625,6 +625,19 @@
 
 
                             </div>
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                                <div class="attr variable">
+            <span class="name">depth</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+</div>
+
+
+                            </div>
                             <div id="RandomizedBenchmarkingRequest.seed" class="classattr">
                                 <div class="attr variable">
             <span class="name">seed</span>
@@ -660,19 +673,6 @@
     <a class="headerlink" href="#RandomizedBenchmarkingRequest.gateset"></a>
     
             <div class="docstring"><p>List of Quil programs, each describing a Clifford.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
-    
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
 </div>
 
 
