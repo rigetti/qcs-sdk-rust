@@ -1,3 +1,9 @@
+## 0.29.0 (2026-09-25)
+
+### Breaking Changes
+
+- ConnectionStrategy fields for more control over gateway use; use endpoint-ID for Gateway-bound jobs, when possible; remove now-superfluous endpoint_id methods and parameters (#597)
+
 ## 0.29.0-rc.1 (2026-09-24)
 
 ### Breaking Changes
