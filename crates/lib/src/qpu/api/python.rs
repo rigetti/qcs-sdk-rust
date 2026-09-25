@@ -3,10 +3,7 @@ use std::collections::HashMap;
 use std::time::Duration;
 
 use numpy::Complex32;
-use pyo3::{
-    prelude::*,
-    types::{PyTuple, PyType},
-};
+use pyo3::{prelude::*, types::PyTuple};
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 
 #[cfg(feature = "stubs")]
@@ -465,19 +462,22 @@ impl ConnectionStrategy {
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]
 #[pymethods]
 impl EndpointLiveness {
-    // pyo3 enums have no by-value constructor, so pickle by name,
-    // like the standard library's `enum.pickle_by_enum_name`.
-    fn __reduce__<'py>(
-        &self,
-        py: Python<'py>,
-    ) -> PyResult<(Bound<'py, PyAny>, (Bound<'py, PyType>, &'static str))> {
-        let name = match self {
-            Self::LiveOnly => "LIVE_ONLY",
-            Self::LiveOrSimulated => "LIVE_OR_SIMULATED",
-            Self::SimulatedOnly => "SIMULATED_ONLY",
-        };
-        let getattr = py.import("builtins")?.getattr("getattr")?;
-        Ok((getattr, (py.get_type::<Self>(), name)))
+    // pyo3 enums have no by-value constructor, so pickle by discriminant,
+    // constructing via a `#[new]` that maps `isize` back to a variant.
+    #[new]
+    fn __new__(value: isize) -> PyResult<Self> {
+        match value {
+            val if val == Self::LiveOnly as isize => Ok(Self::LiveOnly),
+            val if val == Self::LiveOrSimulated as isize => Ok(Self::LiveOrSimulated),
+            val if val == Self::SimulatedOnly as isize => Ok(Self::SimulatedOnly),
+            _ => Err(errors::QpuApiError::new_err(format!(
+                "unknown EndpointLiveness discriminant: {value}"
+            ))),
+        }
+    }
+
+    fn __getnewargs__(&self) -> (isize,) {
+        (*self as isize,)
     }
 }
 

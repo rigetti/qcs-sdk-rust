@@ -550,12 +550,12 @@ impl ExecutionOptions {
 pub enum EndpointLiveness {
     /// Only connect to an accessor attached to live hardware.
     #[default]
-    LiveOnly,
+    LiveOnly = 0,
     /// Connect to an accessor attached to either live or simulated hardware, with no preference
     /// between the two.
-    LiveOrSimulated,
+    LiveOrSimulated = 1,
     /// Only connect to an accessor attached to simulated hardware.
-    SimulatedOnly,
+    SimulatedOnly = 2,
 }
 
 /// The connection strategy to use when submitting and retrieving jobs from a QPU.
