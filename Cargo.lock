@@ -3139,7 +3139,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b"
 dependencies = [
  "chrono",
- "indexmap 2.13.0",
  "inventory",
  "libc",
  "num-complex",
@@ -3302,7 +3301,7 @@ dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
  "qcs-dependencies-client",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "serde",
  "serde_json",
  "thiserror 2.0.20",
@@ -3364,7 +3363,7 @@ dependencies = [
  "qcs-dependencies-client",
  "quil-rs",
  "regex",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "rmp-serde",
  "rstest",
  "serde",
@@ -3407,7 +3406,7 @@ dependencies = [
  "pyo3-build-config",
  "pyo3-stub-gen",
  "qcs-dependencies-client",
- "rigetti-pyo3 0.8.1",
+ "rigetti-pyo3",
  "serde",
  "serde_json",
  "shellexpand",
@@ -3507,7 +3506,6 @@ version = "0.37.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab2279547bc521362a1ed413e1ad379de23d0efc4ae28f427a4184c8c390ee25"
 dependencies = [
- "anyhow",
  "approx",
  "derive-where",
  "derive_more",
@@ -3519,16 +3517,11 @@ dependencies = [
  "nom",
  "nom_locate",
  "num-complex",
- "numpy",
  "once_cell",
  "optipy 0.1.4",
  "pastey",
  "petgraph 0.6.5",
- "pyo3",
- "pyo3-build-config",
- "pyo3-stub-gen",
  "regex",
- "rigetti-pyo3 0.7.1",
  "serde",
  "statrs",
  "strum",
@@ -3927,20 +3920,6 @@ dependencies = [
  "tokio",
  "tokio-rustls",
  "tower-service",
-]
-
-[[package]]
-name = "rigetti-pyo3"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "213e90a6c913d2826aa2b14c0a267c0bd784e586f108319066fdd42834abf325"
-dependencies = [
- "indexmap 2.13.0",
- "itertools 0.14.0",
- "optipy 0.1.4",
- "pastey",
- "pyo3",
- "pyo3-stub-gen",
 ]
 
 [[package]]

@@ -65,7 +65,6 @@ pub trait Client {
     feature = "python",
     pyo3::pyclass(
         module = "qcs_sdk._qcs_sdk.compiler.quilc",
-        get_all,
         frozen,
         from_py_object
     )

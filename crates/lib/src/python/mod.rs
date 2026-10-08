@@ -110,7 +110,7 @@ fn init_module(m: &Bound<'_, PyModule>) -> PyResult<()> {
 mod stubs {
     use pyo3_stub_gen::{
         define_stub_info_gatherer, derive::gen_type_alias_from_python, exclude_from_all,
-        export_verbatim, module_doc, reexport_module_members, Result, StubInfo,
+        export_verbatim, reexport_module_members, Result, StubInfo,
     };
     use std::path::Path;
 
@@ -166,9 +166,7 @@ mod stubs {
     reexport_module_members!("qcs_sdk.qvm.api" from "qcs_sdk._qcs_sdk.qvm.api");
 
     reexport_module_members!("qcs_sdk._qcs_sdk.client" from "qcs_api_client_common._qcs_api_client_common"; "configuration");
-    reexport_module_members!("qcs_sdk._qcs_sdk.compiler.quilc" from "quil._quil"; "program");
     exclude_from_all!("qcs_sdk._qcs_sdk.client", "configuration");
-    exclude_from_all!("qcs_sdk._qcs_sdk.compiler.quilc", "program");
 
     reexport_module_members!("qcs_sdk" from "qcs_sdk._qcs_sdk.client"; "QCSClient");
 
@@ -178,8 +176,6 @@ mod stubs {
     export_verbatim!("qcs_sdk._qcs_sdk", "_gather_diagnostics");
     export_verbatim!("qcs_sdk._qcs_sdk", "__version__");
 
-    module_doc!("quil._quil.validation", "");
-
     define_stub_info_gatherer!(internal_stub_info);
 
     /// Gather stub information to generate stub files.
@@ -188,12 +184,11 @@ mod stubs {
         let mut stubs = StubInfo::from_pyproject_toml(manifest_dir.join("pyproject.toml"))?;
 
         // `pyo3_stub_gen` gathers declarations from every linked crate, so dependencies that
-        // define their own Python packages (`quil-rs` and `qcs-api-client-common`) contribute
-        // their modules here too. Generation rejects any non-empty module outside this
-        // package's module path, and writing files for them would shadow the real, installed
-        // packages, so drop them. The stubs refer to foreign types by their private paths
-        // (`quil._quil.program.Program`), since resolving the public alias needs the foreign
-        // module to still be present at generation time.
+        // define their own Python packages (`qcs-api-client-common`) contribute their modules
+        // here too. Generation rejects any non-empty module outside this package's module path,
+        // and writing files for them would shadow the real, installed packages, so drop them.
+        // The stubs refer to foreign types by their private paths, since resolving the public
+        // alias needs the foreign module to still be present at generation time.
         stubs
             .modules
             .retain(|name, _| name == "qcs_sdk" || name.starts_with("qcs_sdk."));

@@ -1,9 +1,9 @@
 //! Python bindings for the experimental QPU module.
 
-use quil_rs::quil::{Quil, ToQuilError};
+use quil_rs::quil::Quil;
 use rigetti_pyo3::create_init_submodule;
 
-use crate::qpu::experimental::random::ChooseRandomRealSubRegions;
+use crate::qpu::experimental::random::{ChooseRandomRealSubRegions, Error as RandomError};
 
 create_init_submodule! {
     submodules: [ "random": random::init_submodule ],
@@ -40,7 +40,7 @@ impl ChooseRandomRealSubRegions {
     /// ```
     #[staticmethod]
     #[pyo3(name = "build_signature")]
-    fn py_build_signature() -> Result<String, ToQuilError> {
-        ChooseRandomRealSubRegions::build_signature().to_quil()
+    fn py_build_signature() -> Result<String, RandomError> {
+        Ok(ChooseRandomRealSubRegions::build_signature().to_quil()?)
     }
 }
