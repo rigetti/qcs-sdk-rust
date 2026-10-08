@@ -36,13 +36,11 @@ python = [
     "dep:rigetti-pyo3",
     "experimental",
     "tracing-opentelemetry",
-    "quil-rs/python",
     "qcs-api-client-common/python",
 ]
 stubs = [
     "python",
     "dep:pyo3-stub-gen",
-    "quil-rs/stubs",
     "qcs-api-client-common/stubs",
     "pyo3-tracing-subscriber-build",
     "rigetti-pyo3/stubs",

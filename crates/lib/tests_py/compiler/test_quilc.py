@@ -59,7 +59,7 @@ def test_compile_program(
     result = compile_program(
         bell_program, target_device, client=quilc_rpcq_client, options=CompilerOpts(protoquil=True)
     )
-    assert result.program.to_quil() == snapshot
+    assert result.program == snapshot
     assert result.native_quil_metadata == snapshot
 
 

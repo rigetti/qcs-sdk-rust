@@ -1,4 +1,5 @@
 use qcs_api_client_openapi::models::InstructionSetArchitecture;
+use quil_rs::quil::Quil;
 use rigetti_pyo3::{create_init_submodule, impl_repr, py_function_sync_async};
 use std::convert::TryFrom;
 
@@ -75,6 +76,18 @@ impl CompilerOpts {
     #[pyo3(name = "default")]
     fn py_default() -> Self {
         Self::default()
+    }
+}
+
+#[cfg_attr(feature = "stubs", gen_stub_pymethods)]
+#[pymethods]
+impl CompilationResult {
+    /// The compiled program, as a Quil string.
+    #[getter]
+    fn program(&self) -> PyResult<String> {
+        self.program
+            .to_quil()
+            .map_err(|err| errors::QuilcError::new_err(err.to_string()))
     }
 }
 

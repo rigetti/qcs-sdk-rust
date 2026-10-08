@@ -5,9 +5,7 @@ import builtins
 import collections.abc
 from qcs_sdk import _qcs_sdk
 from qcs_sdk._qcs_sdk.qpu import isa
-import quil._quil.program
 import typing
-from quil._quil import program
 
 __all__ = [
     "CompilationResult",
@@ -46,9 +44,9 @@ class CompilationResult:
         Metadata about the compiled program
         """
     @property
-    def program(self) -> program.Program:
+    def program(self) -> builtins.str:
         r"""
-        The compiled program
+        The compiled program, as a Quil string.
         """
 
 @typing.final
