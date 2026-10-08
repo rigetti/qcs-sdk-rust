@@ -2575,6 +2575,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "opentelemetry"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0142c63252a9e054e68a4c61a5778f7b14f576274d593f8ce883d191a099682"
+dependencies = [
+ "futures-core",
+ "futures-sink",
+ "js-sys",
+ "pin-project-lite",
+ "thiserror 2.0.20",
+ "tracing",
+]
+
+[[package]]
 name = "opentelemetry-http"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2583,7 +2597,19 @@ dependencies = [
  "async-trait",
  "bytes",
  "http",
- "opentelemetry",
+ "opentelemetry 0.31.0",
+]
+
+[[package]]
+name = "opentelemetry-http"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5683015d09e2df236ef005b17f6f196f0d5f6313c4fa43a7b6a53b52776e4331"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "http",
+ "opentelemetry 0.32.0",
 ]
 
 [[package]]
@@ -2593,13 +2619,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f69cd6acbb9af919df949cd1ec9e5e7fdc2ef15d234b6b795aaa525cc02f71f"
 dependencies = [
  "http",
- "opentelemetry",
- "opentelemetry-proto",
- "opentelemetry_sdk",
+ "opentelemetry 0.31.0",
+ "opentelemetry-proto 0.31.0",
+ "opentelemetry_sdk 0.31.0",
  "prost",
  "thiserror 2.0.20",
  "tokio",
  "tonic",
+]
+
+[[package]]
+name = "opentelemetry-otlp"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9966929966d17620d7c316c643ba62631826e10021409357772d5eea84f62c35"
+dependencies = [
+ "opentelemetry 0.32.0",
+ "opentelemetry-proto 0.32.0",
+ "opentelemetry_sdk 0.32.1",
+ "thiserror 2.0.20",
 ]
 
 [[package]]
@@ -2610,13 +2648,27 @@ checksum = "a7175df06de5eaee9909d4805a3d07e28bb752c34cab57fa9cff549da596b30f"
 dependencies = [
  "base64 0.22.1",
  "const-hex",
- "opentelemetry",
- "opentelemetry_sdk",
+ "opentelemetry 0.31.0",
+ "opentelemetry_sdk 0.31.0",
  "prost",
  "serde",
  "serde_json",
  "tonic",
  "tonic-prost",
+]
+
+[[package]]
+name = "opentelemetry-proto"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56d658ba1faf63f7b9c492cfbe6e0ec365440a16132d3270c1065f7b33f1b638"
+dependencies = [
+ "base64 0.22.1",
+ "const-hex",
+ "opentelemetry 0.32.0",
+ "opentelemetry_sdk 0.32.1",
+ "prost",
+ "serde",
 ]
 
 [[package]]
@@ -2628,8 +2680,26 @@ dependencies = [
  "futures-channel",
  "futures-executor",
  "futures-util",
- "opentelemetry",
+ "opentelemetry 0.31.0",
  "percent-encoding",
+ "rand 0.9.2",
+ "thiserror 2.0.20",
+ "tokio",
+ "tokio-stream",
+]
+
+[[package]]
+name = "opentelemetry_sdk"
+version = "0.32.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b59f80e1ac4d5ff7a2db8fb6c80badb7f0f3f858211fba08dd9aaec750894f9"
+dependencies = [
+ "futures-channel",
+ "futures-executor",
+ "futures-util",
+ "opentelemetry 0.32.0",
+ "percent-encoding",
+ "portable-atomic",
  "rand 0.9.2",
  "thiserror 2.0.20",
  "tokio",
@@ -3238,7 +3308,7 @@ checksum = "751d9b7fc7751abbee4110735a420cfc4ae172698b5a8aac0f417df3776b10d5"
 dependencies = [
  "pyo3",
  "pyo3-opentelemetry-macros",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.5.2",
 ]
 
 [[package]]
@@ -3301,7 +3371,7 @@ dependencies = [
  "futures-core",
  "pyo3",
  "pyo3-async-runtimes",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.5.2",
  "rigetti-pyo3 0.8.1",
  "serde",
  "serde_json",
@@ -3361,7 +3431,7 @@ dependencies = [
  "qcs-api-client-common",
  "qcs-api-client-grpc",
  "qcs-api-client-openapi",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.5.2",
  "quil-rs",
  "regex",
  "rigetti-pyo3 0.8.1",
@@ -3385,9 +3455,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-common"
-version = "0.26.0"
+version = "0.27.0-a.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0492c2342745b7141535af1ae803eb6269d4ba6b2ce47f51a355f54253cf8f0c"
+checksum = "dc8b9fe097039df3a4870a1bf050242b32f78bcf791b600eff62092843588962"
 dependencies = [
  "async-tempfile",
  "async-trait",
@@ -3406,7 +3476,7 @@ dependencies = [
  "pyo3-async-runtimes",
  "pyo3-build-config",
  "pyo3-stub-gen",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.6.0",
  "rigetti-pyo3 0.8.1",
  "serde",
  "serde_json",
@@ -3425,9 +3495,9 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-grpc"
-version = "0.26.0"
+version = "0.27.0-a.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13266eb1aa189a2a65377f1489e9a43dd4c61db16c06da9274e976e01df64ae0"
+checksum = "249ca800eb43beb4e26c872db878ed6d96a0b203822188c51a1f3cdc565fda0f"
 dependencies = [
  "backon",
  "futures-util",
@@ -3437,7 +3507,7 @@ dependencies = [
  "hyper-socks2",
  "hyper-util",
  "qcs-api-client-common",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.6.0",
  "rigetti-hyper-proxy",
  "serde",
  "thiserror 2.0.20",
@@ -3450,15 +3520,15 @@ dependencies = [
 
 [[package]]
 name = "qcs-api-client-openapi"
-version = "0.27.0"
+version = "0.28.0-a.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4f143435ba46ac18782f3c13b756b9526ceb541953f3caad421ebef22b3ae65a"
+checksum = "5d567b16150a7a9c3a5122006fd4d9c36fda4200613970bda8108ca037337a82"
 dependencies = [
  "anyhow",
  "chrono",
  "http",
  "qcs-api-client-common",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.6.0",
  "serde",
  "serde_json",
  "serde_path_to_error",
@@ -3477,11 +3547,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "594d8244e2e6408f80907ae82e49caebb3e5783e5e1512eb24bf87f10c081e2a"
 dependencies = [
  "http",
- "opentelemetry",
- "opentelemetry-http",
- "opentelemetry-otlp",
- "opentelemetry-proto",
- "opentelemetry_sdk",
+ "opentelemetry 0.31.0",
+ "opentelemetry-http 0.31.0",
+ "opentelemetry-otlp 0.31.1",
+ "opentelemetry-proto 0.31.0",
+ "opentelemetry_sdk 0.31.0",
+ "pbjson",
+ "pbjson-types",
+ "prost",
+ "prost-types",
+ "reqwest 0.13.3",
+ "reqwest-middleware",
+ "reqwest-tracing",
+ "tonic",
+ "tonic-prost",
+ "tower",
+ "tracing-opentelemetry 0.32.1",
+]
+
+[[package]]
+name = "qcs-dependencies-client"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "934c12183373dcd9c28bd6148e301ac42c99169bc03d791dd3f9296f85058f81"
+dependencies = [
+ "http",
+ "opentelemetry 0.32.0",
+ "opentelemetry-http 0.32.0",
+ "opentelemetry-otlp 0.32.0",
+ "opentelemetry-proto 0.32.0",
+ "opentelemetry_sdk 0.32.1",
  "pbjson",
  "pbjson-build",
  "pbjson-types",
@@ -3498,7 +3593,7 @@ dependencies = [
  "tonic-prost-build",
  "tower",
  "tower-http 0.6.8",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.33.0",
 ]
 
 [[package]]
@@ -3894,20 +3989,22 @@ dependencies = [
 
 [[package]]
 name = "reqwest-tracing"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5c1a1510677d43dce9e9c0c07fc5db8772c0e5a43e4f9cef75a11affa05a578"
+checksum = "b5e5af0cd6fc3d3c8f703d597af70b6e4e62432c63157b49419fa1ffaf481702"
 dependencies = [
  "anyhow",
  "async-trait",
  "getrandom 0.2.17",
  "http",
  "matchit",
- "opentelemetry",
+ "opentelemetry 0.31.0",
+ "opentelemetry 0.32.0",
  "reqwest 0.13.3",
  "reqwest-middleware",
  "tracing",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.32.1",
+ "tracing-opentelemetry 0.33.0",
 ]
 
 [[package]]
@@ -3956,7 +4053,7 @@ dependencies = [
  "pyo3",
  "pyo3-async-runtimes",
  "pyo3-stub-gen",
- "qcs-dependencies-client",
+ "qcs-dependencies-client 0.5.2",
  "tokio",
 ]
 
@@ -5362,7 +5459,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ac28f2d093c6c477eaa76b23525478f38de514fa9aeb1285738d4b97a9552fc"
 dependencies = [
  "js-sys",
- "opentelemetry",
+ "opentelemetry 0.31.0",
+ "smallvec",
+ "tracing",
+ "tracing-core",
+ "tracing-log",
+ "tracing-subscriber",
+ "web-time",
+]
+
+[[package]]
+name = "tracing-opentelemetry"
+version = "0.33.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adbc64cba7137545b8044cb1fe9814f7aacf3c6b5f9b45be8bb5db538befdb26"
+dependencies = [
+ "js-sys",
+ "opentelemetry 0.32.0",
  "smallvec",
  "tracing",
  "tracing-core",
