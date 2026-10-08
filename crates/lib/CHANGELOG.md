@@ -1,3 +1,9 @@
+## 0.30.0 (2026-10-08)
+
+### Breaking Changes
+
+- remove quil as a dependency of qcs-sdk-python (#601)
+
 ## 0.29.0 (2026-09-25)
 
 ### Breaking Changes
