@@ -41,7 +41,7 @@ class CompilationResult:
     @property
     def native_quil_metadata(self) -> typing.Optional[NativeQuilMetadata]:
         r"""
-        Metadata about the compiled program.
+        Metadata about the compiled program
         """
     @property
     def program(self) -> builtins.str:

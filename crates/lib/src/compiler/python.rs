@@ -89,12 +89,6 @@ impl CompilationResult {
             .to_quil()
             .map_err(|err| errors::QuilcError::new_err(err.to_string()))
     }
-
-    /// Metadata about the compiled program.
-    #[getter]
-    fn native_quil_metadata(&self) -> Option<NativeQuilMetadata> {
-        self.native_quil_metadata.clone()
-    }
 }
 
 #[cfg_attr(feature = "stubs", gen_stub_pymethods)]

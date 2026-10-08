@@ -60,6 +60,7 @@ pub trait Client {
 
 /// The result of compiling a Quil program to native quil with `quilc`
 #[derive(Clone, Debug, PartialEq)]
+#[cfg_attr(not(feature = "python"), optipy::strip_pyo3)]
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
@@ -73,6 +74,7 @@ pub struct CompilationResult {
     /// The compiled program
     pub program: Program,
     /// Metadata about the compiled program
+    #[pyo3(get)]
     pub native_quil_metadata: Option<NativeQuilMetadata>,
 }
 
