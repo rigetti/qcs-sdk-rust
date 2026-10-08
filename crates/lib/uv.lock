@@ -881,7 +881,7 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "qcs-api-client-common", specifier = ">=0.19.0,<0.20.0" }]
+requires-dist = [{ name = "qcs-api-client-common", specifier = ">=0.19.0,<0.27.0" }]
 
 [package.metadata.requires-dev]
 dev = [
