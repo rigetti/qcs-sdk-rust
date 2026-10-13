@@ -1,3 +1,9 @@
+## 0.31.0 (2026-10-13)
+
+### Breaking Changes
+
+- use released qcs-api-client 0.27.0 and 0.28.0 (#602)
+
 ## 0.30.0 (2026-10-08)
 
 ### Breaking Changes
