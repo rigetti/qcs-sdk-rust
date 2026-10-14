@@ -64,11 +64,7 @@ pub trait Client {
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(
-        module = "qcs_sdk._qcs_sdk.compiler.quilc",
-        frozen,
-        from_py_object
-    )
+    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", frozen, from_py_object)
 )]
 pub struct CompilationResult {
     /// The compiled program
@@ -335,7 +331,12 @@ where
 #[cfg_attr(feature = "stubs", gen_stub_pyclass)]
 #[cfg_attr(
     feature = "python",
-    pyo3::pyclass(module = "qcs_sdk._qcs_sdk.compiler.quilc", eq, from_py_object)
+    pyo3::pyclass(
+        module = "qcs_sdk._qcs_sdk.compiler.quilc",
+        eq,
+        get_all,
+        from_py_object
+    )
 )]
 pub struct NativeQuilMetadata {
     /// Output qubit index relabeling due to SWAP insertion.

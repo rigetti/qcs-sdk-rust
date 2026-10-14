@@ -5,6 +5,7 @@ from qcs_sdk.qpu.isa import InstructionSetArchitecture
 from qcs_sdk.compiler.quilc import (
     DEFAULT_COMPILER_TIMEOUT,
     CompilerOpts,
+    NativeQuilMetadata,
     TargetDevice,
     PauliTerm,
     GenerateRandomizedBenchmarkingSequenceResponse,
@@ -37,6 +38,18 @@ def test_default_compiler_timeout():
 def test_compiler_opts():
     """Ensure CompilerOpts can be constructed with defaults."""
     assert type(CompilerOpts.default()) == CompilerOpts
+
+
+def test_native_quil_metadata_fields():
+    metadata = NativeQuilMetadata(None, 1, 2, 3, 4.0, 0.5, 6, 7.0)
+    assert metadata.final_rewiring == []
+    assert metadata.gate_depth == 1
+    assert metadata.gate_volume == 2
+    assert metadata.multiqubit_gate_depth == 3
+    assert metadata.program_duration == 4.0
+    assert metadata.program_fidelity == 0.5
+    assert metadata.topological_swaps == 6
+    assert metadata.qpu_runtime_estimation == 7.0
 
 
 def test_target_device_error(aspen_m_3_isa: InstructionSetArchitecture):
