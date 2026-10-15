@@ -1,3 +1,9 @@
+## 0.31.1 (2026-10-15)
+
+### Fixes
+
+- add getters to NativeQuilMetadata (#603)
+
 ## 0.31.0 (2026-10-13)
 
 ### Breaking Changes
