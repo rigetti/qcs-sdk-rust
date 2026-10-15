@@ -123,6 +123,47 @@ class NativeQuilMetadata:
     r"""
     Metadata about a program compiled to native quil.
     """
+    @property
+    def final_rewiring(self) -> builtins.list[builtins.int]:
+        r"""
+        Output qubit index relabeling due to SWAP insertion.
+        """
+    @property
+    def gate_depth(self) -> typing.Optional[builtins.int]:
+        r"""
+        Maximum number of successive gates in the native Quil program.
+        """
+    @property
+    def gate_volume(self) -> typing.Optional[builtins.int]:
+        r"""
+        Total number of gates in the native Quil program.
+        """
+    @property
+    def multiqubit_gate_depth(self) -> typing.Optional[builtins.int]:
+        r"""
+        Maximum number of two-qubit gates in the native Quil program.
+        """
+    @property
+    def program_duration(self) -> typing.Optional[builtins.float]:
+        r"""
+        Rough estimate of native quil program length in seconds.
+        """
+    @property
+    def program_fidelity(self) -> typing.Optional[builtins.float]:
+        r"""
+        Rough estimate of fidelity of the native Quil program.
+        """
+    @property
+    def qpu_runtime_estimation(self) -> typing.Optional[builtins.float]:
+        r"""
+        The estimated runtime of the program on a Rigetti QPU, in milliseconds. Available only for
+        protoquil compliant programs.
+        """
+    @property
+    def topological_swaps(self) -> typing.Optional[builtins.int]:
+        r"""
+        Total number of swaps in the native Quil program.
+        """
     def __eq__(self, other: builtins.object, /) -> builtins.bool: ...
     def __getnewargs__(
         self,
