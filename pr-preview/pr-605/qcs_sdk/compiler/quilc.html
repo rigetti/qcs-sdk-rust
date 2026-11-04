@@ -35,10 +35,10 @@
                     <a class="class" href="#CompilationResult">CompilationResult</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#CompilationResult.program">program</a>
+                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
                         </li>
                         <li>
-                                <a class="variable" href="#CompilationResult.native_quil_metadata">native_quil_metadata</a>
+                                <a class="variable" href="#CompilationResult.program">program</a>
                         </li>
                 </ul>
 
@@ -77,10 +77,10 @@
                     <a class="class" href="#ConjugatePauliByCliffordResponse">ConjugatePauliByCliffordResponse</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
                         </li>
                         <li>
-                                <a class="variable" href="#ConjugatePauliByCliffordResponse.phase">phase</a>
+                                <a class="variable" href="#ConjugatePauliByCliffordResponse.pauli">pauli</a>
                         </li>
                 </ul>
 
@@ -101,28 +101,28 @@
                     <a class="class" href="#NativeQuilMetadata">NativeQuilMetadata</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_volume">gate_volume</a>
+                                <a class="variable" href="#NativeQuilMetadata.program_duration">program_duration</a>
                         </li>
                         <li>
                                 <a class="variable" href="#NativeQuilMetadata.topological_swaps">topological_swaps</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.program_duration">program_duration</a>
+                                <a class="variable" href="#NativeQuilMetadata.program_fidelity">program_fidelity</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.gate_depth">gate_depth</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.qpu_runtime_estimation">qpu_runtime_estimation</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#NativeQuilMetadata.final_rewiring">final_rewiring</a>
+                                <a class="variable" href="#NativeQuilMetadata.gate_volume">gate_volume</a>
                         </li>
                         <li>
                                 <a class="variable" href="#NativeQuilMetadata.multiqubit_gate_depth">multiqubit_gate_depth</a>
                         </li>
                         <li>
-                                <a class="variable" href="#NativeQuilMetadata.program_fidelity">program_fidelity</a>
+                                <a class="variable" href="#NativeQuilMetadata.final_rewiring">final_rewiring</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NativeQuilMetadata.qpu_runtime_estimation">qpu_runtime_estimation</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#NativeQuilMetadata.gate_depth">gate_depth</a>
                         </li>
                 </ul>
 
@@ -131,10 +131,10 @@
                     <a class="class" href="#PauliTerm">PauliTerm</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
+                                <a class="variable" href="#PauliTerm.indices">indices</a>
                         </li>
                         <li>
-                                <a class="variable" href="#PauliTerm.indices">indices</a>
+                                <a class="variable" href="#PauliTerm.symbols">symbols</a>
                         </li>
                 </ul>
 
@@ -161,19 +161,19 @@
                     <a class="class" href="#RandomizedBenchmarkingRequest">RandomizedBenchmarkingRequest</a>
                             <ul class="memberlist">
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
-                        </li>
-                        <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
                         </li>
                         <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.interleaver">interleaver</a>
                         </li>
                         <li>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.seed">seed</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#RandomizedBenchmarkingRequest.gateset">gateset</a>
                         </li>
                         <li>
-                                <a class="variable" href="#RandomizedBenchmarkingRequest.depth">depth</a>
+                                <a class="variable" href="#RandomizedBenchmarkingRequest.qubits">qubits</a>
                         </li>
                 </ul>
 
@@ -303,19 +303,6 @@
 </div>
 
 
-                            <div id="CompilationResult.program" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program</span>
-
-        
-    </div>
-    <a class="headerlink" href="#CompilationResult.program"></a>
-    
-            <div class="docstring"><p>The compiled program, as a Quil string.</p>
-</div>
-
-
-                            </div>
                             <div id="CompilationResult.native_quil_metadata" class="classattr">
                                 <div class="attr variable">
             <span class="name">native_quil_metadata</span>
@@ -325,6 +312,19 @@
     <a class="headerlink" href="#CompilationResult.native_quil_metadata"></a>
     
             <div class="docstring"><p>Metadata about the compiled program</p>
+</div>
+
+
+                            </div>
+                            <div id="CompilationResult.program" class="classattr">
+                                <div class="attr variable">
+            <span class="name">program</span>
+
+        
+    </div>
+    <a class="headerlink" href="#CompilationResult.program"></a>
+    
+            <div class="docstring"><p>The compiled program, as a Quil string.</p>
 </div>
 
 
@@ -441,19 +441,6 @@
 </div>
 
 
-                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
-                                <div class="attr variable">
-            <span class="name">pauli</span>
-
-        
-    </div>
-    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
-    
-            <div class="docstring"><p>Description of the encoded Pauli.</p>
-</div>
-
-
-                            </div>
                             <div id="ConjugatePauliByCliffordResponse.phase" class="classattr">
                                 <div class="attr variable">
             <span class="name">phase</span>
@@ -463,6 +450,19 @@
     <a class="headerlink" href="#ConjugatePauliByCliffordResponse.phase"></a>
     
             <div class="docstring"><p>Encoded global phase factor on the emitted Pauli.</p>
+</div>
+
+
+                            </div>
+                            <div id="ConjugatePauliByCliffordResponse.pauli" class="classattr">
+                                <div class="attr variable">
+            <span class="name">pauli</span>
+
+        
+    </div>
+    <a class="headerlink" href="#ConjugatePauliByCliffordResponse.pauli"></a>
+    
+            <div class="docstring"><p>Description of the encoded Pauli.</p>
 </div>
 
 
@@ -522,15 +522,15 @@
 </div>
 
 
-                            <div id="NativeQuilMetadata.gate_volume" class="classattr">
+                            <div id="NativeQuilMetadata.program_duration" class="classattr">
                                 <div class="attr variable">
-            <span class="name">gate_volume</span>
+            <span class="name">program_duration</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_volume"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.program_duration"></a>
     
-            <div class="docstring"><p>Total number of gates in the native Quil program.</p>
+            <div class="docstring"><p>Rough estimate of native quil program length in seconds.</p>
 </div>
 
 
@@ -548,28 +548,54 @@
 
 
                             </div>
-                            <div id="NativeQuilMetadata.program_duration" class="classattr">
+                            <div id="NativeQuilMetadata.program_fidelity" class="classattr">
                                 <div class="attr variable">
-            <span class="name">program_duration</span>
+            <span class="name">program_fidelity</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.program_duration"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.program_fidelity"></a>
     
-            <div class="docstring"><p>Rough estimate of native quil program length in seconds.</p>
+            <div class="docstring"><p>Rough estimate of fidelity of the native Quil program.</p>
 </div>
 
 
                             </div>
-                            <div id="NativeQuilMetadata.gate_depth" class="classattr">
+                            <div id="NativeQuilMetadata.gate_volume" class="classattr">
                                 <div class="attr variable">
-            <span class="name">gate_depth</span>
+            <span class="name">gate_volume</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.gate_depth"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.gate_volume"></a>
     
-            <div class="docstring"><p>Maximum number of successive gates in the native Quil program.</p>
+            <div class="docstring"><p>Total number of gates in the native Quil program.</p>
+</div>
+
+
+                            </div>
+                            <div id="NativeQuilMetadata.multiqubit_gate_depth" class="classattr">
+                                <div class="attr variable">
+            <span class="name">multiqubit_gate_depth</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata.multiqubit_gate_depth"></a>
+    
+            <div class="docstring"><p>Maximum number of two-qubit gates in the native Quil program.</p>
+</div>
+
+
+                            </div>
+                            <div id="NativeQuilMetadata.final_rewiring" class="classattr">
+                                <div class="attr variable">
+            <span class="name">final_rewiring</span>
+
+        
+    </div>
+    <a class="headerlink" href="#NativeQuilMetadata.final_rewiring"></a>
+    
+            <div class="docstring"><p>Output qubit index relabeling due to SWAP insertion.</p>
 </div>
 
 
@@ -588,41 +614,15 @@ protoquil compliant programs.</p>
 
 
                             </div>
-                            <div id="NativeQuilMetadata.final_rewiring" class="classattr">
+                            <div id="NativeQuilMetadata.gate_depth" class="classattr">
                                 <div class="attr variable">
-            <span class="name">final_rewiring</span>
+            <span class="name">gate_depth</span>
 
         
     </div>
-    <a class="headerlink" href="#NativeQuilMetadata.final_rewiring"></a>
+    <a class="headerlink" href="#NativeQuilMetadata.gate_depth"></a>
     
-            <div class="docstring"><p>Output qubit index relabeling due to SWAP insertion.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.multiqubit_gate_depth" class="classattr">
-                                <div class="attr variable">
-            <span class="name">multiqubit_gate_depth</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.multiqubit_gate_depth"></a>
-    
-            <div class="docstring"><p>Maximum number of two-qubit gates in the native Quil program.</p>
-</div>
-
-
-                            </div>
-                            <div id="NativeQuilMetadata.program_fidelity" class="classattr">
-                                <div class="attr variable">
-            <span class="name">program_fidelity</span>
-
-        
-    </div>
-    <a class="headerlink" href="#NativeQuilMetadata.program_fidelity"></a>
-    
-            <div class="docstring"><p>Rough estimate of fidelity of the native Quil program.</p>
+            <div class="docstring"><p>Maximum number of successive gates in the native Quil program.</p>
 </div>
 
 
@@ -642,19 +642,6 @@ protoquil compliant programs.</p>
 </div>
 
 
-                            <div id="PauliTerm.symbols" class="classattr">
-                                <div class="attr variable">
-            <span class="name">symbols</span>
-
-        
-    </div>
-    <a class="headerlink" href="#PauliTerm.symbols"></a>
-    
-            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
-</div>
-
-
-                            </div>
                             <div id="PauliTerm.indices" class="classattr">
                                 <div class="attr variable">
             <span class="name">indices</span>
@@ -664,6 +651,19 @@ protoquil compliant programs.</p>
     <a class="headerlink" href="#PauliTerm.indices"></a>
     
             <div class="docstring"><p>Qubit indices onto which the factors of the Pauli term are applied.</p>
+</div>
+
+
+                            </div>
+                            <div id="PauliTerm.symbols" class="classattr">
+                                <div class="attr variable">
+            <span class="name">symbols</span>
+
+        
+    </div>
+    <a class="headerlink" href="#PauliTerm.symbols"></a>
+    
+            <div class="docstring"><p>Ordered factors of the Pauli term.</p>
 </div>
 
 
@@ -741,28 +741,15 @@ protoquil compliant programs.</p>
 </div>
 
 
-                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
                                 <div class="attr variable">
-            <span class="name">qubits</span>
+            <span class="name">depth</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
     
-            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
-</div>
-
-
-                            </div>
-                            <div id="RandomizedBenchmarkingRequest.seed" class="classattr">
-                                <div class="attr variable">
-            <span class="name">seed</span>
-
-        
-    </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.seed"></a>
-    
-            <div class="docstring"><p>PRNG seed. Set this to guarantee repeatable results.</p>
+            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
 </div>
 
 
@@ -780,6 +767,19 @@ protoquil compliant programs.</p>
 
 
                             </div>
+                            <div id="RandomizedBenchmarkingRequest.seed" class="classattr">
+                                <div class="attr variable">
+            <span class="name">seed</span>
+
+        
+    </div>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.seed"></a>
+    
+            <div class="docstring"><p>PRNG seed. Set this to guarantee repeatable results.</p>
+</div>
+
+
+                            </div>
                             <div id="RandomizedBenchmarkingRequest.gateset" class="classattr">
                                 <div class="attr variable">
             <span class="name">gateset</span>
@@ -793,15 +793,15 @@ protoquil compliant programs.</p>
 
 
                             </div>
-                            <div id="RandomizedBenchmarkingRequest.depth" class="classattr">
+                            <div id="RandomizedBenchmarkingRequest.qubits" class="classattr">
                                 <div class="attr variable">
-            <span class="name">depth</span>
+            <span class="name">qubits</span>
 
         
     </div>
-    <a class="headerlink" href="#RandomizedBenchmarkingRequest.depth"></a>
+    <a class="headerlink" href="#RandomizedBenchmarkingRequest.qubits"></a>
     
-            <div class="docstring"><p>Depth of the benchmarking sequence.</p>
+            <div class="docstring"><p>Number of qubits involved in the benchmarking sequence.</p>
 </div>
 
 
