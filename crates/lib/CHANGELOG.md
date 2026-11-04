@@ -1,3 +1,9 @@
+## 0.31.3 (2026-11-04)
+
+### Fixes
+
+- allow `qcs-api-client-common` 0.27 in `qcs-sdk-python` (#606)
+
 ## 0.31.2 (2026-11-04)
 
 ### Fixes
