@@ -1,3 +1,9 @@
+## 0.31.2 (2026-11-04)
+
+### Fixes
+
+- bump rigetti-pyo3 family; use released quil-rs and qcs-api-client-common (#605)
+
 ## 0.31.1 (2026-10-15)
 
 ### Fixes
