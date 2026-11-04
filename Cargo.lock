@@ -2414,7 +2414,7 @@ version = "5.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51e219e79014df21a225b1860a479e2dcd7cbd9130f4defd4bd0e191ea31d67d"
 dependencies = [
- "base64 0.21.7",
+ "base64 0.22.1",
  "chrono",
  "getrandom 0.2.17",
  "http",
@@ -2650,9 +2650,9 @@ dependencies = [
 
 [[package]]
 name = "optipy"
-version = "0.2.2"
+version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a175ca1709db59997095c070d8a7937b7b1e17d220a7021d33aac0c5f1d33f1c"
+checksum = "c0947ce79c9a883844a6162abf15e30d83d514f26dc184708233ea89f77ee1bc"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3061,7 +3061,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "343d3bd7056eda839b03204e68deff7d1b13aba7af2b2fd16890697274262ee7"
 dependencies = [
  "heck 0.4.1",
- "itertools 0.12.1",
+ "itertools 0.11.0",
  "log",
  "multimap",
  "petgraph 0.8.3",
@@ -3082,7 +3082,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27c6023962132f4b30eb4c172c91ce92d933da334c59c23cddee82358ddafb0b"
 dependencies = [
  "anyhow",
- "itertools 0.12.1",
+ "itertools 0.11.0",
  "proc-macro2",
  "quote",
  "syn 2.0.117",
@@ -3232,9 +3232,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-opentelemetry"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6bda7ec23b6dcfe1274829a8ede269cf4d285e95b23a4f009052e7a71c6d0391"
+checksum = "e297ac2f90616b4bf620a3de3e07256fabc7681b6a71cdc9fca63a830e25a128"
 dependencies = [
  "pyo3",
  "pyo3-opentelemetry-macros",
@@ -3243,9 +3243,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-opentelemetry-macros"
-version = "0.11.1"
+version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d59e36d1ccda42d0e758def2decfdcf4b6fd57a09404e147a285a2a767f9508"
+checksum = "fa4ebf6c035f28ba7d10b43bd1056dde4ac09a342e4a77fe608309fd501f2fa6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3294,9 +3294,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber"
-version = "0.9.2"
+version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7447303555540a84252abac76eb497ec8cf456d6070e867684b4c43b966f417"
+checksum = "f7d010b8ecde546fed235ecd6678e3cc3cb783deac46495271f8c14b5c5fecc0"
 dependencies = [
  "futures-core",
  "pyo3",
@@ -3313,9 +3313,9 @@ dependencies = [
 
 [[package]]
 name = "pyo3-tracing-subscriber-build"
-version = "0.9.2"
+version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03e723e552f2e40a27a661f50be2b407f94a9ae36215b6ffcdf7305b34e84db4"
+checksum = "d9a6cbe2cabcc4869559ecd27ec387d7e8efa95b3c7fce13baa138b3dfc2e11f"
 dependencies = [
  "handlebars",
  "serde",
@@ -3348,7 +3348,7 @@ dependencies = [
  "num",
  "numpy",
  "oauth2-test-server",
- "optipy 0.2.2",
+ "optipy 0.2.3",
  "pastey",
  "pyo3",
  "pyo3-async-runtimes",
@@ -3503,9 +3503,9 @@ dependencies = [
 
 [[package]]
 name = "quil-rs"
-version = "0.37.2"
+version = "0.37.3-beta.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab2279547bc521362a1ed413e1ad379de23d0efc4ae28f427a4184c8c390ee25"
+checksum = "b82ab61b40cf0a2ef9660359c0298826a5a7629ed53bc0a1a7fef426fcc785b9"
 dependencies = [
  "approx",
  "derive-where",
@@ -3519,7 +3519,7 @@ dependencies = [
  "nom_locate",
  "num-complex",
  "once_cell",
- "optipy 0.1.4",
+ "optipy 0.2.3",
  "pastey",
  "petgraph 0.6.5",
  "regex",
@@ -3925,13 +3925,13 @@ dependencies = [
 
 [[package]]
 name = "rigetti-pyo3"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b6cb25f66100ac5f06eb67a38c2080e83508c8aefff7f2af14bdfaaa9c95b1c"
+checksum = "d679679d09a1d341c74d70ae6b35cb858a3ecaa55980f6a7d5b2c37360e28c20"
 dependencies = [
  "indexmap 2.13.0",
  "itertools 0.14.0",
- "optipy 0.2.2",
+ "optipy 0.2.3",
  "pastey",
  "pyo3",
  "pyo3-async-runtimes",
